@@ -7,11 +7,17 @@
   Common functions & declarations for the Namco System 2 driver
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_NAMCOS2_H
+#define MAME_INCLUDES_NAMCOS2_H
+
+#pragma once
 
 #include "machine/namco_c139.h"
 #include "machine/namco_c148.h"
 #include "machine/timer.h"
+#include "sound/c140.h"
 #include "video/c45.h"
+#include "video/namco_c116.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -101,27 +107,30 @@ class namcos2_shared_state : public driver_device
 {
 public:
 	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_dspmaster(*this, "dspmaster"),
-			m_dspslave(*this, "dspslave"),
-			m_gametype(0),
-			m_c68(*this, "c68"),
-			m_master_intc(*this, "master_intc"),
-			m_slave_intc(*this, "slave_intc"),
-			m_sci(*this, "sci"),
-			m_gpu(*this, "gpu"),
-			m_c169_roz_videoram(*this, "rozvideoram", 0),
-			m_c169_roz_gfxbank(0),
-			m_c169_roz_mask(nullptr),
-			m_c355_obj_gfxbank(0),
-			m_c355_obj_palxor(0),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_slave(*this, "slave"),
-			m_mcu(*this, "mcu"),
-			m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_dspmaster(*this, "dspmaster")
+		, m_dspslave(*this, "dspslave")
+		, m_gametype(0)
+		, m_c140(*this, "c140")
+		, m_c68(*this, "c68")
+		, m_c116(*this, "c116")
+		, m_master_intc(*this, "master_intc")
+		, m_slave_intc(*this, "slave_intc")
+		, m_sci(*this, "sci")
+		, m_gpu(*this, "gpu")
+		, m_c169_roz_videoram(*this, "rozvideoram", 0)
+		, m_c169_roz_gfxbank(0)
+		, m_c169_roz_mask(nullptr)
+		, m_c355_obj_gfxbank(0)
+		, m_c355_obj_palxor(0)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_slave(*this, "slave")
+		, m_mcu(*this, "mcu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{ }
 
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
@@ -129,7 +138,9 @@ public:
 	int m_gametype;
 
 protected:
+	optional_device<c140_device> m_c140;
 	optional_device<m37450_device> m_c68;
+	optional_device<namco_c116_device> m_c116;
 	optional_device<namco_c148_device> m_master_intc;
 	optional_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c139_device> m_sci;
@@ -155,12 +166,7 @@ protected:
 	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );
 	DECLARE_WRITE16_MEMBER( c123_tilemap_control_w );
 	DECLARE_READ16_MEMBER( c123_tilemap_control_r );
-	TILE_GET_INFO_MEMBER( get_tile_info0 );
-	TILE_GET_INFO_MEMBER( get_tile_info1 );
-	TILE_GET_INFO_MEMBER( get_tile_info2 );
-	TILE_GET_INFO_MEMBER( get_tile_info3 );
-	TILE_GET_INFO_MEMBER( get_tile_info4 );
-	TILE_GET_INFO_MEMBER( get_tile_info5 );
+	template<int Offset> TILE_GET_INFO_MEMBER( get_tile_info );
 	typedef delegate<void (uint16_t, int*, int*)> c123_tilemap_delegate;
 	void c123_tilemap_init(int gfxbank, void *pMaskROM, c123_tilemap_delegate tilemap_cb);
 	void c123_tilemap_invalidate(void);
@@ -193,33 +199,32 @@ protected:
 	c123_mTilemapInfo m_c123_TilemapInfo;
 
 	// C169 ROZ Layer Emulation
-	void c169_roz_init(int gfxbank, const char *maskregion);
+	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
+	void c169_roz_init(int gfxbank, const char *maskregion, c169_tilemap_delegate tilemap_cb);
 	void c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	DECLARE_READ16_MEMBER( c169_roz_control_r );
 	DECLARE_WRITE16_MEMBER( c169_roz_control_w );
-	DECLARE_READ16_MEMBER( c169_roz_bank_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_bank_w );
 	DECLARE_READ16_MEMBER( c169_roz_videoram_r );
 	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
 
+	c169_tilemap_delegate m_c169_cb;
 	struct roz_parameters
 	{
 		uint32_t left, top, size;
 		uint32_t startx, starty;
 		int incxx, incxy, incyx, incyy;
 		int color, priority;
+		int wrap;
 	};
 	void c169_roz_unpack_params(const uint16_t *source, roz_parameters &params);
 	void c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
 	void c169_roz_draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
 	void c169_roz_get_info(tile_data &tileinfo, int tile_index, int which);
-	TILE_GET_INFO_MEMBER( c169_roz_get_info0 );
-	TILE_GET_INFO_MEMBER( c169_roz_get_info1 );
+	template<int Which> TILE_GET_INFO_MEMBER( c169_roz_get_info );
 	TILEMAP_MAPPER_MEMBER( c169_roz_mapper );
 
 	static const int ROZ_TILEMAP_COUNT = 2;
 	tilemap_t *m_c169_roz_tilemap[ROZ_TILEMAP_COUNT];
-	uint16_t m_c169_roz_bank[0x10/2];
 	uint16_t m_c169_roz_control[0x20/2];
 	optional_shared_ptr<uint16_t> m_c169_roz_videoram;
 	int m_c169_roz_gfxbank;
@@ -273,7 +278,7 @@ protected:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
 	optional_device<cpu_device> m_mcu;
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
@@ -281,16 +286,16 @@ protected:
 class namcos2_state : public namcos2_shared_state
 {
 public:
-	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
-			m_dpram(*this, "dpram"),
-			m_paletteram(*this, "paletteram"),
-			m_spriteram(*this, "spriteram"),
-			m_rozram(*this, "rozram"),
-			m_roz_ctrl(*this, "rozctrl"),
-			m_c45_road(*this, "c45_road")
+	namcos2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_shared_state(mconfig, type, tag),
+		m_dpram(*this, "dpram"),
+		m_spriteram(*this, "spriteram"),
+		m_rozram(*this, "rozram"),
+		m_roz_ctrl(*this, "rozctrl"),
+		m_c45_road(*this, "c45_road")
 	{ }
 
+	void configure_c116_standard(machine_config &config);
 	void configure_c148_standard(machine_config &config);
 	void metlhawk(machine_config &config);
 	void gollygho(machine_config &config);
@@ -298,6 +303,7 @@ public:
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
 	void finallap(machine_config &config);
+	void finalap2(machine_config &config);
 	void luckywld(machine_config &config);
 	void base3(machine_config &config);
 	void sgunner(machine_config &config);
@@ -349,6 +355,7 @@ private:
 
 	virtual void video_start() override;
 	void video_start_finallap();
+	void video_start_finalap2();
 	void video_start_luckywld();
 	void video_start_metlhawk();
 	void video_start_sgunner();
@@ -361,25 +368,21 @@ private:
 
 	TILE_GET_INFO_MEMBER( roz_tile_info );
 
-	DECLARE_READ16_MEMBER( paletteram_word_r );
-	DECLARE_WRITE16_MEMBER( paletteram_word_w );
+	DECLARE_READ8_MEMBER( c116_r );
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
 
 	void draw_sprite_init();
-	void update_palette();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
 	void draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	uint16_t get_palette_register( int which );
 
-	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }
+	int get_pos_irq_scanline() { return (m_c116->get_reg(5) - 32) & 0xff; }
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
-	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_rozram;
 	optional_shared_ptr<uint16_t> m_roz_ctrl;
@@ -400,6 +403,9 @@ private:
 	void GollyGhostUpdateLED_ca( int data );
 	void GollyGhostUpdateDiorama_c0( int data );
 	void TilemapCB(uint16_t code, int *tile, int *mask);
+	void TilemapCB_finalap2(uint16_t code, int *tile, int *mask);
+	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
+	void RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which);
 
 	void c68_default_am(address_map &map);
 	void common_default_am(address_map &map);
@@ -468,3 +474,5 @@ extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 /**************************************************************/
 /* Sound CPU support handlers - 6809                          */
 /**************************************************************/
+
+#endif // MAME_INCLUDES_NAMCOS2_H

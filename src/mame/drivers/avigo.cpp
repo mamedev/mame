@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_SCREEN_VISIBLE_AREA(0, AVIGO_SCREEN_WIDTH-1, 0, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT -1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_avigo)
+	config.set_default_layout(layout_avigo);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_avigo)
 	MCFG_PALETTE_ADD("palette", AVIGO_NUM_COLOURS)

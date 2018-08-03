@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, sitcom_state, update_rxd))
 
 	MCFG_SOFTWARE_LIST_ADD("bitb_list", "sitcom")
-	MCFG_DEFAULT_LAYOUT(layout_sitcom)
+	config.set_default_layout(layout_sitcom);
 MACHINE_CONFIG_END
 
 
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
 	MCFG_DEVICE_ADD("ds2", DL1414T, u32(0)) // remote display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_timer_state, update_ds<2>))
 
-	MCFG_DEFAULT_LAYOUT(layout_sitcomtmr)
+	config.set_default_layout(layout_sitcomtmr);
 MACHINE_CONFIG_END
 
 

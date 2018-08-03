@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(fidel68k_state::fex68k)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(618))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_ex_68k)
+	config.set_default_layout(layout_fidel_ex_68k);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -607,7 +607,7 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(597))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kr)
+	config.set_default_layout(layout_fidel_desdis_68kr);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2325)
 	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 20_MHz_XTAL) // MC68EC020RP25
 	MCFG_DEVICE_PROGRAM_MAP(fdes2325_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kg)
+	config.set_default_layout(layout_fidel_desdis_68kg);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel68k_state::eag)
@@ -638,7 +638,7 @@ MACHINE_CONFIG_START(fidel68k_state::eag)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
+	config.set_default_layout(layout_fidel_eag_68k);
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("1M")

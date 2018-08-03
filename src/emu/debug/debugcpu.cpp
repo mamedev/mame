@@ -25,9 +25,6 @@
 #include "osdepend.h"
 #include "xmlfile.h"
 
-#include <ctype.h>
-#include <fstream>
-
 
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
@@ -152,42 +149,13 @@ symbol_table* debugger_cpu::get_visible_symtable()
 }
 
 
-/*-------------------------------------------------
-    source_script - specifies a debug command
-    script to execute
--------------------------------------------------*/
-
-void debugger_cpu::source_script(const char *file)
-{
-	// close any existing source file
-	m_source_file.reset();
-
-	// open a new one if requested
-	if (file != nullptr)
-	{
-		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
-		if (source_file->fail())
-		{
-			if (m_machine.phase() == machine_phase::RUNNING)
-				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
-			else
-				fatalerror("Cannot open command file '%s'\n", file);
-		}
-		else
-		{
-			m_source_file = std::move(source_file);
-		}
-	}
-}
-
-
 
 //**************************************************************************
 //  MEMORY AND DISASSEMBLY HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  omment_save - save all comments for the given
+//  comment_save - save all comments for the given
 //  machine
 //-------------------------------------------------
 
@@ -638,42 +606,6 @@ void debugger_cpu::reset_transient_flags()
 	for (device_t &device : device_iterator(m_machine.root_device()))
 		device.debug()->reset_transient_flag();
 	m_stop_when_not_device = nullptr;
-}
-
-
-/*-------------------------------------------------
-    process_source_file - executes commands from
-    a source file
--------------------------------------------------*/
-
-void debugger_cpu::process_source_file()
-{
-	std::string buf;
-
-	// loop until the file is exhausted or until we are executing again
-	while (m_execution_state == exec_state::STOPPED
-			&& m_source_file
-			&& std::getline(*m_source_file, buf))
-	{
-		// strip out comments (text after '//')
-		size_t pos = buf.find("//");
-		if (pos != std::string::npos)
-			buf.resize(pos);
-
-		// strip whitespace
-		strtrimrightspace(buf);
-
-		// execute the command
-		if (!buf.empty())
-			m_machine.debugger().console().execute_command(buf, true);
-	}
-
-	if (m_source_file && !m_source_file->good())
-	{
-		if (!m_source_file->eof())
-			m_machine.debugger().console().printf("I/O error, script processing terminated\n");
-		m_source_file.reset();
-	}
 }
 
 
@@ -1401,7 +1333,7 @@ device_debug::device_debug(device_t &device)
 			else
 				m_notifiers.push_back(-1);
 	}
-		
+
 	// set up state-related stuff
 	if (m_state != nullptr)
 	{
@@ -1718,7 +1650,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			}
 
 			// check for commands in the source file
-			machine.debugger().cpu().process_source_file();
+			machine.debugger().console().process_source_file();
 
 			// if an event got scheduled, resume
 			if (machine.scheduled_event_pending())
@@ -2841,9 +2773,9 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	if (end != rend)
 	{
 		if (endian == ENDIANNESS_LITTLE)
-			emask &= make_bitmask<u64>((rend + subamask + 1 - end) * unit_size);
+			emask &= make_bitmask<u64>((subamask + 1 + end - rend) * unit_size);
 		else
-			emask &= ~make_bitmask<u64>((end - rend) * unit_size);
+			emask &= ~make_bitmask<u64>((rend - end) * unit_size);
 	}
 
 	if (rend == (rstart | subamask) || smask == emask)
@@ -2885,9 +2817,9 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
 												 if (m_enabled)
 												 {
-													 if (u32(mode) & u32(read_or_write::READ))
+													 if (u32(mode) & u32(m_type) & u32(read_or_write::READ))
 														 m_phr->remove();
-													 if (u32(mode) & u32(read_or_write::WRITE))
+													 if (u32(mode) & u32(m_type) & u32(read_or_write::WRITE))
 														 m_phw->remove();
 													 install(mode);
 												 }
@@ -2896,6 +2828,10 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 
 device_debug::watchpoint::~watchpoint()
 {
+	if (m_phr)
+		m_phr->remove();
+	if (m_phw)
+		m_phw->remove();
 	m_space.remove_change_notifier(m_notifier);
 }
 

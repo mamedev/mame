@@ -13,7 +13,6 @@
     sprite sync fixes, sprite zoom fixes and others!
 
     Other Issues:
-    - ES5510 DSP isn't hooked up.
     - Various hacks in video core that needs squashing;
     - When playing space invaders dx in original mode, t.t. with overlay, the
       alpha blending effect is wrong (see Taito B version of game)

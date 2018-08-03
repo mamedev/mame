@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_DEVICE_PROGRAM_MAP(mekd2_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_mekd2)
+	config.set_default_layout(layout_mekd2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

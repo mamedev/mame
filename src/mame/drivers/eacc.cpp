@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(eacc_state::eacc)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
 	MCFG_DEVICE_PROGRAM_MAP(eacc_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_eacc)
+	config.set_default_layout(layout_eacc);
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(*this, eacc_state, eacc_keyboard_r))

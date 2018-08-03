@@ -379,21 +379,23 @@ WRITE32_MEMBER( huc6272_device::write )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(huc6272_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSI_RST_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_REQ_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit5))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit4))
-	MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_IO_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
-	MCFG_SCSI_SEL_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
+void huc6272_device::device_add_mconfig(machine_config &config)
+{
+	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
+	scsibus.set_data_input_buffer("scsi_data_in");
+	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
+	scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit5));
+	scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit4));
+	scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
+	scsibus.sel_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
+	output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
+	scsibus.set_output_latch(scsiout);
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", "scsi")
-	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "scsi_ctrl_in");
+	INPUT_BUFFER(config, "scsi_data_in");
 
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
-MACHINE_CONFIG_END
+	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+}

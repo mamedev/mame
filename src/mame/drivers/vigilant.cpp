@@ -507,7 +507,6 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vigilant)
 	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
 
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -516,8 +515,7 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
@@ -567,8 +565,7 @@ MACHINE_CONFIG_START(vigilant_state::buccanrs)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
@@ -625,7 +622,6 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kikcubic)
 	MCFG_PALETTE_ADD("palette", 256)
 
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -634,8 +630,7 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 

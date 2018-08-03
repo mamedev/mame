@@ -77,9 +77,9 @@ public:
 		, m_p_ram(*this, "ram")
 		, m_p_chargen(*this, "chargen")
 	{ }
-	
+
 	void jupiter3(machine_config &config);
-		
+
 	void init_jupiter3();
 
 private:

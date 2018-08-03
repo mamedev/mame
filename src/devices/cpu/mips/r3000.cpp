@@ -14,7 +14,8 @@
 #include "debugger.h"
 
 
-#define ENABLE_OVERFLOWS    0
+#define ENABLE_OVERFLOWS    (0)
+#define ENABLE_IOP_KPUTS    (1)
 
 
 /***************************************************************************
@@ -1076,7 +1077,7 @@ void r3000_device::execute_run()
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
-		/*
+#if ENABLE_IOP_KPUTS
 		if ((m_pc & 0x1fffffff) == 0x00012C48 || (m_pc & 0x1fffffff) == 0x0001420C || (m_pc & 0x1fffffff) == 0x0001430C)
 		{
 			uint32_t ptr = m_r[5];
@@ -1091,7 +1092,7 @@ void r3000_device::execute_run()
 			}
 			fflush(stdout);
 		}
-		*/
+#endif
 
 		// instruction fetch
 		m_op = readop(m_pc);

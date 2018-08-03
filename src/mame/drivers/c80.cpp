@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(c80_state::c80)
 	MCFG_Z80_DAISY_CHAIN(c80_daisy_chain)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_c80 )
+	config.set_default_layout(layout_c80);
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 2500000)

@@ -1633,9 +1633,9 @@ void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pen = m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ((pen & transmask) != transpen)
@@ -4361,36 +4361,35 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_DEVICE_IO_MAP(htengoku_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(htengoku_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	m_bankdev->set_addrmap(0, &ddenlovr_state::htengoku_banked_map);
+	m_bankdev->set_data_width(8);
+	m_bankdev->set_addr_width(20);
+	m_bankdev->set_stride(0x8000);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))  // half of the interleaved layer to write to
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w)) //
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))        // Blitter IRQ Ack
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));  // half of the interleaved layer to write to
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w)); //
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blitter_ack_w));        // Blitter IRQ Ack
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+8, 256-1-8)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_htengoku)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, sprtmtch_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 336-1, 0+8, 256-1-8);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_htengoku));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::sprtmtch_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))

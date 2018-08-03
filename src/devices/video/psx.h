@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 #define PSXGPU_DEBUG_VIEWER ( 0 )
 
 
@@ -50,7 +48,7 @@ DECLARE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device)
 DECLARE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device)
 DECLARE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device)
 
-class psxgpu_device : public device_t, public device_video_interface
+class psxgpu_device : public device_t, public device_video_interface, public device_palette_interface
 {
 public:
 	// configuration helpers
@@ -75,6 +73,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 32*32*32*2; }
 
 	int vramSize;
 
@@ -296,24 +297,23 @@ private:
 	uint16_t p_n_greensubtrans[ MAX_LEVEL * MAX_LEVEL ];
 	uint16_t p_n_bluesubtrans[ MAX_LEVEL * MAX_LEVEL ];
 
-	uint16_t p_n_g0r0[ 0x10000 ];
-	uint16_t p_n_b0[ 0x10000 ];
-	uint16_t p_n_r1[ 0x10000 ];
-	uint16_t p_n_b1g1[ 0x10000 ];
+	uint32_t p_n_g0r0[ 0x10000 ];
+	uint32_t p_n_b0[ 0x10000 ];
+	uint32_t p_n_r1[ 0x10000 ];
+	uint32_t p_n_b1g1[ 0x10000 ];
 
 	devcb_write_line m_vblank_handler;
 
 	void vblank(screen_device &screen, bool vblank_state);
-	DECLARE_PALETTE_INIT( psx );
-	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 #if defined(PSXGPU_DEBUG_VIEWER) && PSXGPU_DEBUG_VIEWER
 	void DebugMeshInit();
 	void DebugMesh( int n_coordx, int n_coordy );
 	void DebugMeshEnd();
 	void DebugCheckKeys();
-	int DebugMeshDisplay( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	int DebugTextureDisplay( bitmap_ind16 &bitmap );
+	int DebugMeshDisplay( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	int DebugTextureDisplay( bitmap_rgb32 &bitmap );
 
 	psx_gpu_debug m_debug;
 #endif

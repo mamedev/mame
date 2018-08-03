@@ -6,8 +6,8 @@
  *
  **************************************************************************/
 
-#ifndef DEVICES_MACHINE_PXA255DEFS
-#define DEVICES_MACHINE_PXA255DEFS
+#ifndef MAME_MACHINE_PXA255DEFS
+#define MAME_MACHINE_PXA255DEFS
 
 #pragma once
 
@@ -376,4 +376,4 @@
 #define PXA255_FIDR1            (PXA255_LCD_BASE_ADDR + 0x00000218)
 #define PXA255_LDCMD1           (PXA255_LCD_BASE_ADDR + 0x0000021c)
 
-#endif // DEVICES_MACHINE_PXA255DEFS
+#endif // MAME_MACHINE_PXA255DEFS

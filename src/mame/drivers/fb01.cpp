@@ -17,7 +17,6 @@
 #include "video/hd44780.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -192,11 +191,10 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_fb01 )
+	config.set_default_layout(layout_fb01);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(fb01_state, fb01)

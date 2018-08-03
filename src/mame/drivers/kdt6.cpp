@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEFAULT_LAYOUT(layout_kdt6)
+	config.set_default_layout(layout_kdt6);
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(13'516'800) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -638,38 +638,37 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1000) // frequency unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beeper, 1000); // frequency unknown
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, kdt6_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, kdt6_state, memory_r))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, kdt6_state, memory_w))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, kdt6_state, io_r))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, kdt6_state, io_w))
+	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
+	m_dma->out_busreq_callback().set(FUNC(kdt6_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set(FUNC(kdt6_state::memory_r));
+	m_dma->out_mreq_callback().set(FUNC(kdt6_state::memory_w));
+	m_dma->in_iorq_callback().set(FUNC(kdt6_state::io_r));
+	m_dma->out_iorq_callback().set(FUNC(kdt6_state::io_w));
 
 	// jumper J3 allows selection of 16MHz / 8 instead
 	clock_device &uart_clk(CLOCK(config, "uart_clk", XTAL(9'830'400) / 8));
 	uart_clk.signal_handler().set("ctc1", FUNC(z80ctc_device::trg1));
 	uart_clk.signal_handler().append("ctc1", FUNC(z80ctc_device::trg2));
 
-	z80ctc_device &ctc1(Z80CTC(config, "ctc1", XTAL(16'000'000) / 4));
+	z80ctc_device &ctc1(Z80CTC(config, "ctc1", 16_MHz_XTAL / 4));
 	ctc1.intr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	ctc1.zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	ctc1.zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxca_w));
 	ctc1.zc_callback<2>().append(m_sio, FUNC(z80sio_device::txca_w));
 
-	z80ctc_device &ctc2(Z80CTC(config, "ctc2", XTAL(16'000'000) / 4));
+	z80ctc_device &ctc2(Z80CTC(config, "ctc2", 16_MHz_XTAL / 4));
 	ctc2.intr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	ctc2.zc_callback<0>().set("speaker", FUNC(speaker_sound_device::level_w));
 	ctc2.zc_callback<2>().set("ctc2", FUNC(z80ctc_device::trg3));
 
-	Z80SIO(config, m_sio, XTAL(16'000'000) / 4);
+	Z80SIO(config, m_sio, 16_MHz_XTAL / 4);
 	m_sio->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_sio->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
@@ -690,20 +689,20 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	m_rs232b->dsr_handler().set(m_sio, FUNC(z80sio_device::syncb_w));
 	m_rs232b->cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w)).invert();
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kdt6_state, pio_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	z80pio_device &pio(Z80PIO(config, "pio", 16_MHz_XTAL / 4));
+	pio.out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	pio.out_pa_callback().set(FUNC(kdt6_state::pio_porta_w));
+	pio.in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
+	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("pio", z80pio_device, pa2_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("pio", z80pio_device, pa3_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("pio", z80pio_device, pa4_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("pio", z80pio_device, pa5_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->fault_handler().set("pio", FUNC(z80pio_device::pa2_w));
+	m_centronics->perror_handler().set("pio", FUNC(z80pio_device::pa3_w));
+	m_centronics->busy_handler().set("pio", FUNC(z80pio_device::pa4_w));
+	m_centronics->select_handler().set("pio", FUNC(z80pio_device::pa5_w));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_UPD1990A_ADD("rtc", XTAL(32'768), NOOP, NOOP)

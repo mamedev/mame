@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(novagf8_state::delta1)
 	MCFG_F3853_EXT_INPUT_CB(novagf8_state, f3853_interrupt)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_delta1)
+	config.set_default_layout(layout_novag_delta1);
 MACHINE_CONFIG_END
 
 

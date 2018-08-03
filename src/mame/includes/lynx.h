@@ -14,6 +14,7 @@
 #include "screen.h"
 #include "audio/lynx.h"
 #include "imagedev/snapquik.h"
+#include "machine/bankdev.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -37,7 +38,11 @@ public:
 		m_sound(*this, "custom"),
 		m_cart(*this, "cartslot"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_bank_fc00(*this, "bank_fc00"),
+		m_bank_fd00(*this, "bank_fd00"),
+		m_bank_fe00(*this, "bank_fe00"),
+		m_bank_fffa(*this, "bank_fffa")
 	{ }
 
 	void lynx(machine_config &config);
@@ -141,10 +146,13 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<address_map_bank_device> m_bank_fc00;
+	required_device<address_map_bank_device> m_bank_fd00;
+	required_memory_bank m_bank_fe00;
+	required_memory_bank m_bank_fffa;
 	uint16_t m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;
-	uint32_t m_lynx_palette[0x10];
 	int m_rotate;
 	uint8_t m_memory_config;
 
@@ -154,12 +162,14 @@ private:
 	UART m_uart;
 	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
 
-	bitmap_ind16 m_bitmap;
-	bitmap_ind16 m_bitmap_temp;
+	bitmap_rgb32 m_bitmap;
+	bitmap_rgb32 m_bitmap_temp;
 
 	void lynx_mem(address_map &map);
+	void lynx_fc00_mem(address_map &map);
+	void lynx_fd00_mem(address_map &map);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(suzy_read);
 	DECLARE_WRITE8_MEMBER(suzy_write);
@@ -173,7 +183,6 @@ private:
 	void lynx_multiply();
 	uint8_t lynx_timer_read(int which, int offset);
 	void lynx_timer_write(int which, int offset, uint8_t data);
-	DECLARE_PALETTE_INIT(lynx);
 	void sound_cb();
 	TIMER_CALLBACK_MEMBER(lynx_blitter_timer);
 	TIMER_CALLBACK_MEMBER(lynx_timer_shot);

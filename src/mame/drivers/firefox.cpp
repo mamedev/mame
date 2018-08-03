@@ -251,14 +251,14 @@ void firefox_state::video_start()
 {
 	m_bgtiles = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firefox_state::bgtile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	m_bgtiles->set_transparent_pen(0);
-	m_bgtiles->set_scrolldy(m_screen->visible_area().min_y, 0);
+	m_bgtiles->set_scrolldy(m_screen->visible_area().top(), 0);
 }
 
 
 uint32_t firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int sprite;
-	int gfxtop = screen.visible_area().min_y;
+	int gfxtop = screen.visible_area().top();
 
 	bitmap.fill(m_palette->pen_color(256), cliprect);
 
@@ -698,8 +698,8 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram_1c")
-	MCFG_X2212_ADD_AUTOSAVE("nvram_1d")
+	X2212(config, "nvram_1c").set_auto_save(true);
+	X2212(config, "nvram_1d").set_auto_save(true);
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_XTAL/8)
 	MCFG_RIOT6532_IN_PA_CB(READ8(*this, firefox_state, riot_porta_r))

@@ -779,11 +779,11 @@ MACHINE_CONFIG_START(ace_state::ace)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SP0256(config, m_sp0256, XTAL(3'000'000));
+	m_sp0256->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_CASSETTE_ADD("cassette")

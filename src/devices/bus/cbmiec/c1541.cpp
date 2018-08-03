@@ -751,16 +751,6 @@ WRITE_LINE_MEMBER( c1541_device_base::byte_w )
 
 
 //-------------------------------------------------
-//  SLOT_INTERFACE( c1540_floppies )
-//-------------------------------------------------
-
-static void c1540_floppies(device_slot_interface &device)
-{
-	device.option_add("525ssqd", ALPS_3255190X);
-}
-
-
-//-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
@@ -815,72 +805,79 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c1541_device_base::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
-	MCFG_DEVICE_PROGRAM_MAP(c1541_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+void c1541_device_base::device_add_mconfig(machine_config &config)
+{
+	M6502(config, m_maincpu, XTAL(16'000'000)/16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_device_base::c1541_mem);
+	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
 
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL(16'000'000)/16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1541_device_base, via0_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1541_device_base, via0_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1541_device_base, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1541_device_base, via0_pb_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, c1541_device_base, via0_ca2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1541_device_base, via0_irq_w))
+	VIA6522(config, m_via0, XTAL(16'000'000)/16);
+	m_via0->readpa_handler().set(FUNC(c1541_device_base::via0_pa_r));
+	m_via0->readpb_handler().set(FUNC(c1541_device_base::via0_pb_r));
+	m_via0->writepa_handler().set(FUNC(c1541_device_base::via0_pa_w));
+	m_via0->writepb_handler().set(FUNC(c1541_device_base::via0_pb_w));
+	m_via0->cb2_handler().set(FUNC(c1541_device_base::via0_ca2_w));
+	m_via0->irq_handler().set(FUNC(c1541_device_base::via0_irq_w));
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL(16'000'000)/16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1541_device_base, via1_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1541_device_base, via1_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, soe_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1541_device_base, via1_irq_w))
+	VIA6522(config, m_via1, XTAL(16'000'000)/16);
+	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
+	m_via1->readpb_handler().set(FUNC(c1541_device_base::via1_pb_r));
+	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
+	m_via1->writepb_handler().set(FUNC(c1541_device_base::via1_pb_w));
+	m_via1->ca2_handler().set(C64H156_TAG, FUNC(c64h156_device::soe_w));
+	m_via1->cb2_handler().set(C64H156_TAG, FUNC(c64h156_device::oe_w));
+	m_via1->irq_handler().set(FUNC(c1541_device_base::via1_irq_w));
 
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
-	MCFG_64H156_ATN_CALLBACK(WRITELINE(*this, c1541_device_base, atn_w))
-	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1541_device_base, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_device_base::floppy_formats)
-MACHINE_CONFIG_END
+	C64H156(config, m_ga, XTAL(16'000'000));
+	m_ga->atn_callback().set(FUNC(c1541_device_base::atn_w));
+	m_ga->byte_callback().set(FUNC(c1541_device_base::byte_w));
+
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	connector.option_add("525ssqd", ALPS_3255190X);
+	connector.set_default_option("525ssqd");
+	connector.set_fixed(true);
+	connector.set_formats(c1541_device_base::floppy_formats);
+}
 
 
-MACHINE_CONFIG_START(c1541c_device::device_add_mconfig)
+void c1541c_device::device_add_mconfig(machine_config &config)
+{
 	c1541_device_base::device_add_mconfig(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(c1541_dolphin_dos_device::device_add_mconfig)
+void c1541_dolphin_dos_device::device_add_mconfig(machine_config &config)
+{
+	c1541_device_base::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_dolphin_dos_device::c1541dd_mem);
+}
+
+
+void c1541_professional_dos_v1_device::device_add_mconfig(machine_config &config)
+{
+	c1541_device_base::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_professional_dos_v1_device::c1541pd_mem);
+}
+
+
+void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &config)
+{
 	c1541_device_base::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY(M6502_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(c1541dd_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_prologic_dos_classic_device::c1541pdc_mem);
 
+	PIA6821(config, m_pia, 0);
+	m_pia->readpb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_r));
+	m_pia->writepa_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pa_w));
+	m_pia->writepb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_w));
+	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
 
-MACHINE_CONFIG_START(c1541_professional_dos_v1_device::device_add_mconfig)
-	c1541_device_base::device_add_mconfig(config);
+	centronics_device &centronics(CENTRONICS(config, CENTRONICS_TAG, centronics_devices, "printer"));
+	centronics.ack_handler().set(MC6821_TAG, FUNC(pia6821_device::ca1_w));
 
-	MCFG_DEVICE_MODIFY(M6502_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(c1541pd_mem)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(c1541_prologic_dos_classic_device::device_add_mconfig)
-	c1541_device_base::device_add_mconfig(config);
-
-	MCFG_DEVICE_MODIFY(M6502_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(c1541pdc_mem)
-
-	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, c1541_prologic_dos_classic_device, pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, c1541_prologic_dos_classic_device, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, c1541_prologic_dos_classic_device, pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(MC6821_TAG, pia6821_device, ca1_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
-MACHINE_CONFIG_END
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out", 0));
+	centronics.set_output_latch(cent_data_out);
+}
 
 
 //-------------------------------------------------

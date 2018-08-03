@@ -30863,7 +30863,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="spider-man 2 (europe) (en,fr,de,es).bin" size="16777216" crc="821838bc" sha1="042CBC4C7F720A4B0C9A2CB3E77B2339DB346A1E" offset="000000" />
+				<rom name="spider-man 2 (europe) (en,fr,de,es).bin" size="16777216" crc="821838bc" sha1="042cbc4c7f720a4b0c9a2cb3e77b2339db346a1e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33991,7 +33991,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="tiger woods prg tour golf (europe) (en,fr,de,es,it).bin" size="8388608" crc="38934732" sha1="9D77F693C141D97A9E659997744C50087BF1FE4F" offset="000000" />
+				<rom name="tiger woods prg tour golf (europe) (en,fr,de,es,it).bin" size="8388608" crc="38934732" sha1="9d77f693c141d97a9e659997744c50087bf1fe4f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

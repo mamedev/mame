@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "emu.h"
-
 
 #define HPMLC_R1_OB     0x10
 

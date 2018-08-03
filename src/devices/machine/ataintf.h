@@ -26,7 +26,7 @@ class ata_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	device_ata_interface *dev() { return m_dev; }
 
@@ -82,6 +82,12 @@ public:
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dmarq_handler(Object &&cb) { return m_dmarq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dasp_handler(Object &&cb) { return m_dasp_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto dmarq_handler() { return m_dmarq_handler.bind(); }
+	auto dasp_handler() { return m_dasp_handler.bind(); }
+
+	ata_slot_device &slot(int index);
+	virtual void set_default_ata_devices(const char* _master, const char* _slave);
 
 	uint16_t read_dma();
 	void write_dma(uint16_t data);
@@ -103,6 +109,14 @@ protected:
 	virtual void set_dmarq(int state);
 	virtual void set_dasp(int state);
 
+	enum : size_t
+	{
+		SLOT_MASTER,
+		SLOT_SLAVE,
+
+		SLOT_COUNT
+	};
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(irq0_write_line);
 	DECLARE_WRITE_LINE_MEMBER(dmarq0_write_line);
@@ -114,11 +128,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dasp1_write_line);
 	DECLARE_WRITE_LINE_MEMBER(pdiag1_write_line);
 
-	ata_slot_device *m_slot[2];
-	int m_irq[2];
-	int m_dmarq[2];
-	int m_dasp[2];
-	int m_pdiag[2];
+	required_device_array<ata_slot_device, SLOT_COUNT> m_slot;
+	int m_irq[SLOT_COUNT];
+	int m_dmarq[SLOT_COUNT];
+	int m_dasp[SLOT_COUNT];
+	int m_pdiag[SLOT_COUNT];
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_dmarq_handler;

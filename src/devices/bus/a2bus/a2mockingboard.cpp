@@ -182,12 +182,12 @@ uint8_t a2bus_ayboard_device::read_cnxx(uint8_t offset)
 		{
 			if (viaSel & 1)
 			{
-				retVal |= m_via1->read(machine().dummy_space(), offset & 0xf);
+				retVal |= m_via1->read(offset & 0xf);
 			}
 
 			if (viaSel & 2)
 			{
-				retVal |= m_via2->read(machine().dummy_space(), offset & 0xf);
+				retVal |= m_via2->read(offset & 0xf);
 			}
 		}
 
@@ -197,11 +197,11 @@ uint8_t a2bus_ayboard_device::read_cnxx(uint8_t offset)
 	{
 		if (offset <= 0x10)
 		{
-			return m_via1->read(machine().dummy_space(), offset & 0xf);
+			return m_via1->read(offset & 0xf);
 		}
 		else if (offset >= 0x80 && offset <= 0x90)
 		{
-			return m_via2->read(machine().dummy_space(), offset & 0xf);
+			return m_via2->read(offset & 0xf);
 		}
 	}
 
@@ -231,11 +231,11 @@ void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 
 			if (viaSel & 1)
 			{
-				m_via1->write(machine().dummy_space(), offset&0xf, data);
+				m_via1->write(offset&0xf, data);
 			}
 			if (viaSel & 2)
 			{
-				m_via2->write(machine().dummy_space(), offset&0xf, data);
+				m_via2->write(offset&0xf, data);
 			}
 		}
 	}
@@ -243,11 +243,11 @@ void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 	{
 		if (offset <= 0x10)
 		{
-			m_via1->write(machine().dummy_space(), offset & 0xf, data);
+			m_via1->write(offset & 0xf, data);
 		}
 		else if (offset >= 0x80 && offset <= 0x90)
 		{
-			m_via2->write(machine().dummy_space(), offset & 0xf, data);
+			m_via2->write(offset & 0xf, data);
 		}
 		else
 		{

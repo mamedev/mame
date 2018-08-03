@@ -32,6 +32,7 @@ public:
 	{ }
 
 	void twincobr(machine_config &config);
+	void twincobrw(machine_config &config);
 	void fsharkbt(machine_config &config);
 	void fshark(machine_config &config);
 

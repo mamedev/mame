@@ -47,9 +47,4 @@
 			<bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" />
 		</screen>
 	</view>
-	<view name="LCD Only">
-		<screen index="0">
-			<bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" />
-		</screen>
-	</view>
 </mamelayout>

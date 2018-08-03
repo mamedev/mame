@@ -92,7 +92,7 @@ void DeviceInformationWindow::fill_device_information()
 
 void DeviceInformationWindow::set_device(const char *tag)
 {
-	m_device = m_machine->device(tag);
+	m_device = m_machine->root_device().subdevice(tag);
 	if(!m_device)
 		m_device = &m_machine->root_device();
 	fill_device_information();

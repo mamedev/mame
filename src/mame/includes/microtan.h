@@ -17,8 +17,11 @@
 #ifndef MAME_INCLUDES_MICROTAN_H
 #define MAME_INCLUDES_MICROTAN_H
 
+#pragma once
+
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
+#include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "imagedev/cassette.h"
 
@@ -29,6 +32,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_irq_line(*this, "irq_line"),
 		m_cassette(*this, "cassette"),
 		m_via6522(*this, "via6522%u", 0),
 		m_ay8910(*this, "ay8910%u", 0),
@@ -41,20 +45,23 @@ public:
 	void init_microtan();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
 	enum
 	{
 		TIMER_READ_CASSETTE,
 		TIMER_PULSE_NMI
 	};
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	enum { IRQ_VIA_0, IRQ_VIA_1, IRQ_KBD };
+
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_irq_line;
 	required_device<cassette_image_device> m_cassette;
 	required_device_array<via6522_device, 2> m_via6522;
 	required_device_array<ay8910_device, 2> m_ay8910;
@@ -67,8 +74,6 @@ private:
 	uint8_t m_keyboard_ascii;
 	emu_timer *m_read_cassette_timer;
 	emu_timer *m_pulse_nmi_timer;
-	int m_via_irq_line[2];
-	int m_kbd_irq_line;
 	uint8_t m_keyrows[10];
 	int m_lastrow;
 	int m_mask;
@@ -96,10 +101,7 @@ private:
 	DECLARE_WRITE8_MEMBER(via_1_out_b);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(via_0_irq);
-	DECLARE_WRITE_LINE_MEMBER(via_1_irq);
 	uint8_t read_dsw();
-	void set_irq_line();
 	void store_key(int key);
 	image_verify_result verify_snapshot(uint8_t *data, int size);
 	image_init_result parse_intel_hex(uint8_t *snapshot_buff, char *src);

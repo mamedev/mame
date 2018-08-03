@@ -68,7 +68,7 @@ public:
 		m_8n5(0),
 		m_400_460(0)
 	{ }
-	
+
 	void mk83(machine_config &config);
 	void xerox820(machine_config &config);
 
@@ -81,7 +81,6 @@ public:
 	DECLARE_READ8_MEMBER( kbpio_pa_r );
 	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
 	DECLARE_READ8_MEMBER( kbpio_pb_r );
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 

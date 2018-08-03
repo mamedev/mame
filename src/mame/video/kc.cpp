@@ -148,9 +148,8 @@ void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t c
 
 void kc85_4_state::video_start()
 {
-	m_video_ram = machine().memory().region_alloc("videoram", (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2), 1, ENDIANNESS_LITTLE)->base();
-	memset(m_video_ram, 0, (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
-	m_display_video_ram = m_video_ram;
+	m_video_ram = make_unique_clear<uint8_t[]>((KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
+	m_display_video_ram = &m_video_ram[0];
 
 	m_kc85_blink_state = 0;
 }
@@ -159,9 +158,9 @@ void kc85_4_state::video_control_w(int data)
 {
 	/* calculate address of video ram to display */
 	if (data & 1)
-		m_display_video_ram = m_video_ram + (KC85_4_SCREEN_PIXEL_RAM_SIZE + KC85_4_SCREEN_COLOUR_RAM_SIZE);
+		m_display_video_ram = &m_video_ram[KC85_4_SCREEN_PIXEL_RAM_SIZE + KC85_4_SCREEN_COLOUR_RAM_SIZE];
 	else
-		m_display_video_ram = m_video_ram;
+		m_display_video_ram = &m_video_ram[0];
 
 	m_high_resolution = (data & 0x08) ? 0 : 1;
 }
@@ -194,8 +193,7 @@ uint32_t kc85_4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void kc_state::video_start()
 {
-	m_video_ram = machine().memory().region_alloc("videoram", 0x4000, 1, ENDIANNESS_LITTLE)->base();
-	memset(m_video_ram, 0, 0x4000);
+	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
 
 	m_kc85_blink_state = 0;
 }
@@ -203,8 +201,8 @@ void kc_state::video_start()
 uint32_t kc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* colour ram takes up 0x02800 bytes */
-	uint8_t *pixel_ram = m_video_ram;
-	uint8_t *colour_ram = m_video_ram + 0x02800;
+	uint8_t *pixel_ram = &m_video_ram[0];
+	uint8_t *colour_ram = &m_video_ram[0x2800];
 
 	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
 	{

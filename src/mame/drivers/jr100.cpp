@@ -130,7 +130,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 			m_beeper->set_clock(894886.25 / (double)(m_t1latch) / 2.0);
 		}
 	}
-	m_via->write(space,offset,data);
+	m_via->write(offset,data);
 }
 
 void jr100_state::jr100_mem(address_map &map)

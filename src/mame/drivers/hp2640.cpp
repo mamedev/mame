@@ -984,7 +984,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_SCREEN_UPDATE_DRIVER(hp2645_state , screen_update)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp2645_state, scanline_timer, "screen", 0, 1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
-	MCFG_DEFAULT_LAYOUT(layout_hp2640)
+	config.set_default_layout(layout_hp2640);
 
 	// RS232
 	MCFG_DEVICE_ADD("rs232" , RS232_PORT, default_rs232_devices , nullptr)

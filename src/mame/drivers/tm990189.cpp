@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
 
 	/* Video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tm990189)
+	config.set_default_layout(layout_tm990189);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -890,7 +890,7 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
-	MCFG_DEFAULT_LAYOUT(layout_tm990189v)
+	config.set_default_layout(layout_tm990189v);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

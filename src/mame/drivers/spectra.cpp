@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(spectra_state::spectra)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_spectra)
+	config.set_default_layout(layout_spectra);
 
 	/* Sound */
 	genpin_audio(config);

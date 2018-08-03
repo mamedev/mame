@@ -3212,7 +3212,7 @@ void rainbow_state::upd7220_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(rainbow_state::rainbow)
-	MCFG_DEFAULT_LAYOUT(layout_rainbow)
+	config.set_default_layout(layout_rainbow);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8088, 24.0734_MHz_XTAL / 5) // approximately 4.815 MHz
@@ -3306,9 +3306,9 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-	MCFG_DEVICE_ADD("dbrg", COM8116_003, 24.0734_MHz_XTAL / 4) // 6.01835 MHz (nominally 6 MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, rainbow_state, dbrg_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, rainbow_state, dbrg_ft_w))
+	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
+	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
+	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 24.0734_MHz_XTAL / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))
@@ -3342,10 +3342,10 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("prtbrg", RIPPLE_COUNTER, 24.0734_MHz_XTAL / 6 / 13) // 74LS393 at E17 (both halves)
+	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)
 	// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
-	MCFG_RIPPLE_COUNTER_STAGES(8)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, rainbow_state, bitrate_counter_w))
+	prtbrg.set_stages(8);
+	prtbrg.count_out_cb().set(FUNC(rainbow_state::bitrate_counter_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 

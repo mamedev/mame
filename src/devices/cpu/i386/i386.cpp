@@ -273,7 +273,7 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		{
 			if( !m_performed_intersegment_jump )
 				m_sreg[segment].base |= 0xfff00000;
-			if(m_cpu_version < 0x5000)
+			if(m_cpu_version < 0x500)
 				m_sreg[segment].flags = 0x93;
 		}
 	}
@@ -335,6 +335,7 @@ uint32_t i386_device::get_flags() const
 
 void i386_device::set_flags(uint32_t f )
 {
+	f &= m_eflags_mask;
 	m_CF = (f & 0x1) ? 1 : 0;
 	m_PF = (f & 0x4) ? 1 : 0;
 	m_AF = (f & 0x10) ? 1 : 0;
@@ -353,7 +354,7 @@ void i386_device::set_flags(uint32_t f )
 	m_VIF = (f & 0x80000) ? 1 : 0;
 	m_VIP = (f & 0x100000) ? 1 : 0;
 	m_ID = (f & 0x200000) ? 1 : 0;
-	m_eflags = f & m_eflags_mask;
+	m_eflags = f;
 }
 
 void i386_device::sib_byte(uint8_t mod, uint32_t* out_ea, uint8_t* out_segment)

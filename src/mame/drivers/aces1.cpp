@@ -474,7 +474,7 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, aces1_state, ic37_read_b)) // meters, extra lamp select
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, aces1_state, ic37_read_c)) // reel write, extra lamp strobe
 
-	MCFG_DEFAULT_LAYOUT(layout_aces1)
+	config.set_default_layout(layout_aces1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

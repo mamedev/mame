@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/nscsi_bus.h"
+#include "imagedev/chd_cd.h"
 #include "cdrom.h"
 
 class nscsi_cdrom_device : public nscsi_full_device
@@ -30,6 +31,7 @@ private:
 	cdrom_file *cdrom;
 	uint32_t bytes_per_block;
 	int lba, cur_sector;
+	required_device<cdrom_image_device> image;
 
 	void return_no_cd();
 };

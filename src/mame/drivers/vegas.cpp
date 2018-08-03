@@ -1770,9 +1770,9 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
 
-	MCFG_DEVICE_ADD(m_timekeeper, M48T37, 0)
-	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, vegas_state, watchdog_reset))
-	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, vegas_state, watchdog_irq))
+	M48T37(config, m_timekeeper);
+	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
+	m_timekeeper->irq_cb().set(FUNC(vegas_state::watchdog_irq));
 
 	MCFG_SMC91C94_ADD(m_ethernet)
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ethernet_interrupt))

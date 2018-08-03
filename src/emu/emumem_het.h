@@ -8,7 +8,7 @@
 template<int Width, int AddrShift, int Endian> class handler_entry_read_tap : public handler_entry_read_passthrough<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_read_passthrough<Width, AddrShift, Endian>;
 
 	handler_entry_read_tap(address_space *space, memory_passthrough_handler &mph, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap) : handler_entry_read_passthrough<Width, AddrShift, Endian>(space, mph), m_name(name), m_tap(std::move(tap)) {}
@@ -30,7 +30,7 @@ protected:
 template<int Width, int AddrShift, int Endian> class handler_entry_write_tap : public handler_entry_write_passthrough<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_write_passthrough<Width, AddrShift, Endian>;
 
 	handler_entry_write_tap(address_space *space, memory_passthrough_handler &mph, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap) : handler_entry_write_passthrough<Width, AddrShift, Endian>(space, mph), m_name(name), m_tap(std::move(tap)) {}

@@ -1047,7 +1047,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_DEVICE_ADD("ppi8255", AMS40489_PPI, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))
@@ -1091,6 +1091,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("cpc_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 
@@ -1098,6 +1099,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpcplus_exp_cards, nullptr, false)
@@ -1125,7 +1127,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_DEVICE_ADD("ppi8255", AMS40489_PPI, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))

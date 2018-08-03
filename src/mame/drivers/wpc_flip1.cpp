@@ -164,26 +164,25 @@ MACHINE_CONFIG_START(wpc_flip1_state::wpc_flip1)
 	MCFG_DEVICE_PROGRAM_MAP(wpc_flip1_map)
 
 	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_dot_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_dot_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_dot_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_dot_state,wpc_sound_data_r),WRITE8(*this, wpc_dot_state,wpc_sound_data_w))
-	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_dot_state,wpc_dmdbank_w))
+	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_flip1_state,wpc_irq_w))
+	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_flip1_state,wpc_firq_w))
+	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_flip1_state,wpc_rombank_w))
+	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_flip1_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_flip1_state,wpc_sound_ctrl_w))
+	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_flip1_state,wpc_sound_data_r),WRITE8(*this, wpc_flip1_state,wpc_sound_data_w))
+	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_flip1_state,wpc_dmdbank_w))
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
 	MCFG_WPC_ROM_REGION("sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_dot_state,wpcsnd_reply_w))
+	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_flip1_state,wpcsnd_reply_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(wpc_dot_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_native_aspect();
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 128-1, 0, 32-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(wpc_flip1_state::screen_update));
 MACHINE_CONFIG_END
 
 /*-----------------

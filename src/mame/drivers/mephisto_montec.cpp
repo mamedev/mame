@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::montec)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_montec)
+	config.set_default_layout(layout_mephisto_montec);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::monteciv)
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_megaiv)
+	config.set_default_layout(layout_mephisto_megaiv);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
+	config.set_default_layout(layout_mephisto_mondial2);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::smondial)
@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_smondial2)
+	config.set_default_layout(layout_mephisto_smondial2);
 MACHINE_CONFIG_END
 
 

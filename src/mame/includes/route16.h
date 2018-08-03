@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+#ifndef MAME_INCLUDES_ROUTE16_H
+#define MAME_INCLUDES_ROUTE16_H
+
+#pragma once
+
 #include "sound/sn76477.h"
 #include "emupal.h"
 
@@ -16,7 +21,7 @@ public:
 		, m_videoram2(*this, "videoram2")
 		, m_palette(*this, "palette")
 		, m_protection_data(0)
-		{}
+	{}
 
 	void routex(machine_config &config);
 	void ttmahjng(machine_config &config);
@@ -71,5 +76,6 @@ private:
 	uint8_t m_palette_2;
 
 	virtual void video_start() override;
-
 };
+
+#endif // MAME_INCLUDES_ROUTE16_H

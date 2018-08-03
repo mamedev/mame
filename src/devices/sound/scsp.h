@@ -38,6 +38,9 @@ public:
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_exts_callback(Object &&cb) { return m_exts_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto main_irq_cb() { return m_main_irq_cb.bind(); }
+	auto exts_cb() { return m_exts_cb.bind(); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );

@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 
-	MCFG_DEFAULT_LAYOUT(layout_bfmsys85)
+	config.set_default_layout(layout_bfmsys85);
 MACHINE_CONFIG_END
 
 // input ports for system85 board /////////////////////////////////////////

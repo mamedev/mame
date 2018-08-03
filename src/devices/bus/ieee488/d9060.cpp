@@ -105,16 +105,12 @@ const tiny_rom_entry *d9060_device_base::device_rom_region() const
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( d9060_main_mem )
-//-------------------------------------------------
-
-void d9060_device_base::d9060_main_mem(address_map &map)
+void d9060_device_base::main_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x0100).m(M6532_0_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x0100).m(M6532_1_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0200, 0x021f).mirror(0x0d60).m(M6532_0_TAG, FUNC(mos6532_new_device::io_map));
-	map(0x0280, 0x029f).mirror(0x0d60).m(M6532_1_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x0100).m(m_riot0, FUNC(mos6532_new_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x0100).m(m_riot1, FUNC(mos6532_new_device::ram_map));
+	map(0x0200, 0x021f).mirror(0x0d60).m(m_riot0, FUNC(mos6532_new_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0d60).m(m_riot1, FUNC(mos6532_new_device::io_map));
 	map(0x1000, 0x13ff).mirror(0x0c00).ram().share("share1");
 	map(0x2000, 0x23ff).mirror(0x0c00).ram().share("share2");
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().share("share3");
@@ -123,15 +119,11 @@ void d9060_device_base::d9060_main_mem(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( d9060_hdc_mem )
-//-------------------------------------------------
-
-void d9060_device_base::d9060_hdc_mem(address_map &map)
+void d9060_device_base::hdc_mem(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x007f).mirror(0x300).ram();
-	map(0x0080, 0x008f).mirror(0x370).rw(M6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0080, 0x008f).mirror(0x370).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x0400, 0x07ff).ram().share("share1");
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");
@@ -370,52 +362,54 @@ WRITE8_MEMBER( d9060_device_base::scsi_data_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(d9060_device_base::device_add_mconfig)
+void d9060_device_base::device_add_mconfig(machine_config &config)
+{
 	// DOS
-	MCFG_DEVICE_ADD(M6502_DOS_TAG, M6502, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(d9060_main_mem)
+	M6502(config, m_maincpu, XTAL(4'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &d9060_device::main_mem);
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, d9060_device_base, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, d9060_device_base, dio_w))
+	MOS6532_NEW(config, m_riot0, XTAL(4'000'000)/4);
+	m_riot0->pa_rd_callback().set(FUNC(d9060_device_base::dio_r));
+	m_riot0->pb_wr_callback().set(FUNC(d9060_device_base::dio_w));
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, d9060_device_base, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, d9060_device_base, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, d9060_device_base, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, d9060_device_base, riot1_pb_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_DOS_TAG, INPUT_LINE_IRQ0))
+	MOS6532_NEW(config, m_riot1, XTAL(4'000'000)/4);
+	m_riot1->pa_rd_callback().set(FUNC(d9060_device_base::riot1_pa_r));
+	m_riot1->pa_wr_callback().set(FUNC(d9060_device_base::riot1_pa_w));
+	m_riot1->pb_rd_callback().set(FUNC(d9060_device_base::riot1_pb_r));
+	m_riot1->pb_wr_callback().set(FUNC(d9060_device_base::riot1_pb_w));
+	m_riot1->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// controller
-	MCFG_DEVICE_ADD(M6502_HDC_TAG, M6502, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(d9060_hdc_mem)
+	M6502(config, m_hdccpu, XTAL(4'000'000)/4);
+	m_hdccpu->set_addrmap(AS_PROGRAM, &d9060_device::hdc_mem);
 
-	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL(4'000'000)/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, d9060_device_base, scsi_data_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, d9060_device_base, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, d9060_device_base, ack_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, d9060_device_base, enable_w))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_HDC_TAG, M6502_IRQ_LINE))
+	VIA6522(config, m_via, XTAL(4'000'000)/4);
+	m_via->writepa_handler().set(FUNC(d9060_device_base::scsi_data_w));
+	m_via->writepb_handler().set(FUNC(d9060_device_base::via_pb_w));
+	m_via->ca2_handler().set(FUNC(d9060_device_base::ack_w));
+	m_via->cb2_handler().set(FUNC(d9060_device_base::enable_w));
+	m_via->irq_handler().set_inputline(m_hdccpu, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_REQ_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_ca1))
-	MCFG_SCSI_CD_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pb2))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pb3))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pb6))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pb7))
-	MCFG_SCSI_DATA0_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa0))
-	MCFG_SCSI_DATA1_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa1))
-	MCFG_SCSI_DATA2_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa2))
-	MCFG_SCSI_DATA3_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa3))
-	MCFG_SCSI_DATA4_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa4))
-	MCFG_SCSI_DATA5_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa5))
-	MCFG_SCSI_DATA6_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa6))
-	MCFG_SCSI_DATA7_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa7))
+	SCSI_PORT(config, m_sasibus);
+	m_sasibus->req_handler().set(M6522_TAG, FUNC(via6522_device::write_ca1));
+	m_sasibus->cd_handler().set(M6522_TAG, FUNC(via6522_device::write_pb2));
+	m_sasibus->bsy_handler().set(M6522_TAG, FUNC(via6522_device::write_pb3));
+	m_sasibus->io_handler().set(M6522_TAG, FUNC(via6522_device::write_pb6));
+	m_sasibus->msg_handler().set(M6522_TAG, FUNC(via6522_device::write_pb7));
+	m_sasibus->data0_handler().set(M6522_TAG, FUNC(via6522_device::write_pa0));
+	m_sasibus->data1_handler().set(M6522_TAG, FUNC(via6522_device::write_pa1));
+	m_sasibus->data2_handler().set(M6522_TAG, FUNC(via6522_device::write_pa2));
+	m_sasibus->data3_handler().set(M6522_TAG, FUNC(via6522_device::write_pa3));
+	m_sasibus->data4_handler().set(M6522_TAG, FUNC(via6522_device::write_pa4));
+	m_sasibus->data5_handler().set(M6522_TAG, FUNC(via6522_device::write_pa5));
+	m_sasibus->data6_handler().set(M6522_TAG, FUNC(via6522_device::write_pa6));
+	m_sasibus->data7_handler().set(M6522_TAG, FUNC(via6522_device::write_pa7));
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
+	OUTPUT_LATCH(config, m_sasi_data_out);
+	m_sasibus->set_output_latch(*m_sasi_data_out);
 
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", D9060HD, SCSI_ID_0)
-MACHINE_CONFIG_END
+	m_sasibus->set_slot_device(1, "harddisk", D9060HD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+}
 
 
 //-------------------------------------------------

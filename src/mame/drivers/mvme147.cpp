@@ -197,7 +197,7 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 		, m_sccterm2(*this, "scc2")
 	{
 	}
-	
+
 	void mvme147(machine_config &config);
 
 private:

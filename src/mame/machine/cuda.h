@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_MACHINE_CUDA_H
+#define MAME_MACHINE_CUDA_H
 
-#ifndef __CUDA_H__
-#define __CUDA_H__
+#pragma once
 
 
 //**************************************************************************
@@ -100,6 +100,10 @@ public:
 	template <class Object> devcb_base &set_linechange_cb(Object &&wr) { return write_linechange.set_callback(std::forward<Object>(wr)); }
 	template <class Object> devcb_base &set_via_clock_cb(Object &&wr) { return write_via_clock.set_callback(std::forward<Object>(wr)); }
 	template <class Object> devcb_base &set_via_data_cb(Object &&wr) { return write_via_data.set_callback(std::forward<Object>(wr)); }
+	auto reset_callback() { return write_reset.bind(); }
+	auto linechange_callback() { return write_linechange.bind(); }
+	auto via_clock_callback() { return write_via_clock.bind(); }
+	auto via_data_callback() { return write_via_data.bind(); }
 
 	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
 
@@ -138,4 +142,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CUDA, cuda_device)
 
-#endif
+#endif // MAME_MACHINE_CUDA_H

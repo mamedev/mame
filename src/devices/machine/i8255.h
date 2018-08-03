@@ -74,7 +74,7 @@ class i8255_device : public device_t
 {
 public:
 	// construction/destruction
-	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
@@ -107,9 +107,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc6_w );
 
 protected:
+	i8255_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_ams40489);
+
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	const bool m_force_portb_in;
+	const bool m_force_portc_out;
+	const bool m_dont_clear_output_latches;
 
 private:
 	inline void check_interrupt(int port);
@@ -158,9 +165,17 @@ private:
 	int m_intr[2];              // interrupt
 };
 
+// AMS40489 ASIC (Amstrad Plus/GX4000 PPI implementation)
+class ams40489_ppi_device : public i8255_device
+{
+public:
+	// construction/destruction
+	ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8255, i8255_device)
 DECLARE_DEVICE_TYPE(I8255A, i8255_device)
+DECLARE_DEVICE_TYPE(AMS40489_PPI, ams40489_ppi_device)
 
 #endif // MAME_MACHINE_I8255_H

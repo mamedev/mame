@@ -531,9 +531,14 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 
 //  SPEAKER(config, "lspeaker").front_left();
 //  SPEAKER(config, "rspeaker").front_right();
-//  MCFG_DEVICE_ADD("aica", AICA, 0)
+
+//  MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block // 33.8688MHz on Board
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-//  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+
+//  MCFG_DEVICE_ADD("aica_pcb", AICA, (XTAL(33'868'800)*2)/3) // AICA PCB
+//  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 
@@ -547,10 +552,13 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr23400" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-23400.ic94",   0x000000, 0x200000, CRC(3d557104) SHA1(d39879f5a1acbd54ad8ee4fbd412f870c9ff4aa5) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "epr21904" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "Development / prototype" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "prot_bot.ic94",    0x000000, 0x200000, CRC(7cbf2fb6) SHA1(7384e3c9314add7d61f93c9edd9fb7788d08f423) )
 // bios 0 is SAMURAI boot rom 0.96 / 2000/8/10
 // bios 1 is SAMURAI boot rom 0.92 / 1999/7/2
 // bios 2 is SAMURAI boot rom 0.84 / 1999/7/22
+// bios 3 is SAMURAI boot rom 0.74 / 1999/5/01 Development version, have options to change country, SCSI ID, boot into debugger mode (will wait for commands from host via SCSI).
 
 
 ROM_START( hikaru )

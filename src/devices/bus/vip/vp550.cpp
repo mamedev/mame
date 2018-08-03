@@ -136,9 +136,9 @@ void vp550_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 //  vip_sc_w - status code write
 //-------------------------------------------------
 
-void vp550_device::vip_sc_w(int data)
+void vp550_device::vip_sc_w(int n, int sc)
 {
-	if (BIT(data, 1))
+	if (BIT(sc, 1))
 	{
 		if (LOG) logerror("VP550 '%s' Clear Interrupt\n", tag());
 

@@ -40,13 +40,11 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 	m_scc1(*this, AM85C30_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_io_system(*this, ":SYSTEM"),
-	m_io_in1(*this, ":IN1"),
-	m_io_sw5(*this, ":SW5"),
-	m_io_trackx(*this, ":TRACKX1"),
-	m_io_tracky(*this, ":TRACKY1"),
-	m_io_gunx(*this, ":GUNX1"),
-	m_io_guny(*this, ":GUNY1"),
+	m_in_cb{ { *this },{ *this },{ *this } },
+	m_trackx_cb(*this),
+	m_tracky_cb(*this),
+	m_gunx_cb(*this),
+	m_guny_cb(*this),
 	m_version(0),
 	m_seq_init(0)
 {
@@ -101,6 +99,16 @@ void iteagle_fpga_device::device_start()
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
 	m_timer = timer_alloc(0, nullptr);
+
+	// Switch IO
+	for (unsigned i = 0; i < IO_NUM; i++)
+		m_in_cb[i].resolve_safe(0xffff);
+	// Track IO
+	m_trackx_cb.resolve_safe(0xff);
+	m_tracky_cb.resolve_safe(0xff);
+	// Gun IO
+	m_gunx_cb.resolve_safe(0xffff);
+	m_guny_cb.resolve_safe(0xffff);
 
 	// Save states
 	save_item(NAME(m_fpga_regs));
@@ -218,8 +226,8 @@ WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)
 		if (1 || (m_fpga_regs[0x14 / 4] & 0x01)) {
 			// Set the gun timer to first fire
 			const rectangle &visarea = m_screen->visible_area();
-			m_gun_x = m_io_gunx->read() * (visarea.width() - 14) / 512;
-			m_gun_y = m_io_guny->read() * visarea.height() / 512;
+			m_gun_x = m_gunx_cb(0) * (visarea.width() - 14) / 512;
+			m_gun_y = m_guny_cb(0) * visarea.height() / 512;
 			m_timer->adjust(attotime::zero);
 			//m_timer->adjust(m_screen->time_until_pos(std::max(0, m_gun_y - BEAM_DY), std::max(0, m_gun_x - BEAM_DX)));
 			//printf("w: %d h: %d x: %d y: %d\n", visarea.width(), visarea.height(), m_gun_x, m_gun_y);
@@ -254,23 +262,22 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 
 	switch (offset) {
 		case 0x00/4:
-			result = ((m_io_system->read()&0xffff)<<16) | (m_io_in1->read()&0xffff);
+			result = (m_in_cb[IO_SYSTEM](0) << 16) | (m_in_cb[IO_IN1](0));
 			if (LOG_FPGA && m_prev_reg!=offset)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x04/4:
-			result = (result & 0xFF0FFFFF) | ((m_io_sw5->read()&0xf)<<20);
+			result = (result & 0xFF0FFFFF) | ((m_in_cb[IO_SW5](0) & 0xf) << 20);
 			if (0 && LOG_FPGA && !ACCESSING_BITS_0_7)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x08/4:
-			result = ((m_io_tracky->read()&0xff)<<8) | (m_io_trackx->read()&0xff);
+			result = (m_tracky_cb(0) << 8) | m_trackx_cb(0);
 			if (LOG_FPGA && m_prev_reg!=offset)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x14/4: // GUN1-- Interrupt & 0x4==0x00080000
-			//result = ((machine().root_device().ioport("GUNY1")->read())<<16) | (machine().root_device().ioport("GUNX1")->read());
-			result = (m_gun_y << 16) | (m_gun_x << 0);
+			result = (m_guny_cb(0) << 16) | (m_gunx_cb(0) << 0);
 			if (LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;

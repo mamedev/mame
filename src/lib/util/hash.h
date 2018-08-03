@@ -10,10 +10,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_UTIL_HASH_H
+#define MAME_UTIL_HASH_H
 
-#ifndef __HASH_H__
-#define __HASH_H__
+#pragma once
 
 #include "hashing.h"
 
@@ -119,4 +119,4 @@ private:
 
 } // namespace util
 
-#endif  /* __HASH_H__ */
+#endif // MAME_UTIL_HASH_H

@@ -43,7 +43,7 @@ public:
 
 	void patapata(machine_config &config);
 
-private:
+protected:
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
@@ -55,6 +55,7 @@ private:
 	void main_map(address_map &map);
 	virtual void video_start() override;
 
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;

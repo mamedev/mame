@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_atari_s1)
+	config.set_default_layout(layout_atari_s1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi", atari_s1_state, nmi, attotime::from_hz(NMI_INT))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s1_state, timer_s, attotime::from_hz(AUDIO_CLK))

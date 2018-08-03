@@ -898,7 +898,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ibm6580_state, vblank_w))
-	MCFG_DEFAULT_LAYOUT(layout_ibm6580)
+	config.set_default_layout(layout_ibm6580);
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(ibm6580_state, ibm6580)

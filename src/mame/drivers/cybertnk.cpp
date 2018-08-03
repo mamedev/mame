@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -696,8 +696,8 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 
 /* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_FRAME_CB(thomson_state, to7_network_got_frame)
+	MC6854(config, m_mc6854);
+	m_mc6854->set_out_frame_callback(FUNC(thomson_state::to7_network_got_frame));
 
 
 /* pia */
@@ -1485,6 +1485,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(thomson_state::to9)
 	to7(config);
+
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
@@ -1502,8 +1503,8 @@ MACHINE_CONFIG_START(thomson_state::to9)
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9_timer_port_out))
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1723,8 +1724,8 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to8_timer_port_out))
@@ -1890,8 +1891,8 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9p_timer_port_out))
@@ -2249,8 +2250,8 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_game_cb2_out))
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -2518,11 +2519,11 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_DEVICE_REMOVE("cartslot")

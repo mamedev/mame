@@ -387,6 +387,7 @@ public:
 	template <unsigned N, class Object> devcb_base &set_out_rxdrq_callback(Object &&cb) { return m_out_rxdrq_cb[N].set_callback(std::forward<Object>(cb)); }
 	template <unsigned N, class Object> devcb_base &set_out_txdrq_callback(Object &&cb) { return m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
 
 	void set_cputag(const char *tag) { m_cputag = tag; }
 
