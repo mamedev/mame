@@ -62,8 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_output_1_w);
 	DECLARE_WRITE8_MEMBER(sw2_output_0_w);
 	DECLARE_WRITE8_MEMBER(sw2_output_1_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_0_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_1_w);
+	template<int Which> DECLARE_WRITE_LINE_MEMBER(display_enable_w);
 	DECLARE_WRITE8_MEMBER(tilebank_external_w);
 
 protected:
@@ -102,24 +101,16 @@ protected:
 	DECLARE_WRITE16_MEMBER(jleague_protection_w);
 	DECLARE_READ16_MEMBER(arescue_dsp_r);
 	DECLARE_WRITE16_MEMBER(arescue_dsp_w);
-	DECLARE_READ16_MEMBER(system32_paletteram_r);
-	DECLARE_WRITE16_MEMBER(system32_paletteram_w);
-	DECLARE_READ32_MEMBER(multi32_paletteram_0_r);
-	DECLARE_WRITE32_MEMBER(multi32_paletteram_0_w);
-	DECLARE_READ32_MEMBER(multi32_paletteram_1_r);
-	DECLARE_WRITE32_MEMBER(multi32_paletteram_1_w);
-	DECLARE_READ16_MEMBER(system32_videoram_r);
-	DECLARE_WRITE16_MEMBER(system32_videoram_w);
+	template<int Which> DECLARE_READ16_MEMBER(paletteram_r);
+	template<int Which> DECLARE_WRITE16_MEMBER(paletteram_w);
+	DECLARE_READ16_MEMBER(videoram_r);
+	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(sprite_control_r);
 	DECLARE_WRITE8_MEMBER(sprite_control_w);
-	DECLARE_READ16_MEMBER(system32_spriteram_r);
-	DECLARE_WRITE16_MEMBER(system32_spriteram_w);
-	DECLARE_READ32_MEMBER(multi32_spriteram_r);
-	DECLARE_WRITE32_MEMBER(multi32_spriteram_w);
-	DECLARE_READ16_MEMBER(system32_mixer_r);
-	DECLARE_WRITE16_MEMBER(system32_mixer_w);
-	DECLARE_WRITE32_MEMBER(multi32_mixer_0_w);
-	DECLARE_WRITE32_MEMBER(multi32_mixer_1_w);
+	DECLARE_READ16_MEMBER(spriteram_r);
+	DECLARE_WRITE16_MEMBER(spriteram_w);
+	template<int Which> DECLARE_READ16_MEMBER(mixer_r);
+	template<int Which> DECLARE_WRITE16_MEMBER(mixer_w);
 	DECLARE_READ8_MEMBER(int_control_r);
 	DECLARE_WRITE8_MEMBER(int_control_w);
 
@@ -147,8 +138,6 @@ protected:
 	inline uint16_t xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value);
 	inline uint16_t xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value);
 	inline void update_color(int offset, uint16_t data);
-	inline uint16_t common_paletteram_r(address_space &space, int which, offs_t offset);
-	void common_paletteram_w(address_space &space, int which, offs_t offset, uint16_t data, uint16_t mem_mask);
 	tilemap_t *find_cache_entry(int page, int bank);
 	inline void get_tilemaps(int bgnum, tilemap_t **tilemaps);
 	uint8_t update_tilemaps(screen_device &screen, const rectangle &cliprect);
@@ -218,9 +207,9 @@ protected:
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
-	required_shared_ptr<uint16_t> m_system32_videoram;
-	required_shared_ptr<uint16_t> m_system32_spriteram;
-	optional_shared_ptr_array<uint16_t, 2> m_system32_paletteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
