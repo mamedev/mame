@@ -35,6 +35,28 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
+
+	// DSP ROM sample map
+	enum {
+		DATA_PAN_TAB		= 0x110,
+		STATE_INIT1			= 0x288,
+		STATE_INIT2			= 0x61a,
+		STATE_REFRESH1		= 0x039,
+		STATE_REFRESH2		= 0x04f,
+		STATE_NORMAL1		= 0x314,
+		STATE_NORMAL2 		= 0x6b2,
+		DATA_ADPCM_TAB		= 0x9dc,
+		DATA_FILTER_TAB		= 0xd53,	// dual filter mode, 5 tables * 95 taps each
+		DATA_FILTER_TAB2	= 0xf2e		// overlapping data (95+15+95)
+	};
+
+	const uint16_t PAN_TABLE_DRY = 0;
+	const uint16_t PAN_TABLE_WET = 98;
+	const uint16_t PAN_TABLE_CH_OFFSET = 196;
+	const uint16_t FILTER_ENTRY_SIZE = 95;
+	const uint16_t DELAY_BASE_OFFSET = 0x554;
+	const uint16_t DELAY_BASE_OFFSET2 = 0x53c;
+
 	struct qsound_voice {
 		uint16_t bank;
 		int16_t addr; // top word is the sample address
@@ -61,7 +83,7 @@ private:
 	struct qsound_fir {
 		int tap_count;	// usually 95
 		int delay_pos;
-		int16_t table_pos;
+		uint16_t table_pos;
 		int16_t taps[95];
 		int16_t delay_line[95];
 	};
@@ -87,14 +109,10 @@ private:
 
 	// MAME resources
 	sound_stream *m_stream;
+	required_region_ptr<uint16_t> m_dsp_rom;
 
 	uint16_t m_data_latch;
 	int16_t m_out[2];
-
-	int16_t m_pan_tables[2][2][98];
-	int16_t m_adpcm_shift[24];
-	uint16_t m_filter_data[5][95];
-	uint16_t m_filter_data2[209]; // Overlapping data (95+19+95)
 
 	qsound_voice m_voice[16];
 	qsound_adpcm m_adpcm[3];
@@ -120,6 +138,8 @@ private:
 
 	uint16_t *register_map[256];
 
+	inline uint16_t read_dsp_rom(uint16_t addr) { return m_dsp_rom[addr&0xfff]; }
+
 	void write_data(uint8_t addr, uint16_t data);
 	uint16_t read_data(uint8_t addr);
 
@@ -134,7 +154,6 @@ private:
 
 	// sub functions
 	inline int16_t get_sample(uint16_t bank,uint16_t address);
-	inline int16_t* get_filter_table(uint16_t offset);
 
 	inline int16_t pcm_update(struct qsound_voice *v, int32_t *echo_out);
 	inline void adpcm_update(int voice_no, int nibble);

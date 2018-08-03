@@ -27,26 +27,11 @@ DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")
 
 // DSP internal ROM region
 ROM_START( qsound_hle )
-	ROM_REGION( 0x2000, "dsp", 0 )
+	ROM_REGION16_LE( 0x2000, "dsp", 0 )
 	// removing WORD_SWAP from original definition
 	ROM_LOAD16_WORD( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
 	ROM_IGNORE( 0x4000 )
 ROM_END
-
-// DSP states
-enum {
-	STATE_INIT1		= 0x288,
-	STATE_INIT2		= 0x61a,
-	STATE_REFRESH1	= 0x039,
-	STATE_REFRESH2	= 0x04f,
-	STATE_NORMAL1	= 0x314,
-	STATE_NORMAL2 	= 0x6b2,
-};
-
-enum {
-	PANTBL_DRY		= 0,
-	PANTBL_WET		= 1,
-};
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -61,6 +46,7 @@ qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 24)
 	, m_stream(nullptr)
+	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)
 {
 }
@@ -81,13 +67,6 @@ void qsound_hle_device::rom_bank_updated()
 void qsound_hle_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
-
-	// copy tables from the DSP rom
-	uint16_t *dsp_rom = (uint16_t*)memregion("dsp")->base();
-	memcpy(m_pan_tables, &dsp_rom[0x110], sizeof(m_pan_tables));
-	memcpy(m_adpcm_shift, &dsp_rom[0x9dc], sizeof(m_adpcm_shift));
-	memcpy(m_filter_data, &dsp_rom[0xd53], sizeof(m_filter_data));
-	memcpy(m_filter_data2, &dsp_rom[0xf2e], sizeof(m_filter_data2));
 
 	init_register_map();
 
@@ -311,20 +290,6 @@ int16_t qsound_hle_device::get_sample(uint16_t bank,uint16_t address)
 	return (int16_t)(sample_data << 8);	// bit0-7 is tied to ground
 }
 
-int16_t* qsound_hle_device::get_filter_table(uint16_t offset)
-{
-	int index;
-
-	if (offset >= 0xf2e && offset < 0xfff)
-		return (int16_t*)&m_filter_data2[offset-0xf2e];	// overlapping filter data
-
-	index = (offset-0xd53)/95;
-	if(index >= 0 && index < 5)
-		return (int16_t*)&m_filter_data[index];	// normal tables
-
-	return NULL;	// no filter found.
-}
-
 /********************************************************************/
 
 // updates one DSP sample
@@ -374,7 +339,7 @@ void qsound_hle_device::state_init()
 
 	for(int i=0;i<19;i++)
 	{
-		m_voice_pan[i] = 0x120;
+		m_voice_pan[i] = DATA_PAN_TAB + 0x10;
 		m_voice_output[i] = 0;
 	}
 
@@ -390,9 +355,9 @@ void qsound_hle_device::state_init()
 		m_dry[0].delay = 46;
 		m_wet[1].delay = 0;
 		m_dry[1].delay = 48;
-		m_filter[0].table_pos = 0xdb2;
-		m_filter[1].table_pos = 0xe11;
-		m_echo.end_pos = 0x554 + 6;
+		m_filter[0].table_pos = DATA_FILTER_TAB + (FILTER_ENTRY_SIZE*1);
+		m_filter[1].table_pos = DATA_FILTER_TAB + (FILTER_ENTRY_SIZE*2);
+		m_echo.end_pos = DELAY_BASE_OFFSET + 6;
 		m_next_state = STATE_REFRESH1;
 	}
 	else
@@ -406,7 +371,7 @@ void qsound_hle_device::state_init()
 		m_filter[1].table_pos = 0xfa4;
 		m_alt_filter[0].table_pos = 0xf73;
 		m_alt_filter[1].table_pos = 0xfa4;
-		m_echo.end_pos = 0x53c + 6;
+		m_echo.end_pos = DELAY_BASE_OFFSET2 + 6;
 		m_next_state = STATE_REFRESH2;
 	}
 
@@ -423,16 +388,13 @@ void qsound_hle_device::state_init()
 // Updates filter parameters for mode 1
 void qsound_hle_device::state_refresh_filter_1()
 {
-	const int16_t *table;
-
 	for(int ch=0; ch<2; ch++)
 	{
 		m_filter[ch].delay_pos = 0;
 		m_filter[ch].tap_count = 95;
 
-		table = get_filter_table(m_filter[ch].table_pos);
-		if (table != NULL)
-			memcpy(m_filter[ch].taps, table, 95 * sizeof(int16_t));
+		for(int i=0; i<95; i++)
+			m_filter[ch].taps[i] = read_dsp_rom(m_filter[ch].table_pos + i);
 	}
 
 	m_state = m_next_state = STATE_NORMAL1;
@@ -441,23 +403,19 @@ void qsound_hle_device::state_refresh_filter_1()
 // Updates filter parameters for mode 2
 void qsound_hle_device::state_refresh_filter_2()
 {
-	const int16_t *table;
-
 	for(int ch=0; ch<2; ch++)
 	{
 		m_filter[ch].delay_pos = 0;
 		m_filter[ch].tap_count = 45;
 
-		table = get_filter_table(m_filter[ch].table_pos);
-		if (table != NULL)
-			memcpy(m_filter[ch].taps, table, 45 * sizeof(int16_t));
+		for(int i=0; i<45; i++)
+			m_filter[ch].taps[i] = (int16_t) read_dsp_rom(m_filter[ch].table_pos + i);
 
 		m_alt_filter[ch].delay_pos = 0;
 		m_alt_filter[ch].tap_count = 44;
 
-		table = get_filter_table(m_filter[ch].table_pos);
-		if (table != NULL)
-			memcpy(m_alt_filter[ch].taps, table, 44 * sizeof(int16_t));
+		for(int i=0; i<44; i++)
+			m_alt_filter[ch].taps[i] = (int16_t) read_dsp_rom(m_filter[ch].table_pos + i);
 	}
 
 	m_state = m_next_state = STATE_NORMAL2;
@@ -535,7 +493,7 @@ void qsound_hle_device::adpcm_update(int voice_no, int nibble)
 
 	m_voice_output[16+voice_no] = (delta * v->cur_vol)>>16;
 
-	v->step_size = (m_adpcm_shift[8+step] * v->step_size) >> 6;
+	v->step_size = (read_dsp_rom(DATA_ADPCM_TAB + 8 + step) * v->step_size) >> 6;
 	v->step_size = CLAMP(v->step_size, 1, 2000);
 }
 
@@ -568,9 +526,9 @@ void qsound_hle_device::state_normal_update()
 
 	// recalculate echo length
 	if(m_state == STATE_NORMAL2)
-		m_echo.length = m_echo.end_pos - 0x53c;
+		m_echo.length = m_echo.end_pos - DELAY_BASE_OFFSET2;
 	else
-		m_echo.length = m_echo.end_pos - 0x554;
+		m_echo.length = m_echo.end_pos - DELAY_BASE_OFFSET;
 
 	m_echo.length = CLAMP(m_echo.length, 0, 1024);
 
@@ -594,13 +552,11 @@ void qsound_hle_device::state_normal_update()
 
 		for(int i=0; i<19; i++)
 		{
-			uint16_t pan_index = m_voice_pan[i]-0x110;
-			if(pan_index > 97)
-				pan_index = 97;
+			uint16_t pan_index = m_voice_pan[i] + (ch * PAN_TABLE_CH_OFFSET);
 
 			// Apply different volume tables on the dry and wet inputs.
-			dry -= (m_voice_output[i] * m_pan_tables[ch][PANTBL_DRY][pan_index])<<2;
-			wet -= (m_voice_output[i] * m_pan_tables[ch][PANTBL_WET][pan_index])<<2;
+			dry -= (m_voice_output[i] * (int16_t) read_dsp_rom(pan_index + PAN_TABLE_DRY))<<2;
+			wet -= (m_voice_output[i] * (int16_t) read_dsp_rom(pan_index + PAN_TABLE_WET))<<2;
 		}
 
 		// Apply FIR filter on 'wet' input
