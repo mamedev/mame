@@ -75,7 +75,7 @@ READ8_MEMBER(lw700i_state::pb_r)
 		return 0;
 	}
 
-	return 0xffff;
+	return 0xff;
 }
 
 WRITE8_MEMBER(lw700i_state::pb_w)
