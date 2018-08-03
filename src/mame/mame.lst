@@ -8890,6 +8890,9 @@ blueprntj                       // (c) 1982 Jaleco (Zilec in ROM 3U, and the pro
 grasspin                        // (c) 1983 Jaleco (Zilec / Ashby programmer names in sound rom)
 saturnzi                        // (c) 1983 Jaleco (Zilec in ROM R6, and the programmer names)
 
+@source:blw700i.cpp
+blw700i                         // (c) 1995 Brother
+
 @source:bmcbowl.cpp
 bmcbowl                         // (c) 1994 BMC
 
