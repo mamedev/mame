@@ -42,12 +42,12 @@ offs_t cosmac_disassembler::long_branch(offs_t &pc, const data_buffer &params)
 
 offs_t cosmac_disassembler::short_skip(offs_t pc)
 {
-	return pc + 2;
+	return pc + 1;
 }
 
 offs_t cosmac_disassembler::long_skip(offs_t pc)
 {
-	return pc + 3;
+	return pc + 2;
 }
 
 
@@ -152,7 +152,8 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	// CDP1802
 	case 0x31: CDP1802_OPCODE("BQ %04X", short_branch(base_pc, pc, params)); break;
 	case 0x39: CDP1802_OPCODE("BNQ %04X", short_branch(base_pc, pc, params)); break;
-	case 0x60: CDP1802_OPCODE("IRX"); break;
+	case 0x60: util::stream_format(stream, m_variant < TYPE_1802 ? "OUT 0" : "IRX"); break;
+	case 0x68: util::stream_format(stream, m_variant < TYPE_1802 ? "INP 0" : "illegal"); break;
 	case 0x72: CDP1802_OPCODE("LDXA"); break;
 	case 0x73: CDP1802_OPCODE("STXD"); break;
 	case 0x74: CDP1802_OPCODE("ADC"); break;

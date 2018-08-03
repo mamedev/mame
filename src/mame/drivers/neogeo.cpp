@@ -452,6 +452,48 @@
     Apollo69 10/19/99
 
 
+
+    Edge connector pinout:
+    ======================
+
+    Kindly submitted by Apollo69 (apollo69@columbus.rr.com)
+    =================================================================
+                  MVS                            JAMMA
+    =================================================================
+           GND = A |  1 = GND              GND = A |  1 = GND
+           GND = B |  2 = GND              GND = B |  2 = GND
+           +5V = C |  3 = +5V              +5V = C |  3 = +5V
+           +5V = D |  4 = +5V              +5V = D |  4 = +5V
+           N/C = E |  5 = N/C                    E |  5
+          +12V = F |  6 = +12V            +12V = F |  6 = +12V
+           key = H |  7 = key              key = H |  7 = key
+     counter 2 = J |  8 = counter 1  counter 2 = J |  8 = counter 1
+     lockout 2 = K |  9 = lockout 1  lockout 2 = K |  9 = lockout 1
+     L speaker = L | 10 = R speaker   speaker- = L | 10 = speaker+
+          test = M | 11 = audio+     audio GND = M | 11
+         green = N | 12 = red            green = N | 12 = red
+          sync = P | 13 = blue            sync = P | 13 = blue
+       service = R | 14 = video GND    service = R | 14 = video GND
+     coin 4 2P = S | 15 = coin 3 1P              S | 15 = test
+     coin 2 2P = T | 16 = coin 1 1P  coin 2 2P = T | 16 = coin 1 1P
+      2P start = U | 17 = 1P start    2P start = U | 17 = 1P start
+         2P up = V | 18 = 1P up          2P up = V | 18 = 1P up
+       2P down = W | 19 = 1P down      2P down = W | 19 = 1P down
+       2P left = X | 20 = 1P left      2P left = X | 20 = 1P left
+      2P right = Y | 21 = 1P right    2P right = Y | 21 = 1P right
+          2P A = Z | 22 = 1P A            2P A = Z | 22 = 1P A
+          2P B = a | 23 = 1P B            2P B = a | 23 = 1P B
+          2P C = b | 24 = 1P C            2P C = b | 24 = 1P C
+          2P D = c | 25 = 1P D            2P D = c | 25 = 1P D
+      sel down = d | 26 = sel up                 d | 26 = data input
+           GND = e | 27 = GND              GND = e | 27 = GND
+           GND = f | 28 = GND              GND = f | 28 = GND
+
+    Later JAMMA systems drop coin lockouts and audio ground.
+    Some JAMMA systems omit data input switch.
+
+
+
 *****************************************************************************
 
     Watchdog:
@@ -1909,7 +1951,7 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, neogeo_base_state, set_palette_bank))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_neogeo)
+	config.set_default_layout(layout_neogeo);
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
@@ -2456,7 +2498,7 @@ MACHINE_CONFIG_START(mvs_state::irrmaze)
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "irrmaze", true)
 
-	MCFG_DEFAULT_LAYOUT(layout_irrmaze)
+	config.set_default_layout(layout_irrmaze);
 
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
 MACHINE_CONFIG_END

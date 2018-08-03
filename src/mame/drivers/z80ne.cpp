@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("z80ne_cass")
 
-	MCFG_DEFAULT_LAYOUT(layout_z80ne)
+	config.set_default_layout(layout_z80ne);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_DEFAULT_LAYOUT(layout_z80net)
+	config.set_default_layout(layout_z80net);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_DEFAULT_LAYOUT(layout_z80netb)
+	config.set_default_layout(layout_z80netb);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
 
-	MCFG_DEFAULT_LAYOUT(layout_z80netf)
+	config.set_default_layout(layout_z80netf);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

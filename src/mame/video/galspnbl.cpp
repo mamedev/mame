@@ -38,12 +38,12 @@ VIDEO_START_MEMBER(galspnbl_state,galspnbl)
 
 void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *dd = &bitmap.pix16(y);
 		uint16_t *sd2 = &m_sprite_bitmap.pix16(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t sprpixel = (sd2[x]);
 			//uint16_t sprpri = (sprpixel >> 8) & 3;

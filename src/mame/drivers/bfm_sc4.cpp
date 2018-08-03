@@ -913,7 +913,7 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
-//  MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
+//  config.set_default_layout(layout_bfm_sc4);
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1262,7 +1262,7 @@ MACHINE_CONFIG_START(sc4_state::sc4dmd)
 	sc4_common(config);
 	/* video hardware */
 
-	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
+	//config.set_default_layout(layout_sc4_dmd);
 	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
 	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, sc4_state, bfmdm01_busy))
 

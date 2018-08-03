@@ -17,8 +17,8 @@
     arkanoidu   USA version. MCU code properly dumped.
     arkanoidj   Japanese version.  Final revision, MCU code properly dumped.
     arkanoidja  Japanese version.  A later revision with level selector.
-                  The 68705 code for this one was not available; Brad Oliver[?]
-                  made it up from the bootleg A75-06.IC16 by changing the level
+                  The 68705 code for this one was not available; it has been
+                  made using the decapped Taito A75__06.IC16 by changing the level
                   data pointer table.
     arkanoidjbl Bootleg of the early Japanese version. The only difference is
                   that the warning text has been replaced by "WAIT"
@@ -757,10 +757,14 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
     write:
     d000      AY8910 control
     d001      AY8910 write
-    d008      bit0/1 = flip screen x/y
-              bit 4 = ROM bank??
-              bit 5 = char bank
-              other bits????????
+    d008      bit 0   flip screen x
+              bit 1   flip screen y
+              bit 2   paddle player select
+              bit 3   coin lockout
+              bit 4   ????????
+              bit 5 = graphics bank
+              bit 6 = palette bank
+              bit 7 = mcu reset
     d010      watchdog reset, or IRQ acknowledge, or both
     f000      ????????
 
@@ -1648,8 +1652,7 @@ ROM_START( arkanoidja ) // V2.0 Japan w/level select
 	ROM_LOAD( "a75-22.ic16",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) ) // v2 JPN level select?, region byte is 0x92
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	// the handcrafted value at 0x351 (0x9ddb) seems incorrect compared to other sets? (but it appears the value is never used, and the data it would usually point to does not exist in the program rom?)
-	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(0a4abef6) SHA1(fdce0b7a2eab7fd4f1f4fc3b93120b1ebc16078e)  ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(543fed28) SHA1(0a0cafc229a9ece7d7f09d717b35a59653ccdc4d)  ) /* Hand crafted based on the original a75-06 chip, need the real data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )

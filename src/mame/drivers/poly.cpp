@@ -290,9 +290,9 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 
 	/* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	//MCFG_MC6854_OUT_TXD_CB(WRITELINE(NETWORK_TAG, poly_network_device, data_w))
-	//MCFG_MC6854_OUT_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
+	MC6854(config, m_adlc);
+	//m_adlc->out_txd_cb().set(NETWORK_TAG, FUNC(poly_network_device::data_w));
+	//m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	//MCFG_POLY_NETWORK_ADD()
 	//MCFG_POLY_NETWORK_CLK_CB(WRITELINE(*this, poly_state, network_clk_w))

@@ -1520,6 +1520,8 @@ void hng64_state::machine_start()
 	}
 
 	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
+
+	init_io();
 }
 
 void hng64_state::machine_reset()
@@ -1530,6 +1532,132 @@ void hng64_state::machine_reset()
 
 	reset_net();
 	reset_sound();
+}
+
+// used (shared ram access at least)
+READ8_MEMBER(hng64_state::ioport0_r)
+{
+	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
+	uint8_t ret = m_ioram[addr];
+
+	logerror("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
+	return ret; // expects 0x03 after writing it to port 0 earlier
+}
+
+// used
+READ8_MEMBER(hng64_state::ioport1_r)
+{
+	logerror("%s: ioport1_r\n", machine().describe_context());
+	return 0xff;
+}
+
+// used (shared ram access at least)
+WRITE8_MEMBER(hng64_state::ioport0_w)
+{
+	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
+	m_ioram[addr] = data;
+
+	logerror("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport1_w)
+{
+	logerror("%s: ioport1_w %02x\n", machine().describe_context(), data);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport3_w)
+{
+	logerror("%s: ioport3_w %02x\n", machine().describe_context(), data);
+}
+
+// used (shared ram access control for port 0 at least)
+WRITE8_MEMBER(hng64_state::ioport7_w)
+{
+	/* Port bits
+
+	 -?xR Aacr
+
+	 a = 0x200 of address bit to external RAM (direct?)
+	 A = 0x400 of address bit to external RAM (direct?)
+	 R = read / write mode? (if 1, write, if 0, read?)
+
+	 r = counter reset? ( 1->0 ?)
+	 c = clock address? ( 1->0 ?)
+
+	 x = written with clock bits, might be latch related?
+	 ? = written before some operations
+
+	*/
+
+	//logerror("%s: ioport7_w %02x\n", machine().describe_context(), data);
+
+	m_ex_ramaddr_upper = (data & 0x0c) >> 2;
+
+	if ((!(data & 0x01)) && (m_port7 & 0x01))
+	{
+		m_ex_ramaddr = 0;
+	}
+
+	if ((!(data & 0x02)) && (m_port7 & 0x02))
+	{
+		m_ex_ramaddr++;
+		m_ex_ramaddr &= 0x1ff;
+	}
+
+	m_port7 = data;
+}
+
+// check if these are used
+READ8_MEMBER(hng64_state::ioport2_r) { logerror("%s: ioport2_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport3_r) { logerror("%s: ioport3_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport4_r) { logerror("%s: ioport4_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport5_r) { logerror("%s: ioport5_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport6_r) { logerror("%s: ioport6_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport7_r) { logerror("%s: ioport7_r\n", machine().describe_context()); return 0xff; }
+
+WRITE8_MEMBER(hng64_state::ioport2_w) { logerror("%s: ioport2_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport4_w) { logerror("%s: ioport4_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport5_w) { logerror("%s: ioport5_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport6_w) { logerror("%s: ioport6_w %02x\n", machine().describe_context(), data); }
+
+READ8_MEMBER(hng64_state::anport0_r) { logerror("%s: anport0_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport1_r) { logerror("%s: anport1_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport2_r) { logerror("%s: anport2_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport3_r) { logerror("%s: anport3_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport4_r) { logerror("%s: anport4_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport5_r) { logerror("%s: anport5_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport6_r) { logerror("%s: anport6_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport7_r) { logerror("%s: anport7_r\n", machine().describe_context()); return 0xff; }
+
+
+TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqon_callback)
+{
+	logerror("timer_hack_on\n");
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE );
+	m_tempio_irqoff_timer->adjust(m_maincpu->cycles_to_attotime(1000));
+}
+
+TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
+{
+	logerror("timer_hack_off\n");
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
+}
+
+void hng64_state::init_io()
+{
+	m_tempio_irqon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqon_callback), this));
+	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
+
+	m_tempio_irqon_timer->adjust(m_maincpu->cycles_to_attotime(100000000)); // just ensure an IRQ gets turned on to move the program forward, real source currently unknown
+	m_port7 = 0;
+	m_ex_ramaddr = 0;
+	m_ex_ramaddr_upper = 0;
+
+	m_ioram = std::make_unique<uint8_t[]>(0x800); // in realty this is 'm_dualport' but as the hookup is incomplete the program fights with the simulation at the moment
+	save_pointer(&m_ioram[0], "m_ioram", 0x800);
+
 }
 
 MACHINE_CONFIG_START(hng64_state::hng64)
@@ -1557,18 +1685,49 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	hng64_audio(config);
 	hng64_network(config);
 
-	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
-	MCFG_DEVICE_DISABLE() // work in progress
-
+	tmp87ph40an_device &iomcu(TMP87PH40AN(config, m_iomcu, 8_MHz_XTAL));
+	iomcu.p0_in_cb().set(FUNC(hng64_state::ioport0_r));
+	iomcu.p1_in_cb().set(FUNC(hng64_state::ioport1_r));
+	iomcu.p2_in_cb().set(FUNC(hng64_state::ioport2_r));
+	iomcu.p3_in_cb().set(FUNC(hng64_state::ioport3_r));
+	iomcu.p4_in_cb().set(FUNC(hng64_state::ioport4_r));
+	iomcu.p5_in_cb().set(FUNC(hng64_state::ioport5_r));
+	iomcu.p6_in_cb().set(FUNC(hng64_state::ioport6_r));
+	iomcu.p7_in_cb().set(FUNC(hng64_state::ioport7_r));
+	iomcu.p0_out_cb().set(FUNC(hng64_state::ioport0_w));
+	iomcu.p1_out_cb().set(FUNC(hng64_state::ioport1_w));
+	iomcu.p2_out_cb().set(FUNC(hng64_state::ioport2_w));
+	iomcu.p3_out_cb().set(FUNC(hng64_state::ioport3_w));
+	iomcu.p4_out_cb().set(FUNC(hng64_state::ioport4_w));
+	iomcu.p5_out_cb().set(FUNC(hng64_state::ioport5_w));
+	iomcu.p6_out_cb().set(FUNC(hng64_state::ioport6_w));
+	iomcu.p7_out_cb().set(FUNC(hng64_state::ioport7_w));
+	iomcu.an0_in_cb().set(FUNC(hng64_state::anport0_r));
+	iomcu.an1_in_cb().set(FUNC(hng64_state::anport1_r));
+	iomcu.an2_in_cb().set(FUNC(hng64_state::anport2_r));
+	iomcu.an3_in_cb().set(FUNC(hng64_state::anport3_r));
+	iomcu.an4_in_cb().set(FUNC(hng64_state::anport4_r));
+	iomcu.an5_in_cb().set(FUNC(hng64_state::anport5_r));
+	iomcu.an6_in_cb().set(FUNC(hng64_state::anport6_r));
+	iomcu.an7_in_cb().set(FUNC(hng64_state::anport7_r));
 MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios))
 
-// all BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, or only the MCU internal ROM
+/* All main BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, but it appears unlikely.
+  
+  The IO MCU was dumped from a TMP87PH40AN type chip taken from an unknown IO board type. 
+  
+  Some boards instead use a TMP87CH40N but in all cases they're stickered SNK-IOJ1.00A so the content is possibly the same on all types.
+
+  This needs further studying of the MCU code as it is known that the different IO boards return a different ident value. 
+*/
+
 #define HNG64_BIOS \
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */ \
+	/* R4300 BIOS code (main CPU) */ \
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "japan", "Japan" ) \
 	ROM_LOAD_HNG64_BIOS( 0, "brom1.bin",         0x00000, 0x080000, CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) ) \
 	ROM_SYSTEM_BIOS( 1, "us", "USA" ) \
@@ -1577,12 +1736,14 @@ MACHINE_CONFIG_END
 	ROM_LOAD_HNG64_BIOS( 2, "bios_export.bin",   0x00000, 0x080000, CRC(bbf07ec6) SHA1(5656aa077f6a6d43953f15b5123eea102a9d5313) ) \
 	ROM_SYSTEM_BIOS( 3, "korea", "Korea" ) \
 	ROM_LOAD_HNG64_BIOS( 3, "bios_korea.bin",    0x00000, 0x080000, CRC(ac953e2e) SHA1(f502188ef252b7c9d04934c4b525730a116de48b) ) \
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
+	/* KL5C80 BIOS (network CPU) */	\
+	ROM_REGION( 0x0100000, "user2", 0 ) \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
+	/* FPGA (unknown) */ \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
 	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
+	/* TMP87PH40AN (I/O MCU) */	\
 	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
-	/* this was dumped from a TMP87PH40AN type chip.  Some boards use a TMP87CH40N, in all cases they're stickered SNK-IOJ1.00A so likely the same content */ \
 	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
 
 

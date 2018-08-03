@@ -318,7 +318,7 @@ void i386_device::i386_bsr_r32_rm32()      // Opcode 0x0f bd
 	} else {
 		m_ZF = 0;
 		dst = temp = 31;
-		while( (src & (1 << temp)) == 0 ) {
+		while( (src & (1U << temp)) == 0 ) {
 			temp--;
 			dst = temp;
 			CYCLES(CYCLES_BSR);

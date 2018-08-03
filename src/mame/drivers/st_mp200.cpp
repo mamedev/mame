@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_st_mp200)
+	config.set_default_layout(layout_st_mp200);
 
 	/* Sound */
 	genpin_audio(config);

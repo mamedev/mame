@@ -789,7 +789,7 @@ MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
 	MCFG_DEVICE_IO_MAP(portmap)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ectimer", ecoinfr_state, ecoinfr_irq_timer, attotime::from_hz(250))
 
-	MCFG_DEFAULT_LAYOUT(layout_ecoinfr)
+	config.set_default_layout(layout_ecoinfr);
 
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)

@@ -13,6 +13,7 @@
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "machine/gen_latch.h"
+#include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
 #include "video/bufsprite.h"
@@ -39,7 +40,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
-		m_mculatch(*this, "mculatch"),
+		m_dpram(*this, "dpram"),
 		m_samplelatch(*this, "samplelatch"),
 		m_dac(*this, "dac"),
 		m_audio(*this, "m72"),
@@ -94,7 +95,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
-	optional_device<generic_latch_8_device> m_mculatch;
+	optional_device<mb8421_mb8431_16_device> m_dpram;
 	optional_device<generic_latch_8_device> m_samplelatch;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
@@ -119,7 +120,6 @@ private:
 	const uint8_t *m_protection_code;
 	const uint8_t *m_protection_crc;
 	uint32_t m_raster_irq_position;
-	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_large;
@@ -152,7 +152,6 @@ private:
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_sample_r);
-	DECLARE_WRITE8_MEMBER(mcu_ack_w);
 	DECLARE_WRITE8_MEMBER(mcu_port1_w);
 	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(mcu_low_w);
@@ -204,7 +203,7 @@ private:
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
-
+	TIMER_CALLBACK_MEMBER(delayed_ram8_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -222,11 +221,11 @@ private:
 	void hharry_map(address_map &map);
 	void hharryu_map(address_map &map);
 	void kengo_map(address_map &map);
-	void m72_8751_map(address_map &map);
-	void m72_8751_portmap(address_map &map);
 	void m72_cpu1_common_map(address_map &map);
 	void m72_map(address_map &map);
+	void m72_protected_map(address_map &map);
 	void m72_portmap(address_map &map);
+	void m72_protected_portmap(address_map &map);
 	void m81_cpu1_common_map(address_map &map);
 	void m81_portmap(address_map &map);
 	void m82_map(address_map &map);
@@ -241,8 +240,8 @@ private:
 	void rtype2_sound_portmap(address_map &map);
 	void rtype_map(address_map &map);
 	void rtype_sound_portmap(address_map &map);
-	void sound_8751_portmap(address_map &map);
 	void sound_portmap(address_map &map);
+	void sound_protected_portmap(address_map &map);
 	void sound_ram_map(address_map &map);
 	void sound_rom_map(address_map &map);
 	void xmultipl_map(address_map &map);

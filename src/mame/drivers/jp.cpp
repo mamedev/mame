@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 	LS259(config, m_latch[9]);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_jp)
+	config.set_default_layout(layout_jp);
 
 	/* Sound */
 	genpin_audio(config);

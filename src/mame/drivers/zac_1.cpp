@@ -273,7 +273,7 @@ MACHINE_CONFIG_START(zac_1_state::zac_1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_outtimer", zac_1_state, zac_1_outtimer, attotime::from_hz(187500))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_zac_1)
+	config.set_default_layout(layout_zac_1);
 
 	/* Sound */
 	genpin_audio(config);

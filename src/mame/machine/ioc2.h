@@ -185,8 +185,8 @@ class ioc2_guinness_device : public ioc2_device
 {
 public:
 	template <typename T>
-	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: ioc2_guinness_device(mconfig, tag, owner, clock)
+	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: ioc2_guinness_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
@@ -201,8 +201,8 @@ class ioc2_full_house_device : public ioc2_device
 {
 public:
 	template <typename T>
-	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: ioc2_full_house_device(mconfig, tag, owner, clock)
+	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: ioc2_full_house_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}

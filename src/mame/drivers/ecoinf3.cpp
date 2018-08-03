@@ -667,7 +667,7 @@ MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	MCFG_DEVICE_PROGRAM_MAP(pyramid_memmap)
 	MCFG_DEVICE_IO_MAP(pyramid_portmap)
 
-	MCFG_DEFAULT_LAYOUT(layout_ecoinf3)
+	config.set_default_layout(layout_ecoinf3);
 
 	SPEAKER(config, "mono").front_center();
 

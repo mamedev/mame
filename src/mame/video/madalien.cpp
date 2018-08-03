@@ -155,11 +155,8 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 void madalien_state::draw_edges(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
 {
-	rectangle clip_edge1;
-	rectangle clip_edge2;
-
-	clip_edge1 = cliprect;
-	clip_edge2 = cliprect;
+	rectangle clip_edge1(cliprect);
+	rectangle clip_edge2(cliprect);
 
 	if (flip)
 	{
@@ -205,7 +202,7 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 			if (flip)
 				hy = ~hy;
 
-			if ((hy < cliprect.min_y) || (hy > cliprect.max_y))
+			if ((hy < cliprect.top()) || (hy > cliprect.bottom()))
 				continue;
 
 			for (x = 0; x < 0x80; x++)
@@ -215,7 +212,7 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 				if (flip)
 					hx = ~hx;
 
-				if ((hx < cliprect.min_x) || (hx > cliprect.max_x))
+				if ((hx < cliprect.left()) || (hx > cliprect.right()))
 					continue;
 
 				if (m_headlight_bitmap->pix16(y, x) != 0)
@@ -283,9 +280,9 @@ uint32_t madalien_state::screen_update_madalien(screen_device &screen, bitmap_in
 			min_x = 0xff - max_x_save;
 		}
 
-		for (y = cliprect.min_y; y <= cliprect.max_y ; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 			for (x = min_x; x <= max_x; x++)
-				if ((x >= cliprect.min_x) && (x <= cliprect.max_x))
+				if ((x >= cliprect.left()) && (x <= cliprect.right()))
 					bitmap.pix16(y, x) |= 8;
 	}
 

@@ -1579,6 +1579,7 @@ static INPUT_PORTS_START( f1en )
 
 	PORT_MODIFY("slavepcb:SERVICE12_A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("slavepcb:SERVICE34_A")
@@ -2489,10 +2490,10 @@ MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
 
-	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_irq_w))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_drq_w))
+	mb89352_device &scsictrl(MB89352A(config, "mb89352", 8000000));
+	scsictrl.set_scsi_port("scsi");
+	scsictrl.irq_cb().set(FUNC(segas32_cd_state::scsi_irq_w));
+	scsictrl.drq_cb().set(FUNC(segas32_cd_state::scsi_drq_w));
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
@@ -2557,7 +2558,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

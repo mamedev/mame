@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(svmu_state::svmu)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", lc8670_cpu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_svmu)
+	config.set_default_layout(layout_svmu);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(svmu_state, svmu)
 

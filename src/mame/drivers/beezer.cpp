@@ -46,8 +46,8 @@
 class beezer_state : public driver_device
 {
 public:
-	beezer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	beezer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sysbank(*this, "sysbank"),
 		m_banked_roms(*this, "banked"),
@@ -527,9 +527,9 @@ MACHINE_CONFIG_START(beezer_state::beezer)
 	MCFG_PTM6840_IRQ_CB(WRITELINE("audio_irqs", input_merger_device, in_w<1>))
 	// schematics show an input labeled VCO to channel 2, but the source is unknown
 
-	MCFG_MM5837_ADD("noise")
-	MCFG_MM5837_VDD(12)
-	MCFG_MM5837_OUTPUT_CB(WRITELINE(*this, beezer_state, noise_w))
+	mm5837_device &noise(MM5837(config, "noise"));
+	noise.set_vdd_voltage(12);
+	noise.output_callback().set(FUNC(beezer_state::noise_w));
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC76, 0)

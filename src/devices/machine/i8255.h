@@ -74,7 +74,7 @@ class i8255_device : public device_t
 {
 public:
 	// construction/destruction
-	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
@@ -117,7 +117,7 @@ protected:
 	const bool m_force_portb_in;
 	const bool m_force_portc_out;
 	const bool m_dont_clear_output_latches;
-	
+
 private:
 	inline void check_interrupt(int port);
 	inline void set_ibf(int port, int state);

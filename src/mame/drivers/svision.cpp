@@ -500,7 +500,7 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 }
 
 MACHINE_CONFIG_START(svision_state::svision_base)
-	MCFG_DEFAULT_LAYOUT(layout_svision)
+	config.set_default_layout(layout_svision);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

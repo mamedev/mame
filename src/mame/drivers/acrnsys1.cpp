@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 	MCFG_DEVICE_ADD("maincpu", M6502, 1.008_MHz_XTAL)  /* 1.008 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(acrnsys1_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_acrnsys1)
+	config.set_default_layout(layout_acrnsys1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

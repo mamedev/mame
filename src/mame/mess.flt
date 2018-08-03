@@ -167,6 +167,7 @@ datum.cpp
 dbox.cpp
 dccons.cpp
 dct11em.cpp
+decstation.cpp
 dectalk.cpp
 decwritr.cpp
 dgn_beta.cpp
@@ -316,6 +317,7 @@ interpro.cpp
 intv.cpp
 ipc.cpp
 ipds.cpp
+iphone2g.cpp
 iq151.cpp
 iqunlim.cpp
 iris3130.cpp
@@ -325,7 +327,6 @@ isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
 itt3030.cpp
-jade.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
@@ -387,6 +388,7 @@ megadriv_rad.cpp
 mekd2.cpp
 mephisto.cpp
 mephisto_montec.cpp
+meritum.cpp
 mes.cpp
 mfabfz.cpp
 mice.cpp
@@ -420,6 +422,7 @@ mmd1.cpp
 mmodular.cpp
 mod8.cpp
 modellot.cpp
+modena.cpp
 molecular.cpp
 monty.cpp
 mpf1.cpp
@@ -725,6 +728,7 @@ tricep.cpp
 trs80.cpp
 trs80dt1.cpp
 trs80m2.cpp
+trs80m3.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp
@@ -743,6 +747,7 @@ tvc.cpp
 tvgame.cpp
 tx0.cpp
 uknc.cpp
+unkz80.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp

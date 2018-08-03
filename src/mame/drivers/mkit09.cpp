@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(mkit09_state::mkit09)
 	MCFG_DEVICE_PROGRAM_MAP(mkit09_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mkit09)
+	config.set_default_layout(layout_mkit09);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -228,7 +228,7 @@ MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	MCFG_DEVICE_PROGRAM_MAP(mkit09a_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mkit09)
+	config.set_default_layout(layout_mkit09);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

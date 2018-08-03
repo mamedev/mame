@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
 	MCFG_DEVICE_PROGRAM_MAP(oxo_memmap)
 	MCFG_DEVICE_IO_MAP(oxo_portmap)
 
-	MCFG_DEFAULT_LAYOUT(layout_ecoinf2)
+	config.set_default_layout(layout_ecoinf2);
 
 	MCFG_DEVICE_ADD("ic10_lamp", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_a_strobedat0))

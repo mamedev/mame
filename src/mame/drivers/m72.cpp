@@ -225,6 +225,7 @@ TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
 void m72_state::machine_reset()
 {
 	m_mcu_sample_addr = 0;
+	//m_mcu_snd_cmd_latch = 0;
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
@@ -304,86 +305,51 @@ The protection device does
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 {
-	uint16_t val = ((uint32_t) param) & 0xffff;
-	uint16_t offset = (((uint32_t) param) >> 16) & 0xffff;
-	uint16_t *ram = (uint16_t *)ptr;
+	uint16_t val = param & 0xffff;
+	uint16_t offset = (param >> 16) & 0x07ff;
+	uint16_t mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
 
-	ram[offset] = val;
+	logerror("MB8421/MB8431 left_w(0x%03x, 0x%04x, 0x%04x)\n", offset, val, mem_mask);
+	m_dpram->left_w(machine().dummy_space(), offset, val, mem_mask);
 }
 
-
-WRITE16_MEMBER(m72_state::main_mcu_sound_w)
+TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 {
-	if (data & 0xfff0)
-		logerror("sound_w: %04x %04x\n", mem_mask, data);
+	uint8_t val = param & 0xff;
+	uint16_t offset = (param >> 9) & 0x07ff;
 
-	if (ACCESSING_BITS_0_7)
-	{
-		m_mculatch->write(space, offset, data);
-	}
+	if (BIT(param, 8))
+		m_dpram->right_w(machine().dummy_space(), offset, val << 8, 0xff00);
+	else
+		m_dpram->right_w(machine().dummy_space(), offset, val, 0x00ff);
 }
+
 
 WRITE16_MEMBER(m72_state::main_mcu_w)
 {
-	uint16_t val = m_protection_ram[offset];
-
-	COMBINE_DATA(&val);
-
-	/* 0x07fe is used for synchronization as well.
-	 * This address however will not trigger an interrupt
-	 */
-
-	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
-	{
-		m_protection_ram[offset] = val;
-		m_mcu->set_input_line(0, ASSERT_LINE);
-		/* Line driven, most likely by write line */
-		//machine().scheduler().timer_set(m_mcu->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
-		//machine().scheduler().timer_set(m_mcu->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
-	}
-	else
-		machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), (offset<<16) | val, m_protection_ram.get());
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
 }
 
 WRITE8_MEMBER(m72_state::mcu_data_w)
 {
-	uint16_t val;
-	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
-	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
-
-	machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), ((offset >>1 ) << 16) | val, m_protection_ram.get());
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | uint32_t(data));
 }
 
 READ8_MEMBER(m72_state::mcu_data_r)
 {
-	uint8_t ret;
-
-	if (offset == 0x0fff || offset == 0x0ffe)
-	{
-		m_mcu->set_input_line(0, CLEAR_LINE);
-	}
-
-	if (offset&1) ret = (m_protection_ram[offset/2] & 0xff00)>>8;
-	else ret = (m_protection_ram[offset/2] & 0x00ff);
-
-	return ret;
+	return (m_dpram->right_r(space, offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
 INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
 {
-	//m_mculatch |= 0x11; /* 0x10 is special as well - FIXME */
-	m_mculatch->write(m_maincpu->space(AS_IO), 0, 0x11);// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
+	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
+	//m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
+	device.execute().set_input_line(1, ASSERT_LINE);
 }
 
 READ8_MEMBER(m72_state::mcu_sample_r)
 {
 	return m_sampleregion[m_mcu_sample_addr++];
-}
-
-WRITE8_MEMBER(m72_state::mcu_ack_w)
-{
-	m_mculatch->acknowledge_w(space, offset, data);
-	m_mculatch->clear_w(space, offset, data);
 }
 
 WRITE8_MEMBER(m72_state::mcu_port1_w)
@@ -411,10 +377,6 @@ WRITE8_MEMBER(m72_state::mcu_high_w)
 
 void m72_state::init_m72_8751()
 {
-	m_protection_ram = std::make_unique<uint16_t[]>(0x10000/2);
-	membank("bank1")->configure_entry(0, m_protection_ram.get());
-
-	save_pointer(NAME(m_protection_ram), 0x10000/2);
 	save_item(NAME(m_mcu_sample_addr));
 
 	/* lohtb2 */
@@ -885,13 +847,6 @@ void m72_state::m72_map(address_map &map)
 	map(0xa0000, 0xa3fff).ram();    /* work RAM */
 }
 
-void m72_state::m72_8751_map(address_map &map)
-{
-	m72_map(map);
-	map(0xb0000, 0xbffff).bankr("bank1");
-	map(0xb0000, 0xb0fff).w(FUNC(m72_state::main_mcu_w));
-}
-
 void m72_state::rtype_map(address_map &map)
 {
 	m72_cpu1_common_map(map);
@@ -899,13 +854,18 @@ void m72_state::rtype_map(address_map &map)
 	map(0x40000, 0x43fff).ram();    /* work RAM */
 }
 
+void m72_state::m72_protected_map(address_map &map)
+{
+	m72_map(map);
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
+}
+
 void m72_state::xmultiplm72_map(address_map &map)
 {
 	m72_cpu1_common_map(map);
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0x83fff).ram();    /* work RAM */
-	map(0xb0000, 0xbffff).bankr("bank1");
-	map(0xb0000, 0xb0fff).w(FUNC(m72_state::main_mcu_w));
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
 }
 
 void m72_state::dbreedm72_map(address_map &map)
@@ -1022,11 +982,10 @@ void m72_state::m72_portmap(address_map &map)
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 }
 
-void m72_state::m72_8751_portmap(address_map &map)
+void m72_state::m72_protected_portmap(address_map &map)
 {
 	m72_portmap(map);
-	//map(0xc0, 0xc1).w(FUNC(m72_state::loht_sample_trigger_w));
-	map(0xc0, 0xc1).w(FUNC(m72_state::main_mcu_sound_w));
+	map(0xc0, 0xc0).w("mculatch", FUNC(generic_latch_8_device::write));
 }
 
 void m72_state::m84_portmap(address_map &map)
@@ -1128,7 +1087,7 @@ void m72_state::rtype_sound_portmap(address_map &map)
 	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void m72_state::sound_8751_portmap(address_map &map)
+void m72_state::sound_protected_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	rtype_sound_portmap(map);
@@ -1169,8 +1128,7 @@ void m72_state::mcu_io_map(address_map &map)
 	/* External access */
 	map(0x0000, 0x0000).rw(FUNC(m72_state::mcu_sample_r), FUNC(m72_state::mcu_low_w));
 	map(0x0001, 0x0001).w(FUNC(m72_state::mcu_high_w));
-	map(0x0002, 0x0002).r(m_mculatch, FUNC(generic_latch_8_device::read));
-	map(0x0002, 0x0002).w(FUNC(m72_state::mcu_ack_w));
+	map(0x0002, 0x0002).rw("mculatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	/* shared at b0000 - b0fff on the main cpu */
 	map(0xc000, 0xcfff).rw(FUNC(m72_state::mcu_data_r), FUNC(m72_state::mcu_data_w));
 }
@@ -1953,27 +1911,30 @@ void m72_state::m72(machine_config &config)
 
 MACHINE_CONFIG_START(m72_state::m72_8751)
 	m72_base(config);
-
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m72_8751_map)
-	MCFG_DEVICE_IO_MAP(m72_8751_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(m72_protected_map)
+	MCFG_DEVICE_IO_MAP(m72_protected_portmap)
 
 	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IO_MAP(sound_8751_portmap)
+	MCFG_DEVICE_IO_MAP(sound_protected_portmap)
 
-	MCFG_DEVICE_ADD("mcu",I8751, XTAL(8'000'000)) /* Uses its own XTAL */
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, m72_state, mcu_port1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, m72_state, mcu_port3_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m72_state, mcu_int)
+	MB8421_MB8431_16BIT(config, m_dpram);
+	//m_dpram->intl_callback().set("upd71059c", FUNC(pic8259_device::ir3_w)); // not actually used?
+	m_dpram->intr_callback().set_inputline("mcu", MCS51_INT0_LINE);
 
 	MCFG_GENERIC_LATCH_8_ADD("mculatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", 1))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", MCS51_INT1_LINE))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_GENERIC_LATCH_8_ADD("samplelatch")
 
 	MCFG_DEVICE_REMOVE("m72") // Sample is controlled by mcu
+
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* Uses its own XTAL */
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, m72_state, mcu_port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, m72_state, mcu_port3_w))
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END
 
 
@@ -1994,6 +1955,7 @@ MACHINE_CONFIG_START(m72_state::m72_xmultipl)
 	m72_8751(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(xmultiplm72_map)
+	// Sound NMI is already triggered at MCU
 MACHINE_CONFIG_END
 
 

@@ -40,7 +40,9 @@ class sonydriv_floppy_image_device : public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
-	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	static void legacy_2_drives_add(machine_config &mconfig, const floppy_interface *config);
 
 	virtual void call_unload() override;
 

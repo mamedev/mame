@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(icecold_state::icecold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motors_timer", icecold_state, icecold_motors_timer, attotime::from_msec(50))
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_icecold)
+	config.set_default_layout(layout_icecold);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

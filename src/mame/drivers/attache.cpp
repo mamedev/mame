@@ -1136,23 +1136,23 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("psg", AY8912, 8_MHz_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_psg, 8_MHz_XTAL / 4);
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, attache_state, pio_portA_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, attache_state, pio_portA_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, attache_state, pio_portB_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, attache_state, pio_portB_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->in_pa_callback().set(FUNC(attache_state::pio_portA_r));
+	m_pio->out_pa_callback().set(FUNC(attache_state::pio_portA_w));
+	m_pio->in_pb_callback().set(FUNC(attache_state::pio_portB_r));
+	m_pio->out_pb_callback().set(FUNC(attache_state::pio_portB_w));
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, 8_MHz_XTAL / 2)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80SIO(config, m_sio, 8_MHz_XTAL / 2);
+	m_sio->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_sio->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
@@ -1172,14 +1172,14 @@ MACHINE_CONFIG_START(attache_state::attache)
 	brc.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
 	brc.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_DEVICE_ADD("dma", AM9517A, 8_MHz_XTAL / 4)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, attache_state, hreq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, attache_state, eop_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, attache_state, dma_mem_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, attache_state, dma_mem_w))
-	MCFG_AM9517A_IN_IOR_0_CB(READ8(*this, attache_state, fdc_dma_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(*this, attache_state, fdc_dma_w))
-	// MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(*this, attache_state, fdc_dack_w))
+	AM9517A(config, m_dma, 8_MHz_XTAL / 4);
+	m_dma->out_hreq_callback().set(FUNC(attache_state::hreq_w));
+	m_dma->out_eop_callback().set(FUNC(attache_state::eop_w));
+	m_dma->in_memr_callback().set(FUNC(attache_state::dma_mem_r));
+	m_dma->out_memw_callback().set(FUNC(attache_state::dma_mem_w));
+	m_dma->in_ior_callback<0>().set(FUNC(attache_state::fdc_dma_r));
+	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
+	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
@@ -1220,23 +1220,23 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("psg", AY8912, 8_MHz_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_psg, 8_MHz_XTAL / 4);
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, attache_state, pio_portA_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, attache_state, pio_portA_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, attache_state, pio_portB_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, attache_state, pio_portB_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->in_pa_callback().set(FUNC(attache_state::pio_portA_r));
+	m_pio->out_pa_callback().set(FUNC(attache_state::pio_portA_w));
+	m_pio->in_pb_callback().set(FUNC(attache_state::pio_portB_r));
+	m_pio->out_pb_callback().set(FUNC(attache_state::pio_portB_w));
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, 8_MHz_XTAL / 2)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80SIO(config, m_sio, 8_MHz_XTAL / 2);
+	m_sio->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_sio->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
@@ -1263,14 +1263,14 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	m_ppi->out_pc_callback().set(FUNC(attache816_state::x86_dsr)).bit(0);
 	m_ppi->out_pc_callback().append(FUNC(attache816_state::ppi_irq)).bit(7).invert();
 
-	MCFG_DEVICE_ADD("dma", AM9517A, 8_MHz_XTAL / 4)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, attache_state, hreq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, attache_state, eop_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, attache_state, dma_mem_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, attache_state, dma_mem_w))
-	MCFG_AM9517A_IN_IOR_0_CB(READ8(*this, attache_state, fdc_dma_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(*this, attache_state, fdc_dma_w))
-	// MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(*this, attache_state, fdc_dack_w))
+	AM9517A(config, m_dma, 8_MHz_XTAL / 4);
+	m_dma->out_hreq_callback().set(FUNC(attache_state::hreq_w));
+	m_dma->out_eop_callback().set(FUNC(attache_state::eop_w));
+	m_dma->in_memr_callback().set(FUNC(attache_state::dma_mem_r));
+	m_dma->out_memw_callback().set(FUNC(attache_state::dma_mem_w));
+	m_dma->in_ior_callback<0>().set(FUNC(attache_state::fdc_dma_r));
+	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
+	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));

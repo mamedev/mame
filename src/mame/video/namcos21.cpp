@@ -103,13 +103,13 @@ void namcos21_state::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const r
 {
 	/* blit the visible framebuffer */
 	int sy;
-	for( sy=clip.min_y; sy<=clip.max_y; sy++ )
+	for( sy=clip.top(); sy<=clip.bottom(); sy++ )
 	{
 		uint16_t *dest = &bitmap.pix16(sy);
 		const uint16_t *pPen = m_mpPolyFrameBufferPens2.get()+NAMCOS21_POLY_FRAME_WIDTH*sy;
 		const uint16_t *pZ = m_mpPolyFrameBufferZ2.get()+NAMCOS21_POLY_FRAME_WIDTH*sy;
 		int sx;
-		for( sx=clip.min_x; sx<=clip.max_x; sx++ )
+		for( sx=clip.left(); sx<=clip.right(); sx++ )
 		{
 			int z = pZ[sx];
 			//if( pZ[sx]!=0x7fff )
@@ -429,17 +429,17 @@ uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_in
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *videoram = m_videoram.get();
-	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.min_y,cliprect.max_y,m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
+	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.top(),cliprect.bottom(),m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
 
-	int yscroll = -cliprect.min_y+(int16_t)m_winrun_gpu_register[0x2/2];
+	int yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
 	int xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
 	int base = 0x1000+0x100*(m_winrun_color&0xf);
 	int sx,sy;
-	for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
+	for( sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
 	{
 		const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
 		uint16_t *pDest = &bitmap.pix16(sy);
-		for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
+		for( sx=cliprect.left(); sx<=cliprect.right(); sx++ )
 		{
 			int pen = pSource[(sx+xscroll) & 0x1ff];
 			switch( pen )

@@ -852,7 +852,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(newbrain_state::newbrain_ad)
 	newbrain(config);
-	MCFG_DEFAULT_LAYOUT(layout_newbrain)
+	config.set_default_layout(layout_newbrain);
 MACHINE_CONFIG_END
 
 
@@ -862,7 +862,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(newbrain_state::newbrain_a)
 	newbrain(config);
-	MCFG_DEFAULT_LAYOUT(layout_newbraina)
+	config.set_default_layout(layout_newbraina);
 MACHINE_CONFIG_END
 
 
@@ -872,7 +872,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(newbrain_state::newbrain_md)
 	newbrain(config);
-	MCFG_DEFAULT_LAYOUT(layout_newbrain)
+	config.set_default_layout(layout_newbrain);
 MACHINE_CONFIG_END
 
 

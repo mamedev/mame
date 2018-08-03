@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(s3_state::s3)
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s3)
+	config.set_default_layout(layout_s3);
 
 	/* Sound */
 	genpin_audio(config);

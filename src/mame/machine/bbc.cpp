@@ -431,8 +431,8 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x30) && (myo<=0x33))                   return 0xfe;
 		if ((myo>=0x34) && (myo<=0x37))                   return bbcm_acccon_r(space, myo-0x34);                          /* ACCCON */
 		if ((myo>=0x38) && (myo<=0x3f))                   return 0xfe;                                                    /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f))                   return m_via6522_0->read(space, myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(space, myo-0x60) : 0xfe;
+		if ((myo>=0x40) && (myo<=0x5f))                   return m_via6522_0->read(myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(myo-0x60) : 0xfe;
 		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
@@ -465,8 +465,8 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		if ((myo>=0x30) && (myo<=0x33))                   page_selectbm_w(space, myo-0x30, data);                         /* ROMSEL */
 		if ((myo>=0x34) && (myo<=0x37))                   bbcm_acccon_w(space, myo-0x34, data);                           /* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f))                                                                                 /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f))                   m_via6522_0->write(space, myo-0x40, data);
-		if ((myo>=0x60) && (myo<=0x7f) && (m_via6522_1))  m_via6522_1->write(space, myo-0x60, data);
+		if ((myo>=0x40) && (myo<=0x5f))                   m_via6522_0->write(myo-0x40, data);
+		if ((myo>=0x60) && (myo<=0x7f) && (m_via6522_1))  m_via6522_1->write(myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
 		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))

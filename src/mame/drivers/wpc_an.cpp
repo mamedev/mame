@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_an_state,wpc_sound_data_r),WRITE8(*this, wpc_an_state,wpc_sound_data_w))
 	MCFG_WPC_SOUND_S11C(WRITE8(*this, wpc_an_state,wpc_sound_s11_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
+	config.set_default_layout(layout_wpc_an);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an)

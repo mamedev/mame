@@ -1293,7 +1293,7 @@ MACHINE_CONFIG_START(tispeak_state::snmath)
 	MCFG_TMS0270_WRITE_PDC_CB(WRITELINE("tms5100", tms5110_device, pdc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_snmath)
+	config.set_default_layout(layout_snmath);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
@@ -1311,7 +1311,7 @@ MACHINE_CONFIG_START(tispeak_state::sns_cd2801)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
 
-	MCFG_DEFAULT_LAYOUT(layout_snspell)
+	config.set_default_layout(layout_snspell);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
@@ -1325,7 +1325,7 @@ MACHINE_CONFIG_START(tispeak_state::snspellit)
 	sns_cd2801(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_snmath)
+	config.set_default_layout(layout_snmath);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tispeak_state::sns_tmc0281)
@@ -1340,7 +1340,7 @@ MACHINE_CONFIG_START(tispeak_state::snspellsp)
 	sns_tmc0281(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_snspellsp)
+	config.set_default_layout(layout_snspellsp);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tispeak_state::sns_tmc0281d)
@@ -1359,7 +1359,7 @@ MACHINE_CONFIG_START(tispeak_state::snread)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
 
-	MCFG_DEFAULT_LAYOUT(layout_snread)
+	config.set_default_layout(layout_snread);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snread")
@@ -1378,7 +1378,7 @@ MACHINE_CONFIG_START(tispeak_state::lantutor)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, lantutor_write_r))
 
-	MCFG_DEFAULT_LAYOUT(layout_snread)
+	config.set_default_layout(layout_snread);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "lantutor")
@@ -1434,7 +1434,7 @@ MACHINE_CONFIG_START(tispeak_state::vocaid)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
-	MCFG_DEFAULT_LAYOUT(layout_tntell)
+	config.set_default_layout(layout_tntell);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
@@ -1465,7 +1465,7 @@ MACHINE_CONFIG_START(tispeak_state::k28m2)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, k28_write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_k28m2)
+	config.set_default_layout(layout_k28m2);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)

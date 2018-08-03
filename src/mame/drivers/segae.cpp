@@ -412,10 +412,10 @@ void systeme_state::io_map(address_map &map)
 	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
-	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xbe, 0xbe).rw(m_vdp2, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0xbf, 0xbf).rw(m_vdp2, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
+	map(0xbe, 0xbe).rw(m_vdp2, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0xbf, 0xbf).rw(m_vdp2, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xe0, 0xe0).portr("e0");
 	map(0xe1, 0xe1).portr("e1");
 	map(0xe2, 0xe2).portr("e2");

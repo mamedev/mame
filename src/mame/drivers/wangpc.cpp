@@ -1282,37 +1282,37 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
 
 	// devices
-	MCFG_DEVICE_ADD(AM9517A_TAG, AM9517A, 4000000)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, wangpc_state, hrq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, wangpc_state, eop_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, wangpc_state, memr_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, wangpc_state, memw_w))
-	MCFG_AM9517A_IN_IOR_1_CB(READ8(WANGPC_BUS_TAG, wangpcbus_device, dack1_r))
-	MCFG_AM9517A_IN_IOR_2_CB(READ8(*this, wangpc_state, ior2_r))
-	MCFG_AM9517A_IN_IOR_3_CB(READ8(WANGPC_BUS_TAG, wangpcbus_device, dack3_r))
-	MCFG_AM9517A_OUT_IOW_1_CB(WRITE8(WANGPC_BUS_TAG, wangpcbus_device, dack1_w))
-	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(*this, wangpc_state, iow2_w))
-	MCFG_AM9517A_OUT_IOW_3_CB(WRITE8(WANGPC_BUS_TAG, wangpcbus_device, dack3_w))
-	MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(*this, wangpc_state, dack0_w))
-	MCFG_AM9517A_OUT_DACK_1_CB(WRITELINE(*this, wangpc_state, dack1_w))
-	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(*this, wangpc_state, dack2_w))
-	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(*this, wangpc_state, dack3_w))
+	AM9517A(config, m_dmac, 4000000);
+	m_dmac->out_hreq_callback().set(FUNC(wangpc_state::hrq_w));
+	m_dmac->out_eop_callback().set(FUNC(wangpc_state::eop_w));
+	m_dmac->in_memr_callback().set(FUNC(wangpc_state::memr_r));
+	m_dmac->out_memw_callback().set(FUNC(wangpc_state::memw_w));
+	m_dmac->in_ior_callback<1>().set(m_bus, FUNC(wangpcbus_device::dack1_r));
+	m_dmac->in_ior_callback<2>().set(FUNC(wangpc_state::ior2_r));
+	m_dmac->in_ior_callback<3>().set(m_bus, FUNC(wangpcbus_device::dack3_r));
+	m_dmac->out_iow_callback<1>().set(m_bus, FUNC(wangpcbus_device::dack1_w));
+	m_dmac->out_iow_callback<2>().set(FUNC(wangpc_state::iow2_w));
+	m_dmac->out_iow_callback<3>().set(m_bus, FUNC(wangpcbus_device::dack3_w));
+	m_dmac->out_dack_callback<0>().set(FUNC(wangpc_state::dack0_w));
+	m_dmac->out_dack_callback<1>().set(FUNC(wangpc_state::dack1_w));
+	m_dmac->out_dack_callback<2>().set(FUNC(wangpc_state::dack2_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(wangpc_state::dack3_w));
 
-	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, wangpc_state, ppi_pa_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, wangpc_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, wangpc_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wangpc_state, ppi_pc_w))
+	I8255A(config, m_ppi, 0);
+	m_ppi->in_pa_callback().set(FUNC(wangpc_state::ppi_pa_r));
+	m_ppi->in_pb_callback().set(FUNC(wangpc_state::ppi_pb_r));
+	m_ppi->in_pc_callback().set(FUNC(wangpc_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(wangpc_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(500000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_CLK2(500000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wangpc_state, pit2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(500000);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(2000000);
+	m_pit->set_clk<2>(500000);
+	m_pit->out_handler<2>().set(FUNC(wangpc_state::pit2_w));
 
 	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
 	MCFG_IM6402_TRO_CALLBACK(WRITELINE("wangpckb", wangpc_keyboard_device, write_rxd))

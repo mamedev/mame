@@ -348,8 +348,8 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
+	MC6854(config, m_adlc);
+	m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 4_MHz_XTAL / 2)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)

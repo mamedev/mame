@@ -31,6 +31,8 @@ public:
 		read_port.set_callback(std::forward<Read>(rd));
 		write_port.set_callback(std::forward<Write>(wr));
 	}
+	auto read_callback() { return read_port.bind(); }
+	auto write_callback() { return write_port.bind(); }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;

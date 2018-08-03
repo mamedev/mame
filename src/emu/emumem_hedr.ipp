@@ -47,7 +47,7 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 
 }
 
-template<int HighBits, int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int HighBits, int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	return m_dispatch[(offset >> LowBits) & BITMASK]->read(offset, mem_mask);
 }
@@ -473,7 +473,7 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 			m_dispatch[i] = np->get_subhandler();
 			m_dispatch[i]->ref();
 			np->unref();
-			
+
 		} else
 			np->detach(handlers);
 	}

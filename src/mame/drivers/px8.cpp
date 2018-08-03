@@ -769,7 +769,7 @@ MACHINE_CONFIG_START(px8_state::px8)
 //  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_px8)
+	config.set_default_layout(layout_px8);
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)

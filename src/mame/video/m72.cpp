@@ -70,7 +70,6 @@ TILE_GET_INFO_MEMBER(m72_state::m82_m84_get_tile_info)
 	tileinfo.group = pri;
 }
 
-
 TILE_GET_INFO_MEMBER(m72_state::get_bg_tile_info)
 {
 	m72_m81_get_tile_info(tileinfo,tile_index,1,m_bg_source);

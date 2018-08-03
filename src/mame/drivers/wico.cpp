@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(wico_state::wico)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wico)
+	config.set_default_layout(layout_wico);
 
 	/* Sound */
 	genpin_audio(config);

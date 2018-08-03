@@ -7,11 +7,11 @@
 
 DEFINE_DEVICE_TYPE(ORICEXT_CONNECTOR, oricext_connector, "oricext_connector", "ORIC extension connector")
 
-oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ORICEXT_CONNECTOR, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	irq_handler(*this),
-	cputag(nullptr)
+oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ORICEXT_CONNECTOR, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, irq_handler(*this)
+	, cputag(nullptr)
 {
 }
 

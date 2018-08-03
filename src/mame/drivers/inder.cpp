@@ -1366,7 +1366,7 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);
@@ -1384,7 +1384,7 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);
@@ -1405,7 +1405,7 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);
@@ -1429,7 +1429,7 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);

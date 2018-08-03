@@ -1129,14 +1129,13 @@ WRITE64_MEMBER(model3_state::scsi_w)
 	}
 }
 
-LSI53C810_FETCH_CB(model3_state::scsi_fetch)
+uint32_t model3_state::scsi_fetch(uint32_t dsp)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint32_t result = space.read_dword(dsp);
+	const uint32_t result = m_maincpu->space(AS_PROGRAM).read_dword(dsp);
 	return flipendian_int32(result);
 }
 
-LSI53C810_IRQ_CB(model3_state::scsi_irq_callback)
+void model3_state::scsi_irq_callback(int state)
 {
 	m_scsi_irq_state = state;
 	update_irq_state();
@@ -1229,7 +1228,7 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 	logerror("real3d_dma_w: %08X, %08X%08X, %08X%08X", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 }
 
-LSI53C810_DMA_CB(model3_state::real3d_dma_callback)
+void model3_state::real3d_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap)
 {
 	switch(dst >> 24)
 	{
@@ -1283,12 +1282,45 @@ TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
 	m_dma_busy = 0;
 }
 
+/* IRQs */
+/*
+    0x80: Unknown (no clearing logic in scud)
+    0x40: SCSP
+    0x20: Unknown (no clearing logic in scud)
+    0x10: Network
+    0x08: Video (unknown -- has callback hook in scud)
+    0x04: Video (unknown -- has callback hook in scud)
+    0x02: Video (VBLANK start?)
+    0x01: Video (unused?)
+
+    IRQ 0x08 and 0x04 directly affect the game speed in magtruck, once per scanline seems fast enough
+    Un-syncing the interrupts breaks the progress bar in magtruck
+*/
+
+TIMER_CALLBACK_MEMBER(model3_state::model3_scan_timer_tick)
+{
+	m_scan_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1), m_screen->vpos() + 1);
+
+	int scanline = param;
+
+	if (scanline == 384)
+	{
+		set_irq_line(0x02, ASSERT_LINE);
+	}
+	else
+	{
+		//if ((scanline & 0x1) == 0)
+			set_irq_line(0x0c, ASSERT_LINE);
+	}
+}
+
 MACHINE_START_MEMBER(model3_state,model3_10)
 {
 	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
+	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_15)
 {
@@ -1296,6 +1328,7 @@ MACHINE_START_MEMBER(model3_state,model3_15)
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
+	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_20)
 {
@@ -1303,6 +1336,7 @@ MACHINE_START_MEMBER(model3_state,model3_20)
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
+	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_21)
 {
@@ -1310,6 +1344,7 @@ MACHINE_START_MEMBER(model3_state,model3_21)
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
+	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_scan_timer_tick),this));
 }
 
 void model3_state::model3_init(int step)
@@ -1332,7 +1367,9 @@ void model3_state::model3_init(int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base()+0x80000, 16);
-	machine().device("audiocpu")->reset();
+	m_audiocpu->reset();
+
+	m_scan_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1), m_screen->vpos() + 1);
 
 	m_m3_step = step; // step = BCD hardware rev.  0x10 for 1.0, 0x15 for 1.5, 0x20 for 2.0, etc.
 	tap_reset();
@@ -1365,6 +1402,7 @@ void model3_state::model3_init(int step)
 	}
 }
 
+//void model3_state::reset_model3_10() { model3_init(0x10); }
 MACHINE_RESET_MEMBER(model3_state,model3_10){ model3_init(0x10); }
 MACHINE_RESET_MEMBER(model3_state,model3_15){ model3_init(0x15); }
 MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(0x20); }
@@ -5716,132 +5754,101 @@ WRITE8_MEMBER(model3_state::scsp_irq)
 	m_audiocpu->set_input_line(offset, data);
 }
 
-/* IRQs */
-/*
-    0x80: Unknown (no clearing logic in scud)
-    0x40: SCSP
-    0x20: Unknown (no clearing logic in scud)
-    0x10: Network
-    0x08: Video (unknown -- has callback hook in scud)
-    0x04: Video (unknown -- has callback hook in scud)
-    0x02: Video (VBLANK start?)
-    0x01: Video (unused?)
-
-    IRQ 0x08 and 0x04 directly affect the game speed in magtruck, once per scanline seems fast enough
-    Un-syncing the interrupts breaks the progress bar in magtruck
-*/
-TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
+void model3_state::add_cpu_66mhz(machine_config &config)
 {
-	int scanline = param;
-
-	if (scanline == 384)
-	{
-		set_irq_line(0x02, ASSERT_LINE);
-	}
-	else
-	{
-		//if ((scanline & 0x1) == 0)
-			set_irq_line(0x0c, ASSERT_LINE);
-	}
+	PPC603E(config, m_maincpu, 66000000);
+	m_maincpu->set_bus_frequency(66000000);   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_10_mem);
 }
 
-MACHINE_CONFIG_START(model3_state::model3_10)
-	MCFG_DEVICE_ADD("maincpu", PPC603E, 66000000)
-	MCFG_PPC_BUS_FREQUENCY(66000000)   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
-	MCFG_DEVICE_PROGRAM_MAP(model3_10_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
+void model3_state::add_cpu_100mhz(machine_config &config)
+{
+	PPC603E(config, m_maincpu, 100000000);
+	m_maincpu->set_bus_frequency(66000000);   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_mem);
+}
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
+void model3_state::add_cpu_166mhz(machine_config &config)
+{
+	PPC603R(config, m_maincpu, 166000000);
+	m_maincpu->set_bus_frequency(66000000);   /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_mem);
+}
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+void model3_state::add_base_devices(machine_config &config)
+{
+	M68000(config, m_audiocpu, 12000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &model3_state::model3_snd);
 
-	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
-	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
+	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	NVRAM(config, "backup", nvram_device::DEFAULT_ALL_1);
+	RTC72421(config, m_rtc, XTAL(32'768)); // internal oscillator
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_visarea(0, 495, 0, 383);
+	m_screen->set_size(512, 400);
+	m_screen->set_screen_update(FUNC(model3_state::screen_update_model3));
 
+	PALETTE(config, m_palette, 32768);
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
-	MCFG_SCREEN_SIZE(512, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	SCSP(config, m_scsp1);
+	m_scsp1->irq_cb().set(FUNC(model3_state::scsp_irq));
+	m_scsp1->add_route(0, "lspeaker", 2.0);
+	m_scsp1->add_route(0, "rspeaker", 2.0);
 
-	MCFG_DEVICE_ADD("scsp2", SCSP)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	scsp_device &scsp2(SCSP(config, "scsp2"));
+	scsp2.add_route(0, "lspeaker", 2.0);
+	scsp2.add_route(0, "rspeaker", 2.0);
+}
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+void model3_state::add_scsi_devices(machine_config &config)
+{
+	SCSI_PORT(config, "scsi", 0);
 
-	MCFG_DEVICE_ADD("lsi53c810", LSI53C810, 0)
-	MCFG_LSI53C810_IRQ_CB(model3_state, scsi_irq_callback)
-	MCFG_LSI53C810_DMA_CB(model3_state, real3d_dma_callback)
-	MCFG_LSI53C810_FETCH_CB(model3_state, scsi_fetch)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-MACHINE_CONFIG_END
+	LSI53C810(config, m_lsi53c810, 0);
+	m_lsi53c810->set_irq_callback(FUNC(model3_state::scsi_irq_callback));
+	m_lsi53c810->set_dma_callback(FUNC(model3_state::real3d_dma_callback));
+	m_lsi53c810->set_fetch_callback(FUNC(model3_state::scsi_fetch));
+	m_lsi53c810->set_scsi_port("scsi");
+}
 
-MACHINE_CONFIG_START(model3_state::model3_15)
-	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
-	MCFG_PPC_BUS_FREQUENCY(66000000)       /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(model3_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
+void model3_state::add_crypt_devices(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_5881_mem);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
+	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	m_cryptdevice->set_read_cb(FUNC(model3_state::crypt_read_callback));
+}
+
+void model3_state::model3_10(machine_config &config)
+{
+	add_cpu_66mhz(config);
+	add_base_devices(config);
+	add_scsi_devices(config);
+
+	config.m_minimum_quantum = attotime::from_hz(600);
+
+	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
+	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
+}
+
+void model3_state::model3_15(machine_config &config)
+{
+	add_cpu_100mhz(config);
+	add_base_devices(config);
+	add_scsi_devices(config);
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
-
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
-	MCFG_SCREEN_SIZE(496, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("scsp2", SCSP)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-
-	MCFG_DEVICE_ADD("lsi53c810", LSI53C810, 0)
-	MCFG_LSI53C810_IRQ_CB(model3_state, scsi_irq_callback)
-	MCFG_LSI53C810_DMA_CB(model3_state, real3d_dma_callback)
-	MCFG_LSI53C810_FETCH_CB(model3_state, scsi_fetch)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-
-	MCFG_M3COMM_ADD("comm_board")
-MACHINE_CONFIG_END
+	M3COMM(config, "comm_board", 0);
+}
 
 void model3_state::scud(machine_config &config)
 {
@@ -5859,46 +5866,16 @@ void model3_state::scud(machine_config &config)
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
 
-MACHINE_CONFIG_START(model3_state::model3_20)
-	MCFG_DEVICE_ADD("maincpu", PPC603R, 166000000)
-	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
-	MCFG_DEVICE_PROGRAM_MAP(model3_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
-
-	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
+void model3_state::model3_20(machine_config &config)
+{
+	add_cpu_166mhz(config);
+	add_base_devices(config);
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
-
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
-	MCFG_SCREEN_SIZE(496, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("scsp2", SCSP)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_M3COMM_ADD("comm_board")
-MACHINE_CONFIG_END
+	M3COMM(config, "comm_board", 0);
+}
 
 uint16_t model3_state::crypt_read_callback(uint32_t addr)
 {
@@ -5914,67 +5891,28 @@ uint16_t model3_state::crypt_read_callback(uint32_t addr)
 	return dat;
 }
 
-MACHINE_CONFIG_START(model3_state::model3_20_5881)
+void model3_state::model3_20_5881(machine_config &config)
+{
 	model3_20(config);
+	add_crypt_devices(config);
+}
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(model3_5881_mem)
-
-	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
-	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(model3_state::model3_21)
-	MCFG_DEVICE_ADD("maincpu", PPC603R, 166000000)
-	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
-	MCFG_DEVICE_PROGRAM_MAP(model3_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
-
-	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
+void model3_state::model3_21(machine_config &config)
+{
+	add_cpu_166mhz(config);
+	add_base_devices(config);
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_21)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup")
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
+	M3COMM(config, "comm_board", 0);
+}
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
-	MCFG_SCREEN_SIZE(496, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("scsp2", SCSP)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_M3COMM_ADD("comm_board")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(model3_state::model3_21_5881)
+void model3_state::model3_21_5881(machine_config &config)
+{
 	model3_21(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(model3_5881_mem)
-
-	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
-	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
-MACHINE_CONFIG_END
-
+	add_crypt_devices(config);
+}
 
 void model3_state::interleave_vroms()
 {

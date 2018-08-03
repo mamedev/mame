@@ -72,18 +72,21 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(luxor_4105_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
-	MCFG_SCSI_BSY_HANDLER(WRITELINE(*this, luxor_4105_device, write_sasi_bsy))
-	MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, luxor_4105_device, write_sasi_req))
-	MCFG_SCSI_CD_HANDLER(WRITELINE(*this, luxor_4105_device, write_sasi_cd))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, luxor_4105_device, write_sasi_io))
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
+void luxor_4105_device::device_add_mconfig(machine_config &config)
+{
+	SCSI_PORT(config, m_sasibus);
+	m_sasibus->set_data_input_buffer(m_sasi_data_in);
+	m_sasibus->bsy_handler().set(FUNC(luxor_4105_device::write_sasi_bsy));
+	m_sasibus->req_handler().set(FUNC(luxor_4105_device::write_sasi_req));
+	m_sasibus->cd_handler().set(FUNC(luxor_4105_device::write_sasi_cd));
+	m_sasibus->io_handler().set(FUNC(luxor_4105_device::write_sasi_io));
+	m_sasibus->set_slot_device(1, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
-	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
-MACHINE_CONFIG_END
+	OUTPUT_LATCH(config, m_sasi_data_out);
+	m_sasibus->set_output_latch(*m_sasi_data_out);
+
+	INPUT_BUFFER(config, m_sasi_data_in);
+}
 
 
 //-------------------------------------------------

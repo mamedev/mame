@@ -187,7 +187,7 @@ public:
 	void vfxsd(machine_config &config);
 	void eps(machine_config &config);
 	void vfx32(machine_config &config);
-	
+
 	void init_eps();
 	void init_common();
 	void init_sq1();

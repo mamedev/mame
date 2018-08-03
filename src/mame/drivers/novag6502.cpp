@@ -77,8 +77,8 @@ instead of magnet sensors.
 class novag6502_state : public novagbase_state
 {
 public:
-	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag),
+	novag6502_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag),
 		m_hlcd0538(*this, "hlcd0538"),
 		m_rombank(*this, "rombank")
 	{ }
@@ -881,7 +881,7 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_supercon)
+	config.set_default_layout(layout_novag_supercon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -901,11 +901,11 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("hlcd0538", HLCD0538, 0)
-	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(*this, novag6502_state, cforte_lcd_output_w))
+	HLCD0538(config, m_hlcd0538, 0);
+	m_hlcd0538->write_cols_callback().set(FUNC(novag6502_state::cforte_lcd_output_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
+	config.set_default_layout(layout_novag_cforte);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -952,7 +952,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_sexpert)
+	config.set_default_layout(layout_novag_sexpert);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(novag6502_state::sforte)
 	MCFG_TIMER_MODIFY("irq_on")
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
 
-	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
+	config.set_default_layout(layout_novag_sforte);
 MACHINE_CONFIG_END
 
 

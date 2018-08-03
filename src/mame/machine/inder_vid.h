@@ -49,8 +49,6 @@ private:
 
 	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
-
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);

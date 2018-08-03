@@ -5,6 +5,11 @@
     Rollergames
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ROLLERG_H
+#define MAME_INCLUDES_ROLLERG_H
+
+#pragma once
+
 #include "machine/k053252.h"
 #include "video/k051316.h"
 #include "video/konami_helper.h"
@@ -13,14 +18,14 @@
 class rollerg_state : public driver_device
 {
 public:
-	rollerg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rollerg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k053244(*this, "k053244"),
 		m_k051316(*this, "k051316"),
 		m_k053252(*this, "k053252")
-		{ }
+	{ }
 
 	void rollerg(machine_config &config);
 
@@ -58,3 +63,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_ROLLERG_H

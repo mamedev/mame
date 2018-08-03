@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_micropin)
+	config.set_default_layout(layout_micropin);
 
 	/* Sound */
 	genpin_audio(config);

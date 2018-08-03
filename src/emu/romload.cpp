@@ -1173,6 +1173,10 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 
 void rom_load_manager::process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag)
 {
+	/* remove existing disk entries for this region */
+	m_chd_list.erase(std::remove_if(m_chd_list.begin(), m_chd_list.end(),
+		[regiontag](std::unique_ptr<open_chd> &chd){ return !strcmp(chd->region(), regiontag); }), m_chd_list.end());
+
 	/* loop until we hit the end of this region */
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
 	{

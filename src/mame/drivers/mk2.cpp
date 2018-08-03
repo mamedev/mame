@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(mk2_state::mk2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk2)
+	config.set_default_layout(layout_mk2);
 
 	MCFG_DEVICE_ADD("miot", MOS6530, 1000000)
 	MCFG_MOS6530_IN_PA_CB(READ8(*this, mk2_state, mk2_read_a))
