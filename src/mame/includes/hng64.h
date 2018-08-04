@@ -305,24 +305,20 @@ private:
 	DECLARE_READ8_MEMBER(hng64_comm_mmu_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
 
+	// shared ram access
 	DECLARE_READ8_MEMBER(ioport0_r);
-	DECLARE_READ8_MEMBER(ioport1_r);
-	DECLARE_READ8_MEMBER(ioport2_r);
-	DECLARE_READ8_MEMBER(ioport3_r);
-	DECLARE_READ8_MEMBER(ioport4_r);
-	DECLARE_READ8_MEMBER(ioport5_r);
-	DECLARE_READ8_MEMBER(ioport6_r);
-	DECLARE_READ8_MEMBER(ioport7_r);
-
 	DECLARE_WRITE8_MEMBER(ioport0_w);
-	DECLARE_WRITE8_MEMBER(ioport1_w);
-	DECLARE_WRITE8_MEMBER(ioport2_w);
-	DECLARE_WRITE8_MEMBER(ioport3_w);
-	DECLARE_WRITE8_MEMBER(ioport4_w);
-	DECLARE_WRITE8_MEMBER(ioport5_w);
-	DECLARE_WRITE8_MEMBER(ioport6_w);
 	DECLARE_WRITE8_MEMBER(ioport7_w);
 
+	// input port access
+	DECLARE_READ8_MEMBER(ioport3_r);
+	DECLARE_WRITE8_MEMBER(ioport3_w);
+	DECLARE_WRITE8_MEMBER(ioport1_w);
+
+	// unknown access
+	DECLARE_WRITE8_MEMBER(ioport4_w);
+
+	// analog input access
 	DECLARE_READ8_MEMBER(anport0_r);
 	DECLARE_READ8_MEMBER(anport1_r);
 	DECLARE_READ8_MEMBER(anport2_r);
@@ -332,7 +328,11 @@ private:
 	DECLARE_READ8_MEMBER(anport6_r);
 	DECLARE_READ8_MEMBER(anport7_r);
 
+	DECLARE_WRITE_LINE_MEMBER( sio0_w );
+
 	uint8_t m_port7;
+	uint8_t m_port1;
+
 	int m_ex_ramaddr;
 	int m_ex_ramaddr_upper;
 	std::unique_ptr<uint8_t[]> m_ioram;

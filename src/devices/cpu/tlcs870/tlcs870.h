@@ -299,6 +299,8 @@ private:
 	uint8_t m_transfer_shiftreg[2];
 	uint8_t m_transfer_shiftpos[2];
 	uint8_t m_transfer_mode[2];
+	int m_transmit_bits[2];
+	int m_receive_bits[2];
 
 	emu_timer *m_serial_transmit_timer[2];
 
