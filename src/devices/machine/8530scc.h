@@ -32,6 +32,7 @@ public:
 	scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
+	auto intrq_callback() { return intrq_cb.bind(); }
 
 	uint8_t get_reg_a(int reg);
 	uint8_t get_reg_b(int reg);

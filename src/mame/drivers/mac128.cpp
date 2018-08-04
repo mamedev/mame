@@ -1363,9 +1363,9 @@ void mac128_state::mac512ke(machine_config &config)
 	IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
 
-	scc85c30_device &scc(SCC85C30(config, "scc", C7M));
-	scc.configure_channels(C3_7M, 0, C3_7M, 0);
-	scc.out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
+	SCC85C30(config, m_scc, C7M);
+	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
+	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 
 	VIA6522(config, m_via, 1000000);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
