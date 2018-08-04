@@ -227,7 +227,7 @@ static const game_offset game_offsets[] =
         ---- ---0     Coin #0 Counter     */
 
 // some games haven't the coin lockout device (blandia, eightfrc, extdwnhl, gundhara, kamenrid, magspeed, sokonuke, zingzip, zombraid)
-WRITE8_MEMBER(seta_state::seta_coin_counter_w)
+void seta_state::seta_coin_counter_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -236,9 +236,9 @@ WRITE8_MEMBER(seta_state::seta_coin_counter_w)
 		m_x1->enable_w(BIT(data, 6));
 }
 
-WRITE8_MEMBER(seta_state::seta_coin_lockout_w)
+void seta_state::seta_coin_lockout_w(u8 data)
 {
-	seta_coin_counter_w(space, 0, data);
+	seta_coin_counter_w(data);
 
 	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2));
 	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
