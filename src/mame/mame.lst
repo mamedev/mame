@@ -18546,8 +18546,9 @@ magtouch                        // (c) 1995
 
 @source:mainevt.cpp
 devstors                        // GX890 (c) 1988
+devstorsx                       // GX890 (c) 1988
+devstorsv                       // GX890 (c) 1988
 devstors2                       // GX890 (c) 1988
-devstors3                       // GX890 (c) 1988
 garuka                          // GX890 (c) 1988 (Japan)
 mainevt                         // GX799 (c) 1988
 mainevt2p                       // GX799 (c) 1988

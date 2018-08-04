@@ -370,7 +370,7 @@ static INPUT_PORTS_START( devstors )
 INPUT_PORTS_END
 
 /* Same as 'devstors', but additional "Cocktail" Dip Switch (even if I don't see the use) */
-static INPUT_PORTS_START( devstor2 )
+static INPUT_PORTS_START( devstors_ct )
 	PORT_INCLUDE( devstors )
 
 	PORT_MODIFY("DSW2")
@@ -652,7 +652,7 @@ ROM_START( devstors )
 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstors2 )
+ROM_START( devstorsx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "890x02.k11",  0x00000, 0x10000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
 
@@ -676,9 +676,33 @@ ROM_START( devstors2 )
 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstors3 )
+ROM_START( devstorsv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "890v02.k11",   0x00000, 0x10000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
+
+	ROM_REGION( 0x40000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_BYTE( "890f06.f22",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
+	ROM_LOAD32_BYTE( "890f07.h22",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
+	ROM_LOAD32_BYTE( "890f08.j22",  0x00002, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
+	ROM_LOAD32_BYTE( "890f09.k22",  0x00003, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
+
+	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
+	ROM_LOAD32_WORD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD32_WORD( "890f05.k4",  0x00002, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) ) /* priority encoder (not used) */
+
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 512k for 007232 samples */
+	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
+ROM_END
+
+ROM_START( devstors2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "890_202.k11",   0x00000, 0x10000, CRC(afbf0951) SHA1(6eb5d7e1de58058bd50d184d4c7e8dbea9cce13d) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
@@ -730,7 +754,8 @@ GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, empty_init, R
 GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstorsx,devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstorsv,devstors, devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )
