@@ -532,7 +532,9 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		//case 0x107c:
 		case 0x1084: return 0x00000002; //MCU->MIPS latch port
 		//case 0x108c:
-		case 0x1104: return m_irq_level;
+		case 0x1104:
+			logerror("%s: irq level READ %04x\n", machine().describe_context(),m_irq_level);
+			return m_irq_level;
 		case 0x111c:
 			//printf("Read to IRQ ACK?\n");
 			break;
@@ -1472,15 +1474,62 @@ void hng64_state::set_irq(uint32_t irq_vector)
 	    - is there an irq mask mechanism?
 	    - is irq level cleared too when the irq acks?
 
-	    This is written with irqs DISABLED
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0 vblank irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1 <empty>
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2 <empty>
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 3d fifo processed irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17 MCU related irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq, needed by xrally and roadedge
+		IRQ level read at 0x80008cac
+
+		-- irq table in Fatal Fury WA - 'empty' entries just do minimum 'interrupt service' with no real function.
+		80000400: 80039F20 lb         irq00 vblank irq
+		80000404: 80039F84 lb         1rq01 jump based on ram content
+		80000408: 8003A08C lb         irq02 'empty'
+		8000040C: 8006FF04 lb         irq03 3d FIFO?
+		80000410: A0000410 sb         irq04 INVALID
+		80000414: A0000414 sb         irq05 INVALID
+		80000418: A0000418 sb         irq06 INVALID
+		8000041C: A000041C sb         irq07 INVALID
+		80000420: A0000420 sb         irq08 INVALID
+		80000424: 8003A00C lb         irq09 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		80000428: 80039FD0 lb         irq0a 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		8000042C: 8003A0C0 lb         irq0b 'empty'(network on xrally?)   writes to sysreg 1074 instead of loading/storing regs tho
+		80000430: 8003A050 lb         irq0c 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		80000434: A0000434 sb         irq0d INVALID
+		80000438: A0000438 sb         irq0e INVALID
+		8000043C: A000043C sb         irq0f INVALID
+		80000440: A0000440 sb         irq10 INVALID
+		80000444: 8003A0FC lb         irq11 IO MCU related?               write to sysreg 1084 instead of loading/storing regs, accesses dualport RAM
+		80000448: A0000448 sb         irq12 INVALID
+		8000044C: A000044C sb         irq13 INVALID
+		80000450: A0000450 sb         irq14 INVALID
+		80000454: A0000454 sb         irq15 INVALID
+		80000458: A0000458 sb         irq16 INVALID
+		8000045C: 8003A1D4 lb         irq17 'empty'                       write to sysreg 1084 instead of loading/storing regs tho (like irq 0x11)
+		80000460: A0000460 sb         irq18 INVALID
+		80000464: A0000464 sb         (all other entries, invalid)
+
+	    Register 111c is connected to the interrupts and written in each one (IRQ ack / latch clear?)
+
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0x00 vblank irq
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 0x01 <empty> (not empty of ffwa)
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 0x02 <empty>
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 0x03 3d fifo processed irq
+		                                                     00010
+															 00020
+														     00040
+															 00080
+															 00100
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 0x09                                          
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 0x0a
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 0x0b network irq, needed by xrally and roadedge
+		                                                     01000
+															 02000
+															 04000
+															 08000
+															 10000
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 0x11 MCU related irq?
+		                                                     40000
+															 80000
+															100000
+															200000
+															400000
+															800000 0x17 MCU related irq?
 
 	    samsho64 / samsho64_2 does this during running:
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000000. (PC=800008fc) just checking?
