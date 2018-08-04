@@ -91,7 +91,6 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 20)
 	, m_rate(0)
-	, m_xor(0)
 	, m_stream(nullptr)
 	, m_sound_enable(0)
 	, m_reg(nullptr)
@@ -165,17 +164,14 @@ void x1_010_device::enable_w(int data)
 
 /* Use these for 8 bit CPUs */
 
-
-READ8_MEMBER( x1_010_device::read )
+u8 x1_010_device::read(offs_t offset)
 {
-	offset ^= m_xor;
 	return m_reg[offset];
 }
 
-WRITE8_MEMBER( x1_010_device::write )
+void x1_010_device::write(offs_t offset, u8 data)
 {
 	int channel, reg;
-	offset ^= m_xor;
 
 	channel = offset/sizeof(X1_010_CHANNEL);
 	reg     = offset%sizeof(X1_010_CHANNEL);
@@ -192,20 +188,20 @@ WRITE8_MEMBER( x1_010_device::write )
 
 /* Use these for 16 bit CPUs */
 
-READ16_MEMBER( x1_010_device::word_r )
+u16 x1_010_device::word_r(offs_t offset)
 {
 	uint16_t  ret;
 
 	ret = m_HI_WORD_BUF[offset]<<8;
-	ret += (read( space, offset )&0xff);
+	ret += (read( offset )&0xff);
 	LOG_REGISTER_READ("%s: Read X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
-WRITE16_MEMBER( x1_010_device::word_w )
+void x1_010_device::word_w(offs_t offset, u16 data)
 {
 	m_HI_WORD_BUF[offset] = (data>>8)&0xff;
-	write( space, offset, data&0xff );
+	write( offset, data&0xff );
 	LOG_REGISTER_WRITE("%s: Write X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, data);
 }
 
