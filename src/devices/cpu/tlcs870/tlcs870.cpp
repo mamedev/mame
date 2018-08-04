@@ -475,6 +475,8 @@ READ8_MEMBER(tlcs870_device::tbtcr_r)
 
 /* SIO emulation */
 
+// TODO: use templates for SIO1/2 ports, as they're the same except for the DBR region they use?
+
 // Serial Port 1
 WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 {
@@ -493,14 +495,40 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 	m_transfer_mode[0] = (m_SIOCR1[0] & 0x38) >> 3;
 	switch (m_transfer_mode[0])
 	{
-	case 0x0: logerror("(Serial set to 8-bit transmit mode)\n"); break;
-	case 0x1: logerror("(Serial set to invalid mode)\n"); break;
-	case 0x2: logerror("(Serial set to 4-bit transmit mode)\n"); break;
-	case 0x3: logerror("(Serial set to invalid mode)\n"); break;
-	case 0x4: logerror("(Serial set to 8-bit transmit/receive mode)\n"); break;
-	case 0x5: logerror("(Serial set to 8-bit receive mode)\n"); break;
-	case 0x6: logerror("(Serial set to 4-bit receive mode)\n"); break;
-	case 0x7: logerror("(Serial set to invalid mode)\n"); break;
+	case 0x0:
+		logerror("(Serial set to 8-bit transmit mode)\n");
+		m_transmit_bits[0] = 8;
+		m_receive_bits[0] = 0;
+		break;
+
+	case 0x2: 
+		logerror("(Serial set to 4-bit transmit mode)\n");
+		m_transmit_bits[0] = 4;
+		m_receive_bits[0] = 0;
+		break;
+
+	case 0x4:
+		logerror("(Serial set to 8-bit transmit/receive mode)\n");
+		m_transmit_bits[0] = 8;
+		m_receive_bits[0] = 8;
+		break;
+
+	case 0x5: logerror("(Serial set to 8-bit receive mode)\n");
+		m_transmit_bits[0] = 0;
+		m_receive_bits[0] = 8;
+		break;
+
+	case 0x6:
+		logerror("(Serial set to 4-bit receive mode)\n");
+		m_transmit_bits[0] = 0;
+		m_receive_bits[0] = 4;		
+		break;
+
+	default:
+		logerror("(Serial set to invalid mode)\n");
+		m_transmit_bits[0] = 0;
+		m_receive_bits[0] = 0;
+		break;
 	}
 
 	if ((m_SIOCR1[0] & 0xc0) == 0x80)
@@ -510,7 +538,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 		m_transfer_shiftreg[0] = 0;
 		m_transfer_pos[0] = 0;
 
-		m_serial_transmit_timer[0]->adjust(attotime::zero);
+		m_serial_transmit_timer[0]->adjust(attotime::zero);	
 	}
 }
 
@@ -547,39 +575,42 @@ READ8_MEMBER(tlcs870_device::sio1sr_r)
 
 TIMER_CALLBACK_MEMBER(tlcs870_device::sio0_transmit_cb)
 {
-	int finish = 0;
-	if (m_transfer_shiftpos[0] == 0)
+	if (m_transmit_bits[0]) // TODO: handle receive cases
 	{
-		m_transfer_shiftreg[0] = m_dbr[m_transfer_pos[0]];
-		logerror("transmitting byte %02x\n", m_transfer_shiftreg[0]);
-	}
-
-	int dataout = m_transfer_shiftreg[0] & 0x01;
-
-	m_serial_out_cb[0](dataout);
-
-	m_transfer_shiftreg[0] >>= 1;
-	m_transfer_shiftpos[0]++;
-
-	if (m_transfer_shiftpos[0] == 8)
-	{
-		logerror("transmitted\n");
-
-		m_transfer_shiftpos[0] = 0;
-		m_transfer_pos[0]++;
-
-		if (m_transfer_pos[0] > m_transfer_numbytes[0])
+		int finish = 0;
+		if (m_transfer_shiftpos[0] == 0)
 		{
-			logerror("end of transmission\n");
-			m_SIOCR1[0] &= ~0x80;
-			// set interrupt latch
-			m_IL |= 1 << (15-TLCS870_IRQ_INTSIO1);
-			finish = 1;
+			m_transfer_shiftreg[0] = m_dbr[m_transfer_pos[0]];
+			logerror("transmitting byte %02x\n", m_transfer_shiftreg[0]);
 		}
-	}
 
-	if (!finish)
-		m_serial_transmit_timer[0]->adjust(cycles_to_attotime(1000)); // TODO: use real speed
+		int dataout = m_transfer_shiftreg[0] & 0x01;
+
+		m_serial_out_cb[0](dataout);
+
+		m_transfer_shiftreg[0] >>= 1;
+		m_transfer_shiftpos[0]++;
+
+		if (m_transfer_shiftpos[0] == 8)
+		{
+			logerror("transmitted\n");
+
+			m_transfer_shiftpos[0] = 0;
+			m_transfer_pos[0]++;
+
+			if (m_transfer_pos[0] > m_transfer_numbytes[0])
+			{
+				logerror("end of transmission\n");
+				m_SIOCR1[0] &= ~0x80;
+				// set interrupt latch
+				m_IL |= 1 << (15 - TLCS870_IRQ_INTSIO1);
+				finish = 1;
+			}
+		}
+
+		if (!finish)
+			m_serial_transmit_timer[0]->adjust(cycles_to_attotime(1000)); // TODO: use real speed
+	}
 }
 
 // Serial Port 2
