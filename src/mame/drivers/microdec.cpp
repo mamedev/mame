@@ -96,6 +96,7 @@ READ8_MEMBER( microdec_state::portf6_r )
 READ8_MEMBER( microdec_state::portf7_r )
 {
 	m_fdc->tc_w(1);
+	m_fdc->tc_w(0);
 	return 0xff;
 }
 
@@ -188,6 +189,8 @@ void microdec_state::init_microdec()
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x1000]);
 	membank("bankw0")->configure_entry(0, &main[0x1000]);
+	m_fdc->set_ready_line_connected(1);
+	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy
 }
 
 void microdec_state::microdec(machine_config &config)
