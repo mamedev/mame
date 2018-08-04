@@ -58,10 +58,9 @@ To Do / Status:
 --------------
 
 trs80m3:   works
-           floppy not working
 
 trs80m4:   works
-           floppy not working
+           will boot model 3 floppies, but not model 4 ones
 
 trs80m4p:  floppy not working, so machine is useless
 
