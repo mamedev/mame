@@ -453,7 +453,7 @@ void ti99_floppy_format::generate_mfm_track_from_sectors(floppy_image *image, ui
 	// The remaining bytes are filled with the gap byte as gap 4.
 	int gap4 = cell_count/16 - tracklen;
 
-	short crc = 0;
+	uint16_t crc = 0;
 
 	// Create Gap 0 and Index AM
 	for (int i=0; i < param[GAP0]; i++)
