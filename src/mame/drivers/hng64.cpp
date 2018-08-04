@@ -530,7 +530,9 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		case 0x001c: return machine().rand(); // hng64 hangs on start-up if zero.
 		//case 0x106c:
 		//case 0x107c:
-		case 0x1084: return 0x00000002; //MCU->MIPS latch port
+		case 0x1084:
+			logerror("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
+			return 0x00000002; //MCU->MIPS latch port
 		//case 0x108c:
 		case 0x1104:
 			logerror("%s: irq level READ %04x\n", machine().describe_context(),m_irq_level);
@@ -595,7 +597,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
+			logerror("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
 		//0x110c global irq mask?
 		/* irq ack */
@@ -752,11 +754,13 @@ READ32_MEMBER(hng64_state::hng64_dualport_r)
 	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 
 	/*
+	I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
+
 	command table:
 	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
 	0x0c = cut down connections, treats the dualport to be normal RAM
 	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
-	0x20 = asks for MCU machine code
+	0x20 = asks for MCU machine code (probably not, this is also written in the function after the TLCS870 requests an interrupt on the MIPS)
 
 	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
 	*/
