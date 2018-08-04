@@ -804,7 +804,7 @@ WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 		(currently we use m_dualport due to simulation, but this should actually be the same RAM as m_ioram)
 	*/
 	COMBINE_DATA(&m_dualport[offset]);
-	logerror("%s: dualport WRITE %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+	logerror("%s: dualport WRITE %08x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 
@@ -1477,32 +1477,61 @@ void hng64_state::set_irq(uint32_t irq_vector)
 		IRQ level read at 0x80008cac
 
 		-- irq table in Fatal Fury WA - 'empty' entries just do minimum 'interrupt service' with no real function.
-		80000400: 80039F20 lb         irq00 vblank irq
-		80000404: 80039F84 lb         1rq01 jump based on ram content
-		80000408: 8003A08C lb         irq02 'empty'
-		8000040C: 8006FF04 lb         irq03 3d FIFO?
-		80000410: A0000410 sb         irq04 INVALID
-		80000414: A0000414 sb         irq05 INVALID
-		80000418: A0000418 sb         irq06 INVALID
-		8000041C: A000041C sb         irq07 INVALID
-		80000420: A0000420 sb         irq08 INVALID
-		80000424: 8003A00C lb         irq09 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
-		80000428: 80039FD0 lb         irq0a 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
-		8000042C: 8003A0C0 lb         irq0b 'empty'(network on xrally?)   writes to sysreg 1074 instead of loading/storing regs tho
-		80000430: 8003A050 lb         irq0c 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
-		80000434: A0000434 sb         irq0d INVALID
-		80000438: A0000438 sb         irq0e INVALID
-		8000043C: A000043C sb         irq0f INVALID
-		80000440: A0000440 sb         irq10 INVALID
-		80000444: 8003A0FC lb         irq11 IO MCU related?               write to sysreg 1084 instead of loading/storing regs, accesses dualport RAM
-		80000448: A0000448 sb         irq12 INVALID
-		8000044C: A000044C sb         irq13 INVALID
-		80000450: A0000450 sb         irq14 INVALID
-		80000454: A0000454 sb         irq15 INVALID
-		80000458: A0000458 sb         irq16 INVALID
-		8000045C: 8003A1D4 lb         irq17 'empty'                       write to sysreg 1084 instead of loading/storing regs tho (like irq 0x11)
-		80000460: A0000460 sb         irq18 INVALID
-		80000464: A0000464 sb         (all other entries, invalid)
+		80000400: 80039F20         irq00 vblank irq
+		80000404: 80039F84         1rq01 jump based on ram content
+		80000408: 8003A08C         irq02 'empty'
+		8000040C: 8006FF04         irq03 3d FIFO?
+		80000410: A0000410         irq04 INVALID
+		80000414: A0000414         irq05 INVALID
+		80000418: A0000418         irq06 INVALID
+		8000041C: A000041C         irq07 INVALID
+		80000420: A0000420         irq08 INVALID
+		80000424: 8003A00C         irq09 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		80000428: 80039FD0         irq0a 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		8000042C: 8003A0C0         irq0b 'empty'(network on xrally?)   writes to sysreg 1074 instead of loading/storing regs tho
+		80000430: 8003A050         irq0c 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		80000434: A0000434         irq0d INVALID
+		80000438: A0000438         irq0e INVALID
+		8000043C: A000043C         irq0f INVALID
+		80000440: A0000440         irq10 INVALID
+		80000444: 8003A0FC         irq11 IO MCU related?               write to sysreg 1084 instead of loading/storing regs, accesses dualport RAM
+		80000448: A0000448         irq12 INVALID
+		8000044C: A000044C         irq13 INVALID
+		80000450: A0000450         irq14 INVALID
+		80000454: A0000454         irq15 INVALID
+		80000458: A0000458         irq16 INVALID
+		8000045C: 8003A1D4         irq17 'empty'                       write to sysreg 1084 instead of loading/storing regs tho (like irq 0x11)
+		80000460: A0000460         irq18 INVALID
+		(all other entries, invalid)
+
+		Xrally (invalid IRQs are more obviously invalid, pointing at 0)
+		80000400: 80016ED0         irq00
+		80000404: 80016F58         irq01
+		80000408: 80017048         irq02
+		8000040C: 80013484         irq03
+		80000410: 00000000         irq04 INVALID
+		80000414: 00000000         irq05 INVALID
+		80000418: 00000000         irq06 INVALID
+		8000041C: 00000000         irq07 INVALID
+		80000420: 00000000         irq08 INVALID
+		80000424: 80016FC8         irq09
+		80000428: 80016F8C         irq0a
+		8000042C: 8001707C         irq0b
+		80000430: 8001700C         irq0c
+		80000434: 00000000         irq0d INVALID
+		80000438: 00000000         irq0e INVALID
+		8000043C: 00000000         irq0f INVALID
+		80000440: 00000000         irq10 INVALID
+		80000444: 800170C0         irq11
+		80000448: 00000000         irq12 INVALID
+		8000044C: 00000000         irq13 INVALID
+		80000450: 00000000         irq14 INVALID
+		80000454: 00000000         irq15 INVALID
+		80000458: 00000000         irq16 INVALID
+		8000045C: 80017198         irq17
+		80000460: 00000000         irq18 INVALID
+		(all other entries, invalid)
+
 
 	    Register 111c is connected to the interrupts and written in each one (IRQ ack / latch clear?)
 
