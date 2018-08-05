@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Samuel Neves, Peter Wilhelmsen, Morten Shearman Kirkegaard
 #ifndef MAME_MACHINE_315_5838_371_0229_COMP_H
 #define MAME_MACHINE_315_5838_371_0229_COMP_H
 
@@ -21,13 +21,6 @@ public:
 	template <typename Object> void set_read_cb_ch1(Object &&readcb) { m_read_ch = std::forward<Object>(readcb); }
 
 	DECLARE_READ32_MEMBER(data_r);
-	uint32_t genericdecathlt_prot_r(uint32_t mem_mask);
-
-	void write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words);
-
-	void upload_table_data(uint16_t data);
-	void set_upload_mode(uint16_t data);
-	void set_prot_addr(uint32_t data, uint32_t mem_mask);
 
 	DECLARE_WRITE32_MEMBER(data_w_doa);
 	DECLARE_WRITE32_MEMBER(data_w);
@@ -43,19 +36,39 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint16_t m_decathlt_prottable1[24];
-	uint16_t m_decathlt_dictionaryy[128];
+	uint16_t genericdecathlt_prot_r();
+
+	void write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words);
+	void set_prot_addr(uint32_t data, uint32_t mem_mask);
 
 	uint32_t m_srcoffset;
 
-	uint32_t m_decathlt_lastcount;
-	uint32_t m_decathlt_prot_uploadmode;
-	uint32_t m_decathlt_prot_uploadoffset;
+	struct {
+		uint16_t mode;
+		struct {
+			uint8_t len;       /* in bits */
+			uint8_t idx;       /* in the dictionary */
+			uint16_t pattern;  /* of the first node */
+		} tree[12];
+		int it2;
+		uint8_t dictionary[256];
+		int id;
+	} s;
 
-	// Decathlete specific variables and functions (see machine/decathlt.c)
+	void set_table_upload_mode_w(uint16_t val);
+	void upload_table_data_w(uint16_t val);
+
+	uint8_t get_decompressed_byte(void);
+	uint16_t decipher(uint16_t c);
+
+	int m_num_bits_compressed;
+	uint16_t m_val_compressed;
+	int m_num_bits;
+	uint16_t m_val;
+
 	sega_dec_read_delegate m_read_ch;
 
-	// Doa
+	// Doa simulation
 	int m_protstate;
 	int m_prot_a;
 	uint8_t m_protram[256];
