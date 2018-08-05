@@ -902,11 +902,11 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		}
 		else if (offset >= 0xffd0 && offset <= 0xffdf)
 		{
-			rv = m_via[0]->read(space, offset);
+			rv = m_via[0]->read(offset);
 		}
 		else if (offset >= 0xffe0 && offset <= 0xffef)
 		{
-			rv = m_via[1]->read(space, offset);
+			rv = m_via[1]->read(offset);
 		}
 		else
 		{
@@ -1049,14 +1049,14 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 		{
 			if (!machine().side_effects_disabled())
 			{
-				m_via[0]->write(space, offset, data);
+				m_via[0]->write(offset, data);
 			}
 		}
 		else if (offset >= 0xffe0 && offset <= 0xffef)
 		{
 			if (!machine().side_effects_disabled())
 			{
-				m_via[1]->write(space, offset, data);
+				m_via[1]->write(offset, data);
 			}
 		}
 		else

@@ -34,8 +34,7 @@ class taptun_module : public osd_module, public netdev_module
 {
 public:
 
-	taptun_module()
-	: osd_module(OSD_NETDEV_PROVIDER, "taptun"), netdev_module()
+	taptun_module() : osd_module(OSD_NETDEV_PROVIDER, "taptun"), netdev_module()
 	{
 	}
 	virtual ~taptun_module() { }
@@ -60,11 +59,11 @@ protected:
 	int recv_dev(uint8_t **buf);
 private:
 #if defined(WIN32)
-	HANDLE m_handle;
+	HANDLE m_handle = INVALID_HANDLE_VALUE;
 	OVERLAPPED m_overlapped;
 	bool m_receive_pending;
 #else
-	int m_fd;
+	int m_fd = -1;
 	char m_ifname[10];
 #endif
 	char m_mac[6];

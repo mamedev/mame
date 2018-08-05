@@ -99,6 +99,9 @@
 
 #define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
 
+#define MAC_MAIN_SND_BUF_OFFSET 0x0300
+#define MAC_ALT_SND_BUF_OFFSET  0x5F00
+
 #ifdef MAME_DEBUG
 #define LOG_ADB         0
 #define LOG_VIA         0
@@ -1652,7 +1655,7 @@ READ16_MEMBER ( mac_state::mac_via_r )
 
 	if (LOG_VIA)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
-	data = m_via1->read(space, offset);
+	data = m_via1->read(offset);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 
@@ -1668,9 +1671,9 @@ WRITE16_MEMBER ( mac_state::mac_via_w )
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_0_7)
-		m_via1->write(space, offset, data & 0xff);
+		m_via1->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_via1->write(space, offset, (data >> 8) & 0xff);
+		m_via1->write(offset, (data >> 8) & 0xff);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 }
@@ -1691,7 +1694,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	offset >>= 8;
 	offset &= 0x0f;
 
-	data = m_via2->read(space, offset);
+	data = m_via2->read(offset);
 
 	if (LOG_VIA)
 		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, m_maincpu->pc());
@@ -1708,9 +1711,9 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
-		m_via2->write(space, offset, data & 0xff);
+		m_via2->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_via2->write(space, offset, (data >> 8) & 0xff);
+		m_via2->write(offset, (data >> 8) & 0xff);
 }
 
 
@@ -2354,7 +2357,23 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 			mouse_callback();
 	}
 
-	m_scanline_timer->adjust(m_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
+	if (m_dac)
+	{
+		uint16_t *snd_buf_ptr;
+		if (m_main_buffer)
+		{
+			snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
+		}
+		else
+		{
+			snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
+		}
+
+		m_dac->write(snd_buf_ptr[scanline] >> 8);
+	}
+
+	int next_scanline = (scanline+1) % MAC_V_TOTAL;
+	m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
 WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)

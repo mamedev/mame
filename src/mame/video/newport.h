@@ -2,7 +2,6 @@
 // copyright-holders:Ryan Holtz
 /*
     SGI "Newport" graphics board used in the Indy and some Indigo2s
-
 */
 
 #ifndef MAME_VIDEO_NEWPORT_H
@@ -13,8 +12,12 @@
 class newport_video_device : public device_t
 {
 public:
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: newport_video_device(mconfig, tag, owner, (uint32_t)0) // TODO: Use actual pixel clock
+	{
+	}
 
+	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER( rex3_r );
 	DECLARE_WRITE32_MEMBER( rex3_w );

@@ -53,6 +53,16 @@ public:
 	template <class Object> devcb_base &set_out_ca_callback(Object &&cb) { return m_out_ca_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_cb_callback(Object &&cb) { return m_out_cb_cb.set_callback(std::forward<Object>(cb)); }
 
+	auto out_irq_cb() { return m_out_irq_cb.bind(); }
+	auto in_pa_cb() { return m_in_pa_cb.bind(); }
+	auto out_pa_cb() { return m_out_pa_cb.bind(); }
+	auto in_pb_cb() { return m_in_pb_cb.bind(); }
+	auto out_pb_cb() { return m_out_pb_cb.bind(); }
+	auto in_pc_cb() { return m_in_pc_cb.bind(); }
+	auto out_pc_cb() { return m_out_pc_cb.bind(); }
+	auto out_ca_cb() { return m_out_ca_cb.bind(); }
+	auto out_cb_cb() { return m_out_cb_cb.bind(); }
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

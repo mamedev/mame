@@ -49,6 +49,7 @@
 #include "screen.h"
 
 #include <math.h>
+#include <array>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -759,14 +760,16 @@ class layout_group
 public:
 	using environment = emu::render::detail::layout_environment;
 	using group_map = std::unordered_map<std::string, layout_group>;
+	using transform = std::array<std::array<float, 3>, 3>;
 
 	layout_group(util::xml::data_node const &groupnode);
 	~layout_group();
 
 	util::xml::data_node const &get_groupnode() const { return m_groupnode; }
 
-	render_bounds make_transform(render_bounds const &dest) const;
-	render_bounds make_transform(render_bounds const &dest, render_bounds const &transform) const;
+	transform make_transform(int orientation, render_bounds const &dest) const;
+	transform make_transform(int orientation, transform const &trans) const;
+	transform make_transform(int orientation, render_bounds const &dest, transform const &trans) const;
 
 	void set_bounds_unresolved();
 	void resolve_bounds(environment &env, group_map &groupmap);
@@ -818,7 +821,9 @@ public:
 				environment &env,
 				util::xml::data_node const &itemnode,
 				element_map &elemmap,
-				render_bounds const &transform);
+				int orientation,
+				layout_group::transform const &trans,
+				render_color const &color);
 		~item();
 
 		// getters
@@ -886,7 +891,9 @@ private:
 			util::xml::data_node const &parentnode,
 			element_map &elemmap,
 			group_map &groupmap,
-			render_bounds const &transform,
+			int orientation,
+			layout_group::transform const &trans,
+			render_color const &color,
 			bool root,
 			bool repeat,
 			bool init);

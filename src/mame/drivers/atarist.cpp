@@ -2050,13 +2050,13 @@ MACHINE_CONFIG_START(st_state::st)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, Y2/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2144,13 +2144,13 @@ MACHINE_CONFIG_START(megast_state::megast)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, Y2/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2246,13 +2246,13 @@ MACHINE_CONFIG_START(ste_state::ste)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, Y2/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2344,13 +2344,13 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, U517/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, U517/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	WD1772(config, m_fdc, U517/2);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();

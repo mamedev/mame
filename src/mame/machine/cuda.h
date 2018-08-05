@@ -59,6 +59,12 @@ class cuda_device :  public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
+	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, int type)
+		: cuda_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_type(type);
+	}
+
 	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
@@ -100,6 +106,10 @@ public:
 	template <class Object> devcb_base &set_linechange_cb(Object &&wr) { return write_linechange.set_callback(std::forward<Object>(wr)); }
 	template <class Object> devcb_base &set_via_clock_cb(Object &&wr) { return write_via_clock.set_callback(std::forward<Object>(wr)); }
 	template <class Object> devcb_base &set_via_data_cb(Object &&wr) { return write_via_data.set_callback(std::forward<Object>(wr)); }
+	auto reset_callback() { return write_reset.bind(); }
+	auto linechange_callback() { return write_linechange.bind(); }
+	auto via_clock_callback() { return write_via_clock.bind(); }
+	auto via_data_callback() { return write_via_data.bind(); }
 
 	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
 

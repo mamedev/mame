@@ -440,9 +440,9 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::txcb_w));
 
 	/* ICF5: 2kbytes of RAM shared between the two CPUs (dual-port RAM)*/
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(*this, pve500_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(*this, pve500_state, mb8421_intr))
+	mb8421_device &mb8421(MB8421(config, "mb8421"));
+	mb8421.intl_callback().set(FUNC(pve500_state::mb8421_intl));
+	mb8421.intr_callback().set(FUNC(pve500_state::mb8421_intr));
 
 	/* video hardware */
 	config.set_default_layout(layout_pve500);

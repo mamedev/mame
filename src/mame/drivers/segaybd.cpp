@@ -1363,9 +1363,9 @@ MACHINE_CONFIG_START(segaybd_state::yboard_link)
 	MCFG_DEVICE_PROGRAM_MAP(link_map)
 	MCFG_DEVICE_IO_MAP(link_portmap)
 
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intr))
+	mb8421_device &mb8421(MB8421(config, "mb8421"));
+	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));
+	mb8421.intr_callback().set(FUNC(segaybd_state::mb8421_intr));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)

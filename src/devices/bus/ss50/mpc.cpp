@@ -121,8 +121,8 @@ MACHINE_CONFIG_START(ss50_mpc_device::device_add_mconfig)
 	MCFG_INPUT_MERGER_ANY_HIGH("loopback")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("outgate", input_merger_device, in_w<1>))
 
-	MCFG_DEVICE_ADD("counter", RIPPLE_COUNTER, 0) // CD4024AE (IC3)
-	MCFG_RIPPLE_COUNTER_STAGES(7) // only Q5 (÷32) and Q4 (÷16) are actually used
+	RIPPLE_COUNTER(config, m_counter); // CD4024AE (IC3)
+	m_counter->set_stages(7); // only Q5 (÷32) and Q4 (÷16) are actually used
 MACHINE_CONFIG_END
 
 

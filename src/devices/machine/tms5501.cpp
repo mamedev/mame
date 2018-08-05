@@ -58,7 +58,7 @@ void tms5501_device::io_map(address_map &map)
 tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TMS5501, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
-	m_write_irq(*this),
+	m_write_int(*this),
 	m_write_xmt(*this),
 	m_read_xi(*this),
 	m_write_xo(*this),
@@ -82,7 +82,7 @@ tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, d
 void tms5501_device::device_start()
 {
 	// resolve callbacks
-	m_write_irq.resolve_safe();
+	m_write_int.resolve_safe();
 	m_write_xmt.resolve_safe();
 	m_read_xi.resolve_safe(0);
 	m_write_xo.resolve_safe();
@@ -496,11 +496,11 @@ void tms5501_device::check_interrupt()
 
 	if (m_cmd & CMD_IAE)
 	{
-		m_write_irq(state);
+		m_write_int(state);
 	}
 	else
 	{
-		m_write_irq(CLEAR_LINE);
+		m_write_int(CLEAR_LINE);
 	}
 }
 

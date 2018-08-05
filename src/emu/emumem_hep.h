@@ -8,7 +8,7 @@
 template<int Width, int AddrShift, int Endian> class handler_entry_read_passthrough : public handler_entry_read<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
 	handler_entry_read_passthrough(address_space *space, memory_passthrough_handler &mph) : handler_entry_read<Width, AddrShift, Endian>(space, handler_entry::F_PASSTHROUGH), m_mph(mph), m_next(nullptr) {}
 	~handler_entry_read_passthrough();
@@ -29,7 +29,7 @@ protected:
 template<int Width, int AddrShift, int Endian> class handler_entry_write_passthrough : public handler_entry_write<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
 	handler_entry_write_passthrough(address_space *space, memory_passthrough_handler &mph) : handler_entry_write<Width, AddrShift, Endian>(space, handler_entry::F_PASSTHROUGH), m_mph(mph), m_next(nullptr) {}
 	~handler_entry_write_passthrough();

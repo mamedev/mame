@@ -240,11 +240,12 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");
 	MCFG_DEVICE_REMOVE("mb:pc_kbdc");
-	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
-	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
-	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
+	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
+	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
+
 	MCFG_DEVICE_REMOVE("mb:rtc")
 	MCFG_DS12885_ADD("mb:rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w))

@@ -10,8 +10,7 @@ Described in Electronics Australia magazine in 1982/1983.
 
 - The ROM was keyed in by hand from a printout, so is therefore considered a bad dump.
 - It has routines for adc, dac, cassette, but there's no hardware to support these.
-- The basic machine is fully emulated as per the schematic, but still marked not working
-  until the ROM can be confirmed as ok.
+- The basic machine is fully emulated as per the schematic.
 
 Memory Map:
 0000-007F = RAM inside the cpu
@@ -214,4 +213,4 @@ ROM_START( datum )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW )
