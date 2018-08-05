@@ -37,23 +37,26 @@
 DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838", "Sega 315-5838 / 317-0229 Compression and Encryption")
 
 sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock)
+	: device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
+  	  device_rom_interface(mconfig, *this, 24)
 {
 }
 
-
-
 void sega_315_5838_comp_device::device_start()
 {
-	m_read_ch.bind_relative_to(*owner());
 }
 
 void sega_315_5838_comp_device::device_reset()
 {
 	m_srcoffset = 0;
+	m_srcstart = 0;
 	m_protstate = 0;
+	m_abort = false;
 }
 
+void sega_315_5838_comp_device::rom_bank_updated()
+{
+}
 
 /**************************
 *
@@ -98,9 +101,14 @@ uint8_t sega_315_5838_comp_device::get_decompressed_byte(void)
 {
 	for (;;)
 	{
+		if (m_abort)
+		{
+			return 0xff;
+		}
+
 		if (m_num_bits_compressed == 0)
 		{
-			m_val_compressed = decipher(genericdecathlt_prot_r());
+			m_val_compressed = decipher(source_word_r());
 			m_num_bits_compressed = 16;
 		}
 
@@ -133,16 +141,24 @@ READ32_MEMBER(sega_315_5838_comp_device::data_r)
 	return (get_decompressed_byte() << 24) | (get_decompressed_byte() << 16) | (get_decompressed_byte() << 8) | (get_decompressed_byte() << 0);
 }
 
-uint16_t sega_315_5838_comp_device::genericdecathlt_prot_r()
+uint16_t sega_315_5838_comp_device::source_word_r()
 {
-	uint16_t tempdata = m_read_ch(m_srcoffset);
+	uint16_t tempdata = read_word((m_srcoffset*2)^2);
 	m_srcoffset++;
+	m_srcoffset &= 0x00ffffff;
+
+	if (m_srcoffset == m_srcstart) // if we've wrapped around to where we started something has gone wrong with the transfer, abandon
+		m_abort = true;
+
 	return tempdata;
 }
 
 void sega_315_5838_comp_device::set_prot_addr(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_srcoffset);
+	m_srcoffset &= 0x00ffffff;
+	m_srcstart = m_srcoffset;
+	m_abort = false;
 
 	m_num_bits_compressed = 0;
 	m_val_compressed = 0;
@@ -154,24 +170,20 @@ void sega_315_5838_comp_device::set_table_upload_mode_w(uint16_t val)
 {
 	m_compstate.mode = val;
 
-	if (m_compstate.mode == 0x8000)
+	if (!(m_compstate.mode & 0x80)) // 0x8000 and 0x0000
 	{
 		m_compstate.it2 = 0;
 	}
-	else if (m_compstate.mode == 0x8080)
+	else // 0x8080 and 0x0080
 	{
 		m_compstate.id = 0;
 	}
-	else
-	{
-		fatalerror("Unknown mode in set_table_upload_mode_w()");
-	}
-}
 
+}
 
 void sega_315_5838_comp_device::upload_table_data_w(uint16_t val)
 {
-	if (m_compstate.mode == 0x8000)
+	if (!(m_compstate.mode & 0x80)) // 0x8000 and 0x0000
 	{
 		assert(m_compstate.it2 / 2 < 12);
 
@@ -186,20 +198,14 @@ void sega_315_5838_comp_device::upload_table_data_w(uint16_t val)
 		}
 		m_compstate.it2++;
 	}
-	else if (m_compstate.mode == 0x8080)
+	else // 0x8080 and 0x0080
 	{
 		assert(m_compstate.id < 255);
 
 		m_compstate.dictionary[m_compstate.id++] = (0xFF00 & val) >> 8;
 		m_compstate.dictionary[m_compstate.id++] = (0x00FF & val) >> 0;
 	}
-	else
-	{
-		fatalerror("Unknown mode in upload_table_data_w()");
-	}
 }
-
-
 
 void sega_315_5838_comp_device::write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words)
 {
@@ -276,15 +282,6 @@ WRITE32_MEMBER(sega_315_5838_comp_device::doa_prot_w)
 
 void sega_315_5838_comp_device::install_doa_protection()
 {
-	//todo, install these in the driver, they differ between games
-	cpu_device* cpu = (cpu_device*)machine().device(":maincpu");
-
 	m_protstate = 0;
 	strcpy((char *)m_protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00"); // this is the single decompressed string DOA needs, note, 2 spaces at start, might indicate a dummy read like with 5881 on Model 2
-
-	cpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(sega_315_5838_comp_device::data_r_doa), this), write32_delegate(FUNC(sega_315_5838_comp_device::doa_prot_w), this));
-	cpu->space(AS_PROGRAM).install_write_handler(0x01d87ff0, 0x01d87ff3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), this)); // set compressed data source address (always set 0, data is in RAM)
-	cpu->space(AS_PROGRAM).install_write_handler(0x01d87ff4, 0x01d87ff7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w_doa), this)); // upload tab
-//  cpu->space(AS_PROGRAM).install_read_handler(0x01d87ff8, 0x01d87ffb, read32_delegate(FUNC(sega_315_5838_comp_device::data_r), this)); // read decompressed data
-
 }

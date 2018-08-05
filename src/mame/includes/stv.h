@@ -20,6 +20,7 @@ public:
 		m_cart3(*this, "stv_slot3"),
 		m_cart4(*this, "stv_slot4"),
 		m_rax(*this, "rax"),
+		m_protbank(*this, "protbank"),
 		m_eeprom(*this, "eeprom"),
 		m_cryptdevice(*this, "315_5881"),
 		m_5838crypt(*this, "315_5838"),
@@ -132,9 +133,10 @@ private:
 	uint32_t m_abus_protenable;
 	uint32_t m_abus_protkey;
 
-	int m_decathlete_database;
 	READ32_MEMBER(decathlt_prot_higher_r);
 	READ32_MEMBER(decathlt_prot_lower_r);
+	void sega5838_map(address_map &map);
+	optional_memory_bank m_protbank;
 
 	uint32_t m_a_bus[4];
 
@@ -149,7 +151,6 @@ private:
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	optional_device<ticket_dispenser_device> m_hopper;
 	uint16_t crypt_read_callback(uint32_t addr);
-	uint16_t crypt_read_callback_ch1(uint32_t addr);
 
 	DECLARE_READ8_MEMBER(pdr1_input_r);
 	DECLARE_READ8_MEMBER(pdr2_input_r);

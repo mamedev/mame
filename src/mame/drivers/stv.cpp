@@ -953,13 +953,13 @@ void stv_state::init_ffreveng()
 
 READ32_MEMBER(stv_state::decathlt_prot_higher_r)
 {
-	m_decathlete_database = 0; // if the protection device is accessed at this address data is fetched from 0x03000000
+	m_protbank->set_entry(1); // if the protection device is accessed at this address data is fetched from 0x03000000
 	return m_5838crypt->data_r(space, offset, mem_mask);
 }
 
 READ32_MEMBER(stv_state::decathlt_prot_lower_r)
 {
-	m_decathlete_database = 1; // if the protection device is accessed at this address data is fetched from 0x02000000
+	m_protbank->set_entry(0); // if the protection device is accessed at this address data is fetched from 0x02000000
 	return m_5838crypt->data_r(space, offset, mem_mask);
 }
 
@@ -973,8 +973,9 @@ void stv_state::init_decathlt()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF4, 0x27FFFF7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w), (sega_315_5838_comp_device*)m_5838crypt)); // upload tables
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27FFFF8, 0x27FFFFb, read32_delegate(FUNC(stv_state::decathlt_prot_lower_r), this)); // read decompressed data
 
-	m_decathlete_database = 0xff;
-
+	m_protbank->configure_entry(0, memregion("cart")->base());
+	m_protbank->configure_entry(1, memregion("cart")->base() + 0x1000000);
+	m_protbank->set_entry(0);
 	init_stv();
 }
 
@@ -1167,23 +1168,17 @@ MACHINE_CONFIG_START(stv_state::stvcd)
 MACHINE_CONFIG_END
 
 
-uint16_t stv_state::crypt_read_callback_ch1(uint32_t addr)
+void stv_state::sega5838_map(address_map &map)
 {
-	if (m_decathlete_database == 0)
-	{
-		return m_maincpu->space().read_word(0x02000000 + 0x1000000 + (addr * 2));
-	}
-	else
-	{
-		return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
-	}
+	map(0x000000, 0xffffff).bankr("protbank");
 }
-
 
 MACHINE_CONFIG_START(stv_state::stv_5838)
 	stv(config);
+
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
-	MCFG_SET_5838_READ_CALLBACK_CH(stv_state, crypt_read_callback_ch1)
+	MCFG_DEVICE_ADDRESS_MAP(0, sega5838_map)
+
 MACHINE_CONFIG_END
 
 

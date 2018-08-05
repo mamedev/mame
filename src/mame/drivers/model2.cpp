@@ -6564,8 +6564,13 @@ void model2_state::init_doa()
 	m_0229crypt->install_doa_protection();
 
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
-	ROM[0x630/4] = 0x08000004;
-	ROM[0x808/4] = 0x08000004;
+	ROM[0x630 / 4] = 0x08000004;
+	ROM[0x808 / 4] = 0x08000004;
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(sega_315_5838_comp_device::data_r_doa), (sega_315_5838_comp_device*)m_0229crypt), write32_delegate(FUNC(sega_315_5838_comp_device::doa_prot_w), (sega_315_5838_comp_device*)m_0229crypt));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01d87ff0, 0x01d87ff3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), (sega_315_5838_comp_device*)m_0229crypt)); // set compressed data source address (always set 0, data is in RAM)
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01d87ff4, 0x01d87ff7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w_doa), (sega_315_5838_comp_device*)m_0229crypt)); // upload tab
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d87ff8, 0x01d87ffb, read32_delegate(FUNC(sega_315_5838_comp_device::data_r), (sega_315_5838_comp_device*)m_0229crypt)); // read decompressed data
 }
 
 // Model 2 (TGPs, Model 1 sound board)

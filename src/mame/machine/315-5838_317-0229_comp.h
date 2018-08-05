@@ -5,20 +5,14 @@
 
 #pragma once
 
-typedef device_delegate<uint16_t (uint32_t)> sega_dec_read_delegate;
-
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
-#define MCFG_SET_5838_READ_CALLBACK_CH( _class, _method) \
-	downcast<sega_315_5838_comp_device &>(*device).set_read_cb_ch1(sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
-class sega_315_5838_comp_device :  public device_t
+class sega_315_5838_comp_device :  public device_t, 
+	                               public device_rom_interface
 {
 public:
 	// construction/destruction
 	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <typename Object> void set_read_cb_ch1(Object &&readcb) { m_read_ch = std::forward<Object>(readcb); }
 
 	DECLARE_READ32_MEMBER(data_r);
 
@@ -35,13 +29,17 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void rom_bank_updated() override;
+
 private:
-	uint16_t genericdecathlt_prot_r();
+	uint16_t source_word_r();
 
 	void write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words);
 	void set_prot_addr(uint32_t data, uint32_t mem_mask);
 
 	uint32_t m_srcoffset;
+	uint32_t m_srcstart; // failsafe
+	bool m_abort;
 
 	struct {
 		uint16_t mode;
@@ -65,8 +63,6 @@ private:
 	uint16_t m_val_compressed;
 	int m_num_bits;
 	uint16_t m_val;
-
-	sega_dec_read_delegate m_read_ch;
 
 	// Doa simulation
 	int m_protstate;
