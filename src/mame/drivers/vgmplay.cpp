@@ -3033,7 +3033,6 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_h6280[0]->set_disable();
 
 	C6280(config, m_c6280[0], 0);
-	m_c6280[0]->set_devicecpu_tag("h6280.0");
 	m_c6280[0]->add_route(0, "lspeaker", 1);
 	m_c6280[0]->add_route(1, "rspeaker", 1);
 
@@ -3041,7 +3040,6 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_h6280[1]->set_disable();
 
 	C6280(config, m_c6280[1], 0);
-	m_c6280[1]->set_devicecpu_tag("h6280.1");
 	m_c6280[1]->add_route(0, "lspeaker", 1);
 	m_c6280[1]->add_route(1, "rspeaker", 1);
 
