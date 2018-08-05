@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
 	H6280(config, m_audiocpu, SOUND_XTAL/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &boogwing_state::audio_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 

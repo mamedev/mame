@@ -308,8 +308,8 @@ static void pce_cart(device_slot_interface &device)
 MACHINE_CONFIG_START(pce_state::pce_common)
 	/* basic machine hardware */
 	H6280(config, m_maincpu, MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, pce_mem);
-	m_maincpu->set_addrmap(AS_IO, pce_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(pce_state::mess_pce_joystick_w));
 	m_maincpu->add_route(0, "lspeaker", 1.00);
@@ -362,8 +362,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pce_state::sgx)
 	/* basic machine hardware */
 	H6280(config, m_maincpu, MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, sgx_mem);
-	m_maincpu->set_addrmap(AS_IO, sgx_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::sgx_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce_state::sgx_io);
 	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(pce_state::mess_pce_joystick_w));
 	m_maincpu->add_route(0, "lspeaker", 1.00);

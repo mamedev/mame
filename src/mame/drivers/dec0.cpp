@@ -1933,7 +1933,7 @@ MACHINE_CONFIG_START(dec0_state::robocop)
 	MCFG_DEVICE_PROGRAM_MAP(robocop_map)
 
 	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
-	m_subcpu->set_addrmap(AS_PROGRAM, robocop_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))  /* Interleave between HuC6280 & 68000 */
@@ -1958,7 +1958,7 @@ MACHINE_CONFIG_START(dec0_state::hippodrm)
 	MCFG_DEVICE_PROGRAM_MAP(hippodrm_map)
 
 	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
-	m_subcpu->set_addrmap(AS_PROGRAM, hippodrm_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
@@ -1973,7 +1973,7 @@ MACHINE_CONFIG_START(dec0_state::ffantasybl)
 	dec0(config);
 
 //	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
-//	m_subcpu->set_addrmap(AS_PROGRAM, hippodrm_sub_map);
+//	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 //	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
@@ -2002,7 +2002,7 @@ MACHINE_CONFIG_START(dec0_state::slyspy)
 
 	// TODO: both games doesn't like /3 here, MT #06740
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(12'000'000)/2/2)); /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
-	audiocpu.set_addrmap(AS_PROGRAM, slyspy_s_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &dec0_state::slyspy_s_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
@@ -2036,7 +2036,7 @@ MACHINE_CONFIG_START(dec0_state::midres)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(24'000'000)/4/3)); /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-	audiocpu.set_addrmap(AS_PROGRAM, midres_s_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &dec0_state::midres_s_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */

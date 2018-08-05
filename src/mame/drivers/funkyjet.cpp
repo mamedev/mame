@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkyjet_state,  irq6_line_hold)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4); /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &funkyjet_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 

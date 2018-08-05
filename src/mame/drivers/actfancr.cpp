@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	/* basic machine hardware */
 	H6280(config, m_maincpu, 21477200/3); /* Should be accurate */
-	m_maincpu->set_addrmap(AS_PROGRAM, actfan_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::actfan_map);
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DEVICE_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	/* basic machine hardware */
 	H6280(config, m_maincpu, XTAL(21'477'272)/3); /* XIN=21.4772Mhz, verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, triothep_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::triothep_map);
 	m_maincpu->port_in_cb().set(FUNC(actfancr_state::triothep_control_r));
 	m_maincpu->port_out_cb().set(FUNC(actfancr_state::triothep_control_select_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused

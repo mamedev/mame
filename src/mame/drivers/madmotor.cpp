@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
 
 	H6280(config, m_audiocpu, 8053000/2); /* Custom chip 45, Crystal near CPU is 8.053 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &madmotor_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */

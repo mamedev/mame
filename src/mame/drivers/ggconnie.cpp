@@ -265,8 +265,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	/* basic machine hardware */
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, sgx_mem);
-	m_maincpu->set_addrmap(AS_IO, sgx_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ggconnie_state::sgx_mem);
+	m_maincpu->set_addrmap(AS_IO, &ggconnie_state::sgx_io);
 	m_maincpu->port_in_cb().set_ioport("IN0");
 	m_maincpu->port_out_cb().set(FUNC(ggconnie_state::lamp_w));
 	m_maincpu->add_route(0, "lspeaker", 1.00);

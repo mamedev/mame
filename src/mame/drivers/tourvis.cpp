@@ -392,8 +392,8 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 MACHINE_CONFIG_START(tourvision_state::tourvision)
 	/* basic machine hardware */
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, pce_mem);
-	m_maincpu->set_addrmap(AS_IO, pce_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tourvision_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &tourvision_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(tourvision_state::pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(tourvision_state::pce_joystick_w));
 	m_maincpu->add_route(0, "lspeaker", 1.00);

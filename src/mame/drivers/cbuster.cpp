@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
 
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45, 6MHz Verified */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cbuster_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_SCREEN_ADD("screen", RASTER)

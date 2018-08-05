@@ -306,8 +306,8 @@ void uapce_state::pce_io(address_map &map)
 MACHINE_CONFIG_START(uapce_state::uapce)
 	/* basic machine hardware */
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, pce_mem);
-	m_maincpu->set_addrmap(AS_IO, pce_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &uapce_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &uapce_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(uapce_state::pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(uapce_state::pce_joystick_w));
 	m_maincpu->add_route(0, "lspeaker", 0.5);

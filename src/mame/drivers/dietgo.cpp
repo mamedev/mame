@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4/3);  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dietgo_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */

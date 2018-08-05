@@ -1868,7 +1868,7 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_DEVICE_PROGRAM_MAP(captaven_map)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000)/4/3));  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
-	audiocpu.set_addrmap(AS_PROGRAM, h6280_sound_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &captaven_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
@@ -1957,7 +1957,7 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
-	audiocpu.set_addrmap(AS_PROGRAM, h6280_sound_custom_latch_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_custom_latch_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
@@ -2082,7 +2082,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DEVICE_PROGRAM_MAP(dragngun_map)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
-	audiocpu.set_addrmap(AS_PROGRAM, h6280_sound_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
@@ -2476,7 +2476,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasheru)
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
-	audiocpu.set_addrmap(AS_PROGRAM, h6280_sound_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &nslasher_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 

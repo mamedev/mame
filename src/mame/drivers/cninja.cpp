@@ -797,8 +797,8 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(cninja_map)
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
-	audiocpu.set_addrmap(AS_PROGRAM, sound_map);
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
@@ -1058,8 +1058,8 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(edrandy_map)
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
-	audiocpu.set_addrmap(AS_PROGRAM, sound_map);
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
@@ -1146,8 +1146,8 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(robocop2_map)
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
-	audiocpu.set_addrmap(AS_PROGRAM, sound_map);
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
@@ -1245,8 +1245,8 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_DEVICE_PROGRAM_MAP(mutantf_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cninja_state,  irq6_line_hold)
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
-	audiocpu.set_addrmap(AS_PROGRAM, sound_map_mutantf);
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map_mutantf);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */

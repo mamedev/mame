@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_DEVICE_PROGRAM_MAP(supbtime_map)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware

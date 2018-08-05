@@ -879,7 +879,7 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
@@ -971,7 +971,7 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
@@ -1068,7 +1068,7 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
@@ -1166,7 +1166,7 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
 	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 

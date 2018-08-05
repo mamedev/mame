@@ -254,14 +254,14 @@ MACHINE_CONFIG_START(battlera_state::battlera)
 
 	/* basic machine hardware */
 	H6280(config, m_maincpu, 21477200/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, battlera_map);
-	m_maincpu->set_addrmap(AS_IO, battlera_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &battlera_state::battlera_map);
+	m_maincpu->set_addrmap(AS_IO, &battlera_state::battlera_portmap);
 	m_maincpu->port_in_cb().set(FUNC(battlera_state::control_data_r));
 	m_maincpu->port_out_cb().set(FUNC(battlera_state::control_data_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	H6280(config, m_audiocpu, 21477200/3);
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &battlera_state::sound_map);
 	m_audiocpu->port_in_cb().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_audiocpu->port_out_cb().set(FUNC(battlera_state::adpcm_reset_w));
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0.60); // music data is stereo, but hardware isn't

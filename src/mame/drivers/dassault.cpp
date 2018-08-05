@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/8);    /* Accurate */
-	m_audiocpu->set_addrmap(AS_PROGRAM, sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dassault_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
