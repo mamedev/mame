@@ -132,6 +132,10 @@ private:
 	uint32_t m_abus_protenable;
 	uint32_t m_abus_protkey;
 
+	int m_decathlete_database;
+	READ32_MEMBER(decathlt_prot_higher_r);
+	READ32_MEMBER(decathlt_prot_lower_r);
+
 	uint32_t m_a_bus[4];
 
 	DECLARE_READ32_MEMBER( common_prot_r );
@@ -146,7 +150,6 @@ private:
 	optional_device<ticket_dispenser_device> m_hopper;
 	uint16_t crypt_read_callback(uint32_t addr);
 	uint16_t crypt_read_callback_ch1(uint32_t addr);
-	uint16_t crypt_read_callback_ch2(uint32_t addr);
 
 	DECLARE_READ8_MEMBER(pdr1_input_r);
 	DECLARE_READ8_MEMBER(pdr2_input_r);

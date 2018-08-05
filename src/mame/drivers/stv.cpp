@@ -951,9 +951,36 @@ void stv_state::init_ffreveng()
 	init_stv();
 }
 
+READ32_MEMBER(stv_state::decathlt_prot_higher_r)
+{
+	if (m_decathlete_database != 0)
+		printf("switch to upper\n");
+
+	m_decathlete_database = 0; // if the protection device is accessed at this address data is fetched from 0x03000000
+	return m_5838crypt->data_r(space, offset, mem_mask);
+}
+
+READ32_MEMBER(stv_state::decathlt_prot_lower_r)
+{
+	if (m_decathlete_database != 1)
+		printf("switch to lower\n");
+
+	m_decathlete_database = 1; // if the protection device is accessed at this address data is fetched from 0x02000000
+	return m_5838crypt->data_r(space, offset, mem_mask);
+}
+
 void stv_state::init_decathlt()
 {
-	m_5838crypt->install_decathlt_protection();
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x37FFFF0, 0x37FFFF3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), (sega_315_5838_comp_device*)m_5838crypt)); // set compressed data source address
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x37FFFF4, 0x37FFFF7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w), (sega_315_5838_comp_device*)m_5838crypt)); // upload tables
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37FFFF8, 0x37FFFFb, read32_delegate(FUNC(stv_state::decathlt_prot_higher_r), this)); // read decompressed data
+
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF0, 0x27FFFF3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), (sega_315_5838_comp_device*)m_5838crypt)); // set compressed data source address
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF4, 0x27FFFF7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w), (sega_315_5838_comp_device*)m_5838crypt)); // upload tables
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27FFFF8, 0x27FFFFb, read32_delegate(FUNC(stv_state::decathlt_prot_lower_r), this)); // read decompressed data
+
+	m_decathlete_database = 0xff;
+
 	init_stv();
 }
 
@@ -1148,19 +1175,21 @@ MACHINE_CONFIG_END
 
 uint16_t stv_state::crypt_read_callback_ch1(uint32_t addr)
 {
-	return m_maincpu->space().read_word(0x02000000 + 0x1000000 + (addr * 2));
+	if (m_decathlete_database == 0)
+	{
+		return m_maincpu->space().read_word(0x02000000 + 0x1000000 + (addr * 2));
+	}
+	else
+	{
+		return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
+	}
 }
 
-uint16_t stv_state::crypt_read_callback_ch2(uint32_t addr)
-{
-	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
-}
 
 MACHINE_CONFIG_START(stv_state::stv_5838)
 	stv(config);
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
-	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
-	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
+	MCFG_SET_5838_READ_CALLBACK_CH(stv_state, crypt_read_callback_ch1)
 MACHINE_CONFIG_END
 
 
