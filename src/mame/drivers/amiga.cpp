@@ -1606,12 +1606,12 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	MCFG_DEVICE_ADD("u61", MSM6242, XTAL(32'768))
 
 	// cd-rom controller
-	MCFG_DMAC_ADD("u36", amiga_state::CLK_7M_PAL)
-	MCFG_DMAC_SCSI_READ_HANDLER(READ8(*this, cdtv_state, dmac_scsi_data_read))
-	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(*this, cdtv_state, dmac_scsi_data_write))
-	MCFG_DMAC_IO_READ_HANDLER(READ8(*this, cdtv_state, dmac_io_read))
-	MCFG_DMAC_IO_WRITE_HANDLER(WRITE8(*this, cdtv_state, dmac_io_write))
-	MCFG_DMAC_INT_HANDLER(WRITELINE(*this, cdtv_state, dmac_int_w))
+	AMIGA_DMAC(config, m_dmac, amiga_state::CLK_7M_PAL);
+	m_dmac->scsi_read_handler().set(FUNC(cdtv_state::dmac_scsi_data_read));
+	m_dmac->scsi_write_handler().set(FUNC(cdtv_state::dmac_scsi_data_write));
+	m_dmac->io_read_handler().set(FUNC(cdtv_state::dmac_io_read));
+	m_dmac->io_write_handler().set(FUNC(cdtv_state::dmac_io_write));
+	m_dmac->int_handler().set(FUNC(cdtv_state::dmac_int_w));
 
 	MCFG_DEVICE_ADD("u32", TPI6525, 0)
 	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, cdtv_state, tpi_int_w))

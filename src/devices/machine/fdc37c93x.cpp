@@ -247,11 +247,11 @@ MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_rtc_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 	// keyboard
-	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_PS2)
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE(*this, fdc37c93x_device, irq_keyboard_w))
-	MCFG_KBDC8042_SYSTEM_RESET_CB(WRITELINE(*this, fdc37c93x_device, kbdp20_gp20_reset_w))
-	MCFG_KBDC8042_GATE_A20_CB(WRITELINE(*this, fdc37c93x_device, kbdp21_gp25_gatea20_w))
+	KBDC8042(config, m_kbdc);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
+	m_kbdc->input_buffer_full_callback().set(FUNC(fdc37c93x_device::irq_keyboard_w));
+	m_kbdc->system_reset_callback().set(FUNC(fdc37c93x_device::kbdp20_gp20_reset_w));
+	m_kbdc->gate_a20_callback().set(FUNC(fdc37c93x_device::kbdp21_gp25_gatea20_w));
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(fdc37c93x_device::irq_floppy_w)

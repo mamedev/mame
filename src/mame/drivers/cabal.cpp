@@ -86,10 +86,10 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 
 
-WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
+void cabal_state::sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_seibu_sound->main_w(space, 4, data & 0x00ff);
+		m_seibu_sound->main_w(4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	m_maincpu->spin_until_time(attotime::from_usec(50));

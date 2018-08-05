@@ -541,9 +541,9 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
 
-	MCFG_DEVICE_ADD("sharedram", MB8421_MB8431_16BIT, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MB8421_INTR_HANDLER(INPUTLINE("sub", M68K_IRQ_6))
+	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
+	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
+	sharedram.intr_callback().set_inputline("sub", M68K_IRQ_6);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -214,8 +214,8 @@ protected:
 	uint16_t m_kiwame_row_select;
 
 	DECLARE_READ16_MEMBER(metafox_protection_r);
-	DECLARE_WRITE8_MEMBER(seta_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(seta_coin_lockout_w);
+	void seta_coin_counter_w(u8 data);
+	void seta_coin_lockout_w(u8 data);
 	DECLARE_WRITE8_MEMBER(seta_vregs_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE16_MEMBER(twineagl_tilebank_w);
@@ -242,8 +242,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(utoukond_sound_control_w);
 	DECLARE_READ16_MEMBER(pairlove_prot_r);
 	DECLARE_WRITE16_MEMBER(pairlove_prot_w);
-	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sub_bankswitch_lockout_w);
+	void sub_bankswitch_w(u8 data);
+	void sub_bankswitch_lockout_w(u8 data);
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_READ8_MEMBER(downtown_ip_r);
 	DECLARE_WRITE8_MEMBER(calibr50_sub_bankswitch_w);

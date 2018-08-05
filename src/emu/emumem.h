@@ -94,149 +94,308 @@ using read16_delegate = device_delegate<u16 (address_space &, offs_t, u16)>;
 using read32_delegate = device_delegate<u32 (address_space &, offs_t, u32)>;
 using read64_delegate = device_delegate<u64 (address_space &, offs_t, u64)>;
 
+using read8s_delegate  = device_delegate<u8  (offs_t, u8 )>;
+using read16s_delegate = device_delegate<u16 (offs_t, u16)>;
+using read32s_delegate = device_delegate<u32 (offs_t, u32)>;
+using read64s_delegate = device_delegate<u64 (offs_t, u64)>;
+
+using read8sm_delegate  = device_delegate<u8  (offs_t)>;
+using read16sm_delegate = device_delegate<u16 (offs_t)>;
+using read32sm_delegate = device_delegate<u32 (offs_t)>;
+using read64sm_delegate = device_delegate<u64 (offs_t)>;
+
+using read8smo_delegate  = device_delegate<u8  ()>;
+using read16smo_delegate = device_delegate<u16 ()>;
+using read32smo_delegate = device_delegate<u32 ()>;
+using read64smo_delegate = device_delegate<u64 ()>;
+
 
 // ======================> write_delegate
 
 // declare delegates for each width
-typedef device_delegate<void (address_space &, offs_t, u8,  u8 )> write8_delegate;
-typedef device_delegate<void (address_space &, offs_t, u16, u16)> write16_delegate;
-typedef device_delegate<void (address_space &, offs_t, u32, u32)> write32_delegate;
-typedef device_delegate<void (address_space &, offs_t, u64, u64)> write64_delegate;
+using write8_delegate  = device_delegate<void (address_space &, offs_t, u8,  u8 )>;
+using write16_delegate = device_delegate<void (address_space &, offs_t, u16, u16)>;
+using write32_delegate = device_delegate<void (address_space &, offs_t, u32, u32)>;
+using write64_delegate = device_delegate<void (address_space &, offs_t, u64, u64)>;
+
+using write8s_delegate  = device_delegate<void (offs_t, u8,  u8 )>;
+using write16s_delegate = device_delegate<void (offs_t, u16, u16)>;
+using write32s_delegate = device_delegate<void (offs_t, u32, u32)>;
+using write64s_delegate = device_delegate<void (offs_t, u64, u64)>;
+
+using write8sm_delegate  = device_delegate<void (offs_t, u8 )>;
+using write16sm_delegate = device_delegate<void (offs_t, u16)>;
+using write32sm_delegate = device_delegate<void (offs_t, u32)>;
+using write64sm_delegate = device_delegate<void (offs_t, u64)>;
+
+using write8smo_delegate  = device_delegate<void (u8 )>;
+using write16smo_delegate = device_delegate<void (u16)>;
+using write32smo_delegate = device_delegate<void (u32)>;
+using write64smo_delegate = device_delegate<void (u64)>;
+
 
 namespace emu { namespace detail {
 
-template <typename T, typename Enable = void> struct read8_device_class { };
-template <typename T, typename Enable = void> struct read16_device_class { };
-template <typename T, typename Enable = void> struct read32_device_class { };
-template <typename T, typename Enable = void> struct read64_device_class { };
+template <typename D, typename T, typename Enable = void> struct rw_device_class  { };
 
-template <typename T, typename Ret, typename... Params>
-struct read8_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read8_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read8_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read8_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read8_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read8_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read8_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read8_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename D, typename T, typename Ret, typename... Params>
+struct rw_device_class<D, Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<D, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename D, typename T, typename Ret, typename... Params>
+struct rw_device_class<D, Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<D, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+template <typename D, typename T, typename Ret, typename... Params>
+struct rw_device_class<D, Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+template <typename D, typename T, typename Ret, typename... Params>
+struct rw_device_class<D, Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
 
-template <typename T, typename Ret, typename... Params>
-struct read16_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read16_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read16_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read16_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read16_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read16_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read16_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read16_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
-
-template <typename T, typename Ret, typename... Params>
-struct read32_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read32_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read32_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read32_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read32_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read32_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read32_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read32_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
-
-template <typename T, typename Ret, typename... Params>
-struct read64_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read64_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read64_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read64_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read64_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read64_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read64_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read64_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
-
-template <typename T> using read8_device_class_t = typename read8_device_class<T>::type;
-template <typename T> using read16_device_class_t = typename read16_device_class<T>::type;
-template <typename T> using read32_device_class_t = typename read32_device_class<T>::type;
-template <typename T> using read64_device_class_t = typename read64_device_class<T>::type;
-
-template <typename T, typename Enable = void> struct write8_device_class { };
-template <typename T, typename Enable = void> struct write16_device_class { };
-template <typename T, typename Enable = void> struct write32_device_class { };
-template <typename T, typename Enable = void> struct write64_device_class { };
-
-template <typename T, typename Ret, typename... Params>
-struct write8_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write8_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write8_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write8_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write8_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write8_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write8_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write8_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
-
-template <typename T, typename Ret, typename... Params>
-struct write16_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write16_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write16_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write16_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write16_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write16_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write16_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write16_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
-
-template <typename T, typename Ret, typename... Params>
-struct write32_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write32_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write32_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write32_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write32_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write32_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write32_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write32_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
-
-template <typename T, typename Ret, typename... Params>
-struct write64_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write64_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write64_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write64_delegate, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write64_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write64_delegate, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write64_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write64_delegate, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
-
-template <typename T> using write8_device_class_t = typename write8_device_class<T>::type;
-template <typename T> using write16_device_class_t = typename write16_device_class<T>::type;
-template <typename T> using write32_device_class_t = typename write32_device_class<T>::type;
-template <typename T> using write64_device_class_t = typename write64_device_class<T>::type;
+template <typename D, typename T> using rw_device_class_t  = typename rw_device_class <D, T>::type;
 
 template <typename T>
-inline read8_delegate make_delegate(T &&func, const char *name, const char *tag, read8_device_class_t<std::remove_reference_t<T> > *obj)
+inline read8_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8_delegate, std::remove_reference_t<T> > *obj)
 { return read8_delegate(func, name, tag, obj); }
 template <typename T>
-inline read16_delegate make_delegate(T &&func, const char *name, const char *tag, read16_device_class_t<std::remove_reference_t<T> > *obj)
+inline read16_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16_delegate, std::remove_reference_t<T> > *obj)
 { return read16_delegate(func, name, tag, obj); }
 template <typename T>
-inline read32_delegate make_delegate(T &&func, const char *name, const char *tag, read32_device_class_t<std::remove_reference_t<T> > *obj)
+inline read32_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32_delegate, std::remove_reference_t<T> > *obj)
 { return read32_delegate(func, name, tag, obj); }
 template <typename T>
-inline read64_delegate make_delegate(T &&func, const char *name, const char *tag, read64_device_class_t<std::remove_reference_t<T> > *obj)
+inline read64_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64_delegate, std::remove_reference_t<T> > *obj)
 { return read64_delegate(func, name, tag, obj); }
 
 template <typename T>
-inline write8_delegate make_delegate(T &&func, const char *name, const char *tag, write8_device_class_t<std::remove_reference_t<T> > *obj)
+inline write8_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8_delegate, std::remove_reference_t<T> > *obj)
 { return write8_delegate(func, name, tag, obj); }
 template <typename T>
-inline write16_delegate make_delegate(T &&func, const char *name, const char *tag, write16_device_class_t<std::remove_reference_t<T> > *obj)
+inline write16_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16_delegate, std::remove_reference_t<T> > *obj)
 { return write16_delegate(func, name, tag, obj); }
 template <typename T>
-inline write32_delegate make_delegate(T &&func, const char *name, const char *tag, write32_device_class_t<std::remove_reference_t<T> > *obj)
+inline write32_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32_delegate, std::remove_reference_t<T> > *obj)
 { return write32_delegate(func, name, tag, obj); }
 template <typename T>
-inline write64_delegate make_delegate(T &&func, const char *name, const char *tag, write64_device_class_t<std::remove_reference_t<T> > *obj)
+inline write64_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64_delegate, std::remove_reference_t<T> > *obj)
 { return write64_delegate(func, name, tag, obj); }
 
-} } // namespace emu::detail
+
+template <typename T>
+inline read8s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > *obj)
+{ return read8s_delegate(func, name, tag, obj); }
+template <typename T>
+inline read16s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > *obj)
+{ return read16s_delegate(func, name, tag, obj); }
+template <typename T>
+inline read32s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > *obj)
+{ return read32s_delegate(func, name, tag, obj); }
+template <typename T>
+inline read64s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > *obj)
+{ return read64s_delegate(func, name, tag, obj); }
+
+template <typename T>
+inline write8s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > *obj)
+{ return write8s_delegate(func, name, tag, obj); }
+template <typename T>
+inline write16s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > *obj)
+{ return write16s_delegate(func, name, tag, obj); }
+template <typename T>
+inline write32s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > *obj)
+{ return write32s_delegate(func, name, tag, obj); }
+template <typename T>
+inline write64s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > *obj)
+{ return write64s_delegate(func, name, tag, obj); }
+
+
+template <typename T>
+inline read8sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > *obj)
+{ return read8sm_delegate(func, name, tag, obj); }
+template <typename T>
+inline read16sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > *obj)
+{ return read16sm_delegate(func, name, tag, obj); }
+template <typename T>
+inline read32sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > *obj)
+{ return read32sm_delegate(func, name, tag, obj); }
+template <typename T>
+inline read64sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > *obj)
+{ return read64sm_delegate(func, name, tag, obj); }
+
+template <typename T>
+inline write8sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > *obj)
+{ return write8sm_delegate(func, name, tag, obj); }
+template <typename T>
+inline write16sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > *obj)
+{ return write16sm_delegate(func, name, tag, obj); }
+template <typename T>
+inline write32sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > *obj)
+{ return write32sm_delegate(func, name, tag, obj); }
+template <typename T>
+inline write64sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > *obj)
+{ return write64sm_delegate(func, name, tag, obj); }
+
+
+template <typename T>
+inline read8smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > *obj)
+{ return read8smo_delegate(func, name, tag, obj); }
+template <typename T>
+inline read16smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > *obj)
+{ return read16smo_delegate(func, name, tag, obj); }
+template <typename T>
+inline read32smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > *obj)
+{ return read32smo_delegate(func, name, tag, obj); }
+template <typename T>
+inline read64smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > *obj)
+{ return read64smo_delegate(func, name, tag, obj); }
+
+template <typename T>
+inline write8smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > *obj)
+{ return write8smo_delegate(func, name, tag, obj); }
+template <typename T>
+inline write16smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > *obj)
+{ return write16smo_delegate(func, name, tag, obj); }
+template <typename T>
+inline write32smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > *obj)
+{ return write32smo_delegate(func, name, tag, obj); }
+template <typename T>
+inline write64smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > *obj)
+{ return write64smo_delegate(func, name, tag, obj); }
+
+
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read8_delegate, L, const char *>::value, read8_delegate> make_lr8_delegate(L l, const char *name)
+{ return read8_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read8s_delegate, L, const char *>::value, read8s_delegate> make_lr8_delegate(L l, const char *name)
+{ return read8s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read8sm_delegate, L, const char *>::value, read8sm_delegate> make_lr8_delegate(L l, const char *name)
+{ return read8sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read8smo_delegate, L, const char *>::value, read8smo_delegate> make_lr8_delegate(L l, const char *name)
+{ return read8smo_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read16_delegate, L, const char *>::value, read16_delegate> make_lr16_delegate(L l, const char *name)
+{ return read16_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read16s_delegate, L, const char *>::value, read16s_delegate> make_lr16_delegate(L l, const char *name)
+{ return read16s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read16sm_delegate, L, const char *>::value, read16sm_delegate> make_lr16_delegate(L l, const char *name)
+{ return read16sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read16smo_delegate, L, const char *>::value, read16smo_delegate> make_lr16_delegate(L l, const char *name)
+{ return read16smo_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read32_delegate, L, const char *>::value, read32_delegate> make_lr32_delegate(L l, const char *name)
+{ return read32_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read32s_delegate, L, const char *>::value, read32s_delegate> make_lr32_delegate(L l, const char *name)
+{ return read32s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read32sm_delegate, L, const char *>::value, read32sm_delegate> make_lr32_delegate(L l, const char *name)
+{ return read32sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read32smo_delegate, L, const char *>::value, read32smo_delegate> make_lr32_delegate(L l, const char *name)
+{ return read32smo_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read64_delegate, L, const char *>::value, read64_delegate> make_lr64_delegate(L l, const char *name)
+{ return read64_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read64s_delegate, L, const char *>::value, read64s_delegate> make_lr64_delegate(L l, const char *name)
+{ return read64s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read64sm_delegate, L, const char *>::value, read64sm_delegate> make_lr64_delegate(L l, const char *name)
+{ return read64sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<read64smo_delegate, L, const char *>::value, read64smo_delegate> make_lr64_delegate(L l, const char *name)
+{ return read64smo_delegate(l, name); }
+
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write8_delegate, L, const char *>::value, write8_delegate> make_lw8_delegate(L l, const char *name)
+{ return write8_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write8s_delegate, L, const char *>::value, write8s_delegate> make_lw8_delegate(L l, const char *name)
+{ return write8s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write8sm_delegate, L, const char *>::value, write8sm_delegate> make_lw8_delegate(L l, const char *name)
+{ return write8sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write8smo_delegate, L, const char *>::value, write8smo_delegate> make_lw8_delegate(L l, const char *name)
+{ return write8smo_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write16_delegate, L, const char *>::value, write16_delegate> make_lw16_delegate(L l, const char *name)
+{ return write16_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write16s_delegate, L, const char *>::value, write16s_delegate> make_lw16_delegate(L l, const char *name)
+{ return write16s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write16sm_delegate, L, const char *>::value, write16sm_delegate> make_lw16_delegate(L l, const char *name)
+{ return write16sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write16smo_delegate, L, const char *>::value, write16smo_delegate> make_lw16_delegate(L l, const char *name)
+{ return write16smo_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write32_delegate, L, const char *>::value, write32_delegate> make_lw32_delegate(L l, const char *name)
+{ return write32_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write32s_delegate, L, const char *>::value, write32s_delegate> make_lw32_delegate(L l, const char *name)
+{ return write32s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write32sm_delegate, L, const char *>::value, write32sm_delegate> make_lw32_delegate(L l, const char *name)
+{ return write32sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write32smo_delegate, L, const char *>::value, write32smo_delegate> make_lw32_delegate(L l, const char *name)
+{ return write32smo_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write64_delegate, L, const char *>::value, write64_delegate> make_lw64_delegate(L l, const char *name)
+{ return write64_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write64s_delegate, L, const char *>::value, write64s_delegate> make_lw64_delegate(L l, const char *name)
+{ return write64s_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write64sm_delegate, L, const char *>::value, write64sm_delegate> make_lw64_delegate(L l, const char *name)
+{ return write64sm_delegate(l, name); }
+
+template <typename L>
+inline std::enable_if_t<std::is_constructible<write64smo_delegate, L, const char *>::value, write64smo_delegate> make_lw64_delegate(L l, const char *name)
+{ return write64smo_delegate(l, name); }
+
+
 
 // =====================-> Width -> types
 
 template<int Width> struct handler_entry_size {};
-template<> struct handler_entry_size<0> { using uX = u8;  using READ = read8_delegate;  using WRITE = write8_delegate;  };
-template<> struct handler_entry_size<1> { using uX = u16; using READ = read16_delegate; using WRITE = write16_delegate; };
-template<> struct handler_entry_size<2> { using uX = u32; using READ = read32_delegate; using WRITE = write32_delegate; };
-template<> struct handler_entry_size<3> { using uX = u64; using READ = read64_delegate; using WRITE = write64_delegate; };
-
-
-// ======================> memopry_units_descritor forwards declaration
-
-template<int Width, int AddrShift, int Endian> class memory_units_descriptor;
+template<> struct handler_entry_size<0> { using uX = u8;  };
+template<> struct handler_entry_size<1> { using uX = u16; };
+template<> struct handler_entry_size<2> { using uX = u32; };
+template<> struct handler_entry_size<3> { using uX = u64; };
 
 // =====================-> Address segmentation for the search tree
 
@@ -247,6 +406,14 @@ constexpr int handler_entry_dispatch_lowbits(int highbits, int width, int ashift
 		(highbits > 14) ? 14 :
 		width + ashift;
 }
+
+} } // namespace emu::detail
+
+
+// ======================> memory_units_descritor forwards declaration
+
+template<int Width, int AddrShift, int Endian> class memory_units_descriptor;
+
 
 
 // =====================-> The root class of all handlers
@@ -334,7 +501,7 @@ template<int Width, int AddrShift, int Endian> class handler_entry_read_passthro
 template<int Width, int AddrShift, int Endian> class handler_entry_read : public handler_entry
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
 	struct mapping {
 		handler_entry_read<Width, AddrShift, Endian> *original;
@@ -395,7 +562,7 @@ template<int Width, int AddrShift, int Endian> class handler_entry_write_passthr
 template<int Width, int AddrShift, int Endian> class handler_entry_write : public handler_entry
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
 	struct mapping {
 		handler_entry_write<Width, AddrShift, Endian> *original;
@@ -477,10 +644,10 @@ constexpr offs_t memory_offset_to_byte(offs_t offset, int AddrShift) { return Ad
 // ======================> generic read/write decomposition routines
 
 // generic direct read
-template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, typename T> typename handler_entry_size<TargetWidth>::uX  memory_read_generic(T rop, offs_t address, typename handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, typename T> typename emu::detail::handler_entry_size<TargetWidth>::uX  memory_read_generic(T rop, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
 {
-	using TargetType = typename handler_entry_size<TargetWidth>::uX;
-	using NativeType = typename handler_entry_size<Width>::uX;
+	using TargetType = typename emu::detail::handler_entry_size<TargetWidth>::uX;
+	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -611,9 +778,9 @@ template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, ty
 }
 
 // generic direct write
-template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, typename T> void memory_write_generic(T wop, offs_t address, typename handler_entry_size<TargetWidth>::uX data, typename handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, typename T> void memory_write_generic(T wop, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX data, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
 {
-	using NativeType = typename handler_entry_size<Width>::uX;
+	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -740,7 +907,7 @@ template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, ty
 // memory_access_cache contains state data for cached access
 template<int Width, int AddrShift, int Endian> class memory_access_cache
 {
-	using NativeType = typename handler_entry_size<Width>::uX;
+	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 
@@ -1073,6 +1240,45 @@ public:
 	void install_write_handler(offs_t addrstart, offs_t addrend, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
 	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
 
+	void install_read_handler(offs_t addrstart, offs_t addrend, read8s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write8s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read8s_delegate rhandler, write8s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read16s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write16s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read16s_delegate rhandler, write16s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read32s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write32s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read32s_delegate rhandler, write32s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read64s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write64s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64s_delegate rhandler, write64s_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+
+	void install_read_handler(offs_t addrstart, offs_t addrend, read8sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write8sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read8sm_delegate rhandler, write8sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read16sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write16sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read16sm_delegate rhandler, write16sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read32sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write32sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read32sm_delegate rhandler, write32sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read64sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write64sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64sm_delegate rhandler, write64sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+
+	void install_read_handler(offs_t addrstart, offs_t addrend, read8smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write8smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read8smo_delegate rhandler, write8smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read16smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write16smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read16smo_delegate rhandler, write16smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read32smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write32smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read32smo_delegate rhandler, write32smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read64smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write64smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64smo_delegate rhandler, write64smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
+
 	// install new-style delegate handlers (with mirror/mask)
 	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
 	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
@@ -1086,6 +1292,45 @@ public:
 	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
 	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
 	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8s_delegate rhandler, write8s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16s_delegate rhandler, write16s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32s_delegate rhandler, write32s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64s_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64s_delegate rhandler, write64s_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8sm_delegate rhandler, write8sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16sm_delegate rhandler, write16sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32sm_delegate rhandler, write32sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64sm_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64sm_delegate rhandler, write64sm_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8smo_delegate rhandler, write8smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16smo_delegate rhandler, write16smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32smo_delegate rhandler, write32smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64smo_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64smo_delegate rhandler, write64smo_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
 
 	// setup
 	void prepare_map();
@@ -1474,13 +1719,13 @@ private:
 #define QWORD_ALIGNED(a)                (((a) & 7) == 0)
 
 
-template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX memory_access_cache<Width, AddrShift, Endian>::read_native(offs_t address, typename handler_entry_size<Width>::uX mask)
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX memory_access_cache<Width, AddrShift, Endian>::read_native(offs_t address, typename emu::detail::handler_entry_size<Width>::uX mask)
 {
 	check_address_r(address);
 	return m_cache_r->read(address, mask);
 }
 
-template<int Width, int AddrShift, int Endian> void memory_access_cache<Width, AddrShift, Endian>::write_native(offs_t address, typename handler_entry_size<Width>::uX data, typename handler_entry_size<Width>::uX mask)
+template<int Width, int AddrShift, int Endian> void memory_access_cache<Width, AddrShift, Endian>::write_native(offs_t address, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mask)
 {
 	check_address_w(address);
 	m_cache_w->write(address, data, mask);

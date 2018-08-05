@@ -105,8 +105,8 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { set_pa_line(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { set_pa_line(1, state); }

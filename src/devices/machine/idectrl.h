@@ -30,7 +30,7 @@
 class ide_controller_device : public abstract_ata_interface_device
 {
 public:
-	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff);

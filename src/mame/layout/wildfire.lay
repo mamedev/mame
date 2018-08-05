@@ -30,10 +30,10 @@
 
 		<repeat count="13">
 			<param name="ypos" start="20" increment="2" />
-			<param name="lampno" start="0" increment="10" />
+			<param name="rowno" start="0" increment="10" />
 			<repeat count="8">
 				<param name="xpos" start="0" increment="2" />
-				<param name="lampno" start="~lampno~" increment="1" />
+				<param name="lampno" start="~rowno~" increment="1" />
 				<bezel name="lamp~lampno~" element="led">
 					<bounds x="~xpos~" y="~ypos~" width="1" height="1" />
 				</bezel>

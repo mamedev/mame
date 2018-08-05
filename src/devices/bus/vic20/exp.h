@@ -48,28 +48,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, VIC20_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), vic20_expansion_cards, nullptr) \
-	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, irq_w)) \
-	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, nmi_w)) \
-	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, res_w))
-
-
-#define MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	downcast<vic20_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	downcast<vic20_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
-
-#define MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(_write) \
-	downcast<vic20_expansion_slot_device &>(*device).set_res_wr_callback(DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -94,9 +72,11 @@ public:
 	}
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_res_wr_callback(Object &&cb) { return m_write_res.set_callback(std::forward<Object>(cb)); }
+	static void add_passthrough(machine_config &config, const char *_tag);
+
+	auto irq_wr_callback() { return m_write_irq.bind(); }
+	auto nmi_wr_callback() { return m_write_nmi.bind(); }
+	auto res_wr_callback() { return m_write_res.bind(); }
 
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);

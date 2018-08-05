@@ -484,10 +484,10 @@ MACHINE_CONFIG_START(mermaid_state::rougien)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("adpcm_counter", RIPPLE_COUNTER, 0)
-	MCFG_DEVICE_ROM("adpcm")
-	MCFG_RIPPLE_COUNTER_STAGES(12)
-	MCFG_RIPPLE_COUNTER_ROM_OUT_CB(WRITE8(*this, mermaid_state, adpcm_data_w))
+	RIPPLE_COUNTER(config, m_adpcm_counter);
+	m_adpcm_counter->set_device_rom_tag("adpcm");
+	m_adpcm_counter->set_stages(12);
+	m_adpcm_counter->rom_out_cb().set(FUNC(mermaid_state::adpcm_data_w));
 MACHINE_CONFIG_END
 
 /* ROMs */

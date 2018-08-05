@@ -199,9 +199,9 @@ MACHINE_CONFIG_START(vt100_keyboard_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("uart", AY31015, 0)
 	MCFG_AY31015_WRITE_SO_CB(WRITELINE(*this, vt100_keyboard_device, signal_out_w))
 
-	MCFG_DEVICE_ADD("counter", RIPPLE_COUNTER, 0) // 2x 74LS93
-	MCFG_RIPPLE_COUNTER_STAGES(8)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, vt100_keyboard_device, key_scan_w))
+	RIPPLE_COUNTER(config, m_scan_counter); // 2x 74LS93
+	m_scan_counter->set_stages(8);
+	m_scan_counter->count_out_cb().set(FUNC(vt100_keyboard_device::key_scan_w));
 MACHINE_CONFIG_END
 
 

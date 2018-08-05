@@ -9,8 +9,6 @@
 
 11/09/2011 - modernised. The portable doesn't seem to have
              scroll registers, and it sets the palette to black.
-             I've added a temporary video output so that you can get
-             an idea of what the screen should look like. [Robbbert]
 
 ****************************************************************************/
 
