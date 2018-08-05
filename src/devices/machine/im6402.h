@@ -87,6 +87,11 @@ public:
 	template <class Object> devcb_base &set_tbre_wr_callback(Object &&cb) { return m_write_tbre.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tre_wr_callback(Object &&cb) { return m_write_tre.set_callback(std::forward<Object>(cb)); }
 
+	auto tro_callback() { return m_write_tro.bind(); }
+	auto dr_callback() { return m_write_dr.bind(); }
+	auto tbre_callback() { return m_write_tbre.bind(); }
+	auto tre_callback() { return m_write_tre.bind(); }
+
 	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
 	DECLARE_WRITE8_MEMBER( write );
 

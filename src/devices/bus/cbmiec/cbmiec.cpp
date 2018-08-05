@@ -273,18 +273,6 @@ void cbm_iec_slot_device::device_start()
 	if (dev) bus->add_device(this, get_card_device());
 }
 
-/*template <typename T>
-void cbm_iec_slot_device::add(machine_config &config, T &&_bus_tag, const char *_default_drive)
-{
-	add_slot(config, "iec4", 4, nullptr);
-	add_slot(config, "iec8", 8, _default_drive);
-	add_slot(config, "iec9", 9, nullptr);
-	add_slot(config, "iec10", 10, nullptr);
-	add_slot(config, "iec11", 11, nullptr);
-
-	CBM_IEC(config, std::forward<T>(_bus_tag), 0);
-}*/
-
 void cbm_iec_slot_device::add_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
 {
 	cbm_iec_slot_device &slot(CBM_IEC_SLOT(config, _tag, 0));

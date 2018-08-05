@@ -47,7 +47,7 @@ void tlcs870_device::set_PSW(uint8_t data)
 {
 	// used by the push/pop opcodes, flags can't be written by memory access
 	m_F = data & 0xf0;
-	m_RBS = data & 0xf0;
+	m_RBS = data & 0x0f;
 }
 
 void tlcs870_device::handle_div(const int reg)

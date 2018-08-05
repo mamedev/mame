@@ -38,7 +38,7 @@ todo: make this actually readable, we don't support unicode source files
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Bingo Galaxy                                ???-?????                 no          ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Galaxy                                834-14788                 no          ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
 Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
 Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816

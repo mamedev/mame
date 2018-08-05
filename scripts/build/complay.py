@@ -98,6 +98,8 @@ class LayoutChecker(Minifyer):
     FLOATCHARS = re.compile('^.*[.eE].*$')
     SHAPES = frozenset(('disk', 'dotmatrix', 'dotmatrix5dot', 'dotmatrixdot', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
     OBJECTS = frozenset(('backdrop', 'bezel', 'cpanel', 'marquee', 'overlay'))
+    ORIENTATIONS = frozenset((0, 90, 180, 270))
+    YESNO = frozenset(("yes", "no"))
 
     def __init__(self, output, **kwargs):
         super(LayoutChecker, self).__init__(output=output, **kwargs)
@@ -246,6 +248,17 @@ class LayoutChecker(Minifyer):
         if has_ltrb and has_origin_size:
             self.handleError('Element bounds has both left/top/right/bottom and origin/size attributes')
 
+    def checkOrientation(self, attrs):
+        if self.have_orientation[-1]:
+            self.handleError('Duplicate element orientation')
+        else:
+            self.have_orientation[-1] = True
+        if self.checkIntAttribute('orientation', attrs, 'rotate', 0) not in self.ORIENTATIONS:
+            self.handleError('Element orientation attribute rotate "%s" is unsupported' % (attrs['rotate'], ))
+        for name in ('swapxy', 'flipx', 'flipy'):
+            if attrs.get(name, 'no') not in self.YESNO:
+                self.handleError('Element orientation attribute %s "%s" is not "yes" or "no"' % (name, attrs[name]))
+
     def checkColorChannel(self, attrs, name):
         channel = self.checkFloatAttribute('color', attrs, name, None)
         if (channel is not None) and ((0.0 > channel) or (1.0 < channel)):
@@ -363,6 +376,8 @@ class LayoutChecker(Minifyer):
                 for group in self.referenced_groups:
                     if (group not in self.groups) and (not self.VARPATTERN.match(group)):
                         self.handleError('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
+            if not self.views:
+                self.handleError('No view elements found')
             self.handlers.pop()
 
     def elementStartHandler(self, name, attrs):
@@ -437,11 +452,16 @@ class LayoutChecker(Minifyer):
                 self.referenced_elements[attrs['element']] = self.formatLocation()
             if 'inputtag' in attrs:
                 if 'inputmask' not in attrs:
-                    self.handleError('Element %s has inputtag without inputmask attribute' % (name, ))
+                    self.handleError('Element %s has inputtag attribute without inputmask attribute' % (name, ))
                 self.checkTag(attrs['inputtag'], name, 'inputtag')
-            self.checkIntAttribute(name, attrs, 'inputmask', None)
+            elif 'inputmask' in attrs:
+                self.handleError('Element %s has inputmask attribute without inputtag attirbute' % (name, ))
+            inputmask = self.checkIntAttribute(name, attrs, 'inputmask', None)
+            if (inputmask is not None) and (0 == inputmask):
+                self.handleError('Element %s has attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
             self.handlers.append((self.objectStartHandler, self.objectEndHandler))
             self.have_bounds.append(False)
+            self.have_orientation.append(False)
         elif 'screen' == name:
             if 'index' in attrs:
                 index = self.checkIntAttribute(name, attrs, 'index', None)
@@ -456,6 +476,7 @@ class LayoutChecker(Minifyer):
                     self.handleError('Element screen attribute tag "%s" contains invalid characters' % (tag, ))
             self.handlers.append((self.objectStartHandler, self.objectEndHandler))
             self.have_bounds.append(False)
+            self.have_orientation.append(False)
         elif 'group' == name:
             if 'ref' not in attrs:
                 self.handleError('Element group missing attribute ref')
@@ -463,6 +484,7 @@ class LayoutChecker(Minifyer):
                 self.referenced_groups[attrs['ref']] = self.formatLocation()
             self.handlers.append((self.objectStartHandler, self.objectEndHandler))
             self.have_bounds.append(False)
+            self.have_orientation.append(False)
         elif 'repeat' == name:
             if 'count' not in attrs:
                 self.handleError('Element repeat missing attribute count')
@@ -496,10 +518,13 @@ class LayoutChecker(Minifyer):
     def objectStartHandler(self, name, attrs):
         if 'bounds' == name:
             self.checkBounds(attrs)
+        elif 'orientation' == name:
+            self.checkOrientation(attrs)
         self.ignored_depth = 1
 
     def objectEndHandler(self, name):
         self.have_bounds.pop()
+        self.have_orientation.pop()
         self.handlers.pop()
 
     def setDocumentLocator(self, locator):
@@ -512,6 +537,7 @@ class LayoutChecker(Minifyer):
         self.variable_scopes = [ ]
         self.repeat_depth = [ ]
         self.have_bounds = [ ]
+        self.have_orientation = [ ]
         self.have_color = [ ]
         self.generated_element_names = False
         self.generated_group_names = False
@@ -529,6 +555,7 @@ class LayoutChecker(Minifyer):
         del self.variable_scopes
         del self.repeat_depth
         del self.have_bounds
+        del self.have_orientation
         del self.have_color
         del self.generated_element_names
         del self.generated_group_names

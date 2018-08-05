@@ -1608,13 +1608,13 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* device hardware */
-	MCFG_DEVICE_ADD("mc68901", MC68901, 16_MHz_XTAL / 4)
-	MCFG_MC68901_TIMER_CLOCK(16_MHz_XTAL / 4)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(*this, x68k_state, mfp_irq_callback))
-	MCFG_MC68901_OUT_TBO_CB(WRITELINE("mc68901", mc68901_device, clock_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE("keyboard", rs232_port_device, write_txd))
+	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);
+	m_mfpdev->set_timer_clock(16_MHz_XTAL / 4);
+	m_mfpdev->set_rx_clock(0);
+	m_mfpdev->set_tx_clock(0);
+	m_mfpdev->out_irq_cb().set(FUNC(x68k_state::mfp_irq_callback));
+	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::clock_w));
+	m_mfpdev->out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "x68k")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("mc68901", mc68901_device, write_rx))

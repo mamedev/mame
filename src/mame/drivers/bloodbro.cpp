@@ -184,9 +184,9 @@ void bloodbro_state::skysmash_map(address_map &map)
 	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read_alt), FUNC(seibu_crtc_device::write_alt));
 }
 
-WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
+void bloodbro_state::weststry_soundlatch_w(offs_t offset, u8 data)
 {
-	m_seibu_sound->main_w(space, offset, data, mem_mask);
+	m_seibu_sound->main_w(offset, data);
 
 	if (offset == 1)
 		m_audiocpu->set_input_line(0, ASSERT_LINE);

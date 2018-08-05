@@ -216,11 +216,11 @@ READ8_MEMBER( vic20_state::read )
 		case IO0:
 			if (BIT(offset, 4))
 			{
-				data = m_via1->read(space, offset & 0x0f);
+				data = m_via1->read(offset & 0x0f);
 			}
 			else if (BIT(offset, 5))
 			{
-				data = m_via2->read(space, offset & 0x0f);
+				data = m_via2->read(offset & 0x0f);
 			}
 			else if (offset >= 0x9000 && offset < 0x9010)
 			{
@@ -291,11 +291,11 @@ WRITE8_MEMBER( vic20_state::write )
 		case IO0:
 			if (BIT(offset, 4))
 			{
-				m_via1->write(space, offset & 0x0f, data);
+				m_via1->write(offset & 0x0f, data);
 			}
 			else if (BIT(offset, 5))
 			{
-				m_via2->write(space, offset & 0x0f, data);
+				m_via2->write(offset & 0x0f, data);
 			}
 			else if (offset >= 0x9000 && offset < 0x9010)
 			{

@@ -36,6 +36,10 @@ public:
 	auto an6_in_cb() { return m_port_analog_in_cb[6].bind(); }
 	auto an7_in_cb() { return m_port_analog_in_cb[7].bind(); }
 
+	auto serial0_out_cb() { return m_serial_out_cb[0].bind(); }
+	auto serial1_out_cb() { return m_serial_out_cb[1].bind(); }
+
+
 protected:
 	// construction/destruction
 	tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
@@ -122,7 +126,8 @@ private:
 		DEBUGGER_REG_WA,
 		DEBUGGER_REG_BC,
 		DEBUGGER_REG_DE,
-		DEBUGGER_REG_HL
+		DEBUGGER_REG_HL,
+		DEBUGGER_REG_RB
 	};
 
 	enum _conditions
@@ -152,6 +157,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 	required_shared_ptr<uint8_t> m_intram;
+	required_shared_ptr<uint8_t> m_dbr;
 
 	PAIR        m_prvpc, m_pc, m_sp;
 
@@ -162,6 +168,8 @@ private:
 	devcb_read8   m_port_in_cb[8];
 	devcb_write8  m_port_out_cb[8];
 	devcb_read8   m_port_analog_in_cb[8];
+	devcb_write_line m_serial_out_cb[2];
+
 
 	uint8_t m_port_out_latch[8];
 	int m_read_input_port;
@@ -204,6 +212,46 @@ private:
 
 	DECLARE_WRITE8_MEMBER(eintcr_w);
 
+	DECLARE_WRITE8_MEMBER(treg1a_l_w);
+	DECLARE_WRITE8_MEMBER(treg1a_h_w);
+	DECLARE_WRITE8_MEMBER(treg1b_l_w);
+	DECLARE_WRITE8_MEMBER(treg1b_h_w);
+	DECLARE_WRITE8_MEMBER(tc1cr_w);
+	DECLARE_WRITE8_MEMBER(tc2cr_w);
+	DECLARE_WRITE8_MEMBER(treg2_l_w);
+	DECLARE_WRITE8_MEMBER(treg2_h_w);
+	DECLARE_WRITE8_MEMBER(treg3a_w);
+	DECLARE_WRITE8_MEMBER(tc3cr_w);
+	DECLARE_WRITE8_MEMBER(tc4cr_w);
+
+	DECLARE_READ8_MEMBER(treg1b_l_r);
+	DECLARE_READ8_MEMBER(treg1b_h_r);
+	DECLARE_READ8_MEMBER(treg3a_r);
+	DECLARE_READ8_MEMBER(treg3b_r);
+	DECLARE_WRITE8_MEMBER(treg4_w);
+
+
+	DECLARE_WRITE8_MEMBER(sio1cr1_w);
+	DECLARE_WRITE8_MEMBER(sio1cr2_w);
+	DECLARE_WRITE8_MEMBER(sio2cr1_w);
+	DECLARE_WRITE8_MEMBER(sio2cr2_w);
+	DECLARE_READ8_MEMBER(sio2sr_r);
+	DECLARE_READ8_MEMBER(sio1sr_r);
+
+	DECLARE_WRITE8_MEMBER(wdtcr1_w);
+	DECLARE_WRITE8_MEMBER(wdtcr2_w);
+
+	DECLARE_WRITE8_MEMBER(tbtcr_w);
+
+	DECLARE_READ8_MEMBER(tbtcr_r);
+
+	DECLARE_WRITE8_MEMBER(syscr1_w);
+	DECLARE_WRITE8_MEMBER(syscr2_w);
+	DECLARE_READ8_MEMBER(syscr1_r);
+	DECLARE_READ8_MEMBER(syscr2_r);
+	DECLARE_WRITE8_MEMBER(rbs_w);
+	DECLARE_READ8_MEMBER(psw_r);
+
 	DECLARE_READ8_MEMBER(adccr_r);
 	DECLARE_READ8_MEMBER(adcdr_r);
 
@@ -224,8 +272,48 @@ private:
 	uint8_t m_EINTCR;
 	uint8_t m_ADCCR;
 	uint8_t m_ADCDR;
+	uint8_t m_SYSCR1;
+	uint8_t m_SYSCR2;
+	uint8_t m_TBTCR;
+	uint16_t m_TREG1A;
+	uint16_t m_TREG1B;
+	uint8_t m_TC1CR;
+	uint16_t m_TREG2;
+	uint8_t m_TC2CR;	
+	uint8_t m_TREG3A;
+	uint8_t m_TREG3B;
+	uint8_t m_TC3CR;
+	uint8_t m_TREG4;
+	uint8_t m_TC4CR;
+	uint8_t m_SIOCR1[2];
+	uint8_t m_SIOCR2[2];
+	uint8_t m_WDTCR1;
 
 	uint16_t m_irqstate;
+
+	// serial stuff
+	TIMER_CALLBACK_MEMBER(sio0_transmit_cb);
+	TIMER_CALLBACK_MEMBER(sio1_transmit_cb);
+	uint8_t m_transfer_numbytes[2];
+	uint8_t m_transfer_pos[2];
+	uint8_t m_transfer_shiftreg[2];
+	uint8_t m_transfer_shiftpos[2];
+	uint8_t m_transfer_mode[2];
+	int m_transmit_bits[2];
+	int m_receive_bits[2];
+
+	emu_timer *m_serial_transmit_timer[2];
+
+	TIMER_CALLBACK_MEMBER(tc1_cb);
+	TIMER_CALLBACK_MEMBER(tc2_cb);
+	TIMER_CALLBACK_MEMBER(tc3_cb);
+	TIMER_CALLBACK_MEMBER(tc4_cb);
+
+	void tc2_reload();
+	void tc2_cancel();
+
+	emu_timer *m_tcx_timer[4];
+
 
 	void set_irq_line(int irqline, int state);
 	void check_interrupts();

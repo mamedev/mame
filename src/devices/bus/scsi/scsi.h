@@ -148,6 +148,8 @@ public:
 		data7_handler().set(tag, FUNC(input_buffer_device::write_bit7));
 	}
 
+	void set_output_latch(output_latch_device &latch);
+
 	DECLARE_WRITE_LINE_MEMBER( write_bsy );
 	DECLARE_WRITE_LINE_MEMBER( write_sel );
 	DECLARE_WRITE_LINE_MEMBER( write_cd );

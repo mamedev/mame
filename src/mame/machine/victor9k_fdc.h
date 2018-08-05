@@ -35,10 +35,10 @@ public:
 	auto syn_wr_callback() { return m_syn_cb.bind(); }
 	auto lbrdy_wr_callback() { return m_lbrdy_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(space, offset, data); }
-	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs6_w ) { m_via6->write(space, offset, data); }
+	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(offset); }
+	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(offset, data); }
+	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(offset); }
+	DECLARE_WRITE8_MEMBER( cs6_w ) { m_via6->write(offset, data); }
 	DECLARE_READ8_MEMBER( cs7_r );
 	DECLARE_WRITE8_MEMBER( cs7_w );
 
@@ -54,6 +54,8 @@ protected:
 
 private:
 	static const int rpm[0x100];
+
+	void add_floppy_drive(machine_config &config, const char *_tag);
 
 	enum
 	{
@@ -110,7 +112,7 @@ private:
 	devcb_write_line m_syn_cb;
 	devcb_write_line m_lbrdy_cb;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_device<via6522_device> m_via4;
 	required_device<via6522_device> m_via5;
 	required_device<via6522_device> m_via6;

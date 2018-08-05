@@ -44,7 +44,7 @@ private:
 	uint16_t m_scroll_ram[6];
 	uint16_t m_layer_en;
 
-	DECLARE_READ8_MEMBER(sdgndmps_sound_comms_r);
+	u8 sdgndmps_sound_comms_r(offs_t offset);
 
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
