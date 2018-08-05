@@ -53,7 +53,7 @@ private:
 		int it2;
 		uint8_t dictionary[256];
 		int id;
-	} s;
+	} m_compstate;
 
 	void set_table_upload_mode_w(uint16_t val);
 	void upload_table_data_w(uint16_t val);

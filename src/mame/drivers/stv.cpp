@@ -953,18 +953,12 @@ void stv_state::init_ffreveng()
 
 READ32_MEMBER(stv_state::decathlt_prot_higher_r)
 {
-	if (m_decathlete_database != 0)
-		printf("switch to upper\n");
-
 	m_decathlete_database = 0; // if the protection device is accessed at this address data is fetched from 0x03000000
 	return m_5838crypt->data_r(space, offset, mem_mask);
 }
 
 READ32_MEMBER(stv_state::decathlt_prot_lower_r)
 {
-	if (m_decathlete_database != 1)
-		printf("switch to lower\n");
-
 	m_decathlete_database = 1; // if the protection device is accessed at this address data is fetched from 0x02000000
 	return m_5838crypt->data_r(space, offset, mem_mask);
 }

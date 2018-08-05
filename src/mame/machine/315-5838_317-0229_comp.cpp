@@ -64,27 +64,29 @@ void sega_315_5838_comp_device::device_reset()
 // this part is likely specific to the decathlete type chip and will differ for the others
 uint16_t sega_315_5838_comp_device::decipher(uint16_t c)
 {
+	// TODO: use BIT macros instead of working in bytes
 	uint16_t p = 0;
 	uint16_t x[16];
 
-	for (int b = 0; b < 16; ++b) {
+	for (int b = 0; b < 16; ++b)
+	{
 		x[b] = (c >> b) & 1;
 	}
 
-	p |= (x[7]^x[9]^x[14] ? 0 : x[5]^x[12]) ^ x[14];
-	p |= (((x[7]^x[9])&(x[12] ^ x[14] ^ x[5])) ^ x[14] ^ 1) << 1;
-	p |= ((x[6]&x[8]) ^ (x[6]&x[15]) ^ (x[8]&x[15]) ^ 1) << 2;
+	p |= (x[7] ^ x[9] ^ x[14] ? 0 : x[5] ^ x[12]) ^ x[14];
+	p |= (((x[7] ^ x[9])&(x[12] ^ x[14] ^ x[5])) ^ x[14] ^ 1) << 1;
+	p |= ((x[6] & x[8]) ^ (x[6] & x[15]) ^ (x[8] & x[15]) ^ 1) << 2;
 	p |= (x[11] ^ x[14] ^ 1) << 3;
-	p |= ((x[7]&(x[1] ^ x[8] ^ x[12])) ^ x[12]) << 4;
-	p |= ((x[6]|x[8]) ^ (x[8]&x[15])) << 5;
-	p |= (x[4] ^ (x[3]|x[10])) << 6;
-	p |= ((x[14]&(x[5] ^ x[12])) ^ x[7] ^ x[9] ^ 1) << 7;
+	p |= ((x[7] & (x[1] ^ x[8] ^ x[12])) ^ x[12]) << 4;
+	p |= ((x[6] | x[8]) ^ (x[8] & x[15])) << 5;
+	p |= (x[4] ^ (x[3] | x[10])) << 6;
+	p |= ((x[14] & (x[5] ^ x[12])) ^ x[7] ^ x[9] ^ 1) << 7;
 	p |= (x[4] ^ x[13] ^ 1) << 8;
 	p |= (x[6] ^ (x[8] | (x[15] ^ 1))) << 9;
 	p |= (x[7] ^ (x[12] | (x[1] ^ x[8] ^ x[7] ^ 1))) << 10;
 	p |= (x[3] ^ x[10] ^ 1) << 11;
 	p |= (x[0] ^ x[2]) << 12;
-	p |= (x[8]^x[1] ? x[12] : x[7]) << 13;
+	p |= (x[8] ^ x[1] ? x[12] : x[7]) << 13;
 	p |= (x[0] ^ x[11] ^ x[14] ^ 1) << 14;
 	p |= (x[10] ^ 1) << 15;
 
@@ -109,19 +111,19 @@ uint8_t sega_315_5838_comp_device::get_decompressed_byte(void)
 
 		for (int i = 0; i < 12; i++)
 		{
-			if (m_num_bits != s.tree[i].len) continue;
-			if (m_val < (s.tree[i].pattern >> (12 - m_num_bits))) continue;
+			if (m_num_bits != m_compstate.tree[i].len) continue;
+			if (m_val < (m_compstate.tree[i].pattern >> (12 - m_num_bits))) continue;
 			if (
 				(m_num_bits < 12) &&
-				(m_val >= (s.tree[i + 1].pattern >> (12 - m_num_bits)))
+				(m_val >= (m_compstate.tree[i + 1].pattern >> (12 - m_num_bits)))
 				) continue;
 
-			int j = s.tree[i].idx + m_val - (s.tree[i].pattern >> (12 - m_num_bits));
+			int j = m_compstate.tree[i].idx + m_val - (m_compstate.tree[i].pattern >> (12 - m_num_bits));
 
 			m_val = 0;
 			m_num_bits = 0;
 
-			return s.dictionary[j];
+			return m_compstate.dictionary[j];
 		}
 	}
 }
@@ -131,20 +133,11 @@ READ32_MEMBER(sega_315_5838_comp_device::data_r)
 	return (get_decompressed_byte() << 24) | (get_decompressed_byte() << 16) | (get_decompressed_byte() << 8) | (get_decompressed_byte() << 0);
 }
 
-
 uint16_t sega_315_5838_comp_device::genericdecathlt_prot_r()
 {
-	switch (m_srcoffset)
-	{
-		default:
-
-		uint16_t tempdata = m_read_ch(m_srcoffset);
-		m_srcoffset++;
-
-		return tempdata;
-	}
-
-	return 0xffff;
+	uint16_t tempdata = m_read_ch(m_srcoffset);
+	m_srcoffset++;
+	return tempdata;
 }
 
 void sega_315_5838_comp_device::set_prot_addr(uint32_t data, uint32_t mem_mask)
@@ -153,19 +146,24 @@ void sega_315_5838_comp_device::set_prot_addr(uint32_t data, uint32_t mem_mask)
 
 	m_num_bits_compressed = 0;
 	m_val_compressed = 0;
-	m_num_bits = 0; 
+	m_num_bits = 0;
 	m_val = 0;
 }
 
 void sega_315_5838_comp_device::set_table_upload_mode_w(uint16_t val)
 {
-	s.mode = val;
+	m_compstate.mode = val;
 
-	if (s.mode == 0x8000) {
-		s.it2 = 0;
-	} else if (s.mode == 0x8080) {
-		s.id = 0;
-	} else {
+	if (m_compstate.mode == 0x8000)
+	{
+		m_compstate.it2 = 0;
+	}
+	else if (m_compstate.mode == 0x8080)
+	{
+		m_compstate.id = 0;
+	}
+	else
+	{
 		fatalerror("Unknown mode in set_table_upload_mode_w()");
 	}
 }
@@ -173,20 +171,30 @@ void sega_315_5838_comp_device::set_table_upload_mode_w(uint16_t val)
 
 void sega_315_5838_comp_device::upload_table_data_w(uint16_t val)
 {
-	if (s.mode == 0x8000) {
-		assert(s.it2/2 < 12);
-		if ((s.it2 & 1) == 0) {
-			s.tree[s.it2/2].len = (0xFF00 & val) >> 8;
-			s.tree[s.it2/2].idx = (0x00FF & val) >> 0;
-		} else {
-			s.tree[s.it2/2].pattern = val;
+	if (m_compstate.mode == 0x8000)
+	{
+		assert(m_compstate.it2 / 2 < 12);
+
+		if ((m_compstate.it2 & 1) == 0)
+		{
+			m_compstate.tree[m_compstate.it2 / 2].len = (0xFF00 & val) >> 8;
+			m_compstate.tree[m_compstate.it2 / 2].idx = (0x00FF & val) >> 0;
 		}
-		s.it2++;
-	} else if (s.mode == 0x8080) {
-		assert(s.id < 255);
-		s.dictionary[s.id++] = (0xFF00 & val) >> 8;
-		s.dictionary[s.id++] = (0x00FF & val) >> 0;
-	} else {
+		else
+		{
+			m_compstate.tree[m_compstate.it2 / 2].pattern = val;
+		}
+		m_compstate.it2++;
+	}
+	else if (m_compstate.mode == 0x8080)
+	{
+		assert(m_compstate.id < 255);
+
+		m_compstate.dictionary[m_compstate.id++] = (0xFF00 & val) >> 8;
+		m_compstate.dictionary[m_compstate.id++] = (0x00FF & val) >> 0;
+	}
+	else
+	{
 		fatalerror("Unknown mode in upload_table_data_w()");
 	}
 }
