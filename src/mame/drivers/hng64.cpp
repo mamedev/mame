@@ -530,9 +530,13 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		case 0x001c: return machine().rand(); // hng64 hangs on start-up if zero.
 		//case 0x106c:
 		//case 0x107c:
-		case 0x1084: return 0x00000002; //MCU->MIPS latch port
+		case 0x1084:
+			logerror("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
+			return 0x00000002; //MCU->MIPS latch port
 		//case 0x108c:
-		case 0x1104: return m_irq_level;
+		case 0x1104:
+			logerror("%s: irq level READ %04x\n", machine().describe_context(),m_irq_level);
+			return m_irq_level;
 		case 0x111c:
 			//printf("Read to IRQ ACK?\n");
 			break;
@@ -593,7 +597,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
+			logerror("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
 		//0x110c global irq mask?
 		/* irq ack */
@@ -750,11 +754,13 @@ READ32_MEMBER(hng64_state::hng64_dualport_r)
 	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 
 	/*
+	I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
+
 	command table:
 	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
 	0x0c = cut down connections, treats the dualport to be normal RAM
 	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
-	0x20 = asks for MCU machine code
+	0x20 = asks for MCU machine code (probably not, this is also written in the function after the TLCS870 requests an interrupt on the MIPS)
 
 	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
 	*/
@@ -802,7 +808,7 @@ WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 		(currently we use m_dualport due to simulation, but this should actually be the same RAM as m_ioram)
 	*/
 	COMBINE_DATA(&m_dualport[offset]);
-	logerror("%s: dualport WRITE %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+	logerror("%s: dualport WRITE %08x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 
@@ -1472,15 +1478,229 @@ void hng64_state::set_irq(uint32_t irq_vector)
 	    - is there an irq mask mechanism?
 	    - is irq level cleared too when the irq acks?
 
-	    This is written with irqs DISABLED
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0 vblank irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1 <empty>
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2 <empty>
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 3d fifo processed irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17 MCU related irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq, needed by xrally and roadedge
+		IRQ level read at 0x80008cac
+		IO RAM is at bf808000 on the MIPS
+
+		-- irq table in Fatal Fury WA - 'empty' entries just do minimum 'interrupt service' with no real function.
+		80000400: 80039F20         irq00 vblank irq
+		80000404: 80039F84         1rq01 jump based on ram content
+		80000408: 8003A08C         irq02 'empty'
+		8000040C: 8006FF04         irq03 3d FIFO?
+		80000410: A0000410         irq04 INVALID
+		80000414: A0000414         irq05 INVALID
+		80000418: A0000418         irq06 INVALID
+		8000041C: A000041C         irq07 INVALID
+		80000420: A0000420         irq08 INVALID
+		80000424: 8003A00C         irq09 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		80000428: 80039FD0         irq0a 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		8000042C: 8003A0C0         irq0b 'empty'(network on xrally?)   writes to sysreg 1074 instead of loading/storing regs tho
+		80000430: 8003A050         irq0c 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+		80000434: A0000434         irq0d INVALID
+		80000438: A0000438         irq0e INVALID
+		8000043C: A000043C         irq0f INVALID
+		80000440: A0000440         irq10 INVALID
+		80000444: 8003A0FC         irq11 IO MCU related?               write to sysreg 1084 instead of loading/storing regs, accesses dualport RAM
+		80000448: A0000448         irq12 INVALID
+		8000044C: A000044C         irq13 INVALID
+		80000450: A0000450         irq14 INVALID
+		80000454: A0000454         irq15 INVALID
+		80000458: A0000458         irq16 INVALID
+		8000045C: 8003A1D4         irq17 'empty'                       write to sysreg 1084 instead of loading/storing regs tho (like irq 0x11)
+		80000460: A0000460         irq18 INVALID
+		(all other entries, invalid)
+
+		Xrally (invalid IRQs are more obviously invalid, pointing at 0)
+		80000400: 80016ED0         irq00
+		80000404: 80016F58         irq01
+		80000408: 80017048         irq02
+		8000040C: 80013484         irq03
+		80000410: 00000000         irq04 INVALID
+		80000414: 00000000         irq05 INVALID
+		80000418: 00000000         irq06 INVALID
+		8000041C: 00000000         irq07 INVALID
+		80000420: 00000000         irq08 INVALID
+		80000424: 80016FC8         irq09
+		80000428: 80016F8C         irq0a
+		8000042C: 8001707C         irq0b
+		80000430: 8001700C         irq0c
+		80000434: 00000000         irq0d INVALID
+		80000438: 00000000         irq0e INVALID
+		8000043C: 00000000         irq0f INVALID
+		80000440: 00000000         irq10 INVALID
+		80000444: 800170C0         irq11
+		80000448: 00000000         irq12 INVALID
+		8000044C: 00000000         irq13 INVALID
+		80000450: 00000000         irq14 INVALID
+		80000454: 00000000         irq15 INVALID
+		80000458: 00000000         irq16 INVALID
+		8000045C: 80017198         irq17
+		80000460: 00000000         irq18 INVALID
+		(all other entries, invalid)
+
+		Buriki
+		80000400: 800C49C4
+		80000404: 800C4748 
+		80000408: 800C4828
+		8000040C: 800C4B80
+		80000410: 00000000 
+		80000414: 00000000 
+		80000418: 00000000 
+		8000041C: 00000000 
+		80000420: 00000000
+		80000424: 800C47B0 
+		80000428: 800C4778 
+		8000042C: 800C4858
+		80000430: 800C47F0 
+		80000434: 00000000 
+		80000438: 00000000 
+		8000043C: 00000000
+		80000440: 00000000 
+		80000444: 800C4890
+		80000448: 00000000
+		8000044C: 00000000
+		80000450: 00000000
+		80000454: 00000000
+		80000458: 00000000
+		8000045C: 800C498C
+		80000460: 00000000
+
+		Beast Busters 2
+		80000400: 8000E9D8 
+		80000404: 8000EAFC 
+		80000408: 8000EBFC 
+		8000040C: 80012D90 
+		80000410: FFFFFFFF 
+		80000414: FFFFFFFF 
+		80000418: FFFFFFFF 
+		8000041C: FFFFFFFF 
+		80000420: FFFFFFFF 
+		80000424: 8000EB74 
+		80000428: 8000EB34 
+		8000042C: 8000EC34 
+		80000430: 8000EBBC 
+		80000434: FFFFFFFF
+		80000438: FFFFFFFF 
+		8000043C: FFFFFFFF
+		80000440: FFFFFFFF 
+		80000444: 8000E508 
+		80000448: FFFFFFFF 
+		8000044C: FFFFFFFF 
+		80000450: FFFFFFFF 
+		80000454: FFFFFFFF 
+		80000458: FFFFFFFF 
+		8000045C: FFFFFFFF irq17 INVALID (not even a stub routine here)
+		80000460: FFFFFFFF
+
+		Roads Edge
+		80000400: 80028B04
+		80000404: 80028B88
+		80000408: 80028C68
+		8000040C: 80036FAC
+		80000410: 00000000
+		80000414: 00000000
+		80000418: 00000000
+		8000041C: 00000000
+		80000420: 00000000
+		80000424: 80028BF0
+		80000428: 80028BB8
+		8000042C: 80028C98
+		80000430: 80028C30
+		80000434: 00000000
+		80000438: 00000000
+		8000043C: 00000000
+		80000440: 00000000
+		80000444: 80027340 
+		80000448: 00000000 
+		8000044C: 00000000
+		80000450: 00000000 
+		80000454: 00000000
+		80000458: 00000000
+		8000045C: 00000000 irq17 INVALID (not even a stub routine here)
+		80000460: 00000000
+
+		SamSho 64 code is more complex, irqs point to functions that get a jump address from a fixed ram location for each IRQ, most are invalid tho?
+		the ingame table is copied from 80005DD0
+		                                  bootup   ingame
+		80000400: 800C03E0 irq00 80005dd0 800c02e0 800cfcc8 
+		80000404: 800C041C irq01 80005dd4 800c0000
+		80000408: 800C0458 irq02 80005dd8 800c0000
+		8000040C: 800C0494 irq03 80005ddc 800c3054 800cfd58
+		80000410: 800C04D0 irq04 80005de0 800c3070 800cfdf8 - interesting because this level is invalid on other games
+		80000414: 800C032C irq05 80000478 00000000
+		80000418: 800C0368 irq06 80000478 00000000
+		8000041C: 800C03A4 irq07 80000478 00000000
+		80000420: 800C050C irq08 80005df0 800c0000
+		80000424: 800C0548 irq09 80005df4 800c0000
+		80000428: 800C0584 irq0a 80005df8 800c0000
+		8000042C: 800C05C0 irq0b 80005dfc 800c0000
+		80000430: 800C05FC irq0c 80005e00 800c0000
+		80000434: 800C02F0 irq0d 80000478 00000000
+		80000438: 800C02F0 irq0e 80000478 00000000
+		8000043C: 800C02F0 irq0f 80000478 00000000
+		80000440: 800C0638 irq10 80005e10 800c0000
+		80000444: 800C0674 irq11 80005e14 800c0000
+		80000448: 800C06B0 irq12 80005e18 800c0000
+		8000044C: 800C06EC irq13 80005e1c 800c0000
+		80000450: 800C0728 irq14 80005e20 800c0000
+		80000454: 800C0764 irq15 80005e24 800c0000
+		80000458: 800C07A0 irq16 80005e28 800c0000
+		8000045C: 800C07DC irq17 80005e2c 800c0000
+		80000460: 00000000 (invalid)
+
+		SamSho 64 2 is the same types as SamSho 64
+		                                  bootup   ingame
+		80000400: 801008DC irq00 802011e0 801007e0 8011f6b4
+		80000404: 80100918 irq01 802011e4 80100500
+		80000408: 80100954 irq02 802011e8 80100500
+		8000040C: 80100990 irq03 802011ec 80101b38 8011f7b8
+		80000410: 801009CC irq04 802011f0 80101b54 80101b54
+		80000414: 80100828 irq05 80000478 0000000b
+		80000418: 80100864 irq06 80000478 0000000b
+		8000041C: 801008A0 irq07 80000478 0000000b
+		80000420: 80100A08 irq08 80201200 80100500
+		80000424: 80100A44 irq09 80201204 80100500
+		80000428: 80100A80 irq0a 80201208 80100500 
+		8000042C: 80100ABC irq0b 8020120c 80100500
+		80000430: 80100AF8 irq0c 80201210 80100500
+		80000434: 801007EC irq0d 80000478 0000000b
+		80000438: 801007EC irq0e 80000478 0000000b
+		8000043C: 801007EC irq0f 80000478 0000000b
+		80000440: 80100B34 irq10 80201220 80100500
+		80000444: 80100B70 irq11 80201224 80100500
+		80000448: 80100BAC irq12 80201228 80100500
+		8000044C: 80100BE8 irq13 8020122c 80100500
+		80000450: 80100C24 irq14 80201230 80100500
+		80000454: 80100C60 irq15 80201234 80100500
+		80000458: 80100C9C irq16 80201238 80100500
+		8000045C: 80100CD8 irq17 8020123c 80100500
+		80000460: 00000000 (invalid)
+
+	    Register 111c is connected to the interrupts and written in each one (IRQ ack / latch clear?)
+
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0x00 vblank irq
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 0x01 <empty> (not empty of ffwa)
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 0x02 <empty>
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 0x03 3d fifo processed irq
+		                                                     00010
+															 00020
+														     00040
+															 00080
+															 00100
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 0x09                                          
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 0x0a
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 0x0b network irq, needed by xrally and roadedge
+		                                                     01000
+															 02000
+															 04000
+															 08000
+															 10000
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 0x11 MCU related irq?
+		                                                     40000
+															 80000
+															100000
+															200000
+															400000
+															800000 0x17 MCU related irq?
 
 	    samsho64 / samsho64_2 does this during running:
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000000. (PC=800008fc) just checking?
