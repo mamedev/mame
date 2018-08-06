@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838",
 
 sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
-	device_rom_interface(mconfig, *this, 24),
+	device_rom_interface(mconfig, *this, 23),
 	m_hackmode(0)
 {
 }
@@ -148,7 +148,7 @@ uint8_t sega_315_5838_comp_device::get_decompressed_byte(void)
 		if (!(m_srcoffset & 1))
 		{
 			uint16_t temp = read_word((m_srcoffset*2)^2);
-			logerror("%s: read data %02x\n", machine().describe_context(), temp);
+			logerror("%s: read data %04x\n", machine().describe_context(), temp);
 #ifdef SEGA315_DUMP_DEBUG
 			if (m_fp)
 			{
@@ -172,7 +172,7 @@ uint8_t sega_315_5838_comp_device::get_decompressed_byte(void)
 		}
 
 		m_srcoffset++;
-		m_srcoffset &= 0x00ffffff;
+		m_srcoffset &= 0x007fffff;
 		return ret;
 	}
 }
@@ -186,7 +186,7 @@ uint16_t sega_315_5838_comp_device::source_word_r()
 {
 	uint16_t tempdata = read_word((m_srcoffset*2)^2);
 	m_srcoffset++;
-	m_srcoffset &= 0x00ffffff;
+	m_srcoffset &= 0x007fffff;
 
 	if (m_srcoffset == m_srcstart) // if we've wrapped around to where we started something has gone wrong with the transfer, abandon
 		m_abort = true;
@@ -204,7 +204,7 @@ uint16_t sega_315_5838_comp_device::source_word_r()
 void sega_315_5838_comp_device::set_prot_addr(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_srcoffset);
-	m_srcoffset &= 0x00ffffff;
+	m_srcoffset &= 0x007fffff;
 	m_srcstart = m_srcoffset;
 	m_abort = false;
 
