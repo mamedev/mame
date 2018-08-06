@@ -492,7 +492,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 	m_adpcm.pos[chan]++;
 	if (m_adpcm.pos[chan] > rate)
 	{
-		if (m_adpcm.input[chan] != -1)
+		if (m_adpcm.input[chan] == -1)
 		{
 			m_adpcm.input[chan] = read_dword(((m_page_setting & 0x1000) << 6) | m_adpcm.addr[chan]) & 0xffff;
 			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
@@ -505,7 +505,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 					interrupt_update();
 				}
 			}
-			if (m_adpcm.addr[chan] == ((m_adpcm.end[chan] & 0x20000) | ((m_adpcm.end[chan] + 1) & 0x20000)))
+			if (m_adpcm.addr[chan] > m_adpcm.end[chan])
 			{
 				m_adpcm.status |= (1 << (chan*2));
 				if (BIT(m_adpcm.control[chan], 1))
@@ -521,6 +521,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 				else
 				{
 					m_adpcm.playing[chan] = 0;
+					return 0;
 				}
 			}
 			m_adpcm.nibble[chan] = 0;
