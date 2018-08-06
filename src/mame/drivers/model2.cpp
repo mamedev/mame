@@ -2720,10 +2720,16 @@ MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
+void model2a_state::sega5838_map(address_map &map)
+{
+	// TODO: shares the ram at 1d80000, add it to main map so it can be shared here
+	//map(0x000000, 0xffffff).bankr("protbank");
+}
+
 MACHINE_CONFIG_START(model2a_state::model2a_0229)
 	model2a(config);
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
-//  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+	MCFG_DEVICE_ADDRESS_MAP(0, sega5838_map)
 MACHINE_CONFIG_END
 
 void model2a_state::zeroguna(machine_config &config)
@@ -6559,13 +6565,47 @@ void model2_state::init_sgt24h()
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
+READ32_MEMBER(model2_state::doa_prot_r)
+{
+	// doa only reads 16-bits at a time, while STV reads 32-bits
+
+	uint32 ret = 0;
+
+	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r(space,0,0xffff)<<16);
+	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r(space,0,0xffff);
+
+	return ret;
+}
+
+READ32_MEMBER(model2_state::doa_unk_r)
+{
+	uint32_t retval = 0;
+
+	// this actually looks a busy status flag
+	m_prot_a = !m_prot_a;
+	if (m_prot_a)
+		retval = 0xffff;
+	else
+		retval = 0xfff0;
+
+	return retval;
+}
+
+
 void model2_state::init_doa()
 {
-	m_0229crypt->install_doa_protection();
-
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
-	ROM[0x630/4] = 0x08000004;
-	ROM[0x808/4] = 0x08000004;
+	ROM[0x630 / 4] = 0x08000004;
+	ROM[0x808 / 4] = 0x08000004;
+
+	// protection ram is 1d80000
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d8400c, 0x01d8400f, read32_delegate(FUNC(model2_state::doa_unk_r), this)); // is this protection related? it's in the same ram range but other games with the device don't use the address for any kind of status
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01d87ff0, 0x01d87ff3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), (sega_315_5838_comp_device*)m_0229crypt)); // set compressed data source address (always set 0, data is in RAM)
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01d87ff4, 0x01d87ff7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w_doa), (sega_315_5838_comp_device*)m_0229crypt)); // upload tab
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d87ff8, 0x01d87ffb, read32_delegate(FUNC(model2_state::doa_prot_r), this)); // read decompressed data
+
+	m_0229crypt->set_hack_mode(sega_315_5838_comp_device::HACK_MODE_DOA);
 }
 
 // Model 2 (TGPs, Model 1 sound board)
