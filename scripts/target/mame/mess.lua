@@ -219,6 +219,7 @@ SOUNDS["ES5506"] = true
 --SOUNDS["BSMT2000"] = true
 --SOUNDS["GAELCO_CG1V"] = true
 --SOUNDS["GAELCO_GAE1"] = true
+SOUNDS["HUC6230"] = true
 SOUNDS["C6280"] = true
 SOUNDS["SP0250"] = true
 SOUNDS["SPU"] = true
