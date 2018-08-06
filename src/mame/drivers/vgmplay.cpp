@@ -2636,7 +2636,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K054539_0, vgmplay_device::A_K054539_0 + 0x22f).w(m_k054539[0], FUNC(k054539_device::write));
 	map(vgmplay_device::A_K054539_1, vgmplay_device::A_K054539_1 + 0x22f).w(m_k054539[1], FUNC(k054539_device::write));
 	map(vgmplay_device::A_C6280_0, vgmplay_device::A_C6280_0 + 0xf).w("huc6280.0:psg", FUNC(c6280_device::c6280_w));
-	map(vgmplay_device::A_C6280_1, vgmplay_device::A_C6280_1 + 0xf).w("huc6280.0:psg", FUNC(c6280_device::c6280_w));
+	map(vgmplay_device::A_C6280_1, vgmplay_device::A_C6280_1 + 0xf).w("huc6280.1:psg", FUNC(c6280_device::c6280_w));
 	// TODO: c140
 	map(vgmplay_device::A_K053260_0, vgmplay_device::A_K053260_0 + 0x2f).w(m_k053260[0], FUNC(k053260_device::write));
 	map(vgmplay_device::A_K053260_1, vgmplay_device::A_K053260_1 + 0x2f).w(m_k053260[1], FUNC(k053260_device::write));
@@ -2651,9 +2651,9 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_SAA1099_0, vgmplay_device::A_SAA1099_0 + 1).w(m_saa1099[0], FUNC(saa1099_device::write));
 	map(vgmplay_device::A_SAA1099_1, vgmplay_device::A_SAA1099_1 + 1).w(m_saa1099[1], FUNC(saa1099_device::write));
 	map(vgmplay_device::A_ES5503_0, vgmplay_device::A_ES5503_0 + 0xe2).w(m_es5503[0], FUNC(es5503_device::write));
-	map(vgmplay_device::A_ES5503_RAM_0, vgmplay_device::A_ES5503_0 + 0x1ffff).ram().share("es5503_ram.0");
+	map(vgmplay_device::A_ES5503_RAM_0, vgmplay_device::A_ES5503_RAM_0 + 0x1ffff).ram().share("es5503_ram.0");
 	map(vgmplay_device::A_ES5503_1, vgmplay_device::A_ES5503_1 + 0xe2).w(m_es5503[1], FUNC(es5503_device::write));
-	map(vgmplay_device::A_ES5503_RAM_1, vgmplay_device::A_ES5503_1 + 0x1ffff).ram().share("es5503_ram.1");
+	map(vgmplay_device::A_ES5503_RAM_1, vgmplay_device::A_ES5503_RAM_1 + 0x1ffff).ram().share("es5503_ram.1");
 	// TODO: es5505
 	map(vgmplay_device::A_X1_010_0, vgmplay_device::A_X1_010_0 + 0x1fff).w(m_x1_010[0], FUNC(x1_010_device::write));
 	map(vgmplay_device::A_X1_010_1, vgmplay_device::A_X1_010_1 + 0x1fff).w(m_x1_010[1], FUNC(x1_010_device::write));
