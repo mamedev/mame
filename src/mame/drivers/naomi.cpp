@@ -9940,6 +9940,9 @@ ROM_START( inidv3cy )
 	//PIC16C621A (317-0406-COM)
 	//(sticker 253-5508-0406)
 	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, CRC(fe91a7af) SHA1(3562d8d454ac6e5b73a24d4dc8928ef24687cdf7) )
+
+	DISK_REGION( "cycraft" )
+	DISK_IMAGE( "initiald3_smcp_v1.66", 0, SHA1(8ade7c0bb85ceebf9e45e4d8053ad76009258a38) )
 ROM_END
 
 ROM_START( inidv3ca )
@@ -9953,6 +9956,9 @@ ROM_START( inidv3ca )
 	//PIC16C621A (317-0406-COM)
 	//(sticker 253-5508-0406)
 	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, CRC(fe91a7af) SHA1(3562d8d454ac6e5b73a24d4dc8928ef24687cdf7) )
+
+	DISK_REGION( "cycraft" )
+	DISK_IMAGE( "initiald3_smcp_v1.66", 0, SHA1(8ade7c0bb85ceebf9e45e4d8053ad76009258a38) )
 ROM_END
 
 /**********************************************
