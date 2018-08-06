@@ -1136,6 +1136,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_UPD7759);
 				// TODO: upd7759
+				m_pc += 3;
 				break;
 			}
 
@@ -1233,6 +1234,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_ES5505);
 				// TODO: es5505
+				m_pc += 3;
 				break;
 			}
 
@@ -1302,6 +1304,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_SCSP);
 				// TODO: SCSP memory
+				m_pc += 4;
 				break;
 			}
 
@@ -1309,6 +1312,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_WSWAN);
 				// TODO: Wonderswan memory
+				m_pc += 4;
 				break;
 			}
 
@@ -1406,6 +1410,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_C140);
 				// TODO: c140
+				m_pc += 4;
 				break;
 			}
 
@@ -1425,6 +1430,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_ES5505);
 				// TODO: es5505
+				m_pc += 4;
 				break;
 			}
 
