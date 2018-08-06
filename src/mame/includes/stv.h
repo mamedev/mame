@@ -134,8 +134,7 @@ private:
 	uint32_t m_abus_protenable;
 	uint32_t m_abus_protkey;
 
-	READ32_MEMBER(decathlt_prot_higher_r);
-	READ32_MEMBER(decathlt_prot_lower_r);
+	READ32_MEMBER(decathlt_prot_r);
 	void sega5838_map(address_map &map);
 	optional_memory_bank m_protbank;
 	bool m_newprotection_element; // debug helper only

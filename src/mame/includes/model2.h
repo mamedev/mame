@@ -187,6 +187,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(vertical_sync_w);
 	DECLARE_READ32_MEMBER(doa_prot_r);
 	DECLARE_READ32_MEMBER(doa_unk_r);
+	void sega_0229_map(address_map &map);
 	int m_prot_a;
 
 	void raster_init(memory_region *texture_rom);
@@ -233,6 +234,7 @@ protected:
 	void geo_sharc_map(address_map &map);
 	void model2_base_mem(address_map &map);
 	void model2_5881_mem(address_map &map);
+	void model2_0229_mem(address_map &map);
 	void model2_snd(address_map &map);
 
 	void debug_init();
@@ -459,8 +461,6 @@ public:
 
 	DECLARE_MACHINE_RESET(model2a);
 
-	void sega5838_map(address_map &map);
-
 	void manxtt(machine_config &config);
 	void manxttdx(machine_config &config);
 	void model2a(machine_config &config);
@@ -474,6 +474,7 @@ public:
 protected:
 	void model2a_crx_mem(address_map &map);
 	void model2a_5881_mem(address_map &map);
+	void model2a_0229_mem(address_map &map);
 };
 
 /*****************************
@@ -514,6 +515,7 @@ protected:
 
 	void model2b_crx_mem(address_map &map);
 	void model2b_5881_mem(address_map &map);
+	void model2b_0229_mem(address_map &map);
 	// TODO: split into own class
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);

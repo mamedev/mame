@@ -1418,6 +1418,12 @@ void model2a_state::model2a_5881_mem(address_map &map)
 	model2_5881_mem(map);
 }
 
+void model2a_state::model2a_0229_mem(address_map &map)
+{
+	model2a_crx_mem(map);
+	model2_0229_mem(map);
+}
+
 /* 2B-CRX overrides */
 void model2b_state::model2b_crx_mem(address_map &map)
 {
@@ -1456,6 +1462,12 @@ void model2b_state::model2b_5881_mem(address_map &map)
 {
 	model2b_crx_mem(map);
 	model2_5881_mem(map);
+}
+
+void model2b_state::model2b_0229_mem(address_map &map)
+{
+	model2b_crx_mem(map);
+	model2_0229_mem(map);
 }
 
 /* 2C-CRX overrides */
@@ -2720,16 +2732,16 @@ MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-void model2a_state::sega5838_map(address_map &map)
-{
-	// TODO: shares the ram at 1d80000, add it to main map so it can be shared here
-	//map(0x000000, 0xffffff).bankr("protbank");
-}
+
 
 MACHINE_CONFIG_START(model2a_state::model2a_0229)
 	model2a(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2a_0229_mem)
+
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, sega5838_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, sega_0229_map)
 MACHINE_CONFIG_END
 
 void model2a_state::zeroguna(machine_config &config)
@@ -2790,8 +2802,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2b_state::model2b_0229)
 	model2b(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2b_0229_mem)
+
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
-//  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+	MCFG_DEVICE_ADDRESS_MAP(0, sega_0229_map)
 MACHINE_CONFIG_END
 
 void model2b_state::indy500(machine_config &config)
@@ -6568,7 +6584,6 @@ void model2_state::init_sgt24h()
 READ32_MEMBER(model2_state::doa_prot_r)
 {
 	// doa only reads 16-bits at a time, while STV reads 32-bits
-
 	uint32 ret = 0;
 
 	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r(space,0,0xffff)<<16);
@@ -6591,19 +6606,30 @@ READ32_MEMBER(model2_state::doa_unk_r)
 	return retval;
 }
 
+void model2_state::sega_0229_map(address_map &map)
+{
+	// view the protection device has into RAM, this might need endian swapping
+	map(0x000000, 0x007fff).ram().share("protram0229");
+}
+
+/* common map for 0229 protection */
+void model2_state::model2_0229_mem(address_map &map)
+{
+	// the addresses here suggest this is only connected to a 0x8000 byte window, not 0x80000 like ST-V
+	map(0x01d80000, 0x01d87fff).ram().share("protram0229");
+	map(0x01d87ff0, 0x01d87ff3).w(m_0229crypt, FUNC(sega_315_5838_comp_device::srcaddr_w));
+	map(0x01d87ff4, 0x01d87ff7).w(m_0229crypt, FUNC(sega_315_5838_comp_device::data_w_doa));
+	map(0x01d87ff8, 0x01d87ffb).r(FUNC(model2_state::doa_prot_r));
+
+	 // is this protection related? it's in the same ram range but other games with the device don't use the address for any kind of status doesn't access the device otherwise?
+	map(0x01d8400c, 0x01d8400f).r(FUNC(model2_state::doa_unk_r));
+}
 
 void model2_state::init_doa()
 {
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x630 / 4] = 0x08000004;
 	ROM[0x808 / 4] = 0x08000004;
-
-	// protection ram is 1d80000
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d8400c, 0x01d8400f, read32_delegate(FUNC(model2_state::doa_unk_r), this)); // is this protection related? it's in the same ram range but other games with the device don't use the address for any kind of status
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01d87ff0, 0x01d87ff3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), (sega_315_5838_comp_device*)m_0229crypt)); // set compressed data source address (always set 0, data is in RAM)
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01d87ff4, 0x01d87ff7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w_doa), (sega_315_5838_comp_device*)m_0229crypt)); // upload tab
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d87ff8, 0x01d87ffb, read32_delegate(FUNC(model2_state::doa_prot_r), this)); // read decompressed data
 
 	m_0229crypt->set_hack_mode(sega_315_5838_comp_device::HACK_MODE_DOA);
 }

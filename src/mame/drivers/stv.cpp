@@ -951,30 +951,15 @@ void stv_state::init_ffreveng()
 	init_stv();
 }
 
-READ32_MEMBER(stv_state::decathlt_prot_higher_r)
+
+READ32_MEMBER(stv_state::decathlt_prot_r)
 {
+	// needs to be a way to indicate if device is enabled and fall through to cartridge data if not?
 	if (m_newprotection_element)
 	{
 		m_newprotection_element = false;
-		m_5838crypt->debug_helper(1);
 	}
 
-	m_protbank->set_entry(1); // if the protection device is accessed at this address data is fetched from 0x03000000
-	uint32 ret = 0;
-	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r(space, offset, mem_mask)<<16);
-	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r(space, offset, mem_mask);
-	return ret;
-}
-
-READ32_MEMBER(stv_state::decathlt_prot_lower_r)
-{
-	if (m_newprotection_element)
-	{
-		m_newprotection_element = false;
-		m_5838crypt->debug_helper(0);
-	}
-
-	m_protbank->set_entry(0); // if the protection device is accessed at this address data is fetched from 0x02000000
 	uint32 ret = 0;
 	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r(space, offset, mem_mask)<<16);
 	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r(space, offset, mem_mask);
@@ -983,22 +968,34 @@ READ32_MEMBER(stv_state::decathlt_prot_lower_r)
 
 WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
 {
+	int offs = offset * 4;
+
 	m_newprotection_element = true;
-	m_5838crypt->srcaddr_w(space,offset,data,mem_mask);
+	m_protbank->set_entry((offs & 0x1800000)>>23); // if the protection device is accessed at this address data is fetched from 0x02000000
+
+	if ((offs & 0x7fffff) == 0x7FFFF0)
+	{
+		m_5838crypt->srcaddr_w(space, offset, data, mem_mask);
+	}
+	else if ((offs & 0x7fffff) == 0x7FFFF4)
+	{
+		m_5838crypt->data_w(space, offset, data, mem_mask);
+	} 
 }
 
 void stv_state::init_decathlt()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x37FFFF0, 0x37FFFF3, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x37FFFF4, 0x37FFFF7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w), (sega_315_5838_comp_device*)m_5838crypt)); // upload tables
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37FFFF8, 0x37FFFFb, read32_delegate(FUNC(stv_state::decathlt_prot_higher_r), this)); // read decompressed data
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000000, 0x37fffff, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address, write data
+	
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27ffff8, 0x27ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); // read decompressed data
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fffff8, 0x2fffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37ffff8, 0x37ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF0, 0x27FFFF3, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF4, 0x27FFFF7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w), (sega_315_5838_comp_device*)m_5838crypt)); // upload tables
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27FFFF8, 0x27FFFFb, read32_delegate(FUNC(stv_state::decathlt_prot_lower_r), this)); // read decompressed data
-
-	m_protbank->configure_entry(0, memregion("cart")->base());
-	m_protbank->configure_entry(1, memregion("cart")->base() + 0x1000000);
+	m_protbank->configure_entry(0, memregion("cart")->base() + 0x0000000);
+	m_protbank->configure_entry(1, memregion("cart")->base() + 0x0800000);
+	m_protbank->configure_entry(2, memregion("cart")->base() + 0x1000000);
+	//m_protbank->configure_entry(3, memregion("cart")->base() + 0x1800000);
+	
 	m_protbank->set_entry(0);
 	
 	m_newprotection_element = false;
@@ -1203,7 +1200,7 @@ MACHINE_CONFIG_END
 
 void stv_state::sega5838_map(address_map &map)
 {
-	map(0x000000, 0xffffff).bankr("protbank");
+	map(0x000000, 0x7fffff).bankr("protbank");
 }
 
 MACHINE_CONFIG_START(stv_state::stv_5838)
