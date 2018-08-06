@@ -958,6 +958,7 @@ READ32_MEMBER(stv_state::decathlt_prot_r)
 	if (m_newprotection_element)
 	{
 		m_newprotection_element = false;
+		m_5838crypt->debug_helper(m_protbankval);
 	}
 
 	uint32 ret = 0;
@@ -970,8 +971,9 @@ WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
 {
 	int offs = offset * 4;
 
+	m_protbankval = (offs & 0x1800000)>>23;
+	m_protbank->set_entry(m_protbankval); // if the protection device is accessed at this address data is fetched from 0x02000000
 	m_newprotection_element = true;
-	m_protbank->set_entry((offs & 0x1800000)>>23); // if the protection device is accessed at this address data is fetched from 0x02000000
 
 	if ((offs & 0x7fffff) == 0x7FFFF0)
 	{
@@ -987,6 +989,7 @@ void stv_state::init_decathlt()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000000, 0x37fffff, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address, write data
 	
+	// really needs installing over the whole range, with fallbacks to read rom if device is disabled or isn't accessed on given address
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27ffff8, 0x27ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); // read decompressed data
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fffff8, 0x2fffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37ffff8, 0x37ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
