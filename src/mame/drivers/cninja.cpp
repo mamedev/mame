@@ -1148,7 +1148,8 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1247,7 +1248,8 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map_mutantf);
-	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
