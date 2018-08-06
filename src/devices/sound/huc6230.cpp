@@ -52,8 +52,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (!channel->m_interpolate)
 				sample = channel->m_curr_sample;
 			else
-				sample = ((channel->m_prev_sample * (frq - channel->m_pos)) >> m_adpcm_freq) + 
-					((channel->m_curr_sample * channel->m_pos) >> m_adpcm_freq);
+				sample = ((channel->m_prev_sample * (frq - channel->m_pos)) + 
+					(channel->m_curr_sample * channel->m_pos)) >> m_adpcm_freq;
 
 			outputs[0][i] = clip(outputs[0][i] + ((sample * channel->m_lvol) >> 2), -32768, 32767);
 			outputs[1][i] = clip(outputs[1][i] + ((sample * channel->m_rvol) >> 2), -32768, 32767);
