@@ -625,7 +625,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 1000000)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(to7)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
-	MCFG_DEVICE_ADD("wd2793", WD2793, 1_MHz_XTAL)
+	MCFG_DEVICE_ADD("wd2793", WD2793, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 
