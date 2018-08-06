@@ -427,8 +427,7 @@ private:
 	required_device_array<okim6295_device, 2> m_okim6295;
 	required_device_array<k051649_device, 2> m_k051649;
 	required_device_array<k054539_device, 2> m_k054539;
-	required_device_array<c6280_device, 2> m_c6280;
-	required_device_array<h6280_device, 2> m_h6280;
+	required_device_array<h6280_device, 2> m_huc6280;
 	required_device_array<c140_device, 2> m_c140;
 	required_device_array<k053260_device, 2> m_k053260;
 	required_device_array<pokey_device, 2> m_pokey;
@@ -1136,6 +1135,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_UPD7759);
 				// TODO: upd7759
+				m_pc += 3;
 				break;
 			}
 
@@ -1233,6 +1233,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_ES5505);
 				// TODO: es5505
+				m_pc += 3;
 				break;
 			}
 
@@ -1302,6 +1303,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_SCSP);
 				// TODO: SCSP memory
+				m_pc += 4;
 				break;
 			}
 
@@ -1309,6 +1311,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_WSWAN);
 				// TODO: Wonderswan memory
+				m_pc += 4;
 				break;
 			}
 
@@ -1406,6 +1409,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_C140);
 				// TODO: c140
+				m_pc += 4;
 				break;
 			}
 
@@ -1425,6 +1429,7 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_ES5505);
 				// TODO: es5505
+				m_pc += 4;
 				break;
 			}
 
@@ -2079,8 +2084,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_okim6295(*this, "okim6295.%d", 0)
 	, m_k051649(*this, "k051649.%d", 0)
 	, m_k054539(*this, "k054539.%d", 0)
-	, m_c6280(*this, "c6280.%d", 0)
-	, m_h6280(*this, "h6280.%d", 0)
+	, m_huc6280(*this, "huc6280.%d", 0)
 	, m_c140(*this, "c140.%d", 0)
 	, m_k053260(*this, "k053260.%d", 0)
 	, m_pokey(*this, "pokey.%d", 0)
@@ -2400,10 +2404,14 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_k054539[0]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0xa4 && (r32(0xa0) & ~0x40000000) ? volume : 0.0f);
 		m_k054539[1]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0xa4 && (r32(0xa0) & 0x40000000) ? volume : 0.0f);
 
-		m_c6280[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0xa8 ? r32(0xa4) & ~0x40000000 : 0);
-		m_c6280[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0xa8 && (r32(0xa4) & 0x40000000) ? r32(0xa4) & ~0x40000000 : 0);
-		m_c6280[0]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0xa8 && (r32(0xa4) & ~0x40000000) ? volume : 0.0f);
-		m_c6280[1]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0xa8 && (r32(0xa4) & 0x40000000) ? volume : 0.0f);
+		// HACK: VGM contain the halved clock speed of the sound core inside the HUC6280
+		m_huc6280[0]->set_clock_scale(2);
+		m_huc6280[1]->set_clock_scale(2);
+
+		m_huc6280[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0xa8 ? r32(0xa4) & ~0x40000000 : 0);
+		m_huc6280[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0xa8 && (r32(0xa4) & 0x40000000) ? r32(0xa4) & ~0x40000000 : 0);
+		m_huc6280[0]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0xa8 && (r32(0xa4) & ~0x40000000) ? volume : 0.0f);
+		m_huc6280[1]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0xa8 && (r32(0xa4) & 0x40000000) ? volume : 0.0f);
 
 		m_c140[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0xac ? r32(0xa8) & ~0x40000000 : 0);
 		m_c140[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0xac && (r32(0xa8) & 0x40000000) ? r32(0xa8) & ~0x40000000 : 0);
@@ -2725,8 +2733,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K051649_1, vgmplay_device::A_K051649_1 + 0xf).w(FUNC(vgmplay_state::scc_w<1>));
 	map(vgmplay_device::A_K054539_0, vgmplay_device::A_K054539_0 + 0x22f).w(m_k054539[0], FUNC(k054539_device::write));
 	map(vgmplay_device::A_K054539_1, vgmplay_device::A_K054539_1 + 0x22f).w(m_k054539[1], FUNC(k054539_device::write));
-	map(vgmplay_device::A_C6280_0, vgmplay_device::A_C6280_0 + 0xf).w(m_c6280[0], FUNC(c6280_device::c6280_w));
-	map(vgmplay_device::A_C6280_1, vgmplay_device::A_C6280_1 + 0xf).w(m_c6280[1], FUNC(c6280_device::c6280_w));
+	map(vgmplay_device::A_C6280_0, vgmplay_device::A_C6280_0 + 0xf).w("huc6280.0:psg", FUNC(c6280_device::c6280_w));
+	map(vgmplay_device::A_C6280_1, vgmplay_device::A_C6280_1 + 0xf).w("huc6280.0:psg", FUNC(c6280_device::c6280_w));
 	// TODO: c140
 	map(vgmplay_device::A_K053260_0, vgmplay_device::A_K053260_0 + 0x2f).w(m_k053260[0], FUNC(k053260_device::write));
 	map(vgmplay_device::A_K053260_1, vgmplay_device::A_K053260_1 + 0x2f).w(m_k053260[1], FUNC(k053260_device::write));
@@ -3127,21 +3135,15 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_k054539[1]->add_route(1, "rspeaker", 1);
 
 	// TODO: prevent error.log spew
-	H6280(config, m_h6280[0], 0);
-	m_h6280[0]->set_disable();
+	H6280(config, m_huc6280[0], 0);
+	m_huc6280[0]->set_disable();
+	m_huc6280[0]->add_route(0, "lspeaker", 1);
+	m_huc6280[0]->add_route(1, "rspeaker", 1);
 
-	C6280(config, m_c6280[0], 0);
-	m_c6280[0]->set_devicecpu_tag("h6280.0");
-	m_c6280[0]->add_route(0, "lspeaker", 1);
-	m_c6280[0]->add_route(1, "rspeaker", 1);
-
-	H6280(config, m_h6280[1], 0);
-	m_h6280[1]->set_disable();
-
-	C6280(config, m_c6280[1], 0);
-	m_c6280[1]->set_devicecpu_tag("h6280.1");
-	m_c6280[1]->add_route(0, "lspeaker", 1);
-	m_c6280[1]->add_route(1, "rspeaker", 1);
+	H6280(config, m_huc6280[1], 0);
+	m_huc6280[1]->set_disable();
+	m_huc6280[1]->add_route(0, "lspeaker", 1);
+	m_huc6280[1]->add_route(1, "rspeaker", 1);
 
 	C140(config, m_c140[0], 0);
 	m_c140[0]->add_route(0, "lspeaker", 0.50);

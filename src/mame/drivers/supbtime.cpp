@@ -143,8 +143,6 @@ void supbtime_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).noprw(); // This board only has 1 oki chip
 	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -343,8 +341,9 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(supbtime_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
