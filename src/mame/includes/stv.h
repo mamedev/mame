@@ -41,6 +41,7 @@ public:
 	void init_batmanfr();
 	void init_finlarch();
 	void init_decathlt();
+	void init_decathlt_nokey();
 	void init_sanjeon();
 	void init_puyosun();
 	void init_winterht();
@@ -137,6 +138,8 @@ private:
 	READ32_MEMBER(decathlt_prot_lower_r);
 	void sega5838_map(address_map &map);
 	optional_memory_bank m_protbank;
+	bool m_newprotection_element; // debug helper only
+	WRITE32_MEMBER(decathlt_prot_srcaddr_w);
 
 	uint32_t m_a_bus[4];
 

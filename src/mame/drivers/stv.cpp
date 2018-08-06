@@ -953,30 +953,63 @@ void stv_state::init_ffreveng()
 
 READ32_MEMBER(stv_state::decathlt_prot_higher_r)
 {
+	if (m_newprotection_element)
+	{
+		m_newprotection_element = false;
+		m_5838crypt->debug_helper(1);
+	}
+
 	m_protbank->set_entry(1); // if the protection device is accessed at this address data is fetched from 0x03000000
-	return m_5838crypt->data_r(space, offset, mem_mask);
+	uint32 ret = 0;
+	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r(space, offset, mem_mask)<<16);
+	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r(space, offset, mem_mask);
+	return ret;
 }
 
 READ32_MEMBER(stv_state::decathlt_prot_lower_r)
 {
+	if (m_newprotection_element)
+	{
+		m_newprotection_element = false;
+		m_5838crypt->debug_helper(0);
+	}
+
 	m_protbank->set_entry(0); // if the protection device is accessed at this address data is fetched from 0x02000000
-	return m_5838crypt->data_r(space, offset, mem_mask);
+	uint32 ret = 0;
+	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r(space, offset, mem_mask)<<16);
+	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r(space, offset, mem_mask);
+	return ret;
+}
+
+WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
+{
+	m_newprotection_element = true;
+	m_5838crypt->srcaddr_w(space,offset,data,mem_mask);
 }
 
 void stv_state::init_decathlt()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x37FFFF0, 0x37FFFF3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), (sega_315_5838_comp_device*)m_5838crypt)); // set compressed data source address
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x37FFFF0, 0x37FFFF3, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x37FFFF4, 0x37FFFF7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w), (sega_315_5838_comp_device*)m_5838crypt)); // upload tables
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37FFFF8, 0x37FFFFb, read32_delegate(FUNC(stv_state::decathlt_prot_higher_r), this)); // read decompressed data
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF0, 0x27FFFF3, write32_delegate(FUNC(sega_315_5838_comp_device::srcaddr_w), (sega_315_5838_comp_device*)m_5838crypt)); // set compressed data source address
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF0, 0x27FFFF3, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x27FFFF4, 0x27FFFF7, write32_delegate(FUNC(sega_315_5838_comp_device::data_w), (sega_315_5838_comp_device*)m_5838crypt)); // upload tables
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27FFFF8, 0x27FFFFb, read32_delegate(FUNC(stv_state::decathlt_prot_lower_r), this)); // read decompressed data
 
 	m_protbank->configure_entry(0, memregion("cart")->base());
 	m_protbank->configure_entry(1, memregion("cart")->base() + 0x1000000);
 	m_protbank->set_entry(0);
+	
+	m_newprotection_element = false;
+
 	init_stv();
+}
+
+void stv_state::init_decathlt_nokey()
+{
+	init_decathlt();
+	m_5838crypt->set_hack_mode(sega_315_5838_comp_device::HACK_MODE_NO_KEY);
 }
 
 void stv_state::init_nameclv3()
@@ -3715,16 +3748,16 @@ GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stvpc_state, init_stv,      
 GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
 
 
-GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
 
 GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
-GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
+GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
+GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 
 
 

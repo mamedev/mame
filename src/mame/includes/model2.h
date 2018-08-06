@@ -185,6 +185,9 @@ protected:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
 	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	DECLARE_READ32_MEMBER(doa_prot_r);
+	DECLARE_READ32_MEMBER(doa_unk_r);
+	int m_prot_a;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
@@ -455,6 +458,8 @@ public:
 	{}
 
 	DECLARE_MACHINE_RESET(model2a);
+
+	void sega5838_map(address_map &map);
 
 	void manxtt(machine_config &config);
 	void manxttdx(machine_config &config);

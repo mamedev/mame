@@ -5,6 +5,8 @@
 
 #pragma once
 
+// #define SEGA315_DUMP_DEBUG // dump stuff to files to help with decryption efforts
+
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
 class sega_315_5838_comp_device :  public device_t, 
@@ -14,16 +16,22 @@ public:
 	// construction/destruction
 	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(data_r);
+	DECLARE_READ16_MEMBER(data_r);
 
 	DECLARE_WRITE32_MEMBER(data_w_doa);
 	DECLARE_WRITE32_MEMBER(data_w);
 	DECLARE_WRITE32_MEMBER(srcaddr_w);
 
-	void install_doa_protection();
+	void debug_helper(int id);
 
-	DECLARE_READ32_MEMBER(data_r_doa);
-	DECLARE_WRITE32_MEMBER(doa_prot_w);
+	enum
+	{
+		HACK_MODE_NONE = 0,
+		HACK_MODE_NO_KEY,
+		HACK_MODE_DOA
+	};
+	
+	void set_hack_mode(int mode) { m_hackmode = mode; }
 
 protected:
 	virtual void device_start() override;
@@ -64,10 +72,10 @@ private:
 	int m_num_bits;
 	uint16_t m_val;
 
-	// Doa simulation
-	int m_protstate;
-	int m_prot_a;
-	uint8_t m_protram[256];
+	int m_hackmode;
+#ifdef SEGA315_DUMP_DEBUG
+	FILE* m_fp;
+#endif
 };
 
 #endif // MAME_MACHINE_315_5838_371_0229_COMP_H

@@ -36,9 +36,10 @@
 
 DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838", "Sega 315-5838 / 317-0229 Compression and Encryption")
 
-sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
-  	  device_rom_interface(mconfig, *this, 24)
+sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
+	device_rom_interface(mconfig, *this, 24),
+	m_hackmode(0)
 {
 }
 
@@ -50,7 +51,6 @@ void sega_315_5838_comp_device::device_reset()
 {
 	m_srcoffset = 0;
 	m_srcstart = 0;
-	m_protstate = 0;
 	m_abort = false;
 }
 
@@ -99,46 +99,87 @@ uint16_t sega_315_5838_comp_device::decipher(uint16_t c)
 
 uint8_t sega_315_5838_comp_device::get_decompressed_byte(void)
 {
-	for (;;)
+	if (m_hackmode == HACK_MODE_NONE)
 	{
-		if (m_abort)
+		// real algorithm, when we have a cipher function
+		for (;;)
 		{
-			return 0xff;
+			if (m_abort)
+			{
+				return 0xff;
+			}
+
+			if (m_num_bits_compressed == 0)
+			{
+				m_val_compressed = decipher(source_word_r());
+				m_num_bits_compressed = 16;
+			}
+
+			m_num_bits_compressed--;
+			m_val <<= 1;
+			m_val |= 1 & (m_val_compressed >> m_num_bits_compressed);
+			m_num_bits++;
+
+			for (int i = 0; i < 12; i++)
+			{
+				if (m_num_bits != m_compstate.tree[i].len) continue;
+				if (m_val < (m_compstate.tree[i].pattern >> (12 - m_num_bits))) continue;
+				if (
+					(m_num_bits < 12) &&
+					(m_val >= (m_compstate.tree[i + 1].pattern >> (12 - m_num_bits)))
+					) continue;
+
+				int j = m_compstate.tree[i].idx + m_val - (m_compstate.tree[i].pattern >> (12 - m_num_bits));
+
+				m_val = 0;
+				m_num_bits = 0;
+
+				return m_compstate.dictionary[j];
+			}
+		}
+	}
+	else
+	{
+		// modes where we don't have the real cipher yet, to aid with data logging etc.
+		// this code will go away eventually
+		uint8_t ret = 0;
+
+		// scrreader is words, this is bytes, for unknown compression we want to log the same number of bytes as we read, so log every other access
+		if (!(m_srcoffset & 1))
+		{
+			uint16_t temp = read_word((m_srcoffset*2)^2);
+			logerror("%s: read data %02x\n", machine().describe_context(), temp);
+#ifdef SEGA315_DUMP_DEBUG
+			if (m_fp)
+			{
+				fwrite(&temp, 1, 2, m_fp);
+			}
+#endif
 		}
 
-		if (m_num_bits_compressed == 0)
+		if (m_hackmode == HACK_MODE_DOA)
 		{
-			m_val_compressed = decipher(source_word_r());
-			m_num_bits_compressed = 16;
+			// this is the single decompressed string DOA needs, note, 2 spaces at start, might indicate a dummy read like with 5881 on Model 2
+			// it reads 50 bytes from the device.  PC = 2C20 is a pass, PC = 2C28 is a fail
+			const uint8_t prot[51] = "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00";
+			if (m_srcoffset<50) ret = prot[m_srcoffset];
+			else ret = 0x00;
+			logerror("%s: doa read %08x %c\n", machine().describe_context(), m_srcoffset, ret);
+		}
+		else if (m_hackmode == HACK_MODE_NO_KEY)
+		{
+			ret = machine().rand();
 		}
 
-		m_num_bits_compressed--;
-		m_val <<= 1;
-		m_val |= 1 & (m_val_compressed >> m_num_bits_compressed);
-		m_num_bits++;
-
-		for (int i = 0; i < 12; i++)
-		{
-			if (m_num_bits != m_compstate.tree[i].len) continue;
-			if (m_val < (m_compstate.tree[i].pattern >> (12 - m_num_bits))) continue;
-			if (
-				(m_num_bits < 12) &&
-				(m_val >= (m_compstate.tree[i + 1].pattern >> (12 - m_num_bits)))
-				) continue;
-
-			int j = m_compstate.tree[i].idx + m_val - (m_compstate.tree[i].pattern >> (12 - m_num_bits));
-
-			m_val = 0;
-			m_num_bits = 0;
-
-			return m_compstate.dictionary[j];
-		}
+		m_srcoffset++;
+		m_srcoffset &= 0x00ffffff;
+		return ret;
 	}
 }
 
-READ32_MEMBER(sega_315_5838_comp_device::data_r)
+READ16_MEMBER(sega_315_5838_comp_device::data_r)
 {
-	return (get_decompressed_byte() << 24) | (get_decompressed_byte() << 16) | (get_decompressed_byte() << 8) | (get_decompressed_byte() << 0);
+	return (get_decompressed_byte() << 8) | (get_decompressed_byte() << 0);
 }
 
 uint16_t sega_315_5838_comp_device::source_word_r()
@@ -149,6 +190,13 @@ uint16_t sega_315_5838_comp_device::source_word_r()
 
 	if (m_srcoffset == m_srcstart) // if we've wrapped around to where we started something has gone wrong with the transfer, abandon
 		m_abort = true;
+
+#ifdef SEGA315_DUMP_DEBUG
+	if (m_fp)
+	{
+		fwrite(&tempdata, 1, 2, m_fp);
+	}
+#endif
 
 	return tempdata;
 }
@@ -166,6 +214,76 @@ void sega_315_5838_comp_device::set_prot_addr(uint32_t data, uint32_t mem_mask)
 	m_val = 0;
 }
 
+void sega_315_5838_comp_device::debug_helper(int id)
+{
+#ifdef SEGA315_DUMP_DEBUG
+
+	if (m_fp)
+	{
+		fclose(m_fp);
+	}
+
+	if (1)
+	{
+		char filename[256];
+		sprintf(filename, "%d_%08x_table_tree_len", id, m_srcoffset * 2);
+		m_fp = fopen(filename, "w+b");
+		for (int i = 0; i < 12; i++)
+		{
+			fwrite(&m_compstate.tree[i].len, 1, 1, m_fp);
+		}
+		fclose(m_fp);
+	}
+
+	if (1)
+	{
+		char filename[256];
+		sprintf(filename, "%d_%08x_table_tree_idx", id, m_srcoffset * 2);
+		m_fp = fopen(filename, "w+b");
+		for (int i = 0; i < 12; i++)
+		{
+			fwrite(&m_compstate.tree[i].idx, 1, 1, m_fp);
+		}
+		fclose(m_fp);
+	}
+
+	if (1)
+	{
+		char filename[256];
+		sprintf(filename, "%d_%08x_table_tree_pattern", id, m_srcoffset * 2);
+		m_fp = fopen(filename, "w+b");
+		for (int i = 0; i < 12; i++)
+		{
+			fwrite(&m_compstate.tree[i].pattern, 1, 2, m_fp);
+		}
+		fclose(m_fp);
+	}
+
+	if (1)
+	{
+		char filename[256];
+		sprintf(filename, "%d_%08x_table_dictionary", id, m_srcoffset * 2);
+		m_fp = fopen(filename, "w+b");
+		for (int i = 0; i < 256; i++)
+		{
+			fwrite(&m_compstate.dictionary[i], 1, 1, m_fp);
+		}
+		fclose(m_fp);
+	}
+
+	if (1)
+	{
+		char filename[256];
+		sprintf(filename, "%d_%08x_table_data", id, m_srcoffset * 2);
+		m_fp = fopen(filename, "w+b");
+		// leave open for writing
+
+	}
+
+#endif
+}
+
+
 void sega_315_5838_comp_device::set_table_upload_mode_w(uint16_t val)
 {
 	m_compstate.mode = val;
@@ -178,7 +296,6 @@ void sega_315_5838_comp_device::set_table_upload_mode_w(uint16_t val)
 	{
 		m_compstate.id = 0;
 	}
-
 }
 
 void sega_315_5838_comp_device::upload_table_data_w(uint16_t val)
@@ -241,47 +358,3 @@ WRITE32_MEMBER( sega_315_5838_comp_device::data_w_doa )  { write_prot_data(data,
 WRITE32_MEMBER( sega_315_5838_comp_device::data_w)  { write_prot_data(data, mem_mask, 0); }
 WRITE32_MEMBER( sega_315_5838_comp_device::srcaddr_w ) { set_prot_addr(data, mem_mask); }
 
-
-READ32_MEMBER(sega_315_5838_comp_device::data_r_doa)
-{
-	uint32_t retval = 0;
-
-	if (offset == 0x7ff8/4)
-	{
-		// PC=2c20
-		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
-		m_protstate+=2;
-		printf("data_r_doaead %08x %08x %08x\n", offset*4, retval, mem_mask);
-	}
-	else if (offset == 0x400c/4) // todo, is this actually part of the protection? it's in the address range, but decathlete doesn't have it afaik.
-	{
-		// this actually looks a busy status flag
-		m_prot_a = !m_prot_a;
-		if (m_prot_a)
-			retval = 0xffff;
-		else
-			retval = 0xfff0;
-	}
-	else
-	{
-		printf("data_r_doaead %08x %08x %08x\n", offset*4, retval, mem_mask);
-		logerror("Unhandled Protection READ @ %x mask %x %s\n", offset, mem_mask, machine().describe_context());
-	}
-
-	return retval;
-}
-
-
-WRITE32_MEMBER(sega_315_5838_comp_device::doa_prot_w)
-{
-	printf("doa_prot_w %08x %08x %08x\n", offset*4, data, mem_mask);
-
-	m_protstate = 0;
-}
-
-
-void sega_315_5838_comp_device::install_doa_protection()
-{
-	m_protstate = 0;
-	strcpy((char *)m_protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00"); // this is the single decompressed string DOA needs, note, 2 spaces at start, might indicate a dummy read like with 5881 on Model 2
-}
