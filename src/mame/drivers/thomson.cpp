@@ -651,7 +651,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 /* sound */
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (6-bit game extension DAC)
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 6-bit game extension R-2R DAC (R=10K)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_MC6846_IRQ_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
 /* floppy */
-	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
+	MCFG_DEVICE_ADD("mc6843", MC6843, 16_MHz_XTAL / 16 / 2)
 
 	MCFG_DEVICE_ADD(m_floppy_image[0], LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
@@ -1715,6 +1715,8 @@ MACHINE_CONFIG_START(thomson_state::to8)
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to8)
+
+	//MCFG_DEVICE_ADD("kbdmcu", MC6804, 11_MHz_XTAL)
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to8_sys_porta_in))
