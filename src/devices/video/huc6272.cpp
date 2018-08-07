@@ -494,7 +494,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 	{
 		if (m_adpcm.input[chan] == -1)
 		{
-			m_adpcm.input[chan] = read_dword(((m_page_setting & 0x1000) << 6) | m_adpcm.addr[chan]) & 0xffff;
+			m_adpcm.input[chan] = read_dword(((m_page_setting & 0x1000) << 6) | m_adpcm.addr[chan]);
 			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
 			if (m_adpcm.addr[chan] == m_adpcm.imm[chan])
 			{
@@ -529,7 +529,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 		else
 		{
 			m_adpcm.nibble[chan] += 4;
-			if (m_adpcm.nibble[chan] >= 12)
+			if (m_adpcm.nibble[chan] >= 28)
 				m_adpcm.input[chan] = -1;
 		}
 	}

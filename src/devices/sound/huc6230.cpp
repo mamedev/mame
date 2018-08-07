@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "huc6230.h"
 
-static const int clip(int val, int min, int max) { return std::max(max,std::min(min,val)); }
+static const int clamp(int val, int min, int max) { return std::min(max,std::max(min,val)); }
 
 
 void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -28,8 +28,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		int cdda_l = inputs[2][i];
 		int cdda_r = inputs[3][i];
-		outputs[0][i] = clip(outputs[0][i] + ((cdda_l * m_cdda_lvol) >> 6), -32768, 32767);
-		outputs[1][i] = clip(outputs[1][i] + ((cdda_r * m_cdda_rvol) >> 6), -32768, 32767);
+		outputs[0][i] = clamp(outputs[0][i] + ((cdda_l * m_cdda_lvol) >> 6), -32768, 32767);
+		outputs[1][i] = clamp(outputs[1][i] + ((cdda_r * m_cdda_rvol) >> 6), -32768, 32767);
 
 		for (int adpcm = 0; adpcm < 2; adpcm++)
 		{
@@ -55,8 +55,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				sample = ((channel->m_prev_sample * (frq - channel->m_pos)) + 
 					(channel->m_curr_sample * channel->m_pos)) >> m_adpcm_freq;
 
-			outputs[0][i] = clip(outputs[0][i] + ((sample * channel->m_lvol) >> 2), -32768, 32767);
-			outputs[1][i] = clip(outputs[1][i] + ((sample * channel->m_rvol) >> 2), -32768, 32767);
+			outputs[0][i] = clamp(outputs[0][i] + ((sample * channel->m_lvol) >> 2), -32768, 32767);
+			outputs[1][i] = clamp(outputs[1][i] + ((sample * channel->m_rvol) >> 2), -32768, 32767);
 		}
 	}
 }
