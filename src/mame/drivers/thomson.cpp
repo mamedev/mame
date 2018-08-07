@@ -667,7 +667,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_CASSETTE_INTERFACE("to_cass")
 
 /* timer */
-	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
+	MCFG_DEVICE_ADD("mc6846", MC6846, 16_MHz_XTAL / 16)
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to7_timer_port_out))
 	MCFG_MC6846_OUT_CP2_CB(WRITELINE("buzzer", dac_bit_interface, write))
 	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to7_timer_port_in))
