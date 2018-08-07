@@ -608,8 +608,8 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			m_dma_len = m_sysregs[offset];
 			do_dma(space);
 			break;
-		//default:
-		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
+		default:
+			logerror("%s: HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x\n", machine().describe_context(), offset*4, m_sysregs[offset]);
 	}
 }
 
@@ -1849,7 +1849,7 @@ WRITE8_MEMBER(hng64_state::ioport7_w)
 
 	if ((!(data & 0x80)) && (m_port7 & 0x80))
 	{
-		logerror("%s: MCU request MIPS IRQ?\n");
+		logerror("%s: MCU request MIPS IRQ?\n", machine().describe_context());
 	}
 
 	if ((!(data & 0x01)) && (m_port7 & 0x01))
