@@ -100,23 +100,9 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
  *
  *************************************/
 
-void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER(policetr_state::vblank)
 {
-	switch (id)
-	{
-	case TIMER_IRQ5_GEN:
-		m_maincpu->set_input_line(R3000_IRQ5, ASSERT_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in policetr_state::device_timer");
-	}
-}
-
-
-INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
-{
-	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	m_irq5_gen_timer->adjust(m_screen->time_until_pos(0));
+	m_maincpu->set_input_line(state ? R3000_IRQ4 : R3000_IRQ5, ASSERT_LINE);
 }
 
 /*************************************
@@ -141,20 +127,20 @@ WRITE32_MEMBER(policetr_state::control_w)
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		m_eeprom->di_write((data & 0x00800000) >> 23);
-		m_eeprom->cs_write((data & 0x00200000) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->clk_write((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write(BIT(data, 23));
+		m_eeprom->cs_write(BIT(data, 21));
+		m_eeprom->clk_write(BIT(data, 22));
 	}
 
 	/* toggling BSMT off then on causes a reset */
-	if (!(old & 0x80000000) && (m_control_data & 0x80000000))
+	if (!BIT(old, 31) && BIT(m_control_data, 31))
 	{
 		m_bsmt->reset();
 	}
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", m_maincpu->pcbase(), data, mem_mask);
+		logerror("%s: control_w = %08X & %08X\n", machine().describe_context(), data, mem_mask);
 }
 
 
@@ -167,7 +153,7 @@ WRITE32_MEMBER(policetr_state::control_w)
 
 WRITE32_MEMBER(policetr_state::bsmt2000_reg_w)
 {
-	if (m_control_data & 0x80000000)
+	if (BIT(m_control_data, 31))
 		m_bsmt->write_data(data);
 	else
 		COMBINE_DATA(&m_bsmt_data_offset);
@@ -388,8 +374,6 @@ INPUT_PORTS_END
 
 void policetr_state::machine_start()
 {
-	m_irq5_gen_timer = timer_alloc(TIMER_IRQ5_GEN);
-
 	save_item(NAME(m_control_data));
 	save_item(NAME(m_bsmt_data_bank));
 	save_item(NAME(m_bsmt_data_offset));
@@ -403,7 +387,6 @@ void policetr_state::policetr(machine_config &config)
 	R3041(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::mem);
-	m_maincpu->set_vblank_int("screen", FUNC(policetr_state::irq4_gen));
 
 	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
 
@@ -413,8 +396,8 @@ void policetr_state::policetr(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(400, 262);  /* needs to be verified */
 	m_screen->set_visarea(0, 393, 0, 239);
-	m_screen->set_palette(m_palette);
 	m_screen->set_screen_update(FUNC(policetr_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(policetr_state::vblank));
 
 	PALETTE(config, m_palette, 256);
 
