@@ -630,6 +630,13 @@ void itech8_state::machine_start()
 	save_item(NAME(m_pia_portb_data));
 }
 
+void grmatch_state::machine_start()
+{
+	itech8_state::machine_start();
+
+	m_palette_timer = timer_alloc(TIMER_PALETTE);
+}
+
 void itech8_state::machine_reset()
 {
 	device_type main_cpu_type = m_maincpu->type();
@@ -649,6 +656,11 @@ void itech8_state::machine_reset()
 	}
 }
 
+void grmatch_state::machine_reset()
+{
+	itech8_state::machine_reset();
+	m_palette_timer->adjust(m_screen->time_until_pos(m_screen->vpos()+1));
+}
 
 void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -1685,312 +1697,247 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 
 /************* core pieces ******************/
 
-MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
+void itech8_state::itech8_core_devices(machine_config &config)
+{
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, CLOCK_8MHz)
-	MCFG_DEVICE_PROGRAM_MAP(tmslo_map)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(512, 263);
+	m_screen->screen_vblank().set(FUNC(itech8_state::generate_nmi));
 
-	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TMS34061(config, m_tms34061, 0);
+	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
+	m_tms34061->set_vram_size(itech8_state::VRAM_SIZE);
+	m_tms34061->int_callback().set(FUNC(itech8_state::generate_tms34061_interrupt));      /* interrupt gen callback */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 263)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, itech8_state, generate_nmi))
-
-	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
-	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
-	MCFG_TMS34061_VRAM_SIZE(itech8_state::VRAM_SIZE)
-	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(*this, itech8_state, generate_tms34061_interrupt))      /* interrupt gen callback */
-
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, CLOCK_8MHz/4)
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, itech8_state, pia_portb_out))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-MACHINE_CONFIG_END
+	via6522_device &via(VIA6522(config, "via6522_0", CLOCK_8MHz/4));
+	via.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
+	via.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
+}
 
+void itech8_state::itech8_core_lo(machine_config &config)
+{
+	MC6809(config, m_maincpu, CLOCK_8MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::tmslo_map);
 
-MACHINE_CONFIG_START(itech8_state::itech8_core_hi)
+	itech8_core_devices(config);
+}
+
+void itech8_state::itech8_core_hi(machine_config &config)
+{
 	itech8_core_lo(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::tmshi_map);
+}
 
+void itech8_state::itech8_sound_ym2203(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tmshi_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2203)
-
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
-	MCFG_DEVICE_PROGRAM_MAP(sound2203_map)
+	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound2203_map);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM2203, CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, itech8_state, ym2203_portb_out))
-	MCFG_SOUND_ROUTE(0, "mono", 0.07)
-	MCFG_SOUND_ROUTE(1, "mono", 0.07)
-	MCFG_SOUND_ROUTE(2, "mono", 0.07)
-	MCFG_SOUND_ROUTE(3, "mono", 0.75)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", CLOCK_8MHz/2));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
+	ymsnd.port_b_write_callback().set(FUNC(itech8_state::ym2203_portb_out));
+	ymsnd.add_route(0, "mono", 0.07);
+	ymsnd.add_route(1, "mono", 0.07);
+	ymsnd.add_route(2, "mono", 0.07);
+	ymsnd.add_route(3, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", CLOCK_8MHz/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
-
-MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2608b)
-
+void itech8_state::itech8_sound_ym2608b(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
-	MCFG_DEVICE_PROGRAM_MAP(sound2608b_map)
+	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound2608b_map);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM2608, CLOCK_8MHz)
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, itech8_state, ym2203_portb_out))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", CLOCK_8MHz));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
+	ymsnd.port_b_write_callback().set(FUNC(itech8_state::ym2203_portb_out));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
-
-MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812)
-
+void itech8_state::itech8_sound_ym3812(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
-	MCFG_DEVICE_PROGRAM_MAP(sound3812_map)
+	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound3812_map);
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READLINE("ticket", ticket_dispenser_device, line_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, itech8_state, pia_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, itech8_state, pia_portb_out))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpb_handler().set("ticket", FUNC(ticket_dispenser_device::line_r));
+	pia.writepa_handler().set(FUNC(itech8_state::pia_porta_out));
+	pia.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", CLOCK_8MHz/2));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", CLOCK_8MHz/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
-
-MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812_external)
-
+void itech8_state::itech8_sound_ym3812_external(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
-	MCFG_DEVICE_PROGRAM_MAP(sound3812_external_map)
+	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound3812_external_map);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", CLOCK_8MHz/2));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", CLOCK_8MHz/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 
 /************* full drivers ******************/
 
-MACHINE_CONFIG_START(itech8_state::wfortune)
+void itech8_state::wfortune(machine_config &config)
+{
 	itech8_core_hi(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym2203(config);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2layer));
+}
 
-
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(itech8_state::grmatch)
+void grmatch_state::grmatch(machine_config &config)
+{
 	itech8_core_hi(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym2608b(config);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_grmatch)
+	m_screen->set_visarea(0, 399, 0, 239);
+	m_screen->set_screen_update(FUNC(grmatch_state::screen_update));
+}
 
-	/* palette updater */
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("palette_timer", itech8_state, grmatch_palette_update, "screen", 0, 0)
-
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(itech8_state::stratab_hi)
+void itech8_state::stratab_hi(machine_config &config)
+{
 	itech8_core_hi(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym2203(config);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2layer));
+}
 
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(itech8_state::stratab_lo)
+void itech8_state::stratab_lo(machine_config &config)
+{
 	itech8_core_lo(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym2203(config);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2layer));
+}
 
-
-MACHINE_CONFIG_START(itech8_state::slikshot_hi)
+void itech8_state::slikshot_hi(machine_config &config)
+{
 	itech8_core_hi(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym2203(config);
 
-	MCFG_DEVICE_ADD("sub", Z80, CLOCK_8MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(slikz80_mem_map)
-	MCFG_DEVICE_IO_MAP(slikz80_io_map)
+	Z80(config, m_subcpu, CLOCK_8MHz/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &itech8_state::slikz80_mem_map);
+	m_subcpu->set_addrmap(AS_IO, &itech8_state::slikz80_io_map);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_slikshot)
-	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_slikshot));
+	MCFG_VIDEO_START_OVERRIDE(itech8_state, slikshot)
+}
 
-
-MACHINE_CONFIG_START(itech8_state::slikshot_lo)
+void itech8_state::slikshot_lo(machine_config &config)
+{
 	itech8_core_lo(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym2203(config);
 
-	MCFG_DEVICE_ADD("sub", Z80, CLOCK_8MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(slikz80_mem_map)
-	MCFG_DEVICE_IO_MAP(slikz80_io_map)
+	Z80(config, m_subcpu, CLOCK_8MHz/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &itech8_state::slikz80_mem_map);
+	m_subcpu->set_addrmap(AS_IO, &itech8_state::slikz80_io_map);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_slikshot)
-	MCFG_VIDEO_START_OVERRIDE(itech8_state,slikshot)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_slikshot));
+	MCFG_VIDEO_START_OVERRIDE(itech8_state, slikshot)
+}
 
-
-MACHINE_CONFIG_START(itech8_state::slikshot_lo_noz80)
+void itech8_state::slikshot_lo_noz80(machine_config &config)
+{
 	itech8_core_lo(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym2203(config);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2page));
+}
 
-
-MACHINE_CONFIG_START(itech8_state::sstrike)
+void itech8_state::sstrike(machine_config &config)
+{
 	slikshot_lo(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
+}
 
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(itech8_state::hstennis_hi)
+void itech8_state::hstennis_hi(machine_config &config)
+{
 	itech8_core_hi(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym3812(config);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 399, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2page_large));
+}
 
-
-MACHINE_CONFIG_START(itech8_state::hstennis_lo)
+void itech8_state::hstennis_lo(machine_config &config)
+{
 	itech8_core_lo(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym3812(config);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 399, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2page_large));
+}
 
-
-MACHINE_CONFIG_START(itech8_state::rimrockn)
-	itech8_core_hi(config);
-
-	/* basic machine hardware */
+void itech8_state::rimrockn(machine_config &config)
+{
+	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", HD6309, CLOCK_12MHz)
-	MCFG_DEVICE_PROGRAM_MAP(tmshi_map)
+	HD6309(config, m_maincpu, CLOCK_12MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::tmshi_map);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(24, 375, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(24, 375, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2page_large));
+}
 
-
-MACHINE_CONFIG_START(itech8_state::ninclown)
-	itech8_core_hi(config);
-
-	/* basic machine hardware */
+void itech8_state::ninclown(machine_config &config)
+{
+	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", M68000, CLOCK_12MHz)
-	MCFG_DEVICE_PROGRAM_MAP(ninclown_map)
+	M68000(config, m_maincpu, CLOCK_12MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::ninclown_map);
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, itech8_state, ninclown_irq))
-MACHINE_CONFIG_END
+	m_screen->set_visarea(64, 423, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2page_large));
+	m_screen->screen_vblank().set(FUNC(itech8_state::ninclown_irq));
+}
 
-
-MACHINE_CONFIG_START(itech8_state::gtg2)
+void itech8_state::gtg2(machine_config &config)
+{
 	itech8_core_lo(config);
-
-	/* basic machine hardware */
 	itech8_sound_ym3812_external(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::gtg2_map);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gtg2_map)
-
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2layer)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(itech8_state::screen_update_2layer));
+}
 
 
 
@@ -2707,15 +2654,15 @@ ROM_END
  *
  *************************************/
 
-void itech8_state::init_grmatch()
+void grmatch_state::driver_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(grmatch_state::palette_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(grmatch_state::xscroll_w),this));
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x01e0, 0x01ff);
 
-	save_item(NAME(m_grmatch_palcontrol));
-	save_item(NAME(m_grmatch_xscroll));
-	save_item(NAME(m_grmatch_palette));
+	save_item(NAME(m_palcontrol));
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_palette));
 }
 
 
@@ -2806,7 +2753,7 @@ GAME( 1989, wfortune,   0,        wfortune,          wfortune, itech8_state, emp
 GAME( 1989, wfortunea,  wfortune, wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
 
 /* Grudge Match-style PCB */
-GAME( 1989, grmatch,    0,        grmatch,           grmatch,  itech8_state, init_grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
+GAME( 1989, grmatch,    0,        grmatch,           grmatch,  grmatch_state, empty_init,   ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
 
 /* Strata Bowling-style PCB */
 GAME( 1990, stratab,    0,        stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?

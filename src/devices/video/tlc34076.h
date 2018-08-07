@@ -29,6 +29,12 @@ public:
 	};
 
 	// construction/destruction
+	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, tlc34076_bits bits)
+		: tlc34076_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_bits(bits);
+	}
+
 	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers

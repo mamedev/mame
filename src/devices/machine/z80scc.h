@@ -387,6 +387,21 @@ public:
 	template <unsigned N, class Object> devcb_base &set_out_rxdrq_callback(Object &&cb) { return m_out_rxdrq_cb[N].set_callback(std::forward<Object>(cb)); }
 	template <unsigned N, class Object> devcb_base &set_out_txdrq_callback(Object &&cb) { return m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+
+	auto out_txda_callback() { return m_out_txd_cb[0].bind(); }
+	auto out_dtra_callback() { return m_out_dtr_cb[0].bind(); }
+	auto out_rtsa_callback() { return m_out_rts_cb[0].bind(); }
+	auto out_wreqa_callback() { return m_out_wreq_cb[0].bind(); }
+	auto out_synca_callback() { return m_out_sync_cb[0].bind(); }
+	auto out_rxdrqa_callback() { return m_out_rxdrq_cb[0].bind(); }
+	auto out_txdrqa_callback() { return m_out_txdrq_cb[0].bind(); }
+	auto out_txdb_callback() { return m_out_txd_cb[1].bind(); }
+	auto out_dtrb_callback() { return m_out_dtr_cb[1].bind(); }
+	auto out_rtsb_callback() { return m_out_rts_cb[1].bind(); }
+	auto out_wreqb_callback() { return m_out_wreq_cb[1].bind(); }
+	auto out_syncb_callback() { return m_out_sync_cb[1].bind(); }
+	auto out_rxdrqb_callback() { return m_out_rxdrq_cb[1].bind(); }
+	auto out_txdrqb_callback() { return m_out_txdrq_cb[1].bind(); }
 	auto out_int_callback() { return m_out_int_cb.bind(); }
 
 	void set_cputag(const char *tag) { m_cputag = tag; }

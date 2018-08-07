@@ -211,6 +211,7 @@ public:
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_sync_timer(nullptr),
+		m_sync_period(attotime::zero),
 		m_key(0),
 		m_sync(0),
 		m_graphic(0),
@@ -1640,7 +1641,8 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 
 	m_ieee->host_ren_w(0);
 
-	m_sync_timer->adjust(machine().time() + m_sync_period, 0, m_sync_period);
+	if (m_sync_period != attotime::zero)
+		m_sync_timer->adjust(machine().time() + m_sync_period, 0, m_sync_period);
 }
 
 
@@ -1766,9 +1768,9 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n").read_handler().set(M6520_1_TAG, FUNC(pia6821_device::ca1_w));
 	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, nullptr).read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
 
-	pet_expansion_slot_device &exp(PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr));
-	exp.dma_read_callback().set(FUNC(pet_state::read));
-	exp.dma_write_callback().set(FUNC(pet_state::write));
+	PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr);
+	m_exp->dma_read_callback().set(FUNC(pet_state::read));
+	m_exp->dma_write_callback().set(FUNC(pet_state::write));
 
 	PET_USER_PORT(config, m_user, pet_user_port_cards, nullptr);
 	m_user->pb_handler().set(m_via, FUNC(via6522_device::write_ca1));
