@@ -23,7 +23,7 @@ void policetr_state::video_start()
 	m_srcbitmap_height_mask = (m_srcbitmap.bytes() / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	m_dstbitmap = std::make_unique<bitmap_ind8>(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
+	m_dstbitmap = std::make_unique<bitmap_ind8>(+DSTBITMAP_WIDTH, +DSTBITMAP_HEIGHT);
 
 	save_item(NAME(m_palette_offset));
 	save_item(NAME(m_palette_index));
