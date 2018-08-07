@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	m_mmu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 
 	// memory control gate array
-	INTERPRO_FMCC(config, m_mcga);
+	INTERPRO_FMCC(config, m_mcga, 0);
 
 	// floppy controller
 	MCFG_N82077AA_ADD(m_fdc, n82077aa_device::MODE_PS2)
