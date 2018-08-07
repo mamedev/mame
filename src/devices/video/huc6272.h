@@ -100,7 +100,7 @@ private:
 		uint32_t start[2];
 		uint32_t end[2];
 		uint32_t imm[2];
-		int input[2];
+		uint32_t input[2];
 		int nibble[2];
 		uint32_t pos[2];
 		uint32_t addr[2];
