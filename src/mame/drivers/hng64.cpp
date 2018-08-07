@@ -639,13 +639,15 @@ READ8_MEMBER(hng64_state::hng64_dualport_r)
 		/*
 		TODO: reads to i/o but coins doesn't work? Let's put a cheap hack for now
 		*/
-		if (ioport("SYSTEM_1")->read() & 0x03 && m_mcu_type == BURIKI_MCU)
+		if (ioport("SYSTEM_1")->read() & 0x03 && m_buriki_hack)
 		{
 			m_maincpu->space(AS_PROGRAM).write_byte(0xf3ce4, 1);
 		}
 
 		switch (offset)
 		{
+
+#if 0 // even just the preliminary hookup does enough for the Main CPU to see the TLCS870 side do this (although the TLCS870 side doesn't survive an F3 reset at the moment for some reason)
 		case 0x002:
 		{
 			/* this is used on post by the io mcu to signal that a init task is complete, zeroed otherwise. */
@@ -661,6 +663,7 @@ READ8_MEMBER(hng64_state::hng64_dualport_r)
 			else
 				return 0x00;
 		}
+#endif
 
 		case 0x004: return ioport("SYSTEM_0")->read();
 		case 0x005: return ioport("SYSTEM_1")->read();
@@ -734,8 +737,6 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 	need to work out what triggers the interrupt, as a write to 0 wouldn't as the Dual Port RAM interrupts
 	are on addresses 0x7fe and 0x7ff
-
-	(currently we use m_dualport due to simulation, but this should actually be the same RAM as m_ioram)
 */
 
 WRITE8_MEMBER(hng64_state::hng64_dualport_w)
@@ -1414,31 +1415,28 @@ void hng64_state::init_fatfurwa()
 {
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
 	init_hng64_fght();
-	m_mcu_type = FIGHT_MCU;
 }
 
 void hng64_state::init_buriki()
 {
 	init_hng64_fght();
-	m_mcu_type = BURIKI_MCU;
+	m_buriki_hack = 1;
 }
 
 void hng64_state::init_ss64()
 {
 	init_hng64_fght();
-	m_mcu_type = SAMSHO_MCU;
+	m_samsho64_3d_hack = 1;
 }
 
 void hng64_state::init_hng64_race()
 {
 	m_no_machine_error_code = 0x02;
-	m_mcu_type = RACING_MCU;
 	init_hng64();
 }
 
 void hng64_state::init_hng64_shoot()
 {
-	m_mcu_type = SHOOT_MCU;
 	m_no_machine_error_code = 0x03;
 	init_hng64();
 }
@@ -1740,7 +1738,9 @@ void hng64_state::machine_start()
 void hng64_state::machine_reset()
 {
 	/* For simulate MCU stepping */
+#if 0
 	m_mcu_fake_time = 0;
+#endif
 	m_mcu_en = 0;
 
 	reset_net();
@@ -1843,7 +1843,7 @@ WRITE8_MEMBER(hng64_state::ioport7_w)
 READ8_MEMBER(hng64_state::ioport0_r)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
-	uint8_t ret = m_ioram[addr];
+	uint8_t ret = m_dt7133_dpram->left_r(space, addr);
 
 	logerror("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
 	return ret; // expects 0x03 after writing it to port 0 earlier
@@ -1852,7 +1852,7 @@ READ8_MEMBER(hng64_state::ioport0_r)
 WRITE8_MEMBER(hng64_state::ioport0_w)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
-	m_ioram[addr] = data;
+	m_dt7133_dpram->left_w(space, addr, data);
 
 	logerror("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
 }
@@ -1926,15 +1926,11 @@ void hng64_state::init_io()
 	m_tempio_irqon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqon_callback), this));
 	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
 
-	m_tempio_irqon_timer->adjust(m_maincpu->cycles_to_attotime(100000000)); // just ensure an IRQ gets turned on to move the program forward, real source currently unknown
+	m_tempio_irqon_timer->adjust(m_maincpu->cycles_to_attotime(50000000)); // just ensure an IRQ gets turned on to move the program forward, real source currently unknown, allows sasm64 to pass IO test 1
 	m_port7 = 0x00;
 	m_port1 = 0x00;
 	m_ex_ramaddr = 0;
 	m_ex_ramaddr_upper = 0;
-
-	m_ioram = std::make_unique<uint8_t[]>(0x800); // in realty this is the ram from m_dt7133_dpram but as the hookup is incomplete the program fights with the simulation at the moment
-	save_pointer(&m_ioram[0], "m_ioram", 0x800);
-
 }
 
 MACHINE_CONFIG_START(hng64_state::hng64)

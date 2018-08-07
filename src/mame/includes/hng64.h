@@ -12,15 +12,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-enum
-{
-	FIGHT_MCU = 1,
-	SHOOT_MCU,
-	RACING_MCU,
-	SAMSHO_MCU,
-	BURIKI_MCU
-};
-
 enum hng64trans_t
 {
 	HNG64_TILEMAP_NORMAL = 1,
@@ -162,7 +153,9 @@ public:
 		m_3d_1(*this, "3d_1"),
 		m_3d_2(*this, "3d_2"),
 		m_com_ram(*this, "com_ram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_buriki_hack(0),
+		m_samsho64_3d_hack(0)
 	{}
 
 	void hng64(machine_config &config);
@@ -213,7 +206,8 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	int m_mcu_type;
+	int m_buriki_hack;
+	int m_samsho64_3d_hack;
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -227,7 +221,9 @@ private:
 	int32_t m_dma_dst;
 	int32_t m_dma_len;
 
+#if 0
 	uint32_t m_mcu_fake_time;
+#endif
 	uint16_t m_mcu_en;
 
 	uint32_t m_activeDisplayList;
@@ -335,7 +331,6 @@ private:
 
 	int m_ex_ramaddr;
 	int m_ex_ramaddr_upper;
-	std::unique_ptr<uint8_t[]> m_ioram;
 
 	TIMER_CALLBACK_MEMBER(tempio_irqon_callback);
 	TIMER_CALLBACK_MEMBER(tempio_irqoff_callback);
