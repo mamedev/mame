@@ -119,8 +119,6 @@ INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 	m_irq5_gen_timer->adjust(m_screen->time_until_pos(0));
 }
 
-
-
 /*************************************
  *
  *  Output ports
@@ -235,7 +233,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
  *
  *************************************/
 
-void policetr_state::policetr_map(address_map &map)
+void policetr_state::mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::policetr_video_w));
@@ -255,18 +253,18 @@ void policetr_state::policetr_map(address_map &map)
 }
 
 
-void policetr_state::sshooter_map(address_map &map)
+void sshooter_state::mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
-	map(0x00200000, 0x00200003).w(FUNC(policetr_state::policetr_bsmt2000_data_w));
-	map(0x00300000, 0x00300003).w(FUNC(policetr_state::policetr_palette_offset_w));
-	map(0x00320000, 0x00320003).w(FUNC(policetr_state::policetr_palette_data_w));
-	map(0x00400000, 0x00400003).r(FUNC(policetr_state::policetr_video_r));
+	map(0x00200000, 0x00200003).w(FUNC(sshooter_state::policetr_bsmt2000_data_w));
+	map(0x00300000, 0x00300003).w(FUNC(sshooter_state::policetr_palette_offset_w));
+	map(0x00320000, 0x00320003).w(FUNC(sshooter_state::policetr_palette_data_w));
+	map(0x00400000, 0x00400003).r(FUNC(sshooter_state::policetr_video_r));
 	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
-	map(0x00600000, 0x00600003).r(FUNC(policetr_state::bsmt2000_data_r));
-	map(0x00700000, 0x00700003).w(FUNC(policetr_state::policetr_bsmt2000_reg_w));
-	map(0x00800000, 0x0080000f).w(FUNC(policetr_state::policetr_video_w));
-	map(0x00a00000, 0x00a00003).w(FUNC(policetr_state::control_w));
+	map(0x00600000, 0x00600003).r(FUNC(sshooter_state::bsmt2000_data_r));
+	map(0x00700000, 0x00700003).w(FUNC(sshooter_state::policetr_bsmt2000_reg_w));
+	map(0x00800000, 0x0080000f).w(FUNC(sshooter_state::policetr_video_w));
+	map(0x00a00000, 0x00a00003).w(FUNC(sshooter_state::control_w));
 	map(0x00a00000, 0x00a00003).portr("IN0");
 	map(0x00a20000, 0x00a20003).portr("IN1");
 	map(0x00a40000, 0x00a40003).portr("DSW");
@@ -382,24 +380,24 @@ static INPUT_PORTS_START( sshoot11 )
 INPUT_PORTS_END
 
 
-void policetr_state::machine_start()
-{
-	m_irq5_gen_timer = timer_alloc(TIMER_IRQ5_GEN);
-}
-
 /*************************************
  *
  *  Machine driver
  *
  *************************************/
 
-MACHINE_CONFIG_START(policetr_state::policetr)
+void policetr_state::machine_start()
+{
+	m_irq5_gen_timer = timer_alloc(TIMER_IRQ5_GEN);
+}
 
+void policetr_state::policetr(machine_config &config)
+{
 	/* basic machine hardware */
-	device = &R3041(config, m_maincpu, MASTER_CLOCK/2);
+	R3041(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
-	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::policetr_map);
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", policetr_state, irq4_gen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::mem);
+	m_maincpu->set_vblank_int("screen", FUNC(policetr_state::irq4_gen));
 
 	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
 
@@ -421,13 +419,12 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 	BSMT2000(config, m_bsmt, MASTER_CLOCK/2);
 	m_bsmt->add_route(0, *m_lspeaker, 1.0);
 	m_bsmt->add_route(1, *m_rspeaker, 1.0);
-MACHINE_CONFIG_END
+}
 
-
-void policetr_state::sshooter(machine_config &config)
+void sshooter_state::sshooter(machine_config &config)
 {
 	policetr(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::sshooter_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sshooter_state::mem);
 }
 
 
@@ -677,33 +674,10 @@ ROM_END
  *
  *************************************/
 
-void policetr_state::init_policetr()
+void policetr_state::driver_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc028ac;
-	m_speedup_data = m_rambase + 0xfc8/4;
-}
-
-void policetr_state::init_plctr13b()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc028bc;
-	m_speedup_data = m_rambase + 0xfc8/4;
-}
-
-
-void policetr_state::init_sshooter()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc03470;
-	m_speedup_data = m_rambase + 0x18fd8/4;
-}
-
-void policetr_state::init_sshoot12()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
-	m_speedup_pc = 0x1fc033e0;
-	m_speedup_data = m_rambase + 0x18fd8/4;
+	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32_delegate(FUNC(policetr_state::speedup_w),this));
+	m_speedup_data = m_rambase + m_speedup_addr/4;
 }
 
 
@@ -714,14 +688,14 @@ void policetr_state::init_sshoot12()
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, init_policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
 
-GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, init_plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
+GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, init_sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, init_sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )

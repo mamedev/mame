@@ -17,6 +17,17 @@ class policetr_state : public driver_device
 {
 public:
 	policetr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: policetr_state(mconfig, type, tag, 0x1fc028ac, 0x00000fc8)
+	{ }
+
+	void policetr(machine_config &config);
+
+	void driver_init() override;
+
+	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
+
+protected:
+	policetr_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_maincpu(*this, "maincpu"),
@@ -26,30 +37,20 @@ public:
 		m_rspeaker(*this, "rspeaker"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_speedup_pc(speedup_pc),
+		m_speedup_addr(speedup_addr) { }
 
-	void sshooter(machine_config &config);
-	void policetr(machine_config &config);
-
-	void init_sshoot12();
-	void init_policetr();
-	void init_sshooter();
-	void init_plctr13b();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
-
-private:
 	enum
 	{
 		TIMER_IRQ5_GEN
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void machine_start() override;
+	void video_start() override;
 
-	void policetr_map(address_map &map);
-	void sshooter_map(address_map &map);
+	void mem(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(irq4_gen);
 
@@ -84,6 +85,7 @@ private:
 	uint64_t m_last_cycles;
 	uint32_t m_loop_count;
 	offs_t m_speedup_pc;
+	offs_t m_speedup_addr;
 	uint32_t m_palette_offset;
 	uint8_t m_palette_index;
 	uint8_t m_palette_data[3];
@@ -97,4 +99,37 @@ private:
 	uint8_t m_video_latch;
 	uint32_t m_srcbitmap_height_mask;
 	emu_timer *m_irq5_gen_timer;
+};
+
+class sshooter_state : public policetr_state
+{
+public:
+	sshooter_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sshooter_state(mconfig, type, tag, 0x1fc03470, 0x00018fd8)
+	{ }
+
+	void sshooter(machine_config &config);
+
+protected:
+	sshooter_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr)
+		: policetr_state(mconfig, type, tag, speedup_pc, speedup_addr)
+	{ }
+
+	void mem(address_map &map);
+};
+
+class sshoot12_state : public sshooter_state
+{
+public:
+	sshoot12_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sshooter_state(mconfig, type, tag, 0x1fc033e0, 0x00018fd8)
+	{ }
+};
+
+class plctr13b_state : public sshooter_state
+{
+public:
+	plctr13b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sshooter_state(mconfig, type, tag, 0x1fc028bc, 0x00000fc8)
+	{ }
 };
