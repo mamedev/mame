@@ -248,7 +248,7 @@ protected:
 
 	required_device<device_memory_interface> m_memory_device;
 	int m_memory_spacenum;
-	address_space *m_memory_space;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
 
 	// callbacks
 	devcb_write_line m_out_nmi_func;

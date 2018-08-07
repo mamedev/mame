@@ -9,6 +9,18 @@
 class interpro_bus_device : public device_t
 {
 public:
+	// callback configuration
+	auto out_irq0_cb() { return m_out_irq0_cb.bind(); }
+	auto out_irq1_cb() { return m_out_irq1_cb.bind(); }
+	auto out_irq2_cb() { return m_out_irq2_cb.bind(); }
+	auto out_vblank_cb() { return m_out_vblank_cb.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER(irq0_w) { m_out_irq0_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq1_w) { m_out_irq1_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq2_w) { m_out_irq2_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(vblank_w) { m_out_vblank_cb(state); }
+
+protected:
 	// construction/destruction
 	interpro_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, type, tag, owner, clock)
@@ -22,18 +34,6 @@ public:
 	{
 	}
 
-	// callback configuration
-	auto out_irq0_cb() { return m_out_irq0_cb.bind(); }
-	auto out_irq1_cb() { return m_out_irq1_cb.bind(); }
-	auto out_irq2_cb() { return m_out_irq2_cb.bind(); }
-	auto out_vblank_cb() { return m_out_vblank_cb.bind(); }
-
-	DECLARE_WRITE_LINE_MEMBER(irq0_w) { m_out_irq0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq1_w) { m_out_irq1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(irq2_w) { m_out_irq2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(vblank_w) { m_out_vblank_cb(state); }
-
-protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 
