@@ -27,8 +27,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
 
 protected:
-	policetr_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr)
-		: driver_device(mconfig, type, tag),
+	policetr_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr) :
+		driver_device(mconfig, type, tag),
+		m_srcbitmap(*this, "gfx"),
 		m_rambase(*this, "rambase"),
 		m_maincpu(*this, "maincpu"),
 		m_bsmt(*this, "bsmt"),
@@ -38,6 +39,8 @@ protected:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_gun_x_io(*this, "GUNX%u", 1U),
+		m_gun_y_io(*this, "GUNY%u", 1U),
 		m_speedup_pc(speedup_pc),
 		m_speedup_addr(speedup_addr) { }
 
@@ -57,26 +60,30 @@ protected:
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_WRITE32_MEMBER(speedup_w);
 
-	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_reg_w);
-	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_data_w);
-	DECLARE_READ32_MEMBER(bsmt2000_data_r);
+	DECLARE_WRITE16_MEMBER(bsmt2000_reg_w);
+	DECLARE_WRITE16_MEMBER(bsmt2000_data_w);
+	DECLARE_READ8_MEMBER(bsmt2000_data_r);
 
-	DECLARE_WRITE32_MEMBER(policetr_video_w);
-	DECLARE_READ32_MEMBER(policetr_video_r);
-	DECLARE_WRITE32_MEMBER(policetr_palette_offset_w);
-	DECLARE_WRITE32_MEMBER(policetr_palette_data_w);
+	DECLARE_WRITE32_MEMBER(video_w);
+	DECLARE_READ32_MEMBER(video_r);
+	DECLARE_WRITE8_MEMBER(palette_offset_w);
+	DECLARE_WRITE8_MEMBER(palette_data_w);
 	void render_display_list(offs_t offset);
-	uint32_t screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	required_region_ptr<uint8_t> m_srcbitmap;
 	required_shared_ptr<uint32_t> m_rambase;
 	required_device<r3041_device> m_maincpu;
 	required_device<bsmt2000_device> m_bsmt;
-	required_memory_region m_bsmt_region;
+	required_region_ptr<uint8_t> m_bsmt_region;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	required_ioport_array<2> m_gun_x_io;
+	required_ioport_array<2> m_gun_y_io;
 
 	uint32_t m_control_data;
 	uint32_t m_bsmt_data_bank;
@@ -90,8 +97,7 @@ protected:
 	uint8_t m_palette_index;
 	uint8_t m_palette_data[3];
 	rectangle m_render_clip;
-	uint8_t *m_srcbitmap;
-	std::unique_ptr<uint8_t[]> m_dstbitmap;
+	std::unique_ptr<bitmap_ind8> m_dstbitmap;
 	uint16_t m_src_xoffs;
 	uint16_t m_src_yoffs;
 	uint16_t m_dst_xoffs;
