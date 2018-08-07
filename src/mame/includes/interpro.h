@@ -79,6 +79,7 @@ public:
 		, m_scsibus(*this, INTERPRO_SCSI_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
+		, m_keyboard(*this, INTERPRO_KEYBOARD_PORT_TAG)
 		, m_diag_led(*this, "digit0")
 	{
 	}
@@ -95,6 +96,8 @@ public:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
+
+	required_device<interpro_keyboard_port_device> m_keyboard;
 
 	void init_common();
 

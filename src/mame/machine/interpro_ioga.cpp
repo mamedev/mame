@@ -134,7 +134,7 @@ DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Arra
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_memory_device(*this, finder_base::DUMMY_TAG)
-	, m_memory_space(nullptr)
+	, m_memory(nullptr)
 	, m_out_nmi_func(*this)
 	, m_out_irq_func(*this)
 	, m_out_irq_vector_func(*this)
@@ -170,8 +170,10 @@ void interpro_ioga_device::device_start()
 {
 	// get the memory space
 	if (!m_memory_device->has_space(m_memory_spacenum))
-		throw emu_fatalerror("%s: Device %s (%s) doen't have memory space %d\n", tag(), m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
-	m_memory_space = &m_memory_device->space(m_memory_spacenum);
+		fatalerror("%s: device %s (%s) doesn't have memory space %d\n",
+			tag(), m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
+
+	m_memory = m_memory_device->space(m_memory_spacenum).cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// resolve callbacks
 	m_out_nmi_func.resolve();
@@ -695,9 +697,9 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 		{
 			// transfer from the memory to device or device to memory
 			if (dma_channel.control & DMA_CTRL_WRITE)
-				dma_channel.device_w(m_memory_space->read_byte(dma_channel.real_address));
+				dma_channel.device_w(m_memory->read_byte(dma_channel.real_address));
 			else
-				m_memory_space->write_byte(dma_channel.real_address, dma_channel.device_r());
+				m_memory->write_byte(dma_channel.real_address, dma_channel.device_r());
 
 			// increment address and decrement count
 			dma_channel.real_address++;
@@ -711,7 +713,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 				// translate virtual address
 				if (dma_channel.control & DMA_CTRL_VIRTUAL)
 				{
-					const u32 ptde = m_memory_space->read_dword(dma_channel.virtual_address);
+					const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
 					dma_channel.virtual_address += 4;
 
 					// FIXME: ignore the page fault flag?
@@ -888,7 +890,7 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 		// translate virtual address
 		if (data & DMA_CTRL_VIRTUAL)
 		{
-			const u32 ptde = m_memory_space->read_dword(dma_channel.virtual_address);
+			const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
 			dma_channel.virtual_address += 4;
 
 			// FIXME: ignore the page fault flag?
@@ -930,7 +932,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 			// TODO: work out which control register bits indicate read from device
 			if (dma_channel.control & SDMA_SEND)
 			{
-				u8 data = m_memory_space->read_byte(dma_channel.address);
+				u8 data = m_memory->read_byte(dma_channel.address);
 
 				LOGMASKED(LOG_SERIALDMA, "dma: transmitting byte 0x%02x to serial channel %d\n",
 					data, dma_channel.channel);
@@ -944,7 +946,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 				LOGMASKED(LOG_SERIALDMA, "dma: receiving byte 0x%02x from serial channel %d\n",
 					data, dma_channel.channel);
 
-				m_memory_space->write_byte(dma_channel.address, data);
+				m_memory->write_byte(dma_channel.address, data);
 			}
 
 			// increment address and decrement count
@@ -1301,14 +1303,14 @@ WRITE16_MEMBER(emerald_ioga_device::eth_w)
 
 	LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
-	m_memory_space->write_word(address, data, mem_mask);
+	m_memory->write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(emerald_ioga_device::eth_r)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
-	const u16 data = m_memory_space->read_word(address, mem_mask);
+	const u16 data = m_memory->read_word(address, mem_mask);
 	LOGMASKED(LOG_NETWORK, "eth_r 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
 
@@ -1362,14 +1364,14 @@ WRITE16_MEMBER(turquoise_ioga_device::eth_w)
 
 	LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
-	m_memory_space->write_word(address, data, mem_mask);
+	m_memory->write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(turquoise_ioga_device::eth_r)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
-	const u16 data = m_memory_space->read_word(address, mem_mask);
+	const u16 data = m_memory->read_word(address, mem_mask);
 	LOGMASKED(LOG_NETWORK, "eth_r 0x%08x mask 0x%04x data 0x%04x\n",
 		address, mem_mask, data);
 
@@ -1450,7 +1452,7 @@ WRITE16_MEMBER(sapphire_ioga_device::eth_w)
 
 	LOGMASKED(LOG_NETWORK, "eth_w channel %c address 0x%08x mask 0x%08x data 0x%04x\n",
 		channel + 'A', address, mem_mask, data);
-	m_memory_space->write_word(address, data, mem_mask);
+	m_memory->write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(sapphire_ioga_device::eth_r)
@@ -1469,7 +1471,7 @@ READ16_MEMBER(sapphire_ioga_device::eth_r)
 			offset << 1, address);
 	}
 
-	u16 data = m_memory_space->read_word(address, mem_mask);
+	u16 data = m_memory->read_word(address, mem_mask);
 	LOGMASKED(LOG_NETWORK, "eth_r channel %c address 0x%08x mask 0x%08x data 0x%04x\n",
 		channel + 'A', address, mem_mask, data);
 	return data;
