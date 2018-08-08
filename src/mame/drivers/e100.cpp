@@ -10,7 +10,7 @@
  * extended with commands suitable for educational experiments using the exapansion bus and its built in
  * io control capabilities.
  *
- * The Esselte 1000 was an educational package based on Apple II plus software and litterature but the relation
+ * The Esselte 1000 was an educational package based on Apple II plus software and literature but the relation
  * to Didact is at this point unknown so it is probably a pure Esselte software production. If this branded
  * distribution is recovered it will be added as a clone of the Apple II driver or just as softlist item.
  *
@@ -97,7 +97,7 @@
  * |DIDACT ESS 100 CPU                         +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----++                            |
  * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
  *
- * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggy back on righ most 2716) with funny address decoding.
+ * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggyback on rightmost 2716) with funny address decoding.
  * Once we get a rom dump for rev 1 the driver need to accomodate another keymap too so probably needs to be splitted somehow.
  *  __________________________________________________________________________________________________________________________________________
  * | The Didact Esselte 100 CPU board rev2, 15/4 1983                                                                     in-PCB coil     +----
@@ -344,7 +344,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
   PB4-PB5 together with CA1, CA2, CB1 and CB2 are used for the printer interface
   PB6-PB7 forms the cassette interface
 
-  The serial bitbanging perform enreliable atm, can be poor original code or inexact CPU timing.
+  The serial bitbanging perform unreliable atm, can be poor original code or inexact CPU timing.
   Best results is achieved with 8 bit at 9600 baud as follows:
 
     mame e100 -window -rs232 null_modem -bitbngr socket.127.0.0.1:4321

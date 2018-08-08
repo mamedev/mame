@@ -6,7 +6,7 @@
  *---------------------------
  * The Candela computer was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company".
  * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a
- * propietary software including CDBASIC. The Candela system lost the battle of the swedish schools to
+ * proprietory software including CDBASIC. The Candela system lost the battle of the Swedish schools to
  * the Compis computer by TeleNova which was based on CP/M initially.  Later both lost to IBM PC as we know.
  * Candela Data continued to sell their system to the swedish industry without major successes despite great
  * innovation and spririt.
@@ -485,7 +485,7 @@ INPUT_PORTS_END
  * Candela Main Unit
  * TODO:
  * - Map PIA:S
- * - ROM/RAM paging by using the PIA:s and the myriad of 74138:s on the board
+ * - ROM/RAM paging by using the PIAs and the myriad of 74138s on the board
  * - Vram and screen for the 6845 CRTC
  * - Keyboard
  * - Serial port
@@ -504,6 +504,10 @@ public:
 		,m_bank1(*this, "bank1")
 		,m_crtc(*this, "crtc")
 	{ }
+
+	void can09(machine_config &config);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -513,9 +517,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pia1_B_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void can09(machine_config &config);
 	void can09_map(address_map &map);
-protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;
@@ -626,7 +628,7 @@ static INPUT_PORTS_START( can09 )
 INPUT_PORTS_END
 
 // traced and guessed from pcb images and debugger
-// It is very likelly that this is a PIA based dynamic address map, needs more analysis
+// It is very likely that this is a PIA based dynamic address map, needs more analysis
 void can09_state::can09_map(address_map &map)
 {
 /*

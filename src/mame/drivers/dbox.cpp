@@ -32,10 +32,10 @@
  *
  * History of Nokia Multimedia Division
  *-------------------------------------
- * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and aquired
+ * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and acquired
  * by Nokia 1985. Luxor designed among other things TV setsm Radios and the famous ABC-80. The Nokia Multimedia
  * Division was formed in Linköping as a result of the Luxor aquesition. Their main design was a satellite
- * receiver, the first satellite in Europee was launched in 1988 and market was growing fast however it took
+ * receiver, the first satellite in Europe was launched in 1988 and the market was growing fast however it took
  * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirsch Gruppe was struck and
  * in 1996 the 68340 based Dbox-1 was released in Germany. The original design was expensive, so soon a cost reduced
  * version based on PPC, the Dbox-2, was released. The boxes sold in millions but the margins were negative or very

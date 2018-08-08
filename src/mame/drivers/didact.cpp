@@ -232,7 +232,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 		m_7segs[digit_nbr] = m_segments;
 }
 
-/* PIA 2 Port B is all outputs to drive the display so it is very unlikelly that this function is called */
+/* PIA 2 Port B is all outputs to drive the display so it is very unlikely that this function is called */
 READ8_MEMBER( md6802_state::pia2_kbB_r )
 {
 	LOG("Warning, trying to read from Port B designated to drive the display, please check why\n");
@@ -379,7 +379,7 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 	uint8_t const digit_nbr = (data >> 4) & 0x07;
 
 	/* There is actually only one 9368 and a 74145 to drive the cathode of the right digit low */
-	/* This can be emulated by prentending there are one 9368 per digit, at least for now      */
+	/* This can be emulated by pretending there are one 9368 per digit, at least for now      */
 	switch (digit_nbr)
 	{
 	case 0:

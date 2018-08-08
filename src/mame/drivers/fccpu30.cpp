@@ -72,10 +72,10 @@
  *---------------------------
  * 1981 Force Computers was founded in San Jose, California. Over time a European headquarter was opened
  *      in Munich, Germany, and a Japanese headquarter in Tokyo
- * 1996 Force was aquired by Solectron Corporation in 1996
+ * 1996 Force was acquired by Solectron Corporation in 1996
  * 2004 Force was sold off from Solectron to Motorola
- * 2008 Force was aquired by Emerson as part of the Motorola Embedded Division
- * 2016 Force was aquired by Platinum Equity as part of the Emerson Network Power Division
+ * 2008 Force was acquired by Emerson as part of the Motorola Embedded Division
+ * 2016 Force was acquired by Platinum Equity as part of the Emerson Network Power Division
  *
  * Force developed and produced VME board products based on SPARC, Pentium, PowerPC and 68K.
  *
