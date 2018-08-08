@@ -693,6 +693,7 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 terco.cpp
+terminal.cpp
 test_t400.cpp
 testconsole.cpp
 tg100.cpp
