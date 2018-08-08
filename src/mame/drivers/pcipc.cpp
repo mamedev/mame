@@ -481,6 +481,7 @@ void pcipc_state::superio_config(device_t *device)
 	MCFG_FDC37C93X_GP20_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_FDC37C93X_GP25_GATEA20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
 	MCFG_FDC37C93X_IRQ1_CB(WRITELINE(":pci:07.0:pic8259_master", pic8259_device, ir1_w))
+	MCFG_FDC37C93X_IRQ8_CB(WRITELINE(":pci:07.0:pic8259_slave", pic8259_device, ir0_w))
 }
 
 MACHINE_CONFIG_START(pcipc_state::pcipc)
