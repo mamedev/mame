@@ -154,6 +154,7 @@ public:
 		m_3d_2(*this, "3d_2"),
 		m_com_ram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_intest(*this, "IN%u", 0U),
 		m_buriki_hack(0),
 		m_samsho64_3d_hack(0)
 	{}
@@ -206,6 +207,8 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	optional_ioport_array<8> m_intest;
+
 	int m_buriki_hack;
 	int m_samsho64_3d_hack;
 
@@ -221,9 +224,6 @@ private:
 	int32_t m_dma_dst;
 	int32_t m_dma_len;
 
-#if 0
-	uint32_t m_mcu_fake_time;
-#endif
 	uint16_t m_mcu_en;
 
 	uint32_t m_activeDisplayList;
