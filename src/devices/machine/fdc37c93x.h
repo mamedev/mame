@@ -20,6 +20,8 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 #include "formats/naslite_dsk.h"
 // parallel port
 #include "machine/pc_lpt.h"
+// serial port
+#include "machine/ins8250.h"
 
 // make sure that pckeybrd.cpp 8042kbdc.cpp are present in project
 
@@ -49,6 +51,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq_floppy_w);
 	// for the internal parallel port
 	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
+	// for the internal serial ports
+	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
 	// rtc
 	DECLARE_WRITE_LINE_MEMBER(irq_rtc_w);
 	// keyboard
@@ -58,9 +63,9 @@ public:
 
 	void unmap_fdc(address_map &map);
 	void map_lpt(address_map &map);
-	void unmap_lpt(address_map &map);
+	void map_serial1(address_map &map);
+	void map_serial2(address_map &map);
 	void map_rtc(address_map &map);
-	void unmap_rtc(address_map &map);
 	void map_keyboard(address_map &map);
 	void unmap_keyboard(address_map &map);
 
@@ -68,6 +73,10 @@ public:
 	DECLARE_WRITE8_MEMBER(disabled_write);
 	DECLARE_READ8_MEMBER(lpt_read);
 	DECLARE_WRITE8_MEMBER(lpt_write);
+	DECLARE_READ8_MEMBER(serial1_read);
+	DECLARE_WRITE8_MEMBER(serial1_write);
+	DECLARE_READ8_MEMBER(serial2_read);
+	DECLARE_WRITE8_MEMBER(serial2_write);
 	DECLARE_READ8_MEMBER(rtc_read);
 	DECLARE_WRITE8_MEMBER(rtc_write);
 	DECLARE_READ8_MEMBER(at_keybc_r);
@@ -118,6 +127,8 @@ private:
 	devcb_write_line m_irq9_callback;
 	required_device<pc_fdc_interface> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
+	required_device<ns16450_device> pc_serial1_comdev;
+	required_device<ns16450_device> pc_serial2_comdev;
 	required_device<ds12885_device> ds12885_rtcdev;
 	required_device<kbdc8042_device> m_kbdc;
 	int sysopt_pin;
@@ -131,6 +142,10 @@ private:
 	void unmap_fdc_addresses();
 	void map_lpt_addresses();
 	void unmap_lpt_addresses();
+	void map_serial1_addresses();
+	void unmap_serial1_addresses();
+	void map_serial2_addresses();
+	void unmap_serial2_addresses();
 	void map_rtc_addresses();
 	void unmap_rtc_addresses();
 	void map_keyboard_addresses();
@@ -141,8 +156,8 @@ private:
 	void write_ide1_configuration_register(int index, int data) {}
 	void write_ide2_configuration_register(int index, int data) {}
 	void write_parallel_configuration_register(int index, int data);
-	void write_serial1_configuration_register(int index, int data) {}
-	void write_serial2_configuration_register(int index, int data) {}
+	void write_serial1_configuration_register(int index, int data);
+	void write_serial2_configuration_register(int index, int data);
 	void write_rtc_configuration_register(int index, int data);
 	void write_keyboard_configuration_register(int index, int data);
 	void write_auxio_configuration_register(int index, int data);

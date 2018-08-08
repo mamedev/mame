@@ -11,6 +11,10 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 #include "emu.h"
 #include "bus/isa/isa.h"
 #include "machine/ds128x.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/ser_mouse.h"
+#include "bus/rs232/terminal.h"
+#include "bus/rs232/null_modem.h"
 #include "machine/fdc37c93x.h"
 
 DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X")
@@ -30,6 +34,8 @@ fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *ta
 	, m_irq9_callback(*this)
 	, floppy_controller_fdcdev(*this, "fdc")
 	, pc_lpt_lptdev(*this, "lpt")
+	, pc_serial1_comdev(*this, "uart_0")
+	, pc_serial2_comdev(*this, "uart_1")
 	, ds12885_rtcdev(*this, "rtc")
 	, m_kbdc(*this, "pc_kbdc")
 	, sysopt_pin(0)
@@ -227,6 +233,14 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+}
+
 FLOPPY_FORMATS_MEMBER(fdc37c93x_device::floppy_formats)
 	FLOPPY_PC_FORMAT,
 	FLOPPY_NASLITE_FORMAT
@@ -242,6 +256,29 @@ MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
 	// parallel port
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_parallel_w))
+	// serial ports
+	MCFG_DEVICE_ADD("uart_0", NS16450, XTAL(1'843'200)) // or NS16550 ?
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport0", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport0", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport0", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, fdc37c93x_device, irq_serial1_w))
+	MCFG_DEVICE_ADD("uart_1", NS16450, XTAL(1'843'200))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport1", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport1", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport1", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, fdc37c93x_device, irq_serial2_w))
+	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "microsoft_mouse")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("uart_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_0", ins8250_uart_device, cts_w))
+	MCFG_DEVICE_ADD("serport1", RS232_PORT, isa_com, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("uart_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_1", ins8250_uart_device, cts_w))
 	// RTC
 	MCFG_DS12885_ADD("rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_rtc_w))
@@ -273,6 +310,20 @@ WRITE_LINE_MEMBER(fdc37c93x_device::irq_parallel_w)
 	if (enabled_logical[LogicalDevice::Parallel] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::Parallel][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::irq_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	request_irq(configuration_registers[LogicalDevice::Serial1][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::irq_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	request_irq(configuration_registers[LogicalDevice::Serial2][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(fdc37c93x_device::irq_rtc_w)
@@ -444,6 +495,64 @@ void fdc37c93x_device::unmap_lpt_addresses()
 	m_isa->unmap_device(base, base + 3);
 }
 
+void fdc37c93x_device::map_serial1(address_map &map)
+{
+	map(0x0, 0x7).rw(FUNC(fdc37c93x_device::serial1_read), FUNC(fdc37c93x_device::serial1_write));
+}
+
+READ8_MEMBER(fdc37c93x_device::serial1_read)
+{
+	return pc_serial1_comdev->ins8250_r(space, offset, mem_mask);
+}
+
+WRITE8_MEMBER(fdc37c93x_device::serial1_write)
+{
+	pc_serial1_comdev->ins8250_w(space, offset, data, mem_mask);
+}
+
+void fdc37c93x_device::map_serial1_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Serial1, 0);
+
+	m_isa->install_device(base, base + 7, *this, &fdc37c93x_device::map_serial1);
+}
+
+void fdc37c93x_device::unmap_serial1_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Serial1, 0);
+
+	m_isa->unmap_device(base, base + 7);
+}
+
+void fdc37c93x_device::map_serial2(address_map &map)
+{
+	map(0x0, 0x7).rw(FUNC(fdc37c93x_device::serial2_read), FUNC(fdc37c93x_device::serial2_write));
+}
+
+READ8_MEMBER(fdc37c93x_device::serial2_read)
+{
+	return pc_serial2_comdev->ins8250_r(space, offset, mem_mask);
+}
+
+WRITE8_MEMBER(fdc37c93x_device::serial2_write)
+{
+	pc_serial2_comdev->ins8250_w(space, offset, data, mem_mask);
+}
+
+void fdc37c93x_device::map_serial2_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Serial2, 0);
+
+	m_isa->install_device(base, base + 7, *this, &fdc37c93x_device::map_serial2);
+}
+
+void fdc37c93x_device::unmap_serial2_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::Serial2, 0);
+
+	m_isa->unmap_device(base, base + 3);
+}
+
 void fdc37c93x_device::map_rtc(address_map &map)
 {
 	map(0x0, 0xf).rw(FUNC(fdc37c93x_device::rtc_read), FUNC(fdc37c93x_device::rtc_write));
@@ -541,6 +650,10 @@ void fdc37c93x_device::remap(int space_id, offs_t start, offs_t end)
 			map_fdc_addresses();
 		if (enabled_logical[LogicalDevice::Parallel] == true)
 			map_lpt_addresses();
+		if (enabled_logical[LogicalDevice::Serial1] == true)
+			map_serial1_addresses();
+		if (enabled_logical[LogicalDevice::Serial2] == true)
+			map_serial2_addresses();
 		if (enabled_logical[LogicalDevice::RTC] == true)
 			map_rtc_addresses();
 		if (enabled_logical[LogicalDevice::Keyboard] == true)
@@ -637,6 +750,46 @@ void fdc37c93x_device::write_parallel_configuration_register(int index, int data
 			if (enabled_logical[LogicalDevice::Parallel] == true)
 				unmap_lpt_addresses();
 			enabled_logical[LogicalDevice::Parallel] = false;
+		}
+	}
+}
+
+void fdc37c93x_device::write_serial1_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::Serial1] == false)
+				map_serial1_addresses();
+			enabled_logical[LogicalDevice::Serial1] = true;
+			logerror("Enabled Serial1 at %04X\n", get_base_address(LogicalDevice::Serial1, 0));
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::Serial1] == true)
+				unmap_serial1_addresses();
+			enabled_logical[LogicalDevice::Serial1] = false;
+		}
+	}
+}
+
+void fdc37c93x_device::write_serial2_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::Serial2] == false)
+				map_serial2_addresses();
+			enabled_logical[LogicalDevice::Serial2] = true;
+			logerror("Enabled Serial2 at %04X\n", get_base_address(LogicalDevice::Serial2, 0));
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::Serial2] == true)
+				unmap_serial2_addresses();
+			enabled_logical[LogicalDevice::Serial2] = false;
 		}
 	}
 }
