@@ -74,7 +74,7 @@ Games on this system include....
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (client)                | Sega / Hitmaker                     | GDROM | GDT-0017       | 317-0403-JPN | 253-5508-0403J|
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev A)        | Sega / Hitmaker                     | GDROM | GDT-0017A      | 317-0403-JPN | 253-5508-0403J|
 |*| 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev B)        | Sega / Hitmaker                     | GDROM | GDT-0017B      | 317-0403-JPN | 253-5508-0403J|
-|*| 2003 | F-Zero AX - Monster Ride Cycraft Edition                        | Sega / Amusement Vision / Nintendo  | Cart  | 837-14343-4S1  | ???          | ???           |
+|*| 2003 | F-Zero AX - Monster Ride Cycraft Edition                        | Sega / Amusement Vision / Nintendo  | Cart  | 837-14343-4S1  | 317-0373-COM | 253-5508-0373 |
 |*| 2005 | Mario Kart Arcade GP (Japan, MKA1 Ver.A1)                       | Namco / Nintendo                    | Cart  | 837-14343-4T1  | 317-5109-COM | 253-5509-5109 |
 | | 2005 | The Key Of Avalon 2.5: War of the Key (server)                  | Sega / Hitmaker                     | GDROM | GDT-0018       | 317-0403-JPN | 253-5508-0403J|
 |*| 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0018A      | 317-0403-JPN | 253-5508-0403J|
@@ -1122,7 +1122,7 @@ F-ZERO AX MONSTER RIDE
 Cart: 842-06CN4000
 ROM PCB: 837-14343-4S1
 Actel ProAsic: 315-6362
-Key Chip (PIC): unknown
+Key Chip (PIC): 253-5508-0373
 IC1-IC4 Samsung K9K1G08UOA
 IC9     MX 29LV400TTC
 
@@ -1140,9 +1140,8 @@ ROM_START( fzeroaxm )
 	// below contain rom board NAND block list/map (16bit words), the "block" is 2 * 32 NAND pages (512 data bytes +16 ECC?)
 	ROM_LOAD16_BYTE( "ic9.bin",     0x21000000, 0x0080000, CRC(bf461723) SHA1(4c18a4c3fabde7e63e36a7fcda19cd6acfe45f84) )
 
-	// PIC label is unknown
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	ROM_LOAD("317-xxxx.pic", 0x00, 0x4000, CRC(0e48f645) SHA1(ec057b0f536c3e9ce5353c02676cf17e96bb3239) )
+	ROM_LOAD("317-0373-com.pic", 0x00, 0x4000, CRC(0e48f645) SHA1(ec057b0f536c3e9ce5353c02676cf17e96bb3239) )
 ROM_END
 
 /* Main board */
