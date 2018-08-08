@@ -54,6 +54,16 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 
+ROM_START( act5a )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // order unknown  // xtals 16.572MHz, 2.000MHz
+	ROM_LOAD( "act5a_2708.u22", 0x0000, 0x0400, CRC(f0ec3b9f) SHA1(7785eba9993c23a767b84fff2c44d5cb6210ad80) )
+	ROM_LOAD( "act5a_9316.u39", 0x0400, 0x2000, CRC(6f9eac71) SHA1(0488bdd19a6bff4e869a3480c7e9d8c5ca9938eb) )
+	ROM_LOAD( "act5a_9316.u55", 0x2400, 0x2000, CRC(8f96b7c8) SHA1(652d420ab5be9412cae322cd1799f8a9e3959c44) )
+	ROM_LOAD( "act5a_2708.u12", 0x4400, 0x0400, CRC(be4a148d) SHA1(69bf838ed9fccdf7f225bc380bcce8e7e0bd88bc) )
+	ROM_LOAD( "act5a_2708.u1",  0x4800, 0x0400, CRC(ad3bfa5a) SHA1(723c7bfefbf96177171b8e58a8e20ee69daa27f0) )
+ROM_END
+
+
 // for French Minitel network
 ROM_START( alcat258 ) // MSM80C154 (+ TS9347// 8k ram // b&w
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -196,6 +206,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY             FULLNAME                     FLAGS */
+COMP( 19??, act5a,     0,      0,      terminal, terminal, terminal_state, empty_init, "Microterm",          "ACT-5A",                 MACHINE_IS_SKELETON )
 COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_IS_SKELETON )
 COMP( 1984, alcat7100, 0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminal 7100",          MACHINE_IS_SKELETON )
 COMP( 1989, ampex210,  0,      0,      terminal, terminal, terminal_state, empty_init, "Ampex",              "210+",                   MACHINE_IS_SKELETON )
