@@ -141,10 +141,6 @@ void policetr_state::render_display_list(offs_t offset)
 
 WRITE32_MEMBER(policetr_state::video_w)
 {
-	/* we assume 4-byte accesses */
-	if (mem_mask)
-		logerror("%s: video_w access with mask %08X\n", machine().describe_context(), mem_mask);
-
 	/* 4 offsets */
 	switch (offset)
 	{
