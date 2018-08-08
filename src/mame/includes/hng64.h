@@ -155,15 +155,12 @@ public:
 		m_com_ram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_intest(*this, "IN%u", 0U),
-		m_buriki_hack(0),
 		m_samsho64_3d_hack(0)
 	{}
 
 	void hng64(machine_config &config);
 
 	void init_hng64_race();
-	void init_fatfurwa();
-	void init_buriki();
 	void init_hng64();
 	void init_hng64_shoot();
 	void init_ss64();
@@ -209,7 +206,6 @@ private:
 
 	optional_ioport_array<8> m_intest;
 
-	int m_buriki_hack;
 	int m_samsho64_3d_hack;
 
 	std::unique_ptr<uint16_t[]> m_soundram;
