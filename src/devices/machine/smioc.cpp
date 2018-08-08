@@ -255,7 +255,7 @@ void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 
 void smioc_device::SendCommand(u16 command)
 {
-	LOG_COMMAND("SMIOC Command %04x (Address %04x, Length %04x)\n", command, m_dmaSendAddress, m_dmaSendLength);
+	LOG_COMMAND("%s SMIOC Command %04x (Address %04x, Length %04x)\n", machine().time().as_string(), command, m_dmaSendAddress, m_dmaSendLength);
 
 	// Assume that command 0 is a hard reset command handled by the logic in the board rather than the cpu.
 	// It's difficult to be sure that this is what actually should happen, but given the context and how it's used, this seems likely.
@@ -288,7 +288,7 @@ void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_n
 {
 	//if (reg != newValue)
 	{
-		logerror("Update %s %04X -> %04X\n", register_name, reg, newValue);
+		logerror("%s Update %s %04X -> %04X\n", machine().time().as_string(), register_name, reg, newValue);
 		reg = newValue;
 	}
 }
@@ -396,7 +396,7 @@ READ8_MEMBER(smioc_device::dma68k_r)
 	// Another (and maybe more likely) possibility is that the hardware is doing a slow fetch of the value, and the N+1 read returns data from the Nth read's address
 
 	data = m_m68k_r_cb(offset-1);
-	LOG_REGISTER_ACCESS("dma68k[%04X] => %02X\n", offset, data);
+	LOG_REGISTER_ACCESS("%s dma68k[%04X] => %02X\n", machine().time().as_string(), offset, data);
 	return data;
 }
 
@@ -407,7 +407,7 @@ WRITE8_MEMBER(smioc_device::dma68k_w)
 
 	m_m68k_w_cb(offset, data);
 
-	LOG_REGISTER_ACCESS("dma68k[%04X] <= %02X\n", offset, data);
+	LOG_REGISTER_ACCESS("%s dma68k[%04X] <= %02X\n", machine().time().as_string(), offset, data);
 }
 
 READ8_MEMBER(smioc_device::boardlogic_mmio_r)
@@ -423,6 +423,7 @@ READ8_MEMBER(smioc_device::boardlogic_mmio_r)
 
 		case 0x1D: // C011D (HW Request flags)
 			data = m_requestFlags_11D;
+			logerror("%s C011D Read => %02X\n", machine().time().as_string(), data);
 			// Assume this is a clear-on-read register - It is read in one location and all set bits are acted on once it is read.
 			m_requestFlags_11D = 0;
 
@@ -444,9 +445,14 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 {
 	switch (offset)
 	{
-	case 0x10: // C0110 (Clear interrupt? This seems to happen a lot but without being related to actually completing anything.)
-		m_smioccpu->int2_w(CLEAR_LINE);
+	case 0x10: // C0110 (Clear interrupt? This seems to happen a lot but without being related to actually completing anything.)		
+		logerror("%s C0110 Write, DeviceBusy = %02X\n", machine().time().as_string(), m_deviceBusy);
 		m_deviceBusy = m_requestFlags_11D;
+		m_smioccpu->int2_w(CLEAR_LINE);
+		if (m_requestFlags_11D)
+		{
+			m_smioccpu->int2_w(HOLD_LINE);
+		}
 		break;
 
 	case 0x11: // C0111 - Set to 1 after providing a status - Acknowledge by hardware by raising bit 4 in C011D (SMIOC E2E flag 0x200

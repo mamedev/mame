@@ -277,8 +277,7 @@ void r9751_state::trace_device(int address, int data, const char* direction)
 	if (basepointer[0] < 0xFFFFFF && basepointer[0] != 0) basepointer[1] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[0]);
 	if (basepointer[1] + 4 < 0xFFFFFF && basepointer[1] != 0) stacktrace[3] = m_maincpu->space(AS_PROGRAM).read_dword(basepointer[1] + 4);
 
-
-	logerror("Device 0x%x (%s) Register [%08X] (%s) %s %08X (%08X, %08X, %08X, %08X)\n", dev, devName, address, regName, direction, data, stacktrace[0], stacktrace[1], stacktrace[2], stacktrace[3]);
+	logerror("%s Device 0x%x (%s) Register [%08X] (%s) %s %08X (%08X, %08X, %08X, %08X)\n", machine().time().as_string(), dev, devName, address, regName, direction, data, stacktrace[0], stacktrace[1], stacktrace[2], stacktrace[3]);
 
 }
 
@@ -383,8 +382,11 @@ READ8_MEMBER(r9751_state::smioc_dma_r)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
 	uint32_t address = (smioc_dma_bank & 0x7FFFF800) + (offset*2 & 0x3FFFF);
+	u16 word = m_maincpu->space(AS_PROGRAM).read_word(address);
+	char c = word & 0xFF;
+	if (c < 32 || c > 127) c = ' ';
 	//if (TRACE_DMA) 
-		logerror("SMIOC DMA READ: %08X DATA: %08X\n", address, m_maincpu->space(AS_PROGRAM).read_word(address));
+		logerror("%s SMIOC DMA READ: %08X DATA: %04X (%c)\n", machine().time().as_string(), address, word, c);
 	return m_maincpu->space(AS_PROGRAM).read_word(address) & 0x00FF;
 }
 
@@ -393,8 +395,10 @@ WRITE8_MEMBER(r9751_state::smioc_dma_w)
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
 	uint32_t address = (smioc_dma_bank & 0x7FFFF800) + (offset*2 & 0x3FFFF);
 	m_maincpu->space(AS_PROGRAM).write_word(address, data);
+	char c = data & 0xFF;
+	if (c < 32 || c > 127) c = ' ';
 	//if (TRACE_DMA) 
-		logerror("SMIOC DMA WRITE: %08X DATA: %08X\n", address, data);
+		logerror("%s SMIOC DMA WRITE: %08X DATA: %08X (%c)\n", machine().time().as_string(), address, data, c);
 }
 
 void r9751_state::init_r9751()
