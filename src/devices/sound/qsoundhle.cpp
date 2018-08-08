@@ -174,8 +174,8 @@ void qsound_hle_device::device_reset()
 void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// Clear the buffers
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	std::fill_n(outputs[0], samples, 0);
+	std::fill_n(outputs[1], samples, 0);
 
 	for (int i = 0; i < samples; i ++)
 	{
@@ -329,13 +329,13 @@ void qsound_hle_device::state_init()
 		return;
 	}
 
-	memset(m_voice, 0, sizeof(m_voice));
-	memset(m_adpcm, 0, sizeof(m_adpcm));
-	memset(m_filter, 0, sizeof(m_filter));
-	memset(m_alt_filter, 0, sizeof(m_alt_filter));
-	memset(m_wet, 0, sizeof(m_wet));
-	memset(m_dry, 0, sizeof(m_dry));
-	memset(&m_echo, 0, sizeof(m_echo));
+	qsound_voice temp = {};		std::fill(std::begin(m_voice),std::end(m_voice),temp);
+	qsound_adpcm temp2 = {};	std::fill(std::begin(m_adpcm),std::end(m_adpcm),temp2);
+	qsound_fir temp3 = {};		std::fill(std::begin(m_filter),std::end(m_filter),temp3);
+								std::fill(std::begin(m_alt_filter),std::end(m_alt_filter),temp3);
+	qsound_delay temp4 = {};	std::fill(std::begin(m_wet),std::end(m_wet),temp4);
+								std::fill(std::begin(m_dry),std::end(m_dry),temp4);
+	qsound_echo temp5 = {};		m_echo = temp5;
 
 	for(int i=0;i<19;i++)
 	{
