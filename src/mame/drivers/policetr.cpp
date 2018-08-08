@@ -113,33 +113,49 @@ WRITE_LINE_MEMBER(policetr_state::vblank)
 
 WRITE32_MEMBER(policetr_state::control_w)
 {
-	uint32_t old = m_control_data;
-
 	// bit $80000000 = BSMT access/ROM read
-	// bit $20000000 = toggled every 64 IRQ4's
-	// bit $10000000 = ????
+	// bit $40000000 = N.C. (per schematic)
+	// bit $20000000 = LED (PCB, red)
+	// bit $10000000 = LED (PCB, green)
 	// bit $00800000 = EEPROM data
 	// bit $00400000 = EEPROM clock
 	// bit $00200000 = EEPROM enable (on 1)
+	// bit $00200000 = Ticket Output (marked "omit for production" on I/O board schematic in Police Trainer manual)
+	// bit $00080000 = LED (coin 2)
+	// bit $00040000 = LED (coin 1)
+	// bit $00020000 = Coin lockout 2 (as noted on the schematic; not used by the actual game)
+	// bit $00010000 = Coin lockout 1 (as noted on the schematic; not used by the actual game)
 
+	const uint32_t old = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
+		machine().bookkeeping().coin_lockout_w(0, BIT(m_control_data, 16));
+		machine().bookkeeping().coin_lockout_w(1, BIT(m_control_data, 17));
+		m_leds[LED_COIN1] = BIT(m_control_data, 18);
+		m_leds[LED_COIN2] = BIT(m_control_data, 19);
+
 		m_eeprom->di_write(BIT(data, 23));
 		m_eeprom->cs_write(BIT(data, 21));
 		m_eeprom->clk_write(BIT(data, 22));
 	}
 
-	/* toggling BSMT off then on causes a reset */
-	if (!BIT(old, 31) && BIT(m_control_data, 31))
+	if (ACCESSING_BITS_24_31)
 	{
-		m_bsmt->reset();
+		m_leds[LED_PCB_RED] = !BIT(m_control_data, 28);
+		m_leds[LED_PCB_GREEN] = !BIT(m_control_data, 29);
+
+		/* toggling BSMT off then on causes a reset */
+		if (!BIT(old, 31) && BIT(m_control_data, 31))
+		{
+			m_bsmt->reset();
+		}
 	}
 
 	/* log any unknown bits */
-	if (data & 0x4f1fffff)
+	if (data & 0x0f1fffff)
 		logerror("%s: control_w = %08X & %08X\n", machine().describe_context(), data, mem_mask);
 }
 
@@ -268,40 +284,44 @@ void sshooter_state::mem(address_map &map)
 
 static INPUT_PORTS_START( policetr )
 	PORT_START("IN0")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2SPR1	(note 1) */
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2PUSH3	(note 1) */
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2PUSH2	(note 1) */
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2USH1	(note 1) */
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2RIGHT	(note 1) */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2LEFT	(note 1) */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2DOWN	(note 1) */
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2UP	(note 1) */
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1SPR1	(note 1) */
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1PUSH3	(note 1) */
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1PUSH2	(note 1) */
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1PUSH1	(note 1) */
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1RIGHT	(note 1) */
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1LEFT	(note 1) */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1DOWN	(note 1) */
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1UP	(note 1) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x00200000, IP_ACTIVE_LOW )       /* Not actually a dipswitch */
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state, bsmt_status_r, nullptr)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /TILT (note 1) */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /SERVICE (note 1) */
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM )	PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state, bsmt_status_r, nullptr)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_PLAYER(1)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* /XSW2 (note 2) */
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_PLAYER(2)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* /XSW2 (note 2) */
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* TKTSNS (note 3) */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM )	PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /VOLMDN (note 1) */
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /VOLMUP (note 1) */
+
+	/* Note 1: Input is unused but is shown in the service menu and noted as written on the I/O schematic in the Police Trainer manual. */
+	/* Note 2: It is unknown if this input is used, but it is noted as written on the I/O schematic in the Police Trainer manual. */
+	/* Note 3: Per the I/O schematic in the Police Trainer manual, the ticket dispenser connector is omitted for production. */
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x00010000, 0x00010000, "SW1:1" )
@@ -374,6 +394,8 @@ INPUT_PORTS_END
 
 void policetr_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_control_data));
 	save_item(NAME(m_bsmt_data_bank));
 	save_item(NAME(m_bsmt_data_offset));

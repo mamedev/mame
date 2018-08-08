@@ -39,6 +39,7 @@ protected:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_leds(*this, "leds%u", 0U),
 		m_gun_x_io(*this, "GUNX%u", 1U),
 		m_gun_y_io(*this, "GUNY%u", 1U),
 		m_speedup_pc(speedup_pc),
@@ -74,6 +75,16 @@ protected:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	enum
+	{
+		LED_PCB_RED,
+		LED_PCB_GREEN,
+		LED_COIN1,
+		LED_COIN2
+	};
+
+	output_finder<4> m_leds;
 
 	required_ioport_array<2> m_gun_x_io;
 	required_ioport_array<2> m_gun_y_io;
