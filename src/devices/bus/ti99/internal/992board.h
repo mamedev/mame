@@ -137,6 +137,9 @@ private:
 
 	// Hexbus inhibit. This prevents the incoming latches to store the data.
 	bool m_communication_disable;
+
+	// Bit 6. It is not documented, but likely to indicate the response phase.
+	bool m_response_phase;
 };
 
 
