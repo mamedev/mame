@@ -36,7 +36,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853")
+DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853 SMI")
 
 //-------------------------------------------------
 //  f3853_device - constructor

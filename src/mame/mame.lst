@@ -21137,6 +21137,9 @@ microtan                        // 1979 Microtan 65
 mt420                           //
 mt5510                          //
 
+@source:microterm_f8.cpp
+act5a                           //
+
 @source:microvsn.cpp
 microvsn                        // Milton Bradley
 
@@ -36888,7 +36891,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 @source:terminal.cpp
 7951om                          //
 a1010                           //
-act5a                           //
 alcat258                        //
 alcat7100                       //
 ampex210                        //
