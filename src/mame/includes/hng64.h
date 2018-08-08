@@ -166,11 +166,6 @@ public:
 	void init_ss64();
 	void init_hng64_fght();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
-
 	uint8_t *m_texturerom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

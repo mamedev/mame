@@ -1182,26 +1182,6 @@ static INPUT_PORTS_START( hng64_fight )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(hng64_state::left_handle_r)
-{
-	return (ioport("AN0")->read() == 0);
-}
-
-CUSTOM_INPUT_MEMBER(hng64_state::right_handle_r)
-{
-	return (ioport("AN0")->read() == 0xff);
-}
-
-CUSTOM_INPUT_MEMBER(hng64_state::acc_down_r)
-{
-	return (ioport("AN1")->read() == 0);
-}
-
-CUSTOM_INPUT_MEMBER(hng64_state::brake_down_r)
-{
-	return (ioport("AN2")->read() == 0);
-}
-
 static INPUT_PORTS_START( hng64_drive )
 	PORT_INCLUDE( hng64 )
 
