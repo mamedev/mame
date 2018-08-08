@@ -149,25 +149,31 @@ constexpr uint16_t MSB_MASK = 0x8000;   // Mask of MSB
 #define HPGPU_VRAM_SIZE 16384
 
 // Index of words in configuration vector
-constexpr unsigned CONF_HOR_0 = 0;  // Horizontal timing, 1st word
-constexpr unsigned CONF_HOR_1 = 1;  // Horizontal timing, 2nd word
-constexpr unsigned CONF_HOR_2 = 2;  // Horizontal timing, 3rd word
-constexpr unsigned CONF_HOR_3 = 3;  // Horizontal timing, 4th word
-constexpr unsigned CONF_VER_0 = 4;  // Vertical timing, 1st word
-constexpr unsigned CONF_VER_1 = 5;  // Vertical timing, 2nd word
-constexpr unsigned CONF_VER_2 = 6;  // Vertical timing, 3rd word
-constexpr unsigned CONF_VER_3 = 7;  // Vertical timing, 4th word
-constexpr unsigned CONF_WPL   = 8;  // Words per line
-constexpr unsigned CONF_LINES = 9;  // Lines
-constexpr unsigned CONF_RAM_SIZE = 10;  // RAM size (?)
+enum
+{
+	CONF_HOR_0 = 0,     // Horizontal timing, 1st word
+	CONF_HOR_1 = 1,     // Horizontal timing, 2nd word
+	CONF_HOR_2 = 2,     // Horizontal timing, 3rd word
+	CONF_HOR_3 = 3,     // Horizontal timing, 4th word
+	CONF_VER_0 = 4,     // Vertical timing, 1st word
+	CONF_VER_1 = 5,     // Vertical timing, 2nd word
+	CONF_VER_2 = 6,     // Vertical timing, 3rd word
+	CONF_VER_3 = 7,     // Vertical timing, 4th word
+	CONF_WPL   = 8,     // Words per line
+	CONF_LINES = 9,     // Lines
+	CONF_RAM_SIZE = 10  // RAM size (?)
+};
 
 // Fields of hor/ver timing words
-constexpr uint16_t HV_CNT_MASK  = 0x3ff;    // Mask of counter part
-constexpr uint16_t HV_ZONE_MASK = 0xc000;   // Mask of zone part
-constexpr uint16_t HV_ZONE_0    = 0x0000;   // Value for zone 0
-constexpr uint16_t HV_ZONE_1    = 0x4000;   // Value for zone 1
-constexpr uint16_t HV_ZONE_2    = 0x8000;   // Value for zone 2
-constexpr uint16_t HV_ZONE_3    = 0xc000;   // Value for zone 3
+enum
+{
+	HV_CNT_MASK  = 0x3ff,   // Mask of counter part
+	HV_ZONE_MASK = 0xc000,  // Mask of zone part
+	HV_ZONE_0    = 0x0000,  // Value for zone 0
+	HV_ZONE_1    = 0x4000,  // Value for zone 1
+	HV_ZONE_2    = 0x8000,  // Value for zone 2
+	HV_ZONE_3    = 0xc000   // Value for zone 3
+};
 
 //**************************************************************************
 //  GLOBAL VARIABLES
