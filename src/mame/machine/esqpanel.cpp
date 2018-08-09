@@ -6,6 +6,11 @@
 #include "emu.h"
 #include "esqpanel.h"
 
+#define LOG_DEBUG (1 << 1)
+#define LOG_OUTPUT_STREAM (std::cerr)
+//#define VERBOSE (LOG_DEBUG)
+#include "logmacro.h"
+
 #define ESQPANEL_EXTERNAL_TIMER_ID 47000
 
 //**************************************************************************
@@ -385,6 +390,21 @@ namespace esqpanel {
 		std::map<const std::string, const std::string> m_template_values;
 	};
 
+	static const std::string slashes_to_separators(const std::string s) {
+		std::string t(s);
+		size_t start_pos = 0;
+		while (start_pos != std::string::npos) {
+			size_t slash = t.find('/', start_pos);
+			if (slash == std::string::npos) {
+				start_pos = slash;
+			} else {
+				t.replace(slash, 1, PATH_SEPARATOR);
+				start_pos = slash + 1;
+			}
+		}
+		LOG("slashes_to_separators: '%s' -> '%s'", s, t);
+		return t;
+	}
 }  // namespace esqpanel
 
 //**************************************************************************
@@ -652,6 +672,15 @@ void esqpanel_device::set_analog_value(offs_t offset, uint16_t value)
 {
 	m_write_analog(offset, value);
 }
+
+const std::string esqpanel_device::get_front_panel_html_file() const {
+	return esqpanel::slashes_to_separators(get_front_panel_html_file_with_slashes());
+}
+
+const std::string esqpanel_device::get_front_panel_js_file() const {
+	return esqpanel::slashes_to_separators(get_front_panel_js_file_with_slashes());
+}
+
 
 /* panel with 1x22 VFD display used in the EPS-16 and EPS-16 Plus */
 

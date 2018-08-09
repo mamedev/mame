@@ -12,6 +12,8 @@
 
 #include <vector>
 
+#define DEBUG_ESQPANEL 0
+
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
@@ -97,8 +99,11 @@ protected:
 
 	void check_external_panel_server();
 
-	virtual const std::string get_front_panel_html_file() const { return ""; }
-	virtual const std::string get_front_panel_js_file() const { return ""; }
+	const std::string get_front_panel_html_file() const;
+	const std::string get_front_panel_js_file() const;
+
+	virtual const std::string get_front_panel_html_file_with_slashes() const { return ""; }
+	virtual const std::string get_front_panel_js_file_with_slashes() const { return ""; }
 	virtual bool write_contents(std::ostream &o) { return false; }
 
 	std::vector<uint8_t> m_light_states;
@@ -155,8 +160,8 @@ protected:
 
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
-	virtual const std::string get_front_panel_html_file() const override { return "/esqpanel/vfx/FrontPanel.html"; }
-	virtual const std::string get_front_panel_js_file() const override { return "/esqpanel/vfx/FrontPanel.js"; }
+	virtual const std::string get_front_panel_html_file_with_slashes() const override { return "esqpanel/vfx/FrontPanel.html"; }
+	virtual const std::string get_front_panel_js_file_with_slashes() const override { return "esqpanel/vfx/FrontPanel.js"; }
 	virtual bool write_contents(std::ostream &o) override;
 
 	required_device<esq2x40_device> m_vfd;
@@ -196,5 +201,7 @@ DECLARE_DEVICE_TYPE(ESQPANEL2X40,     esqpanel2x40_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X40_VFX, esqpanel2x40_vfx_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X40_SQ1, esqpanel2x40_sq1_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X16_SQ1, esqpanel2x16_sq1_device)
+
+#undef DEBUG_ESQPANEL
 
 #endif // MAME_MACHINE_ESQPANEL_H

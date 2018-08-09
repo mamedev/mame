@@ -120,7 +120,7 @@ public:
 	 * Used when evaluating a template. */
 	typedef std::function<bool(std::string &)> substitution;
 
-	http_manager(bool active, short port, const char *root);
+	http_manager(bool active, const char *address, short port, const char *root);
 	virtual ~http_manager();
 	void clear();
 
@@ -169,6 +169,8 @@ private:
 
 	bool read_file(std::ostream &os, const std::string &path);
 
+	bool is_path_safe(const std::string &path);
+
 	bool m_active;
 
 	std::shared_ptr<asio::io_context>   m_io_context;
@@ -186,6 +188,9 @@ private:
 	std::unordered_map<void *, websocket_connection_ptr> m_connections;  // the keys are really webpp::ws_server::Connection pointers
 	std::mutex                                           m_connections_mutex;
 
+	// strings to search for in a file path that would traverse upwards, which is dangerous and must be prevented.
+	std::string m_up;
+	std::string m_up_at_start;
 };
 
 
