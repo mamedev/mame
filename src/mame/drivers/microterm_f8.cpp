@@ -29,6 +29,7 @@ public:
 		, m_kbdecode(*this, "kbdecode")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0U)
+		, m_dsw(*this, "DSW%u", 1U)
 		, m_modifiers(*this, "MODIFIERS")
 		, m_special(*this, "SPECIAL")
 	{ }
@@ -65,13 +66,14 @@ private:
 	required_region_ptr<u8> m_kbdecode;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<11> m_keys;
+	required_ioport_array<3> m_dsw;
 	required_ioport m_modifiers;
 	required_ioport m_special;
 
 	u8 m_port00;
 	u8 m_keylatch;
 	u8 m_scroll;
-	std::unique_ptr<u8[]> m_vram;
+	std::unique_ptr<u16[]> m_vram;
 };
 
 void microterm_f8_state::machine_start()
@@ -79,29 +81,32 @@ void microterm_f8_state::machine_start()
 	m_port00 = 0;
 	m_keylatch = 0;
 	m_scroll = 0;
-	m_vram = make_unique_clear<u8[]>(0xc00); // 6x MM2114 with weird addressing
+	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
 
 	save_item(NAME(m_port00));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_scroll));
-	save_pointer(NAME(m_vram), 0xc00);
+	save_pointer(NAME(m_vram), 0x800);
 }
 
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	unsigned y = cliprect.top();
-	offs_t rowbase = ((y / 12) + m_scroll) % 24 * 0x80;
+	offs_t rowbase = (((y / 12) + m_scroll) % 24) * 80;
 	unsigned line = y % 12;
 	if (line >= 6)
 		line += 2;
 
 	while (y <= cliprect.bottom())
 	{
+		const bool allow_underline = line == 13;
+
 		for (unsigned x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			u8 ch = m_vram[rowbase + (x / 9)];
-			u8 dots = m_chargen[(line << 7) | (ch & 0x7f)];
-			bitmap.pix32(y, x) = BIT(dots, 8 - (x % 9)) ? rgb_t::white() : rgb_t::black();
+			u16 ch = m_vram[rowbase + (x / 9)];
+			u8 chdata = m_chargen[(line << 7) | (ch & 0x7f)];
+			bool dot = (!BIT(ch, 8) && allow_underline) || BIT(chdata, 8 - (x % 9));
+			bitmap.pix32(y, x) = dot ? rgb_t::white() : rgb_t::black();
 		}
 
 		y++;
@@ -111,8 +116,8 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			line = (line + 2) & 15;
 			if (line == 0)
 			{
-				rowbase += 0x80;
-				if (rowbase == 24 * 0x80)
+				rowbase += 80;
+				if (rowbase == 24 * 80)
 					rowbase = 0;
 			}
 		}
@@ -148,12 +153,18 @@ WRITE8_MEMBER(microterm_f8_state::scroll_w)
 
 READ8_MEMBER(microterm_f8_state::vram_r)
 {
-	return m_vram[(offset & 0x1f00) >> 1 | (offset & 0x007f)];
+	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
+	assert(vaddr < 0x800);
+	if ((m_port00 & 0x05) == 0 && !machine().side_effects_disabled())
+		m_port00 = (m_port00 & 0x0f) | ((m_vram[vaddr] >> 4) & 0xf0);
+	return m_vram[vaddr] & 0xff;
 }
 
 WRITE8_MEMBER(microterm_f8_state::vram_w)
 {
-	m_vram[(offset & 0x1f00) >> 1 | (offset & 0x007f)] = data;
+	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
+	assert(vaddr < 0x800);
+	m_vram[vaddr] = data | (m_port00 & 0xf0) << 4;
 }
 
 bool microterm_f8_state::poll_keyboard()
@@ -214,6 +225,9 @@ READ8_MEMBER(microterm_f8_state::port01_r)
 	if (!m_screen->vblank())
 		flags |= 0x20;
 
+	// Protected field setting
+	flags |= ~m_dsw[2]->read() & 0x06;
+
 	return flags;
 }
 
@@ -223,6 +237,7 @@ void microterm_f8_state::f8_mem(address_map &map)
 	map(0x0c00, 0x0c00).r(FUNC(microterm_f8_state::bell_r));
 	map(0x2000, 0x2000).mirror(0x1fff).w(FUNC(microterm_f8_state::scroll_w));
 	map(0x4000, 0x407f).select(0x1f00).rw(FUNC(microterm_f8_state::vram_r), FUNC(microterm_f8_state::vram_w));
+	map(0x5800, 0x5fff).unmaprw();
 	map(0x8000, 0x8000).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
 	map(0xf000, 0xf000).r(FUNC(microterm_f8_state::key_r));
 }
