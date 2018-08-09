@@ -29,15 +29,17 @@ public:
 		, m_kbdecode(*this, "kbdecode")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0U)
-		, m_dsw(*this, "DSW%u", 1U)
 		, m_modifiers(*this, "MODIFIERS")
 		, m_special(*this, "SPECIAL")
+		, m_dsw(*this, "DSW%u", 1U)
+		, m_jumpers(*this, "JUMPERS")
 	{ }
 
 	void act5a(machine_config &config);
 
 private:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -66,9 +68,10 @@ private:
 	required_region_ptr<u8> m_kbdecode;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<11> m_keys;
-	required_ioport_array<3> m_dsw;
 	required_ioport m_modifiers;
 	required_ioport m_special;
+	required_ioport_array<3> m_dsw;
+	required_ioport m_jumpers;
 
 	u8 m_port00;
 	u8 m_keylatch;
@@ -80,7 +83,6 @@ void microterm_f8_state::machine_start()
 {
 	m_port00 = 0;
 	m_keylatch = 0;
-	m_scroll = 0;
 	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
 
 	save_item(NAME(m_port00));
@@ -89,8 +91,14 @@ void microterm_f8_state::machine_start()
 	save_pointer(NAME(m_vram), 0x800);
 }
 
+void microterm_f8_state::machine_reset()
+{
+	m_scroll = 0;
+}
+
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const ioport_value jumpers = m_jumpers->read();
 	unsigned y = cliprect.top();
 	offs_t rowbase = (((y / 12) + m_scroll) % 24) * 80;
 	unsigned line = y % 12;
@@ -99,7 +107,7 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	while (y <= cliprect.bottom())
 	{
-		const bool allow_underline = line == 13;
+		const bool allow_underline = (line == 13) || (line == 12 && !BIT(jumpers, 1));
 
 		for (unsigned x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -416,7 +424,28 @@ static INPUT_PORTS_START(act5a)
 	PORT_DIPSETTING(0x000, "1")
 	PORT_DIPSETTING(0x100, "2")
 
-	// TODO: W1-W5 jumper settings
+	PORT_START("JUMPERS")
+	PORT_DIPNAME(0x0003, 0x0002, "Underline") PORT_DIPLOCATION("W1:1,2")
+	PORT_DIPSETTING(0x0002, "Single")
+	PORT_DIPSETTING(0x0001, "Double")
+	PORT_DIPNAME(0x003c, 0x0034, "Cursor Rate") PORT_DIPLOCATION("W2:1,2,3,4")
+	PORT_DIPSETTING(0x001c, "0 Hz")
+	PORT_DIPSETTING(0x002c, "1 Hz")
+	PORT_DIPSETTING(0x0034, "2 Hz")
+	PORT_DIPSETTING(0x0038, "4 Hz")
+	PORT_DIPNAME(0x01c0, 0x00c0, "Blinking Rate") PORT_DIPLOCATION("W3:1,2,3")
+	PORT_DIPSETTING(0x00c0, "1 Hz")
+	PORT_DIPSETTING(0x0140, "2 Hz")
+	PORT_DIPSETTING(0x0180, "4 Hz")
+	PORT_DIPNAME(0x1e00, 0x0e00, "Protected Video Attribute") PORT_DIPLOCATION("W4:4,3,2,1")
+	PORT_DIPSETTING(0x0e00, "Reduced Intensity")
+	PORT_DIPSETTING(0x1600, "Blinking")
+	PORT_DIPSETTING(0x1a00, "Reverse Video")
+	PORT_DIPSETTING(0x1c00, "Underline")
+	PORT_DIPNAME(0xe000, 0x6000, "Keyboard Auto Repeat Rate") PORT_DIPLOCATION("W5:1,2,3")
+	PORT_DIPSETTING(0x6000, "7.5 cps")
+	PORT_DIPSETTING(0xa000, "15 cps")
+	PORT_DIPSETTING(0xc000, "30 cps")
 INPUT_PORTS_END
 
 void microterm_f8_state::act5a(machine_config &config)
