@@ -97,7 +97,7 @@ void f3853_device::set_interrupt_request_line()
 	if (m_interrupt_req_cb.isnull())
 		return;
 
-	if (m_external_enable && !m_priority_line)
+	if (m_external_enable && !m_priority_line && m_request_flipflop)
 		m_interrupt_req_cb(external_interrupt_vector(), true);
 	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
 		m_interrupt_req_cb(timer_interrupt_vector(), true);
