@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(20'000'000) / 2)
 	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, vme_fcisio1_card_device, config_rd))
 
-	MCFG_MC68153_ADD("bim", XTAL(20'000'000) / 2)
+	MC68153(config, "bim", XTAL(20'000'000) / 2);
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const

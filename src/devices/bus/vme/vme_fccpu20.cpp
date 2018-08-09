@@ -266,8 +266,8 @@ MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("bim", bim68153_device, int2_w))
 
 	/* BIM */
-	MCFG_MC68153_ADD("bim", CLOCK32 / 8)
-	MCFG_BIM68153_OUT_INT_CB(WRITELINE(*this, vme_fccpu20_device, bim_irq_callback))
+	bim68153_device &bim(MC68153(config, "bim", CLOCK32 / 8));
+	bim.out_int_callback().set(FUNC(vme_fccpu20_device::bim_irq_callback));
 		/*INT0 - Abort switch */
 		/*INT1 - MPCC@8.064 MHz aswell */
 		/*INT2 - PI/T timer */
