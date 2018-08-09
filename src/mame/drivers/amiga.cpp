@@ -1613,9 +1613,9 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	m_dmac->io_write_handler().set(FUNC(cdtv_state::dmac_io_write));
 	m_dmac->int_handler().set(FUNC(cdtv_state::dmac_int_w));
 
-	MCFG_DEVICE_ADD("u32", TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, cdtv_state, tpi_int_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cdtv_state, tpi_port_b_write))
+	tpi6525_device &tpi(TPI6525(config, "u32", 0));
+	tpi.out_irq_cb().set(FUNC(cdtv_state::tpi_int_w));
+	tpi.out_pb_cb().set(FUNC(cdtv_state::tpi_port_b_write));
 
 	// cd-rom
 	CR511B(config, m_cdrom, 0);

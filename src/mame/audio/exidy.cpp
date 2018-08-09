@@ -754,12 +754,12 @@ MACHINE_CONFIG_START(venture_sound_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("audiocpu", M6502, 3579545/4)
 	MCFG_DEVICE_PROGRAM_MAP(venture_audio_map)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, SH6532_CLOCK)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, venture_sound_device, r6532_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, venture_sound_device, r6532_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(*this, venture_sound_device, r6532_portb_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, venture_sound_device, r6532_portb_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE("audioirq", input_merger_device, in_w<0>))
+	RIOT6532(config, m_riot, SH6532_CLOCK);
+	m_riot->in_pa_callback().set(FUNC(venture_sound_device::r6532_porta_r));
+	m_riot->out_pa_callback().set(FUNC(venture_sound_device::r6532_porta_w));
+	m_riot->in_pb_callback().set(FUNC(venture_sound_device::r6532_portb_r));
+	m_riot->out_pb_callback().set(FUNC(venture_sound_device::r6532_portb_w));
+	m_riot->irq_callback().set("audioirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, venture_sound_device, pia_pa_w))
@@ -985,12 +985,12 @@ MACHINE_CONFIG_START(victory_sound_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(victory_audio_map)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, SH6532_CLOCK)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, victory_sound_device, r6532_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, victory_sound_device, r6532_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(*this, victory_sound_device, r6532_portb_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, victory_sound_device, r6532_portb_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE("audioirq", input_merger_device, in_w<0>))
+	RIOT6532(config, m_riot, SH6532_CLOCK);
+	m_riot->in_pa_callback().set(FUNC(victory_sound_device::r6532_porta_r));
+	m_riot->out_pa_callback().set(FUNC(victory_sound_device::r6532_porta_w));
+	m_riot->in_pb_callback().set(FUNC(victory_sound_device::r6532_portb_r));
+	m_riot->out_pb_callback().set(FUNC(victory_sound_device::r6532_portb_w));
+	m_riot->irq_callback().set("audioirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, victory_sound_device, irq_clear_w))

@@ -56,6 +56,9 @@ public:
 	template <class Object> devcb_base &set_dir_callback(Object &&dir) { return m_write_dir.set_callback(std::forward<Object>(dir)); }
 	template <class Object> devcb_base &set_dor_callback(Object &&dor) { return m_write_dor.set_callback(std::forward<Object>(dor)); }
 	template <class Object> devcb_base &set_data_out_callback(Object &&out) { return m_write_q.set_callback(std::forward<Object>(out)); }
+	auto in_ready_cb() { return m_write_dir.bind(); }
+	auto out_ready_cb() { return m_write_dor.bind(); }
+	auto out_cb() { return m_write_q.bind(); }
 
 	u8 read();
 	void write(u8 data);
