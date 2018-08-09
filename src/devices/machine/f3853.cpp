@@ -10,11 +10,6 @@
 
     Based on a datasheet obtained from www.freetradezone.com
 
-    The SMI does not have DC0 and DC1, only DC0; as a result, it does
-    not respond to the main CPU's DC0/DC1 swap instruction.  This may
-    lead to two devices responding to the same DC0 address and
-    attempting to place their bytes on the data bus simultaneously!
-
     8-bit shift register:
     Feedback in0 = !((out3 ^ out4) ^ (out5 ^ out7))
     Interrupts are at 0xfe
