@@ -150,6 +150,7 @@ public:
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
 		m_3dregs(*this, "3dregs"),
+		m_comhack(*this, "comhack"),
 		m_3d_1(*this, "3d_1"),
 		m_3d_2(*this, "3d_2"),
 		m_idt7133_dpram(*this, "com_ram"),
@@ -191,6 +192,7 @@ private:
 
 	std::unique_ptr<uint16_t[]> m_dl;
 	required_shared_ptr<uint32_t> m_3dregs;
+	required_shared_ptr<uint32_t> m_comhack;
 	required_shared_ptr<uint32_t> m_3d_1;
 	required_shared_ptr<uint32_t> m_3d_2;
 
@@ -340,6 +342,10 @@ private:
 	uint16_t m_mmub[6];
 	uint8_t read_comm_data(uint32_t offset);
 	void write_comm_data(uint32_t offset,uint8_t data);
+	TIMER_CALLBACK_MEMBER(comhack_callback);
+	emu_timer *m_comhack_timer;
+
+
 	int m_irq_level;
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);

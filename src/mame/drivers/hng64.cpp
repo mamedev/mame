@@ -884,7 +884,7 @@ void hng64_state::hng_map(address_map &map)
 
 	// Communications
 	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
-	map(0xc0001000, 0xc0001007).rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
+	map(0xc0001000, 0xc0001007).ram().share("comhack");//.rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
 
 	/* 6e000000-6fffffff */
 	/* 80000000-81ffffff */
@@ -1771,9 +1771,18 @@ void hng64_state::machine_start()
 	}
 
 	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
+	m_comhack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::comhack_callback), this));
 
 	init_io();
 }
+
+TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
+{
+	printf("comhack_callback %04x\n\n", m_comhack[0]);
+
+	m_comhack[0] = m_comhack[0] | 0x0002;
+}
+
 
 void hng64_state::machine_reset()
 {
@@ -1782,6 +1791,9 @@ void hng64_state::machine_reset()
 
 	reset_net();
 	reset_sound();
+
+	// on real hardware, even with no network, it takes until the counter reaches about 37 (Xtreme Rally) to boot, this kicks in at around 7
+	m_comhack_timer->adjust(m_maincpu->cycles_to_attotime(400000000));
 }
 
 /***********************************************
@@ -1958,6 +1970,7 @@ TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
 	LOG("timer_hack_off\n");
 	m_iomcu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
 }
+
 
 void hng64_state::init_io()
 {
