@@ -77,6 +77,31 @@ void microterm_f8_state::machine_start()
 
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	unsigned y = cliprect.top();
+	offs_t rowbase = (y / 12) * 0x80;
+	unsigned line = y % 12;
+	if (line >= 6)
+		line += 2;
+
+	while (y <= cliprect.bottom())
+	{
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			u8 ch = m_vram[rowbase + (x / 9)];
+			u8 dots = m_chargen[(line << 7) | (ch & 0x7f)];
+			bitmap.pix32(y, x) = BIT(dots, 8 - (x % 9)) ? rgb_t::white() : rgb_t::black();
+		}
+
+		y++;
+		line++;
+		if ((line & 7) >= 6)
+		{
+			line = (line + 2) & 15;
+			if (line == 0)
+				rowbase += 0x80;
+		}
+	}
+
 	return 0;
 }
 
@@ -356,7 +381,7 @@ void microterm_f8_state::act5a(machine_config &config)
 	RS232_PORT(config, m_aux, default_rs232_devices, nullptr);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16.572_MHz_XTAL, 1080, 0, 800, 256, 0, 240); // more or less guessed
+	screen.set_raw(16.572_MHz_XTAL, 918, 0, 720, 301, 0, 288); // more or less guessed
 	screen.set_screen_update(FUNC(microterm_f8_state::screen_update));
 }
 
@@ -373,6 +398,6 @@ ROM_START(act5a)
 	ROM_LOAD("act5a_9316.u55", 0x0000, 0x2000, CRC(8f96b7c8) SHA1(652d420ab5be9412cae322cd1799f8a9e3959c44))
 ROM_END
 
-//COMP(1976, act4, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-IV", MACHINE_IS_SKELETON)
-//COMP(1978, act5, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-V", MACHINE_IS_SKELETON)
-COMP(1980, act5a, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-5A", MACHINE_IS_SKELETON)
+//COMP(1976, act4, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-IV", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP(1978, act5, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-V", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1980, act5a, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-5A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
