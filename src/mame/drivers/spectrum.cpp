@@ -905,6 +905,12 @@ ROM_END
 
 /* Russian clones */
 
+ROM_START( bk08 )
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "right.bin", 0x0000, 0x2000, CRC(fb253544) SHA1(6b79487e3013d0acdea8d224b21c937e88105a2f) )
+	ROM_LOAD( "left.bin",  0x2000, 0x2000, CRC(a092b5f3) SHA1(06b8d98a398f61daf6604c68bcee4596c283c2cd) )
+ROM_END
+
 ROM_START(blitzs)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("blitz.rom",0x0000,0x4000, CRC(91e535a8) SHA1(14f09d45dc3803cbdb05c33adb28eb12dbad9dd0))
@@ -976,6 +982,7 @@ COMP( 1992, didakm92, spectrum, 0,      spectrum, spec_plus, spectrum_state, ini
 COMP( 1992, didaktk,  spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Kompakt",      0 )
 COMP( 1993, didakm93, spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 93",         0 )
 COMP( 1988, mistrum,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
+COMP( 198?, bk08,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
 COMP( 1990, blitzs,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
 COMP( 1990, byte,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Byte",                  0 )  // no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found

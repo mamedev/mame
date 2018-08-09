@@ -35375,6 +35375,7 @@ specpls3                        // 1987 ZX Spectrum +3
 spectra                         //
 
 @source:spectrum.cpp
+bk08                            // Orel BK-08
 blitzs                          // 1990 Blic
 byte                            // 1990 Byte
 cip01                           // 1987 CIP-01
