@@ -350,8 +350,8 @@ void edge2plus_processor_device_base::map(address_map &map)
 {
 	map(0x000, 0x003).rw(FUNC(edge2plus_processor_device_base::reg0_r), FUNC(edge2plus_processor_device_base::reg0_w));
 
-	map(0x008, 0x008).lr8("mouse_x", [this](address_space &space, offs_t offset, u8 mem_mask) { return 0; });
-	map(0x00c, 0x00c).lr8("mouse_y", [this](address_space &space, offs_t offset, u8 mem_mask) { return 0; });
+	map(0x008, 0x008).lr8("mouse_x", [](address_space &space, offs_t offset, u8 mem_mask) { return 0; });
+	map(0x00c, 0x00c).lr8("mouse_y", [](address_space &space, offs_t offset, u8 mem_mask) { return 0; });
 
 	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
 
