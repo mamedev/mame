@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	TMS57002(config, m_tms57002, XTAL(25'000'000));
+	TMS57002(config, m_tms57002, XTAL(25'000'000)/2);
 #ifdef USE_DSP
 	m_tms57002->set_addrmap(AS_DATA, &taito_zoom_device::tms57002_map);
 	m_tms57002->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
