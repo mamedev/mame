@@ -431,6 +431,11 @@ ROM_START( cdc721 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "66315039", 0x0000, 0x1000, CRC(5c9aa968) SHA1(3ec7c5f25562579e6ed3fda7562428ff5e6b9550) )
 	ROM_LOAD( "66307828", 0x1000, 0x1000, CRC(ac97136f) SHA1(0d280e1aa4b9502bd390d260f83af19bf24905cd) ) // foreign character ROM
+
+	// Graphics Firmware pack
+	ROM_REGION( 0x4000, "gfxfw", 0 ) // load at 0x8000
+	ROM_LOAD( "66315369.bin", 0x0000, 0x2000, CRC(224d3368) SHA1(e335ef6cd56d77194235f5a2a7cf2af9ebf42342) )
+	ROM_LOAD( "66315370.bin", 0x2000, 0x2000, CRC(2543bf32) SHA1(1ac73a0e475d9fd86fba054e1a7a443d5bad1987) )
 ROM_END
 
 COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, empty_init, "Control Data Corporation", "721 Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
