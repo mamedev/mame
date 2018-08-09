@@ -1459,13 +1459,15 @@ void z80scc_channel::update_rts()
 		if (m_wr5 & WR5_RTS)
 		{
 				// when the RTS bit is set, the _RTS output goes low
-				set_rts(0);
 				m_rts = 1;
+				set_rts(!m_rts);
 		}
 		else
 		{
 				// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
 				m_rts = 0;
+				if (!(m_wr3 & WR3_AUTO_ENABLES) || (m_rr1 & RR1_ALL_SENT))
+					set_rts(!m_rts);
 		}
 
 		// data terminal ready output follows the state programmed into the DTR bit*/
@@ -2621,8 +2623,6 @@ void z80scc_channel::data_write(uint8_t data)
 			LOGTX("- TX FIFO has more room, setting TBE bit\n");
 			m_rr0 |= RR0_TX_BUFFER_EMPTY; // or there is a slot in the FIFO available
 		}
-		LOGTX("- TX FIFO now has data to send, clearing ALL_SENT bit\n");
-		m_rr1 &= ~RR1_ALL_SENT; // All is definitelly not sent anymore
 	}
 
 	check_waitrequest();
@@ -2636,7 +2636,8 @@ void z80scc_channel::data_write(uint8_t data)
 			LOGTX("- Setting up transmitter\n");
 			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Load the shift register, reload is done in tra_complete()
 			m_tx_fifo_rp_step();
-			m_rr1 |= RR1_ALL_SENT; // Now stuff is on its way again
+			LOGTX("- TX shift register loaded, clearing ALL_SENT bit\n");
+			m_rr1 &= ~RR1_ALL_SENT; // All is definitely not sent anymore
 			m_rr0 |= RR0_TX_BUFFER_EMPTY; // And there is a slot in the FIFO available
 		}
 		else
@@ -2730,7 +2731,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 {
 	LOG("\"%s\"%s: %c : CTS %u\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 
-	if ((m_rr0 & RR0_CTS) != (state ? RR0_CTS : 0)) //  SCC change detection logic
+	if ((m_rr0 & RR0_CTS) != (state ? 0 : RR0_CTS)) //  SCC change detection logic
 	{
 		// enable transmitter if in auto enables mode
 		if (!state)
@@ -2743,7 +2744,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 			}
 		}
 
-		if (state) m_rr0 |= RR0_CTS; else  m_rr0 &= ~RR0_CTS; // Raw pin/status value
+		if (state) m_rr0 &= ~RR0_CTS; else  m_rr0 |= RR0_CTS; // Raw pin/status value
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
 		{
@@ -2767,7 +2768,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 {
 	LOGDCD("\"%s\": %c : DCD %u\n", owner()->tag(), 'A' + m_index, state);
 
-	if ((m_rr0 & RR0_DCD) != (state ? RR0_DCD : 0)) //  SCC change detection logic
+	if ((m_rr0 & RR0_DCD) != (state ? 0 : RR0_DCD)) //  SCC change detection logic
 	{
 		// enable transmitter if in auto enables mode
 		if (!state)
@@ -2783,7 +2784,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 			}
 		}
 
-		if (state) m_rr0 |= RR0_DCD; else  m_rr0 &= ~RR0_DCD; // Raw pin/status value
+		if (state) m_rr0 &= ~RR0_DCD; else  m_rr0 |= RR0_DCD; // Raw pin/status value
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
 		{
@@ -2799,25 +2800,42 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 	}
 }
 
-
-//-------------------------------------------------
-//  ri_w - ring indicator handler
-//-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::ri_w )
-{
-	LOGINT("\"%s\": %c : RI %u - not implemented\n", owner()->tag(), 'A' + m_index, state);
-}
-
 //-------------------------------------------------
 //  sync_w - sync handler for external sync mode
 //-------------------------------------------------
 WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 {
 	LOGSYNC("\"%s\": %c : SYNC %u\n", owner()->tag(), 'A' + m_index, state);
-	if ((m_rr0 & RR0_SYNC_HUNT) != (state ? RR0_SYNC_HUNT : 0)) //  SCC change detection logic
+
+	/*
+	* The /SYNC pin is a general purpose input whose state is reported in the
+	* Sync/Hunt bit in RR0. If the crystal oscillator is enabled, this pin is
+	* not available and the Sync/Hunt bit is forced to 0. Otherwise, the /SYNC
+	* pin may be used to carry the Ring Indicator signal.
+	*/
+	if (!(m_wr11 & WR11_RCVCLK_TYPE))
 	{
-		if (state) m_rr0 |= RR0_SYNC_HUNT; else  m_rr0 &= ~RR0_SYNC_HUNT; // Raw pin/status value
+		// check for state change
+		if ((m_rr0 & RR0_SYNC_HUNT) != (state ? 0 : RR0_SYNC_HUNT))
+		{
+			// record pin state (inverted)
+			if (state)
+				m_rr0 &= ~RR0_SYNC_HUNT;
+			else
+				m_rr0 |= RR0_SYNC_HUNT;
+
+			// trigger an external interrupt if enabled
+			if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_SYNC))
+			{
+				m_extint_latch = 1;
+				m_extint_states = m_rr0;
+
+				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+			}
+		}
 	}
+	else
+		fatalerror("/SYNC cannot be used as an input in RTxC-XTAL clock mode.");
 }
 
 //-------------------------------------------------
