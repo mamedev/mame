@@ -30,6 +30,7 @@ public:
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0U)
 		, m_modifiers(*this, "MODIFIERS")
+		, m_special(*this, "SPECIAL")
 	{ }
 
 	void act5a(machine_config &config);
@@ -43,6 +44,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	DECLARE_READ8_MEMBER(bell_r);
+	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	bool poll_keyboard();
@@ -64,9 +66,11 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<11> m_keys;
 	required_ioport m_modifiers;
+	required_ioport m_special;
 
 	u8 m_port00;
 	u8 m_keylatch;
+	u8 m_scroll;
 	std::unique_ptr<u8[]> m_vram;
 };
 
@@ -74,17 +78,19 @@ void microterm_f8_state::machine_start()
 {
 	m_port00 = 0;
 	m_keylatch = 0;
+	m_scroll = 0;
 	m_vram = make_unique_clear<u8[]>(0xc00); // 6x MM2114 with weird addressing
 
 	save_item(NAME(m_port00));
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_scroll));
 	save_pointer(NAME(m_vram), 0xc00);
 }
 
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	unsigned y = cliprect.top();
-	offs_t rowbase = (y / 12) * 0x80;
+	offs_t rowbase = ((y / 12) + m_scroll) % 24 * 0x80;
 	unsigned line = y % 12;
 	if (line >= 6)
 		line += 2;
@@ -104,7 +110,11 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			line = (line + 2) & 15;
 			if (line == 0)
+			{
 				rowbase += 0x80;
+				if (rowbase == 24 * 0x80)
+					rowbase = 0;
+			}
 		}
 	}
 
@@ -127,6 +137,13 @@ READ8_MEMBER(microterm_f8_state::bell_r)
 	if (!machine().side_effects_disabled())
 		m_bell->set_state(1);
 	return 0;
+}
+
+WRITE8_MEMBER(microterm_f8_state::scroll_w)
+{
+	m_scroll++;
+	if (m_scroll == 24)
+		m_scroll = 0;
 }
 
 READ8_MEMBER(microterm_f8_state::vram_r)
@@ -169,8 +186,8 @@ READ8_MEMBER(microterm_f8_state::port00_r)
 {
 	u8 flags = m_port00;
 
-	// ???
-	if (m_uart->tbmt_r())
+	// On-line/Local mode switch?
+	if (BIT(m_special->read(), 1))
 		flags |= 0x02;
 
 	return flags;
@@ -204,6 +221,7 @@ void microterm_f8_state::f8_mem(address_map &map)
 {
 	map(0x0000, 0x0bff).rom().region("maincpu", 0);
 	map(0x0c00, 0x0c00).r(FUNC(microterm_f8_state::bell_r));
+	map(0x2000, 0x2000).mirror(0x1fff).w(FUNC(microterm_f8_state::scroll_w));
 	map(0x4000, 0x407f).select(0x1f00).rw(FUNC(microterm_f8_state::vram_r), FUNC(microterm_f8_state::vram_w));
 	map(0x8000, 0x8000).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
 	map(0xf000, 0xf000).r(FUNC(microterm_f8_state::key_r));
@@ -285,7 +303,7 @@ static INPUT_PORTS_START(act5a)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U  1") PORT_CHAR('u') PORT_CHAR('U') PORT_CHAR(0x15) PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9  (  0") PORT_CHAR('9') PORT_CHAR('(') PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CHAR(0x0a) PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CHAR(0x7f) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CHAR(0x0d) PORT_CODE(KEYCODE_ENTER)
 
 	PORT_START("KEY7")
@@ -320,8 +338,8 @@ static INPUT_PORTS_START(act5a)
 
 	PORT_START("KEY10")
 	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Send Line/Page") PORT_CODE(KEYCODE_F9)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Print Line/Page") PORT_CHAR(UCHAR_MAMEKEY(PRTSCR)) PORT_CODE(KEYCODE_F10)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Send Line/Page") PORT_CODE(KEYCODE_F11)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Print Line/Page") PORT_CHAR(UCHAR_MAMEKEY(PRTSCR)) PORT_CODE(KEYCODE_F12)
 
 	PORT_START("MODIFIERS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
@@ -329,7 +347,9 @@ static INPUT_PORTS_START(act5a)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CHAR(UCHAR_SHIFT_2) PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
-	// TODO: BREAK key and LINE/LOC toggle
+	PORT_START("SPECIAL")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F9)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line/Loc") PORT_CODE(KEYCODE_F10) PORT_TOGGLE
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(0xff, 0xfd, "Printer Data Rate") PORT_DIPLOCATION("S1:8,7,6,5,4,3,2,1")
