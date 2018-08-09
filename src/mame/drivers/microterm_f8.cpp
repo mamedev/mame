@@ -11,7 +11,9 @@
 #include "cpu/f8/f8.h"
 #include "machine/ay31015.h"
 #include "machine/f3853.h"
+#include "sound/beep.h"
 #include "screen.h"
+#include "speaker.h"
 
 class microterm_f8_state : public driver_device
 {
@@ -23,6 +25,7 @@ public:
 		, m_io(*this, "io")
 		, m_aux(*this, "aux")
 		, m_screen(*this, "screen")
+		, m_bell(*this, "bell")
 		, m_kbdecode(*this, "kbdecode")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0U)
@@ -37,7 +40,9 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	F3853_INTERRUPT_REQ_CB(f3853_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
+	DECLARE_READ8_MEMBER(bell_r);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	bool poll_keyboard();
@@ -54,6 +59,7 @@ private:
 	required_device<rs232_port_device> m_io;
 	required_device<rs232_port_device> m_aux;
 	required_device<screen_device> m_screen;
+	required_device<beep_device> m_bell;
 	required_region_ptr<u8> m_kbdecode;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<11> m_keys;
@@ -108,6 +114,19 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 F3853_INTERRUPT_REQ_CB(microterm_f8_state::f3853_interrupt)
 {
 	m_maincpu->set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE, addr);
+}
+
+WRITE_LINE_MEMBER(microterm_f8_state::vblank_w)
+{
+	if (state)
+		m_bell->set_state(0);
+}
+
+READ8_MEMBER(microterm_f8_state::bell_r)
+{
+	if (!machine().side_effects_disabled())
+		m_bell->set_state(1);
+	return 0;
 }
 
 READ8_MEMBER(microterm_f8_state::vram_r)
@@ -184,6 +203,7 @@ READ8_MEMBER(microterm_f8_state::port01_r)
 void microterm_f8_state::f8_mem(address_map &map)
 {
 	map(0x0000, 0x0bff).rom().region("maincpu", 0);
+	map(0x0c00, 0x0c00).r(FUNC(microterm_f8_state::bell_r));
 	map(0x4000, 0x407f).select(0x1f00).rw(FUNC(microterm_f8_state::vram_r), FUNC(microterm_f8_state::vram_w));
 	map(0x8000, 0x8000).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
 	map(0xf000, 0xf000).r(FUNC(microterm_f8_state::key_r));
@@ -383,6 +403,11 @@ void microterm_f8_state::act5a(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16.572_MHz_XTAL, 918, 0, 720, 301, 0, 288); // more or less guessed
 	screen.set_screen_update(FUNC(microterm_f8_state::screen_update));
+	screen.screen_vblank().set(FUNC(microterm_f8_state::vblank_w));
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_bell, 1760);
+	m_bell->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START(act5a)
@@ -398,6 +423,6 @@ ROM_START(act5a)
 	ROM_LOAD("act5a_9316.u55", 0x0000, 0x2000, CRC(8f96b7c8) SHA1(652d420ab5be9412cae322cd1799f8a9e3959c44))
 ROM_END
 
-//COMP(1976, act4, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-IV", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP(1978, act5, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-V", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1980, act5a, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-5A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP(1976, act4, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-IV", MACHINE_NOT_WORKING)
+//COMP(1978, act5, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-V", MACHINE_NOT_WORKING)
+COMP(1980, act5a, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-5A", MACHINE_NOT_WORKING)
