@@ -215,17 +215,17 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, aim65_state, aim65_pb_r))
+	via6522_device &via0(VIA6522(config, "via6522_0", AIM65_CLOCK));
+	via0.readpb_handler().set(FUNC(aim65_state::aim65_pb_r));
 	// in CA1 printer ready?
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pb_w))
+	via0.writepb_handler().set(FUNC(aim65_state::aim65_pb_w));
 	// out CB1 printer start
 	// out CA2 cass control (H=in)
 	// out CB2 turn printer on
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	via0.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	via6522_device &via1(VIA6522(config, "via6522_0", AIM65_CLOCK));
+	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aim65_state, aim65_pia_a_w))

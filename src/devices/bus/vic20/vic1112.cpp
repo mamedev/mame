@@ -97,22 +97,24 @@ WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic1112_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, DERIVED_CLOCK(1, 1))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, vic1112_device, via0_pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic1112_device, via0_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, vic1112_device, via0_irq_w))
+void vic1112_device::device_add_mconfig(machine_config &config)
+{
+	VIA6522(config, m_via0, DERIVED_CLOCK(1, 1));
+	m_via0->readpb_handler().set(FUNC(vic1112_device::via0_pb_r));
+	m_via0->writepb_handler().set(FUNC(vic1112_device::via0_pb_w));
+	m_via0->irq_handler().set(FUNC(vic1112_device::via0_irq_w));
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, DERIVED_CLOCK(1, 1))
-	MCFG_VIA6522_READPB_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, vic1112_device, via1_irq_w))
+	VIA6522(config, m_via1, DERIVED_CLOCK(1, 1));
+	m_via1->readpb_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	m_via1->writepa_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	m_via1->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	m_via1->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	m_via1->irq_handler().set(FUNC(vic1112_device::via1_irq_w));
 
-	MCFG_CBM_IEEE488_ADD(nullptr)
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(M6522_1_TAG, via6522_device, write_cb1))
-MACHINE_CONFIG_END
+	IEEE488(config, m_bus, 0);
+	ieee488_slot_device::add_cbm_defaults(config, nullptr);
+	m_bus->srq_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+}
 
 
 

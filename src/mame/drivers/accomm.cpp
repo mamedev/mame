@@ -862,9 +862,9 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	/* rtc pcf8573 */
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	VIA6522(config, m_via, XTAL(16'000'000) / 16);
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)

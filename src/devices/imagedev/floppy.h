@@ -317,13 +317,13 @@ class floppy_connector: public device_t,
 {
 public:
 	template <typename T>
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, const floppy_format_type *formats)
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, const floppy_format_type *formats, bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
-		set_fixed(false);
+		set_fixed(fixed);
 		set_formats(formats);
 	}
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
