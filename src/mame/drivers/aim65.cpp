@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	// out CB2 turn printer on
 	via0.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	via6522_device &via1(VIA6522(config, "via6522_0", AIM65_CLOCK));
+	via6522_device &via1(VIA6522(config, "via6522_1", AIM65_CLOCK));
 	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)

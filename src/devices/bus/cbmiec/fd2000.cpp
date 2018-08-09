@@ -224,22 +224,22 @@ void fd2000_device::add_common_devices(machine_config &config)
 	via.readpb_handler().set(FUNC(fd2000_device::via_pb_r));
 	via.writepa_handler().set(FUNC(fd2000_device::via_pa_w));
 	via.writepb_handler().set(FUNC(fd2000_device::via_pb_w));
-
-	DP8473(config, m_fdc, 0);
 }
 
 void fd2000_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd2000_device::fd2000_mem);
-	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats);//fd2000_device::floppy_formats);
+	DP8473(config, m_fdc, 0);
+	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
 void fd4000_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd4000_device::fd4000_mem);
-	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd4000_floppies, "35hd", floppy_image_device::default_floppy_formats);//fd2000_device::floppy_formats);
+	PC8477A(config, m_fdc, 0);
+	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
 

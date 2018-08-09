@@ -494,22 +494,22 @@ void c2040_device::add_common_devices(machine_config &config)
 void c2040_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats, true);
 }
 
 void c3040_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats, true);
 }
 
 void c4040_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats, true);
 }
 
 

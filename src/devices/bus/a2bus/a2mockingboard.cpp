@@ -85,6 +85,9 @@ void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
 
+	AY8913(config, m_ay2, 1022727);
+	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
 	SPEAKER(config, "echosp").front_center();
 	TMS5220(config, m_tms, 640000);
 	m_tms->add_route(ALL_OUTPUTS, "echosp", 1.0);
