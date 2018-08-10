@@ -80,7 +80,7 @@
 	<element name="act_label_k051649"><text string="K051649" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_k054539"><text string="K054539" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_c6280"><text string="HuC6280" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="act_label_c140"><text string="C140" align="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="act_label_c140"><text string="C140" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_k053260"><text string="K053260" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_pokey"><text string="POKEY" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_qsound"><text string="QSound™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>

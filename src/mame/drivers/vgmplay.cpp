@@ -192,6 +192,7 @@ public:
 	template<int Chip> DECLARE_READ8_MEMBER(ymf271_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(ymz280b_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(multipcm_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(c140_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(k053260_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(okim6295_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(k054539_rom_r);
@@ -389,6 +390,7 @@ public:
 	template<int Chip> void multipcm_map(address_map &map);
 	template<int Chip> void okim6295_map(address_map &map);
 	template<int Chip> void k054539_map(address_map &map);
+	template<int Chip> void c140_map(address_map &map);
 	template<int Chip> void k053260_map(address_map &map);
 	template<int Chip> void qsound_map(address_map &map);
 	template<int Chip> void wswan_map(address_map &map);
@@ -1423,7 +1425,11 @@ void vgmplay_device::execute_run()
 			case 0xd4:
 			{
 				pulse_act_led(LED_C140);
-				// TODO: c140
+				uint8_t offset = m_file->read_byte(m_pc + 1);
+				if (offset & 0x80)
+					m_io->write_byte(A_C140_1 + ((offset & 0x7f) << 8) + m_file->read_byte(m_pc + 2), m_file->read_byte(m_pc + 3));
+				else
+					m_io->write_byte(A_C140_0 + ((offset & 0x7f) << 8) + m_file->read_byte(m_pc + 2), m_file->read_byte(m_pc + 3));
 				m_pc += 4;
 				break;
 			}
@@ -2019,6 +2025,12 @@ template<int Chip>
 READ8_MEMBER(vgmplay_device::k054539_rom_r)
 {
 	return rom_r(Chip, 0x8c, offset);
+}
+
+template<int Chip>
+READ8_MEMBER(vgmplay_device::c140_rom_r)
+{
+	return rom_r(Chip, 0x8d, offset);
 }
 
 template<int Chip>
@@ -2646,7 +2658,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K054539_1, vgmplay_device::A_K054539_1 + 0x22f).w(m_k054539[1], FUNC(k054539_device::write));
 	map(vgmplay_device::A_C6280_0, vgmplay_device::A_C6280_0 + 0xf).w("huc6280.0:psg", FUNC(c6280_device::c6280_w));
 	map(vgmplay_device::A_C6280_1, vgmplay_device::A_C6280_1 + 0xf).w("huc6280.1:psg", FUNC(c6280_device::c6280_w));
-	// TODO: c140
+	map(vgmplay_device::A_C140_0, vgmplay_device::A_C140_0 + 0x1ff).w(m_c140[0], FUNC(c140_device::c140_w));
+	map(vgmplay_device::A_C140_1, vgmplay_device::A_C140_1 + 0x1ff).w(m_c140[1], FUNC(c140_device::c140_w));
 	map(vgmplay_device::A_K053260_0, vgmplay_device::A_K053260_0 + 0x2f).w(m_k053260[0], FUNC(k053260_device::write));
 	map(vgmplay_device::A_K053260_1, vgmplay_device::A_K053260_1 + 0x2f).w(m_k053260[1], FUNC(k053260_device::write));
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
@@ -2731,6 +2744,12 @@ template<int Chip>
 void vgmplay_state::k054539_map(address_map &map)
 {
 	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::k054539_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::c140_map(address_map &map)
+{
+	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::c140_rom_r<Chip>));
 }
 
 template<int Chip>
@@ -3065,10 +3084,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_huc6280[1]->add_route(1, "rspeaker", 1);
 
 	C140(config, m_c140[0], 0);
+	m_c140[0]->set_addrmap(0, &vgmplay_state::c140_map<0>);
 	m_c140[0]->add_route(0, "lspeaker", 0.50);
 	m_c140[0]->add_route(1, "rspeaker", 0.50);
 
 	C140(config, m_c140[1], 0);
+	m_c140[1]->set_addrmap(0, &vgmplay_state::c140_map<1>);
 	m_c140[1]->add_route(0, "lspeaker", 0.50);
 	m_c140[1]->add_route(1, "rspeaker", 0.50);
 
@@ -3192,8 +3213,6 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "y8950.1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "upd7759.0", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "upd7759.1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "c140.0", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "c141.1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "scsp", ROMREGION_ERASE00 )
 	// TODO: split up 32x to remove dependencies
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )
