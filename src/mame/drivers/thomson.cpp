@@ -738,9 +738,9 @@ MACHINE_CONFIG_START(thomson_state::to7)
 /* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */
 	PIA6821(config, THOM_PIA_MODEM, 0);
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, thomson_state, to7_modem_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, thomson_state, to7_modem_cb))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(thomson_state::to7_modem_tx_w));
+	m_acia->irq_handler().set(FUNC(thomson_state::to7_modem_cb));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1200) /* 1200 bauds, might be divided by 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, thomson_state, write_acia_clock))

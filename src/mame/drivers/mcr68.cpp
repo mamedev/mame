@@ -907,8 +907,8 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 2))
+	PTM6840(config, m_ptm, 7723800 / 10);
+	m_ptm->irq_callback().set_inputline("maincpu", 2);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

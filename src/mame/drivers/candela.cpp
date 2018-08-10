@@ -698,18 +698,18 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	PIA6821(config, m_pia3, 0); // ROM board
 	PIA6821(config, m_pia4, 0); // ROM board
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	PTM6840(config, "ptm", 0);
 
 	/* RS232 usage: mame can09t -window -debug -rs232 terminal */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE ("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE ("rs232", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE ("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE ("acia", acia6850_device, write_cts))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD ("acia_clock", CLOCK, CAN09T_ACIA_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE (*this, can09t_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, can09t_state, write_acia_clock))
 MACHINE_CONFIG_END
 
 #define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */

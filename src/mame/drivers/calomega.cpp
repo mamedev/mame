@@ -2611,8 +2611,8 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, calomega_state, write_acia_tx))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(FUNC(calomega_state::write_acia_tx));
 
 	MCFG_DEVICE_ADD("aciabaud", CLOCK, UART_CLOCK)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, calomega_state, write_acia_clock))

@@ -501,8 +501,8 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 7652400 / 10)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 6))
+	PTM6840(config, m_ptm, 7652400 / 10);
+	m_ptm->irq_callback().set_inputline("maincpu", 6);
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpb_handler().set_ioport("IN0");

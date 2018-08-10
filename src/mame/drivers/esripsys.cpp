@@ -706,9 +706,9 @@ MACHINE_CONFIG_START(esripsys_state::esripsys)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(8'000'000) / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, esripsys_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(8'000'000) / 4));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.irq_callback().set(FUNC(esripsys_state::ptm_irq));
 MACHINE_CONFIG_END
 
 

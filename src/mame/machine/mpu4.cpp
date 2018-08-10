@@ -2961,12 +2961,12 @@ MACHINE_CONFIG_START(mpu4_state::mpu4_common)
 
 	MCFG_MSC1937_ADD("vfd",0)
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("ptm_ic2", PTM6840, MPU4_MASTER_CLOCK / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, mpu4_state, ic2_o1_callback))
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, mpu4_state, ic2_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, mpu4_state, ic2_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu4_state, cpu0_irq))
+	PTM6840(config, m_6840ptm, MPU4_MASTER_CLOCK / 4);
+	m_6840ptm->set_external_clocks(0, 0, 0);
+	m_6840ptm->o1_callback().set(FUNC(mpu4_state::ic2_o1_callback));
+	m_6840ptm->o2_callback().set(FUNC(mpu4_state::ic2_o2_callback));
+	m_6840ptm->o3_callback().set(FUNC(mpu4_state::ic2_o3_callback));
+	m_6840ptm->irq_callback().set(FUNC(mpu4_state::cpu0_irq));
 
 	PIA6821(config, m_pia3, 0);
 	m_pia3->writepa_handler().set(FUNC(mpu4_state::pia_ic3_porta_w));
@@ -3026,12 +3026,12 @@ MACHINE_CONFIG_START(mpu4_state::mpu4_common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_common2)
-	MCFG_DEVICE_ADD("ptm_ic3ss", PTM6840, MPU4_MASTER_CLOCK / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE("ptm_ic3ss", ptm6840_device, set_c2))
-	MCFG_PTM6840_O2_CB(WRITELINE("ptm_ic3ss", ptm6840_device, set_c1))
-	//MCFG_PTM6840_O3_CB(WRITELINE("ptm_ic3ss", ptm6840_device, set_g1))
-	//MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu4_state, cpu1_ptm_irq))
+	PTM6840(config, m_ptm_ic3ss, MPU4_MASTER_CLOCK / 4);
+	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
+	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
+	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
+	//m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
+	//m_ptm_ic3ss->irq_callback().set(FUNC(mpu4_state::cpu1_ptm_irq));
 
 	pia6821_device &pia_ic4ss(PIA6821(config, "pia_ic4ss", 0));
 	pia_ic4ss.readpb_handler().set(FUNC(mpu4_state::pia_gb_portb_r));

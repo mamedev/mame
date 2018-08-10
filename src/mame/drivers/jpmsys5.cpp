@@ -642,10 +642,10 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 	pia.irqb_handler().set(FUNC(jpmsys5v_state::pia_irq));
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5v_state, u26_o1_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5v_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(jpmsys5v_state::u26_o1_callback));
+	ptm.irq_callback().set(FUNC(jpmsys5v_state::ptm_irq));
 MACHINE_CONFIG_END
 
 READ16_MEMBER(jpmsys5_state::mux_awp_r)
@@ -851,10 +851,10 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5_state, u26_o1_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
+	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
 	config.set_default_layout(layout_jpmsys5);
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
@@ -908,10 +908,10 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5_state, u26_o1_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
+	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
 	config.set_default_layout(layout_jpmsys5);
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)

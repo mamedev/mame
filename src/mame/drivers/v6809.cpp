@@ -325,11 +325,11 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	pia1.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 16_MHz_XTAL / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, v6809_state, speaker_w))
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ptm6840_device &ptm(PTM6840(config, "ptm", 16_MHz_XTAL / 4));
+	ptm.set_external_clocks(4000000/14, 4000000/14, 4000000/14/8);
+	ptm.o1_callback().set(FUNC(v6809_state::speaker_w));
+	ptm.o2_callback().set(FUNC(v6809_state::speaker_en_w));
+	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	ACIA6850(config, "acia0", 0);
 

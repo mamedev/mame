@@ -459,9 +459,9 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 10.738635_MHz_XTAL / 3 / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, arachnid_state, ptm_o1_callback))
+	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 10.738635_MHz_XTAL / 3 / 4));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(arachnid_state::ptm_o1_callback));
 MACHINE_CONFIG_END
 
 /***************************************************************************

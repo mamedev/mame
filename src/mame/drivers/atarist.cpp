@@ -2064,13 +2064,13 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
@@ -2158,13 +2158,13 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
@@ -2260,13 +2260,13 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
@@ -2370,13 +2370,13 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_RS232_OUT_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	// device hardware
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();

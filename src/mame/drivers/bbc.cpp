@@ -893,10 +893,10 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_a", "bbca_cass")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bbc_state, bbc_txd_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bbc_state::bbc_txd_w));
+	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))
@@ -1390,10 +1390,10 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_flop_orig")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bbc_state, bbc_txd_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bbc_state::bbc_txd_w));
+	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))

@@ -402,8 +402,8 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, mekd2_state, cass_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(mekd2_state::cass_w));
 
 	MCFG_DEVICE_ADD("acia_tx_clock", CLOCK, XTAL_MEKD2 / 256) // 4800Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))

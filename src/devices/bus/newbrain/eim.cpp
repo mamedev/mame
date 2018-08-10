@@ -87,8 +87,9 @@ MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 	MCFG_ADC0808_IN6_CB(CONSTANT(0))
 	MCFG_ADC0808_IN7_CB(CONSTANT(0))
 
-	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, newbrain_eim_device, acia_interrupt))
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set(FUNC(newbrain_eim_device::acia_interrupt));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc")

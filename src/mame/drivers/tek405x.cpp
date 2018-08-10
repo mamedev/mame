@@ -1082,8 +1082,8 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	m_com_pia->irqa_handler().set(FUNC(tek4051_state::com_pia_irqa_w));
 	m_com_pia->irqb_handler().set(FUNC(tek4051_state::com_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, tek4051_state, acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set(FUNC(tek4051_state::acia_irq_w));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 38400)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, tek4051_state, write_acia_clock))

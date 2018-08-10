@@ -301,11 +301,11 @@ MACHINE_CONFIG_START(poly_state::poly)
 	//MCFG_POLY_NETWORK_SLOT_ADD("netdown", poly_network_devices, nullptr)
 
 	/* timer */
-	MCFG_DEVICE_ADD("ptm", PTM6840, 12.0576_MHz_XTAL / 3)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, poly_state, ptm_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, poly_state, ptm_o3_callback))
-	//MCFG_PTM6840_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
+	PTM6840(config, m_ptm, 12.0576_MHz_XTAL / 3);
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o2_callback().set(FUNC(poly_state::ptm_o2_callback));
+	m_ptm->o3_callback().set(FUNC(poly_state::ptm_o3_callback));
+	//m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* keyboard encoder */
 	//MCFG_DEVICE_ADD("kr2376", KR2376_12, 50000)
@@ -339,10 +339,10 @@ MACHINE_CONFIG_START(poly_state::poly)
 	m_pia[1]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
 	/* optional rs232 interface */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<6>))
+	ACIA6850(config, m_acia, 0);
+	//m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));
 
 	CLOCK(config, m_acia_clock, 153600);
 	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));

@@ -2230,8 +2230,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 
 	PIA6821(config, m_q133_pia_1, 0); // pia_q133_2_config
 
-	MCFG_DEVICE_ADD("q133_ptm", PTM6840, 2000000) // ptm_q133_config
-	MCFG_PTM6840_EXTERNAL_CLOCKS(1024, 1, 111) // Third is todo
+	PTM6840(config, m_q133_ptm, 2000000); // ptm_q133_config
+	m_q133_ptm->set_external_clocks(1024, 1, 111); // Third is todo
 
 	PIA6821(config, m_q219_pia, 0); // pia_q219_config
 	m_q219_pia->readpb_handler().set(FUNC(cmi_state::pia_q219_b_r));
@@ -2240,18 +2240,18 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	m_q219_pia->irqa_handler().set(FUNC(cmi_state::pia_q219_irqa));
 	m_q219_pia->irqb_handler().set(FUNC(cmi_state::pia_q219_irqb));
 
-	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 2000000) // ptm_q219_config
-	MCFG_PTM6840_EXTERNAL_CLOCKS(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), 1'000'000) // TODO: does the third thing come from a crystal?
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, ptm_q219_irq))
+	PTM6840(config, m_q219_ptm, 2000000); // ptm_q219_config
+	m_q219_ptm->set_external_clocks(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), 1'000'000); // TODO: does the third thing come from a crystal?
+	m_q219_ptm->irq_callback().set(FUNC(cmi_state::ptm_q219_irq));
 
 	PIA6821(config, m_cmi02_pia_0, 0); // pia_cmi02_1_config
 	m_cmi02_pia_0->writepb_handler().set(FUNC(cmi_state::master_tune_w));
 
 	PIA6821(config, m_cmi02_pia_1, 0); // pia_cmi02_2_config
 
-	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 2000000) // ptm_cmi02_config TODO
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, cmi_state, cmi02_ptm_o2))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, cmi02_ptm_irq))
+	PTM6840(config, m_cmi02_ptm, 2000000); // ptm_cmi02_config TODO
+	m_cmi02_ptm->o2_callback().set(FUNC(cmi_state::cmi02_ptm_o2));
+	m_cmi02_ptm->irq_callback().set(FUNC(cmi_state::cmi02_ptm_irq));
 
 	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, 1.8432_MHz_XTAL / 12)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, cmi_state, mkbd_acia_clock))
@@ -2275,23 +2275,21 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_INPUT_MERGER_ANY_HIGH("q133_acia_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi_state, q133_acia_irq))
 
-	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, 1.8432_MHz_XTAL / 12) // acia_mkbd_kbd
-	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, 1.8432_MHz_XTAL / 12) // acia_mkbd_cmi
+	ACIA6850(config, m_acia_mkbd_kbd, 1.8432_MHz_XTAL / 12); // acia_mkbd_kbd
+	ACIA6850(config, m_acia_mkbd_cmi, 1.8432_MHz_XTAL / 12); // acia_mkbd_cmi
 	PIA6821(config, m_ank_pia, 0); // pia_ank_config
 
 	MCFG_DEVICE_MODIFY("q133_acia_0")
 	MCFG_MOS6551_TXD_HANDLER(WRITELINE("acia_mkbd_cmi", acia6850_device, write_rxd))
 	MCFG_MOS6551_RTS_HANDLER(WRITELINE("acia_mkbd_cmi", acia6850_device, write_cts))
 
-	MCFG_DEVICE_MODIFY("acia_mkbd_cmi")
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("q133_acia_0", mos6551_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("q133_acia_0", mos6551_device, write_cts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, cmi_state, mkbd_cmi_acia_int))
+	m_acia_mkbd_cmi->txd_handler().set("q133_acia_0", FUNC(mos6551_device::write_rxd));
+	m_acia_mkbd_cmi->rts_handler().set("q133_acia_0", FUNC(mos6551_device::write_cts));
+	m_acia_mkbd_cmi->irq_handler().set(FUNC(cmi_state::mkbd_cmi_acia_int));
 
-	MCFG_DEVICE_MODIFY("acia_mkbd_kbd")
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("ank_pia", pia6821_device, cb2_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("ank_pia", pia6821_device, ca2_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, cmi_state, mkbd_kbd_acia_int))
+	m_acia_mkbd_kbd->txd_handler().set("ank_pia", FUNC(pia6821_device::cb2_w));
+	m_acia_mkbd_kbd->rts_handler().set("ank_pia", FUNC(pia6821_device::ca2_w));
+	m_acia_mkbd_kbd->irq_handler().set(FUNC(cmi_state::mkbd_kbd_acia_int));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("alphakeys", M6802_IRQ_LINE))
@@ -2306,8 +2304,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ank_pia", pia6821_device, ca1_w))
 
-	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 2000000) // ptm_cmi07_config TODO
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, cmi07_irq))
+	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config TODO
+	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
 
 	MCFG_DEVICE_ADD("wd1791", FD1791, 16_MHz_XTAL / 8) // wd1791_interface
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_irq))

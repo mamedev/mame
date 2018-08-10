@@ -44,10 +44,10 @@ MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
 	m_pia[1]->irqa_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<2>));
 	m_pia[1]->irqb_handler().set("cmi01a_irq", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, cmi01a_device, ptm_o1))
-	MCFG_PTM6840_IRQ_CB(WRITELINE("cmi01a_irq", input_merger_device, in_w<4>))
+	PTM6840(config, m_ptm, 2000000); // ptm_cmi01a_config
+	m_ptm->set_external_clocks(250000, 500000, 500000);
+	m_ptm->o1_callback().set(FUNC(cmi01a_device::ptm_o1));
+	m_ptm->irq_callback().set("cmi01a_irq", FUNC(input_merger_device::in_w<4>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("cmi01a_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi01a_device, cmi01a_irq))

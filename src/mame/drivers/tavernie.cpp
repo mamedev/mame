@@ -317,15 +317,15 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	pia.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 4_MHz_XTAL / 4)
+	ptm6840_device &ptm(PTM6840(config, "ptm", 4_MHz_XTAL / 4));
 	// all i/o lines connect to the 40-pin expansion connector
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O2_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o2_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))

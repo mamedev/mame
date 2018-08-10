@@ -351,11 +351,11 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MC6854(config, m_adlc);
 	m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 4_MHz_XTAL / 2)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, proteus_state, ptm_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, proteus_state, ptm_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
+	PTM6840(config, m_ptm, 4_MHz_XTAL / 2);
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o2_callback().set(FUNC(proteus_state::ptm_o2_callback));
+	m_ptm->o3_callback().set(FUNC(proteus_state::ptm_o3_callback));
+	m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* parallel port */
 	PIA6821(config, m_pia, 0);
@@ -371,10 +371,10 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "parallel")
 
 	/* terminal port */
-	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("terminal", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("terminal", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<4>))
+	ACIA6850(config, m_acia[0], 0);
+	m_acia[0]->txd_handler().set("terminal", FUNC(rs232_port_device::write_txd));
+	m_acia[0]->rts_handler().set("terminal", FUNC(rs232_port_device::write_rts));
+	m_acia[0]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
 
 	MCFG_DEVICE_ADD("terminal", RS232_PORT, default_rs232_devices, "terminal") // TODO: ADM-31 terminal required
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia0", acia6850_device, write_rxd))
@@ -385,10 +385,10 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	acia0_clock.signal_handler().append(m_acia[0], FUNC(acia6850_device::write_rxc));
 
 	/* printer port */
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("printer", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<5>))
+	ACIA6850(config, m_acia[1], 0);
+	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
+	m_acia[1]->rts_handler().set("printer", FUNC(rs232_port_device::write_rts));
+	m_acia[1]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
 	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
@@ -399,10 +399,10 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	acia1_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	/* modem port */
-	MCFG_DEVICE_ADD("acia2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("modem", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("modem", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<6>))
+	ACIA6850(config, m_acia[2], 0);
+	m_acia[2]->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
+	m_acia[2]->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
+	m_acia[2]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));
 
 	MCFG_DEVICE_ADD("modem", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))

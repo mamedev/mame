@@ -847,12 +847,12 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD(m_ptm2, PTM6840, MPU3_MASTER_CLOCK)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, mpu3_state, ic2_o1_callback))
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, mpu3_state, ic2_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, mpu3_state, ic2_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu3_state, cpu0_irq))
+	PTM6840(config, m_ptm2, MPU3_MASTER_CLOCK);
+	m_ptm2->set_external_clocks(0, 0, 0);
+	m_ptm2->o1_callback().set(FUNC(mpu3_state::ic2_o1_callback));
+	m_ptm2->o2_callback().set(FUNC(mpu3_state::ic2_o2_callback));
+	m_ptm2->o3_callback().set(FUNC(mpu3_state::ic2_o3_callback));
+	m_ptm2->irq_callback().set(FUNC(mpu3_state::cpu0_irq));
 
 	PIA6821(config, m_pia3, 0);
 	m_pia3->readpa_handler().set(FUNC(mpu3_state::pia_ic3_porta_r));

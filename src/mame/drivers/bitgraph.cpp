@@ -502,20 +502,20 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(ACIA0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(RS232_H_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(RS232_H_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia0->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
 	MCFG_DEVICE_ADD(RS232_H_TAG, RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD(ACIA1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(RS232_K_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(RS232_K_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia1->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
 	MCFG_DEVICE_ADD(RS232_K_TAG, RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_rxd))
@@ -523,10 +523,10 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_cts))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
-	MCFG_DEVICE_ADD(ACIA2_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia2, 0);
+	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia2->rts_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia2->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
 	MCFG_DEVICE_ADD(RS232_D_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_rxd))
@@ -588,10 +588,10 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 40)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bitgraph_state, system_clock_write))
 
-	MCFG_DEVICE_ADD(ACIA3_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(RS232_M_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(RS232_M_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
+	ACIA6850(config, m_acia3, 0);
+	m_acia3->txd_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia3->rts_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia3->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
 	MCFG_DEVICE_ADD(RS232_M_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_rxd))
