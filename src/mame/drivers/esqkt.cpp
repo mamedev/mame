@@ -224,7 +224,7 @@ void esqkt_state::kt(machine_config &config)
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	auto &panel(ESQPANEL2X16_SQ1(config, "panel"));
+	auto &panel(ESQPANEL2X16_SQ1(config, "sq1panel"));
 	panel.write_tx().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	SCN2681(config, m_duart, 4000000);
