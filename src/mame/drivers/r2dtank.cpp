@@ -474,19 +474,19 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, r2dtank_state, ttl74123_output_changed))
 
-	MCFG_DEVICE_ADD("pia_main", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, r2dtank_state, flipscreen_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
+	PIA6821(config, m_pia_main, 0);
+	m_pia_main->readpa_handler().set_ioport("IN0");
+	m_pia_main->readpb_handler().set_ioport("IN1");
+	m_pia_main->cb2_handler().set(FUNC(r2dtank_state::flipscreen_w));
+	m_pia_main->irqa_handler().set(FUNC(r2dtank_state::main_cpu_irq));
+	m_pia_main->irqb_handler().set(FUNC(r2dtank_state::main_cpu_irq));
 
-	MCFG_DEVICE_ADD("pia_audio", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, r2dtank_state, AY8910_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, r2dtank_state, AY8910_port_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, r2dtank_state, AY8910_select_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
+	PIA6821(config, m_pia_audio, 0);
+	m_pia_audio->readpa_handler().set(FUNC(r2dtank_state::AY8910_port_r));
+	m_pia_audio->writepa_handler().set(FUNC(r2dtank_state::AY8910_port_w));
+	m_pia_audio->writepb_handler().set(FUNC(r2dtank_state::AY8910_select_w));
+	m_pia_audio->irqa_handler().set(FUNC(r2dtank_state::main_cpu_irq));
+	m_pia_audio->irqb_handler().set(FUNC(r2dtank_state::main_cpu_irq));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

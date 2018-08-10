@@ -761,12 +761,12 @@ MACHINE_CONFIG_START(venture_sound_device::device_add_mconfig)
 	m_riot->out_pb_callback().set(FUNC(venture_sound_device::r6532_portb_w));
 	m_riot->irq_callback().set("audioirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, venture_sound_device, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, venture_sound_device, pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, venture_sound_device, pia_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, venture_sound_device, pia_cb2_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("audioirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(venture_sound_device::pia_pa_w));
+	m_pia->writepb_handler().set(FUNC(venture_sound_device::pia_pb_w));
+	m_pia->ca2_handler().set(FUNC(venture_sound_device::pia_ca2_w));
+	m_pia->cb2_handler().set(FUNC(venture_sound_device::pia_cb2_w));
+	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("audioirq") // open collector
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
@@ -992,10 +992,10 @@ MACHINE_CONFIG_START(victory_sound_device::device_add_mconfig)
 	m_riot->out_pb_callback().set(FUNC(victory_sound_device::r6532_portb_w));
 	m_riot->irq_callback().set("audioirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, victory_sound_device, irq_clear_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, victory_sound_device, main_ack_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("audioirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia, 0);
+	m_pia->ca2_handler().set(FUNC(victory_sound_device::irq_clear_w));
+	m_pia->cb2_handler().set(FUNC(victory_sound_device::main_ack_w));
+	m_pia->irqb_handler().set("audioirq", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("audioirq") // open collector
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))

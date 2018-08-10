@@ -326,17 +326,17 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(poly_state, kbd_put))
 
 	/* video control */
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, poly_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, poly_state, pia0_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pa_w));
+	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pb_w));
+	m_pia[0]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
+	m_pia[0]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
 	/* keyboard PIA */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, poly_state, pia1_b_in))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<4>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<5>))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpb_handler().set(FUNC(poly_state::pia1_b_in));
+	m_pia[1]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
+	m_pia[1]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
 	/* optional rs232 interface */
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)

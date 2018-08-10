@@ -633,13 +633,13 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 	MCFG_DEVICE_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, jpmsys5v_state, u29_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jpmsys5v_state, u29_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, jpmsys5v_state, u29_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, jpmsys5v_state, u29_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, jpmsys5v_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, jpmsys5v_state, pia_irq))
+	pia6821_device &pia(PIA6821(config, "6821pia", 0));
+	pia.readpa_handler().set(FUNC(jpmsys5v_state::u29_porta_r));
+	pia.writepb_handler().set(FUNC(jpmsys5v_state::u29_portb_w));
+	pia.ca2_handler().set(FUNC(jpmsys5v_state::u29_ca2_w));
+	pia.cb2_handler().set(FUNC(jpmsys5v_state::u29_cb2_w));
+	pia.irqa_handler().set(FUNC(jpmsys5v_state::pia_irq));
+	pia.irqb_handler().set(FUNC(jpmsys5v_state::pia_irq));
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
@@ -842,13 +842,13 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	MCFG_DEVICE_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, jpmsys5_state, u29_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jpmsys5_state, u29_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
+	pia6821_device &pia(PIA6821(config, "6821pia", 0));
+	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
+	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
+	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
+	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
+	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
+	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
@@ -899,13 +899,13 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	MCFG_SAA1099_ADD("saa", 4000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, jpmsys5_state, u29_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jpmsys5_state, u29_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, jpmsys5_state, u29_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, jpmsys5_state, pia_irq))
+	pia6821_device &pia(PIA6821(config, "6821pia", 0));
+	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
+	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
+	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
+	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
+	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
+	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)

@@ -228,11 +228,12 @@ MACHINE_CONFIG_START(et3400_state::et3400)
 	config.set_default_layout(layout_et3400);
 
 	// Devices
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, et3400_state, pia_aw))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, et3400_state, pia_bw))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, et3400_state, pia_ar))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, et3400_state, pia_br))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(et3400_state::pia_aw));
+	m_pia->writepb_handler().set(FUNC(et3400_state::pia_bw));
+	m_pia->readpa_handler().set(FUNC(et3400_state::pia_ar));
+	m_pia->readpb_handler().set(FUNC(et3400_state::pia_br));
+
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 

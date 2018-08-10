@@ -314,16 +314,16 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, v6809_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, v6809_state, pa_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpb_handler().set(FUNC(v6809_state::pb_r));
+	m_pia0->writepa_handler().set(FUNC(v6809_state::pa_w));
+	m_pia0->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 // no idea what this does
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 16_MHz_XTAL / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)

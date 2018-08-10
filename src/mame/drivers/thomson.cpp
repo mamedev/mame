@@ -701,22 +701,22 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 
 /* pia */
-	MCFG_DEVICE_ADD(THOM_PIA_SYS, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to7_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, to7_sys_portb_in))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to7_sys_portb_out))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, to7_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to7_sys_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia_sys, 0);
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to7_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::to7_sys_portb_in));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to7_sys_portb_out));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::to7_set_cassette_motor));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::to7_sys_cb2_out));
+	m_pia_sys->irqa_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD(THOM_PIA_GAME, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to7_game_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, to7_game_portb_in))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to7_game_portb_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to7_game_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia_game, 0);
+	m_pia_game->readpa_handler().set(FUNC(thomson_state::to7_game_porta_in));
+	m_pia_game->readpb_handler().set(FUNC(thomson_state::to7_game_portb_in));
+	m_pia_game->writepb_handler().set(FUNC(thomson_state::to7_game_portb_out));
+	m_pia_game->cb2_handler().set(FUNC(thomson_state::to7_game_cb2_out));
+	m_pia_game->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_game->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
@@ -736,7 +736,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */
-	MCFG_DEVICE_ADD(THOM_PIA_MODEM, PIA6821, 0)
+	PIA6821(config, THOM_PIA_MODEM, 0);
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, thomson_state, to7_modem_tx_w))
@@ -935,11 +935,10 @@ MACHINE_CONFIG_START(thomson_state::to770)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to770)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to770_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(CONSTANT(0))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to770_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to770_sys_cb2_out))
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to770_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to770_sys_portb_out));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::to770_sys_cb2_out));
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to770_timer_port_out))
@@ -1137,14 +1136,13 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_PALETTE_MODIFY( "palette" )
 	MCFG_PALETTE_INIT_OWNER(thomson_state, mo5)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo5_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo5_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo5_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, data_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // WARNING: differs from TO7 !
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo5_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo5_sys_portb_in));
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::mo5_sys_porta_out));
+	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::mo5_set_cassette_motor));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // WARNING: differs from TO7 !
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
@@ -1492,13 +1490,12 @@ MACHINE_CONFIG_START(thomson_state::to9)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to9)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to9_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(CONSTANT(0))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to9_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQA_HANDLER(NOOP)
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to9_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::to9_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to9_sys_portb_out));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqa_handler().set_nop();
 
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9_timer_port_out))
@@ -1718,13 +1715,12 @@ MACHINE_CONFIG_START(thomson_state::to8)
 
 	//MCFG_DEVICE_ADD("kbdmcu", MC6804, 11_MHz_XTAL)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to8_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(CONSTANT(0))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to8_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQA_HANDLER(NOOP)
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::to9_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to8_sys_portb_out));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqa_handler().set_nop();
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
@@ -1884,14 +1880,13 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP ( to9p)
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to9_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(CONSTANT(0))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to8_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQA_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
+	m_pia_sys->readpb_handler().set_constant(0);
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::to9_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to8_sys_portb_out));
+	m_pia_sys->cb2_handler().set_nop();
+	m_pia_sys->irqa_handler().set_nop();
+	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
@@ -2239,18 +2234,16 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo6_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo6_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, data_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo6_sys_portb_in));
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::mo6_sys_porta_out));
+	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::mo5_set_cassette_motor));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::mo6_sys_cb2_out));
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // differs from TO
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_game_cb2_out))
+	m_pia_game->writepa_handler().set(FUNC(thomson_state::mo6_game_porta_out));
+	m_pia_game->cb2_handler().set(FUNC(thomson_state::mo6_game_cb2_out));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
@@ -2509,17 +2502,15 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo6_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo5nr_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo5nr_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, data_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
+	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
+	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo5nr_sys_portb_in));
+	m_pia_sys->writepa_handler().set(FUNC(thomson_state::mo5nr_sys_porta_out));
+	m_pia_sys->writepb_handler().set("buzzer", FUNC(dac_bit_interface::data_w));
+	m_pia_sys->ca2_handler().set(FUNC(thomson_state::mo5_set_cassette_motor));
+	m_pia_sys->cb2_handler().set(FUNC(thomson_state::mo6_sys_cb2_out));
+	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // differs from TO
 
-	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
+	m_pia_game->writepa_handler().set(FUNC(thomson_state::mo6_game_porta_out));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer("cent_data_in");

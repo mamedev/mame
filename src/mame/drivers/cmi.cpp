@@ -2223,30 +2223,31 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_3_int_w))
 	MCFG_I8214_ENLG_CALLBACK(WRITELINE(*this, cmi_state, i8214_3_enlg))
 
-	MCFG_DEVICE_ADD("q133_pia_1", PIA6821, 0) // pia_q133_1_config
-	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, q133_1_porta_r));
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi_state, q133_1_porta_w));
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, q133_1_portb_w));
+	PIA6821(config, m_q133_pia_0, 0); // pia_q133_1_config
+	m_q133_pia_0->readpa_handler().set(FUNC(cmi_state::q133_1_porta_r));
+	m_q133_pia_0->writepa_handler().set(FUNC(cmi_state::q133_1_porta_w));
+	m_q133_pia_0->writepb_handler().set(FUNC(cmi_state::q133_1_portb_w));
 
-	MCFG_DEVICE_ADD("q133_pia_2", PIA6821, 0) // pia_q133_2_config
+	PIA6821(config, m_q133_pia_1, 0); // pia_q133_2_config
+
 	MCFG_DEVICE_ADD("q133_ptm", PTM6840, 2000000) // ptm_q133_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1024, 1, 111) // Third is todo
 
-	MCFG_DEVICE_ADD("q219_pia", PIA6821, 0) // pia_q219_config
-	MCFG_PIA_READPB_HANDLER(READ8(*this, cmi_state, pia_q219_b_r));
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi_state, vscroll_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, video_attr_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, cmi_state, pia_q219_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, cmi_state, pia_q219_irqb))
+	PIA6821(config, m_q219_pia, 0); // pia_q219_config
+	m_q219_pia->readpb_handler().set(FUNC(cmi_state::pia_q219_b_r));
+	m_q219_pia->writepa_handler().set(FUNC(cmi_state::vscroll_w));
+	m_q219_pia->writepb_handler().set(FUNC(cmi_state::video_attr_w));
+	m_q219_pia->irqa_handler().set(FUNC(cmi_state::pia_q219_irqa));
+	m_q219_pia->irqb_handler().set(FUNC(cmi_state::pia_q219_irqb));
 
 	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 2000000) // ptm_q219_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), 1'000'000) // TODO: does the third thing come from a crystal?
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, ptm_q219_irq))
 
-	MCFG_DEVICE_ADD("cmi02_pia_1", PIA6821, 0) // pia_cmi02_1_config
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, master_tune_w))
+	PIA6821(config, m_cmi02_pia_0, 0); // pia_cmi02_1_config
+	m_cmi02_pia_0->writepb_handler().set(FUNC(cmi_state::master_tune_w));
 
-	MCFG_DEVICE_ADD("cmi02_pia_2", PIA6821, 0) // pia_cmi02_2_config
+	PIA6821(config, m_cmi02_pia_1, 0); // pia_cmi02_2_config
 
 	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 2000000) // ptm_cmi02_config TODO
 	MCFG_PTM6840_O2_CB(WRITELINE(*this, cmi_state, cmi02_ptm_o2))
@@ -2276,7 +2277,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 
 	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, 1.8432_MHz_XTAL / 12) // acia_mkbd_kbd
 	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, 1.8432_MHz_XTAL / 12) // acia_mkbd_cmi
-	MCFG_DEVICE_ADD("ank_pia", PIA6821, 0) // pia_ank_config
+	PIA6821(config, m_ank_pia, 0); // pia_ank_config
 
 	MCFG_DEVICE_MODIFY("q133_acia_0")
 	MCFG_MOS6551_TXD_HANDLER(WRITELINE("acia_mkbd_cmi", acia6850_device, write_rxd))
@@ -2295,13 +2296,12 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("alphakeys", M6802_IRQ_LINE))
 
-	MCFG_DEVICE_MODIFY("ank_pia")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, ank_col_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, cmi_state, ank_rts_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("acia_mkbd_kbd", acia6850_device, write_cts))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("acia_mkbd_kbd", acia6850_device, write_rxd))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
+	m_ank_pia->readpa_handler().set(FUNC(cmi_state::ank_col_r));
+	m_ank_pia->readcb1_handler().set(FUNC(cmi_state::ank_rts_r));
+	m_ank_pia->ca2_handler().set("acia_mkbd_kbd", FUNC(acia6850_device::write_cts));
+	m_ank_pia->cb2_handler().set("acia_mkbd_kbd", FUNC(acia6850_device::write_rxd));
+	m_ank_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
+	m_ank_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ank_pia", pia6821_device, ca1_w))
@@ -2316,15 +2316,15 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	/* Musical keyboard */
-	MCFG_DEVICE_ADD("cmi10_pia_u20", PIA6821, 0)
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, cmi_state, cmi10_u20_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi_state, cmi10_u20_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, cmi10_u20_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi_state, cmi10_u20_cb2_w))
+	PIA6821(config, m_cmi10_pia_u20, 0);
+	m_cmi10_pia_u20->readcb1_handler().set(FUNC(cmi_state::cmi10_u20_cb1_r));
+	m_cmi10_pia_u20->writepa_handler().set(FUNC(cmi_state::cmi10_u20_a_w));
+	m_cmi10_pia_u20->writepb_handler().set(FUNC(cmi_state::cmi10_u20_b_w));
+	m_cmi10_pia_u20->cb2_handler().set(FUNC(cmi_state::cmi10_u20_cb2_w));
 
-	MCFG_DEVICE_ADD("cmi10_pia_u21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, cmi10_u21_a_r))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi_state, cmi10_u21_cb2_w))
+	PIA6821(config, m_cmi10_pia_u21, 0);
+	m_cmi10_pia_u21->readpa_handler().set(FUNC(cmi_state::cmi10_u21_a_r));
+	m_cmi10_pia_u21->cb2_handler().set(FUNC(cmi_state::cmi10_u21_cb2_w));
 
 	SPEAKER(config, "mono").front_center();
 

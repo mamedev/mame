@@ -634,18 +634,18 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, nyny_state, ic48_1_74123_output_changed))
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, nyny_state, main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, nyny_state, main_cpu_irq))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set_ioport("IN0");
+	m_pia1->readpb_handler().set_ioport("IN1");
+	m_pia1->irqa_handler().set(FUNC(nyny_state::main_cpu_irq));
+	m_pia1->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, nyny_state,pia_2_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, nyny_state,pia_2_port_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, nyny_state,flipscreen_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, nyny_state,main_cpu_firq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, nyny_state,main_cpu_irq))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->writepa_handler().set(FUNC(nyny_state::pia_2_port_a_w));
+	m_pia2->writepb_handler().set(FUNC(nyny_state::pia_2_port_b_w));
+	m_pia2->ca2_handler().set(FUNC(nyny_state::flipscreen_w));
+	m_pia2->irqa_handler().set(FUNC(nyny_state::main_cpu_firq));
+	m_pia2->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

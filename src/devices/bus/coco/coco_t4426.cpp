@@ -149,8 +149,8 @@ namespace
 ***************************************************************************/
 
 MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_t4426_device, pia_A_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(coco_t4426_device::pia_A_w));
 
 	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(SERIAL_TAG, rs232_port_device, write_txd))

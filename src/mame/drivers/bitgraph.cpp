@@ -542,13 +542,13 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	m_dbrgb->fr_handler().set(FUNC(bitgraph_state::com8116_b_fr_w));
 	m_dbrgb->ft_handler().set(FUNC(bitgraph_state::com8116_b_ft_w));
 
-	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, bitgraph_state, pia_ca1_r))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, bitgraph_state, pia_cb2_w))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, bitgraph_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, bitgraph_state, pia_pa_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, bitgraph_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, bitgraph_state, pia_pb_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readca1_handler().set(FUNC(bitgraph_state::pia_ca1_r));
+	m_pia->cb2_handler().set(FUNC(bitgraph_state::pia_cb2_w));
+	m_pia->readpa_handler().set(FUNC(bitgraph_state::pia_pa_r));
+	m_pia->writepa_handler().set(FUNC(bitgraph_state::pia_pa_w));
+	m_pia->readpb_handler().set(FUNC(bitgraph_state::pia_pb_r));
+	m_pia->writepb_handler().set(FUNC(bitgraph_state::pia_pb_w));
 
 	MCFG_DEVICE_ADD(EAROM_TAG, ER2055, 0)
 

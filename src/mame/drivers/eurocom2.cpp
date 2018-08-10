@@ -448,19 +448,19 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(eurocom2_state, kbd_put))
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, eurocom2_state, pia1_ca1_r))  // keyboard strobe
-	MCFG_PIA_READCA2_HANDLER(READLINE(*this, eurocom2_state, pia1_ca2_r))  // SST output Q14
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, eurocom2_state, pia1_cb1_r))  // SST output Q6
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, eurocom2_state, pia1_cb2_w)) // SST reset input
-	MCFG_PIA_READPA_HANDLER(READ8(*this, eurocom2_state, kbd_get))
-//  MCFG_PIA_READPB_HANDLER(READ8(*this, eurocom2_state, kbd_get))
-//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readca1_handler().set(FUNC(eurocom2_state::pia1_ca1_r));  // keyboard strobe
+	m_pia1->readca2_handler().set(FUNC(eurocom2_state::pia1_ca2_r));  // SST output Q14
+	m_pia1->readcb1_handler().set(FUNC(eurocom2_state::pia1_cb1_r));  // SST output Q6
+	m_pia1->cb2_handler().set(FUNC(eurocom2_state::pia1_cb2_w)); // SST reset input
+	m_pia1->readpa_handler().set(FUNC(eurocom2_state::kbd_get));
+//  m_pia1->readpb_handler().set(FUNC(eurocom2_state::kbd_get));
+//  m_pia1->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+//  m_pia1->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	PIA6821(config, m_pia2, 0);
+//  m_pia2->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
+//  m_pia2->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE ("rs232", rs232_port_device, write_txd))
@@ -482,21 +482,20 @@ MACHINE_CONFIG_START(waveterm_state::waveterm)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(waveterm_map)
 
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, waveterm_state, waveterm_kbh_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, waveterm_state, waveterm_kb_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, waveterm_state, waveterm_kb_r))
+	m_pia2->cb2_handler().set(FUNC(waveterm_state::waveterm_kbh_w));
+	m_pia2->writepb_handler().set(FUNC(waveterm_state::waveterm_kb_w));
+	m_pia2->readpb_handler().set(FUNC(waveterm_state::waveterm_kb_r));
 
 	// ports A(in/out), B(out), CA1(in), CA2(in), and CB2(out) = interface to PPG bus via DIL socket on WTI board
 	// CB1 -- front panel "End" button
-	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
-//  MCFG_PIA_READPA_HANDLER(READ8(*this, waveterm_state, pia3_pa_r))
-//  MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, waveterm_state, pia3_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, waveterm_state, pia3_pb_w))
-//  MCFG_PIA_READCA1_HANDLER(READLINE(*this, waveterm_state, pia3_ca1_r))
-//  MCFG_PIA_READCA2_HANDLER(READLINE(*this, waveterm_state, pia3_ca2_r))
-	MCFG_PIA_READCB1_HANDLER(IOPORT("FP"))
-//  MCFG_PIA_CB2_HANDLER(WRITELINE(*this, waveterm_state, pia3_cb2_w))
+	PIA6821(config, m_pia3, 0);
+//  m_pia3->readpa_handler().set(FUNC(waveterm_state::pia3_pa_r));
+//  m_pia3->writepa_handler().set(FUNC(waveterm_state::pia3_pa_w));
+	m_pia3->writepb_handler().set(FUNC(waveterm_state::pia3_pb_w));
+//  m_pia3->readca1_handler().set(FUNC(waveterm_state::pia3_ca1_r));
+//  m_pia3->readca2_handler().set(FUNC(waveterm_state::pia3_ca2_r));
+	m_pia3->readcb1_handler().set_ioport("FP");
+//  m_pia3->cb2_handler().set(FUNC(waveterm_state::pia3_cb2_w));
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 

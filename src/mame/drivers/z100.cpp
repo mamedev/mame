@@ -706,13 +706,13 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
 	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, z100_state, video_pia_A_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, z100_state, video_pia_B_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, z100_state, video_pia_CA2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, z100_state, video_pia_CB2_w))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->writepa_handler().set(FUNC(z100_state::video_pia_A_w));
+	m_pia0->writepb_handler().set(FUNC(z100_state::video_pia_B_w));
+	m_pia0->ca2_handler().set(FUNC(z100_state::video_pia_CA2_w));
+	m_pia0->cb2_handler().set(FUNC(z100_state::video_pia_CB2_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	PIA6821(config, m_pia1, 0);
 
 	MCFG_DEVICE_ADD("z207_fdc", FD1797, 1_MHz_XTAL)
 

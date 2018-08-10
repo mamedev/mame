@@ -784,9 +784,9 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia_3", PIA6821, 0)
+	PIA6821(config, "pia_1", 0);
+	PIA6821(config, "pia_2", 0);
+	PIA6821(config, "pia_3", 0);
 
 	/* cassette ACIA */
 	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
@@ -809,11 +809,11 @@ MACHINE_CONFIG_START(c1pmf_state::c1pmf)
 	MCFG_DEVICE_MODIFY(M6502_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(c1pmf_mem)
 
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, c1pmf_state, osi470_pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, c1pmf_state, osi470_pia_cb2_w))
+	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
+	pia0.readpa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_r));
+	pia0.writepa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_w));
+	pia0.writepb_handler().set(FUNC(c1pmf_state::osi470_pia_pb_w));
+	pia0.cb2_handler().set(FUNC(c1pmf_state::osi470_pia_cb2_w));
 
 	/* floppy ACIA */
 	MCFG_DEVICE_ADD("acia_1", ACIA6850, 0)

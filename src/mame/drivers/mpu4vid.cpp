@@ -1342,10 +1342,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::crmaze)
 	mpu4_vid(config);
-	MCFG_DEVICE_MODIFY("pia_ic5")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu4vid_state, pia_ic5_porta_track_r))
-	MCFG_PIA_WRITEPA_HANDLER(NOOP)
-	MCFG_PIA_WRITEPB_HANDLER(NOOP)
+	m_pia5->readpa_handler().set(FUNC(mpu4vid_state::pia_ic5_porta_track_r));
+	m_pia5->writepa_handler().set_nop();
+	m_pia5->writepb_handler().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::mating)

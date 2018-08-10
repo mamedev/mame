@@ -40,11 +40,11 @@ MACHINE_CONFIG_START(midway_cheap_squeak_deluxe_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cpu", M68000, DERIVED_CLOCK(1, 2))
 	MCFG_DEVICE_PROGRAM_MAP(csdeluxe_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_cheap_squeak_deluxe_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, midway_cheap_squeak_deluxe_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_cheap_squeak_deluxe_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_cheap_squeak_deluxe_device, irq_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(midway_cheap_squeak_deluxe_device::porta_w));
+	m_pia->writepb_handler().set(FUNC(midway_cheap_squeak_deluxe_device::portb_w));
+	m_pia->irqa_handler().set(FUNC(midway_cheap_squeak_deluxe_device::irq_w));
+	m_pia->irqb_handler().set(FUNC(midway_cheap_squeak_deluxe_device::irq_w));
 
 	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

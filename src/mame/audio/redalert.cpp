@@ -327,10 +327,10 @@ MACHINE_CONFIG_START(redalert_state::demoneye_audio)
 	MCFG_DEVICE_PROGRAM_MAP(demoneye_audio_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 
-	MCFG_DEVICE_ADD("sndpia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, redalert_state, demoneye_ay8910_latch_2_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_data_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_latch_1_w))
+	pia6821_device &sndpia(PIA6821(config, "sndpia", 0));
+	sndpia.readpa_handler().set(FUNC(redalert_state::demoneye_ay8910_latch_2_r));
+	sndpia.writepa_handler().set(FUNC(redalert_state::demoneye_ay8910_data_w));
+	sndpia.writepb_handler().set(FUNC(redalert_state::demoneye_ay8910_latch_1_w));
 
 	SPEAKER(config, "mono").front_center();
 

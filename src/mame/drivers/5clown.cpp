@@ -1035,16 +1035,16 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, _5clown_state, mux_port_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, counters_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set(FUNC(_5clown_state::mux_port_r));
+	pia0.readpb_handler().set(FUNC(_5clown_state::pia0_b_r));
+	pia0.writepb_handler().set(FUNC(_5clown_state::counters_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW4"))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia1_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, _5clown_state, trigsnd_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, mux_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("SW4");
+	pia1.readpb_handler().set(FUNC(_5clown_state::pia1_b_r));
+	pia1.writepa_handler().set(FUNC(_5clown_state::trigsnd_w));
+	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

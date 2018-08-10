@@ -397,10 +397,11 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, proteus3_state, video_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, proteus3_state, ca2_w))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(proteus3_state::video_w));
+	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
+	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
 

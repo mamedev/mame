@@ -227,9 +227,9 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	via6522_device &via1(VIA6522(config, "via6522_1", AIM65_CLOCK));
 	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aim65_state, aim65_pia_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pia_b_w))
+	pia6821_device &pia(PIA6821(config, "pia6821", 0));
+	pia.writepa_handler().set(FUNC(aim65_state::aim65_pia_a_w));
+	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
 
 	// Deck 1 can play and record
 	MCFG_CASSETTE_ADD( "cassette" )

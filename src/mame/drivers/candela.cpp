@@ -674,11 +674,11 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	MCFG_DEVICE_PROGRAM_MAP(can09t_map)
 
 	/* --PIA inits----------------------- */
-	MCFG_DEVICE_ADD(SYSPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(*this, can09t_state, syspia_A_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, can09t_state, syspia_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, can09t_state, syspia_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09t_state, syspia_cb2_w))
+	PIA6821(config, m_syspia, 0); // CPU board
+	m_syspia->readpa_handler().set(FUNC(can09t_state::syspia_A_r));
+	m_syspia->readpb_handler().set(FUNC(can09t_state::syspia_B_r));
+	m_syspia->writepb_handler().set(FUNC(can09t_state::syspia_B_w));
+	m_syspia->cb2_handler().set(FUNC(can09t_state::syspia_cb2_w));
 	/* 0xE1FB 0xB112 (SYSPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE1FB 0xB113 (SYSPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE203 0xB110 (SYSPIA DDR A)     = 0x00 - Port A all inputs */
@@ -686,16 +686,17 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	/* 0xE20A 0xB112 (SYSPIA Control A) = 0x05 - IRQ A enabled on falling transition on CA2 */
 	/* 0xE20A 0xB113 (SYSPIA Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xE20E 0xB111 (SYSPIA port B)    = 0x10 - Data to port B */
-	MCFG_DEVICE_ADD(USRPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09t_state, usrpia_cb2_w))
+
+	PIA6821(config, m_usrpia, 0); // CPU board
+	m_usrpia->cb2_handler().set(FUNC(can09t_state::usrpia_cb2_w));
 	/* 0xE212 0xB122 (USRPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE212 0xB123 (USRPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE215 0xB120 (USRPIA DDR A)     = 0x00 - Port A all inputs */
 	/* 0xE215 0xB121 (USRPIA DDR B)     = 0xFF - Port B all outputs */
 	/* 0xE21A 0xB122 (USRPIA Control A) = 0x34 - CA2 is low and lock DDRB */
 	/* 0xE21A 0xB123 (USRPIA Control B) = 0x34 - CB2 is low and lock DDRB */
-	MCFG_DEVICE_ADD(PIA3_TAG, PIA6821, 0) // ROM board
-	MCFG_DEVICE_ADD(PIA4_TAG, PIA6821, 0) // ROM board
+	PIA6821(config, m_pia3, 0); // ROM board
+	PIA6821(config, m_pia4, 0); // ROM board
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 
@@ -766,12 +767,12 @@ MACHINE_CONFIG_START(can09_state::can09)
 #endif
 
 	/* --PIA inits----------------------- */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(*this, can09_state, pia1_A_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, can09_state, pia1_A_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, can09_state, pia1_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, can09_state, pia1_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09_state, pia1_cb2_w))
+	PIA6821(config, m_pia1, 0); // CPU board
+	m_pia1->readpa_handler().set(FUNC(can09_state::pia1_A_r));
+	m_pia1->writepa_handler().set(FUNC(can09_state::pia1_A_w));
+	m_pia1->readpb_handler().set(FUNC(can09_state::pia1_B_r));
+	m_pia1->writepb_handler().set(FUNC(can09_state::pia1_B_w));
+	m_pia1->cb2_handler().set(FUNC(can09_state::pia1_cb2_w));
 	/* 0xFF7D 0xE035 (PIA1 Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF81 0xE037 (PIA1 Control B) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF85 0xE034 (PIA1 DDR A)     = 0x1F - Port A mixed mode */

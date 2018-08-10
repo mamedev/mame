@@ -431,21 +431,21 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02 (or DS1220Y)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_U4_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, arachnid_state, pia_u4_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, arachnid_state, pia_u4_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, arachnid_state, pia_u4_pca_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, arachnid_state, pia_u4_pcb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, arachnid_state, pia_u4_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, arachnid_state, pia_u4_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, arachnid_state, pia_u4_pca_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, arachnid_state, pia_u4_pcb_w))
+	PIA6821(config, m_pia_u4, 0);
+	m_pia_u4->readpa_handler().set(FUNC(arachnid_state::pia_u4_pa_r));
+	m_pia_u4->readpb_handler().set(FUNC(arachnid_state::pia_u4_pb_r));
+	m_pia_u4->readca1_handler().set(FUNC(arachnid_state::pia_u4_pca_r));
+	m_pia_u4->readcb1_handler().set(FUNC(arachnid_state::pia_u4_pcb_r));
+	m_pia_u4->writepa_handler().set(FUNC(arachnid_state::pia_u4_pa_w));
+	m_pia_u4->writepb_handler().set(FUNC(arachnid_state::pia_u4_pb_w));
+	m_pia_u4->ca2_handler().set(FUNC(arachnid_state::pia_u4_pca_w));
+	m_pia_u4->cb2_handler().set(FUNC(arachnid_state::pia_u4_pcb_w));
 
-	MCFG_DEVICE_ADD(PIA6821_U17_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, arachnid_state, pia_u17_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, arachnid_state, pia_u17_pca_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, arachnid_state, pia_u17_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, arachnid_state, pia_u17_pcb_w))
+	PIA6821(config, m_pia_u17, 0);
+	m_pia_u17->readpa_handler().set(FUNC(arachnid_state::pia_u17_pa_r));
+	m_pia_u17->readca1_handler().set(FUNC(arachnid_state::pia_u17_pca_r));
+	m_pia_u17->writepb_handler().set(FUNC(arachnid_state::pia_u17_pb_w));
+	m_pia_u17->cb2_handler().set(FUNC(arachnid_state::pia_u17_pcb_w));
 
 	// video hardware
 	MCFG_DEVICE_ADD(TMS9118_TAG, TMS9118, 10.738635_MHz_XTAL / 2)

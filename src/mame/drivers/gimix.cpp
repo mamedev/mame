@@ -571,12 +571,13 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
 
 	/* parallel ports */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 2'000'000)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, gimix_state,pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, gimix_state,pia_pb_w))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, gimix_state,pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, gimix_state,pia_pb_r))
-	MCFG_DEVICE_ADD("pia2", PIA6821, 2'000'000)
+	pia6821_device &pia1(PIA6821(config, "pia1", 2'000'000));
+	pia1.writepa_handler().set(FUNC(gimix_state::pia_pa_w));
+	pia1.writepb_handler().set(FUNC(gimix_state::pia_pb_w));
+	pia1.readpa_handler().set(FUNC(gimix_state::pia_pa_r));
+	pia1.readpb_handler().set(FUNC(gimix_state::pia_pb_r));
+
+	PIA6821(config, "pia2", 2'000'000);
 
 	/* serial ports */
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 2'000'000)

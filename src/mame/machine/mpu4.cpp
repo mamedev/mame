@@ -2968,57 +2968,57 @@ MACHINE_CONFIG_START(mpu4_state::mpu4_common)
 	MCFG_PTM6840_O3_CB(WRITELINE(*this, mpu4_state, ic2_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu4_state, cpu0_irq))
 
-	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu4_state, pia_ic3_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu4_state, pia_ic3_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic3_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic3_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
+	PIA6821(config, m_pia3, 0);
+	m_pia3->writepa_handler().set(FUNC(mpu4_state::pia_ic3_porta_w));
+	m_pia3->writepb_handler().set(FUNC(mpu4_state::pia_ic3_portb_w));
+	m_pia3->ca2_handler().set(FUNC(mpu4_state::pia_ic3_ca2_w));
+	m_pia3->cb2_handler().set(FUNC(mpu4_state::pia_ic3_cb2_w));
+	m_pia3->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
+	m_pia3->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("pia_ic4", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mpu4_state, pia_ic4_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu4_state, pia_ic4_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu4_state, pia_ic4_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu4_state,pia_ic4_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu4_state,pia_ic4_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu4_state,cpu0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu4_state,cpu0_irq))
+	PIA6821(config, m_pia4, 0);
+	m_pia4->readpb_handler().set(FUNC(mpu4_state::pia_ic4_portb_r));
+	m_pia4->writepa_handler().set(FUNC(mpu4_state::pia_ic4_porta_w));
+	m_pia4->writepb_handler().set(FUNC(mpu4_state::pia_ic4_portb_w));
+	m_pia4->ca2_handler().set(FUNC(mpu4_state::pia_ic4_ca2_w));
+	m_pia4->cb2_handler().set(FUNC(mpu4_state::pia_ic4_cb2_w));
+	m_pia4->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
+	m_pia4->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("pia_ic5", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu4_state, pia_ic5_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mpu4_state, pia_ic5_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu4_state, pia_ic5_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu4_state, pia_ic5_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic5_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic5_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
+	PIA6821(config, m_pia5, 0);
+	m_pia5->readpa_handler().set(FUNC(mpu4_state::pia_ic5_porta_r));
+	m_pia5->readpb_handler().set(FUNC(mpu4_state::pia_ic5_portb_r));
+	m_pia5->writepa_handler().set(FUNC(mpu4_state::pia_ic5_porta_w));
+	m_pia5->writepb_handler().set(FUNC(mpu4_state::pia_ic5_portb_w));
+	m_pia5->ca2_handler().set(FUNC(mpu4_state::pia_ic5_ca2_w));
+	m_pia5->cb2_handler().set(FUNC(mpu4_state::pia_ic5_cb2_w));
+	m_pia5->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
+	m_pia5->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("pia_ic6", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu4_state, pia_ic6_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu4_state, pia_ic6_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic6_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic6_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
+	PIA6821(config, m_pia6, 0);
+	m_pia6->writepa_handler().set(FUNC(mpu4_state::pia_ic6_porta_w));
+	m_pia6->writepb_handler().set(FUNC(mpu4_state::pia_ic6_portb_w));
+	m_pia6->ca2_handler().set(FUNC(mpu4_state::pia_ic6_ca2_w));
+	m_pia6->cb2_handler().set(FUNC(mpu4_state::pia_ic6_cb2_w));
+	m_pia6->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
+	m_pia6->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("pia_ic7", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mpu4_state, pia_ic7_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu4_state, pia_ic7_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu4_state, pia_ic7_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic7_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic7_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
+	PIA6821(config, m_pia7, 0);
+	m_pia7->readpb_handler().set(FUNC(mpu4_state::pia_ic7_portb_r));
+	m_pia7->writepa_handler().set(FUNC(mpu4_state::pia_ic7_porta_w));
+	m_pia7->writepb_handler().set(FUNC(mpu4_state::pia_ic7_portb_w));
+	m_pia7->ca2_handler().set(FUNC(mpu4_state::pia_ic7_ca2_w));
+	m_pia7->cb2_handler().set(FUNC(mpu4_state::pia_ic7_cb2_w));
+	m_pia7->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
+	m_pia7->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("pia_ic8", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu4_state, pia_ic8_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu4_state, pia_ic8_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic8_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu4_state, pia_ic8_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu4_state, cpu0_irq))
+	PIA6821(config, m_pia8, 0);
+	m_pia8->readpa_handler().set(FUNC(mpu4_state::pia_ic8_porta_r));
+	m_pia8->writepb_handler().set(FUNC(mpu4_state::pia_ic8_portb_w));
+	m_pia8->ca2_handler().set(FUNC(mpu4_state::pia_ic8_ca2_w));
+	m_pia8->cb2_handler().set(FUNC(mpu4_state::pia_ic8_cb2_w));
+	m_pia8->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
+	m_pia8->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
@@ -3033,12 +3033,12 @@ MACHINE_CONFIG_START(mpu4_state::mpu4_common2)
 	//MCFG_PTM6840_O3_CB(WRITELINE("ptm_ic3ss", ptm6840_device, set_g1))
 	//MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu4_state, cpu1_ptm_irq))
 
-	MCFG_DEVICE_ADD("pia_ic4ss", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mpu4_state, pia_gb_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu4_state, pia_gb_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu4_state, pia_gb_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu4_state, pia_gb_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu4_state, pia_gb_cb2_w))
+	pia6821_device &pia_ic4ss(PIA6821(config, "pia_ic4ss", 0));
+	pia_ic4ss.readpb_handler().set(FUNC(mpu4_state::pia_gb_portb_r));
+	pia_ic4ss.writepa_handler().set(FUNC(mpu4_state::pia_gb_porta_w));
+	pia_ic4ss.writepb_handler().set(FUNC(mpu4_state::pia_gb_portb_w));
+	pia_ic4ss.ca2_handler().set(FUNC(mpu4_state::pia_gb_ca2_w));
+	pia_ic4ss.cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
 MACHINE_CONFIG_END
 
 /* machine driver for MOD 2 board */

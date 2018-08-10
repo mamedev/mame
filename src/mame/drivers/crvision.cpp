@@ -743,11 +743,11 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 	MCFG_DEVICE_PROGRAM_MAP(crvision_map)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, crvision_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, crvision_state, pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, crvision_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(SN76489_TAG, sn76496_base_device, command_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
+	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
+	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
+	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::command_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
@@ -820,14 +820,14 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	MCFG_DEVICE_PROGRAM_MAP(lasr2001_map)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, laser2001_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, laser2001_state, pia_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, laser2001_state, pia_ca1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, laser2001_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, laser2001_state, pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, laser2001_state, pia_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, laser2001_state, pia_cb2_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(laser2001_state::pia_pa_r));
+	m_pia->readpb_handler().set(FUNC(laser2001_state::pia_pb_r));
+	m_pia->readca1_handler().set(FUNC(laser2001_state::pia_ca1_r));
+	m_pia->writepa_handler().set(FUNC(laser2001_state::pia_pa_w));
+	m_pia->writepb_handler().set(FUNC(laser2001_state::pia_pb_w));
+	m_pia->ca2_handler().set(FUNC(laser2001_state::pia_ca2_w));
+	m_pia->cb2_handler().set(FUNC(laser2001_state::pia_cb2_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

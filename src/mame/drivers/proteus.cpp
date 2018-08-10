@@ -358,13 +358,13 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_PTM6840_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* parallel port */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	//MCFG_PIA_READPB_HANDLER(READ8(*this, proteus_state, pia_pb_r))
-	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, proteus_state, pia_pa_w))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, proteus_state, pia_pb_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
+	PIA6821(config, m_pia, 0);
+	//m_pia->readpb_handler().set(FUNC(proteus_state::pia_pb_r));
+	//m_pia->writepa_handler().set(FUNC(proteus_state::pia_pa_w));
+	//m_pia->writepb_handler().set(FUNC(proteus_state::pia_pb_w));
+	//m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
+	m_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
+	m_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
 	MCFG_DEVICE_ADD("parallel", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))

@@ -309,13 +309,13 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tavernie_state, pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, tavernie_state, ca1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tavernie_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tavernie_state, pb_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set(FUNC(tavernie_state::pa_r));
+	pia.readca1_handler().set(FUNC(tavernie_state::ca1_r));
+	pia.writepa_handler().set(FUNC(tavernie_state::pa_w));
+	pia.writepb_handler().set(FUNC(tavernie_state::pb_w));
+	pia.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 4_MHz_XTAL / 4)
 	// all i/o lines connect to the 40-pin expansion connector
@@ -366,10 +366,10 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(tavernie_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("pia_ivg", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, tavernie_state, pb_ivg_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tavernie_state, pa_ivg_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("beeper", beep_device, set_state))
+	PIA6821(config, m_pia_ivg, 0);
+	m_pia_ivg->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));
+	m_pia_ivg->writepa_handler().set(FUNC(tavernie_state::pa_ivg_w));
+	m_pia_ivg->cb2_handler().set("beeper", FUNC(beep_device::set_state));
 
 	MCFG_DEVICE_ADD("fdc", FD1795, 8_MHz_XTAL / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
