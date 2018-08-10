@@ -69,6 +69,26 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
     Improved reg handl       Y             Y          Y         Y
     -------------------------------------------------------------------------
    x/p = Features that has been implemented  n/a = features that will not
+
+
+
+How to calculate the required clock, given the wr contents and the needed
+baud rate:
+
+- let's say B = baud rate (usually 9600).
+- Check wr11
+-- for RX, bits D6,D5 = 1,0
+-- for TX, bits D4,D3 = 1,0
+-- for TRxC, bits D1,D0 = 1,0
+-- let's say T = time constant (wr13 * 256 + wr12) +2. (don't forget the +2)
+-- in the unlikely case of T == 0, pretend T = 1.
+- If the required wr11 bits are set:
+-- let's say M = wr4 D7,D6 if 1,1 M = 64; if 1,0 M = 32; if 0,1 M = 16 else M = 1
+-- so, the required clock on the MCFG_DEVICE_ADD line = 2*T*B*M.
+- If the required wr11 bits are not set:
+-- add a line: MCFG_Z80SCC_OFFSETS(X, 0, Y, 0), where X = channel-A-baud * T,
+   and Y = channel-B-baud * T.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -834,31 +854,28 @@ int z80scc_device::m1_r()
 //-------------------------------------------------
 READ8_MEMBER( z80scc_device::zbus_r )
 {
-	int ba = 0;
-	int reg = 0x20; // Default point to a non register number
+	offset &= 31;
+	bool ba = BIT(offset, 4);
+	u8 reg = offset & 15;
 	uint8_t data = 0;
 
-	/* Expell non- Z-Bus variants */
+	/* Expel non- Z-Bus variants */
 	if ( !(m_variant & SET_Z80X30))
 	{
 		logerror(" zbus_r not supported by this device variant, you should probably use the universal bus variants  c*_r/w and d*_r/w (see z80scc.h)\n");
 		return data;
 	}
 
-	switch ((m_chanB->m_wr0) & 7)
+	if ((m_chanB->m_wr0 & 7) == WR0_Z_SEL_SHFT_RIGHT)
 	{
-	case WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
-	case WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
-	default:
-		logerror("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
-		LOG("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
-		return data;
+		ba = BIT(offset, 0);
+		reg = offset >> 1;
 	}
 
-	if (ba == 0)
-		data = m_chanB->scc_register_read(reg);
-	else
+	if (ba)
 		data = m_chanA->scc_register_read(reg);
+	else
+		data = m_chanB->scc_register_read(reg);
 
 	return data;
 }
@@ -868,29 +885,36 @@ READ8_MEMBER( z80scc_device::zbus_r )
 //-------------------------------------------------
 WRITE8_MEMBER( z80scc_device::zbus_w )
 {
-	int ba = 0;
-	int reg = 0x20; // Default point to a non register number
+	offset &= 31;
+	bool ba = BIT(offset, 4);
+	u8 reg = offset & 15;
 
-	/* Expell non- Z-Bus variants */
+	/* Expel non- Z-Bus variants */
 	if ( !(m_variant & SET_Z80X30))
 	{
 		logerror(" zbus_w not supported by this device variant, you should probably use the universal bus variants  c*_r/w and d*_r/w (see z80scc.h)\n");
 		return;
 	}
 
-	switch ((m_chanB->m_wr0) & 7)
+	if ((m_chanB->m_wr0 & 7) == WR0_Z_SEL_SHFT_RIGHT)
 	{
-	case WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
-	case WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
-	default:
-		logerror("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
-		LOG("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
+		ba = BIT(offset, 0);
+		reg = offset >> 1;
 	}
 
-	if (ba == 0)
-		m_chanB->scc_register_write(reg, data);
-	else
-		m_chanA->scc_register_write(reg, data);
+	switch (reg)
+	{
+		case 2:
+		case 9:
+			m_chanA->scc_register_write(reg, data);
+			m_chanB->scc_register_write(reg, data);
+			break;
+		default:
+			if (ba)
+				m_chanA->scc_register_write(reg, data);
+			else
+				m_chanB->scc_register_write(reg, data);
+	}
 
 	return;
 }
