@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Robbbert
 /******************************************************************************************
 
 Commodore C900
@@ -34,7 +34,6 @@ To Do:
 #include "cpu/z8000/z8000.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
 #include "machine/z8536.h"
 #include "emupal.h"
 
@@ -48,10 +47,11 @@ public:
 	{ }
 
 	void c900(machine_config &config);
+
+private:
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -70,7 +70,6 @@ void c900_state::io_map(address_map &map)
 {
 	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
 	map(0x0100, 0x013f).rw("scc", FUNC(scc8030_device::zbus_r), FUNC(scc8030_device::zbus_w)).umask16(0x00ff);
-	map(0x0ff8, 0x0ff9).nopw();
 }
 
 static INPUT_PORTS_START( c900 )
