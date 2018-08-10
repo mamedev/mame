@@ -720,8 +720,8 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	baudgen.fr_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
 	baudgen.fr_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 
-	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
-	MCFG_AY51013_WRITE_DAV_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
+	AY51013(config, m_uart);
+	m_uart->write_dav_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)

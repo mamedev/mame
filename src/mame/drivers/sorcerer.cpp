@@ -440,10 +440,10 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
-	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(ES_UART_CLOCK);
+	m_uart->set_rx_clock(ES_UART_CLOCK);
+	m_uart->set_auto_rdav(true);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)

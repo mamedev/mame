@@ -495,7 +495,7 @@ void microterm_f8_state::act5a(machine_config &config)
 	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
 	smi.set_interrupt_req_callback(f3853_device::interrupt_req_delegate(FUNC(microterm_f8_state::f3853_interrupt), this));
 
-	AY51013(config, m_uart, 0);
+	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_io, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set(m_io, FUNC(rs232_port_device::write_txd));
 	m_uart->write_dav_callback().set("smi", FUNC(f3853_device::set_external_interrupt_in_line)).invert();

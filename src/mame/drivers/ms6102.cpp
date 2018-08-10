@@ -342,9 +342,9 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// keyboard
-	MCFG_DEVICE_ADD("589wa1", AY31015, 0)
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ms6102_state, irq<1>))
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_kbd_uart);
+	m_kbd_uart->write_dav_callback().set(FUNC(ms6102_state::irq<1>));
+	m_kbd_uart->set_auto_rdav(true);
 
 	ripple_counter_device &ie5(RIPPLE_COUNTER(config, "ie5", XTAL(16'400'000) / 30));
 	ie5.set_stages(2);
