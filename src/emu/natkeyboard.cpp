@@ -323,6 +323,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 	, m_fieldnum(0)
 	, m_status_keydown(false)
 	, m_last_cr(false)
+	, m_post_lf(false)
 	, m_timer(nullptr)
 	, m_current_rate(attotime::zero)
 	, m_queue_chars()
@@ -412,7 +413,13 @@ void natural_keyboard::post(char32_t ch)
 
 	// can we post this key in the queue directly?
 	if (can_post_directly(ch))
+	{
 		internal_post(ch);
+
+		// post LF with CR
+		if (ch == '\r' && m_post_lf)
+			internal_post('\n');
+	}
 
 	// can we post this key with an alternate representation?
 	else if (can_post_alternate(ch))
@@ -640,6 +647,11 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 										machine().logerror("natural_keyboard: code=%u (%s) port=%p field.name='%s'\n",
 											code, unicode_to_string(code), (void *)&port, field.name());
 									}
+
+
+									// check for line feed key
+									if (code == '\n' && curshift == 0)
+										m_post_lf = true;
 								}
 							}
 						}
