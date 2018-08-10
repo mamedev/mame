@@ -48,19 +48,19 @@
 	downcast<i8275_device &>(*device).set_character_width(_value);
 
 #define MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	downcast<i8275_device &>(*device).set_display_callback(i8275_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<i8275_device &>(*device).set_display_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_I8275_DRQ_CALLBACK(_write) \
-	devcb = &downcast<i8275_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<i8275_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8275_IRQ_CALLBACK(_write) \
-	devcb = &downcast<i8275_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<i8275_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8275_HRTC_CALLBACK(_write) \
-	devcb = &downcast<i8275_device &>(*device).set_hrtc_wr_callback(DEVCB_##_write);
+	downcast<i8275_device &>(*device).set_hrtc_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8275_VRTC_CALLBACK(_write) \
-	devcb = &downcast<i8275_device &>(*device).set_vrtc_wr_callback(DEVCB_##_write);
+	downcast<i8275_device &>(*device).set_vrtc_wr_callback(DEVCB_##_write);
 
 
 
@@ -81,12 +81,16 @@ public:
 	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_character_width(int value) { m_hpixels_per_column = value; }
-	template <typename Object> void set_display_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = draw_character_delegate(std::forward<T>(args)...); }
 
 	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return m_write_drq.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_hrtc_wr_callback(Object &&cb) { return m_write_hrtc.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_vrtc_wr_callback(Object &&cb) { return m_write_vrtc.set_callback(std::forward<Object>(cb)); }
+	auto drq_wr_callback() { return m_write_drq.bind(); }
+	auto irq_wr_callback() { return m_write_irq.bind(); }
+	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }
+	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

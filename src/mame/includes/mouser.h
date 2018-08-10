@@ -22,6 +22,11 @@ public:
 		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void mouser(machine_config &config);
+
+	void init_mouser();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -41,14 +46,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	void init_mouser();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(mouser);
 	uint32_t screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(mouser_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(mouser_sound_nmi_assert);
-	void mouser(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void mouser_map(address_map &map);
 	void mouser_sound_io_map(address_map &map);

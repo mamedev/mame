@@ -348,6 +348,8 @@ VIDEOS["VOODOO"] = true
 VIDEOS["VOODOO_PCI"] = true
 VIDEOS["ZEUS2"] = true
 VIDEOS["PPU2C0X"] = true
+VIDEOS["PS2GS"] = true
+VIDEOS["PS2GIF"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -1257,8 +1259,6 @@ files {
 	MAME_DIR .. "src/mame/video/xybots.cpp",
 	MAME_DIR .. "src/mame/machine/asic65.cpp",
 	MAME_DIR .. "src/mame/machine/asic65.h",
-	MAME_DIR .. "src/mame/machine/atari_vg.cpp",
-	MAME_DIR .. "src/mame/machine/atari_vg.h",
 	MAME_DIR .. "src/mame/machine/atarigen.cpp",
 	MAME_DIR .. "src/mame/machine/atarigen.h",
 	MAME_DIR .. "src/mame/machine/mathbox.cpp",
@@ -2688,6 +2688,7 @@ files {
 	MAME_DIR .. "src/mame/video/baraduke.cpp",
 	MAME_DIR .. "src/mame/drivers/cswat.cpp",
 	MAME_DIR .. "src/mame/drivers/dambustr.cpp",
+	MAME_DIR .. "src/mame/drivers/dkmb.cpp",
 	MAME_DIR .. "src/mame/drivers/gal3.cpp",
 	MAME_DIR .. "src/mame/drivers/galaga.cpp",
 	MAME_DIR .. "src/mame/includes/galaga.h",
@@ -3713,6 +3714,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/changela.cpp",
 	MAME_DIR .. "src/mame/includes/changela.h",
 	MAME_DIR .. "src/mame/video/changela.cpp",
+	MAME_DIR .. "src/mame/drivers/cpzodiac.cpp",
 	MAME_DIR .. "src/mame/drivers/crbaloon.cpp",
 	MAME_DIR .. "src/mame/includes/crbaloon.h",
 	MAME_DIR .. "src/mame/video/crbaloon.cpp",

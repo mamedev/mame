@@ -83,6 +83,7 @@ private:
 	std::vector<offs_t> m_live;             // array of live entries by table index
 	std::vector<int>    m_fixedpages;       // number of pages each fixed entry covers
 	std::vector<vtlb_entry> m_table;        // table of entries by address
+	std::vector<offs_t> m_refcnt;           // table of entry reference counts by address
 	vtlb_entry          *m_table_base;      // pointer to m_table[0]
 };
 

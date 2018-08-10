@@ -268,6 +268,7 @@ void upd765_family_device::soft_reset()
 		flopi[i].st0 = i;
 		flopi[i].st0_filled = false;
 	}
+	clr_drive_busy();
 	data_irq = false;
 	other_irq = false;
 	internal_drq = false;
@@ -433,6 +434,7 @@ uint8_t upd765_family_device::read_msr()
 			msr |= 1<<i;
 			//msr |= MSR_CB;
 		}
+	msr |= get_drive_busy();
 
 	if(data_irq) {
 		data_irq = false;
@@ -477,6 +479,7 @@ uint8_t upd765_family_device::read_fifo()
 			for(floppy_info &fi : flopi)
 				if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
 					fi.main_state = IDLE;
+			clr_drive_busy();
 		}
 		break;
 	default:
@@ -2639,6 +2642,8 @@ void i82072_device::device_start()
 
 	save_item(NAME(motor_off_counter));
 	save_item(NAME(motor_on_counter));
+	save_item(NAME(drive_busy));
+	save_item(NAME(delayed_command));
 }
 
 void i82072_device::soft_reset()
@@ -2650,13 +2655,68 @@ void i82072_device::soft_reset()
 
 int i82072_device::check_command()
 {
+	// ...00110 read data
+	// ...01100 read deleted data
+	// ..000101 write data
+	// ..001001 write deleted data
+	// 0.000010 read track
+	// 0.001010 read id
+	// 0.001101 format track
+	// 00000111 recalibrate
+	// 00001000 sense interrupt status
+	// 00000011 specify
+	// 00000100 sense drive status
+	// 00001111 seek
+	// 00010011 configure
 	// ...01011 motor on/off
+	// 1.001111 relative seek
+	// 00001110 dumpreg
+
 	switch(command[0] & 0x1f) {
+	case 0x02:
+		return command_pos == 9 ? C_READ_TRACK : C_INCOMPLETE;
+
+	case 0x03:
+		return command_pos == 3 ? C_SPECIFY : C_INCOMPLETE;
+
+	case 0x04:
+		return command_pos == 2 ? C_SENSE_DRIVE_STATUS : C_INCOMPLETE;
+
+	case 0x05:
+	case 0x09:
+		return command_pos == 9 ? C_WRITE_DATA : C_INCOMPLETE;
+
+	case 0x06:
+	case 0x0c:
+		return command_pos == 9 ? C_READ_DATA : C_INCOMPLETE;
+
+	case 0x07:
+		return command_pos == 2 ? C_RECALIBRATE : C_INCOMPLETE;
+
+	case 0x08:
+		return C_SENSE_INTERRUPT_STATUS;
+
+	case 0x0a:
+		return command_pos == 2 ? C_READ_ID : C_INCOMPLETE;
+
 	case 0x0b:
 		return C_MOTOR_ONOFF;
-	}
 
-	return upd765_family_device::check_command();
+	case 0x0d:
+		return command_pos == 6 ? C_FORMAT_TRACK : C_INCOMPLETE;
+
+	case 0x0e:
+		return C_DUMP_REG;
+
+	case 0x0f:
+		return command_pos == 3 ? C_SEEK : C_INCOMPLETE;
+
+	case 0x13:
+		return command_pos == 4 ? C_CONFIGURE : C_INCOMPLETE;
+
+	default:
+		return C_INVALID;
+	}
 }
 
 void i82072_device::start_command(int cmd)
@@ -2675,13 +2735,18 @@ void i82072_device::start_command(int cmd)
 	case C_SEEK:
 		// start the motor
 		motor_control(command[1] & 0x3, true);
-
-		// TODO: motor on delay
-		//if(motor_on_counter > 0)
 		break;
 	}
 
-	upd765_family_device::start_command(cmd);
+	// execute the command immediately if there's no motor on delay
+	if(motor_on_counter == 0) {
+		upd765_family_device::start_command(cmd);
+
+		// set motor off counter if command execution has completed
+		if (main_phase != PHASE_EXEC && motorcfg)
+			motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
+	} else
+		delayed_command = cmd;
 }
 
 void i82072_device::execute_command(int cmd)
@@ -2700,6 +2765,10 @@ void i82072_device::execute_command(int cmd)
 
 		LOGCOMMAND("command motor %s drive %d\n", motor_on ? "on" : "off", fi.id);
 
+		// if we are selecting a different drive, stop the motor on the previously selected drive
+		if (selected_drive != fi.id && flopi[selected_drive].dev && flopi[selected_drive].dev->mon_r() == 0)
+			flopi[selected_drive].dev->mon_w(1);
+
 		// select the drive
 		if(motor_on)
 			set_ds(fi.id);
@@ -2711,32 +2780,6 @@ void i82072_device::execute_command(int cmd)
 		main_phase = PHASE_CMD;
 		break;
 	}
-
-	case C_SPECIFY:
-		/*
-		 * The InterPro 2000 expects the sense interrupt status command to return
-		 * the status of a completed recalibrate or seek operation instead of a
-		 * pending drive poll status after a soft reset. This behaviour does not
-		 * seem to match any of the other upd765 devices, and without hardware,
-		 * it's difficult to know exactly how it works at this point.
-		 *
-		 * For now, reproduce the expected behaviour by clearing pending drive
-		 * poll results in the specify command, giving two different result
-		 * pathways (both present in InterPro boot code):
-		 *
-		 *   1. reset, poll, sense interrupt status -> drive poll status
-		 *   2. reset, poll, specify, recalibrate, sense interrupt status -> recalibrate status
-		 *
-		 * Possible alternatives include:
-		 *
-		 *   1. Clearing pending status during all command execution.
-		 *   2. Returning results in LIFO order.
-		 *   3. Returning results in priority order (where recalibrate/seek is "higher" priority than poll)
-		 */
-
-		// clear pending interrupts and fall through
-		for(floppy_info &fi : flopi)
-			fi.st0_filled = false;
 
 	default:
 		upd765_family_device::execute_command(cmd);
@@ -2759,16 +2802,18 @@ void i82072_device::execute_command(int cmd)
  */
 void i82072_device::command_end(floppy_info &fi, bool data_completion)
 {
-	LOGCOMMAND("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
-	fi.sub_state = IDLE;
-	if(data_completion) {
-		fi.main_state = IDLE;
-		data_irq = true;
-	} else {
-		other_irq = true;
-		fi.st0_filled = true;
-	}
-	check_irq();
+	if(!data_completion)
+		drive_busy |= (1 << fi.id);
+
+	// set motor off counter
+	if(motorcfg)
+		motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
+
+	// clear existing interrupt sense data
+	for(floppy_info &fi : flopi)
+		fi.st0_filled = false;
+
+	upd765_family_device::command_end(fi, data_completion);
 }
 
 void i82072_device::motor_control(int fid, bool start_motor)
@@ -2795,9 +2840,6 @@ void i82072_device::motor_control(int fid, bool start_motor)
 			// set motor on counter
 			motor_on_counter = (motorcfg & MON) << (motorcfg & HSDA ? 1 : 0);
 		}
-
-		// FIXME: reset motor off timer on command end, not start
-		motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
 	} else {
 		// motor off timer only applies to the selected drive
 		if(selected_drive != fid)
@@ -2806,6 +2848,19 @@ void i82072_device::motor_control(int fid, bool start_motor)
 		// decrement motor on counter
 		if(motor_on_counter)
 			motor_on_counter--;
+
+		// execute the command if the motor on counter has expired
+		if(motor_on_counter == 0 && main_phase == PHASE_CMD && delayed_command) {
+			upd765_family_device::start_command(delayed_command);
+
+			// set motor off counter if command execution has completed
+			if(main_phase != PHASE_EXEC && motorcfg)
+				motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
+
+			delayed_command = 0;
+
+			return;
+		}
 
 		// ignore motor off timer while drive is busy
 		if(fi.main_state == SEEK || fi.main_state == RECALIBRATE)
@@ -2828,13 +2883,14 @@ void i82072_device::motor_control(int fid, bool start_motor)
 
 void i82072_device::index_callback(floppy_image_device *floppy, int state)
 {
-	for(floppy_info &fi : flopi) {
-		if(fi.dev != floppy)
-			continue;
+	if(state)
+		for(floppy_info &fi : flopi) {
+			if(fi.dev != floppy)
+				continue;
 
-		// update motor on/off counters and stop motor if necessary
-		motor_control(fi.id, false);
-	}
+			// update motor on/off counters and stop motor if necessary
+			motor_control(fi.id, false);
+		}
 
 	upd765_family_device::index_callback(floppy, state);
 }

@@ -57,14 +57,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void mk14(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
-	void mk14(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -203,11 +205,11 @@ MACHINE_CONFIG_START(mk14_state::mk14)
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
 	MCFG_DEVICE_ADD("maincpu", INS8060, XTAL(4'433'619))
-	MCFG_SCMP_CONFIG(WRITELINE(*this, mk14_state, cass_w), NOOP, READLINE(*this, mk14_state, cass_r), NOOP, READLINE(*this, mk14_state, cass_r), NOOP)
+	MCFG_SCMP_CONFIG(WRITELINE(*this, mk14_state, cass_w), NOOP, READLINE(*this, mk14_state, cass_r), CONSTANT(0), READLINE(*this, mk14_state, cass_r), NOOP)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk14)
+	config.set_default_layout(layout_mk14);
 
 	// sound
 	SPEAKER(config, "speaker").front_center();

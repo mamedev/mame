@@ -18,33 +18,33 @@ DECLARE_DEVICE_TYPE(HDC9234, hdc9234_device)
 
 /* Interrupt line. To be connected with the controller PCB. */
 #define MCFG_HDC92X4_INTRQ_CALLBACK(_write) \
-	devcb = &downcast<hdc92x4_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<hdc92x4_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 /* DMA request line. To be connected with the controller PCB. */
 #define MCFG_HDC92X4_DMARQ_CALLBACK(_write) \
-	devcb = &downcast<hdc92x4_device &>(*device).set_dmarq_wr_callback(DEVCB_##_write);
+	downcast<hdc92x4_device &>(*device).set_dmarq_wr_callback(DEVCB_##_write);
 
 /* DMA in progress line. To be connected with the controller PCB. */
 #define MCFG_HDC92X4_DIP_CALLBACK(_write) \
-	devcb = &downcast<hdc92x4_device &>(*device).set_dip_wr_callback(DEVCB_##_write);
+	downcast<hdc92x4_device &>(*device).set_dip_wr_callback(DEVCB_##_write);
 
 /* Auxiliary Bus. These 8 lines need to be connected to external latches
    and to a counter circuitry which works together with the external RAM.
    We use the S0/S1 lines as address lines. */
 #define MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(_write) \
-	devcb = &downcast<hdc92x4_device &>(*device).set_auxbus_wr_callback(DEVCB_##_write);
+	downcast<hdc92x4_device &>(*device).set_auxbus_wr_callback(DEVCB_##_write);
 
 /* Callback to read the contents of the external RAM via the data bus.
    Note that the address must be set and automatically increased
    by external circuitry. */
 #define MCFG_HDC92X4_DMA_IN_CALLBACK(_read) \
-	devcb = &downcast<hdc92x4_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
+	downcast<hdc92x4_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
 
 /* Callback to write the contents of the external RAM via the data bus.
    Note that the address must be set and automatically increased
    by external circuitry. */
 #define MCFG_HDC92X4_DMA_OUT_CALLBACK(_write) \
-	devcb = &downcast<hdc92x4_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
+	downcast<hdc92x4_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
 
 //===================================================================
 

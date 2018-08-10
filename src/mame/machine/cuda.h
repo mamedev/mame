@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_MACHINE_CUDA_H
+#define MAME_MACHINE_CUDA_H
 
-#ifndef __CUDA_H__
-#define __CUDA_H__
+#pragma once
 
 
 //**************************************************************************
@@ -38,16 +38,16 @@
 	MCFG_DEVICE_REMOVE(CUDA_TAG)
 
 #define MCFG_CUDA_RESET_CALLBACK(_cb) \
-	devcb = &downcast<cuda_device &>(*device).set_reset_cb(DEVCB_##_cb);
+	downcast<cuda_device &>(*device).set_reset_cb(DEVCB_##_cb);
 
 #define MCFG_CUDA_LINECHANGE_CALLBACK(_cb) \
-	devcb = &downcast<cuda_device &>(*device).set_linechange_cb(DEVCB_##_cb);
+	downcast<cuda_device &>(*device).set_linechange_cb(DEVCB_##_cb);
 
 #define MCFG_CUDA_VIA_CLOCK_CALLBACK(_cb) \
-	devcb = &downcast<cuda_device &>(*device).set_via_clock_cb(DEVCB_##_cb);
+	downcast<cuda_device &>(*device).set_via_clock_cb(DEVCB_##_cb);
 
 #define MCFG_CUDA_VIA_DATA_CALLBACK(_cb) \
-	devcb = &downcast<cuda_device &>(*device).set_via_data_cb(DEVCB_##_cb);
+	downcast<cuda_device &>(*device).set_via_data_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -138,4 +138,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CUDA, cuda_device)
 
-#endif
+#endif // MAME_MACHINE_CUDA_H

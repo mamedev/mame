@@ -696,11 +696,11 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 
 	// scrambled palettes?
-	map(0x300000, 0x33ffff).ram() /* .w(FUNC(stepstag_sub_map::stepstag_palette_w))*/ .share("paletteram1");
+	map(0x300000, 0x33ffff).ram().w(FUNC(stepstag_state::stepstag_palette_left_w)).share("paletteram1");
 
-	map(0x400000, 0x43ffff).ram() /* .w(FUNC(stepstag_sub_map::stepstag_palette_w))*/ .share("paletteram2");
+	map(0x400000, 0x43ffff).ram().w(FUNC(stepstag_state::stepstag_palette_mid_w)).share("paletteram2");
 
-	map(0x500000, 0x53ffff).ram() /* .w(FUNC(stepstag_sub_map::stepstag_palette_w))*/ .share("paletteram3");
+	map(0x500000, 0x53ffff).ram().w(FUNC(stepstag_state::stepstag_palette_right_w)).share("paletteram3");
 
 	// rgb brightness?
 	map(0x700000, 0x700001).nopw(); // 0-f
@@ -1854,7 +1854,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 	MCFG_DEVICE_ADD("sub_gfxdecode", GFXDECODE, "sub_palette", gfx_rocknms_sub)
 	MCFG_PALETTE_ADD("sub_palette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_rocknms)
+	config.set_default_layout(layout_rocknms);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1911,7 +1911,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SCREEN_SIZE(0x160, 0xf0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_mid)
-//  MCFG_SCREEN_PALETTE("palette")
+//  MCFG_SCREEN_PALETTE("mpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
@@ -1934,7 +1934,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_stepstag)
+	config.set_default_layout(layout_stepstag);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2007,7 +2007,7 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_vjdash)
+	config.set_default_layout(layout_vjdash);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2661,6 +2661,9 @@ ROM_START( vjdash )
 	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE ) // 68000
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.11", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.14", 0x00001, 0x80000, NO_DUMP )
+	ROM_FILL( 6, 1, 0x01 )
+	ROM_FILL( 0x100, 1, 0x60 )
+	ROM_FILL( 0x101, 1, 0xfe )
 
 	ROM_REGION( 0x0c00000, "sprites_left", ROMREGION_ERASE )    // left screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
@@ -2764,6 +2767,9 @@ ROM_START( step3 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 ) // 68000
 	ROM_LOAD16_BYTE( "vj98344_step3.4", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "vj98344_step3.1", 0x00001, 0x80000, NO_DUMP )
+	ROM_FILL( 6, 1, 0x01 )
+	ROM_FILL( 0x100, 1, 0x60 )
+	ROM_FILL( 0x101, 1, 0xfe )
 
 	ROM_REGION( 0x100000, "sub", 0 ) // 68000
 	ROM_LOAD16_BYTE( "vj98348_step3_11_v1.1", 0x00000, 0x80000, CRC(9c36aef5) SHA1(bbac48c2c7949a6f8a6ec83515e94a343c88d1b6) )

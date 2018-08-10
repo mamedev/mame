@@ -176,11 +176,11 @@ class namcos22_state : public driver_device
 public:
 	namcos22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_spriteram(*this, "spriteram")
-		, m_czattr(*this, "czattr")
-		, m_czram(*this, "czram")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_czram(*this, "czram")
+		, m_czattr(*this, "czattr")
+		, m_spriteram(*this, "spriteram")
+		, m_gfxdecode(*this, "gfxdecode")
 		, m_maincpu(*this, "maincpu")
 		, m_master(*this, "master")
 		, m_slave(*this, "slave")
@@ -211,35 +211,71 @@ public:
 		, m_cpuled(*this, "cpuled%u", 0U)
 	{ }
 
-	optional_shared_ptr<uint32_t> m_spriteram;
-	optional_shared_ptr<uint32_t> m_czattr;
-	optional_shared_ptr<uint32_t> m_czram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	void namcos22s(machine_config &config);
+	void propcycl(machine_config &config);
+	void dirtdash(machine_config &config);
+	void airco22b(machine_config &config);
+	void cybrcycc(machine_config &config);
+	void tokyowar(machine_config &config);
+	void cybrcomm(machine_config &config);
+	void alpine(machine_config &config);
+	void alpinesa(machine_config &config);
+	void adillor(machine_config &config);
+	void timecris(machine_config &config);
+	void namcos22(machine_config &config);
+
+	void init_acedrvr();
+	void init_aquajet();
+	void init_adillor();
+	void init_cybrcyc();
+	void init_raveracw();
+	void init_ridger2j();
+	void init_victlap();
+	void init_cybrcomm();
+	void init_timecris();
+	void init_tokyowar();
+	void init_propcycl();
+	void init_alpiner2();
+	void init_dirtdash();
+	void init_airco22();
+	void init_alpiner();
+	void init_ridgeraj();
+	void init_alpinesa();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(alpine_motor_read);
+
+	// renderer
 	int m_poly_translucency;
 	uint16_t *m_texture_tilemap;
 	std::unique_ptr<uint8_t[]> m_texture_tileattr;
 	uint8_t *m_texture_tiledata;
 	std::unique_ptr<uint8_t[]> m_texture_ayx_to_pixel;
-	std::unique_ptr<uint8_t[]> m_recalc_czram[4];
 	int m_is_ss22;
 	int m_mixer_flags;
-	int m_fog_r;
-	int m_fog_g;
-	int m_fog_b;
-	int m_fog_r_per_cztype[4];
-	int m_fog_g_per_cztype[4];
-	int m_fog_b_per_cztype[4];
-	uint32_t m_fog_colormask;
+	int m_screen_fade_factor;
 	int m_screen_fade_r;
 	int m_screen_fade_g;
 	int m_screen_fade_b;
-	int m_screen_fade_factor;
+	int m_poly_fade_enabled;
 	int m_poly_fade_r;
 	int m_poly_fade_g;
 	int m_poly_fade_b;
-	int m_poly_fade_enabled;
+	uint32_t m_fog_colormask;
+	int m_fog_r;
+	int m_fog_g;
+	int m_fog_b;
+	std::unique_ptr<uint8_t[]> m_recalc_czram[4];
+	int m_fog_r_per_cztype[4];
+	int m_fog_g_per_cztype[4];
+	int m_fog_b_per_cztype[4];
 
+	required_device<palette_device> m_palette;
+	optional_shared_ptr<uint32_t> m_czram;
+	optional_shared_ptr<uint32_t> m_czattr;
+	optional_shared_ptr<uint32_t> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+private:
 	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);
 	DECLARE_READ32_MEMBER(namcos22s_czram_r);
 	DECLARE_READ32_MEMBER(namcos22s_vics_control_r);
@@ -256,7 +292,6 @@ public:
 	DECLARE_WRITE16_MEMBER(namcos22_dspram16_bank_w);
 	DECLARE_READ16_MEMBER(namcos22_dspram16_r);
 	DECLARE_WRITE16_MEMBER(namcos22_dspram16_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(alpine_motor_read);
 	DECLARE_READ16_MEMBER(pdp_status_r);
 	DECLARE_READ16_MEMBER(pdp_begin_r);
 	DECLARE_READ16_MEMBER(slave_external_ram_r);
@@ -379,24 +414,6 @@ public:
 	void install_141_speedup();
 	void namcos22_init(int game_type);
 
-	void init_acedrvr();
-	void init_aquajet();
-	void init_adillor();
-	void init_cybrcyc();
-	void init_raveracw();
-	void init_ridger2j();
-	void init_victlap();
-	void init_cybrcomm();
-	void init_timecris();
-	void init_tokyowar();
-	void init_propcycl();
-	void init_alpiner2();
-	void init_dirtdash();
-	void init_airco22();
-	void init_alpiner();
-	void init_ridgeraj();
-	void init_alpinesa();
-
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	DECLARE_MACHINE_START(adillor);
 	uint32_t screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -411,18 +428,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
-	void namcos22s(machine_config &config);
-	void propcycl(machine_config &config);
-	void dirtdash(machine_config &config);
-	void airco22b(machine_config &config);
-	void cybrcycc(machine_config &config);
-	void tokyowar(machine_config &config);
-	void cybrcomm(machine_config &config);
-	void alpine(machine_config &config);
-	void alpinesa(machine_config &config);
-	void adillor(machine_config &config);
-	void timecris(machine_config &config);
-	void namcos22(machine_config &config);
 	void alpine_io_map(address_map &map);
 	void alpinesa_am(address_map &map);
 	void iomcu_s22_io(address_map &map);
@@ -442,7 +447,6 @@ public:
 	void slave_dsp_program(address_map &map);
 	void timecris_am(address_map &map);
 
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;

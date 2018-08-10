@@ -44,7 +44,7 @@ public:
 
 	void orbit(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -65,7 +65,6 @@ protected:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void update_misc_flags(address_space &space, uint8_t val);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;

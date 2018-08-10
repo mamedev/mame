@@ -86,6 +86,9 @@ public:
 		m_nmi_gate(false)
 	{ }
 
+	void prophet600(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( pit_ch0_tick_w );
@@ -103,10 +106,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cv_w);
 	DECLARE_WRITE8_MEMBER(gate_w);
 
-	void prophet600(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
 
@@ -274,7 +276,7 @@ MACHINE_CONFIG_START(prophet600_state::prophet600)
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEFAULT_LAYOUT( layout_prophet600 )
+	config.set_default_layout(layout_prophet600);
 
 	MCFG_DEVICE_ADD(PIT_TAG, PIT8253, XTAL(8'000'000)/4)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)

@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	void hankin(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic11_ca2_w);
@@ -70,7 +70,6 @@ protected:
 	void hankin_map(address_map &map);
 	void hankin_sub_map(address_map &map);
 
-private:
 	bool m_timer_x;
 	bool m_timer_sb;
 	uint8_t m_timer_s[3];
@@ -484,7 +483,7 @@ MACHINE_CONFIG_START(hankin_state::hankin)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_hankin)
+	config.set_default_layout(layout_hankin);
 
 	/* Sound */
 	genpin_audio(config);

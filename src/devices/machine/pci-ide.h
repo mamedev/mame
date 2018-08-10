@@ -20,7 +20,7 @@ TODO:
 #include "idectrl.h"
 
 #define MCFG_IDE_PCI_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ide_pci_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ide_pci_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 // This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.
 #define MCFG_IDE_PCI_SET_LEGACY_TOP(_val) \
@@ -40,6 +40,7 @@ public:
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
 	void set_pif(int val) { m_pif = val & 0xff; };
 

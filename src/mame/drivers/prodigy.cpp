@@ -148,6 +148,9 @@ public:
 #endif
 	{ }
 
+	void prodigy(machine_config &config);
+
+private:
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit0_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit1_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit2_cb);
@@ -165,9 +168,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 
-	void prodigy(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
 	uint8_t m_segments;
@@ -643,7 +645,7 @@ MACHINE_CONFIG_START(prodigy_state::prodigy)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(2'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_DEFAULT_LAYOUT(layout_prodigy)
+	config.set_default_layout(layout_prodigy);
 
 	MCFG_DEVICE_ADD("io_74145", TTL74145, 0)
 

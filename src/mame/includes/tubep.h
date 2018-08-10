@@ -7,13 +7,6 @@
 class tubep_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TUBEP_SCANLINE,
-		TIMER_RJAMMER_SCANLINE,
-		TIMER_SPRITE
-	};
-
 	tubep_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_textram(*this, "textram"),
@@ -26,6 +19,18 @@ public:
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm"),
 		m_screen(*this, "screen") { }
+
+	void tubepb(machine_config &config);
+	void tubep(machine_config &config);
+	void rjammer(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_TUBEP_SCANLINE,
+		TIMER_RJAMMER_SCANLINE,
+		TIMER_SPRITE
+	};
 
 	uint8_t m_sound_latch;
 	uint8_t m_ls74;
@@ -110,10 +115,6 @@ public:
 	optional_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
 
-
-	void tubepb(machine_config &config);
-	void tubep(machine_config &config);
-	void rjammer(machine_config &config);
 	void nsc_map(address_map &map);
 	void rjammer_main_map(address_map &map);
 	void rjammer_main_portmap(address_map &map);
@@ -127,6 +128,6 @@ public:
 	void tubep_second_portmap(address_map &map);
 	void tubep_sound_map(address_map &map);
 	void tubep_sound_portmap(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

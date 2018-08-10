@@ -23,22 +23,22 @@
 	downcast<nubus_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_NUBUS_OUT_IRQ9_CB(_devcb) \
-	devcb = &downcast<nubus_device &>(*device).set_out_irq9_callback(DEVCB_##_devcb);
+	downcast<nubus_device &>(*device).set_out_irq9_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQA_CB(_devcb) \
-	devcb = &downcast<nubus_device &>(*device).set_out_irqa_callback(DEVCB_##_devcb);
+	downcast<nubus_device &>(*device).set_out_irqa_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQB_CB(_devcb) \
-	devcb = &downcast<nubus_device &>(*device).set_out_irqb_callback(DEVCB_##_devcb);
+	downcast<nubus_device &>(*device).set_out_irqb_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQC_CB(_devcb) \
-	devcb = &downcast<nubus_device &>(*device).set_out_irqc_callback(DEVCB_##_devcb);
+	downcast<nubus_device &>(*device).set_out_irqc_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQD_CB(_devcb) \
-	devcb = &downcast<nubus_device &>(*device).set_out_irqd_callback(DEVCB_##_devcb);
+	downcast<nubus_device &>(*device).set_out_irqd_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQE_CB(_devcb) \
-	devcb = &downcast<nubus_device &>(*device).set_out_irqe_callback(DEVCB_##_devcb);
+	downcast<nubus_device &>(*device).set_out_irqe_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \

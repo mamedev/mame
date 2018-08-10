@@ -44,31 +44,31 @@
 	downcast<cs4031_device &>(*device).set_keybctag(_keybctag);
 
 #define MCFG_CS4031_IOR(_ior) \
-	devcb = &downcast<cs4031_device *>(device)->set_ior_callback(DEVCB_##_ior);
+	downcast<cs4031_device *>(device)->set_ior_callback(DEVCB_##_ior);
 
 #define MCFG_CS4031_IOW(_iow) \
-	devcb = &downcast<cs4031_device *>(device)->set_iow_callback(DEVCB_##_iow);
+	downcast<cs4031_device *>(device)->set_iow_callback(DEVCB_##_iow);
 
 #define MCFG_CS4031_TC(_tc) \
-	devcb = &downcast<cs4031_device *>(device)->set_tc_callback(DEVCB_##_tc);
+	downcast<cs4031_device *>(device)->set_tc_callback(DEVCB_##_tc);
 
 #define MCFG_CS4031_HOLD(_hold) \
-	devcb = &downcast<cs4031_device *>(device)->set_hold_callback(DEVCB_##_hold);
+	downcast<cs4031_device *>(device)->set_hold_callback(DEVCB_##_hold);
 
 #define MCFG_CS4031_NMI(_nmi) \
-	devcb = &downcast<cs4031_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	downcast<cs4031_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_CS4031_INTR(_intr) \
-	devcb = &downcast<cs4031_device *>(device)->set_intr_callback(DEVCB_##_intr);
+	downcast<cs4031_device *>(device)->set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_CS4031_CPURESET(_cpureset) \
-	devcb = &downcast<cs4031_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
+	downcast<cs4031_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
 
 #define MCFG_CS4031_A20M(_a20m) \
-	devcb = &downcast<cs4031_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
+	downcast<cs4031_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
 
 #define MCFG_CS4031_SPKR(_spkr) \
-	devcb = &downcast<cs4031_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
+	downcast<cs4031_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
 
 
 //**************************************************************************

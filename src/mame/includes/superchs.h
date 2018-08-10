@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+#ifndef MAME_INCLUDES_SUPERCHS_H
+#define MAME_INCLUDES_SUPERCHS_H
+
+#pragma once
+
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
 #include "emupal.h"
@@ -17,8 +22,8 @@ struct schs_tempsprite
 class superchs_state : public driver_device
 {
 public:
-	superchs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	superchs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
 		m_shared_ram(*this,"shared_ram"),
@@ -29,7 +34,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_volume(*this, "SOUND")
-		{ }
+	{ }
 
 	void superchs(machine_config &config);
 	void chase3(machine_config &config);
@@ -66,3 +71,5 @@ private:
 	void superchs_cpub_map(address_map &map);
 	void superchs_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SUPERCHS_H

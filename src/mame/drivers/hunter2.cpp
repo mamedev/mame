@@ -51,6 +51,11 @@ public:
 		, m_bank3(*this, "bank3")
 	{ }
 
+	void hunter2(machine_config &config);
+
+	void init_hunter2();
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(serial_dsr_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -64,17 +69,16 @@ public:
 	DECLARE_WRITE8_MEMBER(irqctrl_w);
 	DECLARE_WRITE8_MEMBER(memmap_w);
 	DECLARE_PALETTE_INIT(hunter2);
-	void init_hunter2();
+
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 	DECLARE_WRITE_LINE_MEMBER(timer1_out);
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
-	void hunter2(machine_config &config);
 	void hunter2_banked_mem(address_map &map);
 	void hunter2_io(address_map &map);
 	void hunter2_mem(address_map &map);
-private:
+
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
 	virtual void machine_reset() override;
@@ -387,7 +391,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
 	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL(4'915'200)/2/2) // unknown clock

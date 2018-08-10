@@ -156,11 +156,10 @@ public:
 	void konamigv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-
 	void konamigv_map(address_map &map);
 
-private:
+	virtual void machine_start() override;
+
 	DECLARE_WRITE16_MEMBER(btc_trackball_w);
 	DECLARE_READ16_MEMBER(tokimeki_serial_r);
 	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
@@ -191,10 +190,9 @@ public:
 
 	void simpbowl(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
-private:
 	DECLARE_READ16_MEMBER(flash_r);
 	DECLARE_WRITE16_MEMBER(flash_w);
 

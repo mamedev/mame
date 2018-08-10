@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_DEVICE_IO_MAP(bw2_io)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE( MSM6255_TAG, msm6255_device, screen_update )
@@ -561,14 +561,14 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_PALETTE_INIT_OWNER(bw2_state, bw2)
 
 	// devices
-	MCFG_DEVICE_ADD(m_pit, PIT8253, 0)
-	MCFG_PIT8253_CLK0(16_MHz_XTAL / 4) // 8251 USART TXC, RXC
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_uart, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart, i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(11000) // LCD controller
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_pit, pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw2_state, mtron_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(16_MHz_XTAL / 4); // 8251 USART TXC, RXC
+	m_pit->out_handler<0>().set(m_uart, FUNC(i8251_device::write_txc));
+	m_pit->out_handler<0>().append(m_uart, FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<1>(11000); // LCD controller
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+	m_pit->set_clk<2>(0); // Floppy /MTRON
+	m_pit->out_handler<2>().set(FUNC(bw2_state::mtron_w));
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, bw2_state, ppi_pa_w))

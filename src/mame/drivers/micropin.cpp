@@ -46,6 +46,12 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pentacup2(machine_config &config);
+	void micropin(machine_config &config);
+
+	void init_micropin();
+
+private:
 	DECLARE_READ8_MEMBER(pia51_r);
 	DECLARE_WRITE8_MEMBER(pia51_w);
 	DECLARE_READ8_MEMBER(p51b_r);
@@ -56,14 +62,11 @@ public:
 	DECLARE_WRITE8_MEMBER(p50a_w);
 	DECLARE_WRITE8_MEMBER(p50b_w);
 	DECLARE_WRITE8_MEMBER(p51a_w);
-	void init_micropin();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void pentacup2(machine_config &config);
-	void micropin(machine_config &config);
 	void micropin_map(address_map &map);
 	void pentacup2_io(address_map &map);
 	void pentacup2_map(address_map &map);
-private:
+
 	uint8_t m_row;
 	uint8_t m_counter;
 	uint8_t m_beep_time;
@@ -304,7 +307,7 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_micropin)
+	config.set_default_layout(layout_micropin);
 
 	/* Sound */
 	genpin_audio(config);

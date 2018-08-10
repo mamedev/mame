@@ -37,7 +37,7 @@ public:
 
 	void hanaroku(machine_config &config);
 
-protected:
+private:
 	/* video-related */
 	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
@@ -49,7 +49,6 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hanaroku_map(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_spriteram1;
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_spriteram3;

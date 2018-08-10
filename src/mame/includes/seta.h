@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SETA_H
+#define MAME_INCLUDES_SETA_H
+
+#pragma once
 
 /***************************************************************************
 
@@ -59,6 +63,7 @@ public:
 		m_extra_port(*this, "EXTRA"),
 		m_track_x(*this, "TRACK%u_X", 1U),
 		m_track_y(*this, "TRACK%u_Y", 1U),
+		m_key(*this, "KEY%u", 0U),
 		m_sharedram(*this,"sharedram"),
 		m_vram(*this,"vram_%u", 0U),
 		m_vctrl(*this,"vctrl_%u", 0U),
@@ -67,8 +72,78 @@ public:
 		m_gun_recoil(*this,"Player%u_Gun_Recoil", 1U),
 		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void keroppij(machine_config &config);
+	void madshark(machine_config &config);
+	void jjsquawb(machine_config &config);
+	void oisipuzl(machine_config &config);
+	void zingzipbl(machine_config &config);
+	void eightfrc(machine_config &config);
+	void gundhara(machine_config &config);
+	void triplfun(machine_config &config);
+	void calibr50(machine_config &config);
+	void blandiap(machine_config &config);
+	void wits(machine_config &config);
+	void msgundam(machine_config &config);
+	void extdwnhl(machine_config &config);
+	void pairlove(machine_config &config);
+	void zingzip(machine_config &config);
+	void wiggie(machine_config &config);
+	void umanclub(machine_config &config);
+	void tndrcade(machine_config &config);
+	void daioh(machine_config &config);
+	void atehate(machine_config &config);
+	void usclssic(machine_config &config);
+	void zombraid(machine_config &config);
+	void thunderlbl(machine_config &config);
+	void blockcarb(machine_config &config);
+	void wrofaero(machine_config &config);
+	void downtown(machine_config &config);
+	void blockcar(machine_config &config);
+	void crazyfgt(machine_config &config);
+	void keroppi(machine_config &config);
+	void drgnunit(machine_config &config);
+	void orbs(machine_config &config);
+	void daiohp(machine_config &config);
+	void magspeed(machine_config &config);
+	void krzybowl(machine_config &config);
+	void kiwame(machine_config &config);
+	void qzkklgy2(machine_config &config);
+	void kamenrid(machine_config &config);
+	void superbar(machine_config &config);
+	void jjsquawk(machine_config &config);
+	void twineagl(machine_config &config);
+	void blandia(machine_config &config);
+	void thunderl(machine_config &config);
+	void metafox(machine_config &config);
+	void utoukond(machine_config &config);
+	void rezon(machine_config &config);
+
+	void init_bank6502();
+	void init_downtown();
+	void init_rezon();
+	void init_twineagl();
+	void init_crazyfgt();
+	void init_metafox();
+	void init_arbalest();
+	void init_wiggie();
+	void init_blandia();
+	void init_kiwame();
+	void init_eightfrc();
+	void init_pairlove();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
+
+	DECLARE_PALETTE_INIT(palette_init_RRRRRGGGGGBBBBB_proms);
+
+	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+
+	uint32_t screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
@@ -88,6 +163,7 @@ public:
 	optional_ioport m_extra_port;
 	optional_ioport_array<2> m_track_x;
 	optional_ioport_array<2> m_track_y;
+	optional_ioport_array<5> m_key;
 
 	optional_shared_ptr<uint8_t> m_sharedram;
 	optional_shared_ptr_array<uint16_t, 2> m_vram;
@@ -144,8 +220,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sub_ctrl_w);
 	DECLARE_READ16_MEMBER(seta_dsw_r);
 	DECLARE_READ16_MEMBER(usclssic_dsw_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
+
 	DECLARE_WRITE8_MEMBER(usclssic_lockout_w);
 	ADC083X_INPUT_CB(zombraid_adc_cb);
 	DECLARE_READ16_MEMBER(zombraid_gun_r);
@@ -179,18 +254,7 @@ public:
 	DECLARE_READ8_MEMBER(dsw1_r);
 	DECLARE_READ8_MEMBER(dsw2_r);
 	DECLARE_READ16_MEMBER(extra_r);
-	void init_bank6502();
-	void init_downtown();
-	void init_rezon();
-	void init_twineagl();
-	void init_crazyfgt();
-	void init_metafox();
-	void init_arbalest();
-	void init_wiggie();
-	void init_blandia();
-	void init_kiwame();
-	void init_eightfrc();
-	void init_pairlove();
+
 	TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(seta_no_layers);
@@ -198,7 +262,7 @@ public:
 	DECLARE_VIDEO_START(twineagl_1_layer);
 	DECLARE_VIDEO_START(seta_1_layer);
 	DECLARE_MACHINE_RESET(calibr50);
-	DECLARE_PALETTE_INIT(palette_init_RRRRRGGGGGBBBBB_proms);
+
 	DECLARE_PALETTE_INIT(usclssic);
 	DECLARE_MACHINE_START(usclssic);
 	DECLARE_VIDEO_START(seta_2_layers);
@@ -214,7 +278,7 @@ public:
 	uint32_t screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_seta_buffer_sprites);
 	DECLARE_READ16_MEMBER(ipl0_ack_r);
 	DECLARE_WRITE16_MEMBER(ipl0_ack_w);
@@ -239,52 +303,7 @@ public:
 	void uPD71054_timer_init(  );
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(utoukond_ym3438_interrupt);
-	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
-	void keroppij(machine_config &config);
-	void madshark(machine_config &config);
-	void jjsquawb(machine_config &config);
-	void oisipuzl(machine_config &config);
-	void zingzipbl(machine_config &config);
-	void eightfrc(machine_config &config);
-	void gundhara(machine_config &config);
-	void triplfun(machine_config &config);
-	void calibr50(machine_config &config);
-	void blandiap(machine_config &config);
-	void wits(machine_config &config);
-	void msgundam(machine_config &config);
-	void extdwnhl(machine_config &config);
-	void pairlove(machine_config &config);
-	void zingzip(machine_config &config);
-	void wiggie(machine_config &config);
-	void umanclub(machine_config &config);
-	void tndrcade(machine_config &config);
-	void daioh(machine_config &config);
-	void atehate(machine_config &config);
-	void usclssic(machine_config &config);
-	void zombraid(machine_config &config);
-	void thunderlbl(machine_config &config);
-	void blockcarb(machine_config &config);
-	void wrofaero(machine_config &config);
-	void downtown(machine_config &config);
-	void blockcar(machine_config &config);
-	void crazyfgt(machine_config &config);
-	void keroppi(machine_config &config);
-	void drgnunit(machine_config &config);
-	void orbs(machine_config &config);
-	void daiohp(machine_config &config);
-	void magspeed(machine_config &config);
-	void krzybowl(machine_config &config);
-	void kiwame(machine_config &config);
-	void qzkklgy2(machine_config &config);
-	void kamenrid(machine_config &config);
-	void superbar(machine_config &config);
-	void jjsquawk(machine_config &config);
-	void twineagl(machine_config &config);
-	void blandia(machine_config &config);
-	void thunderl(machine_config &config);
-	void metafox(machine_config &config);
-	void utoukond(machine_config &config);
-	void rezon(machine_config &config);
+
 	void atehate_map(address_map &map);
 	void blandia_map(address_map &map);
 	void blandiap_map(address_map &map);
@@ -347,15 +366,20 @@ public:
 		m_coin_start_cycles(0)
 	{ }
 
+	void setaroul(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
+private:
 	DECLARE_WRITE16_MEMBER(rtc_w);
 	DECLARE_READ16_MEMBER(rtc_r);
 
 	DECLARE_READ16_MEMBER(inputs_r);
 	DECLARE_WRITE16_MEMBER(mux_w);
-
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
 	DECLARE_WRITE8_MEMBER(pay_w);
 	DECLARE_WRITE8_MEMBER(led_w);
@@ -374,12 +398,10 @@ public:
 	DECLARE_PALETTE_INIT(setaroul);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void setaroul(machine_config &config);
 	void setaroul_map(address_map &map);
-private:
+
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<26> m_bet;
@@ -406,6 +428,8 @@ public:
 		m_dsw1(*this, "DSW1"),
 		m_dsw2_3(*this, "DSW2_3"),
 		m_cabinet(*this, "CABINET"),
+		m_p1x(*this, "P1X"),
+		m_p1y(*this, "P1Y"),
 		m_out_cancel(*this, "cancel%u", 1U),
 		m_out_payout(*this, "payout%u", 1U),
 		m_out_start(*this, "start%u", 1U),
@@ -415,6 +439,12 @@ public:
 		m_out(0)
 	{ }
 
+	void inttoote(machine_config &config);
+	void jockeyc(machine_config &config);
+
+	void init_inttoote();
+
+private:
 	DECLARE_WRITE16_MEMBER(rtc_w);
 	DECLARE_READ16_MEMBER(rtc_r);
 
@@ -436,12 +466,10 @@ public:
 	DECLARE_WRITE16_MEMBER(inttoote_mux_w);
 	DECLARE_WRITE16_MEMBER(inttoote_out_w);
 	DECLARE_READ16_MEMBER(inttoote_700000_r);
-	void init_inttoote();
-	void inttoote(machine_config &config);
-	void jockeyc(machine_config &config);
+
 	void inttoote_map(address_map &map);
 	void jockeyc_map(address_map &map);
-private:
+
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper1, m_hopper2; // the 2nd hopper is optional
 
@@ -449,6 +477,8 @@ private:
 	required_ioport_array<5> m_key1, m_key2;
 	required_ioport m_dsw1, m_dsw2_3;
 	optional_ioport m_cabinet;
+	optional_ioport m_p1x;
+	optional_ioport m_p1y;
 
 	output_finder<2> m_out_cancel;
 	output_finder<2> m_out_payout;
@@ -462,3 +492,5 @@ private:
 	void update_hoppers();
 	void show_outputs();
 };
+
+#endif // MAME_INCLUDES_SETA_H

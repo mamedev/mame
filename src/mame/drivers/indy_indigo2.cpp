@@ -81,15 +81,18 @@ public:
 	{
 	}
 
+	void ip225015(machine_config &config);
+	void ip224613(machine_config &config);
+	void ip244415(machine_config &config);
+
+	void init_ip225015();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE32_MEMBER(ip22_write_ram);
 
-	void init_ip225015();
-	void ip225015(machine_config &config);
-	void ip224613(machine_config &config);
-	void ip244415(machine_config &config);
 	void ip225015_map(address_map &map);
 
 	static void cdrom_config(device_t *device);
@@ -99,7 +102,6 @@ public:
 	static const char* IOC2_TAG;
 	static const char* RTC_TAG;
 
-protected:
 	required_device<mips3_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<sgi_mc_device> m_sgi_mc;

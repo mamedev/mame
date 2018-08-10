@@ -315,10 +315,10 @@ DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 //**************************************************************************
 
 #define MCFG_YGV608_VBLANK_HANDLER( _intcallb ) \
-	devcb = &downcast<ygv608_device &>(*device).set_vblank_callback(DEVCB_##_intcallb);
+	downcast<ygv608_device &>(*device).set_vblank_callback(DEVCB_##_intcallb);
 
 #define MCFG_YGV608_RASTER_HANDLER( _intcallb ) \
-	devcb = &downcast<ygv608_device &>(*device).set_raster_callback(DEVCB_##_intcallb);
+	downcast<ygv608_device &>(*device).set_raster_callback(DEVCB_##_intcallb);
 
 
 #endif

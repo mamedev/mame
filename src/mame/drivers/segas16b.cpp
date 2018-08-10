@@ -3813,11 +3813,12 @@ MACHINE_CONFIG_END
 
 // same as the above, but with custom Sega ICs
 
-MACHINE_CONFIG_START(segas16b_state::rom_5797_fragment)
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier")
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_1")
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_2")
-MACHINE_CONFIG_END
+void segas16b_state::rom_5797_fragment(machine_config &config)
+{
+	SEGA_315_5248_MULTIPLIER(config, m_multiplier, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
+}
 
 MACHINE_CONFIG_START(segas16b_state::system16b_5797)
 	system16b(config);

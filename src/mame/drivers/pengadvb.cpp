@@ -49,10 +49,11 @@ public:
 		, m_bank(*this, "bank%u", 0U)
 	{ }
 
-	void init_pengadvb();
 	void pengadvb(machine_config &config);
 
-protected:
+	void init_pengadvb();
+
+private:
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE8_MEMBER(megarom_bank_w);
@@ -70,7 +71,6 @@ protected:
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_page;
 	required_memory_bank_array<4> m_bank;

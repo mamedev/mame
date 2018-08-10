@@ -763,8 +763,8 @@ VIDEO_START_MEMBER(roundup5_state,roundup5)
 
 	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
 
-	save_pointer(NAME(m_tx_gfxram.get()),0x20000);
-	save_pointer(NAME(m_bg_gfxram.get()),0x20000);
+	save_pointer(NAME(m_tx_gfxram), 0x20000);
+	save_pointer(NAME(m_bg_gfxram), 0x20000);
 }
 
 void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect)

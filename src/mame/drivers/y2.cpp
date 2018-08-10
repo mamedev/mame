@@ -33,9 +33,11 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
+	void system_board_y2(machine_config &config);
+
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_system_board_y2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void system_board_y2(machine_config &config);
 };
 
 void system_board_y2_state::video_start()

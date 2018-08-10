@@ -180,7 +180,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
-protected:
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -699,12 +699,12 @@ MACHINE_CONFIG_START(z100_state::z100)
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, z100_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, z100_state, video_pia_A_w))

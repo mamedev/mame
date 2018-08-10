@@ -24,6 +24,51 @@ class segas32_state : public device_t
 public:
 	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void init_alien3(void);
+	void init_arescue(int m_hasdsp);
+	void init_arabfgt(void);
+	void init_brival(void);
+	void init_darkedge(void);
+	void init_dbzvrvs(void);
+	void init_f1en(void);
+	void init_f1lap(void);
+	void init_ga2(void);
+	void init_harddunk(void);
+	void init_holo(void);
+	void init_jpark(void);
+	void init_orunners(void);
+	void init_radm(void);
+	void init_radr(void);
+	void init_scross(void);
+	void init_slipstrm(void);
+	void init_sonic(void);
+	void init_sonicp(void);
+	void init_spidman(void);
+	void init_svf(void);
+	void init_jleague(void);
+	void init_titlef(void);
+
+	cpu_device* maincpu() { return m_maincpu; }
+
+	uint32_t screen_update_system32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
+	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
+
+	DECLARE_WRITE8_MEMBER(misc_output_0_w);
+	DECLARE_WRITE8_MEMBER(misc_output_1_w);
+	DECLARE_WRITE8_MEMBER(sw2_output_0_w);
+	DECLARE_WRITE8_MEMBER(sw2_output_1_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_0_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_1_w);
+	DECLARE_WRITE8_MEMBER(tilebank_external_w);
+
+protected:
+	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	typedef void (segas32_state::*sys32_output_callback)(int which, uint16_t data);
 
 	struct layer_info
@@ -77,13 +122,7 @@ public:
 	DECLARE_WRITE32_MEMBER(multi32_mixer_1_w);
 	DECLARE_READ8_MEMBER(int_control_r);
 	DECLARE_WRITE8_MEMBER(int_control_w);
-	DECLARE_WRITE8_MEMBER(misc_output_0_w);
-	DECLARE_WRITE8_MEMBER(misc_output_1_w);
-	DECLARE_WRITE8_MEMBER(sw2_output_0_w);
-	DECLARE_WRITE8_MEMBER(sw2_output_1_w);
-	DECLARE_WRITE8_MEMBER(tilebank_external_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_0_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_1_w);
+
 	DECLARE_WRITE16_MEMBER(random_number_w);
 	DECLARE_READ16_MEMBER(random_number_r);
 	DECLARE_READ8_MEMBER(shared_ram_r);
@@ -99,13 +138,10 @@ public:
 	DECLARE_WRITE8_MEMBER(scross_bank_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	uint32_t screen_update_system32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
+
 	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(update_sprites);
-	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
+
 	void common_start(int multi32);
 	void system32_set_vblank(int state);
 	inline uint16_t xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value);
@@ -153,36 +189,11 @@ public:
 	void update_tilemap_text(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
 	void update_bitmap(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
 	void update_background(struct layer_info *layer, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+
 	void signal_sound_irq(int which);
 	void clear_sound_irq(int which);
 	void darkedge_fd1149_vblank();
 	void f1lap_fd1149_vblank();
-	cpu_device* maincpu() { return m_maincpu; }
-
-	void init_alien3(void);
-	void init_arescue(int m_hasdsp);
-	void init_arabfgt(void);
-	void init_brival(void);
-	void init_darkedge(void);
-	void init_dbzvrvs(void);
-	void init_f1en(void);
-	void init_f1lap(void);
-	void init_ga2(void);
-	void init_harddunk(void);
-	void init_holo(void);
-	void init_jpark(void);
-	void init_orunners(void);
-	void init_radm(void);
-	void init_radr(void);
-	void init_scross(void);
-	void init_slipstrm(void);
-	void init_sonic(void);
-	void init_sonicp(void);
-	void init_spidman(void);
-	void init_svf(void);
-	void init_jleague(void);
-	void init_titlef(void);
 
 	void ga2_main_map(address_map &map);
 	void multi32_6player_map(address_map &map);
@@ -200,8 +211,6 @@ public:
 	void upd7725_data_map(address_map &map);
 	void upd7725_prg_map(address_map &map);
 	void v25_map(address_map &map);
-protected:
-	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

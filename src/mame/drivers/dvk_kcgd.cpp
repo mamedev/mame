@@ -68,6 +68,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
+	void kcgd(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -95,13 +98,12 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_index_w);
 	DECLARE_WRITE8_MEMBER(palette_data_w);
 
-	emu_timer *m_vsync_on_timer;
-	emu_timer *m_vsync_off_timer;
+	//emu_timer *m_vsync_on_timer;
+	//emu_timer *m_vsync_off_timer;
 	emu_timer *m_500hz_timer;
 
-	void kcgd(machine_config &config);
 	void kcgd_mem(address_map &map);
-private:
+
 	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
@@ -114,7 +116,6 @@ private:
 	} m_video;
 	std::unique_ptr<uint32_t[]> m_videoram;
 
-protected:
 	required_device<cpu_device> m_maincpu;
 //  required_device<ms7004_device> m_ms7004;
 	required_device<palette_device> m_palette;

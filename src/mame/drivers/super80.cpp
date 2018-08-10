@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(super80_state::super80)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80)
-	MCFG_DEFAULT_LAYOUT( layout_super80 )
+	config.set_default_layout(layout_super80);
 	MCFG_VIDEO_START_OVERRIDE(super80_state,super80)
 
 	/* sound hardware */
@@ -821,7 +821,7 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_MC6845_UPDATE_ROW_CB(super80_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80v)
-	MCFG_DEFAULT_LAYOUT( layout_super80 )
+	config.set_default_layout(layout_super80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

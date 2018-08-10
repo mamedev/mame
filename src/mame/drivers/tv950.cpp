@@ -65,6 +65,9 @@ public:
 		, m_gfx(*this, "graphics")
 	{ }
 
+	void tv950(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(via_b_r);
@@ -75,9 +78,8 @@ public:
 	DECLARE_WRITE8_MEMBER(row_addr_w);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
-	void tv950(machine_config &config);
 	void tv950_mem(address_map &map);
-private:
+
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
 	uint8_t m_attr_screen;

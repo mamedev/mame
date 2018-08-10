@@ -204,6 +204,11 @@ public:
 		m_first_ram_page(0)
 		{ }
 
+	void ti99_2(machine_config &config);
+	void ti99_224(machine_config &config);
+	void ti99_232(machine_config &config);
+
+private:
 	DECLARE_MACHINE_START( ti99_224 );
 	DECLARE_MACHINE_START( ti99_232 );
 	DECLARE_MACHINE_RESET( ti99_2 );
@@ -223,11 +228,6 @@ public:
 	void crumap(address_map &map);
 	void memmap(address_map &map);
 
-	void ti99_2(machine_config &config);
-	void ti99_224(machine_config &config);
-	void ti99_232(machine_config &config);
-
-private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<bus::ti99::internal::video992_device> m_videoctrl;
 	required_device<bus::ti99::internal::io992_device>    m_io992;

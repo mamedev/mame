@@ -508,10 +508,10 @@ static const gfx_layout roz_layout =
 	16*128
 };
 
-static GFXDECODE_START( gfx_2 )
-	GFXDECODE_ENTRY( NAMCOFL_TILEGFXREGION, 0, tile_layout, 0x1000, 0x08 )
-	GFXDECODE_ENTRY( NAMCOFL_SPRITEGFXREGION,   0, obj_layout,      0x0000, 0x10 )
-	GFXDECODE_ENTRY( NAMCOFL_ROTGFXREGION,      0, roz_layout,      0x1800, 0x08 )
+static GFXDECODE_START( gfx_namcofl )
+	GFXDECODE_ENTRY( NAMCOFL_TILEGFXREGION,   0, tile_layout, 0x1000, 0x08 )
+	GFXDECODE_ENTRY( NAMCOFL_SPRITEGFXREGION, 0, obj_layout,  0x0000, 0x10 )
+	GFXDECODE_ENTRY( NAMCOFL_ROTGFXREGION,    0, roz_layout,  0x1800, 0x08 )
 GFXDECODE_END
 
 
@@ -605,10 +605,10 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcofl)
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
@@ -795,7 +795,7 @@ ROM_END
 void namcofl_state::common_init()
 {
 	m_workram = std::make_unique<uint32_t[]>(0x100000/4);
-	save_pointer(NAME(m_workram.get()), 0x100000/4),
+	save_pointer(NAME(m_workram), 0x100000/4),
 
 	save_item(NAME(m_mcu_port6));
 	save_item(NAME(m_sprbank));

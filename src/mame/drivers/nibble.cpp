@@ -67,6 +67,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void nibble(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
@@ -80,7 +83,6 @@ public:
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void nibble(machine_config &config);
 	void nibble_cru_map(address_map &map);
 	void nibble_map(address_map &map);
 };

@@ -452,6 +452,48 @@
     Apollo69 10/19/99
 
 
+
+    Edge connector pinout:
+    ======================
+
+    Kindly submitted by Apollo69 (apollo69@columbus.rr.com)
+    =================================================================
+                  MVS                            JAMMA
+    =================================================================
+           GND = A |  1 = GND              GND = A |  1 = GND
+           GND = B |  2 = GND              GND = B |  2 = GND
+           +5V = C |  3 = +5V              +5V = C |  3 = +5V
+           +5V = D |  4 = +5V              +5V = D |  4 = +5V
+           N/C = E |  5 = N/C                    E |  5
+          +12V = F |  6 = +12V            +12V = F |  6 = +12V
+           key = H |  7 = key              key = H |  7 = key
+     counter 2 = J |  8 = counter 1  counter 2 = J |  8 = counter 1
+     lockout 2 = K |  9 = lockout 1  lockout 2 = K |  9 = lockout 1
+     L speaker = L | 10 = R speaker   speaker- = L | 10 = speaker+
+          test = M | 11 = audio+     audio GND = M | 11
+         green = N | 12 = red            green = N | 12 = red
+          sync = P | 13 = blue            sync = P | 13 = blue
+       service = R | 14 = video GND    service = R | 14 = video GND
+     coin 4 2P = S | 15 = coin 3 1P              S | 15 = test
+     coin 2 2P = T | 16 = coin 1 1P  coin 2 2P = T | 16 = coin 1 1P
+      2P start = U | 17 = 1P start    2P start = U | 17 = 1P start
+         2P up = V | 18 = 1P up          2P up = V | 18 = 1P up
+       2P down = W | 19 = 1P down      2P down = W | 19 = 1P down
+       2P left = X | 20 = 1P left      2P left = X | 20 = 1P left
+      2P right = Y | 21 = 1P right    2P right = Y | 21 = 1P right
+          2P A = Z | 22 = 1P A            2P A = Z | 22 = 1P A
+          2P B = a | 23 = 1P B            2P B = a | 23 = 1P B
+          2P C = b | 24 = 1P C            2P C = b | 24 = 1P C
+          2P D = c | 25 = 1P D            2P D = c | 25 = 1P D
+      sel down = d | 26 = sel up                 d | 26 = data input
+           GND = e | 27 = GND              GND = e | 27 = GND
+           GND = f | 28 = GND              GND = f | 28 = GND
+
+    Later JAMMA systems drop coin lockouts and audio ground.
+    Some JAMMA systems omit data input switch.
+
+
+
 *****************************************************************************
 
     Watchdog:
@@ -1017,7 +1059,7 @@ CUSTOM_INPUT_MEMBER(neogeo_base_state::get_memcard_status)
 {
 	// D0 and D1 are memcard 1 and 2 presence indicators, D2 indicates memcard
 	// write protect status (we are always write enabled)
-	return (!m_memcard || (m_memcard->present() == -1)) ? 0x07 : 0x00;
+	return (!m_memcard || !m_memcard->present()) ? 0x07 : 0x00;
 }
 
 
@@ -1027,7 +1069,7 @@ READ16_MEMBER(neogeo_base_state::memcard_r)
 
 	uint16_t ret;
 
-	if (m_memcard->present() != -1)
+	if (m_memcard->present())
 		ret = m_memcard->read(space, offset) | 0xff00;
 	else
 		ret = 0xffff;
@@ -1042,7 +1084,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		if (m_memcard->present() != -1)
+		if (m_memcard->present())
 				m_memcard->write(space, offset, data);
 	}
 }
@@ -1909,7 +1951,7 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, neogeo_base_state, set_palette_bank))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_neogeo)
+	config.set_default_layout(layout_neogeo);
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
@@ -1921,17 +1963,17 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_DEVICE_ADD(m_sprgen, NEOGEO_SPRITE_OPTIMZIED, 0)
 
 	/* audio hardware */
-	MCFG_INPUT_MERGER_ALL_HIGH(m_audionmi)
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(m_audiocpu, INPUT_LINE_NMI));
+	INPUT_MERGER_ALL_HIGH(config, m_audionmi);
+	m_audionmi->output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(m_audionmi, input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->set_separate_acknowledge(false);
+	m_soundlatch->data_pending_callback().set(m_audionmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch2)
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD(m_ym, YM2610, NEOGEO_YM2610_CLOCK)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE(m_audiocpu, 0))
+	YM2610(config, m_ym, NEOGEO_YM2610_CLOCK);
+	m_ym->irq_handler().set_inputline(m_audiocpu, 0);
 MACHINE_CONFIG_END
 
 
@@ -1990,7 +2032,7 @@ MACHINE_CONFIG_START(mvs_led_state::mv1)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2031,7 +2073,7 @@ MACHINE_CONFIG_START(mvs_led_el_state::mv2f)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2048,7 +2090,7 @@ MACHINE_CONFIG_START(mvs_led_el_state::mv4f)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2067,7 +2109,7 @@ MACHINE_CONFIG_START(mvs_led_el_state::mv6f)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2088,7 +2130,7 @@ MACHINE_CONFIG_START(mvs_led_state::mv1_fixed)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", true)
 
@@ -2133,7 +2175,7 @@ MACHINE_CONFIG_START(aes_state::aes)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(aes_main_map)
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CARTRIDGE_ADD("cslot1", neogeo_cart, nullptr)
 
@@ -2456,7 +2498,7 @@ MACHINE_CONFIG_START(mvs_state::irrmaze)
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "irrmaze", true)
 
-	MCFG_DEFAULT_LAYOUT(layout_irrmaze)
+	config.set_default_layout(layout_irrmaze);
 
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
 MACHINE_CONFIG_END

@@ -18,10 +18,10 @@
 //**************************************************************************
 
 #define MCFG_KM035_TX_HANDLER(_cb) \
-	devcb = &downcast<km035_device &>(*device).set_tx_handler(DEVCB_##_cb);
+	downcast<km035_device &>(*device).set_tx_handler(DEVCB_##_cb);
 
 #define MCFG_KM035_RTS_HANDLER(_cb) \
-	devcb = &downcast<km035_device &>(*device).set_rts_handler(DEVCB_##_cb);
+	downcast<km035_device &>(*device).set_rts_handler(DEVCB_##_cb);
 
 
 //**************************************************************************

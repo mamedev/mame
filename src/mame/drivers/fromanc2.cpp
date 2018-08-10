@@ -490,7 +490,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 
 	save_item(NAME(m_subcpu_int_flag));
 	save_item(NAME(m_subcpu_nmi_flag));
-	save_pointer(NAME(m_bankedram.get()), 0x4000 * 3);
+	save_pointer(NAME(m_bankedram), 0x4000 * 3);
 }
 
 void fromanc2_state::machine_reset()
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -649,7 +649,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

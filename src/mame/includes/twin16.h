@@ -27,6 +27,17 @@ public:
 		m_sprite_gfx_ram(*this, "sprite_gfx_ram"),
 		m_gfxrom(*this, "gfxrom") { }
 
+	void devilw(machine_config &config);
+	void miaj(machine_config &config);
+	void twin16(machine_config &config);
+
+	void init_twin16();
+
+	DECLARE_WRITE8_MEMBER(volume_callback);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
+	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
@@ -70,29 +81,22 @@ public:
 	DECLARE_WRITE8_MEMBER(upd_reset_w);
 	DECLARE_WRITE8_MEMBER(upd_start_w);
 
-	void init_twin16();
-
 	TILE_GET_INFO_MEMBER(fix_tile_info);
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
-	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
 	TIMER_CALLBACK_MEMBER(sprite_tick);
-	DECLARE_WRITE8_MEMBER(volume_callback);
-	void devilw(machine_config &config);
-	void miaj(machine_config &config);
-	void twin16(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base);
-private:
+
 	int set_sprite_timer();
 	void spriteram_process();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap );
@@ -107,17 +111,19 @@ public:
 		: twin16_state(mconfig, type, tag)
 	{}
 
-	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
-	DECLARE_WRITE16_MEMBER(gfx_bank_w);
+	void fround(machine_config &config);
+
 	void init_fround();
 
-	void fround(machine_config &config);
+private:
+	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
+	DECLARE_WRITE16_MEMBER(gfx_bank_w);
+
 	void fround_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
 
-private:
 	uint8_t m_gfx_bank[4];
 };
 
@@ -128,10 +134,12 @@ public:
 		: twin16_state(mconfig, type, tag)
 	{}
 
-	DECLARE_WRITE8_MEMBER(nvram_bank_w);
+	void cuebrickj(machine_config &config);
+
 	void init_cuebrickj();
 
-	void cuebrickj(machine_config &config);
 private:
+	DECLARE_WRITE8_MEMBER(nvram_bank_w);
+
 	uint16_t m_nvram[0x400 * 0x20 / 2];
 };

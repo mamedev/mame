@@ -82,7 +82,7 @@ public:
 
 	void whousetc(machine_config &config);
 
-protected:
+private:
 	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
 	{
 		m_digit[(Dsp << 2) | offset] = data;
@@ -102,7 +102,6 @@ protected:
 	void io_map(address_map &map);
 	void program_map(address_map &map);
 
-private:
 	required_device_array<dl1416_device, 4> m_dsp;
 	output_finder<16> m_digit;
 };
@@ -197,7 +196,7 @@ MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
 	MCFG_DEVICE_ADD("dsp3", DL1416B, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<3>))
 
-	MCFG_DEFAULT_LAYOUT(layout_whousetc)
+	config.set_default_layout(layout_whousetc);
 MACHINE_CONFIG_END
 
 

@@ -55,31 +55,31 @@
 	downcast<mc68901_device &>(*device).set_tx_clock(_clk);
 
 #define MCFG_MC68901_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<mc68901_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<mc68901_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_GPIO_CB(_devcb) \
-	devcb = &downcast<mc68901_device &>(*device).set_out_gpio_callback(DEVCB_##_devcb);
+	downcast<mc68901_device &>(*device).set_out_gpio_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TAO_CB(_devcb) \
-	devcb = &downcast<mc68901_device &>(*device).set_out_tao_callback(DEVCB_##_devcb);
+	downcast<mc68901_device &>(*device).set_out_tao_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TBO_CB(_devcb) \
-	devcb = &downcast<mc68901_device &>(*device).set_out_tbo_callback(DEVCB_##_devcb);
+	downcast<mc68901_device &>(*device).set_out_tbo_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TCO_CB(_devcb) \
-	devcb = &downcast<mc68901_device &>(*device).set_out_tco_callback(DEVCB_##_devcb);
+	downcast<mc68901_device &>(*device).set_out_tco_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TDO_CB(_devcb) \
-	devcb = &downcast<mc68901_device &>(*device).set_out_tdo_callback(DEVCB_##_devcb);
+	downcast<mc68901_device &>(*device).set_out_tdo_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_SO_CB(_devcb) \
-	devcb = &downcast<mc68901_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
+	downcast<mc68901_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
 
 /*#define MCFG_MC68901_OUT_RR_CB(_devcb) \
-    devcb = &downcast<mc68901_device &>(*device).set_out_rr_callback(DEVCB_##_devcb);
+    downcast<mc68901_device &>(*device).set_out_rr_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68901_OUT_TR_CB(_devcb) \
-    devcb = &downcast<mc68901_device &>(*device).set_out_tr_callback(DEVCB_##_devcb);*/
+    downcast<mc68901_device &>(*device).set_out_tr_callback(DEVCB_##_devcb);*/
 
 
 //**************************************************************************

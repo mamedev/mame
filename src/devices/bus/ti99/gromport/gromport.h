@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	DECLARE_WRITE8_MEMBER(set_gromlines); // Combined GROM select lines
+	void set_gromlines(line_state mline, line_state moline, line_state gsq);
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	void set_mask(int mask) { m_mask = mask; }
@@ -72,7 +72,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(romgq_line) = 0;
-	virtual DECLARE_WRITE8_MEMBER(set_gromlines) = 0;
+	virtual void set_gromlines(line_state mline, line_state moline, line_state gsq) =0;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(gclock_in) = 0;
 
@@ -106,10 +106,10 @@ void gromport8(device_slot_interface &device);
 	MCFG_DEVICE_SLOT_INTERFACE(gromport8, "single", false)
 
 #define MCFG_GROMPORT_READY_HANDLER( _ready ) \
-	devcb = &downcast<bus::ti99::gromport::gromport_device &>(*device).set_ready_callback(DEVCB_##_ready);
+	downcast<bus::ti99::gromport::gromport_device &>(*device).set_ready_callback(DEVCB_##_ready);
 
 #define MCFG_GROMPORT_RESET_HANDLER( _reset ) \
-	devcb = &downcast<bus::ti99::gromport::gromport_device &>(*device).set_reset_callback(DEVCB_##_reset);
+	downcast<bus::ti99::gromport::gromport_device &>(*device).set_reset_callback(DEVCB_##_reset);
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device)
 

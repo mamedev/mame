@@ -32,6 +32,9 @@ public:
 		m_upd(*this, "upd%u", 1),
 		m_service(*this, "SERVICE") { }
 
+	void ultrsprt(machine_config &config);
+
+private:
 	static const uint32_t VRAM_PAGES      = 2;
 	static const uint32_t VRAM_PAGE_BYTES = 512 * 1024;
 
@@ -53,14 +56,12 @@ public:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ultrsprt(machine_config &config);
 	void sound_map(address_map &map);
 	void ultrsprt_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint32_t m_cpu_vram_page;
 };
@@ -220,7 +221,7 @@ void ultrsprt_state::machine_start()
 
 	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
-	save_pointer(NAME(m_vram.get()), VRAM_PAGE_BYTES * VRAM_PAGES);
+	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 

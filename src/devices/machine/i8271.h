@@ -9,16 +9,16 @@
 #include "fdc_pll.h"
 
 #define MCFG_I8271_IRQ_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8271_DRQ_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8271_HDL_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8271_OPT_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_opt_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_opt_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     MACROS
@@ -33,6 +33,10 @@ public:
 	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_hdl_wr_callback(Object &&cb) { return hdl_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_opt_wr_callback(Object &&cb) { return opt_cb.set_callback(std::forward<Object>(cb)); }
+	auto intrq_wr_callback() { return intrq_cb.bind(); }
+	auto drq_wr_callback() { return drq_cb.bind(); }
+	auto hdl_wr_callback() { return hdl_cb.bind(); }
+	auto opt_wr_callback() { return opt_cb.bind(); }
 
 	DECLARE_READ8_MEMBER (data_r);
 	DECLARE_WRITE8_MEMBER(data_w);

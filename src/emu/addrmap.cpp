@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "romload.h"
 #include "validity.h"
 
 
@@ -292,20 +293,6 @@ address_map_entry &address_map_entry::rw(read64_delegate rfunc, write64_delegate
 	return *this;
 }
 
-
-//-------------------------------------------------
-//  set_handler - handler setter for setoffset
-//-------------------------------------------------
-
-address_map_entry &address_map_entry::setoffset(setoffset_delegate func)
-{
-	assert(!func.isnull());
-	m_setoffsethd.m_type = AMH_DEVICE_DELEGATE;
-	m_setoffsethd.m_bits = 0;
-	m_setoffsethd.m_name = func.name();
-	m_soproto = func;
-	return *this;
-}
 
 //-------------------------------------------------
 //  unitmask_is_appropriate - verify that the
@@ -795,13 +782,6 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_write.m_bits, entry.m_mask, entry.m_write.m_name);
 #endif
-		}
-		if (entry.m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
-		{
-			// extract the device tag from the proto-delegate
-			const char *devtag = entry.m_soproto.device_name();
-			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry references nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
 		}
 
 		// make sure ports exist

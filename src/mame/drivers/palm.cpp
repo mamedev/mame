@@ -37,6 +37,18 @@ public:
 		m_io_penb(*this, "PENB"),
 		m_io_portd(*this, "PORTD") { }
 
+	void palmiii(machine_config &config);
+	void pilot1k(machine_config &config);
+	void palmvx(machine_config &config);
+	void palmv(machine_config &config);
+	void palm(machine_config &config);
+	void palmpro(machine_config &config);
+	void pilot5k(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
+	DECLARE_INPUT_CHANGED_MEMBER(button_check);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68328_device> m_lsi;
 	required_device<ram_device> m_ram;
@@ -44,8 +56,6 @@ public:
 	uint16_t m_spim_data;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
-	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 	DECLARE_WRITE8_MEMBER(palm_port_f_out);
 	DECLARE_READ8_MEMBER(palm_port_c_in);
 	DECLARE_READ8_MEMBER(palm_port_f_in);
@@ -60,13 +70,6 @@ public:
 	required_ioport m_io_portd;
 
 	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
-	void palmiii(machine_config &config);
-	void pilot1k(machine_config &config);
-	void palmvx(machine_config &config);
-	void palmv(machine_config &config);
-	void palm(machine_config &config);
-	void palmpro(machine_config &config);
-	void pilot5k(machine_config &config);
 	void palm_map(address_map &map);
 };
 
@@ -197,7 +200,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

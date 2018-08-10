@@ -92,6 +92,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void jokrwild(machine_config &config);
+
+	void init_jokrwild();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -100,14 +105,12 @@ public:
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(testa_w);
 	DECLARE_WRITE8_MEMBER(testb_w);
-	void init_jokrwild();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jokrwild);
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void jokrwild(machine_config &config);
 	void jokrwild_map(address_map &map);
 };
 

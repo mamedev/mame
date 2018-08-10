@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(m68705prg_state_base::m68705prg)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(m68705prg_state_base, mcu_load)
 
-	MCFG_DEFAULT_LAYOUT(layout_m68705prg)
+	config.set_default_layout(layout_m68705prg);
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(p3prg_state::prg)

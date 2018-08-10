@@ -18,19 +18,19 @@
 
 
 #define MCFG_MC6854_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<mc6854_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_TXD_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_txd_callback(DEVCB_##_devcb);
+	downcast<mc6854_device &>(*device).set_out_txd_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_FRAME_CB(_class, _method) \
 	downcast<mc6854_device &>(*device).set_out_frame_callback(mc6854_device::out_frame_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6854_OUT_RTS_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
+	downcast<mc6854_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_DTR_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
+	downcast<mc6854_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
 
 
 class mc6854_device : public device_t

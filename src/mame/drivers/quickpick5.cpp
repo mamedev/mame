@@ -49,6 +49,9 @@ public:
 		m_ttlrom_offset(0)
 	{ }
 
+	void quickpick5(machine_config &config);
+
+private:
 	uint32_t screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K05324X_CB_MEMBER(sprite_callback);
@@ -80,14 +83,12 @@ public:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 
-	void quickpick5(machine_config &config);
 	void quickpick5_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<k05324x_device> m_k053245;

@@ -15,7 +15,7 @@
 	downcast<m6502_device *>(device)->disable_cache();
 
 #define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	devcb = &downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
+	downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
 
 class m6502_device : public cpu_device {
 public:

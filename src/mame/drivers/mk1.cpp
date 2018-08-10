@@ -58,18 +58,18 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void mk1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
-	void mk1(machine_config &config);
 	void mk1_io(address_map &map);
 	void mk1_mem(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
-private:
 	uint8_t m_f8[2];
 	uint8_t m_led_data[4];
 	required_device<cpu_device> m_maincpu;
@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(mk1_state::mk1)
 	MCFG_F3853_EXT_INPUT_CB(mk1_state, mk1_interrupt)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk1)
+	config.set_default_layout(layout_mk1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk1_state, mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END

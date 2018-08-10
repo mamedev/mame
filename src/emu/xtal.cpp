@@ -75,11 +75,10 @@ const double XTAL::known_xtals[] = {
 	  1'750'000, /* 1.75_MHz_XTAL          RCA CDP1861 */
 	  1'797'100, /* 1.7971_MHz_XTAL        SWTPC 6800 (with MIKBUG) */
 	  1'843'200, /* 1.8432_MHz_XTAL        Bondwell 12/14 */
-	  1'996'800, /* 1.9968_MHz_XTAL        NEC PC-98xx */
 	  2'000'000, /* 2_MHz_XTAL             - */
 	  2'012'160, /* 2.01216_MHz_XTAL       Cidelsa Draco sound board */
 	  2'097'152, /* 2.097152_MHz_XTAL      Icatel 1995 - Brazilian public payphone */
-	  2'457'600, /* 2.4576_MHz_XTAL        Atari ST MFP, NEC PC-98xx */
+	  2'457'600, /* 2.4576_MHz_XTAL        Atari ST MFP */
 	  2'500'000, /* 2.5_MHz_XTAL           Janken Man units */
 	  2'950'000, /* 2.95_MHz_XTAL          Playmatic MPU-C, MPU-III & Sound-3 */
 	  3'000'000, /* 3_MHz_XTAL             Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
@@ -307,9 +306,11 @@ const double XTAL::known_xtals[] = {
 	 33'868'800, /* 33.8688_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
 	 34'000'000, /* 34_MHz_XTAL            Gaelco PCBs */
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
+	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
 	 38'769'220, /* 38.76922_MHz_XTAL      Namco System 21 video board */
+	 38'863'630, /* 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video */
 	 39'321'600, /* 39.3216_MHz_XTAL       Sun 2/120 */
 	 39'710'000, /* 39.71_MHz_XTAL         Wyse WY-60 132-column display clock */
 	 40'000'000, /* 40_MHz_XTAL            - */
@@ -351,6 +352,7 @@ const double XTAL::known_xtals[] = {
 	 66'666'700, /* 66.6667_MHz_XTAL       Later Midway games */
 	 67'737'600, /* 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based */
 	 68'850'000, /* 68.85_MHz_XTAL         Wyse WY-50 */
+	 69'551'990, /* 69.55199_MHz_XTAL      Sharp X68000 31.5kHz video */
 	 72'000'000, /* 72_MHz_XTAL            Aristocrat MKV */
 	 72'576'000, /* 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	 73'728'000, /* 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary */

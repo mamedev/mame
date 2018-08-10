@@ -504,7 +504,7 @@ void psion_state::machine_start()
 	save_item(NAME(m_port2));
 	save_item(NAME(m_port6_ddr));
 	save_item(NAME(m_port6));
-	save_pointer(NAME(m_paged_ram.get()), m_ram_bank_count * 0x4000);
+	save_pointer(NAME(m_paged_ram), m_ram_bank_count * 0x4000);
 }
 
 void psion_state::machine_reset()
@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)

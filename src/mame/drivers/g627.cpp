@@ -61,17 +61,19 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void g627(machine_config &config);
+
 	void init_v115();
 	void init_v117();
+
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
-	void g627(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	uint8_t m_seg[6];
 	uint8_t m_portc;
 	uint8_t m_motor;
@@ -315,7 +317,7 @@ MACHINE_CONFIG_START(g627_state::g627)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_g627)
+	config.set_default_layout(layout_g627);
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #define MCFG_IE15_KEYBOARD_CB(_devcb) \
-	devcb = &downcast<ie15_keyboard_device &>(*device).set_keyboard_callback(DEVCB_##_devcb);
+	downcast<ie15_keyboard_device &>(*device).set_keyboard_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES

@@ -1090,3 +1090,25 @@ if (VIDEOS["NEREID"]~=null) then
 		MAME_DIR .. "src/devices/video/nereid.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/ps2gif.h,VIDEOS["PS2GIF"] = true
+--------------------------------------------------
+if (VIDEOS["PS2GIF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ps2gif.cpp",
+		MAME_DIR .. "src/devices/video/ps2gif.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ps2gs.h,VIDEOS["PS2GS"] = true
+--------------------------------------------------
+if (VIDEOS["PS2GS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ps2gs.cpp",
+		MAME_DIR .. "src/devices/video/ps2gs.h",
+	}
+end

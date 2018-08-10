@@ -50,12 +50,6 @@ enum
 class astinvad_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INT_OFF,
-		TIMER_INT_GEN
-	};
-
 	astinvad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -68,20 +62,33 @@ public:
 		, m_color_prom(*this, "proms")
 		{ }
 
+	void spcking2(machine_config &config);
+	void spaceint(machine_config &config);
+	void kamikaze(machine_config &config);
+
+	void init_kamikaze();
+	void init_spcking2();
+
+	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
+
+private:
+	enum
+	{
+		TIMER_INT_OFF,
+		TIMER_INT_GEN
+	};
+
 	DECLARE_WRITE8_MEMBER(color_latch_w);
 	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
 	DECLARE_READ8_MEMBER(kamikaze_ppi_r);
 	DECLARE_WRITE8_MEMBER(kamikaze_ppi_w);
 	DECLARE_WRITE8_MEMBER(spaceint_sound1_w);
 	DECLARE_WRITE8_MEMBER(spaceint_sound2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
 	DECLARE_WRITE8_MEMBER(kamikaze_sound1_w);
 	DECLARE_WRITE8_MEMBER(kamikaze_sound2_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound1_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound2_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
-	void init_kamikaze();
-	void init_spcking2();
 	DECLARE_MACHINE_START(kamikaze);
 	DECLARE_MACHINE_RESET(kamikaze);
 	DECLARE_MACHINE_START(spaceint);
@@ -93,14 +100,11 @@ public:
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
 	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
 
-	void spcking2(machine_config &config);
-	void spaceint(machine_config &config);
-	void kamikaze(machine_config &config);
 	void kamikaze_map(address_map &map);
 	void kamikaze_portmap(address_map &map);
 	void spaceint_map(address_map &map);
 	void spaceint_portmap(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
@@ -136,7 +140,7 @@ VIDEO_START_MEMBER(astinvad_state,spaceint)
 	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes());
 
 	save_item(NAME(m_color_latch));
-	save_pointer(NAME(m_colorram.get()), m_videoram.bytes());
+	save_pointer(NAME(m_colorram), m_videoram.bytes());
 }
 
 

@@ -23,14 +23,16 @@ public:
 			m_inputs(*this, "IN%u", 0)
 	{ }
 
+	void mmm(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(strobe_w);
 	DECLARE_READ8_MEMBER(inputs_r);
 	DECLARE_WRITE8_MEMBER(ay_porta_w);
 
-	void mmm(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport_array<8> m_inputs;

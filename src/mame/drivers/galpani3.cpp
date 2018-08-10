@@ -90,9 +90,11 @@ public:
 		m_priority_buffer(*this, "priority_buffer"),
 		m_sprregs(*this, "sprregs"),
 		m_sprite_bitmap(1024, 1024)
-
 	{ }
 
+	void galpani3(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<kaneko_grap2_device, 3> m_grap2;
 	required_device<palette_device> m_palette;
@@ -114,12 +116,10 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
 
-
 	virtual void video_start() override;
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
-	void galpani3(machine_config &config);
 	void galpani3_map(address_map &map);
 };
 
@@ -157,8 +157,8 @@ void galpani3_state::video_start()
 
 	save_item(NAME(m_priority_buffer_scrollx));
 	save_item(NAME(m_priority_buffer_scrolly));
-	save_pointer(NAME(m_spriteram32.get()), 0x4000/4);
-	save_pointer(NAME(m_spc_regs.get()), 0x40/4);
+	save_pointer(NAME(m_spriteram32), 0x4000/4);
+	save_pointer(NAME(m_spc_regs), 0x40/4);
 }
 
 #define SPRITE_DRAW_PIXEL(_pri)                                    \
@@ -171,7 +171,7 @@ void galpani3_state::video_start()
 // TODO : m_framebuffer_bright1 is alpha-blended?
 #define FB_DRAW_PIXEL(_chip, _pixel)                                                              \
 	int alpha = 0xff;                                                                             \
-	uint32_t pal = m_grap2[_chip]->pen_r(_pixel);                                                 \
+	const pen_t &pal = m_grap2[_chip]->pen(_pixel);                                               \
 	if (m_grap2[_chip]->m_framebuffer_palette[_pixel] & 0x8000)                                   \
 	{                                                                                             \
 		alpha = (m_grap2[_chip]->m_framebuffer_bright2 & 0xff);                                   \
@@ -193,8 +193,6 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 	const pen_t *paldata = m_palette->pens();
 
 	bitmap.fill(0, cliprect);
-
-	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
 
@@ -252,11 +250,33 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 				else if (pridat==0xcf) // the girl
 				{
 					SPRITE_DRAW_PIXEL(0x0000);
-					FB_DRAW_PIXEL(0, 0x100);
+					if (m_grap2[0]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(0, 0x100);
+					}
 					SPRITE_DRAW_PIXEL(0x4000);
 					if (m_grap2[1]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(1, 0x100);
+					}
+					SPRITE_DRAW_PIXEL(0x8000);
+					if (dat3 && m_grap2[2]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(2, dat3);
+					}
+					SPRITE_DRAW_PIXEL(0xc000);
+				}
+				else if (pridat==0x30) // during the 'gals boxes' on the intro
+				{
+					SPRITE_DRAW_PIXEL(0x0000);
+					if (m_grap2[1]->m_framebuffer_enable) // TODO : Opaqued and Swapped order?
+					{
+						FB_DRAW_PIXEL(1, dat2);
+					}
+					SPRITE_DRAW_PIXEL(0x4000);
+					if (dat1 && m_grap2[0]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(0, dat1);
 					}
 					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)

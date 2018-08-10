@@ -97,13 +97,15 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void d6809(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_w );
 	void kbd_put(u8 data);
 
-	void d6809(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

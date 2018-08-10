@@ -69,8 +69,11 @@ public:
 		, m_io_row3(*this, "ROW3")
 		, m_charset(*this, "charset")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
+	void midcoin24cdjuke(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
@@ -88,10 +91,9 @@ public:
 
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
-	void midcoin24cdjuke(machine_config &config);
 	void midcoin24cdjuke_io(address_map &map);
 	void midcoin24cdjuke_map(address_map &map);
-private:
+
 	uint8_t m_kb_col;
 };
 
@@ -288,7 +290,7 @@ MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	MCFG_DEVICE_IO_MAP(midcoin24cdjuke_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
 
-	MCFG_DEFAULT_LAYOUT(layout_24cdjuke)
+	config.set_default_layout(layout_24cdjuke);
 
 	MCFG_DEVICE_ADD("ic11", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("MD1"))
@@ -300,9 +302,9 @@ MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, midcoin24cdjuke_state, kb_row_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, midcoin24cdjuke_state, kb_col_w))
 
-	MCFG_DEVICE_ADD("ic31", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("MD4"))
+	i8255_device &ic32(I8255A(config, "ic31", 0));
+	ic32.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ic32.in_pc_callback().set_ioport("MD4");
 MACHINE_CONFIG_END
 
 

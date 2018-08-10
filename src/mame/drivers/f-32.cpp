@@ -45,6 +45,10 @@ public:
 		m_maincpu(*this, "maincpu") ,
 		m_videoram(*this, "videoram"){ }
 
+	void mosaicf2(machine_config &config);
+	void royalpk2(machine_config &config);
+
+private:
 	/* devices */
 	required_device<hyperstone_device>  m_maincpu;
 
@@ -53,8 +57,6 @@ public:
 
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mosaicf2(machine_config &config);
-	void royalpk2(machine_config &config);
 	void common_map(address_map &map);
 	void mosaicf2_io(address_map &map);
 	void royalpk2_io(address_map &map);

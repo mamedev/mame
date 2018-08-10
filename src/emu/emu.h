@@ -49,11 +49,10 @@
 
 // memory and address spaces
 #include "emumem.h"
-class address_map; // Forward declaration
 #include "memarray.h"
 
 // machine-wide utilities
-#include "romload.h"
+#include "romentry.h"
 #include "save.h"
 
 // I/O

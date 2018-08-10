@@ -27,6 +27,9 @@ public:
 		m_bank1000(*this, "bank1000"),
 		m_ram(*this, "ram") { }
 
+	void _88games(machine_config &config);
+
+private:
 	/* video-related */
 	int          m_k88games_priority;
 	int          m_videobank;
@@ -65,7 +68,7 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
-	void _88games(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

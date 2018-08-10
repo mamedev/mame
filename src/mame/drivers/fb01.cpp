@@ -38,6 +38,9 @@ public:
 	{
 	}
 
+	void fb01(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
@@ -50,10 +53,9 @@ public:
 	DECLARE_PALETTE_INIT(fb01);
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
-	void fb01(machine_config &config);
 	void fb01_io(address_map &map);
 	void fb01_mem(address_map &map);
-private:
+
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
 	required_device<midi_port_device> m_midi_thru;
@@ -190,11 +192,11 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_fb01 )
+	config.set_default_layout(layout_lcd); // why set layout only to replace?
+	config.set_default_layout(layout_fb01);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(fb01_state, fb01)

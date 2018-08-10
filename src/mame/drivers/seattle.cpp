@@ -281,11 +281,54 @@ public:
 		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN%u", 0),
+		m_io_analog(*this, "AN%u", 0U),
+		m_io_gun_x(*this, "LIGHT%u_X", 0U),
+		m_io_gun_y(*this, "LIGHT%u_Y", 0U),
+		m_io_fake(*this, "FAKE"),
+		m_io_gearshift(*this, "GEAR"),
+		m_io_system(*this, "SYSTEM"),
+		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
 		{}
 
+	void seattle_common(machine_config &config);
+	void phoenixsa(machine_config &config);
+	void seattle150(machine_config &config);
+	void seattle150_widget(machine_config &config);
+	void seattle200(machine_config &config);
+	void seattle200_widget(machine_config &config);
+	void flagstaff(machine_config &config);
+	void wg3dh(machine_config &config);
+	void sfrush(machine_config &config);
+	void hyprdriv(machine_config &config);
+	void carnevil(machine_config &config);
+	void blitz99(machine_config &config);
+	void blitz2k(machine_config &config);
+	void blitz(machine_config &config);
+	void biofreak(machine_config &config);
+	void sfrushrkw(machine_config &config);
+	void calspeed(machine_config &config);
+	void mace(machine_config &config);
+	void vaportrx(machine_config &config);
+	void sfrushrk(machine_config &config);
+
+	void init_sfrush();
+	void init_blitz2k();
+	void init_carnevil();
+	void init_biofreak();
+	void init_calspeed();
+	void init_sfrushrk();
+	void init_vaportrx();
+	void init_hyprdriv();
+	void init_blitz();
+	void init_wg3dh();
+	void init_mace();
+	void init_blitz99();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
+private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
 	optional_device<atari_cage_seattle_device> m_cage;
@@ -294,6 +337,12 @@ public:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport_array<2> m_io_gun_x;
+	optional_ioport_array<2> m_io_gun_y;
+	optional_ioport m_io_fake;
+	optional_ioport m_io_gearshift;
+	optional_ioport m_io_system;
+	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
 
@@ -345,24 +394,11 @@ public:
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
 	DECLARE_WRITE32_MEMBER(wheel_board_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
-	void init_sfrush();
-	void init_blitz2k();
-	void init_carnevil();
-	void init_biofreak();
-	void init_calspeed();
-	void init_sfrushrk();
-	void init_vaportrx();
-	void init_hyprdriv();
-	void init_blitz();
-	void init_wg3dh();
-	void init_mace();
-	void init_blitz99();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -374,26 +410,6 @@ public:
 	void update_widget_irq();
 	void init_common(int config);
 
-	void seattle_common(machine_config &config);
-	void phoenixsa(machine_config &config);
-	void seattle150(machine_config &config);
-	void seattle150_widget(machine_config &config);
-	void seattle200(machine_config &config);
-	void seattle200_widget(machine_config &config);
-	void flagstaff(machine_config &config);
-	void wg3dh(machine_config &config);
-	void sfrush(machine_config &config);
-	void hyprdriv(machine_config &config);
-	void carnevil(machine_config &config);
-	void blitz99(machine_config &config);
-	void blitz2k(machine_config &config);
-	void blitz(machine_config &config);
-	void biofreak(machine_config &config);
-	void sfrushrkw(machine_config &config);
-	void calspeed(machine_config &config);
-	void mace(machine_config &config);
-	void vaportrx(machine_config &config);
-	void sfrushrk(machine_config &config);
 	void seattle_cs0_map(address_map &map);
 	void seattle_cs1_map(address_map &map);
 	void seattle_cs2_map(address_map &map);
@@ -437,6 +453,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 
+	m_wheel_driver.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
 }
@@ -667,7 +684,7 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 		m_pending_analog_read = currValue;
 	}
 	// Declare calibration finished as soon as a SYSTEM button is hit
-	if (!m_wheel_calibrated && ((~ioport("SYSTEM")->read()) & 0xffff)) {
+	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
 		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
 	}
@@ -697,7 +714,7 @@ WRITE32_MEMBER(seattle_state::wheel_board_w)
 		}
 		else
 		{
-			output().set_value("wheel", arg); // target wheel angle. signed byte.
+			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
 		}
 	}
@@ -712,7 +729,7 @@ WRITE32_MEMBER(seattle_state::wheel_board_w)
 DECLARE_CUSTOM_INPUT_MEMBER(seattle_state::gearshift_r)
 {
 	// Check for gear change and save gear selection
-	uint32_t gear = ioport("GEAR")->read();
+	uint32_t gear = m_io_gearshift->read();
 	for (int i = 0; i < 4; i++)
 	{
 		if (gear & (1 << i))
@@ -734,39 +751,39 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 	switch (offset)
 	{
 		case 0:     /* low 8 bits of X */
-			result = (ioport("LIGHT0_X")->read() << 4) & 0xff;
+			result = (m_io_gun_x[0]->read() << 4) & 0xff;
 			break;
 
 		case 1:     /* upper 4 bits of X */
-			result = (ioport("LIGHT0_X")->read() >> 4) & 0x0f;
-			result |= (ioport("FAKE")->read() & 0x03) << 4;
+			result = (m_io_gun_x[0]->read() >> 4) & 0x0f;
+			result |= (m_io_fake->read() & 0x03) << 4;
 			result |= 0x40;
 			break;
 
 		case 2:     /* low 8 bits of Y */
-			result = (ioport("LIGHT0_Y")->read() << 2) & 0xff;
+			result = (m_io_gun_y[0]->read() << 2) & 0xff;
 			break;
 
 		case 3:     /* upper 4 bits of Y */
-			result = (ioport("LIGHT0_Y")->read() >> 6) & 0x03;
+			result = (m_io_gun_y[0]->read() >> 6) & 0x03;
 			break;
 
 		case 4:     /* low 8 bits of X */
-			result = (ioport("LIGHT1_X")->read() << 4) & 0xff;
+			result = (m_io_gun_x[1]->read() << 4) & 0xff;
 			break;
 
 		case 5:     /* upper 4 bits of X */
-			result = (ioport("LIGHT1_X")->read() >> 4) & 0x0f;
-			result |= (ioport("FAKE")->read() & 0x30);
+			result = (m_io_gun_x[1]->read() >> 4) & 0x0f;
+			result |= (m_io_fake->read() & 0x30);
 			result |= 0x40;
 			break;
 
 		case 6:     /* low 8 bits of Y */
-			result = (ioport("LIGHT1_Y")->read() << 2) & 0xff;
+			result = (m_io_gun_y[1]->read() << 2) & 0xff;
 			break;
 
 		case 7:     /* upper 4 bits of Y */
-			result = (ioport("LIGHT1_Y")->read() >> 6) & 0x03;
+			result = (m_io_gun_y[1]->read() >> 6) & 0x03;
 			break;
 	}
 	return result;
@@ -1888,9 +1905,9 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
-	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x100b0002, 0x01, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(INPUTLINE(m_maincpu, IDE_IRQ_NUM))
-	MCFG_IDE_PCI_SET_LEGACY_TOP(0x0a0)
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
+	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
+	ide.set_legacy_top(0x0a0);
 
 	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, m_screen)
 	MCFG_VOODOO_PCI_FBMEM(2)
@@ -2196,7 +2213,7 @@ ROM_START( sfrush )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
 	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2215,7 +2232,7 @@ ROM_START( sfrusha )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
 	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2236,7 +2253,7 @@ ROM_START( sfrushrk )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2256,7 +2273,7 @@ ROM_START( sfrushrkw )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2275,7 +2292,7 @@ ROM_START( sfrushrkwo )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */

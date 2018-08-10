@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(risc2500_state::risc2500)
 	MCFG_SCREEN_UPDATE_DRIVER(risc2500_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_risc2500)
+	config.set_default_layout(layout_risc2500);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

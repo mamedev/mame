@@ -329,23 +329,26 @@ public:
 		m_lamp(*this, "lamp0")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank_write);
-	DECLARE_WRITE8_MEMBER(coin_counters_write);
-
-	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
-	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
-
-	void init_opaopa();
-	void init_fantzn2();
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void systemex_315_5177(machine_config &config);
 	void systemex(machine_config &config);
 	void ridleofp(machine_config &config);
 	void hangonjr(machine_config &config);
 	void systeme(machine_config &config);
 	void systemeb(machine_config &config);
+
+	void init_opaopa();
+	void init_fantzn2();
+
+private:
+	DECLARE_WRITE8_MEMBER(bank_write);
+	DECLARE_WRITE8_MEMBER(coin_counters_write);
+
+	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
+	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
+
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void banked_decrypted_opcodes_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void io_map(address_map &map);
@@ -353,10 +356,8 @@ public:
 	void vdp1_map(address_map &map);
 	void vdp2_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
-private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
@@ -411,10 +412,10 @@ void systeme_state::io_map(address_map &map)
 	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
-	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xbe, 0xbe).rw(m_vdp2, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0xbf, 0xbf).rw(m_vdp2, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
+	map(0xbe, 0xbe).rw(m_vdp2, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0xbf, 0xbf).rw(m_vdp2, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xe0, 0xe0).portr("e0");
 	map(0xe1, 0xe1).portr("e1");
 	map(0xe2, 0xe2).portr("e2");
@@ -931,13 +932,13 @@ MACHINE_CONFIG_START(systeme_state::ridleofp)
 	MCFG_UPD4701_PORTX("PAD1")
 	MCFG_UPD4701_PORTY("PAD2")
 
-	MCFG_DEVICE_MODIFY("ppi")
-	MCFG_I8255_IN_PORTA_CB(READ8("upd4701", upd4701_device, d_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE("upd4701", upd4701_device, cs_w)) MCFG_DEVCB_BIT(4)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, xy_w)) MCFG_DEVCB_BIT(3)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, ul_w)) MCFG_DEVCB_BIT(2)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, resetx_w)) MCFG_DEVCB_BIT(1) // or possibly bit 0
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, resety_w)) MCFG_DEVCB_BIT(0) // or possibly bit 1
+	i8255_device &ppi(*subdevice<i8255_device>("ppi"));
+	ppi.in_pa_callback().set("upd4701", FUNC(upd4701_device::d_r));
+	ppi.out_pc_callback().set("upd4701", FUNC(upd4701_device::cs_w)).bit(4);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::xy_w)).bit(3);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::ul_w)).bit(2);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resetx_w)).bit(1); // or possibly bit 0
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resety_w)).bit(0); // or possibly bit 1
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(systeme_state::systemex)

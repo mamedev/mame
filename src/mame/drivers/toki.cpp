@@ -502,6 +502,7 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) // verified on pcb
 	MCFG_DEVICE_PROGRAM_MAP(toki_audio_map)
 	MCFG_DEVICE_OPCODES_MAP(toki_audio_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")

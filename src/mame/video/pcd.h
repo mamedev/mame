@@ -15,7 +15,7 @@
 
 
 #define MCFG_PCX_VIDEO_TXD_HANDLER(_devcb) \
-	devcb = &downcast<pcx_video_device &>(*device).set_txd_handler(DEVCB_##_devcb);
+	downcast<pcx_video_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 class pcdx_video_device : public device_t, public device_gfx_interface
 {

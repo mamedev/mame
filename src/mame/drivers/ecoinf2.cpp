@@ -37,7 +37,7 @@ public:
 
 	void ecoinf2_oxo(machine_config &config);
 
-protected:
+private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
@@ -204,7 +204,6 @@ protected:
 	void oxo_memmap(address_map &map);
 	void oxo_portmap(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;
 	required_device<meters_device> m_meters;
@@ -504,7 +503,7 @@ MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
 	MCFG_DEVICE_PROGRAM_MAP(oxo_memmap)
 	MCFG_DEVICE_IO_MAP(oxo_portmap)
 
-	MCFG_DEFAULT_LAYOUT(layout_ecoinf2)
+	config.set_default_layout(layout_ecoinf2);
 
 	MCFG_DEVICE_ADD("ic10_lamp", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_a_strobedat0))

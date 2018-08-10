@@ -75,8 +75,8 @@ void gaelco3d_state::video_start()
 
 	/* save states */
 
-	save_pointer(NAME(m_palette.get()), 32768);
-	save_pointer(NAME(m_polydata_buffer.get()), MAX_POLYDATA);
+	save_pointer(NAME(m_palette), 32768);
+	save_pointer(NAME(m_polydata_buffer), MAX_POLYDATA);
 	save_item(NAME(m_polydata_count));
 	save_item(NAME(m_lastscan));
 }

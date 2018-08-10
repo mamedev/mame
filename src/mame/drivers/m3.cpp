@@ -28,12 +28,14 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void m3(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void m3(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;

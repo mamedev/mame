@@ -85,6 +85,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void rebel5(machine_config &config);
+	void mm4tk(machine_config &config);
+	void mm2(machine_config &config);
+	void mephisto(machine_config &config);
+
+	void init_mephisto();
+
+private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<hc259_device> m_outlatch;
 	required_device<beep_device> m_beep;
@@ -96,7 +104,6 @@ public:
 	//uint8_t *m_p_ram;
 	uint8_t m_led7;
 	uint8_t m_allowNMI;
-	void init_mephisto();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(mm2);
@@ -104,14 +111,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
 
-	void rebel5(machine_config &config);
-	void mm4tk(machine_config &config);
-	void mm2(machine_config &config);
-	void mephisto(machine_config &config);
 	void mephisto_mem(address_map &map);
 	void mm2_mem(address_map &map);
 	void rebel5_mem(address_map &map);
-protected:
+
 	required_ioport_array<8> m_key1;
 	required_ioport_array<8> m_key2;
 	output_finder<4> m_digits;
@@ -319,7 +322,7 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto)
+	config.set_default_layout(layout_mephisto);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_state::rebel5)

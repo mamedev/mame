@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/hd63450.h"
+//#include "machine/imsc012.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
@@ -25,7 +27,7 @@ public:
 	}
 
 	void harriet(machine_config &config);
-protected:
+private:
 	DECLARE_READ8_MEMBER(zpram_r);
 	DECLARE_WRITE8_MEMBER(zpram_w);
 	DECLARE_READ8_MEMBER(unk_status_r);
@@ -62,7 +64,9 @@ void harriet_state::harriet_map(address_map &map)
 	map(0x7f0000, 0x7fffff).ram();
 	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xf30000, 0xf30fff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0xf4003f, 0xf4003f).r(FUNC(harriet_state::unk_status_r));
+	//map(0xf60000, 0xf6000f).rw("c012", FUNC(imsc012_device::read), FUNC(imsc012_device::write));
 }
 
 static INPUT_PORTS_START( harriet )
@@ -72,7 +76,7 @@ void harriet_state::machine_start()
 {
 	m_zpram_data = std::make_unique<u8[]>(0x800);
 	subdevice<nvram_device>("zpram")->set_base(m_zpram_data.get(), 0x800);
-	save_pointer(NAME(m_zpram_data.get()), 0x800);
+	save_pointer(NAME(m_zpram_data), 0x800);
 }
 
 void harriet_state::machine_reset()
@@ -84,24 +88,29 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_DEVICE_ADD("maincpu", M68010, 40_MHz_XTAL / 4) // MC68010FN10
 	MCFG_DEVICE_PROGRAM_MAP(harriet_map)
 
-	//MCFG_DEVICE_ADD("dmac", MC68450, DMAC_CLOCK)
-
 	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
 
-	MCFG_DEVICE_ADD("mfp", MC68901, 0)
+	MCFG_DEVICE_ADD("mfp", MC68901, 40_MHz_XTAL / 16)
 	MCFG_MC68901_TIMER_CLOCK(2.4576_MHz_XTAL)
 	MCFG_MC68901_RX_CLOCK(9600)
 	MCFG_MC68901_TX_CLOCK(9600)
 	MCFG_MC68901_OUT_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_MC68901_OUT_TCO_CB(WRITELINE("mfp", mc68901_device, rc_w))
+	//MCFG_MC68901_OUT_TDO_CB(WRITELINE("mfp", mc68901_device, tc_w))
+
+	MCFG_DEVICE_ADD("dmac", HD63450, 40_MHz_XTAL / 4) // MC68450R10 (or HD68450Y-10)
+	MCFG_HD63450_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mfp", mc68901_device, write_rx))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("mfp", FUNC(mc68901_device::write_rx));
+	rs232.rxd_handler().append("mfp", FUNC(mc68901_device::tbi_w));
 
-	//MCFG_DEVICE_ADD("wdc1", WD33C93, WD_CLOCK)
-	//MCFG_DEVICE_ADD("wdc2", WD33C93, WD_CLOCK)
+	//MCFG_DEVICE_ADD("wdca", WD33C93, 40_MHz_XTAL / 4)
+	//MCFG_DEVICE_ADD("wdcb", WD33C93, 40_MHz_XTAL / 4)
+	//MCFG_DEVICE_ADD("c012", IMSC012, 40_MHz_XTAL / 8) // INMOS IMSC012-P20S link adaptor
 MACHINE_CONFIG_END
 
 

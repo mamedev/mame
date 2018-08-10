@@ -186,8 +186,8 @@ void mb_vcu_device::device_start()
 	}
 
 	save_item(NAME(m_status));
-	save_pointer(NAME(m_ram.get()), 0x800);
-	save_pointer(NAME(m_palram.get()), 0x100);
+	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_palram), 0x100);
 	save_item(NAME(m_param_offset_latch));
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));

@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s11b)
+	config.set_default_layout(layout_s11b);
 
 	/* Sound */
 	genpin_audio(config);
@@ -834,6 +834,17 @@ ROM_START(jokrz_l3)
 	ROM_LOAD("jokeru5.l2", 0x10000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
 ROM_END
 
+ROM_START(jokrz_g4)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u26-l3.rom", 0x4000, 0x4000, CRC(3bf963df) SHA1(9f7757d96deca8638dbc1fe3669eee78dc222ebb))
+	ROM_LOAD("jokerz_u27.g4", 0x8000, 0x8000, CRC(3f3fe7ef) SHA1(afd17cea8442948b5aa0bb842dfbc17442b06a1d))
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("jokeru21.l1", 0x18000, 0x8000, CRC(9e2be4f6) SHA1(6e26b55935d0c8138176b54a11c1a9ab58366628))
+	ROM_LOAD("jokeru22.l1", 0x10000, 0x8000, CRC(2f67160c) SHA1(f1e179fde41f9bf8226069c24b0bd5152a13e518))
+	ROM_REGION(0x30000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("jokeru5.l2", 0x10000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
+ROM_END
+
 /*-----------------------
 / Mousin' Around! 12/89
 /-----------------------*/
@@ -1126,6 +1137,7 @@ GAME(1989,  eatpm_4u,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11b_inve
 GAME(1989,  eatpm_p7,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Elvira and the Party Monsters (PA-7)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  jokrz_l6,       0,          s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (L-6)",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  jokrz_l3,       jokrz_l6,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (L-3)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  jokrz_g4,       jokrz_l6,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (G-4)",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  mousn_l4,       0,          s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Mousin' Around! (LA-4)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  mousn_l1,       mousn_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Mousin' Around! (LA-1)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  mousn_lu,       mousn_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Mousin' Around! (LU-1)",                MACHINE_IS_SKELETON_MECHANICAL)

@@ -40,7 +40,7 @@ public:
 
 	void victory(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(lamp_control_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_READ8_MEMBER(video_control_r);
@@ -67,7 +67,6 @@ protected:
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
 	/* microcode state */
 	struct micro_t
 	{

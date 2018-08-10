@@ -125,6 +125,10 @@ public:
 		std::fill(std::begin(m_old_linescroll), std::end(m_old_linescroll), 0);
 	}
 
+	void baryon(machine_config &config);
+	void dreamwld(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr_array<uint32_t, 2> m_vram;
@@ -163,8 +167,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void baryon(machine_config &config);
-	void dreamwld(machine_config &config);
 	void baryon_map(address_map &map);
 	void dreamwld_map(address_map &map);
 	void oki1_map(address_map &map);
@@ -284,9 +286,9 @@ void dreamwld_state::video_start()
 	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
 
-	save_pointer(NAME(m_spritebuf[0].get()), 0x2000 / 4, 0);
-	save_pointer(NAME(m_spritebuf[1].get()), 0x2000 / 4, 1);
-	save_pointer(NAME(m_lineram16.get()), 0x400/2);
+	save_pointer(NAME(m_spritebuf[0]), 0x2000 / 4, 0);
+	save_pointer(NAME(m_spritebuf[1]), 0x2000 / 4, 1);
+	save_pointer(NAME(m_lineram16), 0x400/2);
 
 }
 

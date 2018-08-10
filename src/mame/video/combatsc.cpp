@@ -267,8 +267,8 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 
 	m_textlayer->set_scroll_rows(32);
 
-	save_pointer(NAME(m_spriteram[0].get()), 0x800);
-	save_pointer(NAME(m_spriteram[1].get()), 0x800);
+	save_pointer(NAME(m_spriteram[0]), 0x800);
+	save_pointer(NAME(m_spriteram[1]), 0x800);
 }
 
 VIDEO_START_MEMBER(combatsc_state,combatscb)
@@ -287,8 +287,8 @@ VIDEO_START_MEMBER(combatsc_state,combatscb)
 	m_bg_tilemap[0]->set_scroll_rows(32);
 	m_bg_tilemap[1]->set_scroll_rows(32);
 
-	save_pointer(NAME(m_spriteram[0].get()), 0x800);
-	save_pointer(NAME(m_spriteram[1].get()), 0x800);
+	save_pointer(NAME(m_spriteram[0]), 0x800);
+	save_pointer(NAME(m_spriteram[1]), 0x800);
 }
 
 /***************************************************************************

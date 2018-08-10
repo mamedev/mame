@@ -65,6 +65,9 @@ public:
 		, m_inputs(*this, "INPUTS")
 	{ }
 
+	void pokemini(machine_config &config);
+
+private:
 	uint8_t m_pm_reg[0x100];
 	PRC m_prc;
 	TIMERS m_timers;
@@ -79,9 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
-	void pokemini(machine_config &config);
 	void pokemini_mem_map(address_map &map);
-protected:
+
 	enum
 	{
 		TIMER_SECONDS,
@@ -1777,7 +1779,7 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 	MCFG_SCREEN_REFRESH_RATE( 72 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)

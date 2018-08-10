@@ -78,6 +78,9 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	void ms0515(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ms0515);
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -103,9 +106,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq9_w);
 	DECLARE_WRITE_LINE_MEMBER(irq11_w);
 
-	void ms0515(machine_config &config);
 	void ms0515_mem(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
 	void irq_encoder(int irq, int state);
@@ -122,7 +124,6 @@ protected:
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
 
-private:
 	uint8_t *m_video_ram;
 	uint8_t m_sysrega, m_sysregc;
 	uint16_t m_bankreg, m_haltreg;
@@ -532,7 +533,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ms0515_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEFAULT_LAYOUT(layout_ms0515)
+	config.set_default_layout(layout_ms0515);
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)

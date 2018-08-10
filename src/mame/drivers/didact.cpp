@@ -584,7 +584,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 MACHINE_CONFIG_START(md6802_state::md6802)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(md6802_map)
-	MCFG_DEFAULT_LAYOUT(layout_md6802)
+	config.set_default_layout(layout_md6802);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("tb16_74145", TTL74145, 0)
@@ -619,7 +619,7 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
 	MCFG_DEVICE_ADD("maincpu", M6800, 505000)
 	MCFG_DEVICE_PROGRAM_MAP(mp68a_map)
-	MCFG_DEFAULT_LAYOUT(layout_mp68a)
+	config.set_default_layout(layout_mp68a);
 
 	/* Devices */
 	/* PIA #1 0x500-0x503 - used differently by laborations and loaded software */

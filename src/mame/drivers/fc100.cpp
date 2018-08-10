@@ -68,6 +68,11 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void fc100(machine_config &config);
+
+	void init_fc100();
+
+private:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
@@ -76,7 +81,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	void init_fc100();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -85,10 +89,9 @@ public:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
-	void fc100(machine_config &config);
 	void fc100_io(address_map &map);
 	void fc100_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -544,11 +547,11 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	MCFG_CASSETTE_FORMATS(fc100_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, fc100_state, txdata_callback))
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL(4'915'200)/16/16) // gives 19200
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(FUNC(fc100_state::txdata_callback));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL(4'915'200)/16/16)); // gives 19200
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read

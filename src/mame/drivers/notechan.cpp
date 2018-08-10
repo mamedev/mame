@@ -309,18 +309,18 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void notechan(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(out_f8_w);
 	DECLARE_WRITE8_MEMBER(out_f9_w);
 	DECLARE_WRITE8_MEMBER(out_fa_w);
 	DECLARE_WRITE8_MEMBER(out_ff_w);
-	void notechan(machine_config &config);
 	void notechan_map(address_map &map);
 	void notechan_port_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	output_finder<32> m_lamps;

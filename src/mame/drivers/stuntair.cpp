@@ -107,6 +107,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void stuntair(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -144,7 +147,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
-	void stuntair(machine_config &config);
 	void stuntair_map(address_map &map);
 	void stuntair_sound_map(address_map &map);
 	void stuntair_sound_portmap(address_map &map);

@@ -54,6 +54,13 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
+
+	void jpms80(machine_config &config);
+
+	void init_jpms80();
+
+
+private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(int1_enable_w);
@@ -61,15 +68,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
 	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
 
-	void jpms80(machine_config &config);
 	void jpms80_io_map(address_map &map);
 	void jpms80_map(address_map &map);
-protected:
 
 	// devices
 	required_device<tms9995_device> m_maincpu;
-public:
-	void init_jpms80();
 };
 
 WRITE_LINE_MEMBER(jpms80_state::int1_enable_w)

@@ -15,22 +15,22 @@
 
 
 #define MCFG_MC6846_OUT_PORT_CB(_devcb) \
-	devcb = &downcast<mc6846_device &>(*device).set_out_port_callback(DEVCB_##_devcb);
+	downcast<mc6846_device &>(*device).set_out_port_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6846_OUT_CP1_CB(_devcb) \
-	devcb = &downcast<mc6846_device &>(*device).set_out_cp1_callback(DEVCB_##_devcb);
+	downcast<mc6846_device &>(*device).set_out_cp1_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6846_OUT_CP2_CB(_devcb) \
-	devcb = &downcast<mc6846_device &>(*device).set_out_cp2_callback(DEVCB_##_devcb);
+	downcast<mc6846_device &>(*device).set_out_cp2_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6846_IN_PORT_CB(_devcb) \
-	devcb = &downcast<mc6846_device &>(*device).set_in_port_callback(DEVCB_##_devcb);
+	downcast<mc6846_device &>(*device).set_in_port_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6846_OUT_CTO_CB(_devcb) \
-	devcb = &downcast<mc6846_device &>(*device).set_out_cto_callback(DEVCB_##_devcb);
+	downcast<mc6846_device &>(*device).set_out_cto_callback(DEVCB_##_devcb);
 
 #define MCFG_MC6846_IRQ_CB(_devcb) \
-	devcb = &downcast<mc6846_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<mc6846_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 
 class mc6846_device : public device_t

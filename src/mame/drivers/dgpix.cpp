@@ -166,6 +166,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vblank(*this, "VBLANK") { }
 
+	void dgpix(machine_config &config);
+
+	void init_elfin();
+	void init_jumpjump();
+	void init_xfiles();
+	void init_xfilesk();
+	void init_kdynastg();
+	void init_fmaniac3();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_vblank;
 
@@ -184,19 +194,11 @@ public:
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
 
-	void init_elfin();
-	void init_jumpjump();
-	void init_xfiles();
-	void init_xfilesk();
-	void init_kdynastg();
-	void init_fmaniac3();
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dgpix(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -385,7 +387,7 @@ void dgpix_state::video_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x40000*2/4);
 
-	save_pointer(NAME(m_vram.get()), 0x40000*2/4);
+	save_pointer(NAME(m_vram), 0x40000*2/4);
 }
 
 uint32_t dgpix_state::screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -9,7 +9,7 @@
 #define YMF278B_STD_CLOCK (33868800)            /* standard clock for OPL4 */
 
 #define MCFG_YMF278B_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ymf278b_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ymf278b_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface
 {

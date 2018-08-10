@@ -1975,13 +1975,13 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	MCFG_DEVICE_ADD("n7751", N7751, 6000000)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, segas16a_state, n7751_rom_r))
-	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, segas16a_state, n7751_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segas16a_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(*this, segas16a_state,n7751_rom_offset_w))
+	MCFG_I8243_ADD("n7751_8243", CONSTANT(0), WRITE8(*this, segas16a_state,n7751_rom_offset_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

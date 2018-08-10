@@ -6,6 +6,18 @@
 
     Xicor X2212 256 x 4 bit Nonvolatile Static RAM.
 
+****************************************************************************
+                             ____   ____
+                     A7   1 |*   \_/    | 18  Vcc
+                     A4   2 |           | 17  A6
+                     A3   3 |           | 16  A5
+                     A2   4 |           | 15  I/O4
+                     A1   5 |   X2212   | 14  I/O3
+                     A0   6 |           | 13  I/O2
+                    /CS   7 |           | 12  I/O1
+                    Vss   8 |           | 11  /WE
+                 /STORE   9 |___________| 10  /ARRAY RECALL
+
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_X2212_H
@@ -13,26 +25,6 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_X2212_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, X2212)
-// some systems (like many early Atari games) wire up the /STORE signal
-// to fire on power-down, effectively creating an "auto-save" functionality
-#define MCFG_X2212_ADD_AUTOSAVE(_tag) \
-	MCFG_DEVICE_ADD(_tag, X2212) \
-	downcast<x2212_device &>(*device).set_auto_save(true);
-
-#define MCFG_X2210_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, X2210)
-
-#define MCFG_X2210_ADD_AUTOSAVE(_tag) \
-	MCFG_DEVICE_ADD(_tag, X2210) \
-	downcast<x2212_device &>(*device).set_auto_save(true);
 
 
 //**************************************************************************
@@ -48,7 +40,8 @@ public:
 	// construction/destruction
 	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	// inline configuration helpers
+	// some systems (like many early Atari games) wire up the /STORE signal
+	// to fire on power-down, effectively creating an "auto-save" functionality
 	void set_auto_save(bool auto_save) { m_auto_save = auto_save; }
 
 	// I/O operations

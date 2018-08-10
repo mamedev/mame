@@ -257,9 +257,6 @@ a5105                           //
 a5120                           //
 a5130                           //
 
-@source:a6809.cpp
-a6809                           //
-
 @source:a7150.cpp
 a7150                           //
 
@@ -874,6 +871,13 @@ acommand                        // (c) 1990
 @source:acrnsys1.cpp
 acrnsys1                        // 1979 Acorn System 1 (Microcomputer Kit)
 
+@source:acrnsys.cpp
+acrnsys2                        // 1980 Acorn System 2
+acrnsys3                        // 1980 Acorn System 3 (6502)
+acrnsys3_6809                   // 1980 Acorn System 3 (6809)
+acrnsys4                        // 1980 Acorn System 4
+acrnsys5                        // 1982 Acorn System 5
+
 @source:actfancr.cpp
 actfancr                        // (c) 1989 Data East Corporation (World)
 actfancr1                       // (c) 1989 Data East Corporation (World)
@@ -1018,6 +1022,7 @@ maddog2_100                     // (c) 1992
 maddog2_110                     // (c) 1992
 maddog2_202                     // (c) 1992
 maddoga                         // (c) 1990
+marvice                         // (c) 1994
 spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
 wsjr                            // (c) 1991
@@ -1298,6 +1303,7 @@ uniap2en                        // 1982 Unitron AP II (in English)
 uniap2pt                        // 1982 Unitron AP II (in Brazilian Portuguese)
 uniap2ti                        // 1982 Unitron AP II+ (Teclado Inteligente)
 craft2p                         // 1982 Craft?
+laser2c                         // 1985? Laser //c (Brazil)
 
 @source:apple2e.cpp
 apple2c                         // Apr 1984 Apple //c
@@ -9663,6 +9669,7 @@ chessmsta                       //
 chessmstdm                      //
 
 @source:chesstrv.cpp
+boris                           //
 borisdpl                        //
 chesstrv                        //
 
@@ -9851,6 +9858,9 @@ cmi2x                           // Fairlight CMI IIx
 
 @source:cmmb.cpp
 cmmb162                         //
+
+@source:cms.cpp
+cms6502                         // CMS 6502 Development System
 
 @source:cninja.cpp
 cninja                          // MAG (c) 1991 Data East Corporation (World)
@@ -10237,6 +10247,9 @@ sf2ui                           // 22/05/1991 (c) 1991 (USA, Rev. I)
 sf2uk                           // 01/11/1991 (c) 1991 (USA)
 sf2v004                         // hack
 sf2yyc                          // hack
+sf2cems6a                       // bootleg
+sf2cems6b                       // bootleg
+sf2cems6c                       // bootleg
 sfach                           // CPS Changer (Street Fighter Alpha)
 sfzbch                          // CPS Changer (Street Fighter ZERO Brazil)
 sfzch                           // CPS Changer (Street Fighter ZERO)
@@ -10620,6 +10633,9 @@ sfiiiu                          // 04/02/1997 (c) 1997 (USA)
 warzard                         // 21/11/1996 (c) 1996 (Japan)
 warzardr1                       // 23/10/1996 (c) 1996 (Japan)
 
+@source:cpzodiac.cpp
+cpzodiac                        //
+
 @source:craft.cpp
 craft                           // Craft, by [lft]
 
@@ -10765,6 +10781,7 @@ pinkswts                        // (c) 2006 Cave (AMI license) - 2006/04/06 MAST
 pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
 pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
 pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
+pinkswtssc                      // bootleg
 
 @source:cvicny.cpp
 cvicny                          //
@@ -11346,6 +11363,9 @@ czeroize                        // 37 1983.10 Zeroize
 decocass                        //
 decomult                        //
 
+@source:decstation.cpp
+ds5k133                         // 1993 Digital Equipment Corporation (DECstation 5000/133)
+
 @source:dectalk.cpp
 dectalk                         // 1983 Digital Equipment Corporation
 
@@ -11438,6 +11458,9 @@ popn1                           // GX803 (c) 1998 (Asia)
 popn2                           // GX831 (c) 1998 (Japan)
 popn3                           // GX980 (c) 1999 (Japan)
 popnstage                       // GQ970 (c) 1999 (Japan)
+
+@source:dkmb.cpp
+dkmb
 
 @source:dkong.cpp
 8ballact                        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
@@ -13426,6 +13449,7 @@ porter                          // 1982 bootleg (Arcade TV Game List - P.98, Lef
 racknrol                        // (c) 1986 Status (Shinkia license) (Senko Kit)
 rockclim                        // (c)1981 Taito
 scramb2                         // bootleg
+scramb3                         // bootleg
 scramblb                        // bootleg
 scrambler                       // bootleg
 spcwarp                         // 1983 Century Electronics UK LTD
@@ -14135,6 +14159,7 @@ aplan                           // bootleg (WeaShing)
 bingowng                        // (c) 1993 Wing Co. Ltd
 bingownga                       // (c) 1993 Wing Co. Ltd
 bonusch                         // (c) 1990 Wing Co. Ltd
+feverch                         // (c) 1990 Wing Co. Ltd
 carb2002                        // bootleg
 carb2003                        // bootleg
 cb3                             // (c) 199? Dyna Electronics
@@ -15463,6 +15488,7 @@ pinmoonl                        //
 @source:inderp.cpp
 centauri
 centauri2
+topaz
 
 @source:indiana.cpp
 indiana                         //
@@ -15528,6 +15554,9 @@ ipc                             // intel
 
 @source:ipds.cpp
 ipds                            // intel
+
+@source:iphone2g.cpp
+iphone2g                        // (c) 2007 Apple
 
 @source:iq151.cpp
 iq151                           //
@@ -17859,6 +17888,7 @@ lastduelb                       // bootleg
 lastduelj                       // 7/1988 (c) 1988 (Japan)
 lastduelo                       // 7/1988 (c) 1988 (US)
 leds2011                        // 1988 (c) 1988 (World)
+leds2011p                       // 1988 (c) 1988 (US, Prototype)
 leds2011u                       // 1988 (c) 1988 (US)
 ledstorm                        // 1988 (c) 1988 (US)
 madgear                         // 2/1989 (c) 1989 (US)
@@ -20952,6 +20982,10 @@ pitbosssc                       // (c) 1992 Merit
 realbrod                        // (c) 1996 Merit
 realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
+
+@source:meritum.cpp
+meritum                         //
+meritum_net                     //
 
 @source:mermaid.cpp
 mermaid                         // (c) 1982 Rock-ola,  made by Sanritsu
@@ -28085,6 +28119,7 @@ gratia                          // (c) 1996
 gratiaa                         // (c) 1996
 hayaosi2                        // (c) 1993
 hayaosi3                        // (c) 1994
+hayaosi3a                       // (c) 1994
 kirarast                        // (c) 1996
 p47aces                         // (c) 1995
 tetrisp                         // (c) 1995 Jaleco / BPS
@@ -32760,6 +32795,7 @@ raidendxj                       // (c) 1994 Seibu Kaihatsu
 raidendxja                      // (c) 1994 Seibu Kaihatsu
 raidendxk                       // (c) 1994 Seibu Kaihatsu
 raidendxnl                      // (c) 1994 Seibu Kaihatsu
+raidendxpt                      // (c) 1994 Seibu Kaihatsu
 raidendxu                       // (c) 1994 Seibu Kaihatsu + Fabtek license
 xsedae                          // (c) 1995 Dream Island
 zeroteam                        // (c) 1993 Seibu Kaihatsu + Fabtek license
@@ -33173,6 +33209,7 @@ esha_ma3                        //
 esha_pa1                        //
 esha_pa4                        //
 esha_pr4                        //
+jokrz_g4                        //
 jokrz_l3                        //
 jokrz_l6                        //
 mousn_l1                        //
@@ -34181,8 +34218,9 @@ alien3j                         // 1993.?? Aliens 3 (Japan)
 arabfgt                         // 1992.?? Arabian Fight (World)
 arabfgtj                        // 1992.03 Arabian Fight (Japan)
 arabfgtu                        // 1992.03 Arabian Fight (US)
-arescue                         // 1992.03 Air Rescue (US)
+arescue                         // 1992.03 Air Rescue (World)
 arescuej                        // 1992.04 Air Rescue (Japan)
+arescueu                        // 1992.03 Air Rescue (US)
 brival                          // 1993.?? Burning Rival (World)
 brivalj                         // 1993.08 Burning Rival (Japan)
 darkedge                        // 1993.?? Dark Edge (World)
@@ -36720,7 +36758,8 @@ vikingt                         //
 
 @source:tatsumi.cpp
 apache3                         // (c) 1988 Tatsumi
-apache3a                        // (c) 1988 Tatsumi + Kana Corporation license
+apache3a                        // (c) 1988 Tatsumi
+apache3b                        // (c) 1988 Tatsumi + Kana Corporation license
 bigfight                        // (c) 1992 Tatsumi
 cyclwarr                        // (c) 1991 Tatsumi
 cyclwarra                       // (c) 1991 Tatsumi
@@ -37511,16 +37550,10 @@ ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
 ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II
 lnw80                           // LNW Research LNW-80
-meritum                         //
-meritum_net                     //
 radionic                        // Radionic
 sys80                           // EACA System 80
 trs80                           // TRS-80 Model I - Level I BASIC
 trs80l2                         // TRS-80 Model I - Level II BASIC
-trs80m3                         // TRS-80 Model III - Radio Shack/Tandy
-trs80m4                         //
-trs80m4p                        //
-cp500                           // Prologica CP500
 
 @source:trs80dt1.cpp
 trs80dt1                        // TRS-80 Data Terminal 1
@@ -37528,6 +37561,12 @@ trs80dt1                        // TRS-80 Data Terminal 1
 @source:trs80m2.cpp
 trs80m16                        //
 trs80m2                         //
+
+@source:trs80m3.cpp
+trs80m3                         // TRS-80 Model III - Radio Shack/Tandy
+trs80m4                         //
+trs80m4p                        //
+cp500                           // Prologica CP500
 
 @source:truco.cpp
 truco                           // (c) 198? Playtronic SRL
@@ -38947,6 +38986,7 @@ ngg_10                          //
 ngg_13                          //
 ngg_p06                         //
 sc_091                          //
+sc_10                           //
 sc_14                           //
 sc_17                           //
 sc_17n                          //

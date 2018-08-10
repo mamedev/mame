@@ -34,8 +34,11 @@ public:
 	void wpc_an_dd(machine_config &config);
 	void wpc_an(machine_config &config);
 	void wpc_an_base(machine_config &config);
+
+	void init_wpc_an();
+
+private:
 	void wpc_an_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -51,8 +54,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
-public:
-	void init_wpc_an();
+
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
@@ -64,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
 	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
-private:
+
 	uint16_t m_vblank_count;
 	uint32_t m_irq_count;
 	uint8_t m_bankmask;
@@ -341,7 +343,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_an_state,wpc_sound_data_r),WRITE8(*this, wpc_an_state,wpc_sound_data_w))
 	MCFG_WPC_SOUND_S11C(WRITE8(*this, wpc_an_state,wpc_sound_s11_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
+	config.set_default_layout(layout_wpc_an);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an)

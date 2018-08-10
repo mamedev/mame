@@ -141,16 +141,21 @@ better notes (complete chip lists) for each board still needed
 class gal3_state : public namcos2_shared_state
 {
 public:
-	gal3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag) ,
+	gal3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_shared_state(mconfig, type, tag) ,
 		m_rso_shared_ram(*this, "rso_shared_ram"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_c140_16a(*this, "c140_16a"),
+		m_c140_16g(*this, "c140_16g") { }
 
-	uint32_t *m_mpSharedRAM0;
-	//uint32_t *m_mpSharedRAM1;
+	void gal3(machine_config &config);
+
+private:
 	uint16_t m_namcos21_video_enable;
 	required_shared_ptr<uint16_t> m_rso_shared_ram;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_device<c140_device> m_c140_16a;
+	required_device<c140_device> m_c140_16g;
 	uint32_t m_led_mst;
 	uint32_t m_led_slv;
 	DECLARE_READ32_MEMBER(led_mst_r);
@@ -166,7 +171,6 @@ public:
 	DECLARE_VIDEO_START(gal3);
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
-	void gal3(machine_config &config);
 	void cpu_mst_map(address_map &map);
 	void cpu_slv_map(address_map &map);
 	void psn_b1_cpu_map(address_map &map);
@@ -459,11 +463,11 @@ void gal3_state::sound_cpu_map(address_map &map)
 	map(0x110000, 0x113fff).ram();
 /// AM_RANGE(0x120000, 0x120003) AM_RAM //2ieme byte
 /// AM_RANGE(0x200000, 0x20017f) AM_RAM //C140
-	map(0x200000, 0x2037ff).rw("c140_16a", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)).umask16(0x00ff);    //C140///////////
+	map(0x200000, 0x2037ff).rw(m_c140_16a, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)).umask16(0x00ff);    //C140///////////
 /// AM_RANGE(0x201000, 0x20117f) AM_RAM //C140
 /// AM_RANGE(0x202000, 0x20217f) AM_RAM //C140
 /// AM_RANGE(0x203000, 0x20317f) AM_RAM //C140
-	map(0x204000, 0x2047ff).rw("c140_16g", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)).umask16(0x00ff);    //C140
+	map(0x204000, 0x2047ff).rw(m_c140_16g, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)).umask16(0x00ff);    //C140
 /// AM_RANGE(0x090000, 0xffffff) AM_RAM
 }
 
@@ -655,15 +659,15 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140_16g", 8000000/374)
-	MCFG_C140_BANK_TYPE(SYSTEM21)    //to be verified
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	C140(config, m_c140_16g, 8000000/374);
+	m_c140_16g->set_bank_type(c140_device::C140_TYPE::SYSTEM21);    //to be verified
+	m_c140_16g->add_route(0, "lspeaker", 0.50);
+	m_c140_16g->add_route(1, "rspeaker", 0.50);
 
-	MCFG_C140_ADD("c140_16a", 8000000/374)
-	MCFG_C140_BANK_TYPE(SYSTEM21)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	C140(config, m_c140_16a, 8000000/374);
+	m_c140_16a->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140_16a->add_route(0, "lspeaker", 0.50);
+	m_c140_16a->add_route(1, "rspeaker", 0.50);
 MACHINE_CONFIG_END
 
 /*

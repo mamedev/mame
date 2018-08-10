@@ -6,7 +6,7 @@
 #pragma once
 
 #define MCFG_MOUSE_STATE_CB(_state_cb) \
-	devcb = &downcast<interpro_mouse_port_device &>(*device).set_state_callback(DEVCB_##_state_cb);
+	downcast<interpro_mouse_port_device &>(*device).set_state_callback(DEVCB_##_state_cb);
 
 class device_interpro_mouse_port_interface;
 

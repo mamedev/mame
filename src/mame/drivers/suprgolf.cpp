@@ -44,6 +44,11 @@ public:
 		m_videoram(*this, "videoram")
 	{ }
 
+	void suprgolf(machine_config &config);
+
+	void init_suprgolf();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -86,13 +91,11 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void init_suprgolf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void suprgolf(machine_config &config);
 	void io_map(address_map &map);
 	void suprgolf_map(address_map &map);
 };
@@ -123,10 +126,10 @@ void suprgolf_state::video_start()
 	save_item(NAME(m_vreg_pen));
 	save_item(NAME(m_palette_switch));
 	save_item(NAME(m_bg_vreg_test));
-	save_pointer(NAME(m_paletteram.get()), 0x1000);
-	save_pointer(NAME(m_bg_vram.get()), 0x2000*0x20);
-	save_pointer(NAME(m_bg_fb.get()), 0x2000*0x20);
-	save_pointer(NAME(m_fg_fb.get()), 0x2000*0x20);
+	save_pointer(NAME(m_paletteram), 0x1000);
+	save_pointer(NAME(m_bg_vram), 0x2000*0x20);
+	save_pointer(NAME(m_bg_fb), 0x2000*0x20);
+	save_pointer(NAME(m_fg_fb), 0x2000*0x20);
 }
 
 uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

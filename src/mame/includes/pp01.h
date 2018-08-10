@@ -31,6 +31,9 @@ public:
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG) { }
 
+	void pp01(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<speaker_sound_device> m_speaker;
@@ -63,7 +66,6 @@ public:
 	DECLARE_READ8_MEMBER(pp01_8255_portc_r);
 	void pp01_video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part);
 	void pp01_set_memory(uint8_t block, uint8_t data);
-	void pp01(machine_config &config);
 	void pp01_io(address_map &map);
 	void pp01_mem(address_map &map);
 };

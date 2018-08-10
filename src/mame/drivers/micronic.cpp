@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)

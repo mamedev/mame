@@ -226,6 +226,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void kas89(machine_config &config);
+
+	void init_kas89();
+
+private:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -233,17 +238,13 @@ public:
 	DECLARE_WRITE8_MEMBER(int_ack_w);
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
-	void init_kas89();
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
-	void kas89(machine_config &config);
 	void audio_io(address_map &map);
 	void audio_map(address_map &map);
 	void kas89_io(address_map &map);
 	void kas89_map(address_map &map);
 
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

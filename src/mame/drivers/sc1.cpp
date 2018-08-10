@@ -33,14 +33,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sc1(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER( matrix_w );
 	DECLARE_WRITE8_MEMBER( pio_port_a_w );
 	DECLARE_READ8_MEMBER( pio_port_b_r );
 
-	void sc1(machine_config &config);
 	void sc1_io(address_map &map);
 	void sc1_mem(address_map &map);
-private:
+
 	uint8_t m_matrix;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
@@ -163,7 +165,7 @@ MACHINE_CONFIG_START(sc1_state::sc1)
 	MCFG_DEVICE_IO_MAP(sc1_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc1)
+	config.set_default_layout(layout_sc1);
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))

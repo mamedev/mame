@@ -73,17 +73,20 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(henry_p1_w);
-	DECLARE_WRITE8_MEMBER(henry_p3_w);
-	void init_hprot1();
-	DECLARE_PALETTE_INIT(hprot1);
-	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void hprotr8a(machine_config &config);
 	void hprot2r6(machine_config &config);
 	void hprot1(machine_config &config);
+
+	void init_hprot1();
+
+private:
+	DECLARE_WRITE8_MEMBER(henry_p1_w);
+	DECLARE_WRITE8_MEMBER(henry_p3_w);
+	DECLARE_PALETTE_INIT(hprot1);
+	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -259,7 +262,7 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hprot1)

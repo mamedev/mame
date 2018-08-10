@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "emu.h"
-
 
 #define HPMLC_R1_OB     0x10
 
@@ -82,10 +80,10 @@
 //**************************************************************************
 
 #define MCFG_HP_HIL_INT_CALLBACK(_devcb) \
-	devcb = &downcast<hp_hil_mlc_device &>(*device).set_int_callback(DEVCB_##_devcb);
+	downcast<hp_hil_mlc_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 #define MCFG_HP_HIL_NMI_CALLBACK(_devcb) \
-	devcb = &downcast<hp_hil_mlc_device &>(*device).set_nmi_callback(DEVCB_##_devcb);
+	downcast<hp_hil_mlc_device &>(*device).set_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_HP_HIL_SLOT_ADD(_mlc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, HP_HIL_SLOT, 0) \
@@ -131,6 +129,8 @@ public:
 
 	template <class Object> devcb_base &set_int_callback(Object &&cb) { return int_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_nmi_callback(Object &&cb) { return nmi_cb.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return int_cb.bind(); }
+	auto nmi_callback() { return nmi_cb.bind(); }
 
 	void add_hp_hil_device(device_hp_hil_interface *device);
 	bool get_int(void) { return m_r3 & 1; }

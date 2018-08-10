@@ -50,6 +50,9 @@ public:
 	{
 	}
 
+	void elwro800(machine_config &config);
+
+private:
 	/* for elwro800 */
 	/* RAM mapped at 0 */
 	uint8_t m_ram_at_0000;
@@ -67,13 +70,12 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
-	void elwro800(machine_config &config);
 	void elwro800_bank1(address_map &map);
 	void elwro800_bank2(address_map &map);
 	void elwro800_io(address_map &map);
 	void elwro800_m1(address_map &map);
 	void elwro800_mem(address_map &map);
-protected:
+
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
@@ -591,26 +593,26 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
 
-	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
+	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum)
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, "upd765", true, true);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("JOY"))
-	MCFG_I8255_IN_PORTB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, elwro800_state, i8255_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, elwro800_state, i8255_port_c_w))
+	I8255A(config, m_i8255, 0);
+	m_i8255->in_pa_callback().set_ioport("JOY");
+	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
+	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255->in_pc_callback().set(FUNC(elwro800_state::i8255_port_c_r));
+	m_i8255->out_pc_callback().set(FUNC(elwro800_state::i8255_port_c_w));
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, elwro800_state, write_centronics_ack))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->ack_handler().set(FUNC(elwro800_state::write_centronics_ack));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
+	I8251(config, m_i8251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

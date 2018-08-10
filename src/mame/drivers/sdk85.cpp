@@ -55,13 +55,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sdk85(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	void sdk85(machine_config &config);
 	void sdk85_io(address_map &map);
 	void sdk85_mem(address_map &map);
-private:
+
 	u8 m_digit;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -162,16 +164,16 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 	MCFG_DEVICE_ADD("expramio", I8155, 6.144_MHz_XTAL / 2) // Expansion RAM (A17)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sdk85)
+	config.set_default_layout(layout_sdk85);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2) // Keyboard/Display Controller (A13)
+	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2)               // Keyboard/Display Controller (A13)
 	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk85_state, scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk85_state, digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, sdk85_state, kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk85_state, scanlines_w))   // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk85_state, digit_w))     // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, sdk85_state, kbd_r))           // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                             // Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
 MACHINE_CONFIG_END
 
 /* ROM definition */

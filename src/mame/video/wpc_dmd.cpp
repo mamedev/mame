@@ -43,7 +43,7 @@ MACHINE_CONFIG_START(wpc_dmd_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wpc_dmd_device, screen_update)
 	MCFG_SCREEN_SIZE(128*4, 32*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128*4-1, 0, 32*4-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scanline", wpc_dmd_device, scanline_timer, attotime::from_hz(60*4*32))
 MACHINE_CONFIG_END

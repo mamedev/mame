@@ -33,8 +33,6 @@ using u64 = std::uint64_t;
 //  CONSTANTS
 //**************************************************************************
 
-enum { TOTAL_MEMORY_BANKS = 512 };
-
 // address space names for common use
 constexpr int AS_PROGRAM = 0; // program address space
 constexpr int AS_DATA    = 1; // data address space
@@ -55,14 +53,8 @@ enum class read_or_write
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// private classes declared in emumem.cpp
-class address_table;
-class address_table_read;
-class address_table_setoffset;
-class address_table_write;
-
 // offsets and addresses are 32-bit (for now...)
-typedef u32 offs_t;
+using offs_t = u32;
 
 // address map constructors are delegates that build up an address_map
 using address_map_constructor = named_delegate<void (address_map &)>;
@@ -87,20 +79,26 @@ struct data_accessors
 	void    (*write_qword_masked)(address_space &space, offs_t address, u64 data, u64 mask);
 };
 
+// a line in the memory structure dump
+struct memory_entry {
+	offs_t start, end;
+	class handler_entry *entry;
+};
+
 
 // ======================> read_delegate
 
 // declare delegates for each width
-typedef device_delegate<u8 (address_space &, offs_t, u8)> read8_delegate;
-typedef device_delegate<u16 (address_space &, offs_t, u16)> read16_delegate;
-typedef device_delegate<u32 (address_space &, offs_t, u32)> read32_delegate;
-typedef device_delegate<u64 (address_space &, offs_t, u64)> read64_delegate;
+using read8_delegate  = device_delegate<u8  (address_space &, offs_t, u8 )>;
+using read16_delegate = device_delegate<u16 (address_space &, offs_t, u16)>;
+using read32_delegate = device_delegate<u32 (address_space &, offs_t, u32)>;
+using read64_delegate = device_delegate<u64 (address_space &, offs_t, u64)>;
 
 
 // ======================> write_delegate
 
 // declare delegates for each width
-typedef device_delegate<void (address_space &, offs_t, u8, u8)> write8_delegate;
+typedef device_delegate<void (address_space &, offs_t, u8,  u8 )> write8_delegate;
 typedef device_delegate<void (address_space &, offs_t, u16, u16)> write16_delegate;
 typedef device_delegate<void (address_space &, offs_t, u32, u32)> write32_delegate;
 typedef device_delegate<void (address_space &, offs_t, u64, u64)> write64_delegate;
@@ -227,18 +225,250 @@ inline write64_delegate make_delegate(T &&func, const char *name, const char *ta
 
 } } // namespace emu::detail
 
-
-// ======================> setoffset_delegate
-
-typedef device_delegate<void (address_space &, offs_t)> setoffset_delegate;
-
 // =====================-> Width -> types
-template<int Width> struct handler_entry_size {};
-template<> struct handler_entry_size<0> { typedef u8  uX; typedef read8_delegate  READ; typedef write8_delegate  WRITE; };
-template<> struct handler_entry_size<1> { typedef u16 uX; typedef read16_delegate READ; typedef write16_delegate WRITE; };
-template<> struct handler_entry_size<2> { typedef u32 uX; typedef read32_delegate READ; typedef write32_delegate WRITE; };
-template<> struct handler_entry_size<3> { typedef u64 uX; typedef read64_delegate READ; typedef write64_delegate WRITE; };
 
+template<int Width> struct handler_entry_size {};
+template<> struct handler_entry_size<0> { using uX = u8;  using READ = read8_delegate;  using WRITE = write8_delegate;  };
+template<> struct handler_entry_size<1> { using uX = u16; using READ = read16_delegate; using WRITE = write16_delegate; };
+template<> struct handler_entry_size<2> { using uX = u32; using READ = read32_delegate; using WRITE = write32_delegate; };
+template<> struct handler_entry_size<3> { using uX = u64; using READ = read64_delegate; using WRITE = write64_delegate; };
+
+
+// ======================> memopry_units_descritor forwards declaration
+
+template<int Width, int AddrShift, int Endian> class memory_units_descriptor;
+
+// =====================-> Address segmentation for the search tree
+
+constexpr int handler_entry_dispatch_lowbits(int highbits, int width, int ashift)
+{
+	return (highbits > 48) ? 48 :
+		(highbits > 32) ? 32 :
+		(highbits > 14) ? 14 :
+		width + ashift;
+}
+
+
+// =====================-> The root class of all handlers
+
+// Handlers the refcounting as part of the interface
+
+class handler_entry
+{
+	DISABLE_COPYING(handler_entry);
+
+	template<int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
+
+public:
+	// Typing flags
+	static constexpr u32 F_DISPATCH    = 0x00000001; // handler that forwards the access to other handlers
+	static constexpr u32 F_UNITS       = 0x00000002; // handler that merges/splits an access among multiple handlers (unitmask support)
+	static constexpr u32 F_PASSTHROUGH = 0x00000004; // handler that passes through the request to another handler
+
+	// Start/end of range flags
+	static constexpr u8 START = 1;
+	static constexpr u8 END   = 2;
+
+	// Intermediary structure for reference count checking
+	class reflist {
+	public:
+		void add(const handler_entry *entry);
+
+		void propagate();
+		void check();
+
+	private:
+		std::unordered_map<const handler_entry *, u32> refcounts;
+		std::unordered_set<const handler_entry *> seen;
+		std::unordered_set<const handler_entry *> todo;
+	};
+
+	handler_entry(address_space *space, u32 flags) { m_space = space; m_refcount = 1; m_flags = flags; }
+	virtual ~handler_entry() {}
+
+	inline void ref(int count = 1) const { m_refcount += count; }
+	inline void unref(int count = 1) const { m_refcount -= count; if(!m_refcount) delete this; }
+	inline u32 flags() const { return m_flags; }
+
+	inline bool is_dispatch() const { return m_flags & F_DISPATCH; }
+	inline bool is_units() const { return m_flags & F_UNITS; }
+	inline bool is_passthrough() const { return m_flags & F_PASSTHROUGH; }
+
+	virtual void dump_map(std::vector<memory_entry> &map) const;
+
+	virtual std::string name() const = 0;
+	virtual void enumerate_references(handler_entry::reflist &refs) const;
+	u32 get_refcount() const { return m_refcount; }
+
+protected:
+	// Address range storage
+	struct range {
+		offs_t start;
+		offs_t end;
+
+		inline void set(offs_t _start, offs_t _end) {
+			start = _start;
+			end = _end;
+		}
+
+		inline void intersect(offs_t _start, offs_t _end) {
+			if(_start > start)
+				start = _start;
+			if(_end < end)
+				end = _end;
+		}
+	};
+
+	address_space *m_space;
+	mutable u32 m_refcount;
+	u32 m_flags;
+};
+
+
+// =====================-> The parent class of all read handlers
+
+// Provides the populate/read/get_ptr/lookup API
+
+template<int Width, int AddrShift, int Endian> class handler_entry_read_passthrough;
+
+template<int Width, int AddrShift, int Endian> class handler_entry_read : public handler_entry
+{
+public:
+	using uX = typename handler_entry_size<Width>::uX;
+
+	struct mapping {
+		handler_entry_read<Width, AddrShift, Endian> *original;
+		handler_entry_read<Width, AddrShift, Endian> *patched;
+		u8 ukey;
+	};
+
+	handler_entry_read(address_space *space, u32 flags) : handler_entry(space, flags) {}
+	~handler_entry_read() {}
+
+	virtual uX read(offs_t offset, uX mem_mask) = 0;
+	virtual void *get_ptr(offs_t offset) const;
+	virtual void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift, Endian> *&handler) const;
+
+	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler) {
+		if(mirror)
+			populate_mirror(start, end, start, end, mirror, handler);
+		else
+			populate_nomirror(start, end, start, end, handler);
+	}
+
+	virtual void populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler);
+	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler);
+
+	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor) {
+		std::vector<mapping> mappings;
+		if(mirror)
+			populate_mismatched_mirror(start, end, start, end, mirror, descriptor, mappings);
+		else
+			populate_mismatched_nomirror(start, end, start, end, descriptor, START|END, mappings);
+	}
+
+	virtual void populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings);
+	virtual void populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings);
+
+	inline void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler) {
+		std::vector<mapping> mappings;
+		if(mirror)
+			populate_passthrough_mirror(start, end, start, end, mirror, handler, mappings);
+		else
+			populate_passthrough_nomirror(start, end, start, end, handler, mappings);
+	}
+
+	virtual void populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
+	virtual void populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
+
+	// Remove a set of passthrough handlers, leaving the lower handler in their place
+	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
+};
+
+
+// =====================-> The parent class of all write handlers
+
+// Provides the populate/write/get_ptr/lookup API
+
+template<int Width, int AddrShift, int Endian> class handler_entry_write_passthrough;
+
+template<int Width, int AddrShift, int Endian> class handler_entry_write : public handler_entry
+{
+public:
+	using uX = typename handler_entry_size<Width>::uX;
+
+	struct mapping {
+		handler_entry_write<Width, AddrShift, Endian> *original;
+		handler_entry_write<Width, AddrShift, Endian> *patched;
+		u8 ukey;
+	};
+
+	handler_entry_write(address_space *space, u32 flags) : handler_entry(space, flags) {}
+	virtual ~handler_entry_write() {}
+
+	virtual void write(offs_t offset, uX data, uX mem_mask) = 0;
+	virtual void *get_ptr(offs_t offset) const;
+	virtual void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const;
+
+	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler) {
+		if(mirror)
+			populate_mirror(start, end, start, end, mirror, handler);
+		else
+			populate_nomirror(start, end, start, end, handler);
+	}
+
+	virtual void populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift, Endian> *handler);
+	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler);
+
+	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor) {
+		std::vector<mapping> mappings;
+		if(mirror)
+			populate_mismatched_mirror(start, end, start, end, mirror, descriptor, mappings);
+		else
+			populate_mismatched_nomirror(start, end, start, end, descriptor, START|END, mappings);
+	}
+
+	virtual void populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings);
+	virtual void populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings);
+
+	inline void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler) {
+		std::vector<mapping> mappings;
+		if(mirror)
+			populate_passthrough_mirror(start, end, start, end, mirror, handler, mappings);
+		else
+			populate_passthrough_nomirror(start, end, start, end, handler, mappings);
+	}
+
+	virtual void populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
+	virtual void populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
+
+	// Remove a set of passthrough handlers, leaving the lower handler in their place
+	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
+};
+
+// =====================-> Passthrough handler management structure
+class memory_passthrough_handler
+{
+	template<int Width, int AddrShift, int Endian> friend class handler_entry_read_passthrough;
+	template<int Width, int AddrShift, int Endian> friend class handler_entry_write_passthrough;
+
+public:
+	memory_passthrough_handler(address_space &space) : m_space(space) {}
+
+	inline void remove();
+
+private:
+	address_space &m_space;
+	std::unordered_set<handler_entry *> m_handlers;
+
+	void add_handler(handler_entry *handler) { m_handlers.insert(handler); }
+	void remove_handler(handler_entry *handler) { m_handlers.erase(m_handlers.find(handler)); }
+};
+
+// =====================-> Forward declaration for address_space
+
+template<int Width, int AddrShift, int Endian> class handler_entry_read_unmapped;
+template<int Width, int AddrShift, int Endian> class handler_entry_write_unmapped;
 
 // ======================> address offset -> byte offset
 
@@ -510,86 +740,87 @@ template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, ty
 // memory_access_cache contains state data for cached access
 template<int Width, int AddrShift, int Endian> class memory_access_cache
 {
-	friend class address_table;
 	using NativeType = typename handler_entry_size<Width>::uX;
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 
 public:
-	using cache_update_delegate = delegate<offs_t (memory_access_cache<Width, AddrShift, Endian> &, offs_t)>;
-
-	// cache_range is an internal class that is part of a list of start/end ranges
-	class cache_range
-	{
-	public:
-		// construction
-		cache_range(): m_addrstart(0),m_addrend(~0) { }
-
-		inline bool operator==(cache_range val) noexcept
-		{   // return true if _Left and _Right identify the same thread
-			return (m_addrstart == val.m_addrstart) && (m_addrend == val.m_addrend);
-		}
-
-		// internal state
-		offs_t                  m_addrstart;            // starting offset of the range
-		offs_t                  m_addrend;              // ending offset of the range
-	};
-
 	// construction/destruction
-	memory_access_cache(address_space &space);
+	memory_access_cache(address_space &space,
+						handler_entry_read <Width, AddrShift, Endian> *root_read,
+						handler_entry_write<Width, AddrShift, Endian> *root_write);
+
 	~memory_access_cache();
 
 	// getters
 	address_space &space() const { return m_space; }
-	u8 *ptr() const { return m_ptr; }
 
-	// see if an address is within bounds, or attempt to update it if not
-	bool address_is_valid(offs_t address) { return EXPECTED(address >= m_addrstart && address <= m_addrend) || set_cache_region(address); }
+	// see if an address is within bounds, update it if not
+	void check_address_r(offs_t address) {
+		if(address >= m_addrstart_r && address <= m_addrend_r)
+			return;
+		m_root_read->lookup(address, m_addrstart_r, m_addrend_r, m_cache_r);
+	}
 
-	// force a recomputation on the next read
-	void force_update() { m_addrend = 0; m_addrstart = 1; }
-	void force_update(u16 if_match) { if (m_entry == if_match) force_update(); }
+	void check_address_w(offs_t address) {
+		if(address >= m_addrstart_w && address <= m_addrend_w)
+			return;
+		m_root_write->lookup(address, m_addrstart_w, m_addrend_w, m_cache_w);
+	}
 
 	// accessor methods
 
 	void *read_ptr(offs_t address) {
-		if (address_is_valid(address))
-			return &m_ptr[memory_offset_to_byte(address & m_addrmask, AddrShift)];
-		return nullptr;
+		check_address_r(address);
+		return m_cache_r->get_ptr(address);
 	}
 
-	u8 read_byte(offs_t address) { return Width == 0 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 0, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xff); }
-	u16 read_word(offs_t address) { return Width == 1 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 1, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffff); }
-	u16 read_word(offs_t address, u16 mask) { return memory_read_generic<Width, AddrShift, Endian, 1, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
-	u16 read_word_unaligned(offs_t address) { return memory_read_generic<Width, AddrShift, Endian, 1, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffff); }
-	u16 read_word_unaligned(offs_t address, u16 mask) { return memory_read_generic<Width, AddrShift, Endian, 1, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
-	u32 read_dword(offs_t address) { return Width == 2 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 2, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffff); }
-	u32 read_dword(offs_t address, u32 mask) { return memory_read_generic<Width, AddrShift, Endian, 2, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
-	u32 read_dword_unaligned(offs_t address) { return memory_read_generic<Width, AddrShift, Endian, 2, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffff); }
-	u32 read_dword_unaligned(offs_t address, u32 mask) { return memory_read_generic<Width, AddrShift, Endian, 2, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
-	u64 read_qword(offs_t address) { return Width == 3 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 3, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffffffffffffU); }
-	u64 read_qword(offs_t address, u64 mask) { return memory_read_generic<Width, AddrShift, Endian, 3, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
-	u64 read_qword_unaligned(offs_t address) { return memory_read_generic<Width, AddrShift, Endian, 3, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffffffffffffU); }
-	u64 read_qword_unaligned(offs_t address, u64 mask) { return memory_read_generic<Width, AddrShift, Endian, 3, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
+	u8 read_byte(offs_t address) { address &= m_addrmask; return Width == 0 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 0, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xff); }
+	u16 read_word(offs_t address) { address &= m_addrmask; return Width == 1 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 1, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffff); }
+	u16 read_word(offs_t address, u16 mask) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 1, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
+	u16 read_word_unaligned(offs_t address) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 1, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffff); }
+	u16 read_word_unaligned(offs_t address, u16 mask) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 1, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
+	u32 read_dword(offs_t address) { address &= m_addrmask; return Width == 2 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 2, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffff); }
+	u32 read_dword(offs_t address, u32 mask) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 2, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
+	u32 read_dword_unaligned(offs_t address) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 2, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffff); }
+	u32 read_dword_unaligned(offs_t address, u32 mask) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 2, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
+	u64 read_qword(offs_t address) { address &= m_addrmask; return Width == 3 ? read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 3, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffffffffffffU); }
+	u64 read_qword(offs_t address, u64 mask) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 3, true>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
+	u64 read_qword_unaligned(offs_t address) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 3, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, 0xffffffffffffffffU); }
+	u64 read_qword_unaligned(offs_t address, u64 mask) { address &= m_addrmask; return memory_read_generic<Width, AddrShift, Endian, 3, false>([this](offs_t offset, NativeType mask) -> NativeType { return read_native(offset, mask); }, address, mask); }
 
-
-	void remove_intersecting_ranges(offs_t start, offs_t end);
+	void write_byte(offs_t address, u8 data) { address &= m_addrmask; if (Width == 0) write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 0, true>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, 0xff); }
+	void write_word(offs_t address, u16 data) { address &= m_addrmask; if (Width == 1) write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 1, true>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, 0xffff); }
+	void write_word(offs_t address, u16 data, u16 mask) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 1, true>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, mask); }
+	void write_word_unaligned(offs_t address, u16 data) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 1, false>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, 0xffff); }
+	void write_word_unaligned(offs_t address, u16 data, u16 mask) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 1, false>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, mask); }
+	void write_dword(offs_t address, u32 data) { address &= m_addrmask; if (Width == 2) write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 2, true>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, 0xffffffff); }
+	void write_dword(offs_t address, u32 data, u32 mask) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 2, true>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, mask); }
+	void write_dword_unaligned(offs_t address, u32 data) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 2, false>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, 0xffffffff); }
+	void write_dword_unaligned(offs_t address, u32 data, u32 mask) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 2, false>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, mask); }
+	void write_qword(offs_t address, u64 data) { address &= m_addrmask; if (Width == 3) write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 3, true>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, 0xffffffffffffffffU); }
+	void write_qword(offs_t address, u64 data, u64 mask) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 3, true>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, mask); }
+	void write_qword_unaligned(offs_t address, u64 data) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 3, false>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, 0xffffffffffffffffU); }
+	void write_qword_unaligned(offs_t address, u64 data, u64 mask) { address &= m_addrmask; memory_write_generic<Width, AddrShift, Endian, 3, false>([this](offs_t offset, NativeType data, NativeType mask) { write_native(offset, data, mask); }, address, data, mask); }
 
 private:
-	// internal helpers
-	bool set_cache_region(offs_t address);
-	cache_range *find_range(offs_t address, u16 &entry);
-
-	// internal state
 	address_space &             m_space;
-	u8 *                        m_ptr;                  // cache access data pointer
-	offs_t                      m_addrmask;             // address mask
-	offs_t                      m_addrstart;            // minimum valid address
-	offs_t                      m_addrend;              // maximum valid address
-	u16                         m_entry;                // live entry
-	std::list<cache_range>     m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
+
+	int                         m_notifier_id;             // id to remove the notifier on destruction
+
+	offs_t                      m_addrmask;                // address mask
+	offs_t                      m_addrstart_r;             // minimum valid address for reading
+	offs_t                      m_addrend_r;               // maximum valid address for reading
+	offs_t                      m_addrstart_w;             // minimum valid address for writing
+	offs_t                      m_addrend_w;               // maximum valid address for writing
+	handler_entry_read<Width, AddrShift, Endian> *m_cache_r;   // read cache
+	handler_entry_write<Width, AddrShift, Endian> *m_cache_w;  // write cache
+
+	handler_entry_read <Width, AddrShift, Endian> *m_root_read;  // decode tree roots
+	handler_entry_write<Width, AddrShift, Endian> *m_root_write;
 
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0));
+	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0));
 };
 
 
@@ -642,17 +873,20 @@ public:
 // address_space holds live information about an address space
 class address_space
 {
-	friend class address_table;
-	friend class address_table_read;
-	friend class address_table_write;
-	friend class address_table_setoffset;
-	template<int Width, int AddrShift, int Endian> friend class memory_access_cache;
 	friend class memory_bank;
 	friend class memory_block;
+	template<int Width, int AddrShift, int Endian> friend class handler_entry_read_unmapped;
+	template<int Width, int AddrShift, int Endian> friend class handler_entry_write_unmapped;
+	template<int Width, int AddrShift, int Endian> friend class memory_access_cache;
+
+	struct notifier_t {
+		std::function<void (read_or_write)> m_notifier;
+		int m_id;
+	};
 
 protected:
 	// construction/destruction
-	address_space(memory_manager &manager, device_memory_interface &memory, int spacenum, bool large);
+	address_space(memory_manager &manager, device_memory_interface &memory, int spacenum);
 
 public:
 	virtual ~address_space();
@@ -663,7 +897,7 @@ public:
 	int spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map.get(); }
 
-	template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrShift, Endian> *cache() const {
+	template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrShift, Endian> *cache() {
 		if(AddrShift != m_config.addr_shift())
 			fatalerror("Requesting cache() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
 		if(8 << Width != m_config.data_width())
@@ -672,8 +906,25 @@ public:
 			fatalerror("Requesting cache() with endianness %s while the config says %s\n",
 					   endianness_names[Endian], endianness_names[m_config.endianness()]);
 
-		return static_cast<memory_access_cache<Width, AddrShift, Endian> *>(m_cache);
+		return static_cast<memory_access_cache<Width, AddrShift, Endian> *>(create_cache());
 	}
+
+	int add_change_notifier(std::function<void (read_or_write)> n);
+	void remove_change_notifier(int id);
+
+	void invalidate_caches(read_or_write mode) {
+		if(u32(mode) & ~m_in_notification) {
+			u32 old = m_in_notification;
+			m_in_notification |= u32(mode);
+			for(const auto &n : m_notifiers)
+				n.m_notifier(mode);
+			m_in_notification = old;
+		}
+	}
+
+	virtual void validate_reference_counts() const = 0;
+
+	virtual void remove_passthrough(std::unordered_set<handler_entry *> &handlers) = 0;
 
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
@@ -689,23 +940,17 @@ public:
 	u8 logaddrchars() const { return m_logaddrchars; }
 
 	// debug helpers
-	const char *get_handler_string(read_or_write readorwrite, offs_t byteaddress);
+	virtual std::string get_handler_string(read_or_write readorwrite, offs_t byteaddress) const = 0;
+	virtual void dump_maps(std::vector<memory_entry> &read_map, std::vector<memory_entry> &write_map) const = 0;
 	bool log_unmap() const { return m_log_unmap; }
 	void set_log_unmap(bool log) { m_log_unmap = log; }
-	void dump_map(FILE *file, read_or_write readorwrite);
-
-	// watchpoint enablers
-	virtual void enable_read_watchpoints(bool enable = true) = 0;
-	virtual void enable_write_watchpoints(bool enable = true) = 0;
 
 	// general accessors
 	virtual void accessors(data_accessors &accessors) const = 0;
-	virtual void *get_read_ptr(offs_t address) = 0;
-	virtual void *get_write_ptr(offs_t address) = 0;
+	virtual void *get_read_ptr(offs_t address) const = 0;
+	virtual void *get_write_ptr(offs_t address) const = 0;
 
 	// read accessors
-	template<int AccessWidth> inline typename handler_entry_size<AccessWidth>::uX read_sized(offs_t address, typename handler_entry_size<AccessWidth>::uX mask);
-
 	virtual u8 read_byte(offs_t address) = 0;
 	virtual u16 read_word(offs_t address) = 0;
 	virtual u16 read_word(offs_t address, u16 mask) = 0;
@@ -734,9 +979,6 @@ public:
 	virtual void write_qword(offs_t address, u64 data, u64 mask) = 0;
 	virtual void write_qword_unaligned(offs_t address, u64 data) = 0;
 	virtual void write_qword_unaligned(offs_t address, u64 data, u64 mask) = 0;
-
-	// Set address. This will invoke setoffset handlers for the respective entries.
-	virtual void set_address(offs_t address) = 0;
 
 	// address-to-byte conversion helpers
 	offs_t address_to_byte(offs_t address) const { return m_config.addr2byte(address); }
@@ -769,7 +1011,7 @@ public:
 	// install ports, banks, RAM (with mirror/mask)
 	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmirror, rtag, nullptr); }
 	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmirror, nullptr, wtag); }
-	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag);
+	virtual void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) = 0;
 	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, tag, nullptr); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, nullptr, tag); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag)  { install_bank_generic(addrstart, addrend, addrmirror, tag, tag); }
@@ -786,11 +1028,36 @@ public:
 		install_device_delegate(addrstart, addrend, device, delegate, unitmask, cswidth);
 	}
 
-	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask = 0, int cswidth = 0);
+	virtual void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask = 0, int cswidth = 0) = 0;
 
-	// install setoffset handler
-	void install_setoffset_handler(offs_t addrstart, offs_t addrend, setoffset_delegate sohandler, u64 unitmask = 0, int cswidth = 0) { install_setoffset_handler(addrstart, addrend, 0, 0, 0, sohandler, unitmask, cswidth); }
-	void install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate sohandler, u64 unitmask = 0, int cswidth = 0);
+	// install taps without mirroring
+	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+
+	// install taps with mirroring
+	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+
 
 	// install new-style delegate handlers (short form)
 	void install_read_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth); }
@@ -807,18 +1074,18 @@ public:
 	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask, cswidth); }
 
 	// install new-style delegate handlers (with mirror/mask)
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, u64 unitmask = 0, int cswidth = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate whandler, u64 unitmask = 0, int cswidth = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, u64 unitmask = 0, int cswidth = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, u64 unitmask = 0, int cswidth = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate whandler, u64 unitmask = 0, int cswidth = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, u64 unitmask = 0, int cswidth = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, u64 unitmask = 0, int cswidth = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0);
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0, int cswidth = 0) = 0;
 
 	// setup
 	void prepare_map();
@@ -826,33 +1093,27 @@ public:
 	void allocate_memory();
 	void locate_memory();
 
-	void invalidate_read_caches();
-	void invalidate_read_caches(u16 entry);
-	void invalidate_read_caches(offs_t start, offs_t end);
+	template<int Width, int AddrShift, int Endian> handler_entry_read_unmapped <Width, AddrShift, Endian> *get_unmap_r() const { return static_cast<handler_entry_read_unmapped <Width, AddrShift, Endian> *>(m_unmap_r); }
+	template<int Width, int AddrShift, int Endian> handler_entry_write_unmapped<Width, AddrShift, Endian> *get_unmap_w() const { return static_cast<handler_entry_write_unmapped<Width, AddrShift, Endian> *>(m_unmap_w); }
 
-private:
+protected:
 	// internal helpers
-	virtual address_table_read &read() = 0;
-	virtual address_table_write &write() = 0;
-	virtual address_table_setoffset &setoffset() = 0;
+	virtual void *create_cache() = 0;
 
 	void populate_map_entry(const address_map_entry &entry, read_or_write readorwrite);
-	void populate_map_entry_setoffset(const address_map_entry &entry);
-	void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet);
-	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr);
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag);
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank);
+	virtual void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet) = 0;
+	virtual void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) = 0;
+	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) = 0;
+	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) = 0;
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);
 	void *find_backing_memory(offs_t addrstart, offs_t addrend);
 	bool needs_backing_store(const address_map_entry &entry);
 	memory_bank &bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite);
-	memory_bank *bank_find_anonymous(offs_t bytestart, offs_t byteend) const;
 	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, u8 *base);
 	void check_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask, int &ncswidth);
 	void check_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
 	void check_address(const char *function, offs_t addrstart, offs_t addrend);
 
-protected:
 	// private state
 	const address_space_config &m_config;       // configuration of this space
 	device_t &              m_device;           // reference to the owning device
@@ -862,19 +1123,21 @@ protected:
 	u64                     m_unmap;            // unmapped value
 	int                     m_spacenum;         // address space index
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
-	void *                  m_cache;           // fast cache-access read info
 	const char *            m_name;             // friendly name of the address space
 	u8                      m_addrchars;        // number of characters to use for physical addresses
 	u8                      m_logaddrchars;     // number of characters to use for logical addresses
-	std::function<void *(void *)> m_cache_alloc;
-	std::function<void (void *)> m_cache_delete;
-	std::function<void (void *)> m_cache_invalidate_read_caches;
-	std::function<void (void *, u16)> m_cache_invalidate_read_cache_entry;
-	std::function<void (void *, offs_t, offs_t)> m_cache_invalidate_read_cache_range;
 
-	template<int Width, int AddrShift, int Endian> void cache_init();
+	handler_entry           *m_unmap_r;
+	handler_entry           *m_unmap_w;
 
-private:
+	handler_entry           *m_nop_r;
+	handler_entry           *m_nop_w;
+
+	std::vector<std::unique_ptr<memory_passthrough_handler>> m_mphs;
+
+	std::vector<notifier_t> m_notifiers;        // notifier list for address map change
+	int                     m_notifier_id;      // next notifier id
+	u32                     m_in_notification;  // notification(s) currently being done
 	memory_manager &        m_manager;          // reference to the owning manager
 };
 
@@ -940,12 +1203,7 @@ class memory_bank
 		// internal state
 		address_space &         m_space;            // address space that references us
 		read_or_write           m_readorwrite;      // used for read or write?
-	};
 
-	// a bank_entry contains a pointer
-	struct bank_entry
-	{
-		u8 *    m_ptr;
 	};
 
 public:
@@ -955,11 +1213,10 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	int index() const { return m_index; }
 	int entry() const { return m_curentry; }
 	bool anonymous() const { return m_anonymous; }
 	offs_t addrstart() const { return m_addrstart; }
-	void *base() const { return *m_baseptr; }
+	void *base() const { return m_baseptr; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *name() const { return m_name.c_str(); }
 
@@ -980,24 +1237,21 @@ public:
 	void configure_entry(int entrynum, void *base);
 	void configure_entries(int startentry, int numentries, void *base, offs_t stride);
 	void set_entry(int entrynum);
+	void add_notifier(std::function<void (void *)> cb);
 
 private:
-	// internal helpers
-	void invalidate_references();
-	void expand_entries(int entrynum);
-
 	// internal state
 	running_machine &       m_machine;              // need the machine to free our memory
-	u8 **                   m_baseptr;              // pointer to our base pointer in the global array
-	u16                     m_index;                // array index for this handler
+	u8 *                    m_baseptr;              // pointer to our current base pointer
+	std::vector<u8 *>       m_entries;              // the entries
 	bool                    m_anonymous;            // are we anonymous or explicit?
 	offs_t                  m_addrstart;            // start offset
 	offs_t                  m_addrend;              // end offset
 	int                     m_curentry;             // current entry
-	std::vector<bank_entry> m_entry;                // array of entries (dynamically allocated)
 	std::string             m_name;                 // friendly name for this bank
 	std::string             m_tag;                  // tag for this bank
-	std::vector<std::unique_ptr<bank_reference>> m_reflist;          // linked list of address spaces referencing this bank
+	std::vector<std::unique_ptr<bank_reference>> m_reflist;     // list of address spaces referencing this bank
+	std::vector<std::function<void (void *)>> m_alloc_notifier; // list of notifier targets when allocating
 };
 
 
@@ -1085,6 +1339,7 @@ private:
 class memory_manager
 {
 	friend class address_space;
+	template<int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
 	friend memory_region::memory_region(running_machine &machine, const char *name, u32 length, u8 width, endianness_t endian);
 public:
 	// construction/destruction
@@ -1097,32 +1352,26 @@ public:
 	const std::unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
 	const std::unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
 
-	// pointers to a bank pointer (internal usage only)
-	u8 **bank_pointer_addr(u8 index) { return &m_bank_ptr[index]; }
-
 	// regions
 	memory_region *region_alloc(const char *name, u32 length, u8 width, endianness_t endian);
 	void region_free(const char *name);
 	memory_region *region_containing(const void *memory, offs_t bytes) const;
 
+	memory_bank *find(const char *tag) const;
+	memory_bank *find(address_space &space, offs_t addrstart, offs_t addrend) const;
+	memory_bank *allocate(address_space &space, offs_t addrstart, offs_t addrend, const char *tag = nullptr);
+
 private:
-	// internal helpers
-	void bank_reattach();
 	void allocate(device_memory_interface &memory);
 
 	// internal state
 	running_machine &           m_machine;              // reference to the machine
 	bool                        m_initialized;          // have we completed initialization?
 
-	u8 *                        m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
-
 	std::vector<std::unique_ptr<memory_block>>   m_blocklist;            // head of the list of memory blocks
 
-	std::unordered_map<std::string,std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
-	u16                      m_banknext;             // next bank to allocate
-
+	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
 	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map for share lookups
-
 	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // list of memory regions
 };
 
@@ -1150,9 +1399,6 @@ private:
 #define DECLARE_WRITE32_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 data, ATTR_UNUSED u32 mem_mask = 0xffffffff)
 #define DECLARE_READ64_MEMBER(name)     u64    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
 #define DECLARE_WRITE64_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 data, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
-
-#define SETOFFSET_MEMBER(name)          void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
-#define DECLARE_SETOFFSET_MEMBER(name)  void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
 
 // device delegate macros
 #define READ8_DELEGATE(_class, _member)                     read8_delegate(FUNC(_class::_member), this)
@@ -1227,17 +1473,22 @@ private:
 #define DWORD_ALIGNED(a)                (((a) & 3) == 0)
 #define QWORD_ALIGNED(a)                (((a) & 7) == 0)
 
-// inline templates
-template<> inline u8  address_space::read_sized<0>(offs_t address, u8  mask) { return read_byte(address); }
-template<> inline u16 address_space::read_sized<1>(offs_t address, u16 mask) { return read_word(address, mask); }
-template<> inline u32 address_space::read_sized<2>(offs_t address, u32 mask) { return read_dword(address, mask); }
-template<> inline u64 address_space::read_sized<3>(offs_t address, u64 mask) { return read_qword(address, mask); }
 
 template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX memory_access_cache<Width, AddrShift, Endian>::read_native(offs_t address, typename handler_entry_size<Width>::uX mask)
 {
-	if (address_is_valid(address))
-		return *reinterpret_cast<NativeType *>(&m_ptr[memory_offset_to_byte(address & m_addrmask, AddrShift)]);
-	return m_space.read_sized<Width>(address, mask);
+	check_address_r(address);
+	return m_cache_r->read(address, mask);
+}
+
+template<int Width, int AddrShift, int Endian> void memory_access_cache<Width, AddrShift, Endian>::write_native(offs_t address, typename handler_entry_size<Width>::uX data, typename handler_entry_size<Width>::uX mask)
+{
+	check_address_w(address);
+	m_cache_w->write(address, data, mask);
+}
+
+void memory_passthrough_handler::remove()
+{
+	m_space.remove_passthrough(m_handlers);
 }
 
 #endif  /* MAME_EMU_EMUMEM_H */

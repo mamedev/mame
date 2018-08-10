@@ -9,47 +9,40 @@ public:
 	silkroad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_oki1(*this, "oki1"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram"),
-		m_vidram(*this, "vidram"),
-		m_vidram2(*this, "vidram2"),
-		m_vidram3(*this, "vidram3"),
+		m_vram(*this, "vram%u", 1U),
 		m_sprram(*this, "sprram"),
-		m_regs(*this, "regs") { }
+		m_regs(*this, "regs"),
+		m_okibank(*this, "okibank")
+	{ }
 
+	void silkroad(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki1;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	required_shared_ptr<uint32_t> m_vidram;
-	required_shared_ptr<uint32_t> m_vidram2;
-	required_shared_ptr<uint32_t> m_vidram3;
+	required_shared_ptr_array<uint32_t, 3> m_vram;
 	required_shared_ptr<uint32_t> m_sprram;
 	required_shared_ptr<uint32_t> m_regs;
 
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_fg2_tilemap;
-	tilemap_t *m_fg3_tilemap;
+	required_memory_bank m_okibank;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
-	DECLARE_WRITE32_MEMBER(silk_coin_counter_w);
-	DECLARE_WRITE32_MEMBER(silkroad_fgram_w);
-	DECLARE_WRITE32_MEMBER(silkroad_fgram2_w);
-	DECLARE_WRITE32_MEMBER(silkroad_fgram3_w);
-	DECLARE_WRITE32_MEMBER(silk_6295_bank_w);
+	tilemap_t *m_tilemap[3];
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg3_tile_info);
+	DECLARE_WRITE8_MEMBER(coin_w);
+	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(okibank_w);
 
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	uint32_t screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void silkroad(machine_config &config);
 	void cpu_map(address_map &map);
+	void oki_map(address_map &map);
 };

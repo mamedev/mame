@@ -9,19 +9,19 @@
 DECLARE_DEVICE_TYPE(ZNMCU, znmcu_device)
 
 #define MCFG_ZNMCU_DATAOUT_HANDLER(_devcb) \
-	devcb = &downcast<znmcu_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
+	downcast<znmcu_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
 
 #define MCFG_ZNMCU_DSR_HANDLER(_devcb) \
-	devcb = &downcast<znmcu_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
+	downcast<znmcu_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
 
 #define MCFG_ZNMCU_DSW_HANDLER(_devcb) \
-	devcb = &downcast<znmcu_device &>(*device).set_dsw_handler(DEVCB_##_devcb);
+	downcast<znmcu_device &>(*device).set_dsw_handler(DEVCB_##_devcb);
 
 #define MCFG_ZNMCU_ANALOG1_HANDLER(_devcb) \
-	devcb = &downcast<znmcu_device &>(*device).set_analog1_handler(DEVCB_##_devcb);
+	downcast<znmcu_device &>(*device).set_analog1_handler(DEVCB_##_devcb);
 
 #define MCFG_ZNMCU_ANALOG2_HANDLER(_devcb) \
-	devcb = &downcast<znmcu_device &>(*device).set_analog2_handler(DEVCB_##_devcb);
+	downcast<znmcu_device &>(*device).set_analog2_handler(DEVCB_##_devcb);
 
 class znmcu_device : public device_t
 {

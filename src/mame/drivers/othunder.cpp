@@ -622,14 +622,14 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_ADC0808_IN2_CB(IOPORT("P2X"))
 	MCFG_ADC0808_IN3_CB(IOPORT("P2Y"))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(*this, othunder_state, eeprom_w))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, othunder_state, coins_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	m_tc0220ioc->write_3_callback().set(FUNC(othunder_state::eeprom_w));
+	m_tc0220ioc->write_4_callback().set(FUNC(othunder_state::coins_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

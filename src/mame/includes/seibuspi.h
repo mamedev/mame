@@ -30,6 +30,35 @@ public:
 		, m_z80_bank(*this, "z80_bank")
 	{ }
 
+	void sys386f(machine_config &config);
+	void sxx2f(machine_config &config);
+	void rdft2(machine_config &config);
+	void ejanhs(machine_config &config);
+	void sys386i(machine_config &config);
+	void sxx2g(machine_config &config);
+	void spi(machine_config &config);
+	void sxx2e(machine_config &config);
+
+	void init_sei252();
+	void init_batlball();
+	void init_senkyu();
+	void init_viprp1();
+	void init_viprp1o();
+	void init_rdft();
+	void init_rfjet();
+	void init_senkyua();
+	void init_rdft2();
+	void init_ejanhs();
+	void init_sys386f();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
+
+	IRQ_CALLBACK_MEMBER(spi_irq_callback);
+	INTERRUPT_GEN_MEMBER(spi_interrupt);
+
+	uint32_t screen_update_sys386f(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint32_t> m_mainram;
@@ -111,11 +140,7 @@ public:
 	DECLARE_READ32_MEMBER(rf2_speedup_r);
 	DECLARE_READ32_MEMBER(rfjet_speedup_r);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
-
 	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
-	IRQ_CALLBACK_MEMBER(spi_irq_callback);
-	INTERRUPT_GEN_MEMBER(spi_interrupt);
 
 	void set_layer_offsets();
 	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, bitmap_ind8 &primap, int primask);
@@ -133,21 +158,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_midl_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	uint32_t screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_sys386f(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void register_video_state();
 	void init_spi_common();
-	void init_sei252();
-	void init_batlball();
-	void init_senkyu();
-	void init_viprp1();
-	void init_viprp1o();
-	void init_rdft();
-	void init_rfjet();
-	void init_senkyua();
-	void init_rdft2();
-	void init_ejanhs();
-	void init_sys386f();
 
 	void text_decrypt(uint8_t *rom);
 	void bg_decrypt(uint8_t *rom, int size);
@@ -157,14 +170,7 @@ public:
 
 	void rfjet_text_decrypt(uint8_t *rom);
 	void rfjet_bg_decrypt(uint8_t *rom, int size);
-	void sys386f(machine_config &config);
-	void sxx2f(machine_config &config);
-	void rdft2(machine_config &config);
-	void ejanhs(machine_config &config);
-	void sys386i(machine_config &config);
-	void sxx2g(machine_config &config);
-	void spi(machine_config &config);
-	void sxx2e(machine_config &config);
+
 	void base_map(address_map &map);
 	void rdft2_map(address_map &map);
 	void rise_map(address_map &map);

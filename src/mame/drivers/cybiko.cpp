@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_SCREEN_PALETTE("hd66421:palette")
 	// video
 	MCFG_HD66421_ADD("hd66421")
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	// sound
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)

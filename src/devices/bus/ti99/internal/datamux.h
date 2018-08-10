@@ -35,7 +35,7 @@ public:
 	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
@@ -71,6 +71,9 @@ private:
 
 	// Console RAM
 	required_device<ram_device> m_padram;
+
+	// Link to the CPU
+	required_device<cpu_device> m_cpu;
 
 	// Keeps the address space pointer
 	address_space* m_spacep;
@@ -138,7 +141,7 @@ private:
 /******************************************************************************/
 
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
-	devcb = &downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
+	downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
 
 } } } // end namespace bus::ti99::internal
 

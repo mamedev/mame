@@ -5,6 +5,10 @@
   Nintendo Donkey Kong hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_DKONG_H
+#define MAME_INCLUDES_DKONG_H
+
+#pragma once
 
 #include "cpu/m6502/n2a03.h"
 #include "machine/eepromser.h"
@@ -131,6 +135,41 @@ public:
 	{
 	}
 
+	void dkong_base(machine_config &config);
+	void dk_braze(machine_config &config);
+	void dkj_braze(machine_config &config);
+	void ddk_braze(machine_config &config);
+	void dk3_braze(machine_config &config);
+	void strtheat(machine_config &config);
+	void spclforc(machine_config &config);
+	void s2650(machine_config &config);
+	void dkongjr(machine_config &config);
+	void radarscp1(machine_config &config);
+	void drktnjr(machine_config &config);
+	void dkong2b(machine_config &config);
+	void drakton(machine_config &config);
+	void radarscp(machine_config &config);
+	void pestplce(machine_config &config);
+	void herbiedk(machine_config &config);
+	void dkong3(machine_config &config);
+	void dkong3b(machine_config &config);
+	void radarscp_audio(machine_config &config);
+	void dkong2b_audio(machine_config &config);
+	void dkongjr_audio(machine_config &config);
+	void dkong3_audio(machine_config &config);
+	void radarscp1_audio(machine_config &config);
+
+	void init_strtheat();
+	void init_herodk();
+	void init_dkingjr();
+	void init_drakton();
+	void init_dkonghs();
+	void init_dkongx();
+	void init_dkong3hs();
+
+	DECLARE_WRITE_LINE_MEMBER(dk_braze_a15);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
@@ -252,14 +291,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dkong_z80dma_rdy_w);
 	DECLARE_READ8_MEMBER(braze_eeprom_r);
 	DECLARE_WRITE8_MEMBER(braze_eeprom_w);
-	DECLARE_WRITE_LINE_MEMBER(dk_braze_a15);
-	void init_strtheat();
-	void init_herodk();
-	void init_dkingjr();
-	void init_drakton();
-	void init_dkonghs();
-	void init_dkongx();
-	void init_dkong3hs();
 	TILE_GET_INFO_MEMBER(dkong_bg_tile_info);
 	TILE_GET_INFO_MEMBER(radarscp1_bg_tile_info);
 	DECLARE_MACHINE_START(dkong2b);
@@ -298,29 +329,6 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	double CD4049(double x);
 
-	void dkong_base(machine_config &config);
-	void dk_braze(machine_config &config);
-	void dkj_braze(machine_config &config);
-	void ddk_braze(machine_config &config);
-	void dk3_braze(machine_config &config);
-	void strtheat(machine_config &config);
-	void spclforc(machine_config &config);
-	void s2650(machine_config &config);
-	void dkongjr(machine_config &config);
-	void radarscp1(machine_config &config);
-	void drktnjr(machine_config &config);
-	void dkong2b(machine_config &config);
-	void drakton(machine_config &config);
-	void radarscp(machine_config &config);
-	void pestplce(machine_config &config);
-	void herbiedk(machine_config &config);
-	void dkong3(machine_config &config);
-	void dkong3b(machine_config &config);
-	void radarscp_audio(machine_config &config);
-	void dkong2b_audio(machine_config &config);
-	void dkongjr_audio(machine_config &config);
-	void dkong3_audio(machine_config &config);
-	void radarscp1_audio(machine_config &config);
 	void dkong3_io_map(address_map &map);
 	void dkong3_map(address_map &map);
 	void dkong3_sound1_map(address_map &map);
@@ -345,3 +353,5 @@ private:
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
+
+#endif // MAME_INCLUDES_DKONG_H

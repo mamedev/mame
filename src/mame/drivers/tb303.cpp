@@ -27,6 +27,9 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
+	void tb303(machine_config &config);
+
+private:
 	u8 m_ram[0xc00];
 	u16 m_ram_address;
 	bool m_ram_ce;
@@ -45,7 +48,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 
 	virtual void machine_start() override;
-	void tb303(machine_config &config);
 };
 
 // TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
@@ -267,7 +269,7 @@ MACHINE_CONFIG_START(tb303_state::tb303)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clear", tb303_state, tp3_clear, TP3_PERIOD)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tb303)
+	config.set_default_layout(layout_tb303);
 
 	/* sound hardware */
 	// discrete...

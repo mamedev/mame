@@ -31,24 +31,24 @@ class super6_state : public driver_device
 {
 public:
 	super6_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ctc(*this, Z80CTC_TAG),
-			m_dart(*this, Z80DART_TAG),
-			m_dma(*this, Z80DMA_TAG),
-			m_pio(*this, Z80PIO_TAG),
-			m_fdc(*this, WD2793_TAG),
-			m_brg(*this, BR1945_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, WD2793_TAG":0"),
-			m_floppy1(*this, WD2793_TAG":1"),
-			m_rom(*this, Z80_TAG),
-			m_j7(*this, "J7")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_ctc(*this, Z80CTC_TAG)
+		, m_dart(*this, Z80DART_TAG)
+		, m_dma(*this, Z80DMA_TAG)
+		, m_pio(*this, Z80PIO_TAG)
+		, m_fdc(*this, WD2793_TAG)
+		, m_brg(*this, BR1945_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_floppy0(*this, WD2793_TAG":0")
+		, m_floppy1(*this, WD2793_TAG":1")
+		, m_rom(*this, Z80_TAG)
+		, m_j7(*this, "J7")
 	{ }
 
 	void super6(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -71,7 +71,6 @@ protected:
 
 	void bankswitch();
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;

@@ -66,14 +66,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void datum(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+
+private:
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
-	void datum(machine_config &config);
 	void datum_mem(address_map &map);
-private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -188,7 +189,7 @@ MACHINE_CONFIG_START(datum_state::datum)
 	MCFG_DEVICE_PROGRAM_MAP(datum_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_datum)
+	config.set_default_layout(layout_datum);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0) // keyboard & display

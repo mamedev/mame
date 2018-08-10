@@ -113,6 +113,9 @@ public:
 		: pce_common_state(mconfig, type, tag),
 		m_discrete(*this, "discrete") { }
 
+	void uapce(machine_config &config);
+
+private:
 	uint8_t m_jamma_if_control_latch;
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
@@ -120,7 +123,7 @@ public:
 	virtual uint8_t joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
-	void uapce(machine_config &config);
+
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void z80_map(address_map &map);

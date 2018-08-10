@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(pc4_state::pc4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc4_state, pc4)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc4)

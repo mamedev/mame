@@ -110,6 +110,10 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void apfm1000(machine_config &config);
+	void apfimag(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_READ8_MEMBER(pia0_porta_r);
 	DECLARE_WRITE8_MEMBER(pia0_portb_w);
@@ -121,11 +125,9 @@ public:
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
 
-	void apfm1000(machine_config &config);
-	void apfimag(machine_config &config);
 	void apfimag_map(address_map &map);
 	void apfm1000_map(address_map &map);
-private:
+
 	uint8_t m_latch;
 	uint8_t m_keyboard_data;
 	uint8_t m_pad_data;

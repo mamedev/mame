@@ -305,8 +305,8 @@ to the same bank as defined through A20.
 class coolridr_state : public driver_device
 {
 public:
-	coolridr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	coolridr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_textBytesToWrite(0x00),
 		m_blitterSerialCount(0x00),
 		m_blitterMode(0x00),
@@ -3227,9 +3227,9 @@ void coolridr_state::machine_start()
 	decode[1].current_object = 0;
 	debug_randompal = 9;
 
-	save_pointer(NAME(m_h1_vram.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pcg.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pal.get()), VRAM_SIZE);
+	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
 }
 
 void coolridr_state::machine_reset()
@@ -3278,17 +3278,17 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PB_CB(WRITE8(*this, coolridr_state, lamps_w))
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN0"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("P1"))
-	MCFG_315_5649_IN_PE_CB(IOPORT("P2"))
-	MCFG_315_5649_AN0_CB(IOPORT("AN0"))
-	MCFG_315_5649_AN1_CB(IOPORT("AN1"))
-	MCFG_315_5649_AN2_CB(IOPORT("AN2"))
-	MCFG_315_5649_AN4_CB(IOPORT("AN4"))
-	MCFG_315_5649_AN5_CB(IOPORT("AN5"))
-	MCFG_315_5649_AN6_CB(IOPORT("AN6"))
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pb_callback().set(FUNC(coolridr_state::lamps_w));
+	io.in_pc_callback().set_ioport("IN0");
+	io.in_pd_callback().set_ioport("P1");
+	io.in_pe_callback().set_ioport("P2");
+	io.an_port_callback<0>().set_ioport("AN0");
+	io.an_port_callback<1>().set_ioport("AN1");
+	io.an_port_callback<2>().set_ioport("AN2");
+	io.an_port_callback<4>().set_ioport("AN4");
+	io.an_port_callback<5>().set_ioport("AN5");
+	io.an_port_callback<6>().set_ioport("AN6");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coolridr)
 
@@ -3308,7 +3308,7 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -3332,10 +3332,9 @@ MACHINE_CONFIG_START(coolridr_state::aquastge)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(aquastge_submap)
 
-	MCFG_DEVICE_REMOVE("io")
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN0"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("IN1"))
+	sega_315_5649_device &io(SEGA_315_5649(config.replace(), "io", 0));
+	io.in_pc_callback().set_ioport("IN0");
+	io.in_pd_callback().set_ioport("IN1");
 MACHINE_CONFIG_END
 
 ROM_START( coolridr )

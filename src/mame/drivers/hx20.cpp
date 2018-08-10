@@ -905,7 +905,7 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_DEVICE_IO_MAP(hx20_sub_io)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

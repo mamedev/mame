@@ -21,6 +21,9 @@ public:
 		std::fill(std::begin(m_sample_rom_offset), std::end(m_sample_rom_offset), 0);
 	}
 
+	void rltennis(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<dac_byte_interface, 2> m_dac;
 	required_region_ptr_array<uint8_t, 2> m_samples;
@@ -49,7 +52,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(sample_player);
-	void rltennis(machine_config &config);
 	void ramdac_map(address_map &map);
 	void rltennis_main(address_map &map);
 };

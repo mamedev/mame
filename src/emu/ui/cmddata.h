@@ -5,10 +5,10 @@
     ui/cmddata.h
 
 *********************************************************************/
-#pragma once
+#ifndef MAME_EMU_UI_CMDDATA_H
+#define MAME_EMU_UI_CMDDATA_H
 
-#ifndef __UI_CMDDATA_H__
-#define __UI_CMDDATA_H__
+#pragma once
 
 #define BUTTON_COLOR_RED        rgb_t(255,64,64)
 #define BUTTON_COLOR_YELLOW     rgb_t(255,238,0)
@@ -399,4 +399,4 @@ static fix_strings_t convert_text[] =
 	{ nullptr,     0, 0 }  // end of array
 };
 
-#endif /* __UI_CMDDATA_H__ */
+#endif // MAME_EMU_UI_CMDDATA_H

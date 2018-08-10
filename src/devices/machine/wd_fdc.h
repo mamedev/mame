@@ -52,19 +52,19 @@
 	downcast<wd_fdc_device_base *>(device)->set_disable_motor_control(true);
 
 #define MCFG_WD_FDC_INTRQ_CALLBACK(_write) \
-	devcb = &downcast<wd_fdc_device_base &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<wd_fdc_device_base &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_DRQ_CALLBACK(_write) \
-	devcb = &downcast<wd_fdc_device_base &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<wd_fdc_device_base &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_HLD_CALLBACK(_write) \
-	devcb = &downcast<wd_fdc_device_base &>(*device).set_hld_wr_callback(DEVCB_##_write);
+	downcast<wd_fdc_device_base &>(*device).set_hld_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_ENP_CALLBACK(_write) \
-	devcb = &downcast<wd_fdc_device_base &>(*device).set_enp_wr_callback(DEVCB_##_write);
+	downcast<wd_fdc_device_base &>(*device).set_enp_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_ENMF_CALLBACK(_read) \
-	devcb = &downcast<wd_fdc_device_base &>(*device).set_enmf_rd_callback(DEVCB_##_read);
+	downcast<wd_fdc_device_base &>(*device).set_enmf_rd_callback(DEVCB_##_read);
 
 class wd_fdc_device_base : public device_t {
 public:
@@ -73,6 +73,11 @@ public:
 	template <class Object> devcb_base &set_hld_wr_callback(Object &&cb) { return hld_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_enp_wr_callback(Object &&cb) { return enp_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_enmf_rd_callback(Object &&cb) { return enmf_cb.set_callback(std::forward<Object>(cb)); }
+	auto intrq_wr_callback() { return intrq_cb.bind(); }
+	auto drq_wr_callback() { return drq_cb.bind(); }
+	auto hld_wr_callback() { return hld_cb.bind(); }
+	auto enp_wr_callback() { return enp_cb.bind(); }
+	auto enmf_rd_callback() { return enmf_cb.bind(); }
 
 	void soft_reset();
 

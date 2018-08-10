@@ -58,8 +58,12 @@ public:
 	{
 	}
 
+	void rc702(machine_config &config);
+
 	void init_rc702();
-	DECLARE_MACHINE_RESET(rc702);
+
+private:
+	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE8_MEMBER(port14_w);
@@ -75,10 +79,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void kbd_put(u8 data);
 
-	void rc702(machine_config &config);
 	void rc702_io(address_map &map);
 	void rc702_mem(address_map &map);
-private:
+
 	bool m_q_state;
 	bool m_qbar_state;
 	bool m_drq_state;
@@ -148,7 +151,7 @@ static INPUT_PORTS_START( rc702 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( rc702_state, rc702 )
+void rc702_state::machine_reset()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -335,34 +338,31 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	MCFG_DEVICE_IO_MAP(rc702_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
-	MCFG_MACHINE_RESET_OVERRIDE(rc702_state, rc702)
+	CLOCK(config, "ctc_clock", 614000).signal_handler().set(FUNC(rc702_state::clock_w));
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 614000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, rc702_state, clock_w))
-
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(8'000'000) / 2)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio1", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1", z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio1", z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc1, 8_MHz_XTAL / 2);
+	m_ctc1->zc_callback<0>().set("sio1", FUNC(z80dart_device::txca_w));
+	m_ctc1->zc_callback<0>().append("sio1", FUNC(z80dart_device::rxca_w));
+	m_ctc1->zc_callback<1>().set("sio1", FUNC(z80dart_device::rxtxcb_w));
+	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("sio1", Z80DART, XTAL(8'000'000) / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(8'000'000) / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, rc702_state, portxx_w)) // parallel port
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//  m_pio->out_pb_callback().set(FUNC(rc702_state::portxx_w)); // parallel port
 
-	MCFG_DEVICE_ADD("dma", AM9517A, XTAL(8'000'000) / 2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, rc702_state, busreq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, rc702_state, tc_w)) // inverted
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, rc702_state, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, rc702_state, memory_write_byte))
-	MCFG_I8237_IN_IOR_1_CB(READ8("fdc", upd765a_device, mdma_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8("crtc", i8275_device, dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8("crtc", i8275_device, dack_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, rc702_state, dack1_w)) // inverted
+	AM9517A(config, m_dma, 8_MHz_XTAL / 2);
+	m_dma->out_hreq_callback().set(FUNC(rc702_state::busreq_w));
+	m_dma->out_eop_callback().set(FUNC(rc702_state::tc_w)); // inverted
+	m_dma->in_memr_callback().set(FUNC(rc702_state::memory_read_byte));
+	m_dma->out_memw_callback().set(FUNC(rc702_state::memory_write_byte));
+	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_r));
+	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dma->out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w)); // inverted
 
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("ctc1", z80ctc_device, trg3))
@@ -385,12 +385,12 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 
-	MCFG_DEVICE_ADD("crtc", I8275, 11640000/7)
-	MCFG_I8275_CHARACTER_WIDTH(7)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rc702_state, display_pixels)
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE("7474", ttl7474_device, clear_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg2))
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, rc702_state, crtc_drq_w))
+	i8275_device &crtc(I8275(config, "crtc", 11640000/7));
+	crtc.set_character_width(7);
+	crtc.set_display_callback(FUNC(rc702_state::display_pixels), this);
+	crtc.irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)).invert();
+	crtc.irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
+	crtc.drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* sound hardware */

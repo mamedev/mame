@@ -2527,16 +2527,16 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, nbmj9195_state, soundcpu_porte_w))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(1024, 512)     /* no way this is correct */
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c011_device, trg1)) MCFG_DEVCB_INVERT
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(1024, 512);     /* no way this is correct */
+	m_screen->set_visarea(0, 640-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(nbmj9195_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c011_device::trg1)).invert();
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD(m_palette, 256)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

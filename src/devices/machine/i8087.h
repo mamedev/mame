@@ -12,10 +12,10 @@
 	downcast<i8087_device &>(*device).set_data_width(_data_width);
 
 #define MCFG_I8087_INT_HANDLER(_devcb) \
-	devcb = &downcast<i8087_device &>(*device).set_int(DEVCB_##_devcb);
+	downcast<i8087_device &>(*device).set_int(DEVCB_##_devcb);
 
 #define MCFG_I8087_BUSY_HANDLER(_devcb) \
-	devcb = &downcast<i8087_device &>(*device).set_busy(DEVCB_##_devcb);
+	downcast<i8087_device &>(*device).set_busy(DEVCB_##_devcb);
 
 DECLARE_DEVICE_TYPE(I8087, i8087_device)
 

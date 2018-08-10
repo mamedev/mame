@@ -24,19 +24,19 @@
 	downcast<gayle_device &>(*device).set_id(_id);
 
 #define MCFG_GAYLE_INT2_HANDLER(_devcb) \
-	devcb = &downcast<gayle_device &>(*device).set_int2_handler(DEVCB_##_devcb);
+	downcast<gayle_device &>(*device).set_int2_handler(DEVCB_##_devcb);
 
 #define MCFG_GAYLE_CS0_READ_HANDLER(_devcb) \
-	devcb = &downcast<gayle_device &>(*device).set_cs0_read_handler(DEVCB_##_devcb);
+	downcast<gayle_device &>(*device).set_cs0_read_handler(DEVCB_##_devcb);
 
 #define MCFG_GAYLE_CS0_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<gayle_device &>(*device).set_cs0_write_handler(DEVCB_##_devcb);
+	downcast<gayle_device &>(*device).set_cs0_write_handler(DEVCB_##_devcb);
 
 #define MCFG_GAYLE_CS1_READ_HANDLER(_devcb) \
-	devcb = &downcast<gayle_device &>(*device).set_cs1_read_handler(DEVCB_##_devcb);
+	downcast<gayle_device &>(*device).set_cs1_read_handler(DEVCB_##_devcb);
 
 #define MCFG_GAYLE_CS1_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<gayle_device &>(*device).set_cs1_write_handler(DEVCB_##_devcb);
+	downcast<gayle_device &>(*device).set_cs1_write_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

@@ -2296,14 +2296,10 @@ READ8_MEMBER(apple2e_state::c800_r)
 		return mig_r(offset-0x600);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = CNXX_UNCLAIMED;
-			update_slotrom_banks();
-		}
-
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		update_slotrom_banks();
 		return 0xff;
 	}
 
@@ -2580,7 +2576,7 @@ uint8_t apple2e_state::read_floatingbus()
 
 	// calculate vertical scanning state
 	//
-	v_line  = i / kHClocks; // which vertical scanning line
+	v_line  = (i / kHClocks) + 188; // which vertical scanning line (MAME starts at blank, not the beginning of the scanning area)
 	v_state = kVLine0State + v_line; // V state bits
 	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
 	{

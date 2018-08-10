@@ -30,6 +30,9 @@ public:
 		m_vfd(*this, "vfd")
 	{ }
 
+	void globalfr(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<s16lf01_device> m_vfd;
 
@@ -37,7 +40,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vfd_w);
 
-	void globalfr(machine_config &config);
 	void globalfr_map(address_map &map);
 };
 
@@ -71,7 +73,7 @@ MACHINE_CONFIG_START(globalfr_state::globalfr)
 	MCFG_DEVICE_ADD("maincpu", M37702S1, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(globalfr_map)
 	MCFG_S16LF01_ADD("vfd",0)
-	MCFG_DEFAULT_LAYOUT(layout_globalfr)
+	config.set_default_layout(layout_globalfr);
 MACHINE_CONFIG_END
 
 /******************************************************************************/

@@ -102,16 +102,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void dauphin(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
-	void dauphin(machine_config &config);
 	void dauphin_io(address_map &map);
 	void dauphin_mem(address_map &map);
-private:
+
 	uint8_t m_cass_data;
 	uint8_t m_last_key;
 	bool m_cass_state;
@@ -240,7 +242,7 @@ MACHINE_CONFIG_START(dauphin_state::dauphin)
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dauphin_state, cass_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_dolphunk)
+	config.set_default_layout(layout_dolphunk);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

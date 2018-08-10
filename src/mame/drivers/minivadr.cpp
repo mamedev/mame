@@ -47,11 +47,13 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
+	void minivadr(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	uint32_t screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void minivadr(machine_config &config);
 	void minivadr_map(address_map &map);
 };
 

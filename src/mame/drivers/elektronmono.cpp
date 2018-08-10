@@ -125,13 +125,12 @@ public:
 
 	void elektron(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void elektron_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

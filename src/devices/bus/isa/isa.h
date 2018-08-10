@@ -85,62 +85,62 @@
 	downcast<isa8_device &>(*device).set_custom_spaces();
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
-	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
+	downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
 
 #define MCFG_ISA_OUT_IRQ2_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ4_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ5_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ6_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ7_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_irq7_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_irq7_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_DRQ1_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_drq1_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_drq1_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_DRQ2_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_drq2_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_drq2_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_DRQ3_CB(_devcb) \
-	devcb = &downcast<isa8_device &>(*device).set_out_drq3_callback(DEVCB_##_devcb);
+	downcast<isa8_device &>(*device).set_out_drq3_callback(DEVCB_##_devcb);
 
 
 #define MCFG_ISA_OUT_IRQ10_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_irq10_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_irq10_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ11_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_irq11_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_irq11_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ12_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_irq12_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_irq12_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ14_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_irq14_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_irq14_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ15_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_irq15_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_irq15_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_DRQ0_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_drq0_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_drq0_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_DRQ5_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_drq5_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_drq5_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_DRQ6_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_drq6_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_drq6_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_DRQ7_CB(_devcb) \
-	devcb = &downcast<isa16_device &>(*device).set_out_drq7_callback(DEVCB_##_devcb);
+	downcast<isa16_device &>(*device).set_out_drq7_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

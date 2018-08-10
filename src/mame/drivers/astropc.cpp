@@ -24,14 +24,15 @@ public:
 	{ }
 
 	void astropc(machine_config &config);
+
+	void init_astropc();
+
+private:
 	void astropc_io(address_map &map);
 	void astropc_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-public:
-	void init_astropc();
 };
 
 void astropc_state::astropc_map(address_map &map)

@@ -50,6 +50,18 @@ public:
 		, m_dat(*this, "dat")
 	{ }
 
+	void swtpc09_base(machine_config &config);
+	void swtpc09i(machine_config &config);
+	void swtpc09d3(machine_config &config);
+	void swtpc09u(machine_config &config);
+	void swtpc09(machine_config &config);
+
+	void init_swtpc09();
+	void init_swtpc09i();
+	void init_swtpc09u();
+	void init_swtpc09d3();
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_READ8_MEMBER(pia0_a_r);
@@ -91,25 +103,15 @@ public:
 	DECLARE_READ8_MEMBER(main_r);
 	DECLARE_WRITE8_MEMBER(main_w);
 
-	void init_swtpc09();
-	void init_swtpc09i();
-	void init_swtpc09u();
-	void init_swtpc09d3();
-
 	DECLARE_READ8_MEMBER ( m6844_r );
 	DECLARE_WRITE8_MEMBER ( m6844_w );
 
-	void swtpc09_base(machine_config &config);
-	void swtpc09i(machine_config &config);
-	void swtpc09d3(machine_config &config);
-	void swtpc09u(machine_config &config);
-	void swtpc09(machine_config &config);
 	void flex_dc4_piaide_mem(address_map &map);
 	void flex_dmf2_mem(address_map &map);
 	void mp09_mem(address_map &map);
 	void uniflex_dmf2_mem(address_map &map);
 	void uniflex_dmf3_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
 	void swtpc09_fdc_dma_transfer();

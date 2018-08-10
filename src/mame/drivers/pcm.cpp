@@ -84,15 +84,17 @@ public:
 	{
 	}
 
+	void pcm(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pcm(machine_config &config);
 	void pcm_io(address_map &map);
 	void pcm_mem(address_map &map);
-private:
+
 	bool m_cone;
 	uint8_t m_85;
 	virtual void machine_reset() override;
@@ -293,15 +295,15 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(10'000'000) /4)
 
-	MCFG_DEVICE_ADD("ctc_u", Z80CTC, XTAL(10'000'000) /4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc_u, 10_MHz_XTAL / 4);
+	m_ctc_u->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc_s", Z80CTC, XTAL(10'000'000) /4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, pcm_state, pcm_82_w))  // speaker
+	Z80CTC(config, m_ctc_s, 10_MHz_XTAL / 4);
+	m_ctc_s->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_s->zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
+	m_ctc_s->zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
+	m_ctc_s->zc_callback<1>().set("sio", FUNC(z80sio_device::rxtxcb_w));
+	m_ctc_s->zc_callback<2>().set(FUNC(pcm_state::pcm_82_w));  // speaker
 MACHINE_CONFIG_END
 
 /* ROM definition */

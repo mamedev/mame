@@ -102,6 +102,11 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void pasha2(machine_config &config);
+
+	void init_pasha2();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_wram;
 	required_shared_ptr<uint16_t> m_paletteram;
@@ -127,7 +132,6 @@ public:
 	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
 	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bank_w);
-	void init_pasha2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -136,7 +140,6 @@ public:
 	required_device<at89c52_device> m_audiocpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
-	void pasha2(machine_config &config);
 	void pasha2_io(address_map &map);
 	void pasha2_map(address_map &map);
 };
@@ -346,8 +349,8 @@ void pasha2_state::video_start()
 	{
 		m_bitmap0[i] = make_unique_clear<uint8_t[]>(0x20000);
 		m_bitmap1[i] = make_unique_clear<uint8_t[]>(0x20000);
-		save_pointer(NAME(m_bitmap0[i].get()), 0x20000, i);
-		save_pointer(NAME(m_bitmap1[i].get()), 0x20000, i);
+		save_pointer(NAME(m_bitmap0[i]), 0x20000, i);
+		save_pointer(NAME(m_bitmap1[i]), 0x20000, i);
 	}
 }
 

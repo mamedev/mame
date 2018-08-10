@@ -43,13 +43,8 @@ class micro3d_sound_device;
 class micro3d_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_MAC_DONE
-	};
-
-	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	micro3d_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_upd7759(*this, "upd7759"),
@@ -69,6 +64,20 @@ public:
 		m_sprite_vram(*this, "sprite_vram"),
 		m_vgb_uart(*this, "uart")
 	{ }
+
+	void micro3d(machine_config &config);
+	void botss11(machine_config &config);
+
+	void init_micro3d();
+	void init_botss();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
+
+private:
+	enum
+	{
+		TIMER_MAC_DONE
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
@@ -152,15 +161,12 @@ public:
 	DECLARE_WRITE32_MEMBER(micro3d_fifo_w);
 	DECLARE_WRITE32_MEMBER(micro3d_alt_fifo_w);
 	DECLARE_READ32_MEMBER(micro3d_pipe_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
 	DECLARE_WRITE8_MEMBER(micro3d_sound_p1_w);
 	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
 	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
 	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
-	void init_micro3d();
-	void init_botss();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
@@ -185,19 +191,15 @@ public:
 	int clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane);
 	void draw_triangles(uint32_t attr);
 
-
-	void micro3d(machine_config &config);
-	void botss11(machine_config &config);
 	void drmath_data(address_map &map);
 	void drmath_prg(address_map &map);
 	void hostmem(address_map &map);
 	void soundmem_io(address_map &map);
 	void soundmem_prg(address_map &map);
 	void vgbmem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<mc2661_device> m_vgb_uart;
 };
 

@@ -323,19 +323,6 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(rom8_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_w);
-	DECLARE_WRITE16_MEMBER(lightgun_w);
-	DECLARE_READ16_MEMBER(lightgun_r);
-	DECLARE_READ16_MEMBER(c76_shared_r);
-	DECLARE_WRITE16_MEMBER(c76_shared_w);
-	DECLARE_READ16_MEMBER(c76_speedup_r);
-	DECLARE_WRITE16_MEMBER(c76_speedup_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
-
 	void coh110(machine_config &config);
 	void coh100(machine_config &config);
 	void myangel3(machine_config &config);
@@ -350,16 +337,30 @@ public:
 	void souledge(machine_config &config);
 	void tekken(machine_config &config);
 	void tekken2(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(rom8_w);
+	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
+	DECLARE_WRITE16_MEMBER(rom8_64_w);
+	DECLARE_WRITE16_MEMBER(lightgun_w);
+	DECLARE_READ16_MEMBER(lightgun_r);
+	DECLARE_READ16_MEMBER(c76_shared_r);
+	DECLARE_WRITE16_MEMBER(c76_shared_w);
+	DECLARE_READ16_MEMBER(c76_speedup_r);
+	DECLARE_WRITE16_MEMBER(c76_speedup_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
+
 	void c76_io_map(address_map &map);
 	void c76_map(address_map &map);
 	void namcos11_map(address_map &map);
 	void ptblank2ua_map(address_map &map);
 	void rom8_64_map(address_map &map);
 	void rom8_map(address_map &map);
-protected:
+
 	virtual void driver_start() override;
 
-private:
 	required_shared_ptr<uint16_t> m_sharedram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;

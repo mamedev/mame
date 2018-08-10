@@ -29,14 +29,13 @@ public:
 
 	void tourtabl(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	output_finder<4> m_leds;
 };

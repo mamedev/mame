@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Luca Elia
 /*
 Vs. Janshi Brandnew Stars
 (c)1997 Jaleco
@@ -120,6 +120,14 @@ public:
 			m_p1_keys(*this, "P1KEY.%u", 0),
 			m_p2_keys(*this, "P2KEY.%u", 0) { }
 
+	void bnstars(machine_config &config);
+
+	void init_bnstars();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+
+private:
+
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
 	tilemap_t *m_ms32_roz_tilemap[2];
@@ -147,8 +155,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ms32_roz0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
 	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
-	void init_bnstars();
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
@@ -160,7 +166,6 @@ public:
 	uint32_t screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *sprram_top, size_t sprram_size);
-	void bnstars(machine_config &config);
 	void bnstars_map(address_map &map);
 	void bnstars_sound_map(address_map &map);
 };
@@ -827,7 +832,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	MCFG_PALETTE_FORMAT(XBRG)
 	MCFG_PALETTE_MEMBITS(16)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -5,6 +5,10 @@
       Dynax hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_DYNAX_H
+#define MAME_INCLUDES_DYNAX_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
@@ -24,24 +28,94 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_oki(*this, "oki")
-		, m_msm(*this, "msm")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_bankdev(*this, "bankdev")
 		, m_mainlatch(*this, "mainlatch")
+		, m_bankdev(*this, "bankdev")
+		, m_blitter(*this, "blitter")
+		, m_msm(*this, "msm")
 		, m_mainirq(*this, "mainirq")
 		, m_soundirq(*this, "soundirq")
 		, m_soundlatch(*this, "soundlatch")
-		, m_blitter(*this, "blitter")
 		, m_blitter2(*this, "blitter2")
 		, m_blitter_gfx(*this, "blitter")
 		, m_led(*this, "led0")
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
+	void mjfriday(machine_config &config);
+	void yarunara(machine_config &config);
+	void janyuki(machine_config &config);
+	void hnoridur(machine_config &config);
+	void gekisha(machine_config &config);
+	void majrjhdx(machine_config &config);
+	void mcnpshnt(machine_config &config);
+	void nanajign(machine_config &config);
+	void cdracula(machine_config &config);
+	void tenkai(machine_config &config);
+	void hjingi(machine_config &config);
+	void mjreach(machine_config &config);
+	void neruton(machine_config &config);
+	void mjdialq2(machine_config &config);
+	void jantouki(machine_config &config);
+	void quiztvqq(machine_config &config);
+	void mjelctrn(machine_config &config);
+	void mjembase(machine_config &config);
+	void mjangels(machine_config &config);
+	void hanamai(machine_config &config);
+	void sprtmtch(machine_config &config);
+
+	void init_mjelct3();
+	void init_blktouch();
+	void init_mjelct3a();
+	void init_maya_common();
+	void init_mayac();
+	void init_maya();
+
 	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(sprtmtch_blitter_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(sprtmtch_vblank_w);
+	DECLARE_WRITE_LINE_MEMBER(layer_half_w);
+	DECLARE_WRITE_LINE_MEMBER(layer_half2_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+
+	DECLARE_WRITE8_MEMBER(hnoridur_blit_pixel_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_scrollx_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_scrolly_w);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<ls259_device> m_mainlatch;
+	optional_device<address_map_bank_device> m_bankdev;
+	optional_device<dynax_blitter_rev2_device> m_blitter;
+
+	/* input / output */
+	uint8_t m_input_sel;
+	uint8_t m_dsw_sel;
+	uint8_t m_keyb;
+	uint8_t m_coins;
+	uint8_t m_hopper;
+
+	DECLARE_VIDEO_START(hnoridur);
+
+	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_dest_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
+	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
+	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
+
+	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
+
+	DECLARE_MACHINE_START(dynax);
+	DECLARE_MACHINE_RESET(dynax);
+
+	void htengoku_banked_map(address_map &map);
+
+private:
 	DECLARE_WRITE8_MEMBER(jantouki_vblank_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter_irq_w);
@@ -102,10 +176,7 @@ public:
 	DECLARE_READ8_MEMBER(gekisha_keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(gekisha_hopper_w);
 	DECLARE_WRITE8_MEMBER(gekisha_p4_w);
-	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
-	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
 	//DECLARE_WRITE8_MEMBER(dynax_blit_pen_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_dest_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(mjembase_blit_dest_w);
@@ -119,26 +190,19 @@ public:
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette67_w);
 	DECLARE_WRITE_LINE_MEMBER(blit_palbank_w);
 	DECLARE_WRITE_LINE_MEMBER(blit2_palbank_w);
-	DECLARE_WRITE_LINE_MEMBER(layer_half_w);
-	DECLARE_WRITE_LINE_MEMBER(layer_half2_w);
 	DECLARE_WRITE_LINE_MEMBER(mjdialq2_blit_dest0_w);
 	DECLARE_WRITE_LINE_MEMBER(mjdialq2_blit_dest1_w);
 	DECLARE_WRITE8_MEMBER(dynax_layer_enable_w);
 	DECLARE_WRITE8_MEMBER(jantouki_layer_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer0_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer1_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_romregion_w);
 	DECLARE_WRITE8_MEMBER(hanamai_blit_pixel_w);
 	DECLARE_WRITE8_MEMBER(cdracula_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(hnoridur_blit_pixel_w);
 	DECLARE_WRITE8_MEMBER(drgpunch_blit_pixel_w);
 	DECLARE_WRITE8_MEMBER(jantouki_blit_pixel_w);
 	DECLARE_WRITE8_MEMBER(jantouki_blit2_pixel_w);
 	DECLARE_WRITE8_MEMBER(mjdialq2_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_scrollx_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_scrolly_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_scrolly_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_scrollx_w);
@@ -146,13 +210,6 @@ public:
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
 	DECLARE_WRITE8_MEMBER(mjembase_priority_w);
-
-	void init_mjelct3();
-	void init_blktouch();
-	void init_mjelct3a();
-	void init_maya_common();
-	void init_mayac();
-	void init_maya();
 
 	uint32_t screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -162,7 +219,6 @@ public:
 	uint32_t screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(sprtmtch_vblank_w);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_vblank_w);
 	DECLARE_WRITE_LINE_MEMBER(mjfriday_vblank_w);
 
@@ -178,12 +234,9 @@ public:
 	DECLARE_READ8_MEMBER(tenkai_dsw_r);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_ack_w);
-	DECLARE_MACHINE_RESET(dynax);
-	DECLARE_MACHINE_START(dynax);
 	DECLARE_MACHINE_START(hanamai);
 	DECLARE_MACHINE_START(hjingi);
 	DECLARE_VIDEO_START(hanamai);
-	DECLARE_VIDEO_START(hnoridur);
 	DECLARE_PALETTE_INIT(sprtmtch);
 	DECLARE_VIDEO_START(sprtmtch);
 	DECLARE_MACHINE_START(jantouki);
@@ -198,32 +251,10 @@ public:
 	//int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y );
 	void mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
-	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 	int debug_mask();
 	int debug_viewer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void dynax_common_reset();
 	void tenkai_show_6c();
-	void mjfriday(machine_config &config);
-	void yarunara(machine_config &config);
-	void janyuki(machine_config &config);
-	void hnoridur(machine_config &config);
-	void gekisha(machine_config &config);
-	void majrjhdx(machine_config &config);
-	void mcnpshnt(machine_config &config);
-	void nanajign(machine_config &config);
-	void cdracula(machine_config &config);
-	void tenkai(machine_config &config);
-	void hjingi(machine_config &config);
-	void mjreach(machine_config &config);
-	void neruton(machine_config &config);
-	void mjdialq2(machine_config &config);
-	void jantouki(machine_config &config);
-	void quiztvqq(machine_config &config);
-	void mjelctrn(machine_config &config);
-	void mjembase(machine_config &config);
-	void mjangels(machine_config &config);
-	void hanamai(machine_config &config);
-	void sprtmtch(machine_config &config);
 	void cdracula_io_map(address_map &map);
 	void cdracula_mem_map(address_map &map);
 	void gekisha_banked_map(address_map &map);
@@ -235,7 +266,6 @@ public:
 	void hnoridur_banked_map(address_map &map);
 	void hnoridur_io_map(address_map &map);
 	void hnoridur_mem_map(address_map &map);
-	void htengoku_banked_map(address_map &map);
 	void jantouki_io_map(address_map &map);
 	void jantouki_mem_map(address_map &map);
 	void jantouki_sound_io_map(address_map &map);
@@ -260,20 +290,11 @@ public:
 	void yarunara_io_map(address_map &map);
 	void yarunara_mem_map(address_map &map);
 
-protected:
 	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<okim6295_device> m_oki;
 	optional_device<msm5205_device> m_msm;
-	optional_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<address_map_bank_device> m_bankdev;
-	optional_device<ls259_device> m_mainlatch;
 	optional_device<rst_pos_buffer_device> m_mainirq;
 	optional_device<rst_pos_buffer_device> m_soundirq;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<dynax_blitter_rev2_device> m_blitter;
 	optional_device<dynax_blitter_rev2_device> m_blitter2;
 	optional_region_ptr<uint8_t> m_blitter_gfx;
 	output_finder<> m_led;
@@ -311,13 +332,6 @@ protected:
 	const int *m_priority_table;
 	int m_hanamai_priority;
 
-	/* input */
-	uint8_t m_input_sel;
-	uint8_t m_dsw_sel;
-	uint8_t m_keyb;
-	uint8_t m_coins;
-	uint8_t m_hopper;
-
 	/* misc */
 	uint8_t m_palette_ram[16*256*2];
 	int m_palbank;
@@ -332,3 +346,5 @@ protected:
 	uint8_t m_gekisha_val[2];
 
 };
+
+#endif // MAME_INCLUDES_DYNAX_H

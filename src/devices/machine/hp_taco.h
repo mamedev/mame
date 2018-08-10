@@ -16,13 +16,13 @@
 #include "formats/hti_tape.h"
 
 #define MCFG_TACO_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<hp_taco_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<hp_taco_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_TACO_FLG_HANDLER(_devcb) \
-	devcb = &downcast<hp_taco_device &>(*device).set_flg_handler(DEVCB_##_devcb);
+	downcast<hp_taco_device &>(*device).set_flg_handler(DEVCB_##_devcb);
 
 #define MCFG_TACO_STS_HANDLER(_devcb) \
-	devcb = &downcast<hp_taco_device &>(*device).set_sts_handler(DEVCB_##_devcb);
+	downcast<hp_taco_device &>(*device).set_sts_handler(DEVCB_##_devcb);
 
 class hp_taco_device : public device_t ,
 						public device_image_interface

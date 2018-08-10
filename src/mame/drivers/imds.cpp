@@ -35,7 +35,7 @@ public:
 
 	void imds(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_READ8_MEMBER(term_status_r);
 	void kbd_put(u8 data);
@@ -44,7 +44,6 @@ protected:
 	void imds_io(address_map &map);
 	void imds_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };

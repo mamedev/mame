@@ -1592,7 +1592,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 /* DSW reading for 16 bit CPUs */
 READ16_MEMBER(seta_state::seta_dsw_r)
 {
-	uint16_t dsw = ioport("DSW")->read();
+	uint16_t dsw = m_dsw->read();
 	if (offset == 0)    return (dsw >> 8) & 0xff;
 	else                return (dsw >> 0) & 0xff;
 }
@@ -2852,14 +2852,13 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 {
 	int row_select = m_kiwame_row_select;
 	int i;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
 	for(i = 0; i < 5; i++)
 		if (row_select & (1<<i))    break;
 
 	switch( offset )
 	{
-		case 0x00/2:    return ioport(keynames[i])->read();
+		case 0x00/2:    return m_key[i]->read();
 		case 0x02/2:    return 0xffff;
 		case 0x04/2:    return m_coins->read();
 //      case 0x06/2:
@@ -3263,10 +3262,10 @@ READ16_MEMBER(jockeyc_state::trackball_r)
 {
 	switch (offset)
 	{
-		case 0/2:   return (ioport("P1X")->read() >> 0) & 0xff;
-		case 2/2:   return (ioport("P1X")->read() >> 8) & 0xff;
-		case 4/2:   return (ioport("P1Y")->read() >> 0) & 0xff;
-		case 6/2:   return (ioport("P1Y")->read() >> 8) & 0xff;
+		case 0/2:   return (m_p1x->read() >> 0) & 0xff;
+		case 2/2:   return (m_p1x->read() >> 8) & 0xff;
+		case 4/2:   return (m_p1y->read() >> 0) & 0xff;
+		case 6/2:   return (m_p1y->read() >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -3467,21 +3466,21 @@ void seta_state::twineagl_sub_map(address_map &map)
 
 READ8_MEMBER(seta_state::downtown_ip_r)
 {
-	int dir1 = ioport("ROT1")->read();  // analog port
-	int dir2 = ioport("ROT2")->read();  // analog port
+	int dir1 = m_rot[0]->read();  // analog port
+	int dir2 = m_rot[1]->read();  // analog port
 
 	dir1 = (~ (0x800 >> dir1)) & 0xfff;
 	dir2 = (~ (0x800 >> dir2)) & 0xfff;
 
 	switch (offset)
 	{
-		case 0: return (ioport("COINS")->read() & 0xf0) + (dir1 >> 8);  // upper 4 bits of p1 rotation + coins
+		case 0: return (m_coins->read() & 0xf0) + (dir1 >> 8);  // upper 4 bits of p1 rotation + coins
 		case 1: return (dir1 & 0xff);                   // lower 8 bits of p1 rotation
-		case 2: return ioport("P1")->read();    // p1
+		case 2: return m_p1->read();    // p1
 		case 3: return 0xff;                            // ?
 		case 4: return (dir2 >> 8);                     // upper 4 bits of p2 rotation + ?
 		case 5: return (dir2 & 0xff);                   // lower 8 bits of p2 rotation
-		case 6: return ioport("P2")->read();    // p2
+		case 6: return m_p2->read();    // p2
 		case 7: return 0xff;                            // ?
 	}
 
@@ -8027,10 +8026,10 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_UPD4701_PORTX("TRACKX")
 	MCFG_UPD4701_PORTY("TRACKY")
 
-	MCFG_DEVICE_ADD("buttonmux", HC157, 0)
-	MCFG_74157_OUT_CB(WRITELINE("upd4701", upd4701_device, middle_w)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, right_w)) MCFG_DEVCB_BIT(1)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, left_w)) MCFG_DEVCB_BIT(2)
+	HC157(config, m_buttonmux, 0);
+	m_buttonmux->out_callback().set(m_upd4701, FUNC(upd4701_device::middle_w)).bit(0);
+	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::right_w)).bit(1);
+	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::left_w)).bit(2);
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
@@ -8590,7 +8589,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_setaroul)
+	config.set_default_layout(layout_setaroul);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -9848,7 +9847,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jockeyc)
+	config.set_default_layout(layout_jockeyc);
 MACHINE_CONFIG_END
 
 
@@ -9877,7 +9876,7 @@ MACHINE_CONFIG_START(jockeyc_state::inttoote)
 	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_inttoote)
+	config.set_default_layout(layout_inttoote);
 MACHINE_CONFIG_END
 
 
@@ -10376,7 +10375,7 @@ ROM_END
 ROM_START( rezont )
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "us001001.u3",  0x000000, 0x020000, CRC(ab923052) SHA1(26761c228b63c300f635787e63e1276b6e3083f0) )
-	ROM_LOAD16_BYTE( "rezon_1_p.u4",  0x000001, 0x020000,  CRC(9ed32f8c) SHA1(68b926de4cb5f2632ab78b2cdf7409411fadbb1d) )
+	ROM_LOAD16_BYTE( "rezon_1_p.u4", 0x000001, 0x020000, CRC(9ed32f8c) SHA1(68b926de4cb5f2632ab78b2cdf7409411fadbb1d) )
 	/* empty gap */
 	ROM_LOAD16_BYTE( "us001004.103", 0x100000, 0x020000, CRC(54871c7c) SHA1(2f807b15760b1e712fa69eee6f33cc8a36ee1c02) ) // 1xxxxxxxxxxxxxxxx = 0x00
 	ROM_LOAD16_BYTE( "us001003.102", 0x100001, 0x020000, CRC(1ac3d272) SHA1(0f19bc9c19e355dad5b463b0fa33127523bf141b) ) // 1xxxxxxxxxxxxxxxx = 0x00
@@ -11903,7 +11902,7 @@ void seta_state::init_downtown()
 	init_bank6502();
 
 	m_downtown_protection = make_unique_clear<uint16_t[]>(0x200/2);
-	save_pointer(NAME(m_downtown_protection.get()),0x200/2);
+	save_pointer(NAME(m_downtown_protection),0x200/2);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
@@ -12013,8 +12012,8 @@ void seta_state::init_pairlove()
 {
 	m_pairslove_protram = make_unique_clear<uint16_t[]>(0x200/2);
 	m_pairslove_protram_old = make_unique_clear<uint16_t[]>(0x200/2);
-	save_pointer(NAME(m_pairslove_protram.get()), 0x200/2);
-	save_pointer(NAME(m_pairslove_protram_old.get()), 0x200/2);
+	save_pointer(NAME(m_pairslove_protram), 0x200/2);
+	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
 }
 
 void seta_state::init_wiggie()

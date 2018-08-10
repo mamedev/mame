@@ -71,13 +71,13 @@
 	downcast<ep64_expansion_bus_slot_device &>(*device).set_dave_tag(_tag);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_NMI_CALLBACK(_write) \
-	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(_write) \
-	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_wait_wr_callback(DEVCB_##_write);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_wait_wr_callback(DEVCB_##_write);
 
 
 

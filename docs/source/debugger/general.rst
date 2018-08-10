@@ -33,11 +33,11 @@ do
 --
 
 |  **do <expression>**
-| 
+|
 | The do command simply evaluates the given <expression>. This is typically used to set or modify variables.
-| 
+|
 | Examples:
-| 
+|
 |   do pc = 0
 |
 | Sets the register 'pc' to 0.
@@ -50,7 +50,7 @@ symlist
 -------
 
 |  **symlist [<cpu>]**
-| 
+|
 | Lists registered symbols. If <cpu> is not specified, then symbols in the global symbol table are displayed; otherwise, the symbols for <cpu>'s specific CPU are displayed. Symbols are listed alphabetically. Read-only symbols are flagged with an asterisk.
 |
 | Examples:
@@ -67,7 +67,7 @@ symlist
 
 
  .. _debugger-command-softreset:
- 
+
 softreset
 ---------
 
@@ -85,7 +85,7 @@ softreset
 
 
  .. _debugger-command-hardreset:
- 
+
 hardreset
 ---------
 
@@ -125,7 +125,7 @@ print
 
 
  .. _debugger-command-printf:
- 
+
 printf
 ------
 
@@ -152,7 +152,7 @@ printf
 
 
  .. _debugger-command-logerror:
- 
+
 logerror
 --------
 
@@ -285,7 +285,7 @@ pcatmem
 
 
  .. _debugger-command-rewind:
- 
+
 rewind
 ------
 

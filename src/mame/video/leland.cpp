@@ -106,7 +106,7 @@ void leland_state::video_start()
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	save_item(NAME(m_gfx_control));
-	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
+	save_pointer(NAME(m_video_ram), VRAM_SIZE);
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	save_item(NAME(m_gfxbank));
@@ -130,8 +130,8 @@ void ataxx_state::video_start()
 	/* allocate memory */
 	m_ataxx_qram = make_unique_clear<uint8_t[]>(QRAM_SIZE);
 
-	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
-	save_pointer(NAME(m_ataxx_qram.get()), QRAM_SIZE);
+	save_pointer(NAME(m_video_ram), VRAM_SIZE);
+	save_pointer(NAME(m_ataxx_qram), QRAM_SIZE);
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	for (uint8_t i = 0; i < 2; i++)

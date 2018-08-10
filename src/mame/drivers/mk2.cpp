@@ -72,17 +72,18 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void mk2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mk2_read_a);
 	DECLARE_WRITE8_MEMBER(mk2_write_a);
 	DECLARE_READ8_MEMBER(mk2_read_b);
 	DECLARE_WRITE8_MEMBER(mk2_write_b);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
-	void mk2(machine_config &config);
 	void mk2_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	uint8_t m_led_data[5];
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -206,7 +207,7 @@ MACHINE_CONFIG_START(mk2_state::mk2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk2)
+	config.set_default_layout(layout_mk2);
 
 	MCFG_DEVICE_ADD("miot", MOS6530, 1000000)
 	MCFG_MOS6530_IN_PA_CB(READ8(*this, mk2_state, mk2_read_a))

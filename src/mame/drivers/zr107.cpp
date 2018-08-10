@@ -215,7 +215,14 @@ public:
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_konppc(*this, "konppc") { }
 
+	void zr107(machine_config &config);
+	void jetwave(machine_config &config);
 
+	void init_common();
+	void init_zr107();
+	void init_jetwave();
+
+private:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
@@ -250,9 +257,6 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
 	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
 
-	void init_common();
-	void init_zr107();
-	void init_jetwave();
 	DECLARE_VIDEO_START(zr107);
 	DECLARE_VIDEO_START(jetwave);
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -262,14 +266,12 @@ public:
 	ADC083X_INPUT_CB(adc0838_callback);
 	K056832_CB_MEMBER(tile_callback);
 
-	void zr107(machine_config &config);
-	void jetwave(machine_config &config);
 	void jetwave_map(address_map &map);
 	void k054539_map(address_map &map);
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
 	void zr107_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
