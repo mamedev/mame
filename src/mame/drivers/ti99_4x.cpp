@@ -58,9 +58,17 @@
 #include "speaker.h"
 
 // Debugging
-#define TRACE_READY 0
-#define TRACE_INTERRUPTS 0
-#define TRACE_CRU 0
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_READY       (1U<<3)
+#define LOG_INTERRUPTS  (1U<<4)
+#define LOG_CRU         (1U<<5)
+#define LOG_CRUREAD     (1U<<6)
+#define LOG_RESETLOAD   (1U<<7)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
+
+#include "logmacro.h"
 
 /*
     The console.
@@ -418,7 +426,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( ti99_4x_state::cruread )
 {
-//  if (TRACE_CRU) logerror("read access to CRU address %04x\n", offset << 4);
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 4);
 	uint8_t value = 0;
 
 	// Let the gromport (not in the QI version) and the p-box behind the I/O port
@@ -433,7 +441,7 @@ READ8_MEMBER( ti99_4x_state::cruread )
 
 WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
-	if (TRACE_CRU) logerror("ti99_4x: write access to CRU address %04x\n", offset << 1);
+	LOGMASKED(LOG_CRU, "Write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
 	if (m_model != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
 	m_ioport->cruwrite(space, offset<<1, data);
@@ -445,9 +453,7 @@ WRITE8_MEMBER( ti99_4x_state::external_operation )
 	// Some games (e.g. Slymoids) actually use IDLE for synchronization
 	if (offset == IDLE_OP) return;
 	else
-	{
-		logerror("ti99_4x: External operation %s not implemented on TI-99 board\n", extop[offset]);
-	}
+		LOGMASKED(LOG_WARN, "External operation %s not implemented on TI-99 board\n", extop[offset]);
 }
 
 /***************************************************************************
@@ -700,7 +706,7 @@ void ti99_4x_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_evpc_in )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: VDP INT2 from EVPC on tms9901, level=%d\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 from EVPC on tms9901, level=%d\n", state);
 	m_int2 = (line_state)state;
 	m_tms9901->set_single_int(2, state);
 }
@@ -710,7 +716,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_evpc_in )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_in )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: VDP INT2 on tms9901, level=%d\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 on tms9901, level=%d\n", state);
 
 	// Pulse for the handset
 	if (m_model == MODEL_4) m_joyport->pulse_clock();
@@ -724,7 +730,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_in )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::handset_interrupt_in)
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: joyport INT12 on tms9901, level=%d\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "joyport INT12 on tms9901, level=%d\n", state);
 	m_int12 = (line_state)state;
 	m_tms9901->set_single_int(12, state);
 }
@@ -735,7 +741,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::handset_interrupt_in)
 */
 INPUT_CHANGED_MEMBER( ti99_4x_state::load_interrupt )
 {
-	logerror("ti99_4x: LOAD interrupt, level=%d\n", newval);
+	LOGMASKED(LOG_RESETLOAD, "LOAD interrupt, level=%d\n", newval);
 	m_cpu->set_input_line(INT_9900_LOAD, (newval==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -755,10 +761,8 @@ void ti99_4x_state::console_ready_join(int id, int state)
 	else
 		m_nready_combined &= ~id;
 
-	if (TRACE_READY)
-	{
-		if (m_nready_prev != m_nready_combined) logerror("ti99_4x: READY bits = %04x\n", ~m_nready_combined);
-	}
+	if (m_nready_prev != m_nready_combined)
+		LOGMASKED(LOG_READY, "READY bits = %04x\n", ~m_nready_combined);
 
 	m_nready_prev = m_nready_combined;
 	m_cpu->set_ready(m_nready_combined==0);
@@ -770,7 +774,7 @@ void ti99_4x_state::console_ready_join(int id, int state)
 */
 WRITE_LINE_MEMBER( ti99_4x_state::console_ready_grom )
 {
-	if (TRACE_READY) logerror("GROM ready = %d\n", state);
+	LOGMASKED(LOG_READY, "GROM ready = %d\n", state);
 	console_ready_join(READY_GROM, state);
 }
 
@@ -802,7 +806,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 {
 	if (machine().phase() != machine_phase::INIT)
 	{
-		logerror("ti99_4x: Console reset line = %d\n", state);
+		LOGMASKED(LOG_RESETLOAD, "Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);
 		m_video->reset_line(state);
 	}
@@ -810,14 +814,14 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 
 WRITE_LINE_MEMBER( ti99_4x_state::extint )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: EXTINT level = %02x\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "EXTINT level = %02x\n", state);
 	m_int1 = (line_state)state;
 	m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: Setting a not connected line ... ignored\n");
+	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
 
 void ti99_4x_state::register_save_state()

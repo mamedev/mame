@@ -75,6 +75,17 @@
 #include "emu.h"
 #include "pcode.h"
 
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_ROM         (1U<<3)
+#define LOG_GROM        (1U<<4)
+#define LOG_SWITCH      (1U<<5)
+#define LOG_CRU         (1U<<6)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_P_CODE, bus::ti99::peb, ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
 
 namespace bus { namespace ti99 { namespace peb {
@@ -93,11 +104,6 @@ namespace bus { namespace ti99 { namespace peb {
 #define ACTIVE_TAG "ACTIVE"
 
 #define CRU_BASE 0x1f00
-
-#define TRACE_ROM 0
-#define TRACE_GROM 0
-#define TRACE_CRU 0
-#define TRACE_SWITCH 0
 
 ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_P_CODE, tag, owner, clock),
@@ -169,14 +175,14 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 		if (m_isrom0)
 		{
 			*value = m_rom[m_address & 0x0fff];
-			if (TRACE_ROM) logerror("Read from rom %04x: %02x\n", offset&0xffff, *value);
+			LOGMASKED(LOG_ROM, "Read from rom %04x: %02x\n", offset&0xffff, *value);
 		}
 		else
 		{
 			if (m_isgrom)
 			{
 				for (auto& elem : m_grom) elem->readz(value);
-				if (TRACE_GROM) logerror("Read from grom %04x: %02x\n", m_address&0xffff, *value);
+				LOGMASKED(LOG_GROM, "Read from grom %04x: %02x\n", m_address&0xffff, *value);
 			}
 			else
 			{
@@ -189,7 +195,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 					// 0001 xxxx xxxx xxxx   Bank 1
 					// 0010 xxxx xxxx xxxx   Bank 2
 					*value = m_rom[(m_bank_select<<12) | (m_address & 0x0fff)];
-					if (TRACE_ROM) logerror("Read from rom %04x (%02x): %02x\n", m_address&0xffff, m_bank_select, *value);
+					LOGMASKED(LOG_ROM, "Read from rom %04x (%02x): %02x\n", m_address&0xffff, m_bank_select, *value);
 				}
 			}
 		}
@@ -265,7 +271,7 @@ WRITE_LINE_MEMBER(ti_pcode_card_device::pcpage_w)
 WRITE_LINE_MEMBER(ti_pcode_card_device::ekrpg_w)
 {
 	m_bank_select = state ? 2 : 1;   // we're calling this bank 1 and bank 2
-	if (TRACE_CRU) logerror("Select rom bank %d\n", m_bank_select);
+	LOGMASKED(LOG_CRU, "Select rom bank %d\n", m_bank_select);
 }
 
 void ti_pcode_card_device::device_start()
@@ -322,7 +328,7 @@ void ti_pcode_card_device::device_config_complete()
 
 INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 {
-	if (TRACE_SWITCH) logerror("Switch changed to %d\n", newval);
+	LOGMASKED(LOG_SWITCH, "Switch changed to %d\n", newval);
 	m_active = (newval != 0);
 }
 

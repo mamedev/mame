@@ -194,6 +194,15 @@ CRUCLK*  51||52  DBIN
 #include "memex.h"
 #include "horizon.h"
 
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_INT         (1U<<3)
+#define LOG_READY       (1U<<4)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+
+#include "logmacro.h"
+
 // Peripheral box that is attached to the TI console (also TI with EVPC)
 // and has the Flex Cable Interface in slot 1
 // This is a device that plugs into the slot "ioport" of the console
@@ -215,18 +224,6 @@ DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_GENMOD,  bus::ti99::peb, peribox_genmod_devic
 DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device, "peribox_slot", "TI P-Box slot")
 
 namespace bus { namespace ti99 { namespace peb {
-
-/*
-    Debugging flags. Set to 0 or 1.
-*/
-// Show interrupt line activity
-#define TRACE_INT 0
-
-// Show ready line activity
-#define TRACE_READY 0
-
-// Show configuration details
-#define TRACE_CONFIG 0
 
 #define PEBSLOT2 "slot2"
 #define PEBSLOT3 "slot3"
@@ -377,7 +374,7 @@ WRITE_LINE_MEMBER(peribox_device::clock_in)
 */
 void peribox_device::inta_join(int slot, int state)
 {
-	if (TRACE_INT) logerror("%s: propagating INTA from slot %d to console: %d\n", tag(), slot, state);
+	LOGMASKED(LOG_INT, "propagating INTA from slot %d to console: %d\n", slot, state);
 	if (state==ASSERT_LINE)
 		m_inta_flag |= (1 << slot);
 	else
@@ -391,7 +388,7 @@ void peribox_device::inta_join(int slot, int state)
 
 void peribox_device::intb_join(int slot, int state)
 {
-	if (TRACE_INT) logerror("%s: propagating INTB from slot %d to console: %d\n", tag(), slot, state);
+	LOGMASKED(LOG_INT, "propagating INTB from slot %d to console: %d\n", slot, state);
 	if (state==ASSERT_LINE)
 		m_intb_flag |= (1 << slot);
 	else
@@ -404,7 +401,7 @@ void peribox_device::intb_join(int slot, int state)
 
 void peribox_device::lcp_join(int slot, int state)
 {
-	if (TRACE_INT) logerror("%s: propagating LCP from slot %d to SGCPU: %d\n", tag(), slot, state);
+	LOGMASKED(LOG_INT, "propagating LCP from slot %d to SGCPU: %d\n", slot, state);
 	if (state==ASSERT_LINE)
 		m_lcp_flag |= (1 << slot);
 	else
@@ -420,7 +417,7 @@ void peribox_device::lcp_join(int slot, int state)
 */
 void peribox_device::ready_join(int slot, int state)
 {
-	if (TRACE_READY) logerror("%s: Incoming READY=%d from slot %d\n", tag(), state, slot);
+	LOGMASKED(LOG_READY, "Incoming READY=%d from slot %d\n", state, slot);
 	// We store the inverse state
 	if (state==CLEAR_LINE)
 		m_ready_flag |= (1 << slot);
@@ -450,13 +447,10 @@ void peribox_device::device_start()
 
 	m_ioport_connected = (m_slot1_inta.isnull()); // TODO: init
 
-	if (TRACE_CONFIG)
+	LOGMASKED(LOG_CONFIG, "AMA/B/C address prefix set to %05x\n", m_address_prefix);
+	for (int i=2; i < 9; i++)
 	{
-		logerror("%s: AMA/B/C address prefix set to %05x\n", tag(), m_address_prefix);
-		for (int i=2; i < 9; i++)
-		{
-			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != nullptr)? m_slot[i]->card_name() : "empty");
-		}
+		LOGMASKED(LOG_CONFIG, "Slot %d = %s\n", i, (m_slot[i] != nullptr)? m_slot[i]->card_name() : "empty");
 	}
 
 	save_item(NAME(m_inta_flag));
