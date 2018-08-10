@@ -63,6 +63,9 @@ public:
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_read_port_callback(Object &&cb) { return m_read_port_cb.set_callback(std::forward<Object>(cb)); }
 
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto read_port_cb() { return m_read_port_cb.bind(); }
+
 protected:
 	// struct describing a single playing voice
 	struct es550x_voice

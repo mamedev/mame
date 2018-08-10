@@ -996,12 +996,12 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 
 READ8_MEMBER(mz2500_state::fdc_r)
 {
-	return m_fdc->read(space, offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(mz2500_state::fdc_w)
 {
-	m_fdc->write(space, offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)

@@ -47,12 +47,13 @@ class cassette_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~cassette_image_device();
 
 	void set_formats(const struct CassetteFormat*  const *formats) { m_formats = formats; }
 	void set_create_opts(const struct CassetteOptions  *create_opts) { m_create_opts = create_opts; }
 	void set_default_state(cassette_state default_state) { m_default_state = default_state; }
+	void set_default_state(int default_state) { m_default_state = (cassette_state)default_state; }
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides

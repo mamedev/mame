@@ -84,7 +84,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	return m_fdc->gen_r(offset & 0x03);
+	return m_fdc->read(offset & 0x03);
 }
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
@@ -98,7 +98,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	return m_fdc->gen_w(offset & 0x03, data);
+	return m_fdc->write(offset & 0x03, data);
 }
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)

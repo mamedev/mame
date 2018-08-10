@@ -598,12 +598,12 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 /* As far as we can tell, the mess of ttl de-inverts the bus */
 READ8_MEMBER(itt3030_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(itt3030_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 /*

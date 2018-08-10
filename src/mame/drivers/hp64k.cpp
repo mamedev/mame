@@ -712,7 +712,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 		case 0:
 				// DMA transfer, not at TC
 				if (m_floppy_if_state == HP64K_FLPST_DMAWR1) {
-						m_fdc->write_data(~m_floppy_in_latch_msb);
+						m_fdc->data_w(~m_floppy_in_latch_msb);
 						m_floppy_if_state = HP64K_FLPST_DMAWR2;
 				} else {
 						logerror("write to IC=0 with floppy state %d\n" , m_floppy_if_state);
@@ -738,7 +738,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 						// Write (to either FDC or drive control)
 						if (BIT(m_floppy_if_ctrl , 2)) {
 								// FDC
-								m_fdc->gen_w(~m_floppy_if_ctrl & 3 , ~m_floppy_in_latch_lsb);
+								m_fdc->write(~m_floppy_if_ctrl & 3 , ~m_floppy_in_latch_lsb);
 						} else {
 								// Drive control
 								m_floppy_drv_ctrl = m_floppy_in_latch_lsb;
@@ -748,7 +748,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 						// Read
 						if (BIT(m_floppy_if_ctrl , 2)) {
 								// FDC
-								m_floppy_out_latch_lsb = ~m_fdc->gen_r(~m_floppy_if_ctrl & 3);
+								m_floppy_out_latch_lsb = ~m_fdc->read(~m_floppy_if_ctrl & 3);
 						} else {
 								// Drive control
 								m_floppy_out_latch_lsb = m_floppy_drv_ctrl;
@@ -763,7 +763,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 		case 2:
 				// DMA transfer, at TC
 				if (m_floppy_if_state == HP64K_FLPST_DMAWR1) {
-						m_fdc->write_data(~m_floppy_in_latch_msb);
+						m_fdc->data_w(~m_floppy_in_latch_msb);
 						m_floppy_if_state = HP64K_FLPST_DMAWR2;
 						m_floppy_dmaen = false;
 						m_floppy_dmai = true;
@@ -802,18 +802,18 @@ void hp64k_state::hp64k_update_floppy_dma(void)
 								m_floppy_if_state = HP64K_FLPST_DMAWR1;
 						} else {
 								// DMA reads
-								m_floppy_out_latch_msb = ~m_fdc->read_data();
+								m_floppy_out_latch_msb = ~m_fdc->data_r();
 								m_floppy_if_state = HP64K_FLPST_DMARD1;
 						}
 						break;
 
 				case HP64K_FLPST_DMAWR2:
-						m_fdc->write_data(~m_floppy_in_latch_lsb);
+						m_fdc->data_w(~m_floppy_in_latch_lsb);
 						m_floppy_if_state = HP64K_FLPST_IDLE;
 						break;
 
 				case HP64K_FLPST_DMARD1:
-						m_floppy_out_latch_lsb = ~m_fdc->read_data();
+						m_floppy_out_latch_lsb = ~m_fdc->data_r();
 						m_cpu->dmar_w(1);
 						m_floppy_if_state = HP64K_FLPST_DMARD2;
 						break;

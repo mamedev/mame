@@ -252,7 +252,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 					// .... ..11 1111 0xx0
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
-					*value = m_wd1773->gen_r((m_address >> 1)&0x03);
+					*value = m_wd1773->read((m_address >> 1)&0x03);
 					if (TRACE_RW) logerror("bwg: read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
 					if (TRACE_DATA)
 					{
@@ -321,7 +321,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
 					if (TRACE_RW) logerror("bwg: write FDC: %04x <- %02x\n", m_address & 0xffff, data);
-					m_wd1773->gen_w((m_address >> 1)&0x03, data);
+					m_wd1773->write((m_address >> 1)&0x03, data);
 				}
 				else
 				{

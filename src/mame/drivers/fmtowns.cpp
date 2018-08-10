@@ -478,13 +478,13 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 	switch(offset)
 	{
 		case 0x00:
-			return m_fdc->status_r(space, 0);
+			return m_fdc->status_r();
 		case 0x02:
-			return m_fdc->track_r(space, 0);
+			return m_fdc->track_r();
 		case 0x04:
-			return m_fdc->sector_r(space, 0);
+			return m_fdc->sector_r();
 		case 0x06:
-			return m_fdc->data_r(space, 0);
+			return m_fdc->data_r();
 		case 0x08:  // selected drive status?
 			//logerror("FDC: read from offset 0x08\n");
 			ret = 0x80;  // always set
@@ -532,19 +532,19 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 				return;
 			if(data == 0xfe)
 				return;
-			m_fdc->cmd_w(space, 0,data);
+			m_fdc->cmd_w(data);
 			logerror("FDC: Command %02x\n",data);
 			break;
 		case 0x02:
-			m_fdc->track_w(space, 0,data);
+			m_fdc->track_w(data);
 			logerror("FDC: Track %02x\n",data);
 			break;
 		case 0x04:
-			m_fdc->sector_w(space, 0,data);
+			m_fdc->sector_w(data);
 			logerror("FDC: Sector %02x\n",data);
 			break;
 		case 0x06:
-			m_fdc->data_w(space, 0,data);
+			m_fdc->data_w(data);
 			logerror("FDC: Data %02x\n",data);
 			break;
 		case 0x08:
@@ -601,13 +601,13 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 }
 
 READ16_MEMBER(towns_state::towns_fdc_dma_r)
-{   uint16_t data = m_fdc->data_r(generic_space(), 0);
+{   uint16_t data = m_fdc->data_r();
 	return data;
 }
 
 WRITE16_MEMBER(towns_state::towns_fdc_dma_w)
 {
-	m_fdc->data_w(generic_space(), 0,data);
+	m_fdc->data_w(data);
 }
 
 /*

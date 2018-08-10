@@ -167,7 +167,7 @@ void st_state::fdc_dma_transfer()
 		if (m_fdc_fifo_msb)
 		{
 			// write LSB to disk
-			m_fdc->write_data(data & 0xff);
+			m_fdc->data_w(data & 0xff);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data & 0xff);
 
@@ -176,7 +176,7 @@ void st_state::fdc_dma_transfer()
 		else
 		{
 			// write MSB to disk
-			m_fdc->write_data(data >> 8);
+			m_fdc->data_w(data >> 8);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data >> 8);
 		}
@@ -200,7 +200,7 @@ void st_state::fdc_dma_transfer()
 	else
 	{
 		// read from controller to FIFO
-		uint8_t data = m_fdc->read_data();
+		uint8_t data = m_fdc->data_r();
 
 		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
 
@@ -250,9 +250,9 @@ READ16_MEMBER( st_state::fdc_data_r )
 		if (!(m_fdc_mode & DMA_MODE_FDC_HDC_CS))
 		{
 			// floppy controller
-			int offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
+			offs_t offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
 
-			data = m_fdc->gen_r(offset);
+			data = m_fdc->read(offset);
 
 			if (LOG) logerror("FDC Register %u Read %02x\n", offset, data);
 		}
@@ -294,11 +294,11 @@ WRITE16_MEMBER( st_state::fdc_data_w )
 		if (!(m_fdc_mode & DMA_MODE_FDC_HDC_CS))
 		{
 			// floppy controller
-			int offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
+			offs_t offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
 
 			if (LOG) logerror("FDC Register %u Write %02x\n", offset, data);
 
-			m_fdc->gen_w(offset, data);
+			m_fdc->write(offset, data);
 		}
 	}
 }

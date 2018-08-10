@@ -1359,10 +1359,10 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 			case 0x6: m_fdc_dma_cnt.b.l = data;     break;
 			case 0x8: m_fdc_dma_cnt.b.h = data;     break;
 			case 0xa: dma_fdc_rom();                break;
-			case 0xc: m_wd1791->write_cmd(data ^ 0xff);        break;
-			case 0xd: m_wd1791->write_track(data ^ 0xff);      break;
-			case 0xe: m_wd1791->write_sector(data ^ 0xff);     break;
-			case 0xf: m_wd1791->write_data(data ^ 0xff);       break;
+			case 0xc: m_wd1791->cmd_w(data ^ 0xff);        break;
+			case 0xd: m_wd1791->track_w(data ^ 0xff);      break;
+			case 0xe: m_wd1791->sector_w(data ^ 0xff);     break;
+			case 0xf: m_wd1791->data_w(data ^ 0xff);       break;
 			default: printf("fdc_w: Invalid access (%x with %x)", m_fdc_addr, data);
 		}
 	}
@@ -1379,10 +1379,10 @@ READ8_MEMBER( cmi_state::fdc_r )
 	{
 		switch (m_fdc_addr)
 		{
-			case 0xc: { return m_wd1791->read_status() ^ 0xff; }
-			case 0xd: { return m_wd1791->read_track() ^ 0xff; }
-			case 0xe: { return m_wd1791->read_sector() ^ 0xff; }
-			case 0xf: { return m_wd1791->read_data() ^ 0xff; }
+			case 0xc: { return m_wd1791->status_r() ^ 0xff; }
+			case 0xd: { return m_wd1791->track_r() ^ 0xff; }
+			case 0xe: { return m_wd1791->sector_r() ^ 0xff; }
+			case 0xf: { return m_wd1791->data_r() ^ 0xff; }
 			default:  return 0;
 		}
 	}
@@ -1414,7 +1414,7 @@ void cmi_state::fdc_dma_transfer()
 	if (!BIT(m_fdc_ctrl, 4))
 	{
 		/* Read a byte at a time */
-		uint8_t data = m_wd1791->read_data() ^ 0xff;
+		uint8_t data = m_wd1791->data_r() ^ 0xff;
 
 		if (m_fdc_dma_cnt.w.l == 0xffff)
 			return;
@@ -1446,7 +1446,7 @@ void cmi_state::fdc_dma_transfer()
 		if (phys_page & 0x80)
 			data = m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)];
 
-		m_wd1791->write_data(data ^ 0xff);
+		m_wd1791->data_w(data ^ 0xff);
 
 		if (!BIT(m_fdc_ctrl, 3))
 			m_fdc_dma_addr.w.l++;

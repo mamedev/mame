@@ -352,7 +352,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 READ8_MEMBER(mz2000_state::fdc_r)
 {
 	if(m_has_fdc)
-		return m_mb8877a->read(space, offset) ^ 0xff;
+		return m_mb8877a->read(offset) ^ 0xff;
 
 	return 0xff;
 }
@@ -360,7 +360,7 @@ READ8_MEMBER(mz2000_state::fdc_r)
 WRITE8_MEMBER(mz2000_state::fdc_w)
 {
 	if(m_has_fdc)
-		m_mb8877a->write(space, offset, data ^ 0xff);
+		m_mb8877a->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER(mz2000_state::floppy_select_w)

@@ -417,12 +417,12 @@ WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 
 READ8_MEMBER(vme_fcscsi1_card_device::fdc_read_byte)
 {
-	return m_fdc->read_data();
+	return m_fdc->data_r();
 }
 
 WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_write_byte)
 {
-	m_fdc->write_data(data & 0xff);
+	m_fdc->data_w(data & 0xff);
 }
 
 READ8_MEMBER(vme_fcscsi1_card_device::scsi_r)

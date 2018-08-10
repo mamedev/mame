@@ -150,7 +150,7 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 	{
 		if (!(m_m6844_channel[0].control & 0x01))  // dma write to memory
 		{
-			uint8_t data = m_fdc->data_r(space, 0);
+			uint8_t data = m_fdc->data_r();
 
 			logerror("swtpc09_dma_write_mem %05X %02X\n", m_m6844_channel[0].address + offset, data);
 			space.write_byte(m_m6844_channel[0].address + offset, data);
@@ -159,7 +159,7 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 		{
 			uint8_t data = space.read_byte(m_m6844_channel[0].address + offset);
 
-			m_fdc->data_w(space, 0, data);
+			m_fdc->data_w(data);
 			//logerror("swtpc09_dma_read_mem %04X %02X\n", m_m6844_channel[0].address, data);
 		}
 

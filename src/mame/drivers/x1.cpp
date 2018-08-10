@@ -733,13 +733,13 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			return m_fdc->status_r(space, offset);
+			return m_fdc->status_r();
 		case 0x0ff9:
-			return m_fdc->track_r(space, offset);
+			return m_fdc->track_r();
 		case 0x0ffa:
-			return m_fdc->sector_r(space, offset);
+			return m_fdc->sector_r();
 		case 0x0ffb:
-			return m_fdc->data_r(space, offset);
+			return m_fdc->data_r();
 		case 0x0ffc:
 			logerror("FDC: read FM type\n");
 			return 0xff;
@@ -764,16 +764,16 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			m_fdc->cmd_w(space, offset,data);
+			m_fdc->cmd_w(data);
 			break;
 		case 0x0ff9:
-			m_fdc->track_w(space, offset,data);
+			m_fdc->track_w(data);
 			break;
 		case 0x0ffa:
-			m_fdc->sector_w(space, offset,data);
+			m_fdc->sector_w(data);
 			break;
 		case 0x0ffb:
-			m_fdc->data_w(space, offset,data);
+			m_fdc->data_w(data);
 			break;
 
 		case 0x0ffc:

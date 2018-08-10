@@ -156,7 +156,7 @@ uint8_t sandy_super_disk_device::read(address_space &space, offs_t offset, uint8
 			switch ((offset >> 2) & 0x03)
 			{
 			case 0:
-				data = m_fdc->read(space, offset & 0x03);
+				data = m_fdc->read(offset & 0x03);
 				break;
 
 			case 3:
@@ -202,7 +202,7 @@ void sandy_super_disk_device::write(address_space &space, offs_t offset, uint8_t
 			switch ((offset >> 2) & 0x03)
 			{
 			case 0:
-				m_fdc->write(space, offset & 0x03, data);
+				m_fdc->write(offset & 0x03, data);
 				break;
 
 			case 1:

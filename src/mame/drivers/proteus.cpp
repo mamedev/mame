@@ -209,12 +209,12 @@ WRITE_LINE_MEMBER(proteus_state::motor_w)
 
 READ8_MEMBER(proteus_state::fdc_inv_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(proteus_state::fdc_inv_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 

@@ -161,7 +161,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 		if (m_WDsel && ((m_address & 9)==0))
 		{
-			if (!machine().side_effects_disabled()) reply = m_fd1771->gen_r((offset >> 1)&0x03);
+			if (!machine().side_effects_disabled()) reply = m_fd1771->read((offset >> 1)&0x03);
 			if (TRACE_DATA)
 			{
 				if ((m_address & 0xffff)==0x5ff6)
@@ -206,7 +206,7 @@ WRITE8_MEMBER(ti_fdc_device::write)
 		{
 			// As this is a memory-mapped access we must prevent the debugger
 			// from messing with the operation
-			if (!machine().side_effects_disabled()) m_fd1771->gen_w((offset >> 1)&0x03, data);
+			if (!machine().side_effects_disabled()) m_fd1771->write((offset >> 1)&0x03, data);
 		}
 	}
 }

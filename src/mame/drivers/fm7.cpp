@@ -445,13 +445,13 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 	switch(offset)
 	{
 		case 0:
-			return m_fdc->status_r(space, offset);
+			return m_fdc->status_r();
 		case 1:
-			return m_fdc->track_r(space, offset);
+			return m_fdc->track_r();
 		case 2:
-			return m_fdc->sector_r(space, offset);
+			return m_fdc->sector_r();
 		case 3:
-			return m_fdc->data_r(space, offset);
+			return m_fdc->data_r();
 		case 4:
 			return m_fdc_side | 0xfe;
 		case 5:
@@ -476,16 +476,16 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 	switch(offset)
 	{
 		case 0:
-			m_fdc->cmd_w(space, offset,data);
+			m_fdc->cmd_w(data);
 			break;
 		case 1:
-			m_fdc->track_w(space, offset,data);
+			m_fdc->track_w(data);
 			break;
 		case 2:
-			m_fdc->sector_w(space, offset,data);
+			m_fdc->sector_w(data);
 			break;
 		case 3:
-			m_fdc->data_w(space, offset,data);
+			m_fdc->data_w(data);
 			break;
 		case 4:
 			m_fdc_side = data & 0x01;

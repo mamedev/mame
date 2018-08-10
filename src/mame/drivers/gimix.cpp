@@ -374,7 +374,7 @@ READ8_MEMBER(gimix_state::fdc_r)
 		m_floppy1_ready = true;
 		logerror("FDC: Floppy drive 1 motor on\n");
 	}
-	return m_fdc->read(space,offset);
+	return m_fdc->read(offset);
 }
 
 WRITE8_MEMBER(gimix_state::fdc_w)
@@ -384,7 +384,7 @@ WRITE8_MEMBER(gimix_state::fdc_w)
 		m_floppy0->get_device()->mon_w(0);
 	if(m_selected_drive == 2)
 		m_floppy1->get_device()->mon_w(0);
-	m_fdc->write(space,offset,data);
+	m_fdc->write(offset,data);
 }
 
 READ8_MEMBER(gimix_state::pia_pa_r)
@@ -432,13 +432,13 @@ WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 		if(DMA_DIRECTION)
 		{
 			// write to disk
-			m_fdc->write_data(m_ram->read(m_dma_current_addr));
+			m_fdc->data_w(m_ram->read(m_dma_current_addr));
 //          logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
 		}
 		else
 		{
 			// read from disk
-			m_ram->write(m_dma_current_addr,m_fdc->read_data());
+			m_ram->write(m_dma_current_addr,m_fdc->data_r());
 //          logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
 		}
 		m_dma_current_addr++;
