@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(qix_state::slither_audio)
 	m_sndpia0->writepb_handler().set(FUNC(qix_state::slither_coinctl_w));
 	m_sndpia0->cb2_handler().set(FUNC(qix_state::qix_flip_screen_w));
 	m_sndpia0->irqa_handler().set(FUNC(qix_state::qix_pia_dint));
-	m_sndpia0->irqb_handler().set(FUNC(qix_pia_dint));
+	m_sndpia0->irqb_handler().set(FUNC(qix_state::qix_pia_dint));
 
 	SPEAKER(config, "mono").front_center();
 

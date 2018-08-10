@@ -116,7 +116,7 @@ public:
 	auto out_intal1_callback() { return m_out_intal1_cb.bind(); }
 
 	// LOCAL IACK callbacks emulating the INTAL0 and INTAL1 outputs for INTAE requesting a vector from a sub device
-	template <unsigned Bit> out_iack_callback() { return m_chn[Bit]->m_out_iack_cb.bind(); }
+	template <unsigned Bit> auto out_iack_callback() { return m_chn[Bit]->m_out_iack_cb.bind(); }
 	auto out_iack0_callback() { return m_chn[CHN_0]->m_out_iack_cb.bind(); }
 	auto out_iack1_callback() { return m_chn[CHN_1]->m_out_iack_cb.bind(); }
 	auto out_iack2_callback() { return m_chn[CHN_2]->m_out_iack_cb.bind(); }

@@ -648,7 +648,6 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 											code, unicode_to_string(code), (void *)&port, field.name());
 									}
 
-
 									// check for line feed key
 									if (code == '\n' && curshift == 0)
 										m_post_lf = true;
