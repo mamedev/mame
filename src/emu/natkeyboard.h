@@ -93,6 +93,7 @@ private:
 	unsigned                        m_fieldnum;         // current step in multi-key sequence
 	bool                            m_status_keydown;   // current keydown status
 	bool                            m_last_cr;          // was the last char a CR?
+	bool                            m_post_lf;          // should we post LFs?
 	emu_timer *                     m_timer;            // timer for posting characters
 	attotime                        m_current_rate;     // current rate for posting
 	ioport_queue_chars_delegate     m_queue_chars;      // queue characters callback
