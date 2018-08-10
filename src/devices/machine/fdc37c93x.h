@@ -40,6 +40,12 @@ public:
 	template <class Object> devcb_base &set_irq1_callback(Object &&cb) { return m_irq1_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_irq8_callback(Object &&cb) { return m_irq8_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_irq9_callback(Object &&cb) { return m_irq9_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txd1_callback(Object &&cb) { return m_txd1_callback.set_callback(std::forward<Object>(cb));	}
+	template <class Object> devcb_base &set_ndtr1_callback(Object &&cb) {return m_ndtr1_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nrts1_callback(Object &&cb) {return m_nrts1_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txd2_callback(Object &&cb) { return m_txd2_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ndtr2_callback(Object &&cb) { return m_ndtr2_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nrts2_callback(Object &&cb) { return m_nrts2_callback.set_callback(std::forward<Object>(cb)); }
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
@@ -51,9 +57,26 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq_floppy_w);
 	// for the internal parallel port
 	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
-	// for the internal serial ports
+	// for the internal uarts
 	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
+	// chip pins for uarts
+	DECLARE_WRITE_LINE_MEMBER(rxd1_w);
+	DECLARE_WRITE_LINE_MEMBER(ndcd1_w);
+	DECLARE_WRITE_LINE_MEMBER(ndsr1_w);
+	DECLARE_WRITE_LINE_MEMBER(nri1_w);
+	DECLARE_WRITE_LINE_MEMBER(ncts1_w);
+	DECLARE_WRITE_LINE_MEMBER(rxd2_w);
+	DECLARE_WRITE_LINE_MEMBER(ndcd2_w);
+	DECLARE_WRITE_LINE_MEMBER(ndsr2_w);
+	DECLARE_WRITE_LINE_MEMBER(nri2_w);
+	DECLARE_WRITE_LINE_MEMBER(ncts2_w);
 	// rtc
 	DECLARE_WRITE_LINE_MEMBER(irq_rtc_w);
 	// keyboard
@@ -125,6 +148,12 @@ private:
 	devcb_write_line m_irq1_callback;
 	devcb_write_line m_irq8_callback;
 	devcb_write_line m_irq9_callback;
+	devcb_write_line m_txd1_callback;
+	devcb_write_line m_ndtr1_callback;
+	devcb_write_line m_nrts1_callback;
+	devcb_write_line m_txd2_callback;
+	devcb_write_line m_ndtr2_callback;
+	devcb_write_line m_nrts2_callback;
 	required_device<pc_fdc_interface> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
 	required_device<ns16450_device> pc_serial1_comdev;
@@ -196,5 +225,23 @@ DECLARE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device);
 
 #define MCFG_FDC37C93X_IRQ9_CB(_devcb) \
 	downcast<fdc37c93x_device &>(*device).set_irq9_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_TXD1_CB(_devcb) \
+	downcast<fdc37c93x_device &>(*device).set_txd1_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_NDTR1_CB(_devcb) \
+	downcast<fdc37c93x_device &>(*device).set_ndtr1_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_NRTS1_CB(_devcb) \
+	downcast<fdc37c93x_device &>(*device).set_nrts1_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_TXD2_CB(_devcb) \
+	downcast<fdc37c93x_device &>(*device).set_txd2_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_NDTR2_CB(_devcb) \
+	downcast<fdc37c93x_device &>(*device).set_ndtr2_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_NRTS2_CB(_devcb) \
+	downcast<fdc37c93x_device &>(*device).set_nrts2_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_FDC37C93X_H

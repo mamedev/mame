@@ -11,10 +11,6 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 #include "emu.h"
 #include "bus/isa/isa.h"
 #include "machine/ds128x.h"
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
-#include "bus/rs232/terminal.h"
-#include "bus/rs232/null_modem.h"
 #include "machine/fdc37c93x.h"
 
 DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X")
@@ -32,6 +28,12 @@ fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *ta
 	, m_irq1_callback(*this)
 	, m_irq8_callback(*this)
 	, m_irq9_callback(*this)
+	, m_txd1_callback(*this)
+	, m_ndtr1_callback(*this)
+	, m_nrts1_callback(*this)
+	, m_txd2_callback(*this)
+	, m_ndtr2_callback(*this)
+	, m_nrts2_callback(*this)
 	, floppy_controller_fdcdev(*this, "fdc")
 	, pc_lpt_lptdev(*this, "lpt")
 	, pc_serial1_comdev(*this, "uart_0")
@@ -233,14 +235,6 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-static void isa_com(device_slot_interface &device)
-{
-	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
-	device.option_add("terminal", SERIAL_TERMINAL);
-	device.option_add("null_modem", NULL_MODEM);
-}
-
 FLOPPY_FORMATS_MEMBER(fdc37c93x_device::floppy_formats)
 	FLOPPY_PC_FORMAT,
 	FLOPPY_NASLITE_FORMAT
@@ -258,27 +252,15 @@ MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_parallel_w))
 	// serial ports
 	MCFG_DEVICE_ADD("uart_0", NS16450, XTAL(1'843'200)) // or NS16550 ?
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport0", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport0", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport0", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, fdc37c93x_device, irq_serial1_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(*this, fdc37c93x_device, txd_serial1_w))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(*this, fdc37c93x_device, dtr_serial1_w))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE(*this, fdc37c93x_device, rts_serial1_w))
 	MCFG_DEVICE_ADD("uart_1", NS16450, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport1", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport1", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport1", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, fdc37c93x_device, irq_serial2_w))
-	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "microsoft_mouse")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_0", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart_0", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_0", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("uart_0", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_0", ins8250_uart_device, cts_w))
-	MCFG_DEVICE_ADD("serport1", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_1", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart_1", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_1", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("uart_1", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_1", ins8250_uart_device, cts_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(*this, fdc37c93x_device, txd_serial2_w))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(*this, fdc37c93x_device, dtr_serial2_w))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE(*this, fdc37c93x_device, rts_serial2_w))
 	// RTC
 	MCFG_DS12885_ADD("rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_rtc_w))
@@ -319,11 +301,103 @@ WRITE_LINE_MEMBER(fdc37c93x_device::irq_serial1_w)
 	request_irq(configuration_registers[LogicalDevice::Serial1][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(fdc37c93x_device::txd_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	m_txd1_callback(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::dtr_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	m_ndtr1_callback(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::rts_serial1_w)
+{
+	if (enabled_logical[LogicalDevice::Serial1] == false)
+		return;
+	m_nrts1_callback(state);
+}
+
 WRITE_LINE_MEMBER(fdc37c93x_device::irq_serial2_w)
 {
 	if (enabled_logical[LogicalDevice::Serial2] == false)
 		return;
 	request_irq(configuration_registers[LogicalDevice::Serial2][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::txd_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	m_txd2_callback(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::dtr_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	m_ndtr2_callback(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::rts_serial2_w)
+{
+	if (enabled_logical[LogicalDevice::Serial2] == false)
+		return;
+	m_nrts2_callback(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::rxd1_w)
+{
+	pc_serial1_comdev->rx_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::ndcd1_w)
+{
+	pc_serial1_comdev->dcd_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::ndsr1_w)
+{
+	pc_serial1_comdev->dsr_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::nri1_w)
+{
+	pc_serial1_comdev->ri_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::ncts1_w)
+{
+	pc_serial1_comdev->cts_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::rxd2_w)
+{
+	pc_serial2_comdev->rx_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::ndcd2_w)
+{
+	pc_serial2_comdev->dcd_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::ndsr2_w)
+{
+	pc_serial2_comdev->dsr_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::nri2_w)
+{
+	pc_serial2_comdev->ri_w(state);
+}
+
+WRITE_LINE_MEMBER(fdc37c93x_device::ncts2_w)
+{
+	pc_serial2_comdev->cts_w(state);
 }
 
 WRITE_LINE_MEMBER(fdc37c93x_device::irq_rtc_w)
@@ -940,6 +1014,12 @@ void fdc37c93x_device::device_start()
 	m_irq1_callback.resolve_safe();
 	m_irq8_callback.resolve_safe();
 	m_irq9_callback.resolve_safe();
+	m_txd1_callback.resolve_safe();
+	m_ndtr1_callback.resolve_safe();
+	m_nrts1_callback.resolve_safe();
+	m_txd2_callback.resolve_safe();
+	m_ndtr2_callback.resolve_safe();
+	m_nrts2_callback.resolve_safe();
 }
 
 void fdc37c93x_device::device_reset()
