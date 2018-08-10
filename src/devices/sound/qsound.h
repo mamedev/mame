@@ -10,10 +10,10 @@
 
 #pragma once
 
+#include "qsoundbase.h"
 #include "cpu/dsp16/dsp16.h"
 
-
-class qsound_device : public device_t, public device_sound_interface, public device_rom_interface
+class qsound_device : public qsound_base_device
 {
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
@@ -24,7 +24,6 @@ public:
 
 protected:
 	// device_t implementation
-	tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;

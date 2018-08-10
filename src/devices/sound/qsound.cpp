@@ -113,27 +113,15 @@
 #define LOGCOMMAND(...)     LOGMASKED(LOG_COMMAND, __VA_ARGS__)
 #define LOGSAMPLE(...)      LOGMASKED(LOG_SAMPLE, __VA_ARGS__)
 
-
 // device type definition
 DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "QSound")
-
-
-// DSP internal ROM region
-ROM_START( qsound )
-	ROM_REGION16_BE( 0x2000, "dsp", 0 )
-	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
-	ROM_IGNORE( 0x4000 )
-ROM_END
-
 
 //-------------------------------------------------
 //  qsound_device - constructor
 //-------------------------------------------------
 
 qsound_device::qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, QSOUND, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 24)
+	: qsound_base_device(mconfig, QSOUND, tag, owner, clock)
 	, m_dsp(*this, "dsp"), m_stream(nullptr)
 	, m_rom_bank(0U), m_rom_offset(0U), m_cmd_addr(0U), m_cmd_data(0U), m_new_data(0U), m_cmd_pending(0U), m_dsp_ready(1U)
 	, m_samples{ 0, 0 }, m_sr(0U), m_fsr(0U), m_ock(1U), m_old(1U), m_ready(0U), m_channel(0U)
@@ -173,18 +161,6 @@ READ8_MEMBER(qsound_device::qsound_r)
 {
 	return m_dsp_ready ? 0x80 : 0x00;
 }
-
-
-//-------------------------------------------------
-//  rom_region - return a pointer to the device's
-//  internal ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *qsound_device::device_rom_region() const
-{
-	return ROM_NAME( qsound );
-}
-
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -280,11 +256,11 @@ void qsound_device::dsp_io_map(address_map &map)
 
 READ16_MEMBER(qsound_device::dsp_sample_r)
 {
-	// FIXME: DSP16 doesn't like bytes, only signed words - should this zero-pad or byte-smear?
+	// on CPS2, bit 0-7 of external ROM data is tied to ground
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));
 	if (!machine().side_effects_disabled())
 		m_rom_bank = (m_rom_bank & 0x8000U) | offset;
-	return (u16(byte) << 8) | u16(byte);
+	return u16(byte) << 8;
 }
 
 WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
