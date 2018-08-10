@@ -136,7 +136,7 @@ void l7a1045_sound_device::device_start()
 	{
 		for (int voice = 0; voice < 0x20; voice++)
 		{
-			save_item(NAME(m_audiodat[reg][voice].dat), (reg << 5) | voice);
+			save_item(NAME(m_audiodat[reg][voice].dat), (reg << 8) | voice);
 		}
 	}
 }
