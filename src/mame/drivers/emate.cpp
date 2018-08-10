@@ -67,7 +67,7 @@ uint32_t emate_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 void emate_state::emate(machine_config &config)
 {
 	ARM710A(config, m_maincpu, XTAL(25'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &emate_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
