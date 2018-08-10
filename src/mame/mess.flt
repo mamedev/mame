@@ -40,6 +40,7 @@ altos8600.cpp
 amico2k.cpp
 amiga.cpp
 ampex.cpp
+ampex210.cpp
 ampro.cpp
 ampscarp.cpp
 amstr_pc.cpp

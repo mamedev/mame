@@ -74,15 +74,6 @@ ROM_START( alcat7100 ) // Z80  // 256k ram // b&w  // looks like it needs a boot
 ROM_END
 
 
-ROM_START( ampex210 ) // Z80 (+6551,MC2672,3515260-01, 3 xtals, speaker) // 8k ram // amber
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "35-5960-03.u30", 0x0000, 0x8000, CRC(d3f86117) SHA1(f8a9b66899117b362b195bfc94c75bc902fb1376) )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "35-526-01.u3",   0x0000, 0x1000, CRC(4659bcd2) SHA1(554574f55ed875baba0a6133648c44df763cc5c4) )
-ROM_END
-
-
 ROM_START( facit4440 ) // Z80 (+HD46505SP, 2x Z80ADART // 16k ram // b&w
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom7.bin",     0x0000, 0x4000, CRC(a8da2b11) SHA1(4436ef14c29ae299f7bc338748158771c02d02a9) )
@@ -198,7 +189,6 @@ ROM_END
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY             FULLNAME                     FLAGS */
 COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_IS_SKELETON )
 COMP( 1984, alcat7100, 0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminal 7100",          MACHINE_IS_SKELETON )
-COMP( 1989, ampex210,  0,      0,      terminal, terminal, terminal_state, empty_init, "Ampex",              "210+",                   MACHINE_IS_SKELETON )
 COMP( 1986, facit4440, 0,      0,      terminal, terminal, terminal_state, empty_init, "Facit",              "Terminal 4440 (30M-F1)", MACHINE_IS_SKELETON )
 COMP( 1986, itt9216,   0,      0,      terminal, terminal, terminal_state, empty_init, "ITT",                "Courier 9216-X",         MACHINE_IS_SKELETON )
 COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multitel D",             MACHINE_IS_SKELETON )

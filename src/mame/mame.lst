@@ -1211,6 +1211,9 @@ videomat                        // 1990 bootleg
 @source:ampex.cpp
 dialog80                        // Ampex Dialogue 80
 
+@source:ampex210.cpp
+ampex210p                       //
+
 @source:ampro.cpp
 ampro                           //
 
@@ -36900,7 +36903,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 a1010                           //
 alcat258                        //
 alcat7100                       //
-ampex210                        //
 ec7915                          //
 facit4440                       //
 feap90                          //
