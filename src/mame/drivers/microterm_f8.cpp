@@ -41,6 +41,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	TIMER_CALLBACK_MEMBER(baud_clock);
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	F3853_INTERRUPT_REQ_CB(f3853_interrupt);
@@ -50,6 +52,7 @@ private:
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(uart_transmit_w);
 	bool poll_keyboard();
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(port00_r);
@@ -77,6 +80,8 @@ private:
 	u8 m_keylatch;
 	u8 m_scroll;
 	std::unique_ptr<u16[]> m_vram;
+
+	emu_timer *m_baud_clock;
 };
 
 void microterm_f8_state::machine_start()
@@ -84,6 +89,9 @@ void microterm_f8_state::machine_start()
 	m_port00 = 0;
 	m_keylatch = 0;
 	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
+
+	m_baud_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microterm_f8_state::baud_clock), this));
+	m_baud_clock->adjust(attotime::zero, 0);
 
 	save_item(NAME(m_port00));
 	save_item(NAME(m_keylatch));
@@ -94,6 +102,29 @@ void microterm_f8_state::machine_start()
 void microterm_f8_state::machine_reset()
 {
 	m_scroll = 0;
+
+	// UART parameters
+	ioport_value dsw3 = m_dsw[2]->read();
+	m_uart->write_np(BIT(dsw3, 9));
+	m_uart->write_tsb(BIT(dsw3, 8));
+	m_uart->write_eps(BIT(dsw3, 7));
+	m_uart->write_nb1(BIT(dsw3, 6));
+	m_uart->write_nb2(BIT(dsw3, 5));
+
+	m_uart->write_cs(1);
+	m_uart->write_swe(0);
+}
+
+TIMER_CALLBACK_MEMBER(microterm_f8_state::baud_clock)
+{
+	m_uart->write_tcp(param);
+	m_uart->write_rcp(param);
+
+	ioport_value rate = m_dsw[1]->read() ^ 0xff;
+	if (BIT(rate, 7))
+		m_baud_clock->adjust(attotime::from_hz(110 * 8), !param);
+	else
+		m_baud_clock->adjust(attotime::from_hz(19200 * 8 / rate), !param);
 }
 
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -177,6 +208,11 @@ WRITE8_MEMBER(microterm_f8_state::vram_w)
 	m_vram[vaddr] = data | (m_port00 & 0xf0) << 4;
 }
 
+WRITE8_MEMBER(microterm_f8_state::uart_transmit_w)
+{
+	m_uart->set_transmit_data((data & 0x7f) | (m_dsw[2]->read() & 0x10) << 3);
+}
+
 bool microterm_f8_state::poll_keyboard()
 {
 	for (int row = 0; row < 11; row++)
@@ -248,7 +284,7 @@ void microterm_f8_state::f8_mem(address_map &map)
 	map(0x2000, 0x2000).mirror(0x1fff).w(FUNC(microterm_f8_state::scroll_w));
 	map(0x4000, 0x407f).select(0x1f00).rw(FUNC(microterm_f8_state::vram_r), FUNC(microterm_f8_state::vram_w));
 	map(0x5800, 0x5fff).unmaprw();
-	map(0x8000, 0x8000).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0x8000, 0x8000).r(m_uart, FUNC(ay51013_device::receive)).w(FUNC(microterm_f8_state::uart_transmit_w));
 	map(0xf000, 0xf000).r(FUNC(microterm_f8_state::key_r));
 }
 
