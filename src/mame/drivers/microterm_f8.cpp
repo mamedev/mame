@@ -122,9 +122,9 @@ TIMER_CALLBACK_MEMBER(microterm_f8_state::baud_clock)
 
 	ioport_value rate = m_dsw[1]->read() ^ 0xff;
 	if (BIT(rate, 7))
-		m_baud_clock->adjust(attotime::from_hz(110 * 8), !param);
+		m_baud_clock->adjust(attotime::from_hz(110 * 32), !param);
 	else
-		m_baud_clock->adjust(attotime::from_hz(19200 * 8 / rate), !param);
+		m_baud_clock->adjust(attotime::from_hz(19200 * 32 / rate), !param);
 }
 
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

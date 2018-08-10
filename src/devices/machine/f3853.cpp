@@ -93,9 +93,15 @@ void f3853_device::set_interrupt_request_line()
 		return;
 
 	if (m_external_enable && !m_priority_line && m_request_flipflop)
+	{
+		m_request_flipflop = false;
 		m_interrupt_req_cb(external_interrupt_vector(), true);
+	}
 	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
+	{
+		m_request_flipflop = false;
 		m_interrupt_req_cb(timer_interrupt_vector(), true);
+	}
 	else
 		m_interrupt_req_cb(0, false);
 }
