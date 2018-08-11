@@ -137,6 +137,7 @@ protected:
 	void orion_set_video_mode(int width);
 	void orionpro_bank_switch();
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 class orion_z80_state : public orion_state
