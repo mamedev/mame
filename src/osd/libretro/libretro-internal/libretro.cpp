@@ -7,10 +7,12 @@
 #include "osdepend.h"
 
 #include "emu.h"
+#include "emuopts.h"
 #include "render.h"
 #include "ui/uimain.h"
 #include "uiinput.h"
 #include "drivenum.h"
+#include "../frontend/mame/mame.h"
 
 #include "libretro.h"
 #include "libretro_shared.h"
@@ -625,18 +627,111 @@ bool retro_load_game(const struct retro_game_info *info)
 
 void retro_unload_game(void)
 {
+   if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
+		   mame_machine_manager::instance()->machine()->options().autosave() &&
+		   (mame_machine_manager::instance()->machine()->system().flags & MACHINE_SUPPORTS_SAVE) != 0)
+	   mame_machine_manager::instance()->machine()->immediate_save("auto");
    if (retro_pause == 0)
       retro_pause = -1;
 }
 
 /* Stubs */
-size_t retro_serialize_size(void) { return 0; }
-bool retro_serialize(void *data, size_t size) { return false; }
-bool retro_unserialize(const void * data, size_t size) { return false; }
+size_t retro_serialize_size(void)
+{
+	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
+			mame_machine_manager::instance()->machine()->save().state_size() > 0)
+		return mame_machine_manager::instance()->machine()->save().state_size();
+	return 0;
+}
+bool retro_serialize(void *data, size_t size)
+{
+	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
+			mame_machine_manager::instance()->machine()->save().state_size() > 0)
+		return (mame_machine_manager::instance()->machine()->save().write_data(data, size) == STATERR_NONE);
+	return false;
+}
+bool retro_unserialize(const void * data, size_t size)
+{
+	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
+			mame_machine_manager::instance()->machine()->save().state_size() > 0)
+		return (mame_machine_manager::instance()->machine()->save().read_data((void*)data, size) == STATERR_NONE);
+	return false;
+}
 
 unsigned retro_get_region (void) { return RETRO_REGION_NTSC; }
-void *retro_get_memory_data(unsigned type) { return 0; }
-size_t retro_get_memory_size(unsigned type) { return 0; }
+
+void *find_mame_bank_base(offs_t start, address_space &space)
+{
+	for ( auto &bank : mame_machine_manager::instance()->machine()->memory().banks() )
+		if ( bank.second->addrstart() == start)
+			return bank.second->base() ;
+	return NULL;
+}
+void *retro_get_memory_data(unsigned type)
+{
+	void *best_match1 = NULL ;
+	void *best_match2 = NULL ;
+	void *best_match3 = NULL ;
+	int space_index = 0 ;
+
+	/* Eventually the RA cheat system can be updated to accommodate multiple memory
+	 * locations, but for now this does a pretty good job for MAME since most of the machines
+	 * have a single primary RAM segment that is marked read/write as AMH_RAM.
+	 *
+	 * This will find a best match based on certain qualities of the address_map_entry objects.
+	 */
+	if ( type == RETRO_MEMORY_SYSTEM_RAM && mame_machine_manager::instance() != NULL &&
+			mame_machine_manager::instance()->machine() != NULL )
+	{
+		memory_interface_iterator iter(mame_machine_manager::instance()->machine()->root_device());
+		for (device_memory_interface &memory : iter)
+			for ( space_index = 0 ; space_index < memory.num_spaces() ; space_index++)
+				if ( memory.has_space(space_index))
+				{
+					auto &space = memory.space(space_index);
+					for (address_map_entry &entry : space.map()->m_entrylist)
+						if ( entry.m_read.m_type == AMH_RAM )
+							if ( entry.m_write.m_type == AMH_RAM )
+								if ( entry.m_share == NULL )
+									best_match1 = find_mame_bank_base(entry.m_addrstart, space) ;
+								else
+									best_match2 = find_mame_bank_base(entry.m_addrstart, space) ;
+							else
+								best_match3 = find_mame_bank_base(entry.m_addrstart, space) ;
+				}
+	}
+	return ( best_match1 != NULL ? best_match1 : ( best_match2 != NULL ? best_match2 : best_match3 ) );
+}
+size_t retro_get_memory_size(unsigned type)
+{
+	size_t best_match1 = 0 ;
+	size_t best_match2 = 0 ;
+	size_t best_match3 = 0 ;
+	int space_index = 0 ;
+
+	if ( type == RETRO_MEMORY_SYSTEM_RAM && mame_machine_manager::instance() != NULL &&
+			mame_machine_manager::instance()->machine() != NULL )
+	{
+		memory_interface_iterator iter(mame_machine_manager::instance()->machine()->root_device());
+		for (device_memory_interface &memory : iter)
+			for ( space_index = 0 ; space_index < memory.num_spaces() ; space_index++)
+				if ( memory.has_space(space_index))
+				{
+					auto &space = memory.space(space_index);
+					for (address_map_entry &entry : space.map()->m_entrylist)
+						if ( entry.m_read.m_type == AMH_RAM )
+							if ( entry.m_write.m_type == AMH_RAM )
+								if ( entry.m_share == NULL )
+									best_match1 = entry.m_addrend - entry.m_addrstart + 1 ;
+								else
+									best_match2 = entry.m_addrend - entry.m_addrstart + 1 ;
+							else
+								best_match3 = entry.m_addrend - entry.m_addrstart + 1 ;
+				}
+	}
+
+	return ( best_match1 != 0 ? best_match1 : ( best_match2 != 0 ? best_match2 : best_match3 ) );
+}
 bool retro_load_game_special(unsigned game_type, const struct retro_game_info *info, size_t num_info) {return false; }
 void retro_cheat_reset(void) {}
 void retro_cheat_set(unsigned unused, bool unused1, const char* unused2) {}
