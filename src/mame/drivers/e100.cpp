@@ -344,7 +344,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
   PB4-PB5 together with CA1, CA2, CB1 and CB2 are used for the printer interface
   PB6-PB7 forms the cassette interface
 
-  The serial bitbanging perform unreliable atm, can be poor original code or inexact CPU timing.
+  The serial bitbanging performs unreliably atm, can be poor original code or inexact CPU timing.
   Best results is achieved with 8 bit at 9600 baud as follows:
 
     mame e100 -window -rs232 null_modem -bitbngr socket.127.0.0.1:4321
