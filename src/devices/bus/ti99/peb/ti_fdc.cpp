@@ -420,9 +420,10 @@ ROM_START( ti_fdc )
 ROM_END
 
 MACHINE_CONFIG_START(ti_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FDC_TAG, FD1771, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, ti_fdc_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, ti_fdc_device, fdc_drq_w))
+	FD1771(config, m_fd1771, 1_MHz_XTAL);
+	m_fd1771->intrq_wr_callback().set(FUNC(ti_fdc_device::fdc_irq_w));
+	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
+
 	MCFG_FLOPPY_DRIVE_ADD("0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)

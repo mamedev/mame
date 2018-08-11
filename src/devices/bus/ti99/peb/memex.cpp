@@ -153,9 +153,9 @@ INPUT_PORTS_START( memex )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(geneve_memex_device::device_add_mconfig)
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("2M");
+	m_ram->set_default_value(0);
 MACHINE_CONFIG_END
 
 ioport_constructor geneve_memex_device::device_input_ports() const

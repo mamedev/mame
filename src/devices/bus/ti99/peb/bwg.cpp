@@ -676,9 +676,9 @@ ROM_START( bwg_fdc )
 ROM_END
 
 MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FDC_TAG, WD1773, 8_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, snug_bwg_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, snug_bwg_device, fdc_drq_w))
+	WD1773(config, m_wd1773, 8_MHz_XTAL);
+	m_wd1773->intrq_wr_callback().set(FUNC(snug_bwg_device::fdc_irq_w));
+	m_wd1773->drq_wr_callback().set(FUNC(snug_bwg_device::fdc_drq_w));
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour

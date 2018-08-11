@@ -1068,13 +1068,13 @@ ROM_END
 
 
 MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
-	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(*this, myarc_hfdc_device, intrq_w))
-	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(*this, myarc_hfdc_device, dip_w))
-	MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(WRITE8(*this, myarc_hfdc_device, auxbus_out))
-	MCFG_HDC92X4_DMARQ_CALLBACK(WRITELINE(*this, myarc_hfdc_device, dmarq_w))
-	MCFG_HDC92X4_DMA_IN_CALLBACK(READ8(*this, myarc_hfdc_device, read_buffer))
-	MCFG_HDC92X4_DMA_OUT_CALLBACK(WRITE8(*this, myarc_hfdc_device, write_buffer))
+	HDC9234(config, m_hdc9234, 0);
+	m_hdc9234->intrq_cb().set(FUNC(myarc_hfdc_device::intrq_w));
+	m_hdc9234->dmarq_cb().set(FUNC(myarc_hfdc_device::dmarq_w));
+	m_hdc9234->dip_cb().set(FUNC(myarc_hfdc_device::dip_w));
+	m_hdc9234->auxbus_cb().set(FUNC(myarc_hfdc_device::auxbus_out));
+	m_hdc9234->dmain_cb().set(FUNC(myarc_hfdc_device::read_buffer));
+	m_hdc9234->dmaout_cb().set(FUNC(myarc_hfdc_device::write_buffer));
 
 	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
