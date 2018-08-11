@@ -25,14 +25,7 @@ public:
 	void set_rx_clock(double rx_clock) { m_rx_clock = rx_clock; }
 	void set_rx_clock(const XTAL &xtal) { set_rx_clock(xtal.dvalue()); }
 	void set_auto_rdav(bool auto_rdav) { m_auto_rdav = auto_rdav; }
-	template <class Object> devcb_base &set_read_si_callback(Object &&cb) { return m_read_si_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_so_callback(Object &&cb) { return m_write_so_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_pe_callback(Object &&cb) { return m_write_pe_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_fe_callback(Object &&cb) { return m_write_fe_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_or_callback(Object &&cb) { return m_write_or_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_dav_callback(Object &&cb) { return m_write_dav_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_tbmt_callback(Object &&cb) { return m_write_tbmt_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_eoc_callback(Object &&cb) { return m_write_eoc_cb.set_callback(std::forward<Object>(cb)); }
+
 	auto read_si_callback() { return m_read_si_cb.bind(); }
 	auto write_so_callback() { return m_write_so_cb.bind(); }
 	auto write_pe_callback() { return m_write_pe_cb.bind(); }
