@@ -4205,23 +4205,22 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))       // Flip Screen
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))      // Blitter IRQ Ack
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))     // Layers Palettes (High Bit)
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::flipscreen_w));       // Flip Screen
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::blitter_ack_w));      // Blitter IRQ Ack
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blit_palbank_w));     // Layers Palettes (High Bit)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.56)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(16, 512-16-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_cdracula)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.56);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(16, 512-16-1, 16, 256-1);
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_cdracula));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dynax_state::sprtmtch_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, CDRACULA_BLITTER, 0)
 	MCFG_CDRACULA_BLITTER_VRAM_OUT_CB(WRITE8(*this, dynax_state, cdracula_blit_pixel_w))
@@ -4259,28 +4258,27 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT  // MSM5205 reset
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dynax_state, adpcm_reset_kludge_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))     // Flip Screen
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))  // Coin Counters
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))  //
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))        // Blitter IRQ Ack
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))       // Layers Palettes (High Bit)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))       // half of the interleaved layer to write to
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();  // MSM5205 reset
+	m_mainlatch->q_out_cb<0>().append(FUNC(dynax_state::adpcm_reset_kludge_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::flipscreen_w));       // Flip Screen
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::coincounter_0_w));    // Coin Counters
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::coincounter_1_w));    //
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::blitter_ack_w));      // Blitter IRQ Ack
+	m_mainlatch->q_out_cb<6>().set(FUNC(dynax_state::blit_palbank_w));     // Layers Palettes (High Bit)
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::layer_half_w));       // half of the interleaved layer to write to
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hanamai)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1-4, 16+8, 255-8);
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hanamai));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dynax_state::sprtmtch_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hanamai_blit_pixel_w))
@@ -4296,8 +4294,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 22000000 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8912(config, "aysnd", 22000000 / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
@@ -4339,28 +4336,27 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC25
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))
+	LS259(config, m_mainlatch); // IC25
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::blitter_ack_w));
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC61
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // IC61
+	outlatch.q_out_cb<0>().set(FUNC(dynax_state::coincounter_0_w));
+	outlatch.q_out_cb<1>().set(FUNC(dynax_state::coincounter_1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256+22);
+	m_screen->set_visarea(0, 512-1-4, 16, 256-1);
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hnoridur));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dynax_state::sprtmtch_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
@@ -4412,30 +4408,29 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::blitter_ack_w));
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, hjingi_hopper_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, hjingi_lockout_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(dynax_state::coincounter_0_w));
+	outlatch.q_out_cb<1>().set(FUNC(dynax_state::coincounter_1_w));
+	outlatch.q_out_cb<2>().set(FUNC(dynax_state::hjingi_hopper_w));
+	outlatch.q_out_cb<3>().set(FUNC(dynax_state::hjingi_lockout_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1-4, 16, 256-1);
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hnoridur));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dynax_state::sprtmtch_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
@@ -4481,25 +4476,24 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // UF12 on Intergirl
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
+	LS259(config, m_mainlatch); // UF12 on Intergirl
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::coincounter_0_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::coincounter_1_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::blitter_ack_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blit_palbank_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_sprtmtch)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, sprtmtch_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 16, 256-1);
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_sprtmtch));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dynax_state::sprtmtch_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, drgpunch_blit_pixel_w))
@@ -4548,25 +4542,25 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest0_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer0_enable_w))
+	LS259(config, m_mainlatch); // IC15
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::mjdialq2_blit_dest1_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::mjdialq2_blit_dest0_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::blit_palbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::coincounter_0_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::coincounter_1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(dynax_state::mjdialq2_layer1_enable_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::mjdialq2_layer0_enable_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, mjfriday_vblank_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 16, 256-1);
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_mjdialq2));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dynax_state::mjfriday_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, mjdialq2_blit_pixel_w))
@@ -4619,12 +4613,10 @@ MACHINE_CONFIG_START(dynax_state::yarunara)
 
 	MCFG_DEVICE_REMOVE("outlatch") // ???
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
+	m_screen->set_visarea(0, 336-1, 8, 256-1-8-1);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
+	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_mainirq, FUNC(rst_pos_buffer_device::rst1_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::mjangels)
@@ -4708,36 +4700,34 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("soundirq", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+	RST_POS_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))  // Coin Counter
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, blit2_palbank_w))  // Layers Palettes (High Bit)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, jantouki_blitter_ack_w)) // Blitter IRQ Ack
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, jantouki_blitter2_ack_w))    // Blitter 2 IRQ Ack
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::coincounter_0_w));  // Coin Counter
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::blit2_palbank_w));  // Layers Palettes (High Bit)
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blit_palbank_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(dynax_state::jantouki_blitter_ack_w)); // Blitter IRQ Ack
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::jantouki_blitter2_ack_w));    // Blitter 2 IRQ Ack
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_pos_buffer_device, rst2_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set(m_soundirq, FUNC(rst_pos_buffer_device::rst2_w));
+	m_soundlatch->set_separate_acknowledge(true);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
+	config.set_default_layout(layout_dualhuov);
 
-	MCFG_SCREEN_ADD("top", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_top)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dynax_state, jantouki_vblank_w))
+	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	top.set_refresh_hz(60);
+	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	top.set_size(512, 256);
+	top.set_visarea(0, 512-1, 16, 256-1);
+	top.set_screen_update(FUNC(dynax_state::screen_update_jantouki_top));
+	top.set_palette(m_palette);
+	top.screen_vblank().set(FUNC(dynax_state::jantouki_vblank_w));
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, jantouki_blit_pixel_w))
@@ -4745,13 +4735,13 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_DYNAX_BLITTER_REV2_SCROLLY_CB(WRITE8(*this, dynax_state, dynax_blit_scrolly_w))
 	MCFG_DYNAX_BLITTER_REV2_READY_CB(WRITELINE(*this, dynax_state, jantouki_blitter_irq_w))
 
-	MCFG_SCREEN_ADD("bottom", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_bottom)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	bottom.set_refresh_hz(60);
+	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	bottom.set_size(512, 256);
+	bottom.set_visarea(0, 512-1, 16, 256-1);
+	bottom.set_screen_update(FUNC(dynax_state::screen_update_jantouki_bottom));
+	bottom.set_palette(m_palette);
 
 	MCFG_DEVICE_ADD(m_blitter2, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, jantouki_blit2_pixel_w))
@@ -4764,8 +4754,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 22000000 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8912(config, "aysnd", 22000000 / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", rst_pos_buffer_device, rst1_w))
@@ -4780,7 +4769,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MSM6242(config, "rtc", 32.768_kHz_XTAL);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::janyuki)
@@ -4807,20 +4796,18 @@ MACHINE_CONFIG_START(dynax_state::mjelctrn)
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(mjelctrn_banked_map)
 
-	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
+	LS259(config.replace(), m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
 	// Q3, Q4 seem to be related to wrap around enable
 
 	MCFG_DEVICE_REMOVE("mainirq")
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
-	MCFG_DEVICE_MODIFY("blitter")
-	MCFG_DYNAX_BLITTER_REV2_READY_CB(WRITELINE("maincpu", tmpz84c015_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("maincpu", tmpz84c015_device, trg2))
+	m_blitter->ready_cb().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
+	m_blitter->ready_cb().append(m_maincpu, FUNC(tmpz84c015_device::trg2));
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
@@ -4832,9 +4819,9 @@ MACHINE_CONFIG_START(dynax_state::mjembase)
 	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW1"))
 	MCFG_TMPZ84C015_IN_PB_CB(IOPORT("DSW2"))
 
-	MCFG_DEVICE_MODIFY("mainlatch") // 13C
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
+	// 13C
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::coincounter_0_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::coincounter_1_w));
 
 	MCFG_DEVICE_REMOVE("outlatch")
 
@@ -4901,23 +4888,23 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 10C on Ougon no Hai
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, tenkai_6c_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, tenkai_70_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, tenkai_blitter_ack_w))
+	LS259(config, m_mainlatch); // 10C on Ougon no Hai
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)).invert();
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::tenkai_6c_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::tenkai_70_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::tenkai_blitter_ack_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)  // hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256+22);
+	m_screen->set_visarea(4, 512-1, 4, 255-8-4);  // hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hnoridur));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
@@ -4941,8 +4928,7 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
+	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::majrjhdx)
@@ -4980,25 +4966,25 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_blit_dest0_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, mjdialq2_layer0_enable_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::mjdialq2_blit_dest1_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::mjdialq2_blit_dest0_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::blit_palbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::coincounter_0_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::coincounter_1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(dynax_state::mjdialq2_layer1_enable_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::mjdialq2_layer0_enable_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(2, 256-1, 16, 256-1);
+	m_screen->set_screen_update(FUNC(dynax_state::screen_update_mjdialq2));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, mjdialq2_blit_pixel_w))
@@ -7385,7 +7371,7 @@ GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     
 GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state, init_mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
+GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE ) // PCB by "Barko", game too?
 GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, init_blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )

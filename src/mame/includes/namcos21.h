@@ -3,6 +3,10 @@
 /**
  * @file namcos21.h
  */
+#ifndef MAME_INCLUDES_NAMCOS21_H
+#define MAME_INCLUDES_NAMCOS21_H
+
+#pragma once
 
 #include "namcos2.h"
 #include "machine/namcoio_gearbox.h"
@@ -45,25 +49,42 @@ struct edge
 class namcos21_state : public namcos2_shared_state
 {
 public:
-	namcos21_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
+	namcos21_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_shared_state(mconfig, type, tag),
+		m_master_dsp_code(*this,"master_dsp_code"),
 		m_winrun_dspbios(*this,"winrun_dspbios"),
 		m_winrun_polydata(*this,"winrun_polydata"),
 		m_dspram16(*this,"dspram16"),
 		m_mpDualPortRAM(*this,"mpdualportram"),
-		m_master_dsp_code(*this,"master_dsp_code"),
 		m_ptrom24(*this,"point24"),
 		m_ptrom16(*this,"point16"),
 		m_dsp(*this, "dsp"),
 		m_io_gearbox(*this, "gearbox"),
 		m_gpu_intc(*this, "gpu_intc")
-		{ }
+	{ }
 
+	void configure_c148_standard(machine_config &config);
+	void driveyes(machine_config &config);
+	void winrun(machine_config &config);
+	void namcos21(machine_config &config);
+
+	void init_driveyes();
+	void init_winrun();
+	void init_starblad();
+	void init_solvalou();
+	void init_cybsled();
+	void init_aircomb();
+
+	optional_shared_ptr<uint16_t> m_master_dsp_code;
+	int m_mbNeedsKickstart;
+	void clear_poly_framebuffer();
+	std::unique_ptr<dsp_state> m_mpDspState;
+
+private:
 	optional_shared_ptr<uint16_t> m_winrun_dspbios;
 	optional_shared_ptr<uint16_t> m_winrun_polydata;
 	optional_shared_ptr<uint16_t> m_dspram16;
 	required_shared_ptr<uint8_t> m_mpDualPortRAM;
-	optional_shared_ptr<uint16_t> m_master_dsp_code;
 
 	optional_region_ptr<int32_t> m_ptrom24;
 	optional_region_ptr<uint16_t> m_ptrom16;
@@ -84,8 +105,6 @@ public:
 	std::unique_ptr<uint8_t[]> m_pointram;
 	int m_pointram_idx;
 	uint16_t m_pointram_control;
-	std::unique_ptr<dsp_state> m_mpDspState;
-	int m_mbNeedsKickstart;
 	uint32_t m_pointrom_idx;
 	uint8_t m_mPointRomMSB;
 	int m_mbPointRomDataAvailable;
@@ -165,19 +184,12 @@ public:
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
 
-	void init_driveyes();
-	void init_winrun();
-	void init_starblad();
-	void init_solvalou();
-	void init_cybsled();
-	void init_aircomb();
 	DECLARE_MACHINE_START(namcos21);
 	DECLARE_VIDEO_START(namcos21);
 	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_driveyes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void allocate_poly_framebuffer();
-	void clear_poly_framebuffer();
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
 	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void renderscanline_flat(const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable);
@@ -192,10 +204,6 @@ public:
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
 	void init(int game_type);
-	void configure_c148_standard(machine_config &config);
-	void driveyes(machine_config &config);
-	void winrun(machine_config &config);
-	void namcos21(machine_config &config);
 	void common_map(address_map &map);
 	void driveyes_common_map(address_map &map);
 	void driveyes_master_map(address_map &map);
@@ -217,3 +225,5 @@ public:
 	void winrun_master_map(address_map &map);
 	void winrun_slave_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NAMCOS21_H

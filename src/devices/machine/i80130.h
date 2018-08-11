@@ -21,22 +21,22 @@
 ///*************************************************************************
 
 #define MCFG_I80130_IRQ_CALLBACK(_write) \
-	devcb = &downcast<i80130_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<i80130_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I80130_ACK_CALLBACK(_write) \
-	devcb = &downcast<i80130_device &>(*device).set_ack_wr_callback(DEVCB_##_write);
+	downcast<i80130_device &>(*device).set_ack_wr_callback(DEVCB_##_write);
 
 #define MCFG_I80130_LIR_CALLBACK(_write) \
-	devcb = &downcast<i80130_device &>(*device).set_lir_wr_callback(DEVCB_##_write);
+	downcast<i80130_device &>(*device).set_lir_wr_callback(DEVCB_##_write);
 
 #define MCFG_I80130_SYSTICK_CALLBACK(_write) \
-	devcb = &downcast<i80130_device &>(*device).set_systick_wr_callback(DEVCB_##_write);
+	downcast<i80130_device &>(*device).set_systick_wr_callback(DEVCB_##_write);
 
 #define MCFG_I80130_DELAY_CALLBACK(_write) \
-	devcb = &downcast<i80130_device &>(*device).set_delay_wr_callback(DEVCB_##_write);
+	downcast<i80130_device &>(*device).set_delay_wr_callback(DEVCB_##_write);
 
 #define MCFG_I80130_BAUD_CALLBACK(_write) \
-	devcb = &downcast<i80130_device &>(*device).set_baud_wr_callback(DEVCB_##_write);
+	downcast<i80130_device &>(*device).set_baud_wr_callback(DEVCB_##_write);
 
 
 

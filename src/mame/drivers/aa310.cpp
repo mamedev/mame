@@ -107,20 +107,6 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
-	required_shared_ptr<uint32_t> m_physram;
-
-	DECLARE_READ32_MEMBER(aa310_psy_wram_r);
-	DECLARE_WRITE32_MEMBER(aa310_psy_wram_w);
-	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
-	void init_aa310();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-
 	void aa5000a(machine_config &config);
 	void aa305(machine_config &config);
 	void aa310(machine_config &config);
@@ -135,8 +121,27 @@ public:
 	void aa540(machine_config &config);
 	void aa440(machine_config &config);
 	void aa4201(machine_config &config);
+
+	void init_aa310();
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
+
+private:
+	required_shared_ptr<uint32_t> m_physram;
+
+	DECLARE_READ32_MEMBER(aa310_psy_wram_r);
+	DECLARE_WRITE32_MEMBER(aa310_psy_wram_w);
+	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	void aa310_mem(address_map &map);
-protected:
+
 	required_device<ram_device> m_ram;
 };
 

@@ -25,6 +25,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void zac_2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ctrl_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ8_MEMBER(data_r);
@@ -33,11 +36,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
-	void zac_2(machine_config &config);
 	void zac_2_data(address_map &map);
 	void zac_2_io(address_map &map);
 	void zac_2_map(address_map &map);
-private:
+
 	uint8_t m_input_line;
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
@@ -223,7 +225,7 @@ MACHINE_CONFIG_START(zac_2_state::zac_2)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_outtimer", zac_2_state, zac_2_outtimer, attotime::from_hz(187500))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_zac_2)
+	config.set_default_layout(layout_zac_2);
 MACHINE_CONFIG_END
 
 /*--------------------------------

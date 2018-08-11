@@ -28,13 +28,18 @@
 #include "sound/wave.h"
 #include "speaker.h"
 
+#define LOG_WARN        (1U<<1)    // Warnings
+#define LOG_CONFIG      (1U<<2)
+#define LOG_MEM         (1U<<3)
+#define LOG_ADDR        (1U<<4)
+#define LOG_READY       (1U<<5)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
 
 namespace bus { namespace ti99 { namespace peb {
-
-#define TRACE_MEM 0
-#define TRACE_ADDR 0
-#define TRACE_READY 0
 
 /****************************************************************************/
 
@@ -56,7 +61,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 	if (m_sbe)
 	{
 		*value = m_vsp->status_r(space, 0, 0xff) & 0xff;
-		if (TRACE_MEM) logerror("read value = %02x\n", *value);
+		LOGMASKED(LOG_MEM, "read value = %02x\n", *value);
 		// We should clear the lines at this point. The TI-99/4A clears the
 		// lines by setting the address bus to a different value, but the
 		// Geneve may behave differently. This may not 100% reflect the real
@@ -74,7 +79,7 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 
 	if (m_sbe)
 	{
-		if (TRACE_MEM) logerror("write value = %02x\n", data);
+		LOGMASKED(LOG_MEM, "write value = %02x\n", data);
 		m_vsp->data_w(space, 0, data);
 		// Note that we must NOT clear the lines here. Find the lines in the
 		// READY callback below.
@@ -94,7 +99,7 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 
 	if (m_sbe)
 	{
-		if (TRACE_ADDR) logerror("set address = %04x, dbin = %d\n", offset, state);
+		LOGMASKED(LOG_ADDR, "set address = %04x, dbin = %d\n", offset, state);
 
 		// Caution: In the current tms5220 emulation, care must be taken
 		// to clear one line before asserting the other line, or otherwise
@@ -116,7 +121,7 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 	// and we have to adapt a /READY to a READY line.
 	// The real synthesizer board uses a transistor for that purpose.
 	m_slot->set_ready((state==0)? ASSERT_LINE : CLEAR_LINE);
-	if (TRACE_READY) logerror("READY = %d\n", (state==0));
+	LOGMASKED(LOG_READY, "READY = %d\n", (state==0));
 
 	if ((state==0) && !m_reading)
 		// Clear the lines only when we are done with writing.

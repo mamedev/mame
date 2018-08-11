@@ -114,18 +114,18 @@ MACHINE_CONFIG_START(imsai_state::imsai)
 	MCFG_DEVICE_IO_MAP(imsai_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(imsai_state, kbd_put))
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(6'000'000) / 3) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(XTAL(6'000'000) / 3) /* Timer 1: user */
-	MCFG_PIT8253_CLK2(XTAL(6'000'000) / 3) /* Timer 2: user */
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(6_MHz_XTAL / 3); // Timer 0: baud rate gen for 8251
+	m_pit->out_handler<0>().set("uart", FUNC(i8251_device::write_txc));
+	m_pit->out_handler<0>().append("uart", FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<1>(6_MHz_XTAL / 3); // Timer 1: user
+	m_pit->set_clk<2>(6_MHz_XTAL / 3); // Timer 2: user
 MACHINE_CONFIG_END
 
 /* ROM definition */

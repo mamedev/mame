@@ -17,7 +17,7 @@
 #include "sound/dmadac.h"
 
 #define MCFG_ATARI_CAGE_IRQ_CALLBACK(_write) \
-	devcb = &downcast<atari_cage_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
+	downcast<atari_cage_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
 
 #define MCFG_ATARI_CAGE_SPEEDUP(_speedup) \
 	downcast<atari_cage_device &>(*device).set_speedup(_speedup);
@@ -79,7 +79,7 @@ private:
 
 	required_memory_bank m_bootbank;
 	required_memory_bank m_mainbank;
- 
+
 	required_memory_region m_bootrom;
 	required_memory_region m_mainrom;
 

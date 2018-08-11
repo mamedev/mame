@@ -51,7 +51,7 @@ public:
 		m_sprite_enable(*this, "sprite_enable"),
 		m_color_latch(*this, "color_latch"),
 		m_characterram(*this, "characterram") { }
-	
+
 	void base(machine_config &config);
 	void mtrap(machine_config &config);
 	void venture(machine_config &config);

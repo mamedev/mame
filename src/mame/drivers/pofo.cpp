@@ -44,7 +44,6 @@
 #include "video/hd61830.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -93,7 +92,7 @@ public:
 
 	void portfolio(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -149,7 +148,6 @@ protected:
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<pcd3311_device> m_dtmf;
@@ -1031,8 +1029,6 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)

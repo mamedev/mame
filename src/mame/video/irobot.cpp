@@ -352,7 +352,7 @@ uint32_t irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 
 	int x, y, offs;
 
 	/* copy the polygon bitmap */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], nullptr);
 
 	/* redraw the non-zero characters in the alpha layer */

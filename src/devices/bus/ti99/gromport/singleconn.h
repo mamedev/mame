@@ -24,7 +24,7 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
-	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	bool is_grom_idle() override;

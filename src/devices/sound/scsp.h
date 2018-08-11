@@ -19,13 +19,13 @@
 	downcast<scsp_device &>(*device).set_roffset(_offs);
 
 #define MCFG_SCSP_IRQ_CB(_devcb) \
-	devcb = &downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	devcb = &downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
+	downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCSP_EXTS_CB(_devcb) \
-	devcb = &downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
+	downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
 
 
 class scsp_device : public device_t,
@@ -38,6 +38,9 @@ public:
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_exts_callback(Object &&cb) { return m_exts_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto main_irq_cb() { return m_main_irq_cb.bind(); }
+	auto exts_cb() { return m_exts_cb.bind(); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );

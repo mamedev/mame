@@ -22,7 +22,7 @@
 //**************************************************************************
 
 #define MCFG_MC146818_IRQ_HANDLER(_irq) \
-	devcb = &downcast<mc146818_device &>(*device).set_irq_callback(DEVCB_##_irq);
+	downcast<mc146818_device &>(*device).set_irq_callback(DEVCB_##_irq);
 
 // The MC146818 doesn't have century support, but when syncing the date & time at startup we can optionally store the century.
 #define MCFG_MC146818_CENTURY_INDEX(_century_index) \
@@ -59,6 +59,8 @@ public:
 
 	// callbacks
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_write_irq.bind(); }
+
 	void set_century_index(int century_index) { m_century_index = century_index; }
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
 	void set_binary(bool binary) { m_binary = binary; }
@@ -69,6 +71,10 @@ public:
 	// read/write access
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	// direct-mapped read/write access
+	DECLARE_READ8_MEMBER( read_direct );
+	DECLARE_WRITE8_MEMBER( write_direct );
 
 protected:
 	mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

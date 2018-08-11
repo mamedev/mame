@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gp_2)
+	config.set_default_layout(layout_gp_2);
 
 	/* Sound */
 	genpin_audio(config);

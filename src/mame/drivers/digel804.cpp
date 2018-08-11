@@ -640,7 +640,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_ROC10937_ADD("vfd",0) // RIGHT_TO_LEFT
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_digel804)
+	config.set_default_layout(layout_digel804);
 
 	MCFG_DEVICE_ADD("74c923", MM74C923, 0)
 	MCFG_MM74C922_DA_CALLBACK(WRITELINE(*this, digel804_state, da_w))

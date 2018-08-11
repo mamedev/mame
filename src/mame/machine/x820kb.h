@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(_devcb) \
-	devcb = &downcast<xerox_820_keyboard_device &>(*device).set_kbstb_wr_callback(DEVCB_##_devcb);
+	downcast<xerox_820_keyboard_device &>(*device).set_kbstb_wr_callback(DEVCB_##_devcb);
 
 
 

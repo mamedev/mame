@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_F1GP_H
+#define MAME_INCLUDES_F1GP_H
+
+#pragma once
 
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
@@ -11,8 +15,8 @@
 class f1gp_state : public driver_device
 {
 public:
-	f1gp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	f1gp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sharedram(*this, "sharedram"),
 		m_spr1vram(*this, "spr1vram"),
 		m_spr2vram(*this, "spr2vram"),
@@ -35,7 +39,8 @@ public:
 		m_k053936(*this, "k053936"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_acia(*this, "acia") { }
+		m_acia(*this, "acia")
+	{ }
 
 	void f1gp2(machine_config &config);
 	void f1gpb(machine_config &config);
@@ -115,3 +120,5 @@ private:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_F1GP_H

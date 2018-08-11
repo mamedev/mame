@@ -348,6 +348,8 @@ VIDEOS["VOODOO"] = true
 VIDEOS["VOODOO_PCI"] = true
 VIDEOS["ZEUS2"] = true
 VIDEOS["PPU2C0X"] = true
+VIDEOS["PS2GS"] = true
+VIDEOS["PS2GIF"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -624,6 +626,17 @@ MACHINES["K054321"] = true
 MACHINES["ADC0844"] = true
 MACHINES["GEN_FIFO"] = true
 MACHINES["Z80DAISY"] = true
+--MACHINES["PS2DMAC"] = true
+MACHINES["PS2INTC"] = true
+--MACHINES["PS2MC"] = true
+--MACHINES["PS2PAD"] = true
+--MACHINES["PS2SIF"] = true
+--MACHINES["PS2TIMER"] = true
+--MACHINES["IOPCDVD"] = true
+--MACHINES["IOPDMA"] = true
+--MACHINES["IOPINTC"] = true
+--MACHINES["IOPSIO2"] = true
+--MACHINES["IOPTIMER"] = true
 
 --------------------------------------------------
 -- specify available bus cores

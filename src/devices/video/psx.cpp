@@ -18,16 +18,17 @@
 #define VERBOSE_LEVEL ( 0 )
 
 // device type definition
-DEFINE_DEVICE_TYPE(CXD8514Q,  cxd8514q_device,  "cxd8514q",  "CXD8514Q GPU")
-DEFINE_DEVICE_TYPE(CXD8538Q,  cxd8538q_device,  "cxd8538q",  "CXD8538Q GPU")
-DEFINE_DEVICE_TYPE(CXD8561Q,  cxd8561q_device,  "cxd8561q",  "CXD8561Q GPU")
-DEFINE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device, "cxd8561bq", "CXD8561BQ GPU")
-DEFINE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device, "cxd8561cq", "CXD8561CQ GPU")
-DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU")
+DEFINE_DEVICE_TYPE(CXD8514Q,  cxd8514q_device,  "cxd8514q",  "CXD8514Q GPU") // VRAM
+DEFINE_DEVICE_TYPE(CXD8538Q,  cxd8538q_device,  "cxd8538q",  "CXD8538Q GPU") // VRAM
+DEFINE_DEVICE_TYPE(CXD8561Q,  cxd8561q_device,  "cxd8561q",  "CXD8561Q GPU") // SGRAM
+DEFINE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device, "cxd8561bq", "CXD8561BQ GPU") // SGRAM
+DEFINE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device, "cxd8561cq", "CXD8561CQ GPU") // SGRAM
+DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU") // SGRAM
 
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_vblank_handler(*this)
 {
 }
@@ -35,6 +36,11 @@ psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, co
 void psxgpu_device::device_start()
 {
 	m_vblank_handler.resolve_safe();
+
+	for( int n_colour = 0; n_colour < 0x10000; n_colour++ )
+	{
+		set_pen_color( n_colour, pal555(n_colour,0, 5, 10) );
+	}
 
 	if (type() == CXD8538Q)
 	{
@@ -316,17 +322,18 @@ void psxgpu_device::DebugCheckKeys()
 #endif
 }
 
-int psxgpu_device::DebugMeshDisplay( bitmap_ind16 &bitmap, const rectangle &cliprect )
+int psxgpu_device::DebugMeshDisplay( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	if( m_debug.b_mesh )
 	{
-		copybitmap( bitmap, *m_debug.mesh, 0, 0, 0, 0, cliprect );
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			draw_scanline16( bitmap, cliprect.min_x, y, cliprect.max_x+1-cliprect.min_x, &m_debug.mesh.pix16(y), pens() );
 	}
 	m_debug.b_clear = 1;
 	return m_debug.b_mesh;
 }
 
-int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
+int psxgpu_device::DebugTextureDisplay( bitmap_rgb32 &bitmap )
 {
 	uint32_t n_y;
 
@@ -361,7 +368,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 				}
 				p_n_interleave[ n_x ] = p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, screen().palette().pens() );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, pens() );
 		}
 	}
 	return m_debug.b_texture;
@@ -534,11 +541,11 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 		p_n_greenb1[ n_level ] = ( ( n_level >> 5 ) & ( MAX_LEVEL - 1 ) ) * MAX_LEVEL;
 		p_n_blueb1[ n_level ] = ( ( n_level >> 10 ) & ( MAX_LEVEL - 1 ) ) * MAX_LEVEL;
 
-		/* 24bit to 15 bit conversion */
-		p_n_g0r0[ n_level ] = ( ( ( n_level >> 11 ) & ( MAX_LEVEL - 1 ) ) << 5 ) | ( ( ( n_level >> 3 ) & ( MAX_LEVEL - 1 ) ) << 0 );
-		p_n_b0[ n_level ] = ( ( n_level >> 3 ) & ( MAX_LEVEL - 1 ) ) << 10;
-		p_n_r1[ n_level ] = ( ( n_level >> 11 ) & ( MAX_LEVEL - 1 ) ) << 0;
-		p_n_b1g1[ n_level ] = ( ( ( n_level >> 11 ) & ( MAX_LEVEL - 1 ) ) << 10 ) | ( ( ( n_level >> 3 ) & ( MAX_LEVEL - 1 ) ) << 5 );
+		/* 24bit color */
+		p_n_g0r0[ n_level ] = ( ( ( n_level >> 8 ) & 0xff ) << 8 ) | ( ( ( n_level >> 0 ) & 0xff ) << 16 );
+		p_n_b0[ n_level ] = ( ( n_level >> 0 ) & 0xff ) << 0;
+		p_n_r1[ n_level ] = ( ( n_level >> 8 ) & 0xff ) << 16;
+		p_n_b1g1[ n_level ] = ( ( ( n_level >> 8 ) & 0xff ) << 0 ) | ( ( ( n_level >> 0 ) & 0xff ) << 8 );
 	}
 
 	for( n_level = 0; n_level < MAX_LEVEL; n_level++ )
@@ -605,7 +612,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	machine().save().register_postload( save_prepost_delegate( FUNC( psxgpu_device::updatevisiblearea ), this ) );
 }
 
-uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint32_t n_x;
 	uint32_t n_y;
@@ -725,7 +732,7 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 			while( n_line > 0 )
 			{
 				uint16_t *p_n_src = p_p_vram[ n_y + n_displaystarty ] + 3 * n_x + n_displaystartx;
-				uint16_t *p_n_dest = &bitmap.pix16(n_y + n_top, n_x + n_left);
+				uint32_t *p_n_dest = &bitmap.pix32(n_y + n_top, n_x + n_left);
 
 				n_column = n_columns;
 				while( n_column > 0 )
@@ -752,7 +759,7 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 			n_line = n_lines;
 			while( n_line > 0 )
 			{
-				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, nullptr );
+				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, pens() );
 				n_y++;
 				n_line--;
 			}
@@ -3794,17 +3801,6 @@ void psxgpu_device::lightgun_set( int n_x, int n_y )
 	n_lightgun_y = n_y;
 }
 
-PALETTE_INIT_MEMBER( psxgpu_device, psx )
-{
-	uint32_t n_colour;
-
-	for( n_colour = 0; n_colour < 0x10000; n_colour++ )
-	{
-		palette.set_pen_color( n_colour, pal555(n_colour,0, 5, 10) );
-	}
-}
-
-
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -3817,8 +3813,4 @@ MACHINE_CONFIG_START(psxgpu_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
 	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, this));
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD( "palette", 65536 )
-	MCFG_PALETTE_INIT_OWNER(psxgpu_device, psx)
 MACHINE_CONFIG_END

@@ -8,7 +8,7 @@
  *
  * Thanks to Plamen Mihaylov and his site http://www.m88k.com/ I got the information
  * required to start the work with this driver. The goal is to boot a tape through
- * the MVME-350 devide connected over a VME bus device.
+ * the MVME-350 device connected over a VME bus device.
  *
  *
  *       ||
@@ -197,7 +197,7 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 		, m_sccterm2(*this, "scc2")
 	{
 	}
-	
+
 	void mvme147(machine_config &config);
 
 private:

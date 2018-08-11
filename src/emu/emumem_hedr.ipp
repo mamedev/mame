@@ -47,7 +47,7 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 
 }
 
-template<int HighBits, int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int HighBits, int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	return m_dispatch[(offset >> LowBits) & BITMASK]->read(offset, mem_mask);
 }
@@ -382,12 +382,8 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 
 	if(LowBits <= Width + AddrShift) {
 		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
-			if(m_dispatch[start_entry]->is_dispatch())
-				m_dispatch[start_entry]->populate_passthrough_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, handler, mappings);
-			else {
-				passthrough_patch(handler, mappings, m_dispatch[ent]);
-				m_ranges[ent].intersect(ostart, oend);
-			}
+			passthrough_patch(handler, mappings, m_dispatch[ent]);
+			m_ranges[ent].intersect(ostart, oend);
 		}
 
 	} else if(start_entry == end_entry) {
@@ -463,16 +459,21 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	for(unsigned int i=0; i != COUNT; i++) {
-		m_dispatch[i]->unref();
+		if(m_dispatch[i]->is_dispatch()) {
+			m_dispatch[i]->detach(handlers);
+			continue;
+		}
+
 		if(!m_dispatch[i]->is_passthrough())
 			continue;
+
 		auto np = static_cast<handler_entry_read_passthrough<Width, AddrShift, Endian> *>(m_dispatch[i]);
 
 		if(handlers.find(np) != handlers.end()) {
 			m_dispatch[i] = np->get_subhandler();
 			m_dispatch[i]->ref();
 			np->unref();
-			
+
 		} else
 			np->detach(handlers);
 	}

@@ -138,8 +138,8 @@ void bbc_weddb2_device::device_start()
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_weddb2_device, wd177xl_read), WRITE8_DELEGATE(bbc_weddb2_device, wd177xl_write));
-	space.install_readwrite_handler(0xfe84, 0xfe8f, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
+	space.install_readwrite_handler(0xfe80, 0xfe83, read8_delegate(FUNC(bbc_weddb2_device::wd177xl_read), this), write8_delegate(FUNC(bbc_weddb2_device::wd177xl_write), this));
+	space.install_readwrite_handler(0xfe84, 0xfe8f, read8sm_delegate(FUNC(wd_fdc_device_base::read), m_fdc.target()), write8sm_delegate(FUNC(wd_fdc_device_base::write), m_fdc.target()));
 }
 
 void bbc_weddb3_device::device_start()
@@ -148,8 +148,8 @@ void bbc_weddb3_device::device_start()
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_weddb3_device, wd177xl_read), WRITE8_DELEGATE(bbc_weddb3_device, wd177xl_write));
-	space.install_readwrite_handler(0xfe84, 0xfe8f, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
+	space.install_readwrite_handler(0xfe80, 0xfe83, read8_delegate(FUNC(bbc_weddb3_device::wd177xl_read), this), write8_delegate(FUNC(bbc_weddb3_device::wd177xl_write), this));
+	space.install_readwrite_handler(0xfe84, 0xfe8f, read8sm_delegate(FUNC(wd_fdc_device_base::read), m_fdc.target()), write8sm_delegate(FUNC(wd_fdc_device_base::write), m_fdc.target()));
 }
 
 //-------------------------------------------------

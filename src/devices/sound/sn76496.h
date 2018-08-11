@@ -19,7 +19,7 @@ DECLARE_DEVICE_TYPE(SEGAPSG,  segapsg_device)
 
 
 #define MCFG_SN76496_READY_HANDLER(cb) \
-	devcb = &downcast<sn76496_base_device &>(*device).set_ready_handler((DEVCB_##cb));
+	downcast<sn76496_base_device &>(*device).set_ready_handler((DEVCB_##cb));
 
 class sn76496_base_device : public device_t, public device_sound_interface
 {
@@ -48,6 +48,7 @@ protected:
 			uint32_t clock);
 
 	virtual void    device_start() override;
+	virtual void    device_clock_changed() override;
 	virtual void    sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:

@@ -69,10 +69,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
-	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
+	void arcadia(machine_config &config);
+	void argh(machine_config &config);
 
 	void init_arcadia();
 	void init_xeon();
@@ -90,15 +88,19 @@ public:
 	void init_dlta();
 	void init_argh();
 
+	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
+	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
+
+private:
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
-	void arcadia(machine_config &config);
-	void argh(machine_config &config);
 	void a500_mem(address_map &map);
 	void arcadia_map(address_map &map);
 	void argh_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
 	optional_memory_region m_bios_region;

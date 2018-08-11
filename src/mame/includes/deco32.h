@@ -23,6 +23,7 @@ class deco32_state : public driver_device
 public:
 	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
 		, m_sprgen(*this, "spritegen%u", 1)
 		, m_deco_tilegen(*this, "tilegen%u", 1)
 		, m_gfxdecode(*this, "gfxdecode")
@@ -36,7 +37,6 @@ public:
 		, m_oki(*this, "oki%u", 1)
 		, m_soundlatch(*this, "soundlatch")
 		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
 		, m_pf_rowscroll32(*this, "pf%u_rowscroll32", 1)
 		, m_generic_paletteram_32(*this, "paletteram")
 	{ }
@@ -69,6 +69,7 @@ protected:
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);
 	DECLARE_WRITE32_MEMBER(palette_dma_w);
 
+	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<decospr_device, 2> m_sprgen;
 	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -94,9 +95,8 @@ protected:
 	std::unique_ptr<uint16_t[]> m_spriteram16_buffered[2]; // all but dragngun
 	std::unique_ptr<uint16_t[]> m_pf_rowscroll[4]; // common
 
-private:	
+private:
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
 
 	// we use the pointers below to store a 32-bit copy..
 	required_shared_ptr_array<uint32_t, 4> m_pf_rowscroll32;
@@ -111,7 +111,7 @@ public:
 	{ }
 
 	void captaven(machine_config &config);
-	
+
 	void init_captaven();
 
 private:

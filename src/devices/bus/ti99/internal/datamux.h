@@ -72,6 +72,9 @@ private:
 	// Console RAM
 	required_device<ram_device> m_padram;
 
+	// Link to the CPU
+	required_device<cpu_device> m_cpu;
+
 	// Keeps the address space pointer
 	address_space* m_spacep;
 
@@ -138,7 +141,7 @@ private:
 /******************************************************************************/
 
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
-	devcb = &downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
+	downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
 
 } } } // end namespace bus::ti99::internal
 

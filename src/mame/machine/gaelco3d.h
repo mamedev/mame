@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #define MCFG_GAELCO_SERIAL_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gaelco_serial_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<gaelco_serial_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 

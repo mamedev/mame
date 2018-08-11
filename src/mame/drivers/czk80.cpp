@@ -49,7 +49,6 @@ I/O ports: These ranges are what is guessed
 #include "machine/z80ctc.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class czk80_state : public driver_device
 {
@@ -201,7 +200,7 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)

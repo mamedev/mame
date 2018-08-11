@@ -22,8 +22,8 @@
 class cp1_state : public driver_device
 {
 public:
-	cp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	cp1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
@@ -266,16 +266,16 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 
 MACHINE_CONFIG_START(cp1_state::cp1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8049, XTAL(6'000'000))
-	MCFG_DEVICE_IO_MAP(cp1_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, cp1_state, port1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, cp1_state, port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, cp1_state, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, cp1_state, port2_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(LOGGER("getbus"))
-	MCFG_MCS48_PORT_BUS_OUT_CB(LOGGER("putbus"))
-	MCFG_MCS48_PORT_T0_IN_CB(LOGGER("t0_r"))
-	MCFG_MCS48_PORT_T1_IN_CB(LOGGER("t1_r"))
+	i8049_device &maincpu(I8049(config, m_maincpu, 6_MHz_XTAL));
+	maincpu.set_addrmap(AS_IO, &cp1_state::cp1_io);
+	maincpu.p1_in_cb().set(FUNC(cp1_state::port1_r));
+	maincpu.p1_out_cb().set(FUNC(cp1_state::port1_w));
+	maincpu.p2_in_cb().set(FUNC(cp1_state::port2_r));
+	maincpu.p2_out_cb().set(FUNC(cp1_state::port2_w));
+	maincpu.bus_in_cb().set_log("getbus");
+	maincpu.bus_out_cb().set_log("putbus");
+	maincpu.t0_in_cb().set_log("t0_r");
+	maincpu.t1_in_cb().set_log("t1_r");
 
 	MCFG_DEVICE_ADD("i8155", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, cp1_state, i8155_porta_w))
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(cp1_state::cp1)
 
 	MCFG_DEVICE_ADD("i8155_cp3", I8155, 0)
 
-	MCFG_DEFAULT_LAYOUT(layout_cp1)
+	config.set_default_layout(layout_cp1);
 
 	MCFG_CASSETTE_ADD("cassette")
 

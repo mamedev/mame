@@ -226,6 +226,7 @@ DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel I8031")
 DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel I8032")
 DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel I8051")
 DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel I8751")
+DEFINE_DEVICE_TYPE(AM8753, am8753_device, "am8753", "AMD Am8753")
 DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel I8052")
 DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel I8752")
 DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel I80C31")
@@ -299,6 +300,11 @@ i8051_device::i8051_device(const machine_config &mconfig, const char *tag, devic
 
 i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8751, tag, owner, clock, 12, 7)
+{
+}
+
+am8753_device::am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, AM8753, tag, owner, clock, 13, 7)
 {
 }
 

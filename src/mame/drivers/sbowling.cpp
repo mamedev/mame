@@ -60,6 +60,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void sbowling(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -88,7 +91,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
-	void sbowling(machine_config &config);
+
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };

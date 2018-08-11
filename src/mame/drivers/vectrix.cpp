@@ -23,14 +23,16 @@ class vectrix_state : public driver_device
 public:
 	vectrix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void vectrix(machine_config &config);
-void io_map(address_map &map);
-void mem_map(address_map &map);
+	void vectrix(machine_config &config);
+
 private:
-//  required_device<cpu_device> m_maincpu;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	//  required_device<cpu_device> m_maincpu;
 };
 
 void vectrix_state::mem_map(address_map &map)

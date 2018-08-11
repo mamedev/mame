@@ -10,13 +10,13 @@
 
 
 #define MCFG_DW_FDC_OUT_DATA_HANDLER(_devcb) \
-	devcb = &downcast<dw_fdc_device &>(*device).set_out_data_handler(DEVCB_##_devcb);
+	downcast<dw_fdc_device &>(*device).set_out_data_handler(DEVCB_##_devcb);
 
 #define MCFG_DW_FDC_OUT_CLOCK_HANDLER(_devcb) \
-	devcb = &downcast<dw_fdc_device &>(*device).set_out_clock_handler(DEVCB_##_devcb);
+	downcast<dw_fdc_device &>(*device).set_out_clock_handler(DEVCB_##_devcb);
 
 #define MCFG_DW_FDC_OUT_STROBE_HANDLER(_devcb) \
-	devcb = &downcast<dw_fdc_device &>(*device).set_out_strobe_handler(DEVCB_##_devcb);
+	downcast<dw_fdc_device &>(*device).set_out_strobe_handler(DEVCB_##_devcb);
 
 
 class dw_fdc_device :  public device_t

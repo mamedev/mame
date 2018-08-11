@@ -61,7 +61,6 @@
 
 #include <queue>
 
-#define TERMINAL_TAG "terminal"
 
 /* Log defines */
 #define TRACE_FDC 0
@@ -92,11 +91,16 @@ public:
 		m_pdc(*this, "pdc"),
 		m_smioc(*this, "smioc"),
 		m_wd33c93(*this, "wd33c93"),
-		m_terminal(*this, TERMINAL_TAG),
+		m_terminal(*this, "terminal"),
 		m_main_ram(*this, "main_ram")
 	{
 	}
 
+	void r9751(machine_config &config);
+
+	void init_r9751();
+
+private:
 	void kbd_put(u8 data);
 
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
@@ -111,11 +115,8 @@ public:
 	DECLARE_READ8_MEMBER(pdc_dma_r);
 	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 
-	void init_r9751();
-
-	void r9751(machine_config &config);
 	void r9751_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
 	required_device<smioc_device> m_smioc;
@@ -648,7 +649,7 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(r9751_state, kbd_put))
 
 	/* i/o hardware */

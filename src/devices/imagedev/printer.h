@@ -14,7 +14,7 @@
 #pragma once
 
 #define MCFG_PRINTER_ONLINE_CB(_devcb) \
-	devcb = &downcast<printer_image_device &>(*device).set_online_callback(DEVCB_##_devcb);
+	downcast<printer_image_device &>(*device).set_online_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS

@@ -91,9 +91,14 @@ public:
 		, m_i8272(*this, "i8272")
 	{ }
 
+	void p8k(machine_config &config);
+	void p8k_16(machine_config &config);
+
+	void init_p8k();
+
+private:
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
-	void init_p8k();
 	DECLARE_MACHINE_RESET(p8k);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
@@ -105,14 +110,12 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
-	void p8k(machine_config &config);
-	void p8k_16(machine_config &config);
 	void p8k_16_datamap(address_map &map);
 	void p8k_16_iomap(address_map &map);
 	void p8k_16_memmap(address_map &map);
 	void p8k_iomap(address_map &map);
 	void p8k_memmap(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<p8k_16_daisy_device> m_daisy;
 	optional_device<z80pio_device> m_pio2;
@@ -429,9 +432,9 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, p8k_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, p8k_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxcb_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 307200));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txcb_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
 
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, 1229000)    /* 1.22MHz clock */
 	// to implement: callbacks!
@@ -491,9 +494,9 @@ MACHINE_CONFIG_START(p8k_state::p8k_16)
 	MCFG_DEVICE_ADD("p8k_16_daisy", P8K_16_DAISY, 0)
 	MCFG_Z80_DAISY_CHAIN(p8k_16_daisy_chain)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxcb_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 307200));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txcb_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, XTAL(4'000'000))

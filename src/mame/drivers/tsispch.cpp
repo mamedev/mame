@@ -113,7 +113,9 @@
 #include "emu.h"
 #include "includes/tsispch.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -391,10 +393,16 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 
 	/* uarts */
 	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
-	// (todo: proper hookup, currently using hack w/i8251_receive_character())
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_rxrdy_int))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txrdy_int))
 	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txempty_int))
+
+	clock_device &clock(CLOCK(config, "baudclock", 153600));
+	clock.signal_handler().set("i8251a_u15", FUNC(i8251_device::write_txc));
+	clock.signal_handler().append("i8251a_u15", FUNC(i8251_device::write_rxc));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -402,8 +410,10 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("i8251a_u15", i8251_device, receive_character))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("i8251a_u15", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("i8251a_u15", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("i8251a_u15", FUNC(i8251_device::write_cts));
 MACHINE_CONFIG_END
 
 /******************************************************************************

@@ -150,11 +150,13 @@ public:
 		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	void init_jwildb52();
 	void jwildb52(machine_config &config);
 
-protected:
+	void init_jwildb52();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+
+private:
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_READ8_MEMBER(unk_f760_r);
 	DECLARE_READ8_MEMBER(in0_r);
@@ -177,7 +179,6 @@ protected:
 	void jwildb52_map(address_map &map);
 	void sound_prog_map(address_map &map);
 
-private:
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_audiocpu;
 	required_device<ptm6840_device> m_6840ptm_2;
@@ -600,11 +601,11 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
 
-	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL(8'000'000)/8) // FIXME
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ptm6840_device &ptm1(PTM6840(config, "6840ptm_1", XTAL(8'000'000)/8)); // FIXME
+	ptm1.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL(8'000'000)/8) // FIXME
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, sigmab52_state, ptm2_irq))
+	PTM6840(config, m_6840ptm_2, XTAL(8'000'000)/8); // FIXME
+	m_6840ptm_2->irq_callback().set(FUNC(sigmab52_state::ptm2_irq));
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 

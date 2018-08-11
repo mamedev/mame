@@ -91,6 +91,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/pgm2.h"
 
 // checked on startup, or doesn't boot

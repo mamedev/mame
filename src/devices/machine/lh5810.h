@@ -17,22 +17,22 @@
 //*************************************************************************
 
 #define MCFG_LH5810_PORTA_R_CB(_devcb) \
-	devcb = &downcast<lh5810_device &>(*device).set_porta_r_callback(DEVCB_##_devcb);
+	downcast<lh5810_device &>(*device).set_porta_r_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTA_W_CB(_devcb) \
-	devcb = &downcast<lh5810_device &>(*device).set_porta_w_callback(DEVCB_##_devcb);
+	downcast<lh5810_device &>(*device).set_porta_w_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTB_R_CB(_devcb) \
-	devcb = &downcast<lh5810_device &>(*device).set_portb_r_callback(DEVCB_##_devcb);
+	downcast<lh5810_device &>(*device).set_portb_r_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTB_W_CB(_devcb) \
-	devcb = &downcast<lh5810_device &>(*device).set_portb_w_callback(DEVCB_##_devcb);
+	downcast<lh5810_device &>(*device).set_portb_w_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTC_W_CB(_devcb) \
-	devcb = &downcast<lh5810_device &>(*device).set_portc_w_callback(DEVCB_##_devcb);
+	downcast<lh5810_device &>(*device).set_portc_w_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_OUT_INT_CB(_devcb) \
-	devcb = &downcast<lh5810_device &>(*device).set_out_int_callback(DEVCB_##_devcb); //currently unused
+	downcast<lh5810_device &>(*device).set_out_int_callback(DEVCB_##_devcb); //currently unused
 
 
 

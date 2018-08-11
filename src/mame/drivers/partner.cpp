@@ -145,11 +145,6 @@ FLOPPY_FORMATS_MEMBER( partner_state::floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static void partner_floppies(device_slot_interface &device)
-{
-	device.option_add("525qd", FLOPPY_525_QD);
-}
-
 /* F4 Character Displayer */
 static const gfx_layout partner_charlayout =
 {
@@ -169,66 +164,65 @@ static GFXDECODE_START( gfx_partner )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(partner_state::partner)
+void partner_state::partner(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 16_MHz_XTAL / 9)
-	MCFG_DEVICE_PROGRAM_MAP(partner_mem)
+	I8080(config, m_maincpu, 16_MHz_XTAL / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &partner_state::partner_mem);
 
-	MCFG_MACHINE_RESET_OVERRIDE(partner_state, partner )
+	auto &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	ppi1.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	ppi1.in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	ppi1.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
-
-	MCFG_DEVICE_ADD("i8275", I8275, 16_MHz_XTAL / 12)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(partner_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
+	auto &i8275(I8275(config, "i8275", 16_MHz_XTAL / 12));
+	i8275.set_character_width(6);
+	i8275.set_display_callback(FUNC(partner_state::display_pixels), this);
+	i8275.drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(78*6, 30*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_size(78*6, 30*10);
+	screen.set_visarea(0, 78*6-1, 0, 30*10-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_partner)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(partner_state,radio86)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_partner);
+	auto &palette(PALETTE(config, m_palette, 3));
+	palette.set_init(palette_init_delegate(FUNC(radio86_state::palette_init_radio86), this));
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, 16_MHz_XTAL / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, partner_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8("wd1793", fd1793_device, data_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8("wd1793", fd1793_device, data_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	auto &dma8257(I8257(config, "dma8257", 16_MHz_XTAL / 9));
+	dma8257.out_hrq_cb().set(FUNC(partner_state::hrq_w));
+	dma8257.in_memr_cb().set(FUNC(partner_state::memory_read_byte));
+	dma8257.out_memw_cb().set(FUNC(partner_state::memory_write_byte));
+	dma8257.in_ior_cb<0>().set("wd1793", FUNC(fd1793_device::data_r));
+	dma8257.out_iow_cb<0>().set("wd1793", FUNC(fd1793_device::data_w));
+	dma8257.out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	dma8257.set_reverse_rw_mode(true);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rkp_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("partner_cass")
+	auto &cassette(CASSETTE(config, "cassette"));
+	cassette.set_formats(rkp_cassette_formats);
+	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.set_interface("partner_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","partner_cass")
+	SOFTWARE_LIST(config, "cass_list").set_type("partner_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_DEVICE_ADD("wd1793", FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma8257", i8257_device, dreq0_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", partner_floppies, "525qd", partner_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", partner_floppies, "525qd", partner_state::floppy_formats)
+	FD1793(config, "wd1793", 16_MHz_XTAL / 16);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","partner_flop")
+	FLOPPY_CONNECTOR(config, "fd0", "525qd", FLOPPY_525_QD, true, floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, floppy_formats);
+
+	SOFTWARE_LIST(config, "flop_list").set_type("partner_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("64K");
+	m_ram->set_default_value(0x00);
+}
 
 /* ROM definition */
 ROM_START( partner )

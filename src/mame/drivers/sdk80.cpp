@@ -51,12 +51,14 @@ public:
 		, m_usart_clock_state(0)
 	{ }
 
+	void sdk80(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
-	void sdk80(machine_config &config);
 	void sdk80_io(address_map &map);
 	void sdk80_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
 	required_device<i8255_device> m_ppi_0;

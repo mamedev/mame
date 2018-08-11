@@ -313,16 +313,16 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 	switch(offset & 0x1F)
 	{
 		case 8:
-			result = m_wd17xx->status_r(space, 0);
+			result = m_wd17xx->status_r();
 			break;
 		case 9:
-			result = m_wd17xx->track_r(space, 0);
+			result = m_wd17xx->track_r();
 			break;
 		case 10:
-			result = m_wd17xx->sector_r(space, 0);
+			result = m_wd17xx->sector_r();
 			break;
 		case 11:
-			result = m_wd17xx->data_r(space, 0);
+			result = m_wd17xx->data_r();
 			break;
 	}
 
@@ -366,16 +366,16 @@ WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 			dskreg_w(data);
 			break;
 		case 8:
-			m_wd17xx->cmd_w(space, 0, data);
+			m_wd17xx->cmd_w(data);
 			break;
 		case 9:
-			m_wd17xx->track_w(space, 0, data);
+			m_wd17xx->track_w(data);
 			break;
 		case 10:
-			m_wd17xx->sector_w(space, 0, data);
+			m_wd17xx->sector_w(data);
 			break;
 		case 11:
-			m_wd17xx->data_w(space, 0, data);
+			m_wd17xx->data_w(data);
 			break;
 	};
 

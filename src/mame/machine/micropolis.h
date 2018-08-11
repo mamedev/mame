@@ -28,13 +28,13 @@
 	MCFG_MICROPOLIS_DRIVE_TAGS(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3)
 
 #define MCFG_MICROPOLIS_DDEN_CALLBACK(_read) \
-	devcb = &downcast<micropolis_device &>(*device).set_dden_rd_callback(DEVCB_##_read);
+	downcast<micropolis_device &>(*device).set_dden_rd_callback(DEVCB_##_read);
 
 #define MCFG_MICROPOLIS_INTRQ_CALLBACK(_write) \
-	devcb = &downcast<micropolis_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<micropolis_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MICROPOLIS_DRQ_CALLBACK(_write) \
-	devcb = &downcast<micropolis_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<micropolis_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     MACROS

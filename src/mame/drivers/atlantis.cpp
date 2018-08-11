@@ -114,7 +114,12 @@ public:
 		m_rtc(*this, "rtc"),
 		m_io_analog(*this, "AN.%u", 0)
 	{ }
+
+	void mwskins(machine_config &config);
+
 	void init_mwskins();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -183,7 +188,7 @@ public:
 
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
-	void mwskins(machine_config &config);
+
 	void map0(address_map &map);
 	void map1(address_map &map);
 	void map2(address_map &map);
@@ -823,9 +828,9 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	MCFG_PCI9050_USER_OUTPUT_CALLBACK(WRITE32(*this, atlantis_state, user_io_output))
 	MCFG_PCI9050_USER_INPUT_CALLBACK(READ32(*this, atlantis_state, user_io_input))
 
-	MCFG_DEVICE_ADD(m_rtc, M48T37, 0)
-	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, atlantis_state, watchdog_reset))
-	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, atlantis_state, watchdog_irq))
+	M48T37(config, m_rtc);
+	m_rtc->reset_cb().set(FUNC(atlantis_state::watchdog_reset));
+	m_rtc->irq_cb().set(FUNC(atlantis_state::watchdog_irq));
 
 	MCFG_DEVICE_ADD(m_ide, IDE_PCI, 0, 0x10950646, 0x07, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(WRITELINE(*this, atlantis_state, ide_irq))

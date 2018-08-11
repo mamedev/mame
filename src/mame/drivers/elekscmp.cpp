@@ -150,7 +150,7 @@ MACHINE_CONFIG_START(elekscmp_state::elekscmp)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_elekscmp)
+	config.set_default_layout(layout_elekscmp);
 MACHINE_CONFIG_END
 
 /* ROM definition */

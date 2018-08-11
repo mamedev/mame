@@ -624,7 +624,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 {
 	m_bank_val[m_bank_addr] = data & 0x3f;
 	m_rambank[m_bank_addr]->set_bank(m_bank_val[m_bank_addr]);
-	
+
 //  if((data*2) >= 0x70)
 //  printf("%s %02x\n",bank_name[m_bank_addr],m_bank_val[m_bank_addr]*2);
 
@@ -837,7 +837,7 @@ READ8_MEMBER(mz2500_state::rmw_r)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
-		return 0xff; 
+		return 0xff;
 
 	int plane;
 	m_cg_latch[0] = m_cgram[offset+0x0000]; //B
@@ -856,7 +856,7 @@ WRITE8_MEMBER(mz2500_state::rmw_w)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
-		return;	
+		return;
 
 	if((m_cg_reg[0x05] & 0xc0) == 0x00) //replace
 	{
@@ -996,12 +996,12 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 
 READ8_MEMBER(mz2500_state::fdc_r)
 {
-	return m_fdc->read(space, offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(mz2500_state::fdc_w)
 {
-	m_fdc->write(space, offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -1818,7 +1818,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_ADDRESS_BANK("rambank5")
 	MCFG_ADDRESS_BANK("rambank6")
 	MCFG_ADDRESS_BANK("rambank7")
-	
+
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2500_state, mz2500_porta_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2500_state, mz2500_porta_w))

@@ -208,7 +208,7 @@ void pes_state::machine_reset()
 
 	m_port3_state = 0; // reset the openbus state of port 3
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
-	machine().device("tms5220")->reset(); // reset the 5220
+	m_speech->reset(); // reset the 5220
 }
 
 /******************************************************************************
@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(pes_state::pes)
 	MCFG_DEVICE_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pes_state, pes_kbd_input))
 MACHINE_CONFIG_END
 

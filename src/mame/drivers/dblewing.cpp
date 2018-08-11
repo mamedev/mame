@@ -404,14 +404,14 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_DECO_SPRITE_PRIORITY_CB(dblewing_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(*this, dblewing_state, soundlatch_irq_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("soundirq", input_merger_device, in_w<0>))
+	DECO104PROT(config, m_deco104, 0);
+	m_deco104->port_a_cb().set_ioport("INPUTS");
+	m_deco104->port_b_cb().set_ioport("SYSTEM");
+	m_deco104->port_c_cb().set_ioport("DSW");
+	m_deco104->set_interface_scramble_interleave();
+	m_deco104->set_use_magic_read_address_xor(true);
+	m_deco104->soundlatch_irq_cb().set(FUNC(dblewing_state::soundlatch_irq_w));
+	m_deco104->soundlatch_irq_cb().append("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

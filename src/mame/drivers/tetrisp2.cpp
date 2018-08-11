@@ -1854,21 +1854,23 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 	MCFG_DEVICE_ADD("sub_gfxdecode", GFXDECODE, "sub_palette", gfx_rocknms_sub)
 	MCFG_PALETTE_ADD("sub_palette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_rocknms)
+	config.set_default_layout(layout_rocknms);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rocknms_left)
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_orientation(ROT0);
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(0x140, 0xe0);
+	lscreen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	lscreen.set_screen_update(FUNC(tetrisp2_state::screen_update_rocknms_left));
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rocknms_right)
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_orientation(ROT270);
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(0x140, 0xe0);
+	rscreen.set_visarea(0, 0x140-1, 0, 0xe0-1);
+	rscreen.set_screen_update(FUNC(tetrisp2_state::screen_update_rocknms_right));
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rocknms)
 
@@ -1896,30 +1898,33 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	// video hardware
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-//  MCFG_SCREEN_RAW_PARAMS(12288000*2, 768, 0, 496, 264*2,0,480)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_left)
-//	MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_orientation(ROT270);
+//  lscreen.set_raw(12288000*2, 768, 0, 496, 264*2,0,480);
+	lscreen.set_refresh_hz(30);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(0x160, 0xf0);
+	lscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
+//  lscreen.set_palette("lpalette"));
 
-	MCFG_SCREEN_ADD("mscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_mid)
-//	MCFG_SCREEN_PALETTE("mpalette")
+	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	mscreen.set_orientation(ROT0);
+	mscreen.set_refresh_hz(60);
+	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	mscreen.set_size(0x160, 0xf0);
+	mscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
+//  mscreen.set_palette("mpalette"));
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0xf0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_orientation(ROT270);;
+	rscreen.set_refresh_hz(30);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(0x160, 0xf0);
+	rscreen.set_visarea(0, 0x160-1, 0, 0xf0-1);
+	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
+	rscreen.set_palette("rpalette");
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
@@ -1934,7 +1939,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_stepstag)
+	config.set_default_layout(layout_stepstag);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2007,7 +2012,7 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_vjdash)
+	config.set_default_layout(layout_vjdash);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2664,7 +2669,7 @@ ROM_START( vjdash )
 	ROM_FILL( 6, 1, 0x01 )
 	ROM_FILL( 0x100, 1, 0x60 )
 	ROM_FILL( 0x101, 1, 0xfe )
-	
+
 	ROM_REGION( 0x0c00000, "sprites_left", ROMREGION_ERASE )    // left screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
@@ -2770,7 +2775,7 @@ ROM_START( step3 )
 	ROM_FILL( 6, 1, 0x01 )
 	ROM_FILL( 0x100, 1, 0x60 )
 	ROM_FILL( 0x101, 1, 0xfe )
-	
+
 	ROM_REGION( 0x100000, "sub", 0 ) // 68000
 	ROM_LOAD16_BYTE( "vj98348_step3_11_v1.1", 0x00000, 0x80000, CRC(9c36aef5) SHA1(bbac48c2c7949a6f8a6ec83515e94a343c88d1b6) )
 	ROM_LOAD16_BYTE( "vj98348_step3_14_v1.1", 0x00001, 0x80000, CRC(b86be557) SHA1(49dbd6ef1c50adcf3386d5423da8ae7685649c46) )

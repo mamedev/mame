@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+#ifndef MAME_INCLUDES_ROUTE16_H
+#define MAME_INCLUDES_ROUTE16_H
+
+#pragma once
+
 #include "sound/sn76477.h"
 #include "emupal.h"
 
@@ -16,8 +21,18 @@ public:
 		, m_videoram2(*this, "videoram2")
 		, m_palette(*this, "palette")
 		, m_protection_data(0)
-		{}
+	{}
 
+	void routex(machine_config &config);
+	void ttmahjng(machine_config &config);
+	void spacecho(machine_config &config);
+	void speakres(machine_config &config);
+	void stratvox(machine_config &config);
+	void route16(machine_config &config);
+
+	void init_route16();
+
+private:
 	DECLARE_WRITE8_MEMBER(out0_w);
 	DECLARE_WRITE8_MEMBER(out1_w);
 	template<bool cpu1> DECLARE_WRITE8_MEMBER(route16_sharedram_w);
@@ -31,17 +46,10 @@ public:
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
 	DECLARE_MACHINE_START(speakres);
 	DECLARE_MACHINE_START(ttmahjng);
-	void init_route16();
 
 	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void routex(machine_config &config);
-	void ttmahjng(machine_config &config);
-	void spacecho(machine_config &config);
-	void speakres(machine_config &config);
-	void stratvox(machine_config &config);
-	void route16(machine_config &config);
 	void cpu1_io_map(address_map &map);
 	void route16_cpu1_map(address_map &map);
 	void route16_cpu2_map(address_map &map);
@@ -50,7 +58,7 @@ public:
 	void stratvox_cpu1_map(address_map &map);
 	void stratvox_cpu2_map(address_map &map);
 	void ttmahjng_cpu1_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
 	optional_device<sn76477_device> m_sn;
@@ -68,5 +76,6 @@ private:
 	uint8_t m_palette_2;
 
 	virtual void video_start() override;
-
 };
+
+#endif // MAME_INCLUDES_ROUTE16_H

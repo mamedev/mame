@@ -47,6 +47,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
@@ -142,6 +143,6 @@ DECLARE_DEVICE_TYPE(UPD7759, upd7759_device)
 DECLARE_DEVICE_TYPE(UPD7756, upd7756_device)
 
 #define MCFG_UPD7759_DRQ_CALLBACK(_write) \
-	devcb = &downcast<upd7759_device &>(*device).set_drq_callback(DEVCB_##_write);
+	downcast<upd7759_device &>(*device).set_drq_callback(DEVCB_##_write);
 
 #endif // MAME_SOUND_UPD7759_H

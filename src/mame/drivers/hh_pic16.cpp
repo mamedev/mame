@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(touchme_state::touchme)
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_touchme)
+	config.set_default_layout(layout_touchme);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(pabball_state::pabball)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, pabball_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
+	config.set_default_layout(layout_hh_pic16_test);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(melodym_state::melodym)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, melodym_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_melodym)
+	config.set_default_layout(layout_melodym);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(maniac_state::maniac)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, maniac_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_maniac)
+	config.set_default_layout(layout_maniac);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -861,7 +861,7 @@ MACHINE_CONFIG_START(matchme_state::matchme)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, matchme_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_matchme)
+	config.set_default_layout(layout_matchme);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1017,7 +1017,7 @@ MACHINE_CONFIG_START(leboom_state::leboom)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, leboom_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_leboom)
+	config.set_default_layout(layout_leboom);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1127,7 +1127,7 @@ MACHINE_CONFIG_START(tbaskb_state::tbaskb)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, tbaskb_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tbaskb)
+	config.set_default_layout(layout_tbaskb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1243,7 +1243,7 @@ MACHINE_CONFIG_START(rockpin_state::rockpin)
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rockpin)
+	config.set_default_layout(layout_rockpin);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1354,7 +1354,7 @@ MACHINE_CONFIG_START(hccbaskb_state::hccbaskb)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, hccbaskb_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hccbaskb)
+	config.set_default_layout(layout_hccbaskb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1506,7 +1506,7 @@ MACHINE_CONFIG_START(ttfball_state::ttfball)
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, ttfball_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ttfball)
+	config.set_default_layout(layout_ttfball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1617,7 +1617,7 @@ MACHINE_CONFIG_START(uspbball_state::uspbball)
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
+	config.set_default_layout(layout_hh_pic16_test);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1752,7 +1752,7 @@ MACHINE_CONFIG_START(us2pfball_state::us2pfball)
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_us2pfball)
+	config.set_default_layout(layout_us2pfball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -98,11 +98,6 @@ ToDo:
 class amust_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BEEP_OFF
-	};
-
 	amust_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
@@ -115,7 +110,16 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void amust(machine_config &config);
+
 	void init_amust();
+
+private:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	DECLARE_MACHINE_RESET(amust);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port04_w);
@@ -132,10 +136,9 @@ public:
 	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void amust(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_port04;
 	u8 m_port06;
 	u8 m_port08;
@@ -412,9 +415,9 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))

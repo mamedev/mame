@@ -886,7 +886,7 @@ MACHINE_CONFIG_START(artmagic_state::shtstar)
 	MCFG_DEVICE_ADD("guncpu", I80C31, 6000000)
 	MCFG_DEVICE_IO_MAP(shtstar_guncpu_io_map)
 	MCFG_DEVICE_PROGRAM_MAP(shtstar_guncpu_map)
-	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ?
+	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ?
 MACHINE_CONFIG_END
 
 

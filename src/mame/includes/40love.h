@@ -45,7 +45,7 @@ public:
 	void sound_map(address_map &map);
 	void undoukai_map(address_map &map);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

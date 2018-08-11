@@ -5,6 +5,10 @@
     includes/x07.h
 
 *********************************************************************/
+#ifndef MAME_INCLUDES_X07_H
+#define MAME_INCLUDES_X07_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
@@ -18,7 +22,6 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
-#include "rendlay.h"
 
 //default value for user defined keys, taken for official documentation
 static const char *const udk_ini[12] = {
@@ -174,6 +177,16 @@ public:
 			m_warm_start(1)
 	{ }
 
+	void x07(machine_config &config);
+
+	void init_x07();
+
+	DECLARE_INPUT_CHANGED_MEMBER( kb_keys );
+	DECLARE_INPUT_CHANGED_MEMBER( kb_func_keys );
+	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
+	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<printer_image_device> m_printer;
 	required_device<beep_device> m_beep;
@@ -189,12 +202,6 @@ public:
 	DECLARE_READ8_MEMBER( x07_io_r );
 	DECLARE_WRITE8_MEMBER( x07_io_w );
 
-	DECLARE_INPUT_CHANGED_MEMBER( kb_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_func_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
-
-	void init_x07();
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	void t6834_cmd(uint8_t cmd);
@@ -283,7 +290,9 @@ public:
 	TIMER_CALLBACK_MEMBER(rstb_clear);
 	TIMER_CALLBACK_MEMBER(beep_stop);
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
-	void x07(machine_config &config);
+
 	void x07_io(address_map &map);
 	void x07_mem(address_map &map);
 };
+
+#endif // MAME_INCLUDES_X07_H

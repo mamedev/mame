@@ -408,13 +408,13 @@ uint32_t bfcobra_state::screen_update_bfcobra(screen_device &screen, bitmap_rgb3
 		lorescol = m_col8bit;
 	}
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		uint16_t y_offset = (y + m_v_scroll) * 256;
 		src = &m_video_ram[offset + y_offset];
 		dest = &bitmap.pix32(y);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x / 2; ++x)
+		for (x = cliprect.left(); x <= cliprect.right() / 2; ++x)
 		{
 			uint8_t x_offset = x + m_h_scroll;
 			uint8_t pen = *(src + x_offset);
@@ -1673,16 +1673,16 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* ACIAs */
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, z80_acia_irq))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(m_acia6850_1, FUNC(acia6850_device::write_rxd));
+	m_acia6850_0->irq_handler().set(FUNC(bfcobra_state::z80_acia_irq));
 
-	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_rxd))
+	ACIA6850(config, m_acia6850_1, 0);
+	m_acia6850_1->txd_handler().set(m_acia6850_0, FUNC(acia6850_device::write_rxd));
 
-	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bfcobra_state, data_acia_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, m6809_data_irq))
+	ACIA6850(config, m_acia6850_2, 0);
+	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
+	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfcobra_state, write_acia_clock))

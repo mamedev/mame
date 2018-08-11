@@ -365,6 +365,16 @@ public:
 
 	// configuration
 	template <typename Object> void set_init(Object &&init) { m_init = std::forward<Object>(init); }
+	void set_init(palette_init_delegate callback) { m_init = callback; }
+	template <class FunctionClass> void set_init(const char *devname, void (FunctionClass::*callback)(palette_device &), const char *name)
+	{
+		set_init(palette_init_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_init(void (FunctionClass::*callback)(palette_device &), const char *name)
+	{
+		set_init(palette_init_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	void set_format(raw_to_rgb_converter raw_to_rgb) { m_raw_to_rgb = raw_to_rgb; }
 	void set_membits(int membits) { m_membits = membits; m_membits_supplied = true; }
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; }

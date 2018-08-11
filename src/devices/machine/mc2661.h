@@ -42,28 +42,28 @@
 	downcast<mc2661_device &>(*device).set_txc(_clock);
 
 #define MCFG_MC2661_TXD_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_txd_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_txd_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_RXRDY_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_rxrdy_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_rxrdy_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_TXRDY_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_txrdy_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_txrdy_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_RTS_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_rts_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_rts_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_DTR_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_dtr_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_dtr_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_TXEMT_DSCHG_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_txemt_dschg_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_txemt_dschg_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_BKDET_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_bkdet_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_bkdet_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_XSYNC_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_xsync_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_xsync_callback(DEVCB_##_write);
 
 
 
@@ -91,6 +91,15 @@ public:
 	template <class Object> devcb_base &set_txemt_dschg_callback(Object &&cb) { return m_write_txemt_dschg.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_bkdet_callback(Object &&cb) { return m_write_bkdet.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_xsync_callback(Object &&cb) { return m_write_xsync.set_callback(std::forward<Object>(cb)); }
+
+	auto txd_handler() { return m_write_txd.bind(); }
+	auto rxrdy_handler() { return m_write_rxrdy.bind(); }
+	auto txrdy_handler() { return m_write_txrdy.bind(); }
+	auto rts_handler() { return m_write_rts.bind(); }
+	auto dtr_handler() { return m_write_dtr.bind(); }
+	auto txemt_dschg_handler() { return m_write_txemt_dschg.bind(); }
+	auto bkdet_handler() { return m_write_bkdet.bind(); }
+	auto xsync_handler() { return m_write_xsync.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

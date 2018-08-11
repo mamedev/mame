@@ -74,7 +74,7 @@ DECLARE_DEVICE_TYPE(MICROTOUCH, microtouch_device)
 
 #define MCFG_MICROTOUCH_ADD(_tag, _clock, _devcb) \
 	MCFG_DEVICE_ADD(_tag, MICROTOUCH, _clock) \
-	devcb = &downcast<microtouch_device &>(*device).set_stx_callback(DEVCB_##_devcb);
+	downcast<microtouch_device &>(*device).set_stx_callback(DEVCB_##_devcb);
 
 #define MCFG_MICROTOUCH_TOUCH_CB(_class, _touch_cb) \
 	downcast<microtouch_device &>(*device).set_touch_callback(microtouch_device::touch_cb(&_class::_touch_cb, this));

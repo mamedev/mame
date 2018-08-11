@@ -712,7 +712,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 		case 0:
 				// DMA transfer, not at TC
 				if (m_floppy_if_state == HP64K_FLPST_DMAWR1) {
-						m_fdc->write_data(~m_floppy_in_latch_msb);
+						m_fdc->data_w(~m_floppy_in_latch_msb);
 						m_floppy_if_state = HP64K_FLPST_DMAWR2;
 				} else {
 						logerror("write to IC=0 with floppy state %d\n" , m_floppy_if_state);
@@ -738,7 +738,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 						// Write (to either FDC or drive control)
 						if (BIT(m_floppy_if_ctrl , 2)) {
 								// FDC
-								m_fdc->gen_w(~m_floppy_if_ctrl & 3 , ~m_floppy_in_latch_lsb);
+								m_fdc->write(~m_floppy_if_ctrl & 3 , ~m_floppy_in_latch_lsb);
 						} else {
 								// Drive control
 								m_floppy_drv_ctrl = m_floppy_in_latch_lsb;
@@ -748,7 +748,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 						// Read
 						if (BIT(m_floppy_if_ctrl , 2)) {
 								// FDC
-								m_floppy_out_latch_lsb = ~m_fdc->gen_r(~m_floppy_if_ctrl & 3);
+								m_floppy_out_latch_lsb = ~m_fdc->read(~m_floppy_if_ctrl & 3);
 						} else {
 								// Drive control
 								m_floppy_out_latch_lsb = m_floppy_drv_ctrl;
@@ -763,7 +763,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 		case 2:
 				// DMA transfer, at TC
 				if (m_floppy_if_state == HP64K_FLPST_DMAWR1) {
-						m_fdc->write_data(~m_floppy_in_latch_msb);
+						m_fdc->data_w(~m_floppy_in_latch_msb);
 						m_floppy_if_state = HP64K_FLPST_DMAWR2;
 						m_floppy_dmaen = false;
 						m_floppy_dmai = true;
@@ -802,18 +802,18 @@ void hp64k_state::hp64k_update_floppy_dma(void)
 								m_floppy_if_state = HP64K_FLPST_DMAWR1;
 						} else {
 								// DMA reads
-								m_floppy_out_latch_msb = ~m_fdc->read_data();
+								m_floppy_out_latch_msb = ~m_fdc->data_r();
 								m_floppy_if_state = HP64K_FLPST_DMARD1;
 						}
 						break;
 
 				case HP64K_FLPST_DMAWR2:
-						m_fdc->write_data(~m_floppy_in_latch_lsb);
+						m_fdc->data_w(~m_floppy_in_latch_lsb);
 						m_floppy_if_state = HP64K_FLPST_IDLE;
 						break;
 
 				case HP64K_FLPST_DMARD1:
-						m_floppy_out_latch_lsb = ~m_fdc->read_data();
+						m_floppy_out_latch_lsb = ~m_fdc->data_r();
 						m_cpu->dmar_w(1);
 						m_floppy_if_state = HP64K_FLPST_DMARD2;
 						break;
@@ -1439,25 +1439,24 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hp64k_state , hp64k_floppy1_rdy));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper" , BEEP , 2500)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
+	BEEP(config, m_beeper, 2500).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp64k_state , hp64k_beeper_off);
 
-	MCFG_DEVICE_ADD("baud_rate" , COM8116 , XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, hp64k_state , hp64k_baud_clk_w));
+	COM8116(config, m_baud_rate, 5.0688_MHz_XTAL);
+	m_baud_rate->fr_handler().set(FUNC(hp64k_state::hp64k_baud_clk_w));
 
-	MCFG_DEVICE_ADD("uart" , I8251 , 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, hp64k_state , hp64k_rxrdy_w));
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, hp64k_state , hp64k_txrdy_w));
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, hp64k_state , hp64k_txd_w));
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, hp64k_state , hp64k_dtr_w));
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, hp64k_state , hp64k_rts_w));
+	I8251(config, m_uart, 0);
+	m_uart->rxrdy_handler().set(FUNC(hp64k_state::hp64k_rxrdy_w));
+	m_uart->txrdy_handler().set(FUNC(hp64k_state::hp64k_txrdy_w));
+	m_uart->txd_handler().set(FUNC(hp64k_state::hp64k_txd_w));
+	m_uart->dtr_handler().set(FUNC(hp64k_state::hp64k_dtr_w));
+	m_uart->rts_handler().set(FUNC(hp64k_state::hp64k_rts_w));
 
-	MCFG_DEVICE_ADD("rs232" , RS232_PORT, default_rs232_devices , nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, hp64k_state , hp64k_rs232_rxd_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, hp64k_state , hp64k_rs232_dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, hp64k_state , hp64k_rs232_cts_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(hp64k_state::hp64k_rs232_rxd_w));
+	m_rs232->dcd_handler().set(FUNC(hp64k_state::hp64k_rs232_dcd_w));
+	m_rs232->cts_handler().set(FUNC(hp64k_state::hp64k_rs232_cts_w));
 
 	MCFG_DEVICE_ADD("phi" , PHI , 0)
 	MCFG_PHI_INT_WRITE_CB(WRITELINE(*this, hp64k_state , hp64k_phi_int_w))

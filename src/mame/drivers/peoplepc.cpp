@@ -34,6 +34,10 @@ public:
 		m_cvram(*this, "cvram"),
 		m_charram(4*1024)
 	{ }
+
+	void olypeopl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_pic_1;
@@ -63,10 +67,9 @@ public:
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg;
-	void olypeopl(machine_config &config);
 	void peoplepc_io(address_map &map);
 	void peoplepc_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -258,12 +261,12 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 
 	MCFG_DEVICE_ADD("pic8259_0", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, peoplepc_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_0", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 

@@ -33,6 +33,13 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette") { }
 
+	void _20pacgal(machine_config &config);
+	void _20pacgal_video(machine_config &config);
+
+	void init_25pacman();
+	void init_20pacgal();
+
+protected:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_char_gfx_ram;
@@ -69,8 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_gfx_w);
 	DECLARE_WRITE8_MEMBER(sprite_ram_w);
 	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
-	void init_25pacman();
-	void init_20pacgal();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -85,8 +91,7 @@ public:
 	void draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x,
 						uint8_t code, uint8_t color, int flip_y, int flip_x);
 	void common_save_state();
-	void _20pacgal(machine_config &config);
-	void _20pacgal_video(machine_config &config);
+
 	void _20pacgal_io_map(address_map &map);
 	void _20pacgal_map(address_map &map);
 };
@@ -101,7 +106,7 @@ public:
 
 	void _25pacman(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
 
 	virtual void machine_start() override;

@@ -261,6 +261,21 @@ public:
 		m_cart(*this, "cartleft"),
 		m_cart2(*this, "cartright") { }
 
+	void atari_common_nodac(machine_config &config);
+	void atari_common(machine_config &config);
+	void a800pal(machine_config &config);
+	void a400pal(machine_config &config);
+	void a5200(machine_config &config);
+	void a800(machine_config &config);
+	void a1200xl(machine_config &config);
+	void a800xlpal(machine_config &config);
+	void a130xe(machine_config &config);
+	void a800xl(machine_config &config);
+	void a600xl(machine_config &config);
+	void xegs(machine_config &config);
+	void a400(machine_config &config);
+
+private:
 	DECLARE_MACHINE_START(a400);
 	DECLARE_MACHINE_START(a800);
 	DECLARE_MACHINE_START(a800xl);
@@ -300,19 +315,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
-	void atari_common_nodac(machine_config &config);
-	void atari_common(machine_config &config);
-	void a800pal(machine_config &config);
-	void a400pal(machine_config &config);
-	void a5200(machine_config &config);
-	void a800(machine_config &config);
-	void a1200xl(machine_config &config);
-	void a800xlpal(machine_config &config);
-	void a130xe(machine_config &config);
-	void a800xl(machine_config &config);
-	void a600xl(machine_config &config);
-	void xegs(machine_config &config);
-	void a400(machine_config &config);
 	void a1200xl_mem(address_map &map);
 	void a130xe_mem(address_map &map);
 	void a400_mem(address_map &map);
@@ -320,7 +322,7 @@ public:
 	void a600xl_mem(address_map &map);
 	void a800xl_mem(address_map &map);
 	void xegs_mem(address_map &map);
-protected:
+
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
 	required_device<pia6821_device> m_pia;
@@ -2120,11 +2122,11 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	MCFG_PALETTE_ADD("palette", sizeof(atari_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(a400_state, a400)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("djoy_0_1"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("djoy_2_3"))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("a8sio", a8sio_device, motor_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("fdc", atari_fdc_device, pia_cb2_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set_ioport("djoy_0_1");
+	m_pia->readpb_handler().set_ioport("djoy_2_3");
+	m_pia->ca2_handler().set("a8sio", FUNC(a8sio_device::motor_w));
+	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
 
 	MCFG_DEVICE_ADD("a8sio", A8SIO, 0)
 	MCFG_A8SIO_DATA_IN_CB(WRITELINE("pokey", pokey_device, sid_w))
@@ -2266,8 +2268,7 @@ MACHINE_CONFIG_START(a400_state::a600xl)
 	MCFG_DEVICE_PROGRAM_MAP(a600xl_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a800xl_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a600xl_pia_pb_w))
+	m_pia->writepb_handler().set(FUNC(a400_state::a600xl_pia_pb_w));
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
@@ -2291,8 +2292,7 @@ MACHINE_CONFIG_START(a400_state::a800xl)
 	MCFG_DEVICE_PROGRAM_MAP(a800xl_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a400_state, a800xl_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a800xl_pia_pb_w))
+	m_pia->writepb_handler().set(FUNC(a400_state::a800xl_pia_pb_w));
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
@@ -2334,8 +2334,7 @@ MACHINE_CONFIG_START(a400_state::a1200xl)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(a1200xl_mem)
 
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a400_state, a800xl_pia_pb_w))
+	m_pia->writepb_handler().set(FUNC(a400_state::a800xl_pia_pb_w));
 MACHINE_CONFIG_END
 
 
@@ -2388,10 +2387,9 @@ MACHINE_CONFIG_START(a400_state::a5200)
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")
 
-	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_READPA_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
-	MCFG_PIA_READPB_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
-	MCFG_PIA_CB2_HANDLER(NOOP) // FIXME: is there anything connected here
+	m_pia->readpa_handler().set_constant(0); // FIXME: is there anything connected here
+	m_pia->readpb_handler().set_constant(0); // FIXME: is there anything connected here
+	m_pia->cb2_handler().set_nop(); // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 

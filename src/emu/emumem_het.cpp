@@ -5,7 +5,7 @@
 #include "emumem_hep.h"
 #include "emumem_het.h"
 
-template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_tap<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_tap<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	uX data = inh::m_next->read(offset, mem_mask);
 	m_tap(offset, data, mem_mask);

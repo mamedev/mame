@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(babbage_state::babbage)
 	MCFG_Z80_DAISY_CHAIN(babbage_daisy_chain)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_babbage)
+	config.set_default_layout(layout_babbage);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, MAIN_CLOCK)

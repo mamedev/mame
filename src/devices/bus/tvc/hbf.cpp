@@ -133,7 +133,7 @@ READ8_MEMBER(tvc_hbf_device::io_read)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			return m_fdc->read(space, offset & 3);
+			return m_fdc->read(offset & 3);
 		case 0x01:
 			return (m_fdc->drq_r()<<7) | (m_fdc->intrq_r() ? 0x01 : 0x00);
 		default:
@@ -150,7 +150,7 @@ WRITE8_MEMBER(tvc_hbf_device::io_write)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			m_fdc->write(space, offset & 3, data);
+			m_fdc->write(offset & 3, data);
 			break;
 		case 0x01:
 		{

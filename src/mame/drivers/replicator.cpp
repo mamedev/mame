@@ -30,7 +30,6 @@
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -162,6 +161,11 @@ public:
 	{
 	}
 
+	void replicator(machine_config &config);
+
+	void init_replicator();
+
+private:
 	virtual void machine_start() override;
 
 	uint8_t m_port_a;
@@ -184,10 +188,8 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	void init_replicator();
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
-	void replicator(machine_config &config);
 	void replicator_data_map(address_map &map);
 	void replicator_io_map(address_map &map);
 	void replicator_prg_map(address_map &map);
@@ -634,7 +636,6 @@ MACHINE_CONFIG_START(replicator_state::replicator)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_replicator)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(4, 20)

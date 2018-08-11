@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(mmd1_state::mmd1)
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd1)
+	config.set_default_layout(layout_mmd1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmd1_state::mmd2)
@@ -516,15 +516,15 @@ MACHINE_CONFIG_START(mmd1_state::mmd2)
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd2)
+	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, mmd1_state, mmd2_scanlines_w))          // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, mmd1_state, mmd2_digit_w))            // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(*this, mmd1_state, mmd2_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                                     // Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
 
 MACHINE_CONFIG_END
 

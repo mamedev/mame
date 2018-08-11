@@ -45,27 +45,28 @@ public:
 	void orbit(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(orbit_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
-	DECLARE_WRITE8_MEMBER(orbit_note_w);
-	DECLARE_WRITE8_MEMBER(orbit_note_amp_w);
-	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
-	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void orbit_map(address_map &map);
-
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void update_misc_flags(address_space &space, uint8_t val);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(playfield_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
+	DECLARE_WRITE8_MEMBER(note_w);
+	DECLARE_WRITE8_MEMBER(note_amp_w);
+	DECLARE_WRITE8_MEMBER(noise_amp_w);
+	DECLARE_WRITE8_MEMBER(noise_rst_w);
+
+	void main_map(address_map &map);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_misc_flags(address_space &space, uint8_t val);
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
@@ -75,6 +76,7 @@ private:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	int        m_flip_screen;
+	emu_timer *m_irq_off_timer;
 
 	/* devices */
 	required_device<f9334_device> m_latch;

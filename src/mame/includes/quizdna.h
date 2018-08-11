@@ -14,6 +14,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
+	void gakupara(machine_config &config);
+	void quizdna(machine_config &config);
+	void gekiretu(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -49,9 +54,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gakupara(machine_config &config);
-	void quizdna(machine_config &config);
-	void gekiretu(machine_config &config);
 	void gakupara_io_map(address_map &map);
 	void gekiretu_io_map(address_map &map);
 	void gekiretu_map(address_map &map);

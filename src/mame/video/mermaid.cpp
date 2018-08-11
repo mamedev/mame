@@ -230,8 +230,8 @@ uint8_t mermaid_state::collision_check( rectangle& rect )
 	int x;
 	int y;
 
-	for (y = rect.min_y; y <= rect.max_y; y++)
-		for (x = rect.min_x; x <= rect.max_x; x++)
+	for (y = rect.top(); y <= rect.bottom(); y++)
+		for (x = rect.left(); x <= rect.right(); x++)
 		{
 			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
 			uint16_t b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
@@ -289,11 +289,9 @@ void mermaid_state::collision_update()
 			sy = 240 - sy;
 		}
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-		rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
 		rect &= visarea;
 
 		// check collision sprite - background
@@ -392,11 +390,9 @@ void mermaid_state::collision_update()
 			sy = 240 - sy;
 		}
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-		rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
 		rect &= visarea;
 
 		// check collision sprite - sprite
@@ -473,11 +469,9 @@ void mermaid_state::collision_update()
 			sy = 240 - sy;
 		}
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-		rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
 		rect &= visarea;
 
 		// check collision sprite - sprite

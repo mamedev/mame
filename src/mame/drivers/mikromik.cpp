@@ -466,29 +466,29 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
 
 	// peripheral hardware
-	MCFG_DEVICE_ADD(I8212_TAG, I8212, 0)
-	MCFG_I8212_INT_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST65_LINE))
-	MCFG_I8212_DI_CALLBACK(READ8(KB_TAG, mm1_keyboard_device, read))
+	I8212(config, m_iop, 0);
+	m_iop->int_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	m_iop->di_rd_callback().set(KB_TAG, FUNC(mm1_keyboard_device::read));
 
-	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 6.144_MHz_XTAL/2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, mm1_state, dma_hrq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, mm1_state, dma_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, mm1_state, read))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, mm1_state, write))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, mm1_state, mpsc_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(UPD765_TAG, upd765_family_device, mdma_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(I8275_TAG, i8275_device, dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, mm1_state, mpsc_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(UPD765_TAG, upd765_family_device, mdma_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, mm1_state, dack3_w))
+	AM9517A(config, m_dmac, 6.144_MHz_XTAL/2);
+	m_dmac->out_hreq_callback().set(FUNC(mm1_state::dma_hrq_w));
+	m_dmac->out_eop_callback().set(FUNC(mm1_state::dma_eop_w));
+	m_dmac->in_memr_callback().set(FUNC(mm1_state::read));
+	m_dmac->out_memw_callback().set(FUNC(mm1_state::write));
+	m_dmac->in_ior_callback<2>().set(FUNC(mm1_state::mpsc_dack_r));
+	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(upd765_family_device::mdma_r));
+	m_dmac->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
+	m_dmac->out_iow_callback<1>().set(FUNC(mm1_state::mpsc_dack_w));
+	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(upd765_family_device::mdma_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(mm1_state::dack3_w));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mm1_state, itxc_w))
-	MCFG_PIT8253_CLK1(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, mm1_state, irxc_w))
-	MCFG_PIT8253_CLK2(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mm1_state, auxc_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(6.144_MHz_XTAL/2/2);
+	m_pit->out_handler<0>().set(FUNC(mm1_state::itxc_w));
+	m_pit->set_clk<1>(6.144_MHz_XTAL/2/2);
+	m_pit->out_handler<1>().set(FUNC(mm1_state::irxc_w));
+	m_pit->set_clk<2>(6.144_MHz_XTAL/2/2);
+	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
 	MCFG_UPD765A_ADD(UPD765_TAG, /* 16_MHz_XTAL/2/2 */ true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST55_LINE))

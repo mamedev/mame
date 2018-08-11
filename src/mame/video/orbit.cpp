@@ -9,7 +9,7 @@ Atari Orbit video emulation
 #include "emu.h"
 #include "includes/orbit.h"
 
-WRITE8_MEMBER(orbit_state::orbit_playfield_w)
+WRITE8_MEMBER(orbit_state::playfield_w)
 {
 	m_playfield_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -36,13 +36,11 @@ void orbit_state::video_start()
 }
 
 
-void orbit_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void orbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const uint8_t* p = m_sprite_ram;
 
-	int i;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		int code = *p++;
 		int vpos = *p++;
@@ -77,7 +75,7 @@ void orbit_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
-uint32_t orbit_state::screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t orbit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_flip_screen = ioport("DSW2")->read() & 8;
 

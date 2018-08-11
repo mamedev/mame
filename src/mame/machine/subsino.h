@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood, Angelo Salese, Roberto Fresca
-#ifndef __MACHINE_SUBSINO__
-#define __MACHINE_SUBSINO__
+#ifndef MAME_MACHINE_SUBSINO_H
+#define MAME_MACHINE_SUBSINO_H
+
+#pragma once
 
 
 extern const uint8_t crsbingo_xors[8];
@@ -16,4 +18,4 @@ void victor21_bitswaps(uint8_t *decrypt, int i);
 
 void subsino_decrypt(running_machine& machine, void (*bitswaps)(uint8_t *decrypt, int i), const uint8_t *xors, int size);
 
-#endif
+#endif // MAME_MACHINE_SUBSINO_H

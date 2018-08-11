@@ -39,16 +39,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	DECLARE_WRITE8_MEMBER(questions_bank_w);
-	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
-	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
-	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
-	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
-	DECLARE_READ8_MEMBER(trackfld_speech_r);
-	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
-	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
-
 	void reaktor(machine_config &config);
 	void atlantol(machine_config &config);
 	void yieartf(machine_config &config);
@@ -64,6 +54,17 @@ public:
 	void init_mastkin();
 	void init_trackfldnz();
 
+private:
+	DECLARE_WRITE8_MEMBER(questions_bank_w);
+	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
+	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
+	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
+	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
+	DECLARE_READ8_MEMBER(trackfld_speech_r);
+	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
+	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
+	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
+
 	void hyprolyb_sound_map(address_map &map);
 	void main_map(address_map &map);
 	void mastkin_map(address_map &map);
@@ -74,7 +75,7 @@ public:
 	void wizzquiz_map(address_map &map);
 	void yieartf_map(address_map &map);
 	void hyprolyb_adpcm_map(address_map &map);
-private:
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_scroll;

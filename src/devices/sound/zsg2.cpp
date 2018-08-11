@@ -175,7 +175,7 @@ int16_t *zsg2_device::prepare_samples(uint32_t offset)
 	m_mem_copy[offset] = block;
 	offset *= 4;
 
-	// decompress 32 byte block to 4 16-bit samples
+	// decompress 32 bit block to 4 16-bit samples
 	// 42222222 51111111 60000000 ssss3333
 	m_full_samples[offset|0] = block >> 8 & 0x7f;
 	m_full_samples[offset|1] = block >> 16 & 0x7f;

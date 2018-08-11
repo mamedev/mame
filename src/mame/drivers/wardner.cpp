@@ -141,18 +141,21 @@ out:
 class wardner_state : public twincobr_state
 {
 public:
-	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
-		: twincobr_state(mconfig, type, tag),
+	wardner_state(const machine_config &mconfig, device_type type, const char *tag) :
+		twincobr_state(mconfig, type, tag),
 		m_membank(*this, "membank")
 	{
 	}
 
+	void wardner(machine_config &config);
+
+	void init_wardner();
+
+private:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	void init_wardner();
 
-	void wardner(machine_config &config);
 	void DSP_io_map(address_map &map);
 	void DSP_program_map(address_map &map);
 	void main_bank_map(address_map &map);
@@ -160,7 +163,7 @@ public:
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
-protected:
+
 	virtual void driver_start() override;
 	virtual void machine_reset() override;
 };
@@ -424,13 +427,13 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 
 	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000)/2, 446, 0, 320, 286, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram8", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, wardner_state, wardner_vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(14_MHz_XTAL/2, 446, 0, 320, 286, 0, 240);
+	m_screen->set_screen_update(FUNC(wardner_state::screen_update_toaplan0));
+	m_screen->screen_vblank().set(m_spriteram8, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
 	MCFG_PALETTE_ADD("palette", 1792)

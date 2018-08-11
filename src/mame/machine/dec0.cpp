@@ -358,8 +358,6 @@ void dec0_state::h6280_decrypt(const char *cputag)
 void dec0_state::init_hippodrm()
 {
 	uint8_t *RAM = memregion("sub")->base();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x18003f, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
 	h6280_decrypt("sub");
 
@@ -379,11 +377,6 @@ void dec0_state::init_slyspy()
 
 	save_item(NAME(m_slyspy_state));
 	save_item(NAME(m_slyspy_sound_state));
-}
-
-void dec0_state::init_robocop()
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
 }
 
 void dec0_state::init_drgninja()

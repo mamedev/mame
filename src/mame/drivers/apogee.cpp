@@ -33,6 +33,9 @@ public:
 		: radio86_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
+	void apogee(machine_config &config);
+
+private:
 	uint8_t m_out0;
 	uint8_t m_out1;
 	uint8_t m_out2;
@@ -42,7 +45,6 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
-	void apogee(machine_config &config);
 	void apogee_mem(address_map &map);
 };
 
@@ -217,7 +219,6 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(apogee_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/9)

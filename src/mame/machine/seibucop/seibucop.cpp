@@ -1310,7 +1310,7 @@ WRITE16_MEMBER( raiden2cop_device::cop_unk_param_b_w)
 	COMBINE_DATA(&m_cop_unk_param_b);
 }
 
-// cupsoc always writes 0xF before commands 0x5105, 0x5905, 0xD104 and 0xF105 and 0xE before 0xD104, then resets this to zero
+// cupsoc always writes 0xF before commands 0x5105, 0x5905, 0xD104 and 0xF105 and 0xE before 0xDDE5, then resets this to zero
 // zeroteam writes 0xE here before 0xEDE5, then resets it to zero
 WRITE16_MEMBER( raiden2cop_device::cop_precmd_w)
 {

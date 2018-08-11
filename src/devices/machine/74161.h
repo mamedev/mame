@@ -59,22 +59,22 @@
 
 
 #define MCFG_7416x_QA_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qa_cb(DEVCB_##_devcb);
+	downcast<ttl7416x_device &>(*device).set_qa_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_QB_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qb_cb(DEVCB_##_devcb);
+	downcast<ttl7416x_device &>(*device).set_qb_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_QC_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qc_cb(DEVCB_##_devcb);
+	downcast<ttl7416x_device &>(*device).set_qc_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_QD_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qd_cb(DEVCB_##_devcb);
+	downcast<ttl7416x_device &>(*device).set_qd_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_OUTPUT_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_output_cb(DEVCB_##_devcb);
+	downcast<ttl7416x_device &>(*device).set_output_cb(DEVCB_##_devcb);
 
 #define MCFG_7416x_TC_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_tc_cb(DEVCB_##_devcb);
+	downcast<ttl7416x_device &>(*device).set_tc_cb(DEVCB_##_devcb);
 
 class ttl7416x_device : public device_t
 {

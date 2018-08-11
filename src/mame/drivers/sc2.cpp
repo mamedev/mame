@@ -30,7 +30,9 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void sc2(machine_config &config);
 
+private:
 	DECLARE_READ8_MEMBER(pio_port_a_r);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
@@ -44,7 +46,6 @@ public:
 	void sc2_update_display();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void sc2(machine_config &config);
 	void sc2_io(address_map &map);
 	void sc2_mem(address_map &map);
 
@@ -219,7 +220,7 @@ MACHINE_CONFIG_START(sc2_state::sc2)
 
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc2)
+	config.set_default_layout(layout_sc2);
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))

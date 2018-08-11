@@ -118,6 +118,27 @@ void l7a1045_sound_device::device_start()
 {
 	/* Allocate the stream */
 	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
+
+	for (int voice = 0; voice < 32; voice++)
+	{
+		save_item(NAME(m_voice[voice].start), voice);
+		save_item(NAME(m_voice[voice].end), voice);
+		save_item(NAME(m_voice[voice].mode), voice);
+		save_item(NAME(m_voice[voice].pos), voice);
+		save_item(NAME(m_voice[voice].frac), voice);
+		save_item(NAME(m_voice[voice].l_volume), voice);
+		save_item(NAME(m_voice[voice].r_volume), voice);
+	}
+	save_item(NAME(m_key));
+	save_item(NAME(m_audiochannel));
+	save_item(NAME(m_audioregister));
+	for (int reg = 0; reg < 0x10; reg++)
+	{
+		for (int voice = 0; voice < 0x20; voice++)
+		{
+			save_item(NAME(m_audiodat[reg][voice].dat), (reg << 8) | voice);
+		}
+	}
 }
 
 

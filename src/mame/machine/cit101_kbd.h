@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(_devcb) \
-	devcb = &downcast<cit101_hle_keyboard_device &>(*device).set_txd_callback(DEVCB_##_devcb);
+	downcast<cit101_hle_keyboard_device &>(*device).set_txd_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

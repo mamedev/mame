@@ -5,7 +5,7 @@
 #include "emumem_hea.h"
 #include "emumem_hem.h"
 
-template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_memory<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	return m_base[((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift)];
 }
@@ -51,7 +51,7 @@ template<int Width, int AddrShift, int Endian> std::string handler_entry_write_m
 
 
 
-template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_memory_bank<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory_bank<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	return static_cast<uX *>(m_bank.base())[((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift)];
 }

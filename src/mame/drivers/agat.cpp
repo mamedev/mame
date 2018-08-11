@@ -106,6 +106,9 @@ public:
 		, m_upperbank(*this, A7_UPPERBANK_TAG)
 	{ }
 
+	void agat7(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
@@ -160,10 +163,9 @@ public:
 	DECLARE_READ8_MEMBER(controller_strobe_r);
 	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
-	void agat7(machine_config &config);
 	void agat7_map(address_map &map);
 	void inhbank_map(address_map &map);
-private:
+
 	int m_speaker_state;
 	int m_cassette_state;
 

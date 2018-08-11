@@ -75,7 +75,7 @@ private:
 };
 
 #define MCFG_TI990_HDC_INT_CALLBACK( _write ) \
-	devcb = &downcast<ti990_hdc_device &>(*device).set_int_callback(DEVCB_##_write);
+	downcast<ti990_hdc_device &>(*device).set_int_callback(DEVCB_##_write);
 
 DECLARE_DEVICE_TYPE(TI990_HDC, ti990_hdc_device)
 

@@ -20,6 +20,14 @@ public:
 		m_fg_tileram(*this, "fg_tileram"),
 		m_bg_tileram(*this, "bg_tileram") { }
 
+	void pirates(machine_config &config);
+
+	void init_pirates();
+	void init_genix();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
@@ -42,11 +50,6 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_tileram_w);
 	DECLARE_READ16_MEMBER(genix_prot_r);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-
-	void init_pirates();
-	void init_genix();
-
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -60,6 +63,5 @@ public:
 	void decrypt_p();
 	void decrypt_s();
 	void decrypt_oki();
-	void pirates(machine_config &config);
 	void pirates_map(address_map &map);
 };

@@ -727,10 +727,10 @@ MACHINE_CONFIG_START(atom_state::atom)
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
+	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
+	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, atom_state, ppi_pa_w))
@@ -837,10 +837,10 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
+	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
+	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, atom_state, ppi_pa_w))

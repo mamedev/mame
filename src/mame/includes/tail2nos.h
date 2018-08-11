@@ -27,6 +27,11 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_acia(*this, "acia") { }
 
+	void tail2nos(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_txvideoram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -48,7 +53,6 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<acia6850_device> m_acia;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
 	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
 	DECLARE_WRITE8_MEMBER(tail2nos_gfxbank_w);
@@ -62,7 +66,6 @@ public:
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);
-	void tail2nos(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_port_map(address_map &map);

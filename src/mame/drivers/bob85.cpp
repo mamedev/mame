@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(bob85_state::bob85)
 	MCFG_I8085A_SOD(WRITELINE(*this, bob85_state, sod_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_bob85)
+	config.set_default_layout(layout_bob85);
 
 	// devices
 	MCFG_CASSETTE_ADD("cassette")

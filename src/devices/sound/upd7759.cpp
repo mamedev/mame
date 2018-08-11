@@ -221,7 +221,7 @@ void upd775x_device::device_start()
 	m_step = 4 * FRAC_ONE;
 
 	// compute the clock period
-	m_clock_period = attotime::from_hz(clock());
+	m_clock_period = clock() ? attotime::from_hz(clock()) : attotime::zero;
 
 	// set the intial state
 	m_state = STATE_IDLE;
@@ -273,6 +273,13 @@ void upd775x_device::device_start()
 	save_item(NAME(m_sample));
 
 	save_item(NAME(m_romoffset));
+}
+
+void upd775x_device::device_clock_changed()
+{
+	m_clock_period = clock() ? attotime::from_hz(clock()) : attotime::zero;
+
+	m_channel->set_sample_rate(clock() / 4);
 }
 
 void upd7759_device::device_start()

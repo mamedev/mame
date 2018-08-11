@@ -1315,23 +1315,23 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 	MCFG_DEVICE_IO_MAP(cpu2_io_map)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("audiouart", acia6850_device, write_rxd))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(m_audiouart, FUNC(acia6850_device::write_rxd));
+	m_acia->irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD("audiouart", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, balsente_state, uint_w))
+	ACIA6850(config, m_audiouart, 0);
+	m_audiouart->txd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	m_audiouart->irq_handler().set([this] (int state) { m_uint = bool(state); });
 
-	MCFG_DEVICE_ADD("uartclock", CLOCK, 8_MHz_XTAL / 16) // 500 kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, balsente_state, uint_propagate_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("audiouart", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("audiouart", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_txc)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc)) MCFG_DEVCB_INVERT
+	clock_device &uartclock(CLOCK(config, "uartclock", 8_MHz_XTAL / 16)); // 500 kHz
+	uartclock.signal_handler().set(FUNC(balsente_state::uint_propagate_w));
+	uartclock.signal_handler().append(m_audiouart, FUNC(acia6850_device::write_txc));
+	uartclock.signal_handler().append(m_audiouart, FUNC(acia6850_device::write_rxc));
+	uartclock.signal_handler().append(m_acia, FUNC(acia6850_device::write_txc)).invert();
+	uartclock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc)).invert();
 
-	MCFG_X2212_ADD_AUTOSAVE("nov0") // system NOVRAM
-	MCFG_X2212_ADD_AUTOSAVE("nov1") // cart NOVRAM
+	X2212(config, "nov0").set_auto_save(true); // system NOVRAM
+	X2212(config, "nov1").set_auto_save(true); // cart NOVRAM
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

@@ -50,7 +50,7 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update)
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
-	devcb = &downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
+	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
 
 
 //**************************************************************************

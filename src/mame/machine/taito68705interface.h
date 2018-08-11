@@ -17,8 +17,6 @@ DECLARE_DEVICE_TYPE(ARKANOID_68705P5,     arkanoid_68705p5_device)
 class taito68705_mcu_device_base : public device_t
 {
 public:
-	template <typename Obj> devcb_base &set_semaphore_cb(Obj &&cb) { return m_semaphore_cb.set_callback(std::forward<Obj>(cb)); }
-
 	// host interface
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -35,6 +33,8 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock);
+
+	auto semaphore_cb() { return m_semaphore_cb.bind(); }
 
 	// MCU callbacks
 	DECLARE_WRITE8_MEMBER(mcu_pa_w);
@@ -62,13 +62,10 @@ private:
 };
 
 
-#define MCFG_TAITO_M68705_AUX_STROBE_CB(cb) \
-		devcb = &downcast<taito68705_mcu_device &>(*device).set_aux_strobe_cb(DEVCB_##cb);
-
 class taito68705_mcu_device : public taito68705_mcu_device_base
 {
 public:
-	template <typename Obj> devcb_base &set_aux_strobe_cb(Obj &&cb) { return m_aux_strobe_cb.set_callback(std::forward<Obj>(cb)); }
+	auto aux_strobe_cb() { return m_aux_strobe_cb.bind(); }
 
 	taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -97,16 +94,11 @@ protected:
 };
 
 
-#define MCFG_ARKANOID_MCU_SEMAPHORE_CB(cb) \
-		devcb = &downcast<arkanoid_mcu_device_base &>(*device).set_semaphore_cb(DEVCB_##cb);
-
-#define MCFG_ARKANOID_MCU_PORTB_R_CB(cb) \
-		devcb = &downcast<arkanoid_mcu_device_base &>(*device).set_portb_r_cb(DEVCB_##cb);
-
 class arkanoid_mcu_device_base : public taito68705_mcu_device_base
 {
 public:
-	template <typename Obj> devcb_base &set_portb_r_cb(Obj &&cb) { return m_portb_r_cb.set_callback(std::forward<Obj>(cb)); }
+	using taito68705_mcu_device_base::semaphore_cb;
+	auto portb_r_cb() { return m_portb_r_cb.bind(); }
 
 protected:
 	arkanoid_mcu_device_base(

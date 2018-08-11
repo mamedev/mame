@@ -71,7 +71,7 @@
  *
  * History of Heurikon
  *---------------------
- * The company was founded 1972 as cellar company. Heurikon was aquired
+ * The company was founded 1972 as cellar company. Heurikon was acquired
  * 1989 by Computer Products, 1990 by Artesyn and finally in 2005 by Emerson
  * Electric who consolidated it fully by 2009 and closed the office.
  *

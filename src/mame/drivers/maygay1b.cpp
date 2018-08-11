@@ -779,9 +779,9 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygay1b_state, duart_irq_handler))
 	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, maygay1b_state, m1_duart_r))
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, maygay1b_state, m1_pia_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, maygay1b_state, m1_pia_portb_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set(FUNC(maygay1b_state::m1_pia_porta_w));
+	pia.writepb_handler().set(FUNC(maygay1b_state::m1_pia_portb_w));
 
 	MCFG_DEVICE_ADD("mainlatch", HC259, 0) // U29
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, maygay1b_state, ramen_w))  // m_RAMEN
@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
+	config.set_default_layout(layout_maygay1b);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)

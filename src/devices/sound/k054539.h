@@ -20,7 +20,7 @@
 	downcast<k054539_device &>(*device).set_override("^" _region);
 
 #define MCFG_K054539_TIMER_HANDLER(_devcb) \
-	devcb = &downcast<k054539_device &>(*device).set_timer_handler(DEVCB_##_devcb);
+	downcast<k054539_device &>(*device).set_timer_handler(DEVCB_##_devcb);
 
 
 class k054539_device : public device_t,
@@ -67,6 +67,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

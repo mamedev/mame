@@ -22,6 +22,11 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void pokechmp(machine_config &config);
+
+	void init_pokechmp();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -31,7 +36,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pokechmp_videoram_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	void init_pokechmp();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_pokechmp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -41,7 +45,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void pokechmp(machine_config &config);
 	void pokechmp_map(address_map &map);
 	void pokechmp_oki_map(address_map &map);
 	void pokechmp_sound_map(address_map &map);
