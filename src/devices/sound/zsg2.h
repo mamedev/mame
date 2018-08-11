@@ -51,7 +51,6 @@ private:
 	{
 		uint16_t v[16];
 		bool is_playing;
-		int16_t *samples;
 		uint32_t cur_pos;
 		uint32_t step_ptr;
 		uint32_t step;
@@ -59,12 +58,29 @@ private:
 		uint32_t end_pos;
 		uint32_t loop_pos;
 		uint32_t page;
+
 		uint16_t vol;
-		uint16_t flags;
-		uint8_t panl;
-		uint8_t panr;
+		uint16_t vol_initial;
+		uint16_t vol_target;
+
+		int16_t emphasis_cutoff;
+		int16_t emphasis_cutoff_initial;
+		int16_t emphasis_cutoff_target;
+
+		uint16_t output_cutoff;
+		uint16_t output_cutoff_initial;
+		uint16_t output_cutoff_target;
+
+		int32_t emphasis_filter_state;
+		int32_t output_filter_state;
+
+		// Attenuation for output channels
+		uint8_t output_gain[4];
+
+		int16_t samples[5]; // +1 history
 	};
 
+	uint16_t gain_tab[256];
 	zchan m_chan[48];
 
 	required_region_ptr<uint32_t> m_mem_base;
@@ -83,6 +99,9 @@ private:
 	void control_w(int reg, uint16_t data);
 	uint16_t control_r(int reg);
 	int16_t *prepare_samples(uint32_t offset);
+	void filter_samples(zchan *ch);
+	int16_t expand_reg(uint8_t val);
+	inline int16_t ramp(int32_t current, int32_t target, int32_t top, int32_t bottom);
 };
 
 DECLARE_DEVICE_TYPE(ZSG2, zsg2_device)
