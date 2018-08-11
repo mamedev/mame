@@ -1083,21 +1083,22 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(INPUTLINE("maincpu", 3))
-	MCFG_ADC0844_CH1_CB(IOPORT("WHEEL"))
-	MCFG_ADC0844_CH2_CB(IOPORT("ACCEL"))
-	MCFG_ADC0844_CH3_CB(IOPORT("BRAKE"))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(midvunit_state::midvunit)
+void midvunit_state::midvunit(machine_config &config)
+{
 	midvcommon(config);
 
+	ADC0844(config, m_adc, 0);
+	m_adc->intr_callback().set_inputline("maincpu", 3);
+	m_adc->ch1_callback().set_ioport("WHEEL");
+	m_adc->ch2_callback().set_ioport("ACCEL");
+	m_adc->ch3_callback().set_ioport("BRAKE");
+
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
-MACHINE_CONFIG_END
+	DCS_AUDIO_2K(config, "dcs", 0);
+}
 
 
 MACHINE_CONFIG_START(midvunit_state::crusnwld)
@@ -1132,8 +1133,6 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(0)
 	MCFG_MIDWAY_IOASIC_UPPER(452) /* no alternates */
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
-
-	MCFG_DEVICE_REMOVE("adc")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)

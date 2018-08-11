@@ -42,8 +42,6 @@ class addressable_latch_device : public device_t
 {
 public:
 	// static configuration
-	template<unsigned Bit, class Object> devcb_base &set_q_out_cb(Object &&cb) { return m_q_out_cb[Bit].set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_parallel_out_cb(Object &&cb) { return m_parallel_out_cb.set_callback(std::forward<Object>(cb)); }
 	template <unsigned Bit> auto q_out_cb() { return m_q_out_cb[Bit].bind(); }
 	auto parallel_out_cb() { return m_parallel_out_cb.bind(); }
 

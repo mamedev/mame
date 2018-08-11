@@ -51,7 +51,6 @@ public:
 	ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ttl74148_device() {}
 
-	template <typename Object> void set_output_callback(Object &&cb) { m_output_cb = std::forward<Object>(cb); }
 	auto out_cb() { return m_output_cb.bind(); }
 
 	/* must call update() after setting the inputs */

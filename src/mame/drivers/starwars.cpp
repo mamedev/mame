@@ -311,10 +311,10 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
-	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
-	MCFG_ADC0808_IN1_CB(IOPORT("STICKX")) // yaw
-	MCFG_ADC0808_IN2_CB(CONSTANT(0)) // thrust (unused)
+	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK / 16)); // designated as "137243-001" on parts list and "157249-120" on schematics
+	adc.in_callback<0>().set_ioport("STICKY"); // pitch
+	adc.in_callback<1>().set_ioport("STICKX"); // yaw
+	adc.in_callback<2>().set_constant(0); // thrust (unused)
 
 	RIOT6532(config, m_riot, MASTER_CLOCK / 8);
 	m_riot->in_pa_callback().set(FUNC(starwars_state::r6532_porta_r));

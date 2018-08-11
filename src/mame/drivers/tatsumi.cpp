@@ -886,14 +886,14 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
-	MCFG_DEVICE_ADD("adc", M58990, 1000000) // unknown clock
-	MCFG_ADC0808_IN0_CB(IOPORT("STICK_X"))
-	MCFG_ADC0808_IN1_CB(IOPORT("STICK_Y"))
-	MCFG_ADC0808_IN2_CB(CONSTANT(0)) // VSP1
-	MCFG_ADC0808_IN4_CB(READ8(*this, apache3_state, apache3_vr1_r))
-	MCFG_ADC0808_IN5_CB(IOPORT("THROTTLE"))
-	MCFG_ADC0808_IN6_CB(CONSTANT(0)) // RPSNC
-	MCFG_ADC0808_IN7_CB(CONSTANT(0)) // LPSNC
+	m58990_device &adc(M58990(config, "adc", 1000000)); // unknown clock
+	adc.in_callback<0>().set_ioport("STICK_X");
+	adc.in_callback<1>().set_ioport("STICK_Y");
+	adc.in_callback<2>().set_constant(0); // VSP1
+	adc.in_callback<4>().set(FUNC(apache3_state::apache3_vr1_r));
+	adc.in_callback<5>().set_ioport("THROTTLE");
+	adc.in_callback<6>().set_constant(0); // RPSNC
+	adc.in_callback<7>().set_constant(0); // LPSNC
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 

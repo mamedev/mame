@@ -411,9 +411,9 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 	MCFG_DEVICE_PROGRAM_MAP(aa310_mem)
 	MCFG_ARM_COPRO(VL86C020)
 
-	MCFG_DEVICE_ADD("kart", AAKART, 8000000/256)
-	MCFG_AAKART_OUT_TX_CB(WRITELINE(*this, archimedes_state, a310_kart_tx_w))
-	MCFG_AAKART_OUT_RX_CB(WRITELINE(*this, archimedes_state, a310_kart_rx_w))
+	AAKART(config, m_kart, 8000000/256);
+	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
+	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(0x100)

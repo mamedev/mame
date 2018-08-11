@@ -1196,11 +1196,11 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/32) // 625 kHz
-	MCFG_ADC0808_IN0_CB(IOPORT("ADC0")) // J102 pin 5 (POT1)
-	MCFG_ADC0808_IN1_CB(IOPORT("ADC1")) // J102 pin 7 (POT2)
-	MCFG_ADC0808_IN2_CB(IOPORT("ADC2")) // J102 pin 9 (POT3)
-	MCFG_ADC0808_IN3_CB(IOPORT("ADC3")) // J102 pin 8 (POT4)
+	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK/32)); // 625 kHz
+	adc.in_callback<0>().set_ioport("ADC0"); // J102 pin 5 (POT1)
+	adc.in_callback<1>().set_ioport("ADC1"); // J102 pin 7 (POT2)
+	adc.in_callback<2>().set_ioport("ADC2"); // J102 pin 9 (POT3)
+	adc.in_callback<3>().set_ioport("ADC3"); // J102 pin 8 (POT4)
 	// IN4 = J102 pin 6 (unused)
 	// IN5 = J102 pin 4 (unused)
 	// IN6 = J102 pin 2 (unused)

@@ -961,11 +961,11 @@ MACHINE_CONFIG_START(mcr68_state::spyhunt2)
 	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_CH1_CB(IOPORT("AN1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("AN2"))
-	MCFG_ADC0844_CH3_CB(IOPORT("AN3"))
-	MCFG_ADC0844_CH4_CB(IOPORT("AN4"))
+	ADC0844(config, m_adc, 0);
+	m_adc->ch1_callback().set_ioport("AN1");
+	m_adc->ch2_callback().set_ioport("AN2");
+	m_adc->ch3_callback().set_ioport("AN3");
+	m_adc->ch4_callback().set_ioport("AN4");
 MACHINE_CONFIG_END
 
 

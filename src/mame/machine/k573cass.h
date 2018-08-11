@@ -128,7 +128,7 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5) override;
 
-	ADC083X_INPUT_CB(punchmania_inputs_callback);
+	double punchmania_inputs_callback(uint8_t input);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

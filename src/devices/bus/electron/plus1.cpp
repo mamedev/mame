@@ -97,12 +97,12 @@ MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* adc */
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE(*this, electron_plus1_device, ready_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("JOY1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("JOY2"))
-	MCFG_ADC0844_CH3_CB(IOPORT("JOY3"))
-	MCFG_ADC0844_CH4_CB(IOPORT("JOY4"))
+	ADC0844(config, m_adc, 0);
+	m_adc->intr_callback().set(FUNC(electron_plus1_device::ready_w));
+	m_adc->ch1_callback().set_ioport("JOY1");
+	m_adc->ch2_callback().set_ioport("JOY2");
+	m_adc->ch3_callback().set_ioport("JOY3");
+	m_adc->ch4_callback().set_ioport("JOY4");
 
 	/* cartridges */
 	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk1", electron_cart, nullptr)

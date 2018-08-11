@@ -370,9 +370,9 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(rc702_state, kbd_put))
 
-	MCFG_DEVICE_ADD("7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, rc702_state, q_w))
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, rc702_state, qbar_w))
+	TTL7474(config, m_7474, 0);
+	m_7474->output_cb().set(FUNC(rc702_state::q_w));
+	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
