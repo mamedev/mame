@@ -24,6 +24,7 @@
     - http://machines.hyperreal.org/manufacturers/PPG/info/ppg.waveterm.revisions.txt
     - http://www.flexusergroup.com/flexusergroup/default.htm
     - http://web.archive.org/web/20091026234737/http://geocities.com/flexemu/
+    - http://oldcomputer.info/8bit/microtrol/index.htm
 
 ****************************************************************************/
 
@@ -77,6 +78,9 @@ public:
 	{
 	}
 
+	void eurocom2(machine_config &config);
+	void microtrol(machine_config &config);
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(fdc_aux_r);
@@ -93,9 +97,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia1_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 
-	void eurocom2(machine_config &config);
 	void eurocom2_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -502,9 +505,15 @@ MACHINE_CONFIG_START(waveterm_state::waveterm)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "waveterm")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(eurocom2_state::microtrol)
+	eurocom2(config);
+
+	// TODO: Second board has WD2793A FDC and what looks like a RAM disk
+MACHINE_CONFIG_END
+
 
 ROM_START(eurocom2)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 
 	ROM_DEFAULT_BIOS("mon54")
 	ROM_SYSTEM_BIOS(0, "mon24", "Eurocom Control V2.4")
@@ -520,11 +529,18 @@ ROM_START(eurocom2)
 ROM_END
 
 ROM_START(waveterm)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("rom.bin", 0x0000, 0x1000, CRC(add3c20f) SHA1(4d47d99231bff2209634e6aac5710e782ee2f6da))
 ROM_END
 
+ROM_START(microtrol)
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("mon1.bin", 0x0000, 0x0800, CRC(4e82af0f) SHA1(a708f0c8a4d7ab216bc065e82a4ad42009cc3696)) // "microtrol Control V5.1"
+	ROM_LOAD("mon2.bin", 0x0800, 0x0800, CRC(577a2b4c) SHA1(e7097a96417fa249a62c967039f039e637079cb6))
+ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME         FLAGS
-COMP( 1981, eurocom2, 0,        0,      eurocom2, eurocom2, eurocom2_state, empty_init, "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON )
-COMP( 1982, waveterm, eurocom2, 0,      waveterm, waveterm, waveterm_state, empty_init, "PPG",   "Waveterm A",    MACHINE_IS_SKELETON )
+
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY      FULLNAME                     FLAGS
+COMP( 1981, eurocom2,  0,        0,      eurocom2,  eurocom2, eurocom2_state, empty_init, "Eltec",     "Eurocom II V7",             MACHINE_IS_SKELETON )
+COMP( 1982, waveterm,  eurocom2, 0,      waveterm,  waveterm, waveterm_state, empty_init, "PPG",       "Waveterm A",                MACHINE_IS_SKELETON )
+COMP( 1985, microtrol, eurocom2, 0,      microtrol, eurocom2, eurocom2_state, empty_init, "Microtrol", "Unknown portable computer", MACHINE_IS_SKELETON )

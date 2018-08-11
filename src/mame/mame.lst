@@ -12468,6 +12468,7 @@ strvmstr                        // (c) 1986 Enerdyne Technologies Inc
 @source:eurocom2.cpp
 eurocom2                        //
 waveterm                        //
+microtrol                       //
 
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
