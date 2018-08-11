@@ -11,6 +11,7 @@
 #include "cpu/f8/f8.h"
 #include "machine/ay31015.h"
 #include "machine/f3853.h"
+#include "machine/input_merger.h"
 #include "sound/beep.h"
 #include "screen.h"
 #include "speaker.h"
@@ -23,7 +24,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_uart(*this, "uart")
 		, m_io(*this, "io")
-		, m_aux(*this, "aux")
 		, m_screen(*this, "screen")
 		, m_bell(*this, "bell")
 		, m_kbdecode(*this, "kbdecode")
@@ -65,7 +65,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay51013_device> m_uart;
 	required_device<rs232_port_device> m_io;
-	required_device<rs232_port_device> m_aux;
+	//required_device<rs232_port_device> m_aux;
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_bell;
 	required_region_ptr<u8> m_kbdecode;
@@ -409,7 +409,7 @@ static INPUT_PORTS_START(act5a)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 	PORT_START("SPECIAL")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F9)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F9) PORT_WRITE_LINE_DEVICE_MEMBER("txd", input_merger_device, in_w<1>)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line/Loc") PORT_CODE(KEYCODE_F10) PORT_TOGGLE
 
 	PORT_START("DSW1")
@@ -497,12 +497,15 @@ void microterm_f8_state::act5a(machine_config &config)
 
 	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_io, FUNC(rs232_port_device::rxd_r));
-	m_uart->write_so_callback().set(m_io, FUNC(rs232_port_device::write_txd));
+	m_uart->write_so_callback().set("txd", FUNC(input_merger_device::in_w<0>));
 	m_uart->write_dav_callback().set("smi", FUNC(f3853_device::set_external_interrupt_in_line)).invert();
 	m_uart->set_auto_rdav(true);
 
 	RS232_PORT(config, m_io, default_rs232_devices, nullptr);
-	RS232_PORT(config, m_aux, default_rs232_devices, nullptr);
+
+	INPUT_MERGER_ALL_HIGH(config, "txd").output_handler().set(m_io, FUNC(rs232_port_device::write_txd));
+
+	//RS232_PORT(config, m_aux, default_rs232_devices, nullptr);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16.572_MHz_XTAL, 918, 0, 720, 301, 0, 288); // more or less guessed
