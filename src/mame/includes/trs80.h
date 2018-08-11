@@ -15,6 +15,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/com8116.h"
+#include "machine/i8255.h"
 #include "bus/rs232/rs232.h"
 #include "machine/buffer.h"
 #include "machine/wd_fdc.h"
@@ -40,6 +41,7 @@ public:
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_cent_status_in(*this, "cent_status_in")
 		, m_uart(*this, "uart")
+		, m_ppi(*this, "ppi")  // Radionic only
 		, m_brg(*this, "brg")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -105,6 +107,7 @@ private:
 	void trs80_io(address_map &map);
 	void trs80_mem(address_map &map);
 	void ht1080z_io(address_map &map);
+	void radionic_mem(address_map &map);
 
 	uint8_t m_mode;
 	uint8_t m_irq;
@@ -130,6 +133,7 @@ private:
 	optional_device<output_latch_device> m_cent_data_out;
 	optional_device<input_buffer_device> m_cent_status_in;
 	optional_device<ay31015_device> m_uart;
+	optional_device<i8255_device> m_ppi;
 	optional_device<com8116_device> m_brg;
 	optional_device<fd1793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;

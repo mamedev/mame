@@ -404,19 +404,19 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wardner_state, int_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, wardner_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, wardner_state, bg_ram_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wardner_state, fg_rom_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wardner_state, display_on_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));
+	mainlatch.q_out_cb<3>().set(FUNC(wardner_state::flipscreen_w));
+	mainlatch.q_out_cb<4>().set(FUNC(wardner_state::bg_ram_bank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(wardner_state::fg_rom_bank_w));
+	mainlatch.q_out_cb<6>().set(FUNC(wardner_state::display_on_w));
 
-	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wardner_state, dsp_int_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, wardner_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wardner_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wardner_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, wardner_state, coin_lockout_2_w))
+	ls259_device &coinlatch(LS259(config, "coinlatch"));
+	coinlatch.q_out_cb<0>().set(FUNC(wardner_state::dsp_int_w));
+	coinlatch.q_out_cb<4>().set(FUNC(wardner_state::coin_counter_1_w));
+	coinlatch.q_out_cb<5>().set(FUNC(wardner_state::coin_counter_2_w));
+	coinlatch.q_out_cb<6>().set(FUNC(wardner_state::coin_lockout_1_w));
+	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(14'000'000)/4) /* 3.5MHz measured on CLKin */

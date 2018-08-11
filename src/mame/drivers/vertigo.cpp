@@ -134,8 +134,8 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vertigo_state, v_irq3_w))
 	MCFG_PIT8253_CLK2(24_MHz_XTAL / 100)
 
-	MCFG_DEVICE_ADD("74148", TTL74148, 0)
-	MCFG_74148_OUTPUT_CB(vertigo_state, update_irq)
+	TTL74148(config, m_ttl74148, 0);
+	m_ttl74148->out_cb().set(FUNC(vertigo_state::update_irq));
 
 	/* motor controller */
 	MCFG_DEVICE_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)

@@ -14,52 +14,11 @@
 #include "machine/z80scc.h"
 #include "bus/interpro/keyboard/keyboard.h"
 
-enum control_mask
-{
-	NO_HOLD      = 0x01, // release DSP hold
-	DSP_1_HOLD_L = 0x02, // hold DSP 1
-	// 0x04 maybe reset?
-	FIFO_LW_ENB  = 0x08, // fifo low water interrupt enable
-	HOLD_ENB     = 0x10, // DSP hold interrupt enable
-	HOLDA_INT_H  = 0x20, // DSP hold interrupt asserted (aka HOLD_INTR)
-	FIFO_LW_INTR = 0x40, // fifo low water interrupt asserted (ififo)
-	FIFO_HW_INTR = 0x80, // fifo high water interrupt asserted (ififo)
-};
-
-enum status_mask
-{
-	DSP_1_HOLDA_H = 0x01, // aka DSP_HOLDA
-	FIFO_EMPTY    = 0x02, // aka IFIFO_EMPTY?
-	FIFO_HFULL    = 0x04,
-	KREG_OUT_FULL = 0x08,
-	KREG_IN_FULL  = 0x10,
-
-	// SRX_INT0_H
-	// SRX_PORT_RDY
-};
-
-enum attention_mask
-{
-};
-
-enum reg0_mask
-{
-/*
-    0x08,
-    0x10, // mouse button interrupt?
-    0x20,
-    0x40,
-*/
-	SCC_INT = 0x80, // serial controller
-	VBLANK = 0x1000, // vertical blank?
-};
-
-class edge1_device_base : public device_t, public srx_card_device_base
+class edge1_device_base : public device_t, public device_srx_card_interface
 {
 public:
-	const char *tag() const { return device_t::tag(); }
-
 	DECLARE_WRITE_LINE_MEMBER(holda);
+	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 protected:
 	edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -70,9 +29,9 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(scc_irq) { if (state) m_reg0 |= SCC_INT; else m_reg0 &= ~SCC_INT; irq0(state); }
+	DECLARE_WRITE_LINE_MEMBER(scc_irq);
 
-	DECLARE_READ32_MEMBER(reg0_r) { return ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0)); }
+	DECLARE_READ32_MEMBER(reg0_r);
 	DECLARE_WRITE32_MEMBER(reg0_w) { COMBINE_DATA(&m_reg0); }
 
 	DECLARE_READ32_MEMBER(control_r) { return m_control; };
@@ -82,13 +41,16 @@ protected:
 	DECLARE_READ32_MEMBER(fifo_r) { return m_fifo; };
 	DECLARE_WRITE32_MEMBER(fifo_w) { COMBINE_DATA(&m_fifo); }
 	DECLARE_READ32_MEMBER(kernel_r) { return m_kernel; };
-	DECLARE_WRITE32_MEMBER(kernel_w) { COMBINE_DATA(&m_kernel); m_status |= KREG_IN_FULL; } // FIXME: what clears this?
+	DECLARE_WRITE32_MEMBER(kernel_w);
 
 	DECLARE_READ32_MEMBER(attention_r) { return m_attention; };
 	DECLARE_WRITE32_MEMBER(attention_w) { COMBINE_DATA(&m_attention); }
 
 	DECLARE_WRITE32_MEMBER(ififo_lwm_w) { COMBINE_DATA(&m_ififo_lwm); }
 	DECLARE_WRITE32_MEMBER(ififo_hwm_w) { COMBINE_DATA(&m_ififo_hwm); }
+
+	DECLARE_READ32_MEMBER(srx_master_control_r) { return m_srx_master_control; }
+	DECLARE_WRITE32_MEMBER(srx_master_control_w) { COMBINE_DATA(&m_srx_master_control); }
 
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_sram;
@@ -108,57 +70,54 @@ private:
 
 	u32 m_ififo_lwm;
 	u32 m_ififo_hwm;
+
+	u32 m_srx_master_control;
 };
 
-class edge2_processor_device_base : public device_t, public srx_card_device_base
+class edge2_processor_device_base : public device_t, public device_srx_card_interface
 {
-public:
-	const char *tag() const { return device_t::tag(); }
-
 protected:
 	edge2_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
 
-	virtual void device_start() override;
+	virtual void device_start() override {};
 };
 
-class edge2_framebuffer_device_base : public device_t, public srx_card_device_base
+class edge2_framebuffer_device_base : public device_t, public device_srx_card_interface
 {
-public:
-	const char *tag() const { return device_t::tag(); }
-
 protected:
 	edge2_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
 
-	virtual void device_start() override;
+	virtual void device_start() override {};
 };
 
-class edge2plus_processor_device_base : public device_t, public srx_card_device_base
+class edge2plus_processor_device_base : public device_t, public device_srx_card_interface
 {
 public:
-	const char *tag() const { return device_t::tag(); }
-
-	void register_screen(screen_device *screen) { m_screen = screen; }
+	void register_screen(screen_device *screen, ram_device *ram) { m_screen = screen; m_sram = ram; }
+	required_device<tms3203x_device> m_dsp1;
 
 protected:
 	edge2plus_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
 
-	virtual void device_start() override;
+	void dsp1_map(address_map &map);
+
+	virtual void device_start() override {};
 
 	DECLARE_WRITE_LINE_MEMBER(holda);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq) { if (state) m_reg0 |= SCC_INT; else m_reg0 &= ~SCC_INT; irq0(state); }
+	DECLARE_WRITE_LINE_MEMBER(scc_irq);
 
 	DECLARE_READ32_MEMBER(control_r) { return m_control; };
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_READ32_MEMBER(status_r) { return m_status; };
 	DECLARE_WRITE32_MEMBER(status_w) { COMBINE_DATA(&m_status); }
 	DECLARE_READ32_MEMBER(kernel_r) { return m_kernel; };
-	DECLARE_WRITE32_MEMBER(kernel_w) { COMBINE_DATA(&m_kernel); m_status |= KREG_IN_FULL; } // FIXME: what clears this?
+	DECLARE_WRITE32_MEMBER(kernel_w);
 	DECLARE_WRITE32_MEMBER(mapping_w) { COMBINE_DATA(&m_mapping); }
 	DECLARE_READ32_MEMBER(attention_r) { return m_attention; };
 	DECLARE_WRITE32_MEMBER(attention_w) { COMBINE_DATA(&m_attention); }
@@ -166,11 +125,9 @@ protected:
 	DECLARE_WRITE32_MEMBER(ififo_lwm_w) { COMBINE_DATA(&m_ififo_lwm); }
 	DECLARE_WRITE32_MEMBER(ififo_hwm_w) { COMBINE_DATA(&m_ififo_hwm); }
 
-	DECLARE_READ32_MEMBER(reg0_r) { m_reg0 ^= VBLANK; return m_reg0; }
-	//DECLARE_READ32_MEMBER(reg0_r) { logerror("reg0_r vblank %d\n", m_screen->vblank()); return (m_screen == nullptr) ? (m_reg0 & ~VBLANK) : ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0)); }
+	DECLARE_READ32_MEMBER(reg0_r);
 	DECLARE_WRITE32_MEMBER(reg0_w) { COMBINE_DATA(&m_reg0); }
 
-	required_device<tms3203x_device> m_dsp1;
 
 private:
 	u32 m_control;
@@ -185,14 +142,14 @@ private:
 	u32 m_reg0;
 
 	screen_device *m_screen;
+	ram_device *m_sram;
 };
 
-class edge2plus_framebuffer_device_base : public device_t, public srx_card_device_base
+class edge2plus_framebuffer_device_base : public device_t, public device_srx_card_interface
 {
-public:
-		const char *tag() const { return device_t::tag(); }
-
 protected:
+	friend class edge2plus_processor_device_base;
+
 	edge2plus_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;

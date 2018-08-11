@@ -196,23 +196,23 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia0_irq_b))
+	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
+	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
+	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
+	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
+	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
+	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
 
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, coco_state, pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, coco_state, pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia1_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
+	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
+	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
+	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
+	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
+	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
+	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
+	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
+	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
+	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
 	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, 14.218_MHz_XTAL, MAINCPU_TAG)
 	MCFG_SAM6883_RES_CALLBACK(READ8(*this, dragon_state, sam_read))
@@ -350,10 +350,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
 	// pia 2
-	MCFG_DEVICE_ADD( PIA2_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dragon_alpha_state, pia2_pa_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dragon_alpha_state, pia2_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dragon_alpha_state, pia2_firq_b))
+	pia6821_device &pia2(PIA6821(config, PIA2_TAG, 0));
+	pia2.writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
+	pia2.irqa_handler().set(FUNC(dragon_alpha_state::pia2_firq_a));
+	pia2.irqb_handler().set(FUNC(dragon_alpha_state::pia2_firq_b));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dgnalpha_flop_list", "dgnalpha_flop")

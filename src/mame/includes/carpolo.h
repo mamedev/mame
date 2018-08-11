@@ -124,7 +124,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ls153_za_w);
 	DECLARE_WRITE_LINE_MEMBER(ls153_zb_w);
 
-	TTL74148_OUTPUT_CB(ttl74148_3s_cb);
+	DECLARE_WRITE8_MEMBER(ttl74148_3s_cb);
 
 	void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy);
 	void normalize_coordinates(int *x1, int *y1, int *x2, int *y2);

@@ -38,6 +38,8 @@ public:
 	// config helper
 	template <class Object> devcb_base &set_clkout_handler(Object &&cb) { return m_clkout_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dataout_handler(Object &&cb) { return m_dataout_handler.set_callback(std::forward<Object>(cb)); }
+	auto clkout_handler() { return m_clkout_handler.bind(); }
+	auto dataout_handler() { return m_dataout_handler.bind(); }
 
 	// construction/destruction
 	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

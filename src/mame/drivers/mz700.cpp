@@ -419,7 +419,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz_state, pio_port_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz_state, pio_port_c_w))
 
-	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
+	TTL74145(config, m_ls145);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)

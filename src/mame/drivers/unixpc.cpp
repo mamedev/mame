@@ -344,13 +344,13 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	MCFG_DEVICE_ADD("maincpu", M68010, 40_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(unixpc_mem)
 
-	MCFG_DEVICE_ADD("gcr", LS259) // 7K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, unixpc_state, error_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, unixpc_state, parity_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, unixpc_state, bpplus_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, unixpc_state, romlmap_w))
+	LS259(config, m_gcr); // 7K
+	m_gcr->q_out_cb<0>().set(FUNC(unixpc_state::error_enable_w));
+	m_gcr->q_out_cb<1>().set(FUNC(unixpc_state::parity_enable_w));
+	m_gcr->q_out_cb<2>().set(FUNC(unixpc_state::bpplus_w));
+	m_gcr->q_out_cb<3>().set(FUNC(unixpc_state::romlmap_w));
 
-	MCFG_DEVICE_ADD("tcr", LS259) // 10K
+	LS259(config, m_tcr); // 10K
 
 	output_latch_device &mreg(OUTPUT_LATCH(config, "mreg"));
 	mreg.bit_handler<0>().set_output("led_0").invert();

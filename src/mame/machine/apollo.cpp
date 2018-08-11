@@ -1093,9 +1093,10 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_pic8259_slave->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_slave_set_int_line));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, apollo_state, apollo_ptm_irq_function))
+	PTM6840(config, m_ptm, 0);
+	m_ptm->set_external_clocks(250000, 125000, 62500);
+	m_ptm->irq_callback().set(FUNC(apollo_state::apollo_ptm_irq_function));
+
 	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
 

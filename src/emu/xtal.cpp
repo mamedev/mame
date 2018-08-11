@@ -182,6 +182,7 @@ const double XTAL::known_xtals[] = {
 	 13'495'200, /* 13.4952_MHz_XTAL       Used on Shadow Force pcb and maybe other Technos pcbs? */
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
+	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
 	 14'000'000, /* 14_MHz_XTAL            - */
 	 14'112'000, /* 14.112_MHz_XTAL        Timex/Sinclair TS2068 */
 	 14'192'640, /* 14.19264_MHz_XTAL      Central Data 2650 */
@@ -210,6 +211,7 @@ const double XTAL::known_xtals[] = {
 	 16'128'000, /* 16.128_MHz_XTAL        Fujitsu FM-7 */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
+	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
 	 16'588'800, /* 16.5888_MHz_XTAL       SM 7238 */
 	 16'669'800, /* 16.6698_MHz_XTAL       Qume QVT-102 */
 	 16'670'000, /* 16.67_MHz_XTAL         - */

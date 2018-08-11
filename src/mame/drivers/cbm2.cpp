@@ -2343,19 +2343,22 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_PLS100_ADD(PLA2_TAG)
-	MCFG_DEVICE_ADD(MOS6525_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, p500_state, tpi1_irq_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi1_pa_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, tpi1_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi1_pb_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, p500_state, tpi1_ca_w))
-	MCFG_TPI6525_OUT_CB_CB(WRITELINE(*this, p500_state, tpi1_cb_w))
-	MCFG_DEVICE_ADD(MOS6525_2_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi2_pa_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi2_pb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(*this, p500_state, tpi2_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, p500_state, tpi2_pc_w))
+
+	TPI6525(config, m_tpi1, 0);
+	m_tpi1->out_irq_cb().set(FUNC(p500_state::tpi1_irq_w));
+	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
+	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
+	m_tpi1->in_pb_cb().set(FUNC(cbm2_state::tpi1_pb_r));
+	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pb_w));
+	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
+	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
+
+	TPI6525(config, m_tpi2, 0);
+	m_tpi2->out_pa_cb().set(FUNC(cbm2_state::tpi2_pa_w));
+	m_tpi2->out_pb_cb().set(FUNC(cbm2_state::tpi2_pb_w));
+	m_tpi2->in_pc_cb().set(FUNC(p500_state::tpi2_pc_r));
+	m_tpi2->out_pc_cb().set(FUNC(p500_state::tpi2_pc_w));
+
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, VIC6567_CLOCK)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
@@ -2459,19 +2462,22 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_PLS100_ADD(PLA2_TAG)
-	MCFG_DEVICE_ADD(MOS6525_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, p500_state, tpi1_irq_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi1_pa_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, tpi1_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi1_pb_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, p500_state, tpi1_ca_w))
-	MCFG_TPI6525_OUT_CB_CB(WRITELINE(*this, p500_state, tpi1_cb_w))
-	MCFG_DEVICE_ADD(MOS6525_2_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi2_pa_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi2_pb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(*this, p500_state, tpi2_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, p500_state, tpi2_pc_w))
+
+	TPI6525(config, m_tpi1, 0);
+	m_tpi1->out_irq_cb().set(FUNC(p500_state::tpi1_irq_w));
+	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
+	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
+	m_tpi1->in_pb_cb().set(FUNC(cbm2_state::tpi1_pb_r));
+	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pb_w));
+	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
+	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
+
+	TPI6525(config, m_tpi2, 0);
+	m_tpi2->out_pa_cb().set(FUNC(cbm2_state::tpi2_pa_w));
+	m_tpi2->out_pb_cb().set(FUNC(cbm2_state::tpi2_pb_w));
+	m_tpi2->in_pc_cb().set(FUNC(p500_state::tpi2_pc_r));
+	m_tpi2->out_pc_cb().set(FUNC(p500_state::tpi2_pc_w));
+
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
@@ -2574,17 +2580,20 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
-	MCFG_DEVICE_ADD(MOS6525_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, cbm2_state, tpi1_irq_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi1_pa_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi1_pb_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, cbm2_state, tpi1_ca_w))
-	MCFG_DEVICE_ADD(MOS6525_2_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi2_pa_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi2_pb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(*this, cbm2_state, tpi2_pc_r))
+
+	TPI6525(config, m_tpi1, 0);
+	m_tpi1->out_irq_cb().set(FUNC(cbm2_state::tpi1_irq_w));
+	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
+	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
+	m_tpi1->in_pb_cb().set(FUNC(cbm2_state::tpi1_pb_r));
+	m_tpi1->out_pb_cb().set(FUNC(cbm2_state::tpi1_pb_w));
+	m_tpi1->out_ca_cb().set(FUNC(cbm2_state::tpi1_ca_w));
+
+	TPI6525(config, m_tpi2, 0);
+	m_tpi2->out_pa_cb().set(FUNC(cbm2_state::tpi2_pa_w));
+	m_tpi2->out_pb_cb().set(FUNC(cbm2_state::tpi2_pb_w));
+	m_tpi2->in_pc_cb().set(FUNC(cbm2_state::tpi2_pc_r));
+
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
@@ -2703,8 +2712,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cbm2_state::cbm2hp_ntsc)
 	cbm2lp_ntsc(config);
-	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
-	MCFG_TPI6525_IN_PC_CB(READ8(*this, cbm2hp_state, tpi2_pc_r))
+	m_tpi2->in_pc_cb().set(FUNC(cbm2hp_state::tpi2_pc_r));
 MACHINE_CONFIG_END
 
 
@@ -2744,11 +2752,11 @@ MACHINE_CONFIG_START(cbm2hp_state::bx256hp)
 	MCFG_DEVICE_ADD(EXT_I8259A_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(EXT_MOS6526_TAG, mos6526_device, pa_r))
-	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, ext_tpi_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, ext_tpi_pb_w))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, cbm2_state, ext_tpi_pc_w))
+	TPI6525(config, m_ext_tpi, 0);
+	m_ext_tpi->in_pa_cb().set(EXT_MOS6526_TAG, FUNC(mos6526_device::pa_r));
+	m_ext_tpi->in_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_r));
+	m_ext_tpi->out_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_w));
+	m_ext_tpi->out_pc_cb().set(FUNC(cbm2_state::ext_tpi_pc_w));
 
 	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(60)
@@ -2770,8 +2778,7 @@ MACHINE_CONFIG_START(cbm2_state::cbm2hp_pal)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	// devices
-	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
-	MCFG_TPI6525_IN_PC_CB(READ8(*this, cbm2hp_state, tpi2_pc_r))
+	m_tpi2->in_pc_cb().set(FUNC(cbm2hp_state::tpi2_pc_r));
 
 	MCFG_DEVICE_MODIFY(MOS6526_TAG)
 	MCFG_MOS6526_TOD(50)
@@ -2814,11 +2821,11 @@ MACHINE_CONFIG_START(cbm2hp_state::cbm730)
 	MCFG_DEVICE_ADD(EXT_I8259A_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(EXT_MOS6526_TAG, mos6526_device, pa_r))
-	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, ext_tpi_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, ext_tpi_pb_w))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, cbm2_state, ext_tpi_pc_w))
+	TPI6525(config, m_ext_tpi, 0);
+	m_ext_tpi->in_pa_cb().set(EXT_MOS6526_TAG, FUNC(mos6526_device::pa_r));
+	m_ext_tpi->in_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_r));
+	m_ext_tpi->out_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_w));
+	m_ext_tpi->out_pc_cb().set(FUNC(cbm2_state::ext_tpi_pc_w));
 
 	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(50)

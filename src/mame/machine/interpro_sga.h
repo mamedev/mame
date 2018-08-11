@@ -6,15 +6,12 @@
 
 #pragma once
 
-#define MCFG_INTERPRO_SGA_BERR_CB(_out_berr) \
-	downcast<interpro_sga_device &>(*device).set_out_berr_callback(DEVCB_##_out_berr);
-
 class interpro_sga_device : public device_t
 {
 public:
 	interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_berr_callback(Object &&cb) { return out_berr_func.set_callback(std::forward<Object>(cb)); }
+	auto berr_callback() { return m_berr_func.bind(); }
 
 	virtual void map(address_map &map);
 
@@ -185,7 +182,7 @@ private:
 	u32 m_dcksum0; // dma 1 device checksum register 0
 	u32 m_dcksum1; // dma 1 device checksum register 1
 
-	devcb_write32 out_berr_func;
+	devcb_write32 m_berr_func;
 };
 
 // device type definition

@@ -343,34 +343,34 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 
 	/* PIA 0 at $FC20-$FC23 I46 */
-	MCFG_DEVICE_ADD(PIA_0_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia0_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia0_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_irq_b))
+	PIA6821(config, m_pia_0, 0);
+	m_pia_0->readpa_handler().set(FUNC(dgn_beta_state::d_pia0_pa_r));
+	m_pia_0->readpb_handler().set(FUNC(dgn_beta_state::d_pia0_pb_r));
+	m_pia_0->writepa_handler().set(FUNC(dgn_beta_state::d_pia0_pa_w));
+	m_pia_0->writepb_handler().set(FUNC(dgn_beta_state::d_pia0_pb_w));
+	m_pia_0->cb2_handler().set(FUNC(dgn_beta_state::d_pia0_cb2_w));
+	m_pia_0->irqa_handler().set(FUNC(dgn_beta_state::d_pia0_irq_a));
+	m_pia_0->irqb_handler().set(FUNC(dgn_beta_state::d_pia0_irq_b));
 
 	/* PIA 1 at $FC24-$FC27 I63 */
-	MCFG_DEVICE_ADD(PIA_1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia1_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia1_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia1_irq_b))
+	PIA6821(config, m_pia_1, 0);
+	m_pia_1->readpa_handler().set(FUNC(dgn_beta_state::d_pia1_pa_r));
+	m_pia_1->readpb_handler().set(FUNC(dgn_beta_state::d_pia1_pb_r));
+	m_pia_1->writepa_handler().set(FUNC(dgn_beta_state::d_pia1_pa_w));
+	m_pia_1->writepb_handler().set(FUNC(dgn_beta_state::d_pia1_pb_w));
+	m_pia_1->irqa_handler().set(FUNC(dgn_beta_state::d_pia1_irq_a));
+	m_pia_1->irqb_handler().set(FUNC(dgn_beta_state::d_pia1_irq_b));
 
 	/* PIA 2 at FCC0-FCC3 I28 */
 	/* This seems to control the RAM paging system, and have the DRQ */
 	/* from the WD2797 */
-	MCFG_DEVICE_ADD(PIA_2_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia2_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia2_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia2_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia2_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_b))
+	PIA6821(config, m_pia_2, 0);
+	m_pia_2->readpa_handler().set(FUNC(dgn_beta_state::d_pia2_pa_r));
+	m_pia_2->readpb_handler().set(FUNC(dgn_beta_state::d_pia2_pb_r));
+	m_pia_2->writepa_handler().set(FUNC(dgn_beta_state::d_pia2_pa_w));
+	m_pia_2->writepb_handler().set(FUNC(dgn_beta_state::d_pia2_pb_w));
+	m_pia_2->irqa_handler().set(FUNC(dgn_beta_state::d_pia2_irq_a));
+	m_pia_2->irqb_handler().set(FUNC(dgn_beta_state::d_pia2_irq_b));
 
 	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 1_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_intrq_w))

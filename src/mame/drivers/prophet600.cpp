@@ -285,9 +285,9 @@ MACHINE_CONFIG_START(prophet600_state::prophet600)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, prophet600_state, pit_ch0_tick_w))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, prophet600_state, pit_ch2_tick_w))
 
-	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, prophet600_state, acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia->irq_handler().set(FUNC(prophet600_state::acia_irq_w));
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(UART_TAG, acia6850_device, write_rxd))

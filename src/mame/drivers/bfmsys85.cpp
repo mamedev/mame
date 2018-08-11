@@ -398,8 +398,8 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
 	MCFG_MSC1937_ADD("vfd",0)
 
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bfmsys85_state,sys85_data_w))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(FUNC(bfmsys85_state::sys85_data_w));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfmsys85_state, write_acia_clock))

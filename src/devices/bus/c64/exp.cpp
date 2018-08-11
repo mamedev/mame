@@ -295,6 +295,16 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 }
 
 
+void c64_expansion_slot_device::set_passthrough()
+{
+	irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::irq_w));
+	nmi_wr_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::nmi_w));
+	reset_wr_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::reset_w));
+	cd_rd_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_cd_r));
+	cd_wr_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_cd_w));
+	dma_wr_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_w));
+}
+
 //-------------------------------------------------
 //  SLOT_INTERFACE( c64_expansion_cards )
 //-------------------------------------------------

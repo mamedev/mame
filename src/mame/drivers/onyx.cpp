@@ -43,7 +43,6 @@ To Do:
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 //#include "machine/z80dma.h"
-#include "machine/terminal.h"
 
 class onyx_state : public driver_device
 {

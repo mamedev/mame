@@ -744,8 +744,8 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_DEVICE_ADD("video", LADYBUG_VIDEO, 4000000)
 	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0) // L5 on video board or H3 on single board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ladybug_state, flipscreen_w)) // no other outputs used
+	ls259_device &videolatch(LS259(config, "videolatch")); // L5 on video board or H3 on single board
+	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flipscreen_w)); // no other outputs used
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

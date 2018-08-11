@@ -37,6 +37,7 @@ private:
 
 	x68k_expansion_slot_device *m_slot;
 
+	required_device<scsi_port_device> m_scsibus;
 	required_device<mb89352_device> m_spc;
 };
 

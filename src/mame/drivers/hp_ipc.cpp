@@ -495,7 +495,7 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0600000, 0x060FFFF).rw(FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
 	map(0x0610000, 0x0610007).rw(FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
 	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
-	map(0x0620000, 0x062000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
+	map(0x0620000, 0x0620007).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
 	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::reg8_r) , FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
 	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
@@ -738,9 +738,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, 15.92_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_outer)
 
-	MCFG_HP1LL3_ADD("gpu")
-//  MCFG_HP1LL3_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_4))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	HP1LL3(config , "gpu" , 24_MHz_XTAL / 8).set_screen("screen");
 
 	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
 	// XXX when floppy code correctly handles 600 rpm drives.
@@ -799,12 +797,13 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	// horizontal time = 60 us (min)
 	// ver.refresh period = ~300 us
 	// ver.period = 16.7ms (~60 hz)
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
-	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 512, 278, 0, 256)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
+	SCREEN(config , m_screen , SCREEN_TYPE_LCD);
+	m_screen->set_color(rgb_t::amber()); // actually a kind of EL display
+	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
+	m_screen->set_raw(6_MHz_XTAL * 2 , 720 , 0 , 512 , 261 , 0 , 255);
+	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 

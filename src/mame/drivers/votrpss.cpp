@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)

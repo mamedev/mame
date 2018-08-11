@@ -121,15 +121,15 @@ MACHINE_CONFIG_START(slicer_state::slicer)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("drivelatch", LS259, 0) // U29
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("sasi", scsi_port_device, write_sel))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("sasi", scsi_port_device, write_rst))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, slicer_state, drive_size_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("fdc", fd1797_device, dden_w))
+	ls259_device &drivelatch(LS259(config, "drivelatch")); // U29
+	drivelatch.q_out_cb<0>().set("sasi", FUNC(scsi_port_device::write_sel));
+	drivelatch.q_out_cb<1>().set("sasi", FUNC(scsi_port_device::write_rst));
+	drivelatch.q_out_cb<2>().set(FUNC(slicer_state::drive_sel_w<3>));
+	drivelatch.q_out_cb<3>().set(FUNC(slicer_state::drive_sel_w<2>));
+	drivelatch.q_out_cb<4>().set(FUNC(slicer_state::drive_sel_w<1>));
+	drivelatch.q_out_cb<5>().set(FUNC(slicer_state::drive_sel_w<0>));
+	drivelatch.q_out_cb<6>().set(FUNC(slicer_state::drive_size_w));
+	drivelatch.q_out_cb<7>().set("fdc", FUNC(fd1797_device::dden_w));
 
 	MCFG_DEVICE_ADD("sasi", SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")

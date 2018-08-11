@@ -33,30 +33,6 @@
 #pragma once
 
 //**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<0>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<1>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<2>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<3>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<4>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<5>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<6>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_q_out_cb<7>(DEVCB_##_devcb);
-
-#define MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(_devcb) \
-	downcast<addressable_latch_device &>(*device).set_parallel_out_cb(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

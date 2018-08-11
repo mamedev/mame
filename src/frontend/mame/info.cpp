@@ -108,7 +108,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST display vbstart CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT sound EMPTY>\n"
 "\t\t\t<!ATTLIST sound channels CDATA #REQUIRED>\n"
-"\t\t\t<!ELEMENT condition EMPTY>\n"
+"\t\t<!ELEMENT condition EMPTY>\n"
 "\t\t\t<!ATTLIST condition tag CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST condition mask CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST condition relation (eq|ne|gt|le|lt|ge) #REQUIRED>\n"

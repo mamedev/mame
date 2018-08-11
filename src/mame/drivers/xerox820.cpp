@@ -98,12 +98,12 @@ void xerox820ii_state::bankswitch(int bank)
 
 READ8_MEMBER( xerox820_state::fdc_r )
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( xerox820_state::fdc_w )
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER( xerox820_state::scroll_w )

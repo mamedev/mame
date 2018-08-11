@@ -2,17 +2,19 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Jade JGZ80 (with Serial Parallel Interrupt Controller)
+Unknown Z80 (with Serial Parallel Interrupt Controller)
 
-    Single board Z80 computer on a S100 card.
-    The SPIO board adds four CTCs, two SIOs and one PIO.
+Single board Z80 computer on a S100 card.
+The SPIO board adds four CTCs, two SIOs and one PIO.
 
-    2013-09-12 Skeleton driver.
+2013-09-12 Skeleton driver.
 
-    No info found as yet.
+No info found as yet.
 
-    It takes about 8 seconds to start up.
-    Type HE to get a list of commands.
+It should display P-Mon 4b 08/29/83 SPIC, then pause a bit,
+then show a # prompt. Type HE to get a list of commands.
+
+Currently does nothing due to a SIO regression.
 
 ****************************************************************************/
 
@@ -25,15 +27,15 @@
 //#include "bus/s100/s100.h"
 
 
-class jade_state : public driver_device
+class unkz80_state : public driver_device
 {
 public:
-	jade_state(const machine_config &mconfig, device_type type, const char *tag)
+	unkz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void jade(machine_config &config);
+	void unkz80(machine_config &config);
 
 private:
 	void io_map(address_map &map);
@@ -43,14 +45,14 @@ private:
 };
 
 
-void jade_state::mem_map(address_map &map)
+void unkz80_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom().region("roms", 0);
 	map(0x0800, 0xffff).ram();
 }
 
-void jade_state::io_map(address_map &map)
+void unkz80_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -60,13 +62,13 @@ void jade_state::io_map(address_map &map)
 }
 
 /* Input ports */
-static INPUT_PORTS_START( jade )
+static INPUT_PORTS_START( unkz80 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(jade_state::jade)
+MACHINE_CONFIG_START(unkz80_state::unkz80)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu",Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
@@ -79,8 +81,7 @@ MACHINE_CONFIG_START(jade_state::jade)
 	CLOCK(config, "trg0", 4_MHz_XTAL / 2).signal_handler().set("ctc2", FUNC(z80ctc_device::trg0));
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))  // no evidence of a daisy chain because IM2 is not set
+	MCFG_DEVICE_ADD("sio", Z80SIO, 4_MHz_XTAL)
 	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -91,12 +92,12 @@ MACHINE_CONFIG_START(jade_state::jade)
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( jgz80 )
+ROM_START( unkz80 )
 	ROM_REGION( 0x800, "roms", 0 )
-	ROM_LOAD( "jgz80.rom",   0x0000, 0x0800, CRC(90c4a1ef) SHA1(8a93a11051cc27f3edca24f0f4297ebe0099964e) )
+	ROM_LOAD( "unkz80.rom",   0x0000, 0x0800, CRC(90c4a1ef) SHA1(8a93a11051cc27f3edca24f0f4297ebe0099964e) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME  FLAGS
-COMP( 1983, jgz80, 0,      0,      jade,    jade,  jade_state, empty_init, "Jade Computer Products", "JGZ80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, unkz80, 0,      0,      unkz80,    unkz80,  unkz80_state, empty_init, "<unknown>", "Unknown Z80 computer",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

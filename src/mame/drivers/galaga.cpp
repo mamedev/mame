@@ -1779,8 +1779,8 @@ MACHINE_CONFIG_START(galaga_state::gatsbee)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gatsbee_main_map)
 
-	MCFG_DEVICE_ADD("extralatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, gatsbee_bank_w))
+	ls259_device &extralatch(LS259(config, "extralatch"));
+	extralatch.q_out_cb<0>().set(FUNC(galaga_state::gatsbee_bank_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xevious_state::xevious)

@@ -180,7 +180,6 @@ http://blog.system11.org/?p=1943
 #include "cpu/i8085/i8085.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
-#include "sound/c6280.h"
 #include "machine/i8155.h"
 
 #include "bus/generic/slot.h"
@@ -341,10 +340,6 @@ void tourvision_state::pce_mem(address_map &map)
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
 	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
-	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(FUNC(tourvision_state::pce_joystick_r), FUNC(tourvision_state::pce_joystick_w));
-	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
 void tourvision_state::pce_io(address_map &map)
@@ -396,9 +391,14 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 
 MACHINE_CONFIG_START(tourvision_state::tourvision)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
-	MCFG_DEVICE_IO_MAP(pce_io)
+	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tourvision_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &tourvision_state::pce_io);
+	m_maincpu->port_in_cb().set(FUNC(tourvision_state::pce_joystick_r));
+	m_maincpu->port_out_cb().set(FUNC(tourvision_state::pce_joystick_w));
+	m_maincpu->add_route(0, "lspeaker", 1.00);
+	m_maincpu->add_route(1, "rspeaker", 1.00);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("subcpu", I8085A, 18000000/3 /*?*/)
@@ -427,10 +427,6 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_C6280_CPU("maincpu")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tourvision_cart")
 	MCFG_GENERIC_EXTENSIONS("bin")

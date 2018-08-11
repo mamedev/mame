@@ -566,21 +566,21 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, wmg_state, wmg_port_select_w))
+	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
+	pia0.cb2_handler().set(FUNC(wmg_state::wmg_port_select_w));
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_state, williams_snd_cmd_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_any_high_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_any_high_device, in_w<1>))
+	pia6821_device &pia1(PIA6821(config, "pia_1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.writepb_handler().set(FUNC(williams_state::williams_snd_cmd_w));
+	pia1.irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	pia1.irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<1>))
+	pia6821_device &pia2(PIA6821(config, "pia_2", 0));
+	pia2.writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	pia2.irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	pia2.irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 MACHINE_CONFIG_END
 
 /*************************************

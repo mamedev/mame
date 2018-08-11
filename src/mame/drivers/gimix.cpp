@@ -30,7 +30,6 @@
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "machine/wd_fdc.h"
-#include "machine/terminal.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -374,7 +373,7 @@ READ8_MEMBER(gimix_state::fdc_r)
 		m_floppy1_ready = true;
 		logerror("FDC: Floppy drive 1 motor on\n");
 	}
-	return m_fdc->read(space,offset);
+	return m_fdc->read(offset);
 }
 
 WRITE8_MEMBER(gimix_state::fdc_w)
@@ -384,7 +383,7 @@ WRITE8_MEMBER(gimix_state::fdc_w)
 		m_floppy0->get_device()->mon_w(0);
 	if(m_selected_drive == 2)
 		m_floppy1->get_device()->mon_w(0);
-	m_fdc->write(space,offset,data);
+	m_fdc->write(offset,data);
 }
 
 READ8_MEMBER(gimix_state::pia_pa_r)
@@ -432,13 +431,13 @@ WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
 		if(DMA_DIRECTION)
 		{
 			// write to disk
-			m_fdc->write_data(m_ram->read(m_dma_current_addr));
+			m_fdc->data_w(m_ram->read(m_dma_current_addr));
 //          logerror("DMA: read from RAM %05x\n",m_dma_current_addr);
 		}
 		else
 		{
 			// read from disk
-			m_ram->write(m_dma_current_addr,m_fdc->read_data());
+			m_ram->write(m_dma_current_addr,m_fdc->data_r());
 //          logerror("DMA: write to RAM %05x\n",m_dma_current_addr);
 		}
 		m_dma_current_addr++;
@@ -559,8 +558,8 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, gimix_state,irq_w))
 
 	/* timer */
-	MCFG_DEVICE_ADD("timer", PTM6840, 2'000'000)  // clock is a guess
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
+	ptm6840_device &ptm(PTM6840(config, "timer", 2'000'000));  // clock is a guess
+	ptm.irq_callback().set(FUNC(gimix_state::irq_w));  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
 	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 4)
@@ -571,29 +570,30 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
 
 	/* parallel ports */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 2'000'000)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, gimix_state,pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, gimix_state,pia_pb_w))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, gimix_state,pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, gimix_state,pia_pb_r))
-	MCFG_DEVICE_ADD("pia2", PIA6821, 2'000'000)
+	pia6821_device &pia1(PIA6821(config, "pia1", 2'000'000));
+	pia1.writepa_handler().set(FUNC(gimix_state::pia_pa_w));
+	pia1.writepb_handler().set(FUNC(gimix_state::pia_pb_w));
+	pia1.readpa_handler().set(FUNC(gimix_state::pia_pa_r));
+	pia1.readpb_handler().set(FUNC(gimix_state::pia_pb_r));
+
+	PIA6821(config, "pia2", 2'000'000);
 
 	/* serial ports */
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 2'000'000)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial1",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial1",rs232_port_device,write_rts))
+	ACIA6850(config, m_acia1, 2'000'000);
+	m_acia1->txd_handler().set("serial1", FUNC(rs232_port_device::write_txd));
+	m_acia1->rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("acia2", ACIA6850, 2'000'000)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial2",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial2",rs232_port_device,write_rts))
+	ACIA6850(config, m_acia2, 2'000'000);
+	m_acia2->txd_handler().set("serial2", FUNC(rs232_port_device::write_txd));
+	m_acia2->rts_handler().set("serial2", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("acia3", ACIA6850, 2'000'000)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial3",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial3",rs232_port_device,write_rts))
+	ACIA6850(config, m_acia3, 2'000'000);
+	m_acia3->txd_handler().set("serial3", FUNC(rs232_port_device::write_txd));
+	m_acia3->rts_handler().set("serial3", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("acia4", ACIA6850, 2'000'000)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial4",rs232_port_device,write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial4",rs232_port_device,write_rts))
+	ACIA6850(config, m_acia4, 2'000'000);
+	m_acia4->txd_handler().set("serial4", FUNC(rs232_port_device::write_txd));
+	m_acia4->rts_handler().set("serial4", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("serial1",RS232_PORT, default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1",acia6850_device,write_rxd))

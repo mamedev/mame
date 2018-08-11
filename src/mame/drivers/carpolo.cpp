@@ -241,18 +241,18 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	                                                   but it's supposed to happen 60
 	                                                   times a sec, so it's a good place */
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, carpolo_state, pia_0_port_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, carpolo_state, pia_0_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, carpolo_state, pia_0_port_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, carpolo_state, coin1_interrupt_clear_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, carpolo_state,coin2_interrupt_clear_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpb_handler().set(FUNC(carpolo_state::pia_0_port_b_r));
+	pia0.writepa_handler().set(FUNC(carpolo_state::pia_0_port_a_w));
+	pia0.writepb_handler().set(FUNC(carpolo_state::pia_0_port_b_w));
+	pia0.ca2_handler().set(FUNC(carpolo_state::carpolo_state::coin1_interrupt_clear_w));
+	pia0.cb2_handler().set(FUNC(carpolo_state::carpolo_state::coin2_interrupt_clear_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, carpolo_state, pia_1_port_a_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, carpolo_state, pia_1_port_b_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, carpolo_state, coin3_interrupt_clear_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, carpolo_state, coin4_interrupt_clear_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia0.readpa_handler().set(FUNC(carpolo_state::pia_1_port_a_r));
+	pia0.readpb_handler().set(FUNC(carpolo_state::pia_1_port_b_r));
+	pia1.ca2_handler().set(FUNC(carpolo_state::coin3_interrupt_clear_w));
+	pia1.cb2_handler().set(FUNC(carpolo_state::coin4_interrupt_clear_w));
 
 	MCFG_DEVICE_ADD(m_ttl7474_2s_1, TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, carpolo_state, carpolo_7474_2s_1_q_cb))
@@ -275,12 +275,12 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_DEVICE_ADD(m_ttl7474_1a_1, TTL7474, 0)
 	MCFG_DEVICE_ADD(m_ttl7474_1a_2, TTL7474, 0)
 
-	MCFG_DEVICE_ADD(m_ttl74148_3s, TTL74148, 0)
-	MCFG_74148_OUTPUT_CB(carpolo_state, ttl74148_3s_cb)
+	TTL74148(config, m_ttl74148_3s, 0);
+	m_ttl74148_3s->out_cb().set(FUNC(carpolo_state::ttl74148_3s_cb));
 
-	MCFG_DEVICE_ADD(m_ttl74153_1k, TTL153)
-	MCFG_TTL153_ZA_CB(WRITELINE(*this, carpolo_state, ls153_za_w)) // pia1 pb5
-	MCFG_TTL153_ZB_CB(WRITELINE(*this, carpolo_state, ls153_zb_w)) // pia1 pb4
+	TTL153(config, m_ttl74153_1k);
+	m_ttl74153_1k->za_cb().set(FUNC(carpolo_state::ls153_za_w)); // pia1 pb5
+	m_ttl74153_1k->zb_cb().set(FUNC(carpolo_state::ls153_zb_w)); // pia1 pb4
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

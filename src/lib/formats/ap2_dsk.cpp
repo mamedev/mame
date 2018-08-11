@@ -1716,6 +1716,8 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 		uint8_t idx = r8(img, off_tmap + trkid);
 		if(idx != 0xff) {
 			uint32_t boff = off_trks + 6656*idx;
+			if (r16(img, boff + 6648) == 0)
+				return false;
 			generate_track_from_bitstream(track, head, &img[boff], r16(img, boff + 6648), image, subtrack, r16(img, boff + 6650));
 		}
 	}

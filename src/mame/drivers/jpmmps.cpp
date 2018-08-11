@@ -250,15 +250,15 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // watchdog
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // ram en
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // alarm
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // nmi en
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("reelmcu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // reel en
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // io en
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bb
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // diagnostic led
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC10
+	mainlatch.q_out_cb<0>().set_nop(); // watchdog
+	mainlatch.q_out_cb<1>().set_nop(); // ram en
+	mainlatch.q_out_cb<2>().set_nop(); // alarm
+	mainlatch.q_out_cb<3>().set_nop(); // nmi en
+	//mainlatch.q_out_cb<4>().set_inputline("reelmcu", INPUT_LINE_RESET).invert(); // reel en
+	mainlatch.q_out_cb<5>().set_nop(); // io en
+	mainlatch.q_out_cb<6>().set_nop(); // bb
+	mainlatch.q_out_cb<7>().set_nop(); // diagnostic led
 
 	//MCFG_DEVICE_ADD("reelmcu", TMS7041, XTAL(5'000'000))
 

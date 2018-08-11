@@ -3073,14 +3073,14 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, funworld_state, pia1_ca2_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.readpb_handler().set_ioport("DSW");
+	pia1.ca2_handler().set(FUNC(funworld_state::pia1_ca2_w));
 
 	/* video hardware */
 

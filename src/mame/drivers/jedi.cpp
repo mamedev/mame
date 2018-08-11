@@ -345,14 +345,14 @@ MACHINE_CONFIG_START(jedi_state::jedi)
 	MCFG_ADC0808_IN2_CB(IOPORT("STICKX"))
 	MCFG_ADC0808_IN3_CB(CONSTANT(0)) // SPARE
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 14J
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jedi_state, coin_counter_left_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jedi_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // LED control - not used
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // LED control - not used
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, jedi_state, foreground_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, jedi_state, audio_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, jedi_state, video_off_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // 14J
+	outlatch.q_out_cb<0>().set(FUNC(jedi_state::coin_counter_left_w));
+	outlatch.q_out_cb<1>().set(FUNC(jedi_state::coin_counter_right_w));
+	outlatch.q_out_cb<2>().set_nop(); // LED control - not used
+	outlatch.q_out_cb<3>().set_nop(); // LED control - not used
+	outlatch.q_out_cb<4>().set(FUNC(jedi_state::foreground_bank_w));
+	outlatch.q_out_cb<6>().set(FUNC(jedi_state::audio_reset_w));
+	outlatch.q_out_cb<7>().set(FUNC(jedi_state::video_off_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

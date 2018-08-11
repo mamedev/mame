@@ -791,11 +791,11 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, ATARI_CLOCK_14MHz/8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, atarisy1_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, atarisy1_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, atarisy1_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, atarisy1_state, via_pb_w))
+	via6522_device &via(VIA6522(config, "via6522_0", ATARI_CLOCK_14MHz/8));
+	via.readpa_handler().set(FUNC(atarisy1_state::via_pa_r));
+	via.readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
+	via.writepa_handler().set(FUNC(atarisy1_state::via_pa_w));
+	via.writepb_handler().set(FUNC(atarisy1_state::via_pb_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::marble)

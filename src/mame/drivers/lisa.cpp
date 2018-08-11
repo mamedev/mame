@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "includes/lisa.h"
-#include "cpu/m6502/m6504.h"
 #include "cpu/cop400/cop400.h"
 #include "formats/ap_dsk35.h"
 #include "screen.h"
@@ -98,96 +97,95 @@ static const floppy_interface lisa_floppy_interface =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-MACHINE_CONFIG_START(lisa_state::lisa)
+void lisa_state::lisa(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
-	MCFG_DEVICE_PROGRAM_MAP(lisa_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER(SCREEN_TAG, lisa_state,  lisa_interrupt)
+	M68000(config, m_maincpu, 5093760);        /* 20.37504 MHz / 4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_map);
+	m_maincpu->set_vblank_int(SCREEN_TAG, FUNC(lisa_state::lisa_interrupt));
 
-	MCFG_DEVICE_ADD(COP421_TAG, COP421, 3900000)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
+	cop421_cpu_device &cop(COP421(config, COP421_TAG, 3900000));
+	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
 
-	MCFG_DEVICE_ADD(KB_COP421_TAG, COP421, 3900000) // ?
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
+	cop421_cpu_device &kbcop(COP421(config, KB_COP421_TAG, 3900000)); // ?
+	kbcop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
 
-	MCFG_DEVICE_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
-	MCFG_DEVICE_PROGRAM_MAP(lisa_fdc_map)
+	M6504(config, m_fdc_cpu, 2000000);        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
+	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_fdc_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // U4E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, lisa_state, diag1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, lisa_state, diag2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, lisa_state, seg1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, lisa_state, seg2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, lisa_state, setup_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, lisa_state, sfmsk_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, lisa_state, vtmsk_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, lisa_state, hdmsk_w))
+	LS259(config, m_latch, 0); // U4E
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(880, 380)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 364-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lisa_state, screen_update_lisa)
-	MCFG_SCREEN_PALETTE("palette")
+	m_latch->q_out_cb<0>().set(FUNC(lisa_state::diag1_w));
+	m_latch->q_out_cb<1>().set(FUNC(lisa_state::diag2_w));
+	m_latch->q_out_cb<2>().set(FUNC(lisa_state::seg1_w));
+	m_latch->q_out_cb<3>().set(FUNC(lisa_state::seg2_w));
+	m_latch->q_out_cb<4>().set(FUNC(lisa_state::setup_w));
+	m_latch->q_out_cb<5>().set(FUNC(lisa_state::sfmsk_w));
+	m_latch->q_out_cb<6>().set(FUNC(lisa_state::vtmsk_w));
+	m_latch->q_out_cb<7>().set(FUNC(lisa_state::hdmsk_w));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(880, 380);
+	m_screen->set_visarea(0, 720-1, 0, 364-1);
+	m_screen->set_screen_update(FUNC(lisa_state::screen_update_lisa));
+	m_screen->set_palette("palette");
 
+	PALETTE(config, m_palette, 2);
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* nvram */
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", lisa_state, nvram_init)
+	NVRAM(config, m_nvram);
+	m_nvram->set_custom_handler(FUNC(lisa_state::nvram_init));
 
 	/* devices */
-	MCFG_IWM_ADD("fdc", lisa2_fdc_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_interface)
+	IWM(config, m_fdc, &lisa2_fdc_interface);
+	sonydriv_floppy_image_device::legacy_2_drives_add(config, &lisa_floppy_interface);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","lisa")
+	SOFTWARE_LIST(config, "disk_list").set_type("lisa", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 500000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, lisa_state, COPS_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, lisa_state, COPS_via_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, lisa_state, COPS_via_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, lisa_state, COPS_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, lisa_state, COPS_via_irq_func))
+	VIA6522(config, m_via0, 500000);
+	m_via0->writepa_handler().set(FUNC(lisa_state::COPS_via_out_a));
+	m_via0->writepb_handler().set(FUNC(lisa_state::COPS_via_out_b));
+	m_via0->ca2_handler().set(FUNC(lisa_state::COPS_via_out_ca2));
+	m_via0->cb2_handler().set(FUNC(lisa_state::COPS_via_out_cb2));
+	m_via0->irq_handler().set(FUNC(lisa_state::COPS_via_irq_func));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 500000)
+	VIA6522(config, m_via1, 500000);
 
-	MCFG_DEVICE_ADD("scc", SCC8530, 7833600)
-MACHINE_CONFIG_END
+	SCC8530(config, m_scc, 7833600);
+}
 
-
-MACHINE_CONFIG_START(lisa_state::lisa210)
+void lisa_state::lisa210(machine_config &config)
+{
 	lisa(config);
-	MCFG_DEVICE_MODIFY( "fdccpu" )
-	MCFG_DEVICE_PROGRAM_MAP(lisa210_fdc_map)
+	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa210_fdc_map);
 
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */
-	MCFG_IWM_MODIFY("fdc", lisa210_fdc_interface)
+	m_fdc->set_config(&lisa210_fdc_interface);
 
 	/* via */
-	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_DEVICE_CLOCK(1250000)
-	MCFG_DEVICE_MODIFY("via6522_1")
-	MCFG_DEVICE_CLOCK(1250000)
-MACHINE_CONFIG_END
+	m_via0->set_clock(1250000);
+	m_via1->set_clock(1250000);
+}
 
-
-MACHINE_CONFIG_START(lisa_state::macxl)
+void lisa_state::macxl(machine_config &config)
+{
 	lisa210(config);
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_SIZE(   768/* ???? */, 447/* ???? */)
-	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)
-MACHINE_CONFIG_END
+	m_screen->set_size(   768/* ???? */, 447/* ???? */);
+	m_screen->set_visarea(0, 608-1, 0, 431-1);
+}
 
 /* 2008-05 FP:
 Small note about natural keyboard support: currently,

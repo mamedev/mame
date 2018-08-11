@@ -57,7 +57,7 @@
 #define CAR_BORDER_EXTRA_BITS       0x50
 
 
-TTL74148_OUTPUT_CB(carpolo_state::ttl74148_3s_cb)
+WRITE8_MEMBER(carpolo_state::ttl74148_3s_cb)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_ttl74148_3s->output_valid_r() ? CLEAR_LINE : ASSERT_LINE);
 }

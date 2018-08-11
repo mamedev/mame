@@ -1116,9 +1116,9 @@ MACHINE_CONFIG_START(cclimber_state::root)
 	MCFG_DEVICE_IO_MAP(cclimber_portmap)
 
 	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cclimber_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_y_w))
+	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1254,11 +1254,11 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_DEVICE_PROGRAM_MAP(swimmer_map)
 
 	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cclimber_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cclimber_state, sidebg_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cclimber_state, palette_bank_w))
+	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(cclimber_state::sidebg_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(cclimber_state::palette_bank_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(4'000'000)/2)  /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(swimmer_audio_map)

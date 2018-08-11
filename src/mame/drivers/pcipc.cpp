@@ -26,6 +26,10 @@
 #include "machine/i82371sb.h"
 #include "video/mga2064w.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/ser_mouse.h"
+#include "bus/rs232/terminal.h"
+#include "bus/rs232/null_modem.h"
 #include "machine/fdc37c93x.h"
 
 class pcipc_state : public driver_device
@@ -473,6 +477,14 @@ static void isa_internal_devices(device_slot_interface &device)
 	device.option_add("fdc37c93x", FDC37C93X);
 }
 
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+}
+
 void pcipc_state::superio_config(device_t *device)
 {
 	devcb_base *devcb = nullptr;
@@ -481,6 +493,13 @@ void pcipc_state::superio_config(device_t *device)
 	MCFG_FDC37C93X_GP20_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_FDC37C93X_GP25_GATEA20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
 	MCFG_FDC37C93X_IRQ1_CB(WRITELINE(":pci:07.0:pic8259_master", pic8259_device, ir1_w))
+	MCFG_FDC37C93X_IRQ8_CB(WRITELINE(":pci:07.0:pic8259_slave", pic8259_device, ir0_w))
+	MCFG_FDC37C93X_TXD1_CB(WRITELINE(":serport0", rs232_port_device, write_txd))
+	MCFG_FDC37C93X_NDTR1_CB(WRITELINE(":serport0", rs232_port_device, write_dtr))
+	MCFG_FDC37C93X_NRTS1_CB(WRITELINE(":serport0", rs232_port_device, write_rts))
+	MCFG_FDC37C93X_TXD2_CB(WRITELINE(":serport1", rs232_port_device, write_txd))
+	MCFG_FDC37C93X_NDTR2_CB(WRITELINE(":serport1", rs232_port_device, write_dtr))
+	MCFG_FDC37C93X_NRTS2_CB(WRITELINE(":serport1", rs232_port_device, write_rts))
 }
 
 MACHINE_CONFIG_START(pcipc_state::pcipc)
@@ -504,7 +523,19 @@ MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-MACHINE_CONFIG_END
+	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "microsoft_mouse")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd1_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd1_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr1_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, nri1_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ncts1_w))
+	MCFG_DEVICE_ADD("serport1", RS232_PORT, isa_com, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd2_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd2_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr2_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, nri2_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ncts2_w))
+	MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcipc_state::pcipctx)
 	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)

@@ -60,7 +60,7 @@ template<int Width, int AddrShift, int Endian> void handler_entry_read_units<Wid
 }
 
 
-template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_units<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_units<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	uX result = m_unmap;
 	for (int index = 0; index < m_subunits; index++) {
@@ -94,7 +94,7 @@ template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width
 	return result;
 }
 
-template<int Width, int AddrShift, int Endian> std::string handler_entry_read_units<Width, AddrShift, Endian>::m2r(typename handler_entry_size<Width>::uX mask)
+template<int Width, int AddrShift, int Endian> std::string handler_entry_read_units<Width, AddrShift, Endian>::m2r(typename emu::detail::handler_entry_size<Width>::uX mask)
 {
 	constexpr u32 mbits = 8*sizeof(uX);
 	u32 start, end;
@@ -204,7 +204,7 @@ template<int Width, int AddrShift, int Endian> void handler_entry_write_units<Wi
 }
 
 
-template<int Width, int AddrShift, int Endian> std::string handler_entry_write_units<Width, AddrShift, Endian>::m2r(typename handler_entry_size<Width>::uX mask)
+template<int Width, int AddrShift, int Endian> std::string handler_entry_write_units<Width, AddrShift, Endian>::m2r(typename emu::detail::handler_entry_size<Width>::uX mask)
 {
 	constexpr u32 mbits = 8*sizeof(uX);
 	u32 start, end;

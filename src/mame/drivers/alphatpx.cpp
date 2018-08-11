@@ -1049,12 +1049,12 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_12_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_12_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 
@@ -1128,12 +1128,12 @@ READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_34_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_34_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 

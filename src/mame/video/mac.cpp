@@ -59,14 +59,14 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "machine/ram.h"
 #include "render.h"
 
-PALETTE_INIT_MEMBER(mac_state,mac)
+void mac_state::palette_init_mac(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
 }
 
 // 4-level grayscale
-PALETTE_INIT_MEMBER(mac_state,macgsc)
+void mac_state::palette_init_macgsc(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x7f, 0x7f, 0x7f);

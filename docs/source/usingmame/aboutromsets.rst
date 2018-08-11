@@ -38,7 +38,7 @@ A **non-merged set** is one that contains absolutely everything necessary for a 
 
 A **split set** is one where the parent set contains all of the normal data it should, and the clone sets contain *only* what has changed as compared to the parent set. This saves some space, but isn't quite as efficient as
 
-A **merged set** takes the parent set and one or more clone sets and puts them all inside the parent set's storage. To use the existing Pac-Man example, combining the Puckman, Midway Pac-Man (USA) sets, along with various bootleg versions-- and combining it all into ((PUCKMAN.ZIP**, would be making a merged set. A complete merged set with the parent and all clones is the most common format MAME sets are stored in as it saves the most space.
+A **merged set** takes the parent set and one or more clone sets and puts them all inside the parent set's storage. To use the existing Pac-Man example, combining the Puckman, Midway Pac-Man (USA) sets, along with various bootleg versions, and combining it all into **PUCKMAN.ZIP**, would be making a merged set. A complete merged set with the parent and all clones is the most common format MAME sets are stored in as it saves the most space.
 
 With those basic principles, there are two other kinds of set that will come up in MAME use from time to time.
 

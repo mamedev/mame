@@ -176,7 +176,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( ri_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( txc_w );
 	DECLARE_WRITE_LINE_MEMBER( sync_w );
@@ -388,6 +387,22 @@ public:
 	template <unsigned N, class Object> devcb_base &set_out_txdrq_callback(Object &&cb) { return m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 
+	auto out_txda_callback() { return m_out_txd_cb[0].bind(); }
+	auto out_dtra_callback() { return m_out_dtr_cb[0].bind(); }
+	auto out_rtsa_callback() { return m_out_rts_cb[0].bind(); }
+	auto out_wreqa_callback() { return m_out_wreq_cb[0].bind(); }
+	auto out_synca_callback() { return m_out_sync_cb[0].bind(); }
+	auto out_rxdrqa_callback() { return m_out_rxdrq_cb[0].bind(); }
+	auto out_txdrqa_callback() { return m_out_txdrq_cb[0].bind(); }
+	auto out_txdb_callback() { return m_out_txd_cb[1].bind(); }
+	auto out_dtrb_callback() { return m_out_dtr_cb[1].bind(); }
+	auto out_rtsb_callback() { return m_out_rts_cb[1].bind(); }
+	auto out_wreqb_callback() { return m_out_wreq_cb[1].bind(); }
+	auto out_syncb_callback() { return m_out_sync_cb[1].bind(); }
+	auto out_rxdrqb_callback() { return m_out_rxdrq_cb[1].bind(); }
+	auto out_txdrqb_callback() { return m_out_txdrq_cb[1].bind(); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
+
 	void set_cputag(const char *tag) { m_cputag = tag; }
 
 	void configure_channels(int rxa, int txa, int rxb, int txb)
@@ -433,8 +448,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_chanB->cts_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_chanA->dcd_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_chanB->dcd_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->ri_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->ri_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_chanA->rxc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_chanB->rxc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_chanA->txc_w(state); }

@@ -135,15 +135,15 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, apple3_state, apple3_via_0_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, apple3_state, apple3_via_0_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, apple3_state, apple3_via_0_irq_func))
+	VIA6522(config, m_via[0], 1000000);
+	m_via[0]->writepa_handler().set(FUNC(apple3_state::apple3_via_0_out_a));
+	m_via[0]->writepb_handler().set(FUNC(apple3_state::apple3_via_0_out_b));
+	m_via[0]->irq_handler().set(FUNC(apple3_state::apple3_via_0_irq_func));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, apple3_state, apple3_via_1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, apple3_state, apple3_via_1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, apple3_state, apple3_via_1_irq_func))
+	VIA6522(config, m_via[1], 1000000);
+	m_via[1]->writepa_handler().set(FUNC(apple3_state::apple3_via_1_out_a));
+	m_via[1]->writepb_handler().set(FUNC(apple3_state::apple3_via_1_out_b));
+	m_via[1]->irq_handler().set(FUNC(apple3_state::apple3_via_1_irq_func));
 
 	/* sound */
 	SPEAKER(config, "speaker").front_center();
