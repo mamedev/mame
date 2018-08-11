@@ -21664,6 +21664,9 @@ mosaica                         // (c) 1990 Space + Fuuki license
 mouser                          // UPL-83001 (c) 1983
 mouserc                         // UPL-83001 (c) 1983
 
+@source:mpc3000.cpp
+mpc3000
+
 @source:mpf1.cpp
 mpf1                            // 1979 Multitech Micro Professor 1
 mpf1b                           // 1979 Multitech Micro Professor 1B

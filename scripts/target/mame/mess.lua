@@ -963,7 +963,8 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"acorn",
 		"act",
 		"adc",
-		"agat",
+		"agat"
+		"akai",
 		"alesis",
 		"altos",
 		"ami",
@@ -1434,6 +1435,11 @@ files {
 	MAME_DIR .. "src/mame/includes/apple2.h",
 	MAME_DIR .. "src/mame/video/agat7.cpp",
 	MAME_DIR .. "src/mame/video/agat7.h",
+}
+
+createMESSProjects(_target, _subtarget, "akai")
+files {
+	MAME_DIR .. "src/mame/mpc3000.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "alesis")
