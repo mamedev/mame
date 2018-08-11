@@ -11284,6 +11284,7 @@ hvysmsh                         // MBG (c) 1993 Data East Corporation (World)
 hvysmsha                        // MBG (c) 1993 Data East Corporation (Asia)
 hvysmshj                        // MBG (c) 1993 Data East Corporation (Japan)
 wcvol95                         // MBX (c) 1993 Data East
+wcvol95j                        // MBX (c) 1993 Data East
 wcvol95x                        // ?
 
 @source:deco32.cpp
