@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m65sc02.h"
+#include "machine/input_merger.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
 //#include "machine/msm58321.h"
@@ -57,12 +58,18 @@ void textelcomp_state::textelcomp(machine_config &config)
 	M65SC02(config, m_maincpu, 3.6864_MHz_XTAL / 2); // GS65SC02P-2 (clock not verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &textelcomp_state::mem_map);
 
-	VIA6522(config, "via0", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m65sc02_device::IRQ_LINE);
+
+	via6522_device &via0(VIA6522(config, "via0", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
+	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+
 	VIA6522(config, "via1", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
 	VIA6522(config, "via2", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
 	VIA6522(config, "via3", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
 
-	MOS6551(config, "acia", 3.6864_MHz_XTAL / 2).set_xtal(3.6864_MHz_XTAL / 2); // GS65SC51P-2
+	mos6551_device &acia(MOS6551(config, "acia", 3.6864_MHz_XTAL / 2)); // GS65SC51P-2
+	acia.set_xtal(3.6864_MHz_XTAL / 2);
+	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	//SED1330(config, "lcdc", 6.4_MHz_XTAL); // SED1330F + B&W LCD
 
