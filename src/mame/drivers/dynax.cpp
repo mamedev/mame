@@ -4938,11 +4938,11 @@ MACHINE_CONFIG_START(dynax_state::majrjhdx)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dynax_state::mjreach)
+void dynax_state::mjreach(machine_config &config)
+{
 	tenkai(config);
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w)) // not inverted
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)); // not inverted
+}
 
 /***************************************************************************
                                 Mahjong Gekisha

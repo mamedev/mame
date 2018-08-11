@@ -1403,15 +1403,15 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
 
 	/* soft switches */
-	MCFG_DEVICE_ADD("softlatch", F9334, 0) // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, napple2_state, txt_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, napple2_state, mix_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, napple2_state, scr_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, napple2_state, res_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, napple2_state, an0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, napple2_state, an1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, napple2_state, an2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, napple2_state, an3_w))
+	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
+	m_softlatch->q_out_cb<0>().set(FUNC(napple2_state::txt_w));
+	m_softlatch->q_out_cb<1>().set(FUNC(napple2_state::mix_w));
+	m_softlatch->q_out_cb<2>().set(FUNC(napple2_state::scr_w));
+	m_softlatch->q_out_cb<3>().set(FUNC(napple2_state::res_w));
+	m_softlatch->q_out_cb<4>().set(FUNC(napple2_state::an0_w));
+	m_softlatch->q_out_cb<5>().set(FUNC(napple2_state::an1_w));
+	m_softlatch->q_out_cb<6>().set(FUNC(napple2_state::an2_w));
+	m_softlatch->q_out_cb<7>().set(FUNC(napple2_state::an3_w));
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(A2_KBDC_TAG, AY3600, 0)

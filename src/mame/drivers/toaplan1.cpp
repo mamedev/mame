@@ -1920,11 +1920,11 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("coinlatch", LS259, 0) // 19L
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_2_w))
+	ls259_device &coinlatch(LS259(config, "coinlatch")); // 19L
+	coinlatch.q_out_cb<4>().set(FUNC(toaplan1_rallybik_state::coin_counter_1_w));
+	coinlatch.q_out_cb<5>().set(FUNC(toaplan1_rallybik_state::coin_counter_2_w));
+	coinlatch.q_out_cb<6>().set(FUNC(toaplan1_rallybik_state::coin_lockout_1_w));
+	coinlatch.q_out_cb<7>().set(FUNC(toaplan1_rallybik_state::coin_lockout_2_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 

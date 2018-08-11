@@ -570,14 +570,14 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	m_pia[3]->writepb_handler().set(FUNC(spiders_state::spiders_audio_b_w));
 	m_pia[3]->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ic60", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, spiders_state, ic60_74123_output_changed))
+	ttl74123_device &ic60(TTL74123(config, "ic60", 0));
+	ic60.set_connection_type(TTL74123_GROUNDED);	/* the hook up type */
+	ic60.set_resistor_value(RES_K(22));				/* resistor connected to RCext */
+	ic60.set_capacitor_value(CAP_U(0.01));			/* capacitor connected to Cext and RCext */
+	ic60.set_a_pin_value(1);						/* A pin - driven by the CRTC */
+	ic60.set_b_pin_value(1);						/* B pin - pulled high */
+	ic60.set_clear_pin_value(1);					/* Clear pin - pulled high */
+	ic60.out_cb().set(FUNC(spiders_state::ic60_74123_output_changed));
 
 	/* audio hardware */
 	spiders_audio(config);

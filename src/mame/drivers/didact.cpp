@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(md6802_state::md6802)
 	config.set_default_layout(layout_md6802);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("tb16_74145", TTL74145, 0)
+	TTL74145(config, m_tb16_74145, 0);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
 	PIA6821(config, m_pia1, 0);
 

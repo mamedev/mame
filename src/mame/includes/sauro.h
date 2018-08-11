@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/sp0256.h"
 #include "emupal.h"
@@ -14,6 +15,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sp0256(*this, "speech"),
+		m_mainlatch(*this, "mainlatch"),
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -33,6 +35,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<sp0256_device> m_sp0256;
+	optional_device<ls259_device> m_mainlatch;
 	optional_device<generic_latch_8_device> m_soundlatch; // sauro only
 
 	required_shared_ptr<uint8_t> m_spriteram;

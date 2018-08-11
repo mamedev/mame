@@ -76,10 +76,10 @@ MACHINE_CONFIG_START(tti_state::tti)
 	MCFG_DEVICE_ADD("novram", EEPROM_SERIAL_X24C44_16BIT)
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(WRITELINE("mfp", mc68901_device, i0_w))
 
-	MCFG_DEVICE_ADD("bitlatch", LS259, 0) // U17
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("novram", eeprom_serial_x24c44_device, di_write))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("novram", eeprom_serial_x24c44_device, clk_write))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("novram", eeprom_serial_x24c44_device, cs_write))
+	ls259_device &bitlatch(LS259(config, "bitlatch")); // U17
+	bitlatch.q_out_cb<0>().set("novram", FUNC(eeprom_serial_x24c44_device::di_write));
+	bitlatch.q_out_cb<1>().set("novram", FUNC(eeprom_serial_x24c44_device::clk_write));
+	bitlatch.q_out_cb<2>().set("novram", FUNC(eeprom_serial_x24c44_device::cs_write));
 MACHINE_CONFIG_END
 
 ROM_START( tti )

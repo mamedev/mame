@@ -125,9 +125,9 @@ MACHINE_CONFIG_START(sams_memory_expansion_device::device_add_mconfig)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
-	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sams_memory_expansion_device, access_mapper_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sams_memory_expansion_device, map_mode_w))
+	LS259(config, m_crulatch); // U8
+	m_crulatch->q_out_cb<0>().set(FUNC(sams_memory_expansion_device::access_mapper_w));
+	m_crulatch->q_out_cb<1>().set(FUNC(sams_memory_expansion_device::map_mode_w));
 MACHINE_CONFIG_END
 
 void sams_memory_expansion_device::device_start()

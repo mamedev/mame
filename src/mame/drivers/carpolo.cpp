@@ -275,12 +275,12 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_DEVICE_ADD(m_ttl7474_1a_1, TTL7474, 0)
 	MCFG_DEVICE_ADD(m_ttl7474_1a_2, TTL7474, 0)
 
-	MCFG_DEVICE_ADD(m_ttl74148_3s, TTL74148, 0)
-	MCFG_74148_OUTPUT_CB(carpolo_state, ttl74148_3s_cb)
+	TTL74148(config, m_ttl74148_3s, 0);
+	m_ttl74148_3s->out_cb().set(FUNC(carpolo_state::ttl74148_3s_cb));
 
-	MCFG_DEVICE_ADD(m_ttl74153_1k, TTL153)
-	MCFG_TTL153_ZA_CB(WRITELINE(*this, carpolo_state, ls153_za_w)) // pia1 pb5
-	MCFG_TTL153_ZB_CB(WRITELINE(*this, carpolo_state, ls153_zb_w)) // pia1 pb4
+	TTL153(config, m_ttl74153_1k);
+	m_ttl74153_1k->za_cb().set(FUNC(carpolo_state::ls153_za_w)); // pia1 pb5
+	m_ttl74153_1k->zb_cb().set(FUNC(carpolo_state::ls153_zb_w)); // pia1 pb4
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1162,15 +1162,15 @@ MACHINE_CONFIG_START(ti_rs232_pio_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("serdev1", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("piodev", TI99_PIO_DEV, 0)
 
-	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U12
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, selected_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_direction_in_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_handshake_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_spareout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, flag0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, cts0_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, cts1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, led_w))
+	LS259(config, m_crulatch); // U12
+	m_crulatch->q_out_cb<0>().set(FUNC(ti_rs232_pio_device::selected_w));
+	m_crulatch->q_out_cb<1>().set(FUNC(ti_rs232_pio_device::pio_direction_in_w));
+	m_crulatch->q_out_cb<2>().set(FUNC(ti_rs232_pio_device::pio_handshake_out_w));
+	m_crulatch->q_out_cb<3>().set(FUNC(ti_rs232_pio_device::pio_spareout_w));
+	m_crulatch->q_out_cb<4>().set(FUNC(ti_rs232_pio_device::flag0_w));
+	m_crulatch->q_out_cb<5>().set(FUNC(ti_rs232_pio_device::cts0_w));
+	m_crulatch->q_out_cb<6>().set(FUNC(ti_rs232_pio_device::cts1_w));
+	m_crulatch->q_out_cb<7>().set(FUNC(ti_rs232_pio_device::led_w));
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_rs232_pio_device::device_rom_region() const

@@ -418,9 +418,9 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2a_w));
 	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2b_w));
 
-	MCFG_DEVICE_ADD("ic14", TTL153)
-	MCFG_TTL153_ZA_CB(WRITELINE("ic15", z80sio_device, rxca_w))
-	MCFG_TTL153_ZB_CB(WRITELINE("ic15", z80sio_device, txca_w))
+	ttl153_device &ttl74153(TTL153(config, "ic14"));
+	ttl74153.za_cb().set("ic15", FUNC(z80sio_device::rxca_w));
+	ttl74153.zb_cb().set("ic15", FUNC(z80sio_device::txca_w));
 
 	CLOCK(config, "ic15_rxtxcb", 4_MHz_XTAL / 16).signal_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 

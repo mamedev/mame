@@ -347,13 +347,13 @@ void sym1_state::sym1(machine_config &config)
 	riot.pb_wr_callback().set(FUNC(sym1_state::riot_b_w));
 
 	TTL74145(config, m_ttl74145, 0);
-	m_ttl74145->output_line0_callback().set(FUNC(sym1_state::sym1_74145_output_0_w));
-	m_ttl74145->output_line1_callback().set(FUNC(sym1_state::sym1_74145_output_1_w));
-	m_ttl74145->output_line2_callback().set(FUNC(sym1_state::sym1_74145_output_2_w));
-	m_ttl74145->output_line3_callback().set(FUNC(sym1_state::sym1_74145_output_3_w));
-	m_ttl74145->output_line4_callback().set(FUNC(sym1_state::sym1_74145_output_4_w));
-	m_ttl74145->output_line5_callback().set(FUNC(sym1_state::sym1_74145_output_5_w));
-	m_ttl74145->output_line6_callback().set("speaker", FUNC(speaker_sound_device::level_w));
+	m_ttl74145->output_line_callback<0>().set(FUNC(sym1_state::sym1_74145_output_0_w));
+	m_ttl74145->output_line_callback<1>().set(FUNC(sym1_state::sym1_74145_output_1_w));
+	m_ttl74145->output_line_callback<2>().set(FUNC(sym1_state::sym1_74145_output_2_w));
+	m_ttl74145->output_line_callback<3>().set(FUNC(sym1_state::sym1_74145_output_3_w));
+	m_ttl74145->output_line_callback<4>().set(FUNC(sym1_state::sym1_74145_output_4_w));
+	m_ttl74145->output_line_callback<5>().set(FUNC(sym1_state::sym1_74145_output_5_w));
+	m_ttl74145->output_line_callback<6>().set("speaker", FUNC(speaker_sound_device::level_w));
 	// lines 7-9 not connected
 
 	VIA6522(config, "via1", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));

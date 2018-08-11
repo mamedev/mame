@@ -1490,8 +1490,8 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_DEVICE_ADD("9b", TTL7474, 0) // HCT74
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc9b_w))
 
-	MCFG_DEVICE_ADD("13", HCT157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	HCT157(config, m_13, 0);
+	m_13->out_callback().set("msm", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 

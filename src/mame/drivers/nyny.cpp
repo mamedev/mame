@@ -625,14 +625,14 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic48_1", ttl74123_device, a_w))
 
 	/* 74LS123 */
-	MCFG_DEVICE_ADD("ic48_1", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, nyny_state, ic48_1_74123_output_changed))
+	TTL74123(config, m_ic48_1, 0);
+	m_ic48_1->set_connection_type(TTL74123_GROUNDED);	/* the hook up type */
+	m_ic48_1->set_resistor_value(RES_K(22));			/* resistor connected to RCext */
+	m_ic48_1->set_capacitor_value(CAP_U(0.01));			/* capacitor connected to Cext and RCext */
+	m_ic48_1->set_a_pin_value(1);						/* A pin - driven by the CRTC */
+	m_ic48_1->set_b_pin_value(1);						/* B pin - pulled high */
+	m_ic48_1->set_clear_pin_value(1);					/* Clear pin - pulled high */
+	m_ic48_1->out_cb().set(FUNC(nyny_state::ic48_1_74123_output_changed));
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set_ioport("IN0");

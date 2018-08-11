@@ -503,7 +503,6 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "emu.h"
 #include "includes/williams.h"
 
-#include "machine/74157.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
@@ -1592,13 +1591,13 @@ MACHINE_CONFIG_START(williams_state::williams_muxed)
 	m_pia[0]->cb2_handler().set("mux_0", FUNC(ls157_device::select_w));
 	m_pia[0]->cb2_handler().append("mux_1", FUNC(ls157_device::select_w));
 
-	MCFG_DEVICE_ADD("mux_0", LS157, 0) // IC3 on interface board (actually LS257 with OC tied low)
-	MCFG_74157_A_IN_CB(IOPORT("INP2"))
-	MCFG_74157_B_IN_CB(IOPORT("INP1"))
+	LS157(config, m_mux0, 0); // IC3 on interface board (actually LS257 with OC tied low)
+	m_mux0->a_in_callback().set_ioport("INP2");
+	m_mux0->b_in_callback().set_ioport("INP1");
 
-	MCFG_DEVICE_ADD("mux_1", LS157, 0) // IC4 on interface board (actually LS257 with OC tied low)
-	MCFG_74157_A_IN_CB(IOPORT("INP2A"))
-	MCFG_74157_B_IN_CB(IOPORT("INP1A"))
+	LS157(config, m_mux1, 0); // IC4 on interface board (actually LS257 with OC tied low)
+	m_mux1->a_in_callback().set_ioport("INP2A");
+	m_mux1->b_in_callback().set_ioport("INP1A");
 MACHINE_CONFIG_END
 
 
@@ -1689,9 +1688,9 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
 
-	MCFG_DEVICE_ADD("mux_a", LS157_X2, 0)
-	MCFG_74157_A_IN_CB(IOPORT("IN3"))
-	MCFG_74157_B_IN_CB(READ8(*this, williams_state, williams_49way_port_0_r))
+	LS157_X2(config, m_muxa, 0);
+	m_muxa->a_in_callback().set_ioport("IN3");
+	m_muxa->b_in_callback().set(FUNC(williams_state::williams_49way_port_0_r));
 MACHINE_CONFIG_END
 
 
@@ -1708,13 +1707,13 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	m_pia[0]->cb2_handler().set("mux_a", FUNC(ls157_x2_device::select_w));
 	m_pia[0]->cb2_handler().append("mux_b", FUNC(ls157_device::select_w));
 
-	MCFG_DEVICE_MODIFY("mux_a") // IC7 (for PA0-PA3) + IC5 (for PA4-PA7)
-	MCFG_74157_A_IN_CB(READ8(*this, williams_state, williams_49way_port_0_r))
-	MCFG_74157_B_IN_CB(IOPORT("IN3"))
+	// IC7 (for PA0-PA3) + IC5 (for PA4-PA7)
+	m_muxa->a_in_callback().set(FUNC(williams_state::williams_49way_port_0_r));
+	m_muxa->b_in_callback().set_ioport("IN3");
 
-	MCFG_DEVICE_ADD("mux_b", LS157, 0) // IC3
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157(config, m_muxb, 0); // IC3
+	m_muxb->a_in_callback().set_ioport("INP1");
+	m_muxb->b_in_callback().set_ioport("INP2");
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq_b")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu_b", M6808_IRQ_LINE))
@@ -1820,9 +1819,9 @@ MACHINE_CONFIG_START(williams2_state::inferno)
 	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
 	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_x2_device::select_w));
 
-	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157_X2(config, m_mux, 0); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
+	m_mux->a_in_callback().set_ioport("INP1");
+	m_mux->b_in_callback().set_ioport("INP2");
 MACHINE_CONFIG_END
 
 
@@ -1862,9 +1861,9 @@ MACHINE_CONFIG_START(tshoot_state::tshoot)
 	MCFG_DEVICE_MODIFY("pia_2")
 	m_pia[2]->cb2_handler().set(FUNC(tshoot_state::maxvol_w));
 
-	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // U2 + U3 on interface board
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157_X2(config, m_mux, 0); // U2 + U3 on interface board
+	m_mux->a_in_callback().set_ioport("INP1");
+	m_mux->b_in_callback().set_ioport("INP2");
 MACHINE_CONFIG_END
 
 
@@ -1893,9 +1892,9 @@ MACHINE_CONFIG_START(joust2_state::joust2)
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("mux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("INP1"))
-	MCFG_74157_B_IN_CB(IOPORT("INP2"))
+	LS157(config, m_mux, 0);
+	m_mux->a_in_callback().set_ioport("INP1");
+	m_mux->b_in_callback().set_ioport("INP2");
 MACHINE_CONFIG_END
 
 

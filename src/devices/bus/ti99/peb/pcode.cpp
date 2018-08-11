@@ -418,9 +418,9 @@ MACHINE_CONFIG_START(ti_pcode_card_device::device_add_mconfig)
 	m_grom7->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
 	m_grom7->set_region_and_ident(PCODE_GROM_TAG, 0xe000, 7);
 
-	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U12
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ti_pcode_card_device, pcpage_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ti_pcode_card_device, ekrpg_w))
+	LS259(config, m_crulatch); // U12
+	m_crulatch->q_out_cb<0>().set(FUNC(ti_pcode_card_device::pcpage_w));
+	m_crulatch->q_out_cb<4>().set(FUNC(ti_pcode_card_device::ekrpg_w));
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_pcode_card_device::device_rom_region() const

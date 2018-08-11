@@ -730,14 +730,14 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5a_w))
 
-	MCFG_DEVICE_ADD("ic14a", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(WRITE8("msm_a", msm5205_device, data_w))
+	HC157(config, m_ic14a, 0); // actually IC15 on Jolly Park
+	m_ic14a->out_callback().set("msm_a", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5m_w))
 
-	MCFG_DEVICE_ADD("ic14m", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(WRITE8("msm_m", msm5205_device, data_w))
+	HC157(config, m_ic14m, 0); // actually IC15 on Jolly Park
+	m_ic14m->out_callback().set("msm_m", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spinb_state::jolypark)

@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(e100_state::e100)
 	MCFG_DEVICE_PROGRAM_MAP(e100_map)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kbd_74145", TTL74145, 0)
+	TTL74145(config, m_kbd_74145, 0);
 
 	/* --PIA inits----------------------- */
 	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */

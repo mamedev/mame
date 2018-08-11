@@ -465,14 +465,14 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 
 	/* 74LS123 */
 
-	MCFG_DEVICE_ADD("74123", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, r2dtank_state, ttl74123_output_changed))
+	ttl74123_device &ttl74123(TTL74123(config, "74123", 0));
+	ttl74123.set_connection_type(TTL74123_GROUNDED);	/* the hook up type */
+	ttl74123.set_resistor_value(RES_K(22));				/* resistor connected to RCext */
+	ttl74123.set_capacitor_value(CAP_U(0.01));			/* capacitor connected to Cext and RCext */
+	ttl74123.set_a_pin_value(1);						/* A pin - driven by the CRTC */
+	ttl74123.set_b_pin_value(1);						/* B pin - pulled high */
+	ttl74123.set_clear_pin_value(1);					/* Clear pin - pulled high */
+	ttl74123.out_cb().set(FUNC(r2dtank_state::ttl74123_output_changed));
 
 	PIA6821(config, m_pia_main, 0);
 	m_pia_main->readpa_handler().set_ioport("IN0");

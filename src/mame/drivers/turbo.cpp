@@ -875,10 +875,10 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, turbo_state, digit_w))      // display A&B
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC125 - outputs passed through CN5
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, turbo_state, coin_meter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, turbo_state, coin_meter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, turbo_state, start_lamp_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // IC125 - outputs passed through CN5
+	outlatch.q_out_cb<0>().set(FUNC(turbo_state::coin_meter_1_w));
+	outlatch.q_out_cb<1>().set(FUNC(turbo_state::coin_meter_2_w));
+	outlatch.q_out_cb<3>().set(FUNC(turbo_state::start_lamp_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)

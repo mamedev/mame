@@ -138,22 +138,22 @@ MACHINE_CONFIG_START(jpms80_state::jpms80)
 	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // I/O IC5
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // I/O IC6
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // I/O IC7
-	MCFG_DEVICE_ADD("outlatch3", LS259, 0) // I/O IC8
-	MCFG_DEVICE_ADD("outlatch4", LS259, 0) // I/O IC9
-	MCFG_DEVICE_ADD("outlatch5", LS259, 0) // I/O IC10
-	MCFG_DEVICE_ADD("outlatch6", LS259, 0) // I/O IC11
-	MCFG_DEVICE_ADD("outlatch7", LS259, 0) // I/O IC12
-	MCFG_DEVICE_ADD("outlatch8", LS259, 0) // I/O IC13
-	MCFG_DEVICE_ADD("outlatch9", LS259, 0) // I/O IC14
+	LS259(config, "outlatch0"); // I/O IC5
+	LS259(config, "outlatch1"); // I/O IC6
+	LS259(config, "outlatch2"); // I/O IC7
+	LS259(config, "outlatch3"); // I/O IC8
+	LS259(config, "outlatch4"); // I/O IC9
+	LS259(config, "outlatch5"); // I/O IC10
+	LS259(config, "outlatch6"); // I/O IC11
+	LS259(config, "outlatch7"); // I/O IC12
+	LS259(config, "outlatch8"); // I/O IC13
+	LS259(config, "outlatch9"); // I/O IC14
 
-	MCFG_DEVICE_ADD("outlatch10", LS259, 0) // I/O IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jpms80_state, int1_enable_w)) // 50 - INT1 enable (lv3)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jpms80_state, int2_enable_w)) // 51 - INT2 enable (lv4)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, jpms80_state, watchdog_w)) // 52 - Watchdog
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, jpms80_state, io_enable_w)) // 53 - I/O Enable
+	ls259_device &outlatch10(LS259(config, "outlatch10")); // I/O IC15
+	outlatch10.q_out_cb<0>().set(FUNC(jpms80_state::int1_enable_w)); // 50 - INT1 enable (lv3)
+	outlatch10.q_out_cb<1>().set(FUNC(jpms80_state::int2_enable_w)); // 51 - INT2 enable (lv4)
+	outlatch10.q_out_cb<2>().set(FUNC(jpms80_state::watchdog_w)); // 52 - Watchdog
+	outlatch10.q_out_cb<3>().set(FUNC(jpms80_state::io_enable_w)); // 53 - I/O Enable
 
 	MCFG_DEVICE_ADD("tms9902duart", TMS9902, DUART_CLOCK)
 

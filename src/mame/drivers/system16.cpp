@@ -2144,8 +2144,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_2x_ym2203_msm5205)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("5205", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("5205", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("5205", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, datsu_msm5205_callback))

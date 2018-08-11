@@ -478,12 +478,12 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1H
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, crgolf_state, color_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, crgolf_state, screen_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, crgolf_state, screen_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, crgolf_state, screenb_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, crgolf_state, screena_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
+	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
+	mainlatch.q_out_cb<4>().set(FUNC(crgolf_state::screen_flip_w));
+	mainlatch.q_out_cb<5>().set(FUNC(crgolf_state::screen_select_w));
+	mainlatch.q_out_cb<6>().set(FUNC(crgolf_state::screenb_enable_w));
+	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screena_enable_w));
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
