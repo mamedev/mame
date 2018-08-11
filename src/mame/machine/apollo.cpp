@@ -1049,49 +1049,49 @@ static void apollo_isa_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(apollo_state::common)
 	// configuration MUST be reset first !
-	MCFG_DEVICE_ADD(APOLLO_CONF_TAG, APOLLO_CONF, 0)
+	APOLLO_CONF(config, APOLLO_CONF_TAG, 0);
 
-	MCFG_DEVICE_ADD(APOLLO_DMA1_TAG, AM9517A, 14.318181_MHz_XTAL / 3)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apollo_state, apollo_dma_1_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, apollo_state, apollo_dma8237_out_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, apollo_state, apollo_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, apollo_state, apollo_dma_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(READ8(*this, apollo_state, pc_dma8237_0_dack_r))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, apollo_state, pc_dma8237_1_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, apollo_state, pc_dma8237_2_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(*this, apollo_state, pc_dma8237_3_dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, apollo_state, pc_dma8237_0_dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, apollo_state, pc_dma8237_1_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, apollo_state, pc_dma8237_2_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, apollo_state, pc_dma8237_3_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, apollo_state, pc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, apollo_state, pc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apollo_state, pc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apollo_state, pc_dack3_w))
+	AM9517A(config, m_dma8237_1, 14.318181_MHz_XTAL / 3);
+	m_dma8237_1->out_hreq_callback().set(FUNC(apollo_state::apollo_dma_1_hrq_changed));
+	m_dma8237_1->out_eop_callback().set(FUNC(apollo_state::apollo_dma8237_out_eop));
+	m_dma8237_1->in_memr_callback().set(FUNC(apollo_state::apollo_dma_read_byte));
+	m_dma8237_1->out_memw_callback().set(FUNC(apollo_state::apollo_dma_write_byte));
+	m_dma8237_1->in_ior_callback<0>().set(FUNC(apollo_state::pc_dma8237_0_dack_r));
+	m_dma8237_1->in_ior_callback<1>().set(FUNC(apollo_state::pc_dma8237_1_dack_r));
+	m_dma8237_1->in_ior_callback<2>().set(FUNC(apollo_state::pc_dma8237_2_dack_r));
+	m_dma8237_1->in_ior_callback<3>().set(FUNC(apollo_state::pc_dma8237_3_dack_r));
+	m_dma8237_1->out_iow_callback<0>().set(FUNC(apollo_state::pc_dma8237_0_dack_w));
+	m_dma8237_1->out_iow_callback<1>().set(FUNC(apollo_state::pc_dma8237_1_dack_w));
+	m_dma8237_1->out_iow_callback<2>().set(FUNC(apollo_state::pc_dma8237_2_dack_w));
+	m_dma8237_1->out_iow_callback<3>().set(FUNC(apollo_state::pc_dma8237_3_dack_w));
+	m_dma8237_1->out_dack_callback<0>().set(FUNC(apollo_state::pc_dack0_w));
+	m_dma8237_1->out_dack_callback<1>().set(FUNC(apollo_state::pc_dack1_w));
+	m_dma8237_1->out_dack_callback<2>().set(FUNC(apollo_state::pc_dack2_w));
+	m_dma8237_1->out_dack_callback<3>().set(FUNC(apollo_state::pc_dack3_w));
 
-	MCFG_DEVICE_ADD(APOLLO_DMA2_TAG, AM9517A, 14.318181_MHz_XTAL / 3)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apollo_state, apollo_dma_2_hrq_changed))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, apollo_state, apollo_dma_read_word))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, apollo_state, apollo_dma_write_word))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, apollo_state, pc_dma8237_5_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, apollo_state, pc_dma8237_6_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(*this, apollo_state, pc_dma8237_7_dack_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, apollo_state, pc_dma8237_5_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, apollo_state, pc_dma8237_6_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, apollo_state, pc_dma8237_7_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, apollo_state, pc_dack4_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, apollo_state, pc_dack5_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apollo_state, pc_dack6_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apollo_state, pc_dack7_w))
+	AM9517A(config, m_dma8237_2, 14.318181_MHz_XTAL / 3);
+	m_dma8237_2->out_hreq_callback().set(FUNC(apollo_state::apollo_dma_2_hrq_changed));
+	m_dma8237_2->in_memr_callback().set(FUNC(apollo_state::apollo_dma_read_word));
+	m_dma8237_2->out_memw_callback().set(FUNC(apollo_state::apollo_dma_write_word));
+	m_dma8237_2->in_ior_callback<1>().set(FUNC(apollo_state::pc_dma8237_5_dack_r));
+	m_dma8237_2->in_ior_callback<2>().set(FUNC(apollo_state::pc_dma8237_6_dack_r));
+	m_dma8237_2->in_ior_callback<3>().set(FUNC(apollo_state::pc_dma8237_7_dack_r));
+	m_dma8237_2->out_iow_callback<1>().set(FUNC(apollo_state::pc_dma8237_5_dack_w));
+	m_dma8237_2->out_iow_callback<2>().set(FUNC(apollo_state::pc_dma8237_6_dack_w));
+	m_dma8237_2->out_iow_callback<3>().set(FUNC(apollo_state::pc_dma8237_7_dack_w));
+	m_dma8237_2->out_dack_callback<0>().set(FUNC(apollo_state::pc_dack4_w));
+	m_dma8237_2->out_dack_callback<1>().set(FUNC(apollo_state::pc_dack5_w));
+	m_dma8237_2->out_dack_callback<2>().set(FUNC(apollo_state::pc_dack6_w));
+	m_dma8237_2->out_dack_callback<3>().set(FUNC(apollo_state::pc_dack7_w));
 
-	MCFG_DEVICE_ADD(APOLLO_PIC1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, apollo_state, apollo_pic8259_master_set_int_line))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, apollo_state, apollo_pic8259_get_slave_ack))
+	PIC8259(config, m_pic8259_master, 0);
+	m_pic8259_master->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_master_set_int_line));
+	m_pic8259_master->in_sp_callback().set_constant(1);
+	m_pic8259_master->read_slave_ack_callback().set(FUNC(apollo_state::apollo_pic8259_get_slave_ack));
 
-	MCFG_DEVICE_ADD(APOLLO_PIC2_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, apollo_state, apollo_pic8259_slave_set_int_line))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pic8259_slave, 0);
+	m_pic8259_slave->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_slave_set_int_line));
+	m_pic8259_slave->in_sp_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)

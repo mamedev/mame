@@ -52,16 +52,20 @@
 class mtxl_state : public driver_device
 {
 public:
-	mtxl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+	mtxl_state(const machine_config &mconfig, device_type type, const char *tag) :
+			driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 #ifndef REAL_PCI_CHIPSET
-		m_mb(*this, "mb"),
+			m_mb(*this, "mb"),
 #endif
-		m_ram(*this, RAM_TAG),
-		m_iocard(*this, "dbank"),
-		m_multikey(*this, "multikey")
+			m_ram(*this, RAM_TAG),
+			m_iocard(*this, "dbank"),
+			m_multikey(*this, "multikey")
 		{ }
+
+	void at486(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 #ifndef REAL_PCI_CHIPSET
 	required_device<at_mb_device> m_mb;
@@ -75,7 +79,6 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(coin_r);
-	void at486(machine_config &config);
 	static void cdrom(device_t *device);
 	void at32_io(address_map &map);
 	void at32_map(address_map &map);
@@ -107,19 +110,19 @@ WRITE8_MEMBER(mtxl_state::key_w)
 void mtxl_state::at32_map(address_map &map)
 {
 	map.unmap_value_high();
-	#ifndef REAL_PCI_CHIPSET
+#ifndef REAL_PCI_CHIPSET
 	map(0x00000000, 0x0009ffff).bankrw("bank10");
 	map(0x000c8000, 0x000cffff).ram().share("nvram");
 	map(0x000d0000, 0x000dffff).m(m_iocard, FUNC(address_map_bank_device::amap32));
 	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
-	#endif
+#endif
 }
 
 void mtxl_state::at32_io(address_map &map)
 {
 	map.unmap_value_high();
-	#ifndef REAL_PCI_CHIPSET
+#ifndef REAL_PCI_CHIPSET
 	map(0x0000, 0x001f).rw("mb:dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x003f).rw("mb:pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
@@ -130,14 +133,14 @@ void mtxl_state::at32_io(address_map &map)
 	map(0x00a0, 0x00bf).rw("mb:pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw("mb:dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
 	map(0x0224, 0x0227).rw("cs4231", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
-	#endif
+#endif
 	map(0x0228, 0x022b).portr("Unknown");
 	map(0x022f, 0x022f).w(FUNC(mtxl_state::bank_w));
 	map(0x022d, 0x022d).rw(FUNC(mtxl_state::key_r), FUNC(mtxl_state::key_w));
 	map(0x022c, 0x022c).r(FUNC(mtxl_state::coin_r));
-	#ifndef REAL_PCI_CHIPSET
+#ifndef REAL_PCI_CHIPSET
 	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	#endif
+#endif
 }
 
 void mtxl_state::dbank_map(address_map &map)
@@ -205,11 +208,11 @@ void mtxl_state::cdrom(device_t *device)
 	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
 	ide1->set_default_option("");
 	ide1->set_fixed(true);
-MACHINE_CONFIG_END
+}
 #endif
 
 MACHINE_CONFIG_START(mtxl_state::at486)
-	MCFG_DEVICE_ADD("maincpu", I486DX4, 33000000)
+	MCFG_DEVICE_ADD(m_maincpu, I486DX4, 33000000)
 	MCFG_DEVICE_PROGRAM_MAP(at32_map)
 	MCFG_DEVICE_IO_MAP(at32_io)
 #ifndef REAL_PCI_CHIPSET
@@ -232,8 +235,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
 	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
 
-	MCFG_DEVICE_MODIFY("mb:dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8("cs4231", ad1848_device, dack_w))
+	subdevice<am9517a_device>("mb:dma8237_1")->out_iow_callback<1>().set("cs4231", FUNC(ad1848_device::dack_w));
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");

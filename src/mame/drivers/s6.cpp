@@ -75,6 +75,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void s6(machine_config &config);
+
+	void init_s6();
+
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -94,14 +102,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s6);
-	void init_s6();
-	void s6(machine_config &config);
+
 	void s6_audio_map(address_map &map);
 	void s6_main_map(address_map &map);
-private:
+
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
 	uint8_t m_kbdrow;
@@ -411,7 +416,7 @@ MACHINE_CONFIG_START(s6_state::s6)
 	MCFG_MACHINE_RESET_OVERRIDE(s6_state, s6)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s6)
+	config.set_default_layout(layout_s6);
 
 	/* Sound */
 	genpin_audio(config);

@@ -99,30 +99,6 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
-	DECLARE_READ8_MEMBER(questions_r);
-	DECLARE_WRITE8_MEMBER(low_offset_w);
-	DECLARE_WRITE8_MEMBER(med_offset_w);
-	DECLARE_WRITE8_MEMBER(high_offset_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(casino5_bank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE8_MEMBER(led1_w);
-	DECLARE_WRITE8_MEMBER(led2_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(misc_couple_w);
-	void init_couple();
-	void init_key_5();
-	void init_key_4();
-	void init_key_7();
-	void init_key_0();
-	void init_key_2();
-	void init_dtrvwz5();
-	DECLARE_MACHINE_START(casino5);
-	MC6845_BEGIN_UPDATE(crtc_begin_update);
-	MC6845_UPDATE_ROW(crtc_update_row);
 	void misdraw(machine_config &config);
 	void couple(machine_config &config);
 	void phrcraze(machine_config &config);
@@ -134,6 +110,35 @@ public:
 	void trvwhziv(machine_config &config);
 	void bigappg(machine_config &config);
 	void pitboss(machine_config &config);
+
+	void init_couple();
+	void init_key_5();
+	void init_key_4();
+	void init_key_7();
+	void init_key_0();
+	void init_key_2();
+	void init_dtrvwz5();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
+
+private:
+	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
+	DECLARE_READ8_MEMBER(questions_r);
+	DECLARE_WRITE8_MEMBER(low_offset_w);
+	DECLARE_WRITE8_MEMBER(med_offset_w);
+	DECLARE_WRITE8_MEMBER(high_offset_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(casino5_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE8_MEMBER(led1_w);
+	DECLARE_WRITE8_MEMBER(led2_w);
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(misc_couple_w);
+
+	DECLARE_MACHINE_START(casino5);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	void bigappg_map(address_map &map);
 	void casino5_map(address_map &map);
 	void couple_map(address_map &map);
@@ -149,7 +154,6 @@ public:
 	void trvwhiz_map(address_map &map);
 	void trvwhziv_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
 	pen_t m_pens[NUM_PENS];
@@ -173,7 +177,7 @@ void merit_state::machine_start()
 	m_question_address = 0;
 	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 
-	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 	save_item(NAME(m_question_address));

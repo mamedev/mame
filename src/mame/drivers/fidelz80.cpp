@@ -523,6 +523,22 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	void cc10(machine_config &config);
+	void vcc(machine_config &config);
+
+	void bcc(machine_config &config);
+
+	void scc(machine_config &config);
+
+	void vsc(machine_config &config);
+
+	void vbrc(machine_config &config);
+
+	void dsc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	// devices/pointers
 	optional_device<i8041_device> m_mcu;
 	optional_device<z80pio_device> m_z80pio;
@@ -533,8 +549,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// CC10 and VCC/UVC
 	void vcc_prepare_display();
@@ -550,22 +564,18 @@ public:
 	void cc10_map(address_map &map);
 	void vcc_io(address_map &map);
 	void vcc_map(address_map &map);
-	void cc10(machine_config &config);
-	void vcc(machine_config &config);
 
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
 	void bcc_io(address_map &map);
 	void bcc_map(address_map &map);
-	void bcc(machine_config &config);
 
 	// SCC
 	DECLARE_READ8_MEMBER(scc_input_r);
 	DECLARE_WRITE8_MEMBER(scc_control_w);
 	void scc_io(address_map &map);
 	void scc_map(address_map &map);
-	void scc(machine_config &config);
 
 	// VSC
 	void vsc_prepare_display();
@@ -579,7 +589,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 	void vsc_io(address_map &map);
 	void vsc_map(address_map &map);
-	void vsc(machine_config &config);
 
 	// VBRC
 	void vbrc_prepare_display();
@@ -591,14 +600,12 @@ public:
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
 	void vbrc_main_io(address_map &map);
 	void vbrc_main_map(address_map &map);
-	void vbrc(machine_config &config);
 
 	// DSC
 	void dsc_prepare_display();
 	DECLARE_WRITE8_MEMBER(dsc_control_w);
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
-	void dsc(machine_config &config);
 	void dsc_map(address_map &map);
 };
 
@@ -1660,7 +1667,7 @@ MACHINE_CONFIG_START(fidelz80_state::bcc)
 	MCFG_DEVICE_IO_MAP(bcc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_bcc)
+	config.set_default_layout(layout_fidel_bcc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1677,7 +1684,7 @@ MACHINE_CONFIG_START(fidelz80_state::scc)
 	MCFG_DEVICE_IO_MAP(scc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc8)
+	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1703,7 +1710,7 @@ MACHINE_CONFIG_START(fidelz80_state::cc10)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
+	config.set_default_layout(layout_fidel_cc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1729,7 +1736,7 @@ MACHINE_CONFIG_START(fidelz80_state::vcc)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
+	config.set_default_layout(layout_fidel_vcc);
 
 	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
 
@@ -1759,7 +1766,7 @@ MACHINE_CONFIG_START(fidelz80_state::vsc)
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, fidelz80_state, vsc_pio_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
+	config.set_default_layout(layout_fidel_vsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1784,10 +1791,10 @@ MACHINE_CONFIG_START(fidelz80_state::vbrc)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t1_r))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(*this, fidelz80_state, vbrc_ioexp_port_w))
+	MCFG_I8243_ADD("i8243", CONSTANT(0), WRITE8(*this, fidelz80_state, vbrc_ioexp_port_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
+	config.set_default_layout(layout_fidel_vbrc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1806,7 +1813,7 @@ MACHINE_CONFIG_START(fidelz80_state::dsc)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidelz80_state, irq_off, attotime::from_hz(523))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_dsc)
+	config.set_default_layout(layout_fidel_dsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -105,6 +105,11 @@ public:
 	{
 	}
 
+	void seibucats(machine_config &config);
+
+	void init_seibucats();
+
+private:
 	// screen updates
 //  uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 //  IRQ_CALLBACK_MEMBER(spi_irq_callback);
@@ -114,19 +119,15 @@ public:
 	DECLARE_WRITE16_MEMBER(input_select_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE16_MEMBER(aux_rtc_w);
-	void init_seibucats();
 
-	void seibucats(machine_config &config);
 	void seibucats_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 //  virtual void video_start() override;
 
-
-private:
 	uint16_t m_input_select;
 
 //  optional_ioport_array<5> m_key;

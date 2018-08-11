@@ -28,7 +28,7 @@ public:
 
 	void foodf(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -44,7 +44,6 @@ protected:
 
 	void main_map(address_map &map);
 
-private:
 	required_device<x2212_device> m_nvram;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<timer_device> m_scan_timer;

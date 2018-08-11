@@ -65,6 +65,11 @@ public:
 	{
 	}
 
+	void tv990(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(color);
+
+private:
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_fontram;
@@ -91,10 +96,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
 
 	INTERRUPT_GEN_MEMBER(vblank);
-	DECLARE_INPUT_CHANGED_MEMBER(color);
-	void tv990(machine_config &config);
 	void tv990_mem(address_map &map);
-private:
+
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;

@@ -170,7 +170,7 @@ private:
 
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;
-	required_device<cpu_device> m_maincpu;
+	required_device<mcs51_cpu_device> m_maincpu;
 
 	required_ioport m_col1;
 	required_ioport m_col2;

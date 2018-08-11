@@ -32,10 +32,10 @@
 //**************************************************************************
 
 #define MCFG_RP5C15_OUT_ALARM_CB(_devcb) \
-	devcb = &downcast<rp5c15_device &>(*device).set_out_alarm_callback(DEVCB_##_devcb);
+	downcast<rp5c15_device &>(*device).set_out_alarm_callback(DEVCB_##_devcb);
 
 #define MCFG_RP5C15_OUT_CLKOUT_CB(_devcb) \
-	devcb = &downcast<rp5c15_device &>(*device).set_out_clkout_callback(DEVCB_##_devcb);
+	downcast<rp5c15_device &>(*device).set_out_clkout_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

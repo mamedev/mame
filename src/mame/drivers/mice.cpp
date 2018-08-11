@@ -47,11 +47,12 @@ public:
 
 	void mice2(machine_config &config);
 	void mice(machine_config &config);
+
+private:
 	void mice2_io(address_map &map);
 	void mice2_mem(address_map &map);
 	void mice_io(address_map &map);
 	void mice_mem(address_map &map);
-private:
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -180,12 +181,12 @@ MACHINE_CONFIG_START(mice_state::mice)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
 
-	MCFG_DEVICE_ADD("rpt", I8155, 6.144_MHz_XTAL / 2)
-	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	i8155_device &rpt(I8155(config, "rpt", 6.144_MHz_XTAL / 2));
+	rpt.in_pc_callback().set_ioport("BAUD");
+	rpt.out_to_callback().set("uart", FUNC(i8251_device::write_txc));
+	rpt.out_to_callback().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	I8255(config, "ppi", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mice_state::mice2)

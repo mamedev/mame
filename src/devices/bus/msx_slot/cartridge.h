@@ -17,13 +17,13 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_YAMAHA_EXPANSION, msx_slot_yamaha_expansion_device)
 #define MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag, _devcb) \
 	MCFG_DEVICE_ADD(_tag, MSX_SLOT_CARTRIDGE, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(msx_cart, nullptr, false) \
-	devcb = &downcast<msx_slot_cartridge_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<msx_slot_cartridge_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 #define MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, _devcb, _default) \
 	MCFG_DEVICE_ADD(_tag, MSX_SLOT_YAMAHA_EXPANSION, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(msx_yamaha_60pin, _default, false) \
-	devcb = &downcast<msx_slot_cartridge_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<msx_slot_cartridge_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 class msx_slot_cartridge_device : public device_t

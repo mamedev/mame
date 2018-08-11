@@ -39,7 +39,7 @@
 #define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _slot_intf, _def_slot, _devcb) \
 	MCFG_DEVICE_ADD(_tag, PET_DATASSETTE_PORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	devcb = &downcast<pet_datassette_port_device &>(*device).set_read_handler(DEVCB_##_devcb);
+	downcast<pet_datassette_port_device &>(*device).set_read_handler(DEVCB_##_devcb);
 
 
 

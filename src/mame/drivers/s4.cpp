@@ -59,6 +59,13 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void s4(machine_config &config);
+	void s4a(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -80,15 +87,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s4);
 	DECLARE_MACHINE_RESET(s4a);
-	void s4(machine_config &config);
-	void s4a(machine_config &config);
 	void s4_audio_map(address_map &map);
 	void s4_main_map(address_map &map);
-private:
+
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -435,7 +438,7 @@ MACHINE_CONFIG_START(s4_state::s4)
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s4)
+	config.set_default_layout(layout_s4);
 
 	/* Sound */
 	genpin_audio(config);

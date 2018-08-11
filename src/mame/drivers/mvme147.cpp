@@ -198,6 +198,9 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	{
 	}
 
+	void mvme147(machine_config &config);
+
+private:
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 	/* PCC - Peripheral Channel Controller */
@@ -215,11 +218,8 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void mvme147(machine_config &config);
 	void mvme147_mem(address_map &map);
-protected:
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc85c30_device> m_sccterm;
 	required_device<scc85c30_device> m_sccterm2;

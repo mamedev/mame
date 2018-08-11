@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "includes/atarist.h"
 #include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "bus/midi/midi.h"
 #include "video/atarist.h"
 #include "screen.h"
@@ -1773,21 +1774,6 @@ WRITE_LINE_MEMBER( st_state::ikbd_tx_w )
 	m_ikbd_tx = state;
 }
 
-WRITE_LINE_MEMBER( st_state::acia_ikbd_irq_w )
-{
-	m_acia_ikbd_irq = state;
-
-	m_mfp->i4_w(!(m_acia_ikbd_irq || m_acia_midi_irq));
-}
-
-
-WRITE_LINE_MEMBER( st_state::acia_midi_irq_w )
-{
-	m_acia_midi_irq = state;
-
-	m_mfp->i4_w(!(m_acia_ikbd_irq || m_acia_midi_irq));
-}
-
 WRITE_LINE_MEMBER(st_state::write_acia_clock)
 {
 	m_acia0->write_txc(state);
@@ -1880,8 +1866,6 @@ void st_state::state_save()
 	save_item(NAME(m_ikbd_tx));
 	save_item(NAME(m_ikbd_joy));
 	save_item(NAME(m_midi_tx));
-	save_item(NAME(m_acia_ikbd_irq));
-	save_item(NAME(m_acia_midi_irq));
 }
 
 //-------------------------------------------------
@@ -2055,9 +2039,9 @@ MACHINE_CONFIG_START(st_state::st)
 
 	// devices
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, Y2/4);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
@@ -2082,11 +2066,14 @@ MACHINE_CONFIG_START(st_state::st)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2146,9 +2133,9 @@ MACHINE_CONFIG_START(megast_state::megast)
 	// devices
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, Y2/4);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
@@ -2173,11 +2160,14 @@ MACHINE_CONFIG_START(megast_state::megast)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2245,9 +2235,9 @@ MACHINE_CONFIG_START(ste_state::ste)
 
 	// devices
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, Y2/4);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
@@ -2272,11 +2262,14 @@ MACHINE_CONFIG_START(ste_state::ste)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2359,9 +2352,9 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
 	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, U517/2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, U517/2);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 
@@ -2379,11 +2372,14 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	// device hardware
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))

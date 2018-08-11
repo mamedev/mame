@@ -34,6 +34,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
+	void fireone(machine_config &config);
+	void starfire(machine_config &config);
+
+	void init_starfire();
+	void init_fireone();
+
+private:
 	required_shared_ptr<uint8_t> m_starfire_colorram;
 	required_shared_ptr<uint8_t> m_starfire_videoram;
 	optional_device<samples_device> m_samples;
@@ -62,8 +69,6 @@ public:
 	DECLARE_READ8_MEMBER(starfire_colorram_r);
 	DECLARE_WRITE8_MEMBER(starfire_videoram_w);
 	DECLARE_READ8_MEMBER(starfire_videoram_r);
-	void init_starfire();
-	void init_fireone();
 	virtual void video_start() override;
 	uint32_t screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
@@ -71,7 +76,6 @@ public:
 	void get_pens(pen_t *pens);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	void fireone(machine_config &config);
-	void starfire(machine_config &config);
+
 	void main_map(address_map &map);
 };

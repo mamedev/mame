@@ -51,9 +51,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void st_mp201(machine_config &config);
+	void st_mp200(machine_config &config);
+
 	void init_st_mp200();
 	void init_st_mp201();
 	void init_st_mp202();
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+private:
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -65,14 +73,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	void st_mp201(machine_config &config);
-	void st_mp200(machine_config &config);
+
 	void st_mp200_map(address_map &map);
-private:
+
 	uint8_t m_u10a;
 	uint8_t m_u10b;
 	uint8_t m_u11a;
@@ -582,7 +588,7 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_st_mp200)
+	config.set_default_layout(layout_st_mp200);
 
 	/* Sound */
 	genpin_audio(config);
@@ -665,7 +671,7 @@ ROM_END
 
 ROM_START(cheetahb)
 	ROM_REGION(0x10000, "maincpu", 0)   // Blue cabinet version - has different sound effects to the black cabinet version
-	ROM_LOAD( "cheetah__x_b16.u1", 0x1000, 0x0800, CRC(2f736A0A) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
+	ROM_LOAD( "cheetah__x_b16.u1", 0x1000, 0x0800, CRC(2f736a0a) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
 	ROM_LOAD( "cheetah__x_b16.u5", 0x1800, 0x0800, CRC(168f0650) SHA1(5b3294bf64f06cc9d193bb14891b2acfbb5c06d4))
 	ROM_LOAD( "cheetah__x_b16.u2", 0x5000, 0x0800, CRC(f6bd41bc) SHA1(ac94f4ba17c31dfe10ab7efab63d98aa3401e4ae))
 	ROM_LOAD( "cheetah__x_b16.u6", 0x5800, 0x0800, CRC(c7eba210) SHA1(ced377e53f30b371e74c26527e5f8bebcc10ee59))

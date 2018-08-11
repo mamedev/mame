@@ -122,6 +122,9 @@ class hp2645_state : public driver_device
 public:
 	hp2645_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp2645(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -152,10 +155,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
-	void hp2645(machine_config &config);
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
-protected:
+
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
 	required_ioport_array<4> m_io_key;
@@ -982,7 +984,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_SCREEN_UPDATE_DRIVER(hp2645_state , screen_update)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp2645_state, scanline_timer, "screen", 0, 1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
-	MCFG_DEFAULT_LAYOUT(layout_hp2640)
+	config.set_default_layout(layout_hp2640);
 
 	// RS232
 	MCFG_DEVICE_ADD("rs232" , RS232_PORT, default_rs232_devices , nullptr)

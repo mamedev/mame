@@ -745,18 +745,18 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_DEVICE_ADD("maincpu", M65C02, 2000000)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_mem)
 
-	MCFG_DEVICE_ADD("via0", VIA6522, 2000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, clcd_state, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, clcd_state, via0_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, clcd_state, via0_cb1_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, clcd_state, write_irq_via0))
+	via6522_device &via0(VIA6522(config, "via0", 2000000));
+	via0.writepa_handler().set(FUNC(clcd_state::via0_pa_w));
+	via0.writepb_handler().set(FUNC(clcd_state::via0_pb_w));
+	via0.cb1_handler().set(FUNC(clcd_state::via0_cb1_w));
+	via0.irq_handler().set(FUNC(clcd_state::write_irq_via0));
 
-	MCFG_DEVICE_ADD("via1", VIA6522, 2000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, clcd_state, via1_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, clcd_state, via1_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, clcd_state, write_irq_via1))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
+	via6522_device &via1(VIA6522(config, "via1", 2000000));
+	via1.writepa_handler().set(FUNC(clcd_state::via1_pa_w));
+	via1.writepb_handler().set(FUNC(clcd_state::via1_pb_w));
+	via1.irq_handler().set(FUNC(clcd_state::write_irq_via1));
+	via1.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
+	via1.cb2_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 2000000)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
@@ -771,8 +771,8 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("via1", via6522_device, write_pb4))
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, nullptr)
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
+	m_centronics->busy_handler().set("via1", FUNC(via6522_device::write_pb6)).invert();
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
 

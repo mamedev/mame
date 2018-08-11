@@ -33,6 +33,9 @@ public:
 		, m_soundbank(*this, "soundbank")
 	{ }
 
+	void mephisto(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(shift_load_w);
 	DECLARE_READ8_MEMBER(ay8910_read);
 	DECLARE_WRITE8_MEMBER(ay8910_write);
@@ -41,12 +44,11 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
-	void mephisto(machine_config &config);
 	void mephisto_8051_io(address_map &map);
 	void mephisto_8051_map(address_map &map);
 	void mephisto_map(address_map &map);
 	void sport2k_8051_io(address_map &map);
-private:
+
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
 	bool m_ay8910_bc1;
@@ -182,7 +184,7 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, mephisto_pinball_state, ay8910_read))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, mephisto_pinball_state, ay8910_write))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, mephisto_pinball_state, t0_t1_w))
-	MCFG_MCS51_SERIAL_RX_CB(NOOP) // from MUART
+	MCFG_MCS51_SERIAL_RX_CB(CONSTANT(0)) // from MUART
 
 	SPEAKER(config, "mono").front_center();
 

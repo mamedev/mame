@@ -519,15 +519,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvecs)
 	intv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(intvecs_mem)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_DEVICE_ADD("ecs", INTV_ROM_ECS, 0)
 
-	MCFG_DEVICE_ADD("speech", SP0256, 3120000)
+	sp0256_device &speech(SP0256(config, "speech", 3120000));
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	speech.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cassette */
 	//MCFG_CASSETTE_ADD( "cassette" )

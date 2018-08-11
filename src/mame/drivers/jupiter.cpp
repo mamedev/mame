@@ -54,11 +54,13 @@ public:
 		, m_acia1(*this, "acia1")
 	{ }
 
+	void jupiter2(machine_config &config);
+
 	void init_jupiter2();
 
-	void jupiter2(machine_config &config);
-	void jupiter2_mem(address_map &map);
 private:
+	void jupiter2_mem(address_map &map);
+
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia0;
@@ -76,17 +78,20 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void jupiter3(machine_config &config);
+
 	void init_jupiter3();
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
 
-	void jupiter3(machine_config &config);
 	void jupiter3_io(address_map &map);
 	void jupiter3_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;

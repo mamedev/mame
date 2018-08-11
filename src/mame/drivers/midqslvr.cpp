@@ -40,6 +40,9 @@ public:
 	{
 	}
 
+	void midqslvr(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
@@ -62,7 +65,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void midqslvr(machine_config &config);
 	void midqslvr_io(address_map &map);
 	void midqslvr_map(address_map &map);
 

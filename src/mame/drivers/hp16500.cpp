@@ -59,12 +59,18 @@
 class hp16500_state : public driver_device
 {
 public:
-	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hp16500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mlc(*this, "mlc")
-		{ }
+	{ }
 
+	void hp16500(machine_config &config);
+	void hp16500a(machine_config &config);
+	void hp1651(machine_config &config);
+	void hp1650(machine_config &config);
+
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -97,15 +103,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
-	void hp16500(machine_config &config);
-	void hp16500a(machine_config &config);
-	void hp1651(machine_config &config);
-	void hp1650(machine_config &config);
 	void hp16500_map(address_map &map);
 	void hp16500a_map(address_map &map);
 	void hp1650_map(address_map &map);
 	void hp1651_map(address_map &map);
-private:
+
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 
@@ -474,21 +476,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC030, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp16500_map)
+	M68EC030(config, m_maincpu, 25'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
-	MCFG_SCREEN_SIZE(576,384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp16500_state, vsync_changed))
-	// FIXME: Where is the AP line connected to? The MLC documentation recommends
-	// connecting it to VBLANK
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(hp16500_state::screen_update_hp16500));
+	screen.set_size(576,384);
+	screen.set_visarea(0, 576-1, 0, 384-1);
+	screen.set_refresh_hz(60);
+	screen.screen_vblank().set(FUNC(hp16500_state::vsync_changed));
+	// FIXME: Where is the AP line connected to? The MLC documentation recommends connecting it to VBLANK
+	screen.screen_vblank().append(m_mlc, FUNC(hp_hil_mlc_device::ap_w));
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp16500_state, irq_2))
+	HP_HIL_MLC(config, m_mlc, XTAL(15'920'000)/2);
+	m_mlc->int_callback().set(FUNC(hp16500_state::irq_2));
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced
 	// later with a 16500b specific keyboard implementation

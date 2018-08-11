@@ -168,18 +168,18 @@ DECLARE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device);
 	fdc37c93x_device::static_set_sysopt_pin(*device, _pinvalue);
 
 #define MCFG_FDC37C93X_GP20_RESET_CB(_devcb) \
-	devcb = &downcast<fdc37c93x_device &>(*device).set_gp20_reset_callback(DEVCB_##_devcb);
+	downcast<fdc37c93x_device &>(*device).set_gp20_reset_callback(DEVCB_##_devcb);
 
 #define MCFG_FDC37C93X_GP25_GATEA20_CB(_devcb) \
-	devcb = &downcast<fdc37c93x_device &>(*device).set_gp25_gatea20_callback(DEVCB_##_devcb);
+	downcast<fdc37c93x_device &>(*device).set_gp25_gatea20_callback(DEVCB_##_devcb);
 
 #define MCFG_FDC37C93X_IRQ1_CB(_devcb) \
-	devcb = &downcast<fdc37c93x_device &>(*device).set_irq1_callback(DEVCB_##_devcb);
+	downcast<fdc37c93x_device &>(*device).set_irq1_callback(DEVCB_##_devcb);
 
 #define MCFG_FDC37C93X_IRQ8_CB(_devcb) \
-	devcb = &downcast<fdc37c93x_device &>(*device).set_irq8_callback(DEVCB_##_devcb);
+	downcast<fdc37c93x_device &>(*device).set_irq8_callback(DEVCB_##_devcb);
 
 #define MCFG_FDC37C93X_IRQ9_CB(_devcb) \
-	devcb = &downcast<fdc37c93x_device &>(*device).set_irq9_callback(DEVCB_##_devcb);
+	downcast<fdc37c93x_device &>(*device).set_irq9_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_FDC37C93X_H

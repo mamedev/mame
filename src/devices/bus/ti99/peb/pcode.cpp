@@ -134,13 +134,12 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 
 	if (validaccess)
 	{
-		int lines = (state==ASSERT_LINE)? 1 : 0;
-		if (a14==ASSERT_LINE) lines |= 2;
-		line_state select = m_isgrom? ASSERT_LINE : CLEAR_LINE;
-
 		// always deliver to GROM so that the select line may be cleared
+		line_state mline = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+		line_state gsq = m_isgrom? ASSERT_LINE : CLEAR_LINE;
+
 		for (int i=0; i < 8; i++)
-			m_grom[i]->set_lines(space, lines, select);
+			m_grom[i]->set_lines(mline, a14, gsq);
 	}
 }
 
@@ -176,7 +175,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 		{
 			if (m_isgrom)
 			{
-				for (auto& elem : m_grom) elem->readz(space, m_address, value);
+				for (auto& elem : m_grom) elem->readz(value);
 				if (TRACE_GROM) logerror("Read from grom %04x: %02x\n", m_address&0xffff, *value);
 			}
 			else
@@ -206,7 +205,7 @@ WRITE8_MEMBER( ti_pcode_card_device::write )
 	if (machine().side_effects_disabled()) return;
 	if (m_active && m_isgrom && m_selected)
 	{
-		for (auto & elem : m_grom) elem->write(space, m_address, data);
+		for (auto & elem : m_grom) elem->write(data);
 	}
 }
 

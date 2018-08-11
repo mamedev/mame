@@ -441,7 +441,7 @@ void sns_rom_sdd1_device::device_start()
 		save_item(NAME(m_dma[i].size), i);
 	}
 
-	save_pointer(NAME(m_buffer.data.get()), 0x10000);
+	save_pointer(NAME(m_buffer.data), 0x10000);
 	save_item(NAME(m_buffer.offset));
 	save_item(NAME(m_buffer.size));
 	save_item(NAME(m_buffer.ready));

@@ -663,12 +663,12 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(rbisland_sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC next to C-Chip */
-	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
-	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
-	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
-	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(*this, rbisland_state, counters_w))
+	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); // 12MHz OSC next to C-Chip
+	m_cchip->in_pa_callback().set_ioport("800007");
+	m_cchip->in_pb_callback().set_ioport("800009");
+	m_cchip->in_pc_callback().set_ioport("80000B");
+	m_cchip->in_ad_callback().set_ioport("80000D");
+	m_cchip->out_pb_callback().set(FUNC(rbisland_state::counters_w));
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
 

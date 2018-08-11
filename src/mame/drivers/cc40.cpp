@@ -527,7 +527,7 @@ void cc40_state::init_sysram(int chip, u16 size)
 	{
 		// init to largest possible
 		m_sysram[chip] = std::make_unique<u8[]>(0x2000);
-		save_pointer(NAME(m_sysram[chip].get()), 0x2000, chip);
+		save_pointer(NAME(m_sysram[chip]), 0x2000, chip);
 
 		save_item(NAME(m_sysram_size[chip]), chip);
 		save_item(NAME(m_sysram_end[chip]), chip);
@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(6*31+1, 9*1+1+1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1+1)
-	MCFG_DEFAULT_LAYOUT(layout_cc40)
+	config.set_default_layout(layout_cc40);
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

@@ -19,6 +19,7 @@
 #define MAME_EMU_MCONFIG_H
 
 #include <cassert>
+#include <map>
 #include <memory>
 #include <tuple>
 #include <type_traits>
@@ -100,15 +101,20 @@ public:
 	device_t &root_device() const { assert(m_root_device); return *m_root_device; }
 	device_t &current_device() const { assert(m_current_device); return *m_current_device; }
 	emu_options &options() const { return m_options; }
-	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
-	template <class DeviceClass> inline DeviceClass *device(const char *tag) const { return downcast<DeviceClass *>(device(tag)); }
+	device_t *device(const char *tag) const { return root_device().subdevice(tag); }
+	template <class DeviceClass> DeviceClass *device(const char *tag) const { return downcast<DeviceClass *>(device(tag)); }
+	template <typename T> void apply_default_layouts(T &&op) const
+	{
+		for (std::pair<char const *, internal_layout const *> const &lay : m_default_layouts)
+			op(*device(lay.first), *lay.second);
+	}
 
 	// public state
 	attotime                m_minimum_quantum;          // minimum scheduling quantum
 	std::string             m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
 
-	// other parameters
-	const internal_layout *            m_default_layout;           // default layout for this machine
+	// configuration methods
+	void set_default_layout(internal_layout const &layout);
 
 	// helpers during configuration; not for general use
 	token begin_configuration(device_t &device)
@@ -167,18 +173,20 @@ public:
 
 private:
 	class current_device_stack;
+	typedef std::map<char const *, internal_layout const *, bool (*)(char const *, char const *)> default_layout_map;
 
 	// internal helpers
 	std::pair<const char *, device_t *> resolve_owner(const char *tag) const;
 	std::tuple<const char *, device_t *, device_t *> prepare_replace(const char *tag);
 	device_t &add_device(std::unique_ptr<device_t> &&device, device_t *owner);
 	device_t &replace_device(std::unique_ptr<device_t> &&device, device_t &owner, device_t *existing);
-	void remove_references(ATTR_UNUSED device_t &device);
+	void remove_references(device_t &device);
 
 	// internal state
 	game_driver const &         m_gamedrv;
 	emu_options &               m_options;
 	std::unique_ptr<device_t>   m_root_device;
+	default_layout_map          m_default_layouts;
 	device_t *                  m_current_device;
 };
 
@@ -223,9 +231,7 @@ inline std::enable_if_t<emu::detail::is_device_interface<typename std::remove_re
 ATTR_COLD void _name(machine_config &config) \
 { \
 	device_t *device = nullptr; \
-	devcb_base *devcb = nullptr; \
 	(void)device; \
-	(void)devcb;
 
 /**
 @def MACHINE_CONFIG_END
@@ -244,10 +250,6 @@ Ends a machine_config.
 	config.m_minimum_quantum = _time;
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
 	config.m_perfect_cpu_quantum = subtag(_cputag);
-
-// core video parameters
-#define MCFG_DEFAULT_LAYOUT(_layout) \
-	config.m_default_layout = &(_layout);
 
 // add/remove devices
 #define MCFG_DEVICE_ADD(_tag, ...) \

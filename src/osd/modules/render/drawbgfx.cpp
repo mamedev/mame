@@ -950,8 +950,9 @@ bool renderer_bgfx::update_dimensions()
 #else
 			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), width, height);
 #endif
+			if (m_ortho_view)
+				m_ortho_view->set_backbuffer(m_framebuffer);
 
-			m_ortho_view->set_backbuffer(m_framebuffer);
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
 			bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 			bgfx::setViewMode(s_current_view, bgfx::ViewMode::Sequential);

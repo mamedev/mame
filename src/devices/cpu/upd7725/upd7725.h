@@ -30,37 +30,37 @@ enum
 
 
 #define MCFG_NECDSP_IN_INT_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_in_int_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_in_int_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_IN_SI_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_in_si_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_in_si_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_IN_SCK_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_in_sck_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_in_sck_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_IN_SIEN_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_in_sien_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_in_sien_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_IN_SOEN_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_in_soen_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_in_soen_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_IN_DACK_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_in_dack_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_in_dack_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_OUT_P0_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_out_p0_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_out_p0_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_OUT_P1_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_out_p1_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_out_p1_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_OUT_SO_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_OUT_SORQ_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_out_sorq_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_out_sorq_callback(DEVCB_##_devcb);
 
 #define MCFG_NECDSP_OUT_DRQ_CB(_devcb) \
-	devcb = &downcast<necdsp_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
+	downcast<necdsp_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
 
 
 // ======================> necdsp_device

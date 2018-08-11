@@ -323,17 +323,17 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8("tms", tms5220_device, data_w))
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
+	X2212(config, "x2212").set_auto_save(true); /* nvram */
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 9L/M
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, starwars_state, coin1_counter_w)) // Coin counter 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, starwars_state, coin2_counter_w)) // Coin counter 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT // LED 3
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1")) // bank switch
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, starwars_state, prng_reset_w)) // reset PRNG
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, starwars_state, recall_w)) // NVRAM array recall
+	ls259_device &outlatch(LS259(config, "outlatch")); // 9L/M
+	outlatch.q_out_cb<0>().set(FUNC(starwars_state::coin1_counter_w)); // Coin counter 1
+	outlatch.q_out_cb<1>().set(FUNC(starwars_state::coin2_counter_w)); // Coin counter 2
+	outlatch.q_out_cb<2>().set_output("led2").invert(); // LED 3
+	outlatch.q_out_cb<3>().set_output("led1").invert(); // LED 2
+	outlatch.q_out_cb<4>().set_membank("bank1"); // bank switch
+	outlatch.q_out_cb<5>().set(FUNC(starwars_state::prng_reset_w)); // reset PRNG
+	outlatch.q_out_cb<6>().set_output("led0").invert(); // LED 1
+	outlatch.q_out_cb<7>().set(FUNC(starwars_state::recall_w)); // NVRAM array recall
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -349,41 +349,32 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	POKEY(config, m_pokey[0], MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
+	POKEY(config, m_pokey[1], MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
+	POKEY(config, m_pokey[2], MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
+	POKEY(config, m_pokey[3], MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	TMS5220(config, m_tms, MASTER_CLOCK/2/9).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pokey3", POKEY, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa7_w));
+	m_soundlatch->data_pending_callback().append(FUNC(starwars_state::boost_interleave_hack));
 
-	MCFG_DEVICE_ADD("pokey4", POKEY, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-
-	MCFG_DEVICE_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("riot", riot6532_device, pa7_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, starwars_state, boost_interleave_hack))
-
-	MCFG_GENERIC_LATCH_8_ADD("mainlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("riot", riot6532_device, pa6_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, starwars_state, boost_interleave_hack))
+	GENERIC_LATCH_8(config, m_mainlatch);
+	m_mainlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa6_w));
+	m_mainlatch->data_pending_callback().append(FUNC(starwars_state::boost_interleave_hack));
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(starwars_state::esb)
 	starwars(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
 
 	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 101, false)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("bank2"))
+	subdevice<ls259_device>("outlatch")->q_out_cb<4>().append_membank("bank2");
 MACHINE_CONFIG_END
 
 

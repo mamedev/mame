@@ -66,6 +66,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void gpworld(machine_config &config);
+
+	void init_gpworld();
+
+private:
 	uint8_t m_nmi_enable;
 	uint8_t m_start_lamp;
 	uint8_t m_ldp_read_latch;
@@ -82,7 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_io_write);
 	DECLARE_WRITE8_MEMBER(brake_gas_write);
 	DECLARE_WRITE8_MEMBER(palette_write);
-	void init_gpworld();
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback);
@@ -93,10 +97,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	void gpworld(machine_config &config);
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

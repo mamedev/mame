@@ -445,20 +445,20 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
 	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, warriorb_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(warriorb_state::coin_control_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -529,20 +529,20 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
 	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, warriorb_state, coin_control_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
+	TC0510NIO(config, m_tc0510nio, 0);
+	m_tc0510nio->read_0_callback().set_ioport("DSWA");
+	m_tc0510nio->read_1_callback().set_ioport("DSWB");
+	m_tc0510nio->read_2_callback().set_ioport("IN0");
+	m_tc0510nio->read_3_callback().set_ioport("IN1");
+	m_tc0510nio->write_4_callback().set(FUNC(warriorb_state::coin_control_w));
+	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

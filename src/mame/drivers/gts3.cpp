@@ -48,16 +48,20 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void gts3(machine_config &config);
+
 	void init_gts3();
+
+	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+
+private:
 	DECLARE_WRITE8_MEMBER(segbank_w);
 	DECLARE_READ8_MEMBER(u4a_r);
 	DECLARE_READ8_MEMBER(u4b_r);
 	DECLARE_WRITE8_MEMBER(u4b_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
-	void gts3(machine_config &config);
 	void gts3_map(address_map &map);
-private:
+
 	bool m_dispclk;
 	bool m_lampclk;
 	uint8_t m_digit;
@@ -288,7 +292,7 @@ MACHINE_CONFIG_START(gts3_state::gts3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gts3)
+	config.set_default_layout(layout_gts3);
 
 	/* Sound */
 	genpin_audio(config);

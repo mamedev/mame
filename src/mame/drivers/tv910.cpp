@@ -59,6 +59,9 @@ public:
 		, m_charset(*this, "CHARSET")
 	{ }
 
+	void tv910(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -80,9 +83,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
-	void tv910(machine_config &config);
 	void tv910_mem(address_map &map);
-private:
+
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<r6545_1_device> m_crtc;

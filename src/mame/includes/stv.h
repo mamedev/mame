@@ -27,6 +27,15 @@ public:
 	{
 	}
 
+	void stv_slot(machine_config &config);
+	void stv_cartslot(machine_config &config);
+	void stv(machine_config &config);
+	void hopper(machine_config &config);
+	void batmanfr(machine_config &config);
+	void stv_5838(machine_config &config);
+	void stv_5881(machine_config &config);
+	void stvcd(machine_config &config);
+
 	void init_astrass();
 	void init_batmanfr();
 	void init_finlarch();
@@ -74,6 +83,7 @@ public:
 	void init_mausuke();
 	void init_hopper();
 
+private:
 	DECLARE_READ8_MEMBER(stv_ioga_r);
 	DECLARE_WRITE8_MEMBER(stv_ioga_w);
 	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
@@ -144,14 +154,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pdr2_output_w);
 	void stv_select_game(int gameno);
 	uint8_t     m_prev_gamebank_select;
-	void stv_slot(machine_config &config);
-	void stv_cartslot(machine_config &config);
-	void stv(machine_config &config);
-	void hopper(machine_config &config);
-	void batmanfr(machine_config &config);
-	void stv_5838(machine_config &config);
-	void stv_5881(machine_config &config);
-	void stvcd(machine_config &config);
+
 	void sound_mem(address_map &map);
 	void stv_mem(address_map &map);
 	void stvcd_mem(address_map &map);

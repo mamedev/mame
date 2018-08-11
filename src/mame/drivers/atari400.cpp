@@ -261,6 +261,21 @@ public:
 		m_cart(*this, "cartleft"),
 		m_cart2(*this, "cartright") { }
 
+	void atari_common_nodac(machine_config &config);
+	void atari_common(machine_config &config);
+	void a800pal(machine_config &config);
+	void a400pal(machine_config &config);
+	void a5200(machine_config &config);
+	void a800(machine_config &config);
+	void a1200xl(machine_config &config);
+	void a800xlpal(machine_config &config);
+	void a130xe(machine_config &config);
+	void a800xl(machine_config &config);
+	void a600xl(machine_config &config);
+	void xegs(machine_config &config);
+	void a400(machine_config &config);
+
+private:
 	DECLARE_MACHINE_START(a400);
 	DECLARE_MACHINE_START(a800);
 	DECLARE_MACHINE_START(a800xl);
@@ -300,19 +315,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
-	void atari_common_nodac(machine_config &config);
-	void atari_common(machine_config &config);
-	void a800pal(machine_config &config);
-	void a400pal(machine_config &config);
-	void a5200(machine_config &config);
-	void a800(machine_config &config);
-	void a1200xl(machine_config &config);
-	void a800xlpal(machine_config &config);
-	void a130xe(machine_config &config);
-	void a800xl(machine_config &config);
-	void a600xl(machine_config &config);
-	void xegs(machine_config &config);
-	void a400(machine_config &config);
 	void a1200xl_mem(address_map &map);
 	void a130xe_mem(address_map &map);
 	void a400_mem(address_map &map);
@@ -320,7 +322,7 @@ public:
 	void a600xl_mem(address_map &map);
 	void a800xl_mem(address_map &map);
 	void xegs_mem(address_map &map);
-protected:
+
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
 	required_device<pia6821_device> m_pia;

@@ -79,10 +79,10 @@
 
 
 #define MCFG_MOS6560_POTX_CALLBACK(_read) \
-	devcb = &downcast<mos6560_device &>(*device).set_potx_rd_callback(DEVCB_##_read);
+	downcast<mos6560_device &>(*device).set_potx_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS6560_POTY_CALLBACK(_read) \
-	devcb = &downcast<mos6560_device &>(*device).set_poty_rd_callback(DEVCB_##_read);
+	downcast<mos6560_device &>(*device).set_poty_rd_callback(DEVCB_##_read);
 
 
 

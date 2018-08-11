@@ -3212,7 +3212,7 @@ void rainbow_state::upd7220_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(rainbow_state::rainbow)
-	MCFG_DEFAULT_LAYOUT(layout_rainbow)
+	config.set_default_layout(layout_rainbow);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8088, 24.0734_MHz_XTAL / 5) // approximately 4.815 MHz
@@ -3286,10 +3286,10 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_WD2010_IN_WF_CB(READLINE(*this, rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
 
 	MCFG_WD2010_IN_DRDY_CB(READLINE(*this, rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
-	MCFG_WD2010_IN_SC_CB(VCC)                                        // SEEK COMPLETE (set to VCC if not serviced)
+	MCFG_WD2010_IN_SC_CB(CONSTANT(1))                                        // SEEK COMPLETE (set to VCC if not serviced)
 
-	MCFG_WD2010_IN_TK000_CB(VCC) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
-	MCFG_WD2010_IN_INDEX_CB(VCC) //    "
+	MCFG_WD2010_IN_TK000_CB(CONSTANT(1)) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
+	MCFG_WD2010_IN_INDEX_CB(CONSTANT(1)) //    "
 
 	MCFG_HARDDISK_ADD("decharddisk1")
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
@@ -3306,9 +3306,9 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-	MCFG_DEVICE_ADD("dbrg", COM8116_003, 24.0734_MHz_XTAL / 4) // 6.01835 MHz (nominally 6 MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, rainbow_state, dbrg_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, rainbow_state, dbrg_ft_w))
+	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
+	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
+	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 24.0734_MHz_XTAL / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))

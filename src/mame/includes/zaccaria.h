@@ -19,6 +19,9 @@ public:
 		, m_dsw_port(*this, "DSW.%u", 0)
 	{ }
 
+	void zaccaria(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_READ8_MEMBER(prot1_r);
 	DECLARE_READ8_MEMBER(prot2_r);
@@ -38,9 +41,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section);
 
-	void zaccaria(machine_config &config);
 	void main_map(address_map &map);
-protected:
+
 	required_device<cpu_device>                 m_maincpu;
 	required_device<gfxdecode_device>           m_gfxdecode;
 	required_device<palette_device>             m_palette;

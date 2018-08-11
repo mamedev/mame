@@ -38,15 +38,15 @@ public:
 		m_pwr(*this, "PWR")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
-
 	void noki3330(machine_config &config);
 	void noki3410(machine_config &config);
 	void noki7110(machine_config &config);
 	void noki6210(machine_config &config);
 	void noki3310(machine_config &config);
 
-protected:
+	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -71,7 +71,6 @@ protected:
 
 	void noki3310_map(address_map &map);
 
-private:
 	void assert_fiq(int num);
 	void assert_irq(int num);
 	void ack_fiq(uint16_t mask);

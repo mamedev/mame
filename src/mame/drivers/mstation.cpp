@@ -52,6 +52,9 @@ public:
 	{
 	}
 
+	void mstation(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_bankdev1;
@@ -98,7 +101,6 @@ public:
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
-	void mstation(machine_config &config);
 	void mstation_banked_map(address_map &map);
 	void mstation_io(address_map &map);
 	void mstation_mem(address_map &map);
@@ -461,7 +463,7 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_AMD_29F080_ADD("flash0")
 	MCFG_SST_28SF040_ADD("flash1")

@@ -69,6 +69,10 @@ public:
 			m_kbrequest(1)
 	{ }
 
+	void cm6000(machine_config &config);
+	void hx20(machine_config &config);
+
+private:
 	required_device<hd63701_cpu_device> m_maincpu;
 	required_device<hd63701_cpu_device> m_subcpu;
 	required_device<mc146818_device> m_rtc;
@@ -144,8 +148,6 @@ public:
 	// sio state
 	int m_sio_rx;
 	int m_sio_pin;
-	void cm6000(machine_config &config);
-	void hx20(machine_config &config);
 	void cm6000_mem(address_map &map);
 	void hx20_io(address_map &map);
 	void hx20_mem(address_map &map);

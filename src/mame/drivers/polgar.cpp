@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
+	config.set_default_layout(layout_mephisto_lcd);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_polgar_state::polgar10)
@@ -515,21 +515,21 @@ MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("outlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led100"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led101"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led102"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led103"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led104"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led105"))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(MEMBANK("rombank")) MCFG_DEVCB_MASK(0xc0) MCFG_DEVCB_XOR(0x40) MCFG_DEVCB_RSHIFT(-6)
+	hc259_device &outlatch(HC259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set_output("led100");
+	outlatch.q_out_cb<1>().set_output("led101");
+	outlatch.q_out_cb<2>().set_output("led102");
+	outlatch.q_out_cb<3>().set_output("led103");
+	outlatch.q_out_cb<4>().set_output("led104");
+	outlatch.q_out_cb<5>().set_output("led105");
+	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("1M")
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
+	config.set_default_layout(layout_mephisto_lcd);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_milano_state::milano)
@@ -540,7 +540,7 @@ MACHINE_CONFIG_START(mephisto_milano_state::milano)
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_milano)
+	config.set_default_layout(layout_mephisto_milano);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_academy_state::academy)
@@ -548,11 +548,11 @@ MACHINE_CONFIG_START(mephisto_academy_state::academy)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(academy_mem)
 
-	MCFG_DEVICE_REPLACE("outlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mephisto_academy_state, academy_nmi_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("display:beeper", beep_device, set_state)) MCFG_DEVCB_INVERT
+	hc259_device &outlatch(HC259(config.replace(), "outlatch"));
+	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));
+	outlatch.q_out_cb<2>().set("display:beeper", FUNC(beep_device::set_state)).invert();
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
+	config.set_default_layout(layout_mephisto_academy);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_modena_state::modena)
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(mephisto_modena_state::modena)
 	MCFG_DEVICE_REMOVE("display")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
+	config.set_default_layout(layout_mephisto_modena);
 
 	MCFG_DEVICE_REMOVE("outlatch")
 

@@ -415,14 +415,14 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(crshrace_state::screen_update_crshrace));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().append(m_spriteram2, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crshrace)
 	MCFG_PALETTE_ADD("palette", 2048)

@@ -32,6 +32,14 @@
 #include <utility>
 #include <vector>
 
+// Generate a N-bit mask at compile time.  N better be constant.
+// Works even for signed types
+
+template<typename T> constexpr T make_bitmask(unsigned int N)
+{
+	return T((N < (8 * sizeof(T)) ? (std::make_unsigned_t<T>(1) << N) : std::make_unsigned_t<T>(0)) - 1);
+}
+
 
 // ======================> simple_list
 

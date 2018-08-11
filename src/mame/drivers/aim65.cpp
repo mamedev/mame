@@ -191,7 +191,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_DEVICE_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(aim65_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_aim65)
+	config.set_default_layout(layout_aim65);
 
 	/* alpha-numeric display */
 	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))

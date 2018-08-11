@@ -53,6 +53,12 @@ public:
 	{
 	}
 
+	void pc200(machine_config &config);
+	void pc2086(machine_config &config);
+	void ppc640(machine_config &config);
+	void ppc512(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
@@ -86,10 +92,7 @@ public:
 
 	int m_dipstate;
 	static void cfg_com(device_t *device);
-	void pc200(machine_config &config);
-	void pc2086(machine_config &config);
-	void ppc640(machine_config &config);
-	void ppc512(machine_config &config);
+
 	void pc200_io(address_map &map);
 	void pc2086_map(address_map &map);
 	void ppc512_io(address_map &map);

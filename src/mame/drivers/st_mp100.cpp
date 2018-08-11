@@ -44,6 +44,12 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void st_mp100(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+private:
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -55,13 +61,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	void st_mp100(machine_config &config);
 	void st_mp100_map(address_map &map);
-private:
+
 	uint8_t m_u10a;
 	uint8_t m_u10b;
 	uint8_t m_u11a;
@@ -714,7 +717,7 @@ MACHINE_CONFIG_START(st_mp100_state::st_mp100)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_st_mp100)
+	config.set_default_layout(layout_st_mp100);
 
 	/* Sound */
 	genpin_audio(config);

@@ -22,8 +22,8 @@
 class ht6000_state : public driver_device
 {
 public:
-	ht6000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ht6000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_rom2(*this, "rom2"),
 		m_switches(*this, "kc%u", 0),
 		m_port_a(0),
@@ -33,11 +33,10 @@ public:
 
 	void ht6000(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_memory_region m_rom2;
 	required_ioport_array<16> m_switches;
 
@@ -313,13 +312,14 @@ void ht6000_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START( ht6000_state::ht6000 )
-	MCFG_DEVICE_ADD("maincpu", UPD7810, 12_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, ht6000_state, port_a_w))
+void ht6000_state::ht6000(machine_config &config)
+{
+	upd7810_device &maincpu(UPD7810(config, "maincpu", 12_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &ht6000_state::maincpu_map);
+	maincpu.pa_out_cb().set(FUNC(ht6000_state::port_a_w));
 
-	MCFG_DEVICE_ADD("keycpu", I8049, 10_MHz_XTAL)
-MACHINE_CONFIG_END
+	I8049(config, "keycpu", 10_MHz_XTAL);
+}
 
 
 //**************************************************************************

@@ -86,6 +86,10 @@ public:
 	{
 	}
 
+	void ivg09(machine_config &config);
+	void cpu09(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(ca1_r);
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
@@ -98,11 +102,9 @@ public:
 	DECLARE_MACHINE_RESET(ivg09);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void ivg09(machine_config &config);
-	void cpu09(machine_config &config);
 	void cpu09_mem(address_map &map);
 	void ivg09_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_pa;
 	optional_shared_ptr<uint8_t> m_p_videoram;
@@ -329,9 +331,9 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tavernie_state::ivg09)
@@ -349,7 +351,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEFAULT_LAYOUT(layout_tavernie)
+	config.set_default_layout(layout_tavernie);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess

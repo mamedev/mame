@@ -435,32 +435,36 @@
 
 class dbox_state : public driver_device
 {
- public:
- dbox_state(const machine_config &mconfig, device_type type, const char *tag)
-   : driver_device(mconfig, type, tag)
-   , m_maincpu(*this, "maincpu")
-   , m_display(*this, "display")
-   , m_ip16_74259(*this, "hct259.ip16")
-  { }
+public:
+	dbox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_display(*this, "display")
+		, m_ip16_74259(*this, "hct259.ip16")
+	{ }
+
+	void dbox(machine_config &config);
+
+	void init_dbox();
+
+private:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_device<sda5708_device> m_display;
 	required_device<latch8_device> m_ip16_74259;
 
 	virtual void machine_reset() override;
-	virtual void machine_start () override;
-	void init_dbox();
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
 
-	void dbox(machine_config &config);
 	void dbox_map(address_map &map);
 
 #if LOCALFLASH
-	DECLARE_READ16_MEMBER (sysflash_r);
-	DECLARE_WRITE16_MEMBER (sysflash_w);
+	DECLARE_READ16_MEMBER(sysflash_r);
+	DECLARE_WRITE16_MEMBER(sysflash_w);
 private:
-	uint16_t *m_sysflash;
+	uint16_t * m_sysflash;
 	uint32_t m_sf_mode;
 	uint32_t m_sf_state;
 #endif
@@ -623,7 +627,7 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_sda5708)
+	config.set_default_layout(layout_sda5708);
 	/* IP16 74256 8 bit latch */
 	MCFG_LATCH8_ADD("hct259.ip16")
 	MCFG_LATCH8_WRITE_4(WRITELINE("display", sda5708_device, reset_w))

@@ -1165,7 +1165,7 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2o)
+	config.set_default_layout(layout_jclub2o);
 MACHINE_CONFIG_END
 
 
@@ -1201,7 +1201,7 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2o)
+	config.set_default_layout(layout_jclub2o);
 MACHINE_CONFIG_END
 
 
@@ -1233,7 +1233,7 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2)
+	config.set_default_layout(layout_jclub2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

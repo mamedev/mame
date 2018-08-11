@@ -13,31 +13,31 @@
 ***************************************************************************/
 
 #define MCFG_E05A30_PRINTHEAD_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_printhead_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_printhead_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_PF_STEPPER_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_pf_stepper_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_pf_stepper_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CR_STEPPER_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_cr_stepper_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_cr_stepper_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_READY_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_ACK_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_centronics_ack_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_centronics_ack_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_BUSY_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_centronics_busy_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_centronics_busy_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_PERROR_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_centronics_perror_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_centronics_perror_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_FAULT_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_centronics_fault_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_centronics_fault_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_SELECT_CALLBACK(_write) \
-	devcb = &downcast<e05a30_device &>(*device).set_centronics_select_wr_callback(DEVCB_##_write);
+	downcast<e05a30_device &>(*device).set_centronics_select_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     TYPE DEFINITIONS

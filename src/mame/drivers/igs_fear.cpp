@@ -21,9 +21,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void igs_fear(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	void init_igs_fear();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	//virtual void video_start();
 	virtual void video_start_igs_fear();
 	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -31,7 +34,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void igs_fear(machine_config &config);
 	void igs_igs_fear_map(address_map &map);
 };
 

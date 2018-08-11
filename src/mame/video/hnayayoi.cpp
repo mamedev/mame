@@ -19,7 +19,7 @@ void hnayayoi_state::common_vh_start( int num_pixmaps )
 	for (int i = 0; i < num_pixmaps; i++)
 	{
 		m_pixmap[i] = make_unique_clear<uint8_t[]>(256 * 256);
-		save_pointer(NAME(m_pixmap[i].get()), 256 * 256, i);
+		save_pointer(NAME(m_pixmap[i]), 256 * 256, i);
 	}
 }
 

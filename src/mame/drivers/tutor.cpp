@@ -200,6 +200,10 @@ public:
 	{
 	}
 
+	void pyuutajr(machine_config &config);
+	void tutor(machine_config &config);
+
+private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	optional_device<cassette_image_device> m_cass;
@@ -227,8 +231,6 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	void pyuutajr(machine_config &config);
-	void tutor(machine_config &config);
 	void pyuutajr_mem(address_map &map);
 	void tutor_io(address_map &map);
 	void tutor_memmap(address_map &map);

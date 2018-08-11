@@ -12,7 +12,7 @@
 #define MAME_MACHINE_8530SCC_H
 
 #define MCFG_Z8530_INTRQ_CALLBACK(_write) \
-	devcb = &downcast<scc8530_t &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<scc8530_t &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 class scc8530_t : public device_t
 {

@@ -32,52 +32,52 @@
 ///*************************************************************************
 
 #define MCFG_DS75161A_IN_REN_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_ren_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_ren_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_IN_IFC_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_ifc_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_ifc_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_IN_NDAC_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_ndac_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_ndac_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_IN_NRFD_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_nrfd_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_nrfd_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_IN_DAV_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_dav_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_dav_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_IN_EOI_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_eoi_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_eoi_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_IN_ATN_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_atn_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_atn_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_IN_SRQ_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_in_srq_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_in_srq_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_REN_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_ren_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_ren_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_IFC_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_ifc_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_ifc_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_NDAC_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_ndac_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_ndac_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_NRFD_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_nrfd_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_nrfd_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_DAV_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_dav_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_dav_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_EOI_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_eoi_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_eoi_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_ATN_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_atn_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_atn_callback(DEVCB_##_devcb);
 
 #define MCFG_DS75161A_OUT_SRQ_CB(_devcb) \
-	devcb = &downcast<ds75161a_device &>(*device).set_out_srq_callback(DEVCB_##_devcb);
+	downcast<ds75161a_device &>(*device).set_out_srq_callback(DEVCB_##_devcb);
 
 ///*************************************************************************
 //  TYPE DEFINITIONS

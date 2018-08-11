@@ -98,6 +98,9 @@ public:
 		, m_joy(*this, "JOY")
 	{ }
 
+	void ace(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -129,10 +132,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ald_w);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
 
-	void ace(machine_config &config);
 	void ace_io(address_map &map);
 	void ace_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<z80pio_device> m_z80pio;
@@ -777,11 +779,11 @@ MACHINE_CONFIG_START(ace_state::ace)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SP0256(config, m_sp0256, XTAL(3'000'000));
+	m_sp0256->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_CASSETTE_ADD("cassette")

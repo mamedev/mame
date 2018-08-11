@@ -251,6 +251,18 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void nmg5(machine_config &config);
+	void pclubys(machine_config &config);
+	void garogun(machine_config &config);
+	void searchp2(machine_config &config);
+	void _7ordi(machine_config &config);
+
+	void init_prot_val_00();
+	void init_prot_val_10();
+	void init_prot_val_20();
+	void init_prot_val_40();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_scroll_ram;
@@ -284,10 +296,6 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	void init_prot_val_00();
-	void init_prot_val_10();
-	void init_prot_val_20();
-	void init_prot_val_40();
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void machine_start() override;
@@ -295,11 +303,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
-	void nmg5(machine_config &config);
-	void pclubys(machine_config &config);
-	void garogun(machine_config &config);
-	void searchp2(machine_config &config);
-	void _7ordi(machine_config &config);
 	void nmg5_map(address_map &map);
 	void nmg5_sound_map(address_map &map);
 	void pclubys_map(address_map &map);

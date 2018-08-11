@@ -55,6 +55,10 @@ public:
 	{
 	}
 
+	void mc7105(machine_config &config);
+	void vt240(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_i8085;
 	required_device<i8251_device> m_i8251;
@@ -123,8 +127,7 @@ public:
 	uint16_t m_irqs;
 	bool m_lb;
 	uint16_t m_scrl;
-	void mc7105(machine_config &config);
-	void vt240(machine_config &config);
+
 	void bank_map(address_map &map);
 	void upd7220_map(address_map &map);
 	void vt240_char_io(address_map &map);
@@ -710,7 +713,7 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip1_w))
 
-	MCFG_X2212_ADD("x2212")
+	X2212(config, "x2212");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt240_state::mc7105)

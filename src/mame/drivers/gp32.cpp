@@ -1688,7 +1688,7 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
 
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
-	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
+	config.set_default_layout(layout_lcd_rot);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

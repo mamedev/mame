@@ -399,8 +399,8 @@
 class kurukuru_state : public driver_device
 {
 public:
-	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
@@ -410,6 +410,10 @@ public:
 		m_bank1(*this, "bank1")
 	{ }
 
+	void ppj(machine_config &config);
+	void kurukuru(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
@@ -431,8 +435,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
-	void ppj(machine_config &config);
-	void kurukuru(machine_config &config);
 	void kurukuru_audio_io(address_map &map);
 	void kurukuru_audio_map(address_map &map);
 	void kurukuru_io(address_map &map);
@@ -864,14 +866,12 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set(m_soundirq, FUNC(rst_neg_buffer_device::rst28_w));
 
 	// latch irq vector is $ef (rst $28)
 	// timer irq vector is $f7 (rst $30)
 	// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("audiocpu", 0))
+	RST_NEG_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ym2149", YM2149, YM2149_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))

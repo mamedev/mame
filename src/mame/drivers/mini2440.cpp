@@ -32,6 +32,13 @@ public:
 		m_penx(*this, "PENX"),
 		m_peny(*this, "PENY") { }
 
+	void mini2440(machine_config &config);
+
+	void init_mini2440();
+
+	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
 	required_device<nand_device> m_nand;
@@ -41,10 +48,8 @@ public:
 	required_ioport m_peny;
 
 	uint32_t m_port[9];
-	void init_mini2440();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	DECLARE_READ32_MEMBER(s3c2440_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
@@ -56,7 +61,6 @@ public:
 	DECLARE_WRITE16_MEMBER(s3c2440_i2s_data_w );
 	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
 
-	void mini2440(machine_config &config);
 	void mini2440_map(address_map &map);
 };
 
@@ -233,7 +237,7 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 

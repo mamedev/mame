@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	MCFG_DEVICE_IO_MAP(poly880_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_poly880 )
+	config.set_default_layout(layout_poly880);
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(7'372'800)/16)

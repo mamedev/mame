@@ -195,51 +195,32 @@ TODO!
 
 WRITE8_MEMBER(taitob_state::bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 3);
+	m_audiobank->set_entry(data & 3);
 }
 
-
-
-READ16_MEMBER(taitob_state::tracky1_hi_r)
+template<int Player>
+READ16_MEMBER(taitob_state::tracky_hi_r)
 {
-	return ioport("TRACKX1")->read();
+	return m_trackx_io[Player]->read();
 }
 
-READ16_MEMBER(taitob_state::tracky1_lo_r)
+template<int Player>
+READ16_MEMBER(taitob_state::tracky_lo_r)
 {
-	return (ioport("TRACKX1")->read() & 0xff) << 8;
+	return (m_trackx_io[Player]->read() & 0xff) << 8;
 }
 
-READ16_MEMBER(taitob_state::trackx1_hi_r)
+template<int Player>
+READ16_MEMBER(taitob_state::trackx_hi_r)
 {
-	return ioport("TRACKY1")->read();
+	return m_tracky_io[Player]->read();
 }
 
-READ16_MEMBER(taitob_state::trackx1_lo_r)
+template<int Player>
+READ16_MEMBER(taitob_state::trackx_lo_r)
 {
-	return (ioport("TRACKY1")->read() & 0xff) << 8;
+	return (m_tracky_io[Player]->read() & 0xff) << 8;
 }
-
-READ16_MEMBER(taitob_state::tracky2_hi_r)
-{
-	return ioport("TRACKX2")->read();
-}
-
-READ16_MEMBER(taitob_state::tracky2_lo_r)
-{
-	return (ioport("TRACKX2")->read() & 0xff) << 8;
-}
-
-READ16_MEMBER(taitob_state::trackx2_hi_r)
-{
-	return ioport("TRACKY2")->read();
-}
-
-READ16_MEMBER(taitob_state::trackx2_lo_r)
-{
-	return (ioport("TRACKY2")->read() & 0xff) << 8;
-}
-
 
 WRITE16_MEMBER(taitob_state::gain_control_w)
 {
@@ -258,7 +239,7 @@ WRITE16_MEMBER(taitob_state::gain_control_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(taitob_state::realpunc_sensor)
+INPUT_CHANGED_MEMBER(taitob_c_state::realpunc_sensor)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE);
 }
@@ -292,7 +273,7 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 		/* bit 7 - set all the time (Chip Select?) */
 
 		/* EEPROM */
-		ioport("EEPROMOUT")->write(data, 0xff);
+		m_eepromout_io->write(data, 0xff);
 	}
 }
 
@@ -338,7 +319,7 @@ WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 	}
 }
 
-WRITE16_MEMBER(taitob_state::realpunc_output_w)
+WRITE16_MEMBER(taitob_c_state::realpunc_output_w)
 {
 /*
    15 = Camera Enable?
@@ -348,22 +329,12 @@ WRITE16_MEMBER(taitob_state::realpunc_output_w)
 }
 
 
-void taitob_state::tc0180vcu_memrw(address_map &map, u32 addr)
-{
-	map(addr+0x00000, addr+0x0ffff).rw(m_tc0180vcu, FUNC(tc0180vcu_device::word_r), FUNC(tc0180vcu_device::word_w));
-	map(addr+0x10000, addr+0x1197f).ram().share("spriteram");
-	map(addr+0x11980, addr+0x137ff).ram();
-	map(addr+0x13800, addr+0x13fff).rw(m_tc0180vcu, FUNC(tc0180vcu_device::scroll_r), FUNC(tc0180vcu_device::scroll_w));
-	map(addr+0x18000, addr+0x1801f).rw(m_tc0180vcu, FUNC(tc0180vcu_device::ctrl_r), FUNC(tc0180vcu_device::ctrl_w));
-	map(addr+0x40000, addr+0x7ffff).rw(FUNC(taitob_state::tc0180vcu_framebuffer_word_r), FUNC(taitob_state::tc0180vcu_framebuffer_word_w));
-}
-
 void taitob_state::rastsag2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x201fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x607fff).ram(); /* Main RAM */ /*ashura up to 603fff only*/
-	tc0180vcu_memrw(map, 0x400000);
 	map(0x800000, 0x800001).nopr();
 	map(0x800000, 0x800000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x800002, 0x800002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -375,7 +346,7 @@ void taitob_state::crimec_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x600001).nopr();
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -390,7 +361,7 @@ void taitob_state::tetrist_map(address_map &map)
 	map(0x200000, 0x200001).nopr();
 	map(0x200000, 0x200000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x800000, 0x807fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -400,7 +371,7 @@ void taitob_state::tetrista_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x201fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x600003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0xff00);
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa00001).nopr();
@@ -412,7 +383,7 @@ void taitob_state::tetrista_map(address_map &map)
 void taitob_state::hitice_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x610000, 0x610001).portr("P3_P4");
 	map(0x700000, 0x700001).nopr();
@@ -432,16 +403,16 @@ void taitob_state::rambo3_map(address_map &map)
 	map(0x200000, 0x200001).nopr();
 	map(0x200000, 0x200000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
-	map(0x600010, 0x600011).r(FUNC(taitob_state::tracky1_lo_r)); /*player 1*/
-	map(0x600012, 0x600013).r(FUNC(taitob_state::tracky1_hi_r));
-	map(0x600014, 0x600015).r(FUNC(taitob_state::trackx1_lo_r));
-	map(0x600016, 0x600017).r(FUNC(taitob_state::trackx1_hi_r));
-	map(0x600018, 0x600019).r(FUNC(taitob_state::tracky2_lo_r)); /*player 2*/
-	map(0x60001a, 0x60001b).r(FUNC(taitob_state::tracky2_hi_r));
-	map(0x60001c, 0x60001d).r(FUNC(taitob_state::trackx2_lo_r));
-	map(0x60001e, 0x60001f).r(FUNC(taitob_state::trackx2_hi_r));
+	map(0x600010, 0x600011).r(FUNC(taitob_state::tracky_lo_r<0>)); /*player 1*/
+	map(0x600012, 0x600013).r(FUNC(taitob_state::tracky_hi_r<0>));
+	map(0x600014, 0x600015).r(FUNC(taitob_state::trackx_lo_r<0>));
+	map(0x600016, 0x600017).r(FUNC(taitob_state::trackx_hi_r<0>));
+	map(0x600018, 0x600019).r(FUNC(taitob_state::tracky_lo_r<1>)); /*player 2*/
+	map(0x60001a, 0x60001b).r(FUNC(taitob_state::tracky_hi_r<1>));
+	map(0x60001c, 0x60001d).r(FUNC(taitob_state::trackx_lo_r<1>));
+	map(0x60001e, 0x60001f).r(FUNC(taitob_state::trackx_hi_r<1>));
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
@@ -450,7 +421,7 @@ void taitob_state::rambo3_map(address_map &map)
 void taitob_state::pbobble_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0x500024, 0x500025).portr("P3_P4_A");        /* shown in service mode, game omits to read it */
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
@@ -468,7 +439,7 @@ void taitob_state::pbobble_map(address_map &map)
 void taitob_state::spacedx_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0x500024, 0x500025).portr("P3_P4_A");
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
@@ -496,7 +467,7 @@ void taitob_state::spacedxo_map(address_map &map)
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x302000, 0x303fff).readonly();
 	map(0x400000, 0x40ffff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x500000);
+	map(0x500000, 0x57ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 }
 
 
@@ -508,7 +479,7 @@ void taitob_state::qzshowby_map(address_map &map)
 	map(0x200026, 0x200027).w(FUNC(taitob_state::eeprom_w));
 	map(0x200028, 0x200029).rw(FUNC(taitob_state::player_34_coin_ctrl_r), FUNC(taitob_state::player_34_coin_ctrl_w));
 	map(0x20002e, 0x20002f).portr("P3_P4_B");    /* player 3,4 buttons */
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x600001).nopr();
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -524,7 +495,7 @@ void taitob_state::viofight_map(address_map &map)
 	map(0x200000, 0x200001).nopr();
 	map(0x200000, 0x200000).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x200002, 0x200002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x80000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa03fff).ram(); /* Main RAM */
@@ -535,7 +506,7 @@ void taitob_state::masterw_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x203fff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x400000);
+	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x800003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa00001).nopr();
@@ -560,7 +531,7 @@ void taitob_state::silentd_map(address_map &map)
 //  map(0x240000, 0x240001).nopr(); /* read 4 times at init */
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x403fff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x500000);
+	map(0x500000, 0x57ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 }
 
 
@@ -568,7 +539,7 @@ void taitob_state::selfeena_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* Main RAM */
-	tc0180vcu_memrw(map, 0x200000);
+	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x410000, 0x41000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00); /* mirror address - seems to be only used for coin control */
@@ -587,23 +558,23 @@ void taitob_state::sbm_map(address_map &map)
 	map(0x320000, 0x320001).nopr();
 	map(0x320000, 0x320000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320002, 0x320002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	tc0180vcu_memrw(map, 0x900000);
+	map(0x900000, 0x97ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 }
 
-void taitob_state::realpunc_map(address_map &map)
+void taitob_c_state::realpunc_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	map(0x110000, 0x12ffff).ram();
 	map(0x130000, 0x13ffff).ram(); // Check me
 	map(0x180000, 0x18000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
-	map(0x184000, 0x184001).w(FUNC(taitob_state::realpunc_video_ctrl_w));
+	map(0x184000, 0x184001).w(FUNC(taitob_c_state::realpunc_video_ctrl_w));
 	map(0x188000, 0x188001).nopr();
 	map(0x188000, 0x188000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x188002, 0x188003).nopr();
 	map(0x188002, 0x188002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
-	map(0x18c000, 0x18c001).w(FUNC(taitob_state::realpunc_output_w));
-	tc0180vcu_memrw(map, 0x200000);
+	map(0x18c000, 0x18c001).w(FUNC(taitob_c_state::realpunc_output_w));
+	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x300001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x300002, 0x300003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
@@ -612,7 +583,7 @@ void taitob_state::realpunc_map(address_map &map)
 	map(0x320002, 0x320002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
 }
 
-void taitob_state::realpunc_hd63484_map(address_map &map)
+void taitob_c_state::realpunc_hd63484_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram();
 }
@@ -620,7 +591,7 @@ void taitob_state::realpunc_hd63484_map(address_map &map)
 void taitob_state::masterw_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
@@ -630,7 +601,7 @@ void taitob_state::masterw_sound_map(address_map &map)
 void taitob_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
@@ -646,7 +617,7 @@ void taitob_state::sound_map(address_map &map)
 void taitob_state::viofight_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       /* yes, both addresses for the same chip */
@@ -1730,69 +1701,11 @@ static INPUT_PORTS_START( realpunc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_BUTTON2 ) PORT_NAME("Pad Photosensor 1 (N)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_state,realpunc_sensor, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,IPT_BUTTON3 ) PORT_NAME("Pad Photosensor 2 (U)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_state,realpunc_sensor, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,IPT_BUTTON4 ) PORT_NAME("Pad Photosensor 3 (D)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_state,realpunc_sensor, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_BUTTON2 ) PORT_NAME("Pad Photosensor 1 (N)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_c_state,realpunc_sensor, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,IPT_BUTTON3 ) PORT_NAME("Pad Photosensor 2 (U)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_c_state,realpunc_sensor, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,IPT_BUTTON4 ) PORT_NAME("Pad Photosensor 3 (D)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_c_state,realpunc_sensor, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,IPT_UNKNOWN )
 INPUT_PORTS_END
-
-
-
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			8*16+0, 8*16+1, 8*16+2, 8*16+3, 8*16+4, 8*16+5, 8*16+6, 8*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16 },
-	64*8
-};
-
-static GFXDECODE_START( gfx_taito_b )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )  /* text */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 256 )  /* sprites & playfield */
-GFXDECODE_END
-
-static const gfx_layout rambo3_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-static const gfx_layout rambo3_tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8
-};
-
-static GFXDECODE_START( gfx_rambo3 )
-	GFXDECODE_ENTRY( "gfx1", 0, rambo3_charlayout,  0, 256 )  /* text */
-	GFXDECODE_ENTRY( "gfx1", 0, rambo3_tilelayout,  0, 256 )  /* sprites & playfield */
-GFXDECODE_END
 
 
 /*
@@ -1844,13 +1757,13 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1859,20 +1772,20 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
 
@@ -1902,13 +1815,13 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
-	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc.read_0_callback().set_ioport("DSWA");
+	tc0040ioc.read_1_callback().set_ioport("DSWB");
+	tc0040ioc.read_2_callback().set_ioport("IN0");
+	tc0040ioc.read_3_callback().set_ioport("IN1");
+	tc0040ioc.write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1917,33 +1830,33 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 24_MHz_XTAL / 8)  /* 3 MHz */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitob_state, bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, m_ym, 24_MHz_XTAL / 8));  /* 3 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set_membank(m_audiobank).mask(0x03);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -1981,13 +1894,13 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1996,20 +1909,20 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
 
@@ -2039,13 +1952,13 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2054,20 +1967,20 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
 
@@ -2098,13 +2011,13 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2113,10 +2026,9 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2124,23 +2036,24 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4) // nominally "6.6 MHZ"
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 24_MHz_XTAL / 8)  /* 3 MHz */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitob_state, bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, m_ym, 24_MHz_XTAL / 8));  /* 3 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set_membank(m_audiobank).mask(0x03);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -2162,13 +2075,13 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2177,20 +2090,20 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rambo3)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
 
@@ -2221,13 +2134,13 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2236,20 +2149,20 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
 
@@ -2282,13 +2195,13 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
-	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
-	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
-	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
-	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
-	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
+	TC0640FIO(config, m_tc0640fio, 0);
+	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
+	m_tc0640fio->read_1_callback().set_ioport("COIN");
+	m_tc0640fio->read_2_callback().set_ioport("START");
+	m_tc0640fio->read_3_callback().set_ioport("P1_P2_A");
+	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
 	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
@@ -2300,20 +2213,20 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
@@ -2346,13 +2259,13 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
-	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
-	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
-	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
-	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
-	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
+	TC0640FIO(config, m_tc0640fio, 0);
+	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
+	m_tc0640fio->read_1_callback().set_ioport("COIN");
+	m_tc0640fio->read_2_callback().set_ioport("START");
+	m_tc0640fio->read_3_callback().set_ioport("P1_P2_A");
+	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
 	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
@@ -2364,20 +2277,20 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
@@ -2407,13 +2320,13 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2422,20 +2335,20 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
@@ -2468,13 +2381,13 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
-	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
-	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
-	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
-	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
-	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
+	TC0640FIO(config, m_tc0640fio, 0);
+	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
+	m_tc0640fio->read_1_callback().set_ioport("COIN");
+	m_tc0640fio->read_2_callback().set_ioport("START");
+	m_tc0640fio->read_3_callback().set_ioport("P1_P2_A");
+	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
 	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
@@ -2486,20 +2399,20 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x80)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
 	MCFG_TC0180VCU_FG_COLORBASE(0x40)
 	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
@@ -2529,13 +2442,13 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2544,33 +2457,33 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 24_MHz_XTAL / 8)   /* 3 MHz */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitob_state, bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, m_ym, 24_MHz_XTAL / 8));  /* 3 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set_membank(m_audiobank).mask(0x03);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 4.224_MHz_XTAL / 4, okim6295_device::PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -2592,13 +2505,13 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2607,20 +2520,20 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
@@ -2650,13 +2563,13 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2665,20 +2578,20 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
@@ -2717,13 +2630,13 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2732,20 +2645,20 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x10)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
 	MCFG_TC0180VCU_FG_COLORBASE(0x20)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 
@@ -2782,13 +2695,13 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("JOY"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("START"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("PHOTOSENSOR"))
+	TC0510NIO(config, m_tc0510nio, 0);
+	m_tc0510nio->read_0_callback().set_ioport("DSWA");
+	m_tc0510nio->read_1_callback().set_ioport("DSWB");
+	m_tc0510nio->read_2_callback().set_ioport("JOY");
+	m_tc0510nio->read_3_callback().set_ioport("START");
+	m_tc0510nio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0510nio->read_7_callback().set_ioport("PHOTOSENSOR");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2797,20 +2710,20 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
 
@@ -2839,13 +2752,13 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
+	TC0510NIO(config, m_tc0510nio, 0);
+	m_tc0510nio->read_0_callback().set_ioport("DSWA");
+	m_tc0510nio->read_1_callback().set_ioport("DSWB");
+	m_tc0510nio->read_2_callback().set_ioport("IN0");
+	m_tc0510nio->read_3_callback().set_ioport("IN1");
+	m_tc0510nio->write_4_callback().set(FUNC(taitob_c_state::player_12_coin_ctrl_w));
+	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2853,23 +2766,23 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
+	MCFG_SCREEN_UPDATE_DRIVER(taitob_c_state, screen_update_realpunc)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
+	MCFG_VIDEO_START_OVERRIDE(taitob_c_state,realpunc)
 
 	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
 	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
+	MCFG_TC0180VCU_FB_COLORBASE(0x40)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
 	MCFG_TC0180VCU_FG_COLORBASE(0x80)
 	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
 	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
 
@@ -2903,7 +2816,7 @@ ROM_START( rastsag2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b81-11.37", 0x00000, 0x10000, CRC(3704bf09) SHA1(a0a37b23e3df482c5f5aa43825345ea8affbba34) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
@@ -2924,7 +2837,7 @@ ROM_START( nastarw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b81-11.37", 0x00000, 0x10000, CRC(3704bf09) SHA1(a0a37b23e3df482c5f5aa43825345ea8affbba34) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
@@ -2945,7 +2858,7 @@ ROM_START( nastar )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b81-11.37", 0x00000, 0x10000, CRC(3704bf09) SHA1(a0a37b23e3df482c5f5aa43825345ea8affbba34) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
@@ -2970,7 +2883,7 @@ ROM_START( crimec )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b99-08.45", 0x00000, 0x10000, CRC(26135451) SHA1(651c77285eb12a13a2fe4069031c6f01150ecba4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
@@ -2988,7 +2901,7 @@ ROM_START( crimecu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b99-08.45", 0x00000, 0x10000, CRC(26135451) SHA1(651c77285eb12a13a2fe4069031c6f01150ecba4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
@@ -3006,7 +2919,7 @@ ROM_START( crimecj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b99-08.45", 0x00000, 0x10000, CRC(26135451) SHA1(651c77285eb12a13a2fe4069031c6f01150ecba4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
@@ -3024,7 +2937,7 @@ ROM_START( ashura )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c43-16",  0x00000, 0x10000, CRC(cb26fce1) SHA1(7cc60326455c7bb2ca543ddfd4002462cc079837) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
@@ -3042,7 +2955,7 @@ ROM_START( ashuraj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c43-16",  0x00000, 0x10000, CRC(cb26fce1) SHA1(7cc60326455c7bb2ca543ddfd4002462cc079837) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
@@ -3060,7 +2973,7 @@ ROM_START( ashurau )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c43-16",  0x00000, 0x10000, CRC(cb26fce1) SHA1(7cc60326455c7bb2ca543ddfd4002462cc079837) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
@@ -3078,7 +2991,7 @@ ROM_START( tetrist ) // Nastar / Nastar Warrior / Rastan Saga 2 conversion with 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c12-06.37", 0x00000, 0x10000, CRC(f2814b38) SHA1(846d3cc7a6f1cfbfd5661d6942f24330d21f91f0) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "tc0180vcu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	/* b81-03.14 & b81-04.15 are present on the original board and are actually from Nastar
@@ -3107,7 +3020,7 @@ ROM_START( tetrista ) // Master of Weapon conversion with graphics ROMs left in 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c35-05.30", 0x00000, 0x10000, CRC(785c63fb) SHA1(13db76d8ce52ff21bfda0866c9c6b52147c6fc9d) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "tc0180vcu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	/* b72-01.5 & b72-02.6 are present on the original board and are actually from Master of Weapon
@@ -3130,7 +3043,7 @@ ROM_START( hitice ) /* 4 Player version */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c59-08.50",  0x00000, 0x10000, CRC(d3cbc10b) SHA1(75305e264300e0ebd15ada45a6d222fee75bd8e4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "c59-03.12",  0x00000, 0x80000, CRC(9e513048) SHA1(4ffa63c01a25e912dd218b7b2deaf5ad1a53659a) )
 	ROM_LOAD( "c59-02.13",  0x80000, 0x80000, CRC(affb5e07) SHA1(afe92268c78ab5565d2913672e25f3136a15f534) )
 
@@ -3154,7 +3067,7 @@ ROM_START( hiticerb ) /* 4 Player version */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c59-08.50",  0x00000, 0x10000, CRC(d3cbc10b) SHA1(75305e264300e0ebd15ada45a6d222fee75bd8e4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD16_BYTE( "ic5.bin",  0x00000, 0x20000, CRC(55698bbc) SHA1(ba0e0de12e3e52ef026d37d667060e8ba6925340) )
 	ROM_LOAD16_BYTE( "ic1.bin",  0x40000, 0x20000, CRC(fca01c22) SHA1(94d7d521ea6fdab752939c1f2087b16a2b2922a8) )
 	ROM_LOAD16_BYTE( "ic6.bin",  0x00001, 0x20000, CRC(a7cb863f) SHA1(f749d38c2164bb9833e653bc1253a336c0043daa) )
@@ -3184,7 +3097,7 @@ ROM_START( hiticej ) /* 2 Player version */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c59-08.50",  0x00000, 0x10000, CRC(d3cbc10b) SHA1(75305e264300e0ebd15ada45a6d222fee75bd8e4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "c59-03.12",  0x00000, 0x80000, CRC(9e513048) SHA1(4ffa63c01a25e912dd218b7b2deaf5ad1a53659a) )
 	ROM_LOAD( "c59-02.13",  0x80000, 0x80000, CRC(affb5e07) SHA1(afe92268c78ab5565d2913672e25f3136a15f534) )
 
@@ -3208,7 +3121,7 @@ ROM_START( rambo3 ) /* all of the following roms should most likely have the nam
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "ramb3-10.bin", 0x00000, 0x10000, CRC(b18bc020) SHA1(5f3a108ad1f652103dda14672223529077a0924b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "ramb3-03.bin",  0x000000, 0x80000, CRC(f5808c41) SHA1(73e129e87d7e240f96cb06d484fb19cd0ef49721) )
 	ROM_LOAD( "ramb3-04.bin",  0x080000, 0x80000, CRC(c57831ce) SHA1(85c203a858df34fe8663b2b16447d328cdb4145e) )
 	ROM_LOAD( "ramb3-01.bin",  0x100000, 0x80000, CRC(c55fcf54) SHA1(6a26ed2541be9e3341f20e74cc49b5366ce7d424) )
@@ -3228,7 +3141,7 @@ ROM_START( rambo3u )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "ramb3-10.bin", 0x00000, 0x10000, CRC(b18bc020) SHA1(5f3a108ad1f652103dda14672223529077a0924b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "ramb3-03.bin",  0x000000, 0x80000, CRC(f5808c41) SHA1(73e129e87d7e240f96cb06d484fb19cd0ef49721) )
 	ROM_LOAD( "ramb3-04.bin",  0x080000, 0x80000, CRC(c57831ce) SHA1(85c203a858df34fe8663b2b16447d328cdb4145e) )
 	ROM_LOAD( "ramb3-01.bin",  0x100000, 0x80000, CRC(c55fcf54) SHA1(6a26ed2541be9e3341f20e74cc49b5366ce7d424) )
@@ -3251,26 +3164,26 @@ ROM_START( rambo3p ) /* Is this set a prototype or possible bootleg? */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "r3-00.rom", 0x00000, 0x10000, CRC(df7a6ed6) SHA1(68f7f17c9ead6aee653b02de234ec54b519907d7) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "r3-ch1ll.rom", 0x000000, 0x020000, CRC(c86ea5fc) SHA1(daf89340bb5d6ae57ef6faedb3f86c944c68fc45) )
-	ROM_LOAD( "r3-ch1hl.rom", 0x020000, 0x020000, CRC(7525eb92) SHA1(f691a000580d078f207ea6e9bc8a527e74bc20e5) )
-	ROM_LOAD( "r3-ch3ll.rom", 0x040000, 0x020000, CRC(abe54b1e) SHA1(4b6d0c694d9c1fcdec87b70fbadee9fb3455b42c) )
-	ROM_LOAD( "r3-ch3hl.rom", 0x060000, 0x020000, CRC(80e5647e) SHA1(744e9dcc651b80ef4b3cc29ed0ebb223bb65f106) )
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
+	ROM_LOAD16_BYTE( "r3-ch1ll.rom", 0x000000, 0x020000, CRC(c86ea5fc) SHA1(daf89340bb5d6ae57ef6faedb3f86c944c68fc45) )
+	ROM_LOAD16_BYTE( "r3-ch1hl.rom", 0x040000, 0x020000, CRC(7525eb92) SHA1(f691a000580d078f207ea6e9bc8a527e74bc20e5) )
+	ROM_LOAD16_BYTE( "r3-ch3ll.rom", 0x080000, 0x020000, CRC(abe54b1e) SHA1(4b6d0c694d9c1fcdec87b70fbadee9fb3455b42c) )
+	ROM_LOAD16_BYTE( "r3-ch3hl.rom", 0x0c0000, 0x020000, CRC(80e5647e) SHA1(744e9dcc651b80ef4b3cc29ed0ebb223bb65f106) )
 
-	ROM_LOAD( "r3-ch1lh.rom", 0x080000, 0x020000, CRC(75568cf0) SHA1(78cb940fafb6e01a018d6823636b398a898e988a) )
-	ROM_LOAD( "r3-ch1hh.rom", 0x0a0000, 0x020000, CRC(e39cff37) SHA1(79680526759013f8641e82c27b3afc184c06f059) )
-	ROM_LOAD( "r3-ch3lh.rom", 0x0c0000, 0x020000, CRC(5a155c04) SHA1(9472ef6474275ac5993c2afb222cfbc8d848bd86) )
-	ROM_LOAD( "r3-ch3hh.rom", 0x0e0000, 0x020000, CRC(abe58fdb) SHA1(6429caa8680255c46457ab0ad6c0f610291d8a92) )
+	ROM_LOAD16_BYTE( "r3-ch1lh.rom", 0x000001, 0x020000, CRC(75568cf0) SHA1(78cb940fafb6e01a018d6823636b398a898e988a) )
+	ROM_LOAD16_BYTE( "r3-ch1hh.rom", 0x040001, 0x020000, CRC(e39cff37) SHA1(79680526759013f8641e82c27b3afc184c06f059) )
+	ROM_LOAD16_BYTE( "r3-ch3lh.rom", 0x080001, 0x020000, CRC(5a155c04) SHA1(9472ef6474275ac5993c2afb222cfbc8d848bd86) )
+	ROM_LOAD16_BYTE( "r3-ch3hh.rom", 0x0c0001, 0x020000, CRC(abe58fdb) SHA1(6429caa8680255c46457ab0ad6c0f610291d8a92) )
 
-	ROM_LOAD( "r3-ch0ll.rom", 0x100000, 0x020000, CRC(b416f1bf) SHA1(8ae546c8286d616a991766eb97c3d281dbafd944) )
-	ROM_LOAD( "r3-ch0hl.rom", 0x120000, 0x020000, CRC(a4cad36d) SHA1(f8327bcc490cb66703de9bbcd931d964609ae822) )
-	ROM_LOAD( "r3-ch2ll.rom", 0x140000, 0x020000, CRC(d0ce3051) SHA1(0dc57f53b82d8ae15106df8a08b404c076b9fcef) )
-	ROM_LOAD( "r3-ch2hl.rom", 0x160000, 0x020000, CRC(837d8677) SHA1(6a3b36399e89c8ff031b25bcf62704197d711a5b) )
+	ROM_LOAD16_BYTE( "r3-ch0ll.rom", 0x100000, 0x020000, CRC(b416f1bf) SHA1(8ae546c8286d616a991766eb97c3d281dbafd944) )
+	ROM_LOAD16_BYTE( "r3-ch0hl.rom", 0x140000, 0x020000, CRC(a4cad36d) SHA1(f8327bcc490cb66703de9bbcd931d964609ae822) )
+	ROM_LOAD16_BYTE( "r3-ch2ll.rom", 0x180000, 0x020000, CRC(d0ce3051) SHA1(0dc57f53b82d8ae15106df8a08b404c076b9fcef) )
+	ROM_LOAD16_BYTE( "r3-ch2hl.rom", 0x1c0000, 0x020000, CRC(837d8677) SHA1(6a3b36399e89c8ff031b25bcf62704197d711a5b) )
 
-	ROM_LOAD( "r3-ch0lh.rom", 0x180000, 0x020000, CRC(76a330a2) SHA1(4324bceca7bf5155f7b2543748989e2d364a7e97) )
-	ROM_LOAD( "r3-ch0hh.rom", 0x1a0000, 0x020000, CRC(4dc69751) SHA1(2abf657dc951dc263b53a2c7a4ed2f4aaf5f9a98) )
-	ROM_LOAD( "r3-ch2lh.rom", 0x1c0000, 0x020000, CRC(df3bc48f) SHA1(6747a453da4bca0b837f4ef1f1bbe871f15332ed) )
-	ROM_LOAD( "r3-ch2hh.rom", 0x1e0000, 0x020000, CRC(bf37dfac) SHA1(27e825bd0a4d7ae65714fefeb6fedac501984ba9) )
+	ROM_LOAD16_BYTE( "r3-ch0lh.rom", 0x100001, 0x020000, CRC(76a330a2) SHA1(4324bceca7bf5155f7b2543748989e2d364a7e97) )
+	ROM_LOAD16_BYTE( "r3-ch0hh.rom", 0x140001, 0x020000, CRC(4dc69751) SHA1(2abf657dc951dc263b53a2c7a4ed2f4aaf5f9a98) )
+	ROM_LOAD16_BYTE( "r3-ch2lh.rom", 0x180001, 0x020000, CRC(df3bc48f) SHA1(6747a453da4bca0b837f4ef1f1bbe871f15332ed) )
+	ROM_LOAD16_BYTE( "r3-ch2hh.rom", 0x1c0001, 0x020000, CRC(bf37dfac) SHA1(27e825bd0a4d7ae65714fefeb6fedac501984ba9) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "r3-a1.rom", 0x00000, 0x20000, CRC(4396fa19) SHA1(cb6d983f210249676c500723041d74fa3fdc517d) )
@@ -3287,7 +3200,7 @@ ROM_START( pbobble )
 	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 128k for Z80 code */
 	ROM_LOAD( "pb-ic27.bin", 0x00000, 0x20000, CRC(26efa4c4) SHA1(795af8f6d23c2cbe2c811ec9ab1f14a4eee3f99e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "pb-ic14.bin", 0x00000, 0x80000, CRC(55f90ea4) SHA1(793c79e5b72171124368ad09dd31235252c541f5) )
 	ROM_LOAD( "pb-ic9.bin",  0x80000, 0x80000, CRC(3253aac9) SHA1(916d85aa96e2914630833292a0655b0389b4a39b) )
 
@@ -3303,7 +3216,7 @@ ROM_START( spacedx )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "d89-07.27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9",  0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
@@ -3327,7 +3240,7 @@ ROM_START( spacedxj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "d89-07.27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9" , 0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
@@ -3351,7 +3264,7 @@ ROM_START( spacedxo ) // different PCB type, similar to Silent Dragon
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "d89-07.27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "d89-12.bin",0x00000, 0x80000, CRC(53df86f1) SHA1(f03d77dd54eb455462133a29dd8fec007abedcfd) )
 	ROM_LOAD( "d89-13.bin",0x80000, 0x80000, CRC(c44c1352) SHA1(78a04fe0ade6e8f9e6bbda7652a54a79b6208fdd) )
 
@@ -3367,7 +3280,7 @@ ROM_START( qzshowby )
 	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 128k for Z80 code */
 	ROM_LOAD(  "d72-11.bin", 0x00000, 0x20000, CRC(2ca046e2) SHA1(983620e657d729e1441d509f18141bb3bb581855) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "d72-03.bin", 0x000000, 0x200000, CRC(1de257d0) SHA1(df03b1fb5cd69e2d2eb2088f96f26b0ea9756fb7) )
 	ROM_LOAD( "d72-02.bin", 0x200000, 0x200000, CRC(bf0da640) SHA1(2b2493904ed0b94dc12b56dae71cc5c25701aef9) )
 
@@ -3393,7 +3306,7 @@ ROM_START( viofight )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 128k for Z80 code */
 	ROM_LOAD(  "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "c16-01.1", 0x000000, 0x080000, CRC(7059ce83) SHA1(1e6825ab944254cd4ba6574762172245b3352319) )
 	ROM_LOAD( "c16-02.2", 0x080000, 0x080000, CRC(b458e905) SHA1(b712cbf4a4015e1fc2243871fe753e230f0172c2) )
 	ROM_LOAD( "c16-03.3", 0x100000, 0x080000, CRC(515a9431) SHA1(836be28614326d093be8841617cca83cef8d55cc) )
@@ -3417,7 +3330,7 @@ ROM_START( viofightu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 128k for Z80 code */
 	ROM_LOAD(  "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "c16-01.1", 0x000000, 0x080000, CRC(7059ce83) SHA1(1e6825ab944254cd4ba6574762172245b3352319) )
 	ROM_LOAD( "c16-02.2", 0x080000, 0x080000, CRC(b458e905) SHA1(b712cbf4a4015e1fc2243871fe753e230f0172c2) )
 	ROM_LOAD( "c16-03.3", 0x100000, 0x080000, CRC(515a9431) SHA1(836be28614326d093be8841617cca83cef8d55cc) )
@@ -3441,7 +3354,7 @@ ROM_START( viofightj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 128k for Z80 code */
 	ROM_LOAD(  "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "c16-01.1", 0x000000, 0x080000, CRC(7059ce83) SHA1(1e6825ab944254cd4ba6574762172245b3352319) )
 	ROM_LOAD( "c16-02.2", 0x080000, 0x080000, CRC(b458e905) SHA1(b712cbf4a4015e1fc2243871fe753e230f0172c2) )
 	ROM_LOAD( "c16-03.3", 0x100000, 0x080000, CRC(515a9431) SHA1(836be28614326d093be8841617cca83cef8d55cc) )
@@ -3465,7 +3378,7 @@ ROM_START( masterw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b72_07.30", 0x00000, 0x10000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
@@ -3480,7 +3393,7 @@ ROM_START( masterwu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b72_07.30", 0x00000, 0x10000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
@@ -3495,7 +3408,7 @@ ROM_START( masterwj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "b72_07.30", 0x00000, 0x10000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
@@ -3511,7 +3424,7 @@ ROM_START( yukiwo ) /* Prototype of Master of Weapons */
 	ROM_LOAD( "ic30-snd.bin", 0x00000, 0x08000, CRC(8632adb7) SHA1(a746ed0e7e2c2c216874b5729d59d7ed37689e4f) ) // TMM27256AD-20
 	ROM_RELOAD(0x8000, 0x8000)
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD16_BYTE( "ic1-a010.bin", 0x000001, 0x020000, CRC(0030dce2) SHA1(649e0caf83b259814e1f0c2f6de40ebd8ea1a639) )
 	ROM_LOAD16_BYTE( "ic5-9df1.bin", 0x000000, 0x020000, CRC(0507b908) SHA1(72f9913ddec37cd4e6b0b611619d0195302eb7e8) )
 	ROM_LOAD16_BYTE( "ic3-1305.bin", 0x080001, 0x020000, CRC(8772b1a6) SHA1(961c8da0fcc3ce9dd334d7bcae75d8b93ded0bb4) )
@@ -3532,7 +3445,7 @@ ROM_START( silentd ) /* Silkscreened PCB number ET910000B */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD(  "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "east-04.ic28", 0x000000, 0x100000, CRC(53237217) SHA1(fec044c26b8c99235f88c8be0d9ac63b81a3a094) )
 	ROM_LOAD( "east-06.ic29", 0x100000, 0x100000, CRC(e6e6dfa7) SHA1(913fa9a21cea175a1af87023144ebc98b3b0f33b) )
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
@@ -3555,7 +3468,7 @@ ROM_START( silentdj ) /* Silkscreened PCB number ET910000B */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD(  "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "east-04.ic28", 0x000000, 0x100000, CRC(53237217) SHA1(fec044c26b8c99235f88c8be0d9ac63b81a3a094) )
 	ROM_LOAD( "east-06.ic29", 0x100000, 0x100000, CRC(e6e6dfa7) SHA1(913fa9a21cea175a1af87023144ebc98b3b0f33b) )
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
@@ -3578,7 +3491,7 @@ ROM_START( silentdu ) /* Dumped from an original Taito PCB (ET910000B) */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD(  "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "east-04.ic28", 0x000000, 0x100000, CRC(53237217) SHA1(fec044c26b8c99235f88c8be0d9ac63b81a3a094) )
 	ROM_LOAD( "east-06.ic29", 0x100000, 0x100000, CRC(e6e6dfa7) SHA1(913fa9a21cea175a1af87023144ebc98b3b0f33b) )
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
@@ -3599,7 +3512,7 @@ ROM_START( selfeena ) /* Silkscreened PCB number ET910000A */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "se-03.39",0x00000, 0x10000, CRC(675998be) SHA1(16e59a9b7dc46aeee0022cb73cf6feced6796c35) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "se-04.2",  0x000000, 0x80000, CRC(920ad100) SHA1(69cd2af6218db90632f09a131d2956ab69034643) )
 	ROM_LOAD( "se-05.1",  0x080000, 0x80000, CRC(d297c995) SHA1(e5ad5a8ce222621c9156c2949916bee6b3099c4e) )
 
@@ -3617,7 +3530,7 @@ ROM_START( ryujin ) /* Silkscreened PCB number ET910000A */
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "ruj05.39",0x00000, 0x10000, CRC(95270b16) SHA1(c1ad76268679cf198e9f1514360f280b73e49ab5) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "ryujin07.2", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
 	ROM_LOAD( "ryujin06.1", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
 
@@ -3635,7 +3548,7 @@ ROM_START( sbm )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c69-31.ic28",0x00000, 0x10000, CRC(c999f753) SHA1(5d944b492893a0bb605743e2928c802427a85fbf) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD       ( "c69-01.ic5", 0x000000, 0x100000, CRC(521fabe3) SHA1(f81303688ac014145a7e9325affc4a0f86755ba9) )
 	ROM_LOAD16_BYTE( "c69-13.ic2", 0x100000, 0x020000, CRC(d1550884) SHA1(f3a65827c45959fe5ac4bfc92831a8bed76bf287) )
 	ROM_LOAD16_BYTE( "c69-12.ic1", 0x100001, 0x020000, CRC(eb56582c) SHA1(41b77704aeaecf3eaa3f87e97c0b59fd00e5349e) )
@@ -3664,7 +3577,7 @@ ROM_START( sbmj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c69-23.28",0x00000, 0x10000, CRC(b2fce13e) SHA1(ecdb08482af80fd04cc8b67157e11ca61ce06437) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD       ( "c69-01.ic5", 0x000000, 0x100000, CRC(521fabe3) SHA1(f81303688ac014145a7e9325affc4a0f86755ba9) )
 	ROM_LOAD16_BYTE( "c69-13.ic2", 0x100000, 0x020000, CRC(d1550884) SHA1(f3a65827c45959fe5ac4bfc92831a8bed76bf287) )
 	ROM_LOAD16_BYTE( "c69-12.ic1", 0x100001, 0x020000, CRC(eb56582c) SHA1(41b77704aeaecf3eaa3f87e97c0b59fd00e5349e) )
@@ -3686,7 +3599,7 @@ ROM_START( realpunc )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for Z80 code */
 	ROM_LOAD( "d76_06.106",0x00000, 0x10000, CRC(72c799fd) SHA1(ab086be38b890152b33f0c4e33d0f02d0a5321bc) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
 	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
 
@@ -3702,7 +3615,7 @@ ROM_START( realpuncj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for Z80 code */
 	ROM_LOAD( "d76_06.106",0x00000, 0x10000, CRC(72c799fd) SHA1(ab086be38b890152b33f0c4e33d0f02d0a5321bc) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
 	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
 
@@ -3712,7 +3625,7 @@ ROM_END
 
 void taitob_state::init_taito_b()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, init_taito_b, ROT270, "Taito Corporation Japan",   "Master of Weapon (World)",  MACHINE_SUPPORTS_SAVE )

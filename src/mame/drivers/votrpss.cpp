@@ -89,6 +89,9 @@ public:
 		, m_ppi(*this, "ppi")
 	{ }
 
+	void votrpss(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_READ8_MEMBER(ppi_pb_r);
@@ -100,10 +103,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
-	void votrpss(machine_config &config);
 	void votrpss_io(address_map &map);
 	void votrpss_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_porta;
 	uint8_t m_portb;
@@ -249,7 +251,7 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_votrpss)
+	//config.set_default_layout(layout_votrpss);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -275,12 +277,12 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(8'000'000)) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(XTAL(8'000'000) / 256) /* Timer 1: Pitch */
-	MCFG_PIT8253_CLK2(XTAL(8'000'000) / 4096) /* Timer 2: Volume */
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(8_MHz_XTAL); // Timer 0: baud rate gen for 8251
+	pit.out_handler<0>().set("uart", FUNC(i8251_device::write_txc));
+	pit.out_handler<0>().append("uart", FUNC(i8251_device::write_rxc));
+	pit.set_clk<1>(8_MHz_XTAL / 256); // Timer 1: Pitch
+	pit.set_clk<2>(8_MHz_XTAL / 4096); // Timer 2: Volume
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, votrpss_state, ppi_pa_r))

@@ -50,7 +50,7 @@ public:
 	void de_type2_alpha3(machine_config &config);
 	void de_type3(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -104,7 +104,6 @@ protected:
 	bool m_more_data;
 	bool m_nmi_enable;
 
-private:
 	uint32_t m_segment1;
 	uint32_t m_segment2;
 	uint8_t m_strobe;
@@ -555,7 +554,7 @@ MACHINE_CONFIG_START(de_2_state::de_type1)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2)
+	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -570,7 +569,7 @@ MACHINE_CONFIG_START(de_2_state::de_type2)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2)
+	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -585,7 +584,7 @@ MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2a3)
+	config.set_default_layout(layout_de2a3);
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -600,7 +599,7 @@ MACHINE_CONFIG_START(de_2_state::de_type3)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2a3)
+	config.set_default_layout(layout_de2a3);
 
 	genpin_audio(config);
 	de_bg_audio(config);

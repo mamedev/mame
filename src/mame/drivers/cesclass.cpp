@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(cesclassic_state::cesclassic)
 	MCFG_SCREEN_UPDATE_DRIVER(cesclassic_state, screen_update)
 	MCFG_SCREEN_SIZE(8*16*2, 8*8+3*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 8*16*2-1, 0*8, 8*8-1)
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(cesclassic_state, cesclassic)

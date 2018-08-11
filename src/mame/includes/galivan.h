@@ -25,6 +25,16 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void galivan(machine_config &config);
+	void ninjemak(machine_config &config);
+	void youmab(machine_config &config);
+
+	void init_youmab();
+
+protected:
+	void io_map(address_map &map);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -55,7 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
-	void init_youmab();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
@@ -75,11 +84,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void galivan(machine_config &config);
-	void ninjemak(machine_config &config);
-	void youmab(machine_config &config);
+
 	void galivan_map(address_map &map);
-	void io_map(address_map &map);
 	void ninjemak_io_map(address_map &map);
 	void ninjemak_map(address_map &map);
 	void sound_io_map(address_map &map);

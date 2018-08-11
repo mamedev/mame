@@ -60,6 +60,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void wico(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(lampst_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(muxen_w);
@@ -73,10 +76,9 @@ public:
 	DECLARE_READ8_MEMBER(gentmrcl_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
-	void wico(machine_config &config);
 	void ccpu_map(address_map &map);
 	void hcpu_map(address_map &map);
-private:
+
 	bool m_zcen;
 	bool m_gten;
 	bool m_disp_on;
@@ -449,7 +451,7 @@ MACHINE_CONFIG_START(wico_state::wico)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wico)
+	config.set_default_layout(layout_wico);
 
 	/* Sound */
 	genpin_audio(config);

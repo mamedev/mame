@@ -647,17 +647,17 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_punchout)
 	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
+	config.set_default_layout(layout_dualhovu);
 
-	MCFG_SCREEN_ADD("top", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_top)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, punchout_state, vblank_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	top.set_refresh_hz(60);
+	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	top.set_size(32*8, 32*8);
+	top.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	top.set_screen_update(FUNC(punchout_state::screen_update_punchout_top));
+	top.set_palette(m_palette);
+	top.screen_vblank().set(FUNC(punchout_state::vblank_irq));
+	top.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -43,25 +43,25 @@
 ***************************************************************************/
 
 #define MCFG_I8279_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<i8279_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<i8279_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_I8279_OUT_SL_CB(_devcb) \
-	devcb = &downcast<i8279_device &>(*device).set_out_sl_callback(DEVCB_##_devcb);
+	downcast<i8279_device &>(*device).set_out_sl_callback(DEVCB_##_devcb);
 
 #define MCFG_I8279_OUT_DISP_CB(_devcb) \
-	devcb = &downcast<i8279_device &>(*device).set_out_disp_callback(DEVCB_##_devcb);
+	downcast<i8279_device &>(*device).set_out_disp_callback(DEVCB_##_devcb);
 
 #define MCFG_I8279_OUT_BD_CB(_devcb) \
-	devcb = &downcast<i8279_device &>(*device).set_out_bd_callback(DEVCB_##_devcb);
+	downcast<i8279_device &>(*device).set_out_bd_callback(DEVCB_##_devcb);
 
 #define MCFG_I8279_IN_RL_CB(_devcb) \
-	devcb = &downcast<i8279_device &>(*device).set_in_rl_callback(DEVCB_##_devcb);
+	downcast<i8279_device &>(*device).set_in_rl_callback(DEVCB_##_devcb);
 
 #define MCFG_I8279_IN_SHIFT_CB(_devcb) \
-	devcb = &downcast<i8279_device &>(*device).set_in_shift_callback(DEVCB_##_devcb);
+	downcast<i8279_device &>(*device).set_in_shift_callback(DEVCB_##_devcb);
 
 #define MCFG_I8279_IN_CTRL_CB(_devcb) \
-	devcb = &downcast<i8279_device &>(*device).set_in_ctrl_callback(DEVCB_##_devcb);
+	downcast<i8279_device &>(*device).set_in_ctrl_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS

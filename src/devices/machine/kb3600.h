@@ -64,31 +64,31 @@
 //**************************************************************************
 
 #define MCFG_AY3600_MATRIX_X0(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x0_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x0_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X1(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x1_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x1_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X2(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x2_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x2_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X3(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x3_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x3_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X4(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x4_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x4_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X5(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x5_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x5_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X6(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x6_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x6_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X7(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x7_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x7_cb(DEVCB_##_cb);
 #define MCFG_AY3600_MATRIX_X8(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x8_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_x8_cb(DEVCB_##_cb);
 #define MCFG_AY3600_SHIFT_CB(_cb)   \
-	devcb = &downcast<ay3600_device &>(*device).set_shift_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_shift_cb(DEVCB_##_cb);
 #define MCFG_AY3600_CONTROL_CB(_cb) \
-	devcb = &downcast<ay3600_device &>(*device).set_control_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_control_cb(DEVCB_##_cb);
 #define MCFG_AY3600_DATA_READY_CB(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_data_ready_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_data_ready_cb(DEVCB_##_cb);
 #define MCFG_AY3600_AKO_CB(_cb) \
-	devcb = &downcast<ay3600_device &>(*device).set_ako_cb(DEVCB_##_cb);
+	downcast<ay3600_device &>(*device).set_ako_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -33,7 +33,13 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void gts80a(machine_config &config);
+	void gts80a_s(machine_config &config);
+	void gts80a_ss(machine_config &config);
+
 	void init_gts80a();
+
+private:
 	DECLARE_READ8_MEMBER(port1a_r);
 	DECLARE_READ8_MEMBER(port2a_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -41,11 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port2b_w);
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
-	void gts80a(machine_config &config);
-	void gts80a_s(machine_config &config);
-	void gts80a_ss(machine_config &config);
 	void gts80a_map(address_map &map);
-private:
+
 	uint8_t m_port2;
 	uint8_t m_segment;
 	uint8_t m_lamprow;
@@ -352,7 +355,7 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gts80a)
+	config.set_default_layout(layout_gts80a);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)
@@ -473,7 +476,7 @@ MACHINE_CONFIG_START(caveman_state::caveman)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_DEFAULT_LAYOUT(layout_gts80a_caveman)
+	config.set_default_layout(layout_gts80a_caveman);
 
 MACHINE_CONFIG_END
 

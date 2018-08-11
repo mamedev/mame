@@ -368,7 +368,7 @@ void _20pacgal_state::common_save_state()
 	m_ram_48000 = make_unique_clear<uint8_t[]>(0x2000);
 
 	save_item(NAME(m_game_selected));
-	save_pointer(NAME(m_ram_48000.get()), 0x2000);
+	save_pointer(NAME(m_ram_48000), 0x2000);
 	save_item(NAME(m_irq_mask));
 }
 

@@ -1575,6 +1575,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2b2",       CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2ceupl",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2rules",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2cems6a",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2cems6c",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"varth",       CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthr1",     CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
@@ -2318,7 +2321,7 @@ void cps_state::video_start()
 #endif
 	save_item(NAME(m_last_sprite_offset));
 
-	save_pointer(NAME(m_buffered_obj.get()), m_obj_size / 2);
+	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
@@ -2334,7 +2337,7 @@ void cps2_state::video_start()
 	memset(m_objram2, 0, m_cps2_obj_size);
 
 	save_item(NAME(m_cps2_last_sprite_offset));
-	save_pointer(NAME(m_cps2_buffered_obj.get()), m_cps2_obj_size / 2);
+	save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
 	save_item(NAME(m_pri_ctrl));
 	save_item(NAME(m_objram_bank));
 }

@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(alto2_state::alto2)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_vertical )
+	config.set_default_layout(layout_vertical);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

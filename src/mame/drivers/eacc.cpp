@@ -66,6 +66,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void eacc(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
 	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
 	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
@@ -75,9 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER( eacc_segment_w );
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
-	void eacc(machine_config &config);
 	void eacc_mem(address_map &map);
-private:
 	uint8_t m_digit;
 	bool m_cb1;
 	bool m_cb2;
@@ -249,7 +250,7 @@ MACHINE_CONFIG_START(eacc_state::eacc)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
 	MCFG_DEVICE_PROGRAM_MAP(eacc_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_eacc)
+	config.set_default_layout(layout_eacc);
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(*this, eacc_state, eacc_keyboard_r))

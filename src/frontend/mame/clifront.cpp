@@ -16,6 +16,7 @@
 #include "mameopts.h"
 #include "audit.h"
 #include "info.h"
+#include "romload.h"
 #include "unzip.h"
 #include "validity.h"
 #include "sound/samples.h"

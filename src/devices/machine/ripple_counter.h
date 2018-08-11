@@ -20,9 +20,9 @@
 
 // output callbacks
 #define MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(_devcb) \
-	devcb = &downcast<ripple_counter_device &>(*device).set_count_out_cb(DEVCB_##_devcb);
+	downcast<ripple_counter_device &>(*device).set_count_out_cb(DEVCB_##_devcb);
 #define MCFG_RIPPLE_COUNTER_ROM_OUT_CB(_devcb) \
-	devcb = &downcast<ripple_counter_device &>(*device).set_rom_out_cb(DEVCB_##_devcb);
+	downcast<ripple_counter_device &>(*device).set_rom_out_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,6 +40,8 @@ public:
 	void set_stages(u8 stages) { m_count_mask = (1U << stages) - 1; set_rom_addr_width(stages); }
 	template<class Object> devcb_base &set_count_out_cb(Object &&cb) { return m_count_out_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_rom_out_cb(Object &&cb) { return m_rom_out_cb.set_callback(std::forward<Object>(cb)); }
+	auto count_out_cb() { return m_count_out_cb.bind(); }
+	auto rom_out_cb() { return m_rom_out_cb.bind(); }
 
 	// control line handlers
 	DECLARE_WRITE_LINE_MEMBER(clock_w);

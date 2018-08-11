@@ -53,6 +53,11 @@ public:
 		m_vram(*this, "vram")
 		{ }
 
+	void kongambl(machine_config &config);
+
+	void init_kingtut();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
@@ -70,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
-	void init_kingtut();
+
 	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
@@ -81,7 +86,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void kongambl(machine_config &config);
+
 	void kongamaud_map(address_map &map);
 	void kongambl_map(address_map &map);
 };

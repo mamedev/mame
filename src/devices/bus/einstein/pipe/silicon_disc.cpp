@@ -69,7 +69,7 @@ void einstein_silicon_disc_device::device_start()
 	memset(m_ram.get(), 0xff, 0x40000);
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x40000);
+	save_pointer(NAME(m_ram), 0x40000);
 	save_item(NAME(m_sector));
 }
 

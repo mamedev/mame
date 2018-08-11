@@ -281,16 +281,16 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(PIA1_TAG, pia6821_device, ca1_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("printer", printer)
 
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "fdcv11")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	MCFG_COCO_VHD_ADD(VHD0_TAG)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_coco3)
+	config.set_default_layout(layout_coco3);
 
 	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG)
 	MCFG_GIME_HSYNC_CALLBACK(WRITELINE(PIA0_TAG, pia6821_device, ca1_w))
@@ -354,14 +354,14 @@ MACHINE_CONFIG_START(coco3_state::coco3h)
 	MCFG_DEVICE_PROGRAM_MAP(coco3_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco3_state::coco3dw1)
+void coco3_state::coco3dw1(machine_config &config)
+{
 	coco3(config);
-	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cc3hdb1")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
-MACHINE_CONFIG_END
+	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "cc3hdb1"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+}
 
 //**************************************************************************
 //  ROMS

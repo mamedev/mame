@@ -194,7 +194,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	case -1: m_pc_delta_to_bytes = [](offs_t delta) { return delta << 1; }; break;
 	case  0: m_pc_delta_to_bytes = [](offs_t delta) { return delta;      }; break;
 	case  3: m_pc_delta_to_bytes = [](offs_t delta) { return delta >> 3; }; break;
-	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address buf shift\n");
+	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address bus shift\n");
 	}
 
 	// Define the filler
@@ -719,7 +719,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 2);
 						const u32 *src = get_ptr<u32>(pc);
-						return src[0] | (u64(src[1]) << 32);
+						return u64(src[0]) | (u64(src[1]) << 32);
 					};
 				}
 				break;
@@ -782,7 +782,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
-						return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
+						return u64(src[0]) | (u64(src[1]) << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 					};
 				}
 				break;
@@ -815,7 +815,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
-						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u32(src[2] << 16) | src[3];
+						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u64(src[2] << 16) | u64(src[3]);
 					};
 				}
 				break;
@@ -872,7 +872,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return src[0] | (src[1] << 8) | (src[2] << 16) | u32(src[3] << 24) |
+						return u64(src[0]) | (u64(src[1]) << 8) | (u64(src[2]) << 16) | (u64(src[3]) << 24) |
 						(u64(src[4]) << 32) | (u64(src[5]) << 40) | (u64(src[6]) << 48) | (u64(src[7]) << 56);
 					};
 				}
@@ -920,8 +920,8 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return (u64(src[0]) << 56) | (u64(src[1]) << 32) | (u64(src[2]) << 40) | (u64(src[3]) << 32) |
-						(src[4] << 24) | (src[5] << 16) | (src[6] << 8) | src[7];
+						return (u64(src[0]) << 56) | (u64(src[1]) << 48) | (u64(src[2]) << 40) | (u64(src[3]) << 32) |
+						(u64(src[4]) << 24) | (u64(src[5]) << 16) | (u64(src[6]) << 8) | u64(src[7]);
 					};
 				}
 				break;
@@ -945,7 +945,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			m_do_r64 = [this](offs_t pc) -> u64 {
 				fill(pc, 64);
 				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
-				return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
+				return u64(src[0]) | (u64(src[1]) << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 			};
 			break;
 		}

@@ -82,6 +82,7 @@
 #include "dirtc.h"
 #include "image.h"
 #include "network.h"
+#include "romload.h"
 #include "ui/uimain.h"
 #include <time.h>
 #include <rapidjson/writer.h>

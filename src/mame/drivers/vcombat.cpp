@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 
 	/* Disabled for now as it can't handle multiple screens */
 //  MCFG_MC6845_ADD("crtc", MC6845, "screen", 6000000 / 16)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)

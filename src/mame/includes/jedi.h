@@ -47,7 +47,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(jedi_audio_comm_stat_r);
 	void jedi(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(rom_banksel_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
@@ -80,7 +80,6 @@ protected:
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
 	/* machine state */
 	emu_timer *m_interrupt_timer;
 

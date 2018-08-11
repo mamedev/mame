@@ -459,8 +459,19 @@ public:
 		, m_ctrl2(*this, "ctrl2")
 	{ }
 
+	void saturn(machine_config &config);
+	void saturnjp(machine_config &config);
+	void saturneu(machine_config &config);
+	void saturnus(machine_config &config);
+
+	void init_saturnus();
+	void init_saturneu();
+	void init_saturnjp();
+
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
+
+private:
 
 	DECLARE_MACHINE_START(saturn);
 	DECLARE_MACHINE_RESET(saturn);
@@ -472,9 +483,6 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
 
 	void saturn_init_driver(int rgn);
-	void init_saturnus();
-	void init_saturneu();
-	void init_saturnjp();
 	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
 	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
 	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);
@@ -493,10 +501,6 @@ public:
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
 
-	void saturn(machine_config &config);
-	void saturnjp(machine_config &config);
-	void saturneu(machine_config &config);
-	void saturnus(machine_config &config);
 	void saturn_mem(address_map &map);
 	void sound_mem(address_map &map);
 };
@@ -652,7 +656,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));

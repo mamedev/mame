@@ -71,8 +71,13 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_p_chargen(*this, "chargen")
 		, m_io_dsw(*this, "DSW")
-		{ }
+	{ }
 
+	void ts803(machine_config &config);
+
+	void init_ts803();
+
+private:
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_READ8_MEMBER(porta0_r);
@@ -82,13 +87,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	void init_ts803();
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ts803(machine_config &config);
 	void ts803_io(address_map &map);
 	void ts803_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
 	bool m_graphics_mode;
@@ -374,8 +377,8 @@ Bit 2 = 0 alpha memory access (round off)
 void ts803_state::machine_start()
 {
 	//save these 2 so we can examine them in the debugger
-	save_pointer(NAME(m_videoram.get()), 0x8000);
-	save_pointer(NAME(m_56kram.get()), 0xc000);
+	save_pointer(NAME(m_videoram), 0x8000);
+	save_pointer(NAME(m_56kram), 0xc000);
 }
 
 void ts803_state::machine_reset()
@@ -439,13 +442,13 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_MC6845_UPDATE_ROW_CB(ts803_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
 
-	MCFG_DEVICE_ADD("sti_clock", CLOCK, 16_MHz_XTAL / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sti", z80sti_device, tc_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sti", z80sti_device, rc_w))
+	clock_device &sti_clock(CLOCK(config, "sti_clock", 16_MHz_XTAL / 13));
+	sti_clock.signal_handler().set("sti", FUNC(z80sti_device::tc_w));
+	sti_clock.signal_handler().append("sti", FUNC(z80sti_device::rc_w));
 
-	MCFG_DEVICE_ADD("dart_clock", CLOCK, (16_MHz_XTAL / 13) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
+	clock_device &dart_clock(CLOCK(config, "dart_clock", 16_MHz_XTAL / 13 / 8));
+	dart_clock.signal_handler().set("dart", FUNC(z80dart_device::txca_w));
+	dart_clock.signal_handler().append("dart", FUNC(z80dart_device::rxca_w));
 
 	MCFG_DEVICE_ADD("sti", Z80STI, 16_MHz_XTAL / 4)
 	MCFG_Z80STI_OUT_TBO_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))

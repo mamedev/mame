@@ -585,6 +585,12 @@ public:
 		, m_chargen(*this, CHARGEN_TAG)
 	{ }
 
+	void fanucspmgm(machine_config &config);
+	void fanucspmg(machine_config &config);
+
+	void init_fanucspmg();
+
+private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8085a_cpu_device> m_subcpu;
 	required_device<i8251_device> m_usart0;
@@ -631,17 +637,13 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
 
-	void init_fanucspmg();
-
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
 
-	void fanucspmgm(machine_config &config);
-	void fanucspmg(machine_config &config);
 	void maincpu_io(address_map &map);
 	void maincpu_mem(address_map &map);
 	void subcpu_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	int32_t m_vram_bank;
 	uint8_t m_vbl_ctrl;
@@ -1006,12 +1008,12 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 
 	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, fanucspmg_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD(PIC1_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(PIC0_TAG, pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(PIC0_TAG, pic8259_device, ir3_w))

@@ -31,11 +31,13 @@ public:
 		, m_mfp(*this, "mfp")
 	{ }
 
+	void tti(machine_config &config);
+
+private:
 	IRQ_CALLBACK_MEMBER(intack);
 
-	void tti(machine_config &config);
 	void prg_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;
 };

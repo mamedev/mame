@@ -34,7 +34,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void gts80b_s2(machine_config &config);
+	void gts80b_s3(machine_config &config);
+	void bonebstr(machine_config &config);
+	void gts80b_s1(machine_config &config);
+	void gts80b_s(machine_config &config);
+	void gts80b(machine_config &config);
+
 	void init_gts80b();
+
+private:
 	DECLARE_READ8_MEMBER(port1a_r);
 	DECLARE_READ8_MEMBER(port2a_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -42,14 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port2b_w);
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
-	void gts80b_s2(machine_config &config);
-	void gts80b_s3(machine_config &config);
-	void bonebstr(machine_config &config);
-	void gts80b_s1(machine_config &config);
-	void gts80b_s(machine_config &config);
-	void gts80b(machine_config &config);
 	void gts80b_map(address_map &map);
-private:
+
 	uint8_t m_dispcmd;
 	uint8_t m_port2a;
 	uint8_t m_port2b;
@@ -393,7 +396,7 @@ MACHINE_CONFIG_START(gts80b_state::gts80b)
 	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gts80b)
+	config.set_default_layout(layout_gts80b);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)

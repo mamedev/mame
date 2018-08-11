@@ -435,9 +435,9 @@ void _20pacgal_state::video_start()
 	m_sprite_ram = make_unique_clear<uint8_t[]>(0x180);
 	m_sprite_color_lookup = make_unique_clear<uint8_t[]>(0x100);
 
-	save_pointer(NAME(m_sprite_gfx_ram.get()), 0x2000);
-	save_pointer(NAME(m_sprite_ram.get()), 0x180);
-	save_pointer(NAME(m_sprite_color_lookup.get()), 0x100);
+	save_pointer(NAME(m_sprite_gfx_ram), 0x2000);
+	save_pointer(NAME(m_sprite_ram), 0x180);
+	save_pointer(NAME(m_sprite_color_lookup), 0x100);
 
 	if (m_proms != nullptr)
 		get_pens();

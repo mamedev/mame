@@ -79,6 +79,11 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
+	void vg5k(machine_config &config);
+
+	void init_vg5k();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
 	required_device<dac_bit_interface> m_dac;
@@ -98,11 +103,9 @@ public:
 	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
-	void init_vg5k();
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
-	void vg5k(machine_config &config);
 	void vg5k_io(address_map &map);
 	void vg5k_mem(address_map &map);
 };

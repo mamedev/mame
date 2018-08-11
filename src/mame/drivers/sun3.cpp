@@ -220,8 +220,8 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 class sun3_state : public driver_device
 {
 public:
-	sun3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sun3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
@@ -234,8 +234,15 @@ public:
 		m_rom(*this, "user1"),
 		m_idprom(*this, "idprom"),
 		m_ram(*this, RAM_TAG)
-		{ }
+	{ }
 
+	void sun3(machine_config &config);
+	void sun3e(machine_config &config);
+	void sun3_60(machine_config &config);
+	void sun3200(machine_config &config);
+	void sun3_50(machine_config &config);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
@@ -267,18 +274,13 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
-	void sun3(machine_config &config);
-	void sun3e(machine_config &config);
-	void sun3_60(machine_config &config);
-	void sun3200(machine_config &config);
-	void sun3_50(machine_config &config);
 	void sun3_mem(address_map &map);
 	void vmetype0space_map(address_map &map);
 	void vmetype0space_novram_map(address_map &map);
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
-private:
+
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint32_t m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
@@ -1019,8 +1021,7 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
 	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
@@ -1124,8 +1125,7 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
 	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))

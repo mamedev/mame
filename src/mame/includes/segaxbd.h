@@ -33,17 +33,15 @@ public:
 	// construction/destruction
 	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER(adc_r);
-	DECLARE_WRITE16_MEMBER(adc_w);
-	DECLARE_WRITE16_MEMBER(iocontrol_w);
+	void xboard_base_mconfig(machine_config &config);
 
-	// game-specific main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
-	DECLARE_READ16_MEMBER(rascot_excs_r);
-	DECLARE_WRITE16_MEMBER(rascot_excs_w);
-	DECLARE_READ16_MEMBER(smgp_excs_r);
-	DECLARE_WRITE16_MEMBER(smgp_excs_w);
+	void install_aburner2(void);
+	void install_loffire(void);
+	void install_smgp(void);
+	void install_gprider(void);
+
+	// devices
+	required_device<m68000_device> m_maincpu;
 
 	// custom I/O
 	DECLARE_READ8_MEMBER(aburner2_motor_r);
@@ -53,16 +51,24 @@ public:
 	DECLARE_READ8_MEMBER(lastsurv_port_r);
 	DECLARE_WRITE8_MEMBER(lastsurv_muxer_w);
 
+	// game-specific main CPU read/write handlers
+	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
+	DECLARE_READ16_MEMBER(rascot_excs_r);
+	DECLARE_WRITE16_MEMBER(rascot_excs_w);
+	DECLARE_READ16_MEMBER(smgp_excs_r);
+	DECLARE_WRITE16_MEMBER(smgp_excs_w);
+
+protected:
+	// main CPU read/write handlers
+	DECLARE_READ16_MEMBER(adc_r);
+	DECLARE_WRITE16_MEMBER(adc_w);
+	DECLARE_WRITE16_MEMBER(iocontrol_w);
+
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// palette helpers
 	DECLARE_WRITE16_MEMBER(paletteram_w);
-
-	void install_aburner2(void);
-	void install_loffire(void);
-	void install_smgp(void);
-	void install_gprider(void);
 
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
@@ -77,7 +83,7 @@ public:
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 	void sub_map(address_map &map);
-protected:
+
 	// timer IDs
 	enum
 	{
@@ -104,9 +110,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(pd_0_w);
 
 	// devices
-public:
-	required_device<m68000_device> m_maincpu;
-protected:
 	required_device<m68000_device> m_subcpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_soundcpu2;
@@ -131,12 +134,11 @@ protected:
 	// game-specific state
 	uint16_t *        m_loffire_sync;
 	uint8_t           m_lastsurv_mux;
-public: // -- stupid system16.c
+
 	// memory pointers
 	required_shared_ptr<uint16_t> m_paletteram;
 	bool            m_gprider_hack;
 
-protected:
 	void palette_init();
 	uint32_t      m_palette_entries;          // number of palette entries
 	uint8_t       m_palette_normal[32];       // RGB translations for normal pixels
@@ -149,10 +151,8 @@ protected:
 	optional_ioport_array<4> m_mux_ports;
 	output_finder<4> m_lamps;
 
-protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	void xboard_base_mconfig(machine_config &config);
 };
 
 

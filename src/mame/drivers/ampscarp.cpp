@@ -23,8 +23,9 @@ public:
 	{ }
 
 	void ampscarp(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
 };
 

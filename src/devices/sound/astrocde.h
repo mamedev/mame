@@ -40,31 +40,31 @@
 //**************************************************************************
 
 #define MCFG_ASTROCADE_IO_SI_READ_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_si_callback(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_si_callback(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO0_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<0>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO1_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<1>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO2_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<2>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO3_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<3>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO4_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<4>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<4>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO5_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<5>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<5>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO6_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<6>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<6>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_SO7_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<7>(DEVCB_##_devcb);
+	downcast<astrocade_io_device &>(*device).set_so_callback<7>(DEVCB_##_devcb);
 
 #define MCFG_ASTROCADE_IO_POT0(_tag) \
 	downcast<astrocade_io_device &>(*device).set_pot_tag<0>(_tag);

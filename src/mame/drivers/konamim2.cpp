@@ -194,6 +194,7 @@ Notes:
 #include "imagedev/chd_cd.h"
 #include "machine/terminal.h"
 #include "emupal.h"
+#include "romload.h"
 #include "softlist.h"
 #include "screen.h"
 
@@ -219,6 +220,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub") { }
 
+	void m2(machine_config &config);
+	void _3do_m2(machine_config &config);
+
+	void init_m2();
+
+private:
 	required_shared_ptr<uint64_t> m_main_ram;
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport m_in_country;
@@ -269,7 +276,6 @@ public:
 	DECLARE_READ8_MEMBER(id6_r);
 	DECLARE_READ8_MEMBER(id7_r);
 
-	void init_m2();
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -280,8 +286,6 @@ public:
 	void cde_dma_transfer(address_space &space, int channel, int next);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	void m2(machine_config &config);
-	void _3do_m2(machine_config &config);
 	void _3do_m2_main(address_map &map);
 	void _3do_m2_main_m(address_map &map);
 	void _3do_m2_main_s(address_map &map);

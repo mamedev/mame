@@ -501,14 +501,14 @@ VIDEO_START_MEMBER(dynax_state,hanamai)
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_HANAMAI;
 
-	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,hnoridur)
@@ -527,14 +527,14 @@ VIDEO_START_MEMBER(dynax_state,hnoridur)
 
 	m_priority_table = priority_hnoridur;
 
-	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mcnpshnt)
@@ -555,12 +555,12 @@ VIDEO_START_MEMBER(dynax_state,sprtmtch)
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_DRGPUNCH;
 
-	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,jantouki)
@@ -585,22 +585,22 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_JANTOUKI;
 
-	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[4][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[4][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[5][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[5][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[6][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[6][1].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[7][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[7][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][1]), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mjdialq2)
@@ -611,8 +611,8 @@ VIDEO_START_MEMBER(dynax_state,mjdialq2)
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_MJDIALQ2;
 
-	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mjelctrn)

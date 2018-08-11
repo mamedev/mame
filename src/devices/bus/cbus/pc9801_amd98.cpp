@@ -32,8 +32,6 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_X1 XTAL(1'996'800)
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -48,17 +46,17 @@ DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "pc9801_am
 MACHINE_CONFIG_START(pc9801_amd98_device::device_add_mconfig)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK_X1*2)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1'996'800)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("OPN_PA1"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_amd98_device,ay3_address_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK_X1*2)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1'996'800)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("OPN_PA2"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_amd98_device,ay3_data_latch_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("ay3", AY8910, MAIN_CLOCK_X1*2)
+	MCFG_DEVICE_ADD("ay3", AY8910, 1'996'800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END

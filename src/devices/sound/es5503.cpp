@@ -111,10 +111,9 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 
 		*accumulator = altram << resshift;
 	}
-	int omode = (pPartner->control>>1) & 3;
 
 	// if swap mode, start the partner
-	if ((mode == MODE_SWAP) || (omode == MODE_SWAP))
+	if (mode == MODE_SWAP)
 	{
 		pPartner->control &= ~1;    // clear the halt bit
 		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)

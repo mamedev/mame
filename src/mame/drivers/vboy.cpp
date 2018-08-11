@@ -161,6 +161,9 @@ public:
 		m_vboy_timer.latch = 0;
 	}
 
+	void vboy(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<vboy_cart_slot_device> m_cart;
 	required_device<timer_device> m_maintimer;
@@ -226,7 +229,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
-	void vboy(machine_config &config);
+
 	void vboy_io(address_map &map);
 	void vboy_mem(address_map &map);
 };
@@ -1367,7 +1370,7 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_pad", vboy_state, timer_pad_tick, attotime::from_hz(50.038029f))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_vboy)
+	config.set_default_layout(layout_vboy);
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(vboy_state, vboy)
 

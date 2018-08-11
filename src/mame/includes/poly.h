@@ -33,7 +33,8 @@
 #ifndef MAME_INCLUDES_POLY_H
 #define MAME_INCLUDES_POLY_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
@@ -81,6 +82,14 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
+	void poly(machine_config &config);
+	void poly2(machine_config &config);
+
+	void init_poly();
+
+	virtual void poly_bank(address_map &map);
+
+private:
 	DECLARE_READ8_MEMBER( logical_mem_r );
 	DECLARE_WRITE8_MEMBER( logical_mem_w );
 	DECLARE_READ8_MEMBER( vector_r );
@@ -103,21 +112,14 @@ public:
 	DECLARE_READ8_MEMBER( network_r );
 	DECLARE_WRITE8_MEMBER( network_w );
 	DECLARE_WRITE_LINE_MEMBER( network_clk_w );
-	void init_poly();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void poly_bank(address_map &map);
-
-	void poly(machine_config &config);
 	void poly_mem(address_map &map);
-	void poly2(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device_array<saa5050_device, 2> m_trom;
@@ -157,18 +159,18 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
+	void polydev(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(drive_register_w);
 	DECLARE_READ8_MEMBER(drive_register_r);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_READ8_MEMBER(fdc_inv_r);
 	DECLARE_WRITE8_MEMBER(fdc_inv_w);
 
-	void polydev(machine_config &config);
 
-protected:
 	virtual void poly_bank(address_map &map) override;
 
-private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<fd1771_device> m_fdc;
@@ -176,4 +178,4 @@ private:
 	floppy_image_device *m_current_floppy;
 };
 
-#endif /* MAME_INCLUDES_POLY_H */
+#endif // MAME_INCLUDES_POLY_H

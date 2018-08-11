@@ -597,15 +597,17 @@ void comx35_state::machine_reset()
 
 MACHINE_CONFIG_START(comx35_state::pal)
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_PAL)
-	MCFG_DEVICE_PROGRAM_MAP(comx35_mem)
-	MCFG_DEVICE_IO_MAP(comx35_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, comx35_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, comx35_state, ef2_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, comx35_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, comx35_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, comx35_state, sc_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, cdp1869_device::CPU_CLK_PAL));
+	cpu.set_addrmap(AS_PROGRAM, &comx35_state::comx35_mem);
+	cpu.set_addrmap(AS_IO, &comx35_state::comx35_io);
+	cpu.wait_cb().set_constant(1);
+	cpu.clear_cb().set(FUNC(comx35_state::clear_r));
+	cpu.ef2_cb().set(FUNC(comx35_state::ef2_r));
+	cpu.ef4_cb().set(FUNC(comx35_state::ef4_r));
+	cpu.q_cb().set(FUNC(comx35_state::q_w));
+	cpu.sc_cb().set(FUNC(comx35_state::sc_w));
+	cpu.sc_cb().append(EXPANSION_TAG, FUNC(comx_expansion_slot_device::sc_w));
+	cpu.tpb_cb().set(EXPANSION_TAG, FUNC(comx_expansion_slot_device::tpb_w));
 
 	// sound and video hardware
 	comx35_pal_video(config);
@@ -647,15 +649,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(comx35_state::ntsc)
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_NTSC)
-	MCFG_DEVICE_PROGRAM_MAP(comx35_mem)
-	MCFG_DEVICE_IO_MAP(comx35_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, comx35_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, comx35_state, ef2_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, comx35_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, comx35_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, comx35_state, sc_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, cdp1869_device::CPU_CLK_NTSC));
+	cpu.set_addrmap(AS_PROGRAM, &comx35_state::comx35_mem);
+	cpu.set_addrmap(AS_IO, &comx35_state::comx35_io);
+	cpu.wait_cb().set_constant(1);
+	cpu.clear_cb().set(FUNC(comx35_state::clear_r));
+	cpu.ef2_cb().set(FUNC(comx35_state::ef2_r));
+	cpu.ef4_cb().set(FUNC(comx35_state::ef4_r));
+	cpu.q_cb().set(FUNC(comx35_state::q_w));
+	cpu.sc_cb().set(FUNC(comx35_state::sc_w));
+	cpu.sc_cb().append(EXPANSION_TAG, FUNC(comx_expansion_slot_device::sc_w));
+	cpu.tpb_cb().set(EXPANSION_TAG, FUNC(comx_expansion_slot_device::tpb_w));
 
 	// sound and video hardware
 	comx35_ntsc_video(config);

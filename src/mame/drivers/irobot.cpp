@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	MCFG_ADC0808_IN0_CB(IOPORT("AN0"))
 	MCFG_ADC0808_IN1_CB(IOPORT("AN1"))
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram")
+	X2212(config, "nvram").set_auto_save(true);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

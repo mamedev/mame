@@ -24,19 +24,19 @@
 	downcast<kbdc8042_device &>(*device).set_keyboard_type(kbdc8042_device::_kbdt);
 
 #define MCFG_KBDC8042_SYSTEM_RESET_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_GATE_A20_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_OUTPUT_BUFFER_EMPTY_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_SPEAKER_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_speaker_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_speaker_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -63,6 +63,11 @@ public:
 	template <class Object> devcb_base &set_input_buffer_full_callback(Object &&cb) { return m_input_buffer_full_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_output_buffer_empty_callback(Object &&cb) { return m_output_buffer_empty_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_speaker_callback(Object &&cb) { return m_speaker_cb.set_callback(std::forward<Object>(cb)); }
+	auto system_reset_callback() { return m_system_reset_cb.bind(); }
+	auto gate_a20_callback() { return m_gate_a20_cb.bind(); }
+	auto input_buffer_full_callback() { return m_input_buffer_full_cb.bind(); }
+	auto output_buffer_empty_callback() { return m_output_buffer_empty_cb.bind(); }
+	auto speaker_callback() { return m_speaker_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );

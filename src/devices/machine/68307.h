@@ -12,17 +12,17 @@
 
 /* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
 #define MCFG_MC68307_SERIAL_A_TX_CALLBACK(_cb) \
-	devcb = &downcast<m68307_cpu_device &>(*device).set_a_tx_cb(DEVCB_##_cb);
+	downcast<m68307_cpu_device &>(*device).set_a_tx_cb(DEVCB_##_cb);
 
 #define MCFG_MC68307_SERIAL_B_TX_CALLBACK(_cb) \
-	devcb = &downcast<m68307_cpu_device &>(*device).set_b_tx_cb(DEVCB_##_cb);
+	downcast<m68307_cpu_device &>(*device).set_b_tx_cb(DEVCB_##_cb);
 
 // deprecated: use ipX_w() instead
 #define MCFG_MC68307_SERIAL_INPORT_CALLBACK(_cb) \
-	devcb = &downcast<m68307_cpu_device &>(*device).set_inport_cb(DEVCB_##_cb);
+	downcast<m68307_cpu_device &>(*device).set_inport_cb(DEVCB_##_cb);
 
 #define MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(_cb) \
-	devcb = &downcast<m68307_cpu_device &>(*device).set_outport_cb(DEVCB_##_cb);
+	downcast<m68307_cpu_device &>(*device).set_outport_cb(DEVCB_##_cb);
 
 
 class m68307_cpu_device : public m68000_device

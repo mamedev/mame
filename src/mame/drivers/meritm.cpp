@@ -1083,7 +1083,7 @@ MACHINE_START_MEMBER(meritm_state, crt260)
 	MACHINE_START_CALL_MEMBER(common);
 	save_item(NAME(m_bank));
 	save_item(NAME(m_psd_a15));
-	save_pointer(NAME(m_ram.get()), 0x8000);
+	save_pointer(NAME(m_ram), 0x8000);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
@@ -1110,19 +1110,19 @@ MACHINE_CONFIG_START(meritm_state::crt250)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, crt250_port_b_w))   // used LMP x DRIVE
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, _8255_port_c_r))
 
-	MCFG_DEVICE_ADD(m_z80pio[0], Z80PIO, SYSTEM_CLK/6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(m_maincpu, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, meritm_state, audio_pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, audio_pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, meritm_state, audio_pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, audio_pio_port_b_w))
+	Z80PIO(config, m_z80pio[0], SYSTEM_CLK/6);
+	m_z80pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80pio[0]->in_pa_callback().set(FUNC(meritm_state::audio_pio_port_a_r));
+	m_z80pio[0]->out_pa_callback().set(FUNC(meritm_state::audio_pio_port_a_w));
+	m_z80pio[0]->in_pb_callback().set(FUNC(meritm_state::audio_pio_port_b_r));
+	m_z80pio[0]->out_pb_callback().set(FUNC(meritm_state::audio_pio_port_b_w));
 
-	MCFG_DEVICE_ADD(m_z80pio[1], Z80PIO, SYSTEM_CLK/6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(m_maincpu, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("PIO1_PORTA"))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, io_pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("PIO1_PORTB"))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, io_pio_port_b_w))
+	Z80PIO(config, m_z80pio[1], SYSTEM_CLK/6);
+	m_z80pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80pio[1]->in_pa_callback().set_ioport("PIO1_PORTA");
+	m_z80pio[1]->out_pa_callback().set(FUNC(meritm_state::io_pio_port_a_w));
+	m_z80pio[1]->in_pb_callback().set_ioport("PIO1_PORTB");
+	m_z80pio[1]->out_pb_callback().set(FUNC(meritm_state::io_pio_port_b_w));
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)

@@ -59,6 +59,12 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void play_2(machine_config &config);
+	void zira(machine_config &config);
+
+	void init_zira();
+
+private:
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
 	DECLARE_WRITE8_MEMBER(port03_w);
@@ -78,14 +84,11 @@ public:
 	DECLARE_READ8_MEMBER(psg_r);
 	DECLARE_WRITE8_MEMBER(psg_w);
 	DECLARE_READ8_MEMBER(sound_in_r);
-	void init_zira();
 
-	void play_2(machine_config &config);
-	void zira(machine_config &config);
 	void play_2_io(address_map &map);
 	void play_2_map(address_map &map);
 	void zira_sound_map(address_map &map);
-private:
+
 	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
 	uint8_t m_kbdrow;
@@ -364,55 +367,53 @@ WRITE8_MEMBER( play_2_state::psg_w )
 // **************** Machine *****************************
 MACHINE_CONFIG_START(play_2_state::play_2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CDP1802, XTAL(2'950'000))
-	MCFG_DEVICE_PROGRAM_MAP(play_2_map)
-	MCFG_DEVICE_IO_MAP(play_2_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_2_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, play_2_state, ef1_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, play_2_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE("4013a", ttl7474_device, clear_w))
+	CDP1802(config, m_maincpu, 2.95_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_2_state::play_2_map);
+	m_maincpu->set_addrmap(AS_IO, &play_2_state::play_2_io);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(play_2_state::clear_r));
+	m_maincpu->ef1_cb().set(FUNC(play_2_state::ef1_r));
+	m_maincpu->ef4_cb().set(FUNC(play_2_state::ef4_r));
+	m_maincpu->q_cb().set("4013a", FUNC(ttl7474_device::clear_w));
+	m_maincpu->tpb_cb().set(FUNC(play_2_state::clock_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_2)
-
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(2'950'000) / 8) // TPB line from CPU
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock_w))
+	config.set_default_layout(layout_play_2);
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock2_w))
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	MCFG_DEVICE_ADD("4013a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE("4013a", ttl7474_device, d_w))
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, play_2_state, q4013a_w))
+	TTL7474(config, m_4013a, 0);
+	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
+	m_4013a->output_cb().set(FUNC(play_2_state::q4013a_w));
 
-	MCFG_DEVICE_ADD("4013b", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE("maincpu", cosmac_device, ef2_w))
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
+	TTL7474(config, m_4013b, 0);
+	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w));
+	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // int is reversed in mame
 
 	/* Sound */
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
+	MCFG_CDP1863_ADD("1863", 0, 2.95_MHz_XTAL / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_2_state::zira)
 	play_2(config);
-	MCFG_DEVICE_ADD("cop402", COP402, XTAL(2'000'000))
+	MCFG_DEVICE_ADD("cop402", COP402, 2_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(zira_sound_map)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false)
 	MCFG_COP400_WRITE_D_CB(WRITE8(*this, play_2_state, sound_d_w))
 	MCFG_COP400_WRITE_G_CB(WRITE8(*this, play_2_state, sound_g_w))
 	MCFG_COP400_READ_L_CB(READ8(*this, play_2_state, psg_r))
 	MCFG_COP400_WRITE_L_CB(WRITE8(*this, play_2_state, psg_w))
 	MCFG_COP400_READ_IN_CB(READ8(*this, play_2_state, sound_in_r))
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(2'000'000))
+	MCFG_DEVICE_ADD("aysnd1", AY8910, 2_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

@@ -73,14 +73,13 @@ public:
 
 	void dblcrown(machine_config &config);
 
-protected:
+private:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -127,7 +126,7 @@ void dblcrown_state::video_start()
 	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
 	m_vram = std::make_unique<uint8_t[]>(0x1000 * 0x10);
 
-	save_pointer(NAME(m_vram.get()), 0x1000 * 0x10);
+	save_pointer(NAME(m_vram), 0x1000 * 0x10);
 }
 
 uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )

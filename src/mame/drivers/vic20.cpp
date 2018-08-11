@@ -58,6 +58,11 @@ public:
 		m_lock(*this, "LOCK")
 	{ }
 
+	void ntsc(machine_config &config);
+	void pal(machine_config &config);
+	void vic20(machine_config &config);
+
+private:
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
@@ -146,9 +151,7 @@ public:
 		IO2 = 6,
 		IO3 = 7
 	};
-	void ntsc(machine_config &config);
-	void pal(machine_config &config);
-	void vic20(machine_config &config);
+
 	void vic20_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);

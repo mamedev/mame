@@ -44,9 +44,11 @@ public:
 	{ }
 
 	void mccpm(machine_config &config);
+
+private:
 	void mccpm_io(address_map &map);
 	void mccpm_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -85,9 +87,9 @@ MACHINE_CONFIG_START(mccpm_state::mccpm)
 	MCFG_DEVICE_IO_MAP(mccpm_io)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

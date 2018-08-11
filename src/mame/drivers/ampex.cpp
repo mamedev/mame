@@ -36,6 +36,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void ampex(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(read_5840);
@@ -54,9 +57,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(so_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
 
-	void ampex(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 
 	u8 m_page;
@@ -202,30 +204,30 @@ void ampex_state::machine_start()
 	save_item(NAME(m_attr));
 	save_item(NAME(m_attr_readback));
 	save_item(NAME(m_uart_loopback));
-	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
+	save_pointer(NAME(m_paged_ram), 0x1800 * 4);
 }
 
 MACHINE_CONFIG_START(ampex_state::ampex)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(23'814'000) / 9) // clocked by 8224?
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000) / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250)
-	MCFG_SCREEN_UPDATE_DRIVER(ampex_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(23.814_MHz_XTAL / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250);
+	screen.set_screen_update(FUNC(ampex_state::screen_update));
 
 	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2 / CHAR_WIDTH)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(*this, ampex_state, vsyn_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE(*this, ampex_state, so_w))
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ampex_state, dav_w))
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_uart, 0); // COM8017, actually
+	m_uart->write_so_callback().set(FUNC(ampex_state::so_w));
+	m_uart->write_dav_callback().set(FUNC(ampex_state::dav_w));
+	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay31015_device, write_rcp))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("uart", ay31015_device, write_tcp))
+	COM5016_5(config, m_dbrg, 4.9152_MHz_XTAL);
+	m_dbrg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
+	m_dbrg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )

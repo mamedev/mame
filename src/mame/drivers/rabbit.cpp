@@ -112,6 +112,11 @@ public:
 		m_blitterregs(*this, "blitterregs"),
 		m_spriteram(*this, "spriteram") { }
 
+	void rabbit(machine_config &config);
+
+	void init_rabbit();
+
+private:
 	DECLARE_WRITE32_MEMBER(tilemap0_w);
 	DECLARE_WRITE32_MEMBER(tilemap1_w);
 	DECLARE_WRITE32_MEMBER(tilemap2_w);
@@ -125,16 +130,11 @@ public:
 	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
-	void init_rabbit();
-
-	void rabbit(machine_config &config);
-
 	void rabbit_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -444,10 +444,10 @@ void rabbit_state::video_start()
 
 	m_blit_done_timer = timer_alloc(TIMER_BLIT_DONE);
 
-	save_pointer(NAME(m_tilemap_ram[0].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[1].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[2].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[3].get()), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[1]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[2]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[3]), 0x20000/4);
 }
 
 /*

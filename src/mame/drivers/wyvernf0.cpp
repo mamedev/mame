@@ -61,6 +61,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void wyvernf0(machine_config &config);
+
+private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -109,7 +112,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void wyvernf0(machine_config &config);
+
 	void sound_map(address_map &map);
 	void wyvernf0_map(address_map &map);
 };
@@ -622,7 +625,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 
 	// sprite codes lookup in banked RAM
 	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
-	save_pointer(NAME(m_objram.get()), 0x1000 * 2);
+	save_pointer(NAME(m_objram), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 
 	save_item(NAME(m_sound_nmi_enable));

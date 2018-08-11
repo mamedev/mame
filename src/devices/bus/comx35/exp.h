@@ -57,7 +57,7 @@
 
 
 #define MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<comx_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<comx_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 
 
@@ -84,12 +84,15 @@ public:
 	uint8_t io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER( ef4_r );
+	DECLARE_READ_LINE_MEMBER(ef4_r);
 
-	DECLARE_WRITE_LINE_MEMBER( ds_w );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_WRITE_LINE_MEMBER(ds_w);
+	DECLARE_WRITE_LINE_MEMBER(q_w);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_write_irq(state); }
+
+	DECLARE_WRITE8_MEMBER(sc_w);
+	DECLARE_WRITE_LINE_MEMBER(tpb_w);
 
 protected:
 	// device-level overrides
@@ -116,6 +119,8 @@ protected:
 	virtual int comx_ef4_r() { return CLEAR_LINE; }
 	virtual void comx_ds_w(int state) { m_ds = state; }
 	virtual void comx_q_w(int state) { }
+	virtual void comx_sc_w(int n, int sc) { }
+	virtual void comx_tpb_w(int state) { }
 
 	// memory access
 	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) { return 0; }

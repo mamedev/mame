@@ -40,12 +40,6 @@ struct ssi263_t
 class thayers_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTRQ_TICK,
-		TIMER_SSI263_PHONEME_TICK
-	};
-
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_pr7820(*this, "laserdisc")
@@ -55,6 +49,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	void thayers(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+
+private:
+	enum
+	{
+		TIMER_INTRQ_TICK,
+		TIMER_SSI263_PHONEME_TICK
+	};
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
@@ -97,8 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER(den2_w);
 	DECLARE_WRITE8_MEMBER(ssi263_register_w);
 	DECLARE_READ8_MEMBER(ssi263_register_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void check_interrupt();
@@ -106,10 +111,9 @@ public:
 	required_ioport_array<10> m_row;
 	output_finder<16> m_digits;
 
-	void thayers(machine_config &config);
 	void thayers_io_map(address_map &map);
 	void thayers_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

@@ -41,6 +41,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void chance(machine_config &config);
+	void play_1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
@@ -55,12 +59,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	void chance(machine_config &config);
-	void play_1(machine_config &config);
 	void chance_map(address_map &map);
 	void play_1_io(address_map &map);
 	void play_1_map(address_map &map);
-private:
+
 	uint16_t m_resetcnt;
 	uint16_t m_clockcnt;
 	uint16_t m_waitcnt;
@@ -482,7 +484,7 @@ MACHINE_CONFIG_START(play_1_state::play_1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_1)
+	config.set_default_layout(layout_play_1);
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 100) // crossing-point detector
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_1_state, clock_w))

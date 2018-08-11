@@ -182,6 +182,21 @@ public:
 		, m_mdout(*this, "mdout")
 	{ }
 
+	void sq1(machine_config &config);
+	void vfx(machine_config &config);
+	void vfxsd(machine_config &config);
+	void eps(machine_config &config);
+	void vfx32(machine_config &config);
+
+	void init_eps();
+	void init_common();
+	void init_sq1();
+	void init_denib();
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
+
+private:
 	required_device<m68000_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<es5510_device> m_esp;
@@ -218,27 +233,13 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void sq1(machine_config &config);
-	void vfx(machine_config &config);
-	void vfxsd(machine_config &config);
-	void eps(machine_config &config);
-	void vfx32(machine_config &config);
 	void eps_map(address_map &map);
 	void sq1_map(address_map &map);
 	void vfx_map(address_map &map);
 	void vfxsd_map(address_map &map);
-private:
+
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
-
-public:
-	void init_eps();
-	void init_common();
-	void init_sq1();
-	void init_denib();
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
-	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
 	//dmac
 	DECLARE_WRITE8_MEMBER(dma_end);
@@ -669,15 +670,19 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(eps_map)
 
+	MCFG_DEVICE_MODIFY("duart")
+	MCFG_DEVICE_CLOCK(10_MHz_XTAL / 2)
+
 	MCFG_ESQPANEL2X40_VFX_REMOVE("panel")
 	MCFG_ESQPANEL1X22_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
-	MCFG_DEVICE_ADD("mc68450", HD63450, "maincpu")   // MC68450 compatible
+	MCFG_DEVICE_ADD("mc68450", HD63450, 10_MHz_XTAL)   // MC68450 compatible
+	MCFG_HD63450_CPU("maincpu")
 	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(*this, esq5505_state, dma_end))
