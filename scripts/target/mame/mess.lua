@@ -963,7 +963,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"acorn",
 		"act",
 		"adc",
-		"agat"
+		"agat",
 		"akai",
 		"alesis",
 		"altos",
@@ -1439,7 +1439,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "akai")
 files {
-	MAME_DIR .. "src/mame/mpc3000.cpp",
+	MAME_DIR .. "src/mame/drivers/mpc3000.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "alesis")
