@@ -121,7 +121,7 @@ MACHINE_CONFIG_START(evmbug_state::evmbug)
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(evmbug_state, kbd_put))
 
 	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL(12'000'000) / 4)

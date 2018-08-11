@@ -21,7 +21,6 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "machine/74259.h"
-#include "machine/terminal.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"

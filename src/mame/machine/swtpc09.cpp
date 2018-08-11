@@ -656,7 +656,6 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 void swtpc09_state::machine_start()
 {
 	m_pia_counter = 0;  // init ptm/pia counter to 0
-	m_term_data = 0;    // terminal keyboard input
 	m_fdc_status = 0;    // for floppy controller
 	m_interrupt = 0;
 	m_active_interrupt = false;
