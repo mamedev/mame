@@ -699,6 +699,7 @@ terco.cpp
 terminal.cpp
 test_t400.cpp
 testconsole.cpp
+textelcomp.cpp
 tg100.cpp
 thomson.cpp
 ti630.cpp

@@ -174,15 +174,6 @@ ROM_START( teleguide ) // order unknown // i8051, i8031 (layout very similar to 
 ROM_END
 
 
-ROM_START( a1010 ) // 65SC02 (+ 4x 65SC22, 65SC51, SED1330F, xtal ??? + 6.400, 3.6v battery, RTC 58321A) // 32k + 8k + 8k ram // b&w LCD // This is a portable digital teletype machine
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d15_31.bin",   0x0000, 0x8000, CRC(5ee1175d) SHA1(87ff6a3d5c64a53b0ab23d54aa343365c44d0407) )
-
-	ROM_REGION( 0x8000, "chargen", 0 )
-	ROM_LOAD( "chargen.bin",  0x0000, 0x8000, CRC(07daa70e) SHA1(8066a0ac238b06fbeeb99c3a2a8a9e70a27db7a9) )
-ROM_END
-
-
 
 /* Driver */
 
@@ -200,4 +191,3 @@ COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty
 COMP( 1992, vdm79322,  0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "VDM79322",               MACHINE_IS_SKELETON )
 COMP( 1993, ikt5a,     0,      0,      terminal, terminal, terminal_state, empty_init, "Creator / Fura Elektronik", "IKT-5A",          MACHINE_IS_SKELETON )
 COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )
-COMP( 1993, a1010,     0,      0,      terminal, terminal, terminal_state, empty_init, "Humantechnik", "Textel Compact A1010-0",       MACHINE_IS_SKELETON )

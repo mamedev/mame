@@ -36903,7 +36903,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 
 @source:terminal.cpp
 7951om                          //
-a1010                           //
 alcat258                        //
 alcat7100                       //
 ec7915                          //
@@ -36950,6 +36949,9 @@ tetrisp2                        // (c) 1997 Jaleco
 tetrisp2j                       // (c) 1997 Jaleco
 tetrisp2ja                      // (c) 1997 Jaleco
 vjdash                          // (c) 1999 Jaleco
+
+@source:textelcomp.cpp
+a1010                           //
 
 @source:tg100.cpp
 tg100                           // (c) 1991
