@@ -87,7 +87,7 @@ void emate_state::emate(machine_config &config)
 /* ROM definition */
 ROM_START( emate )
 	ROM_REGION32_LE( 0x800000, "maincpu", 0 )
-	ROM_LOAD( "ematev22.bin", 0x000000, 0x800000, CRC(5fb47dd8) SHA1(6ae880493ddde880827d1e9f08e9cb2c38f9f2ec) )
+	ROM_LOAD( "ematev22.bin", 0x000000, 0x800000, CRC(b16a453c) SHA1(f21006fa0d7350b743acffdfe26a151778f87b3b) )
 ROM_END
 
 /* Driver */
