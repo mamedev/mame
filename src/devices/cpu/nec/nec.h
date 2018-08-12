@@ -14,6 +14,7 @@ enum
 	NEC_PC=0,
 	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
 	NEC_FLAGS, NEC_ES, NEC_CS, NEC_SS, NEC_DS,
+	NEC_AEX,
 	NEC_PENDING
 };
 
@@ -22,7 +23,7 @@ class nec_common_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,6 +40,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -93,10 +95,13 @@ private:
 	uint8_t   m_prefetch_cycles;
 	int8_t    m_prefetch_count;
 	uint8_t   m_prefetch_reset;
-	uint32_t  m_chip_type;
+	const uint32_t m_chip_type;
 
 	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
 	uint8_t   m_seg_prefix;     /* prefix segment indicator */
+
+	bool m_aex;
+	optional_shared_ptr<uint16_t> m_v33_transtable;
 
 	uint32_t m_EA;
 	uint16_t m_EO;
@@ -109,6 +114,12 @@ private:
 	static const nec_ophandler s_nec_instruction[256];
 	static const nec_eahandler s_GetEA[192];
 
+protected:
+	void v33_internal_port_map(address_map &map);
+	uint16_t aex_r();
+	offs_t v33_translate(offs_t addr);
+
+private:
 	inline void prefetch();
 	void do_prefetch(int previous_ICount);
 	inline uint8_t fetch();
@@ -116,6 +127,7 @@ private:
 	uint8_t fetchop();
 	void nec_interrupt(unsigned int_num, int source);
 	void nec_trap();
+	void nec_brk(unsigned int_num);
 	void external_int();
 
 	void i_add_br8();

@@ -172,13 +172,6 @@ m_DST = 0x00;
 m_DMK = 0x0f;
 */
 
-device_memory_interface::space_config_vector v53_base_device::memory_space_config() const
-{
-	auto r = nec_common_device::memory_space_config();
-	r.emplace_back(std::make_pair(AS_IO, &m_io_space_config));
-	return r;
-}
-
 void v53_base_device::device_reset()
 {
 	nec_common_device::device_reset();
@@ -416,6 +409,7 @@ WRITE_LINE_MEMBER(v53_base_device::hack_w)
 
 void v53_base_device::v53_internal_port_map(address_map &map)
 {
+	v33_internal_port_map(map);
 	map(0xffe0, 0xffe0).w(FUNC(v53_base_device::BSEL_w)); // 0xffe0 // uPD71037 DMA mode bank selection register
 	map(0xffe1, 0xffe1).w(FUNC(v53_base_device::BADR_w)); // 0xffe1 // uPD71037 DMA mode bank register peripheral mapping (also uses OPHA)
 //  AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0x00ff) // 0xffe2
@@ -532,8 +526,7 @@ MACHINE_CONFIG_END
 
 
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type) :
-	nec_common_device(mconfig, type, tag, owner, clock, true, prefetch_size, prefetch_cycles, chip_type),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(v53_base_device::v53_internal_port_map), this) ),
+	nec_common_device(mconfig, type, tag, owner, clock, true, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v53_base_device::v53_internal_port_map), this)),
 	m_v53tcu(*this, "pit"),
 	m_v53dmau(*this, "upd71071dma"),
 	m_v53icu(*this, "upd71059pic"),

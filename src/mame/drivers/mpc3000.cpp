@@ -96,8 +96,8 @@ void mpc3000_state::machine_reset()
 
 void mpc3000_state::mpc3000_map(address_map &map)
 {
-	map(0x00000, 0x8ffff).ram();
-	map(0xa0000, 0xfffff).rom().region("maincpu", 0x20000); // first 0x20000 of the ROM is not used
+	map(0x000000, 0x07ffff).mirror(0x80000).rom().region("maincpu", 0);
+	map(0x300000, 0x38ffff).ram();
 }
 
 void mpc3000_state::mpc3000_io_map(address_map &map)
