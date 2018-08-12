@@ -1050,10 +1050,10 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	m_mainlatch[0]->q_out_cb<7>().set(FUNC(zaxxon_state::int_enable_w)); // INTON
 
 	// U53 on Control Board
-	m_mainlatch[0]->q_out_cb<0>().set_nop(); // not used
-	m_mainlatch[0]->q_out_cb<3>().set(FUNC(zaxxon_state::bg_color_w)); // CREF 3
-	m_mainlatch[0]->q_out_cb<6>().set(FUNC(zaxxon_state::congo_fg_bank_w)); // BS
-	m_mainlatch[0]->q_out_cb<7>().set(FUNC(zaxxon_state::congo_color_bank_w)); // CBS
+	m_mainlatch[1]->q_out_cb<0>().set_nop(); // not used
+	m_mainlatch[1]->q_out_cb<3>().set(FUNC(zaxxon_state::bg_color_w)); // CREF 3
+	m_mainlatch[1]->q_out_cb<6>().set(FUNC(zaxxon_state::congo_fg_bank_w)); // BS
+	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::congo_color_bank_w)); // CBS
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(congo_sound_map)
