@@ -1019,9 +1019,9 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::slapfght_state::sound_reset_w));
-	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::slapfght_state::flipscreen_w));
-	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::slapfght_state::irq_enable_w));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 	mainlatch.q_out_cb<4>().set_membank("bank1");
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz

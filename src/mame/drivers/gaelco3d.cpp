@@ -950,13 +950,13 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 
 	LS259(config, m_mainlatch); // IC5 on bottom board next to EEPROM
 	m_mainlatch->q_out_cb<0>().set(m_serial, FUNC(gaelco_serial_device::tr_w));
-	m_mainlatch->q_out_cb<0>().set(m_serial, FUNC(gaelco_serial_device::rts_w));
-	m_mainlatch->q_out_cb<0>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
-	m_mainlatch->q_out_cb<0>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write));
-	m_mainlatch->q_out_cb<0>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
-	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco3d_state::tms_reset_w));
-	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco3d_state::tms_irq_w));
-	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco3d_state::unknown_13a_w));
+	m_mainlatch->q_out_cb<1>().set(m_serial, FUNC(gaelco_serial_device::rts_w));
+	m_mainlatch->q_out_cb<2>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
+	m_mainlatch->q_out_cb<3>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write));
+	m_mainlatch->q_out_cb<4>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
+	m_mainlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::tms_reset_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(gaelco3d_state::tms_irq_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(gaelco3d_state::unknown_13a_w));
 
 	LS259(config, m_outlatch); // IC2 on top board near edge connector
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco3d_state::tms_control3_w));
