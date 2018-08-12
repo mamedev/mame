@@ -157,28 +157,34 @@ device_memory_interface::space_config_vector nec_common_device::memory_space_con
 /* FIXME: Need information about prefetch size and cycles for V33.
  * complete guess below, nbbatman will not work
  * properly without. */
+v33_base_device::v33_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_port_map)
+	: nec_common_device(mconfig, type, tag, owner, clock, true, 6, 1, V33_TYPE, internal_port_map)
+{
+}
+
+
 v33_device::v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33, tag, owner, clock, true, 6, 1, V33_TYPE, address_map_constructor(FUNC(v33_device::v33_internal_port_map), this))
+	: v33_base_device(mconfig, V33, tag, owner, clock, address_map_constructor(FUNC(v33_device::v33_internal_port_map), this))
 {
 }
 
 
 v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33A, tag, owner, clock, true, 6, 1, V33_TYPE, address_map_constructor(FUNC(v33a_device::v33_internal_port_map), this))
+	: v33_base_device(mconfig, V33A, tag, owner, clock, address_map_constructor(FUNC(v33a_device::v33_internal_port_map), this))
 {
 }
 
 
-uint16_t nec_common_device::xam_r()
+uint16_t v33_base_device::xam_r()
 {
 	// Only bit 0 is defined
 	return m_xa ? 1 : 0;
 }
 
-void nec_common_device::v33_internal_port_map(address_map &map)
+void v33_base_device::v33_internal_port_map(address_map &map)
 {
 	map(0xff00, 0xff7f).ram().share("v33_transtable");
-	map(0xff80, 0xff81).r(FUNC(nec_common_device::xam_r)).unmapw();
+	map(0xff80, 0xff81).r(FUNC(v33_base_device::xam_r)).unmapw();
 	map(0xff82, 0xffff).unmaprw();
 }
 
@@ -191,9 +197,9 @@ offs_t nec_common_device::v33_translate(offs_t addr)
 		return addr & 0xfffff;
 }
 
-bool nec_common_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	if (m_chip_type == V33_TYPE && spacenum == AS_PROGRAM)
+	if (spacenum == AS_PROGRAM)
 		address = v33_translate(address);
 	return true;
 }

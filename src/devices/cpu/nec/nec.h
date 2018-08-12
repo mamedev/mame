@@ -40,7 +40,6 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -100,9 +99,6 @@ private:
 	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
 	uint8_t   m_seg_prefix;     /* prefix segment indicator */
 
-	bool m_xa;
-	optional_shared_ptr<uint16_t> m_v33_transtable;
-
 	uint32_t m_EA;
 	uint16_t m_EO;
 	uint16_t m_E16;
@@ -115,8 +111,10 @@ private:
 	static const nec_eahandler s_GetEA[192];
 
 protected:
-	void v33_internal_port_map(address_map &map);
-	uint16_t xam_r();
+	// FIXME: these belong in v33_base_device
+	bool m_xa;
+	optional_shared_ptr<uint16_t> m_v33_transtable;
+
 	offs_t v33_translate(offs_t addr);
 
 private:
@@ -418,13 +416,25 @@ public:
 };
 
 
-class v33_device : public nec_common_device
+class v33_base_device : public nec_common_device
+{
+protected:
+	v33_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_port_map);
+
+	// device_memory_interface overrides
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+
+	void v33_internal_port_map(address_map &map);
+	uint16_t xam_r();
+};
+
+class v33_device : public v33_base_device
 {
 public:
 	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class v33a_device : public nec_common_device
+class v33a_device : public v33_base_device
 {
 public:
 	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
