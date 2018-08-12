@@ -548,16 +548,16 @@ READ8_MEMBER(maygay1b_state::nec_reset_r)
 
 WRITE8_MEMBER(maygay1b_state::nec_bank0_w)
 {
-	m_upd7759->set_bank_base(0x00000);
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->set_rom_bank(0);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
 {
-	m_upd7759->set_bank_base(0x20000);
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->set_rom_bank(1);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }

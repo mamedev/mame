@@ -469,8 +469,8 @@ WRITE16_MEMBER(jpmimpct_state::volume_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->set_bank_base(0x20000 * ((data >> 1) & 3));
-		m_upd7759->reset_w(data & 0x01);
+		m_upd7759->set_rom_bank((data >> 1) & 3);
+		m_upd7759->reset_w(BIT(data, 0));
 	}
 }
 
@@ -478,7 +478,7 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(space, 0, data);
+		m_upd7759->port_w(data);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}

@@ -796,7 +796,7 @@ WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 WRITE8_MEMBER(bfm_sc2_state::nec_reset_w)
 {
 	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data);
+	m_upd7759->reset_w(data != 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -808,9 +808,9 @@ WRITE8_MEMBER(bfm_sc2_state::nec_latch_w)
 	if ( data & 0x80 )         bank |= 0x01;
 	if ( m_expansion_latch & 2 ) bank |= 0x02;
 
-	m_upd7759->set_bank_base(bank*0x20000);
+	m_upd7759->set_rom_bank(bank);
 
-	m_upd7759->port_w(space, 0, data&0x3F);    // setup sample
+	m_upd7759->port_w(data & 0x3f);    // setup sample
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
