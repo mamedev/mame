@@ -14,7 +14,7 @@ enum
 	NEC_PC=0,
 	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
 	NEC_FLAGS, NEC_ES, NEC_CS, NEC_SS, NEC_DS,
-	NEC_AEX,
+	NEC_XA,
 	NEC_PENDING
 };
 
@@ -100,7 +100,7 @@ private:
 	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
 	uint8_t   m_seg_prefix;     /* prefix segment indicator */
 
-	bool m_aex;
+	bool m_xa;
 	optional_shared_ptr<uint16_t> m_v33_transtable;
 
 	uint32_t m_EA;
@@ -116,7 +116,7 @@ private:
 
 protected:
 	void v33_internal_port_map(address_map &map);
-	uint16_t aex_r();
+	uint16_t xam_r();
 	offs_t v33_translate(offs_t addr);
 
 private:

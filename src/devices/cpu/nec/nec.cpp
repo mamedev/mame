@@ -169,22 +169,23 @@ v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-uint16_t nec_common_device::aex_r()
+uint16_t nec_common_device::xam_r()
 {
-	return m_aex ? 1 : 0;
+	// Only bit 0 is defined
+	return m_xa ? 1 : 0;
 }
 
 void nec_common_device::v33_internal_port_map(address_map &map)
 {
 	map(0xff00, 0xff7f).ram().share("v33_transtable");
-	map(0xff80, 0xff81).r(FUNC(nec_common_device::aex_r)).unmapw();
+	map(0xff80, 0xff81).r(FUNC(nec_common_device::xam_r)).unmapw();
 	map(0xff82, 0xffff).unmaprw();
 }
 
 
 offs_t nec_common_device::v33_translate(offs_t addr)
 {
-	if (m_aex)
+	if (m_xa)
 		return uint32_t(m_v33_transtable[(addr >> 14) & 63]) << 14 | (addr & 0x03fff);
 	else
 		return addr & 0xfffff;
@@ -295,7 +296,7 @@ void nec_common_device::device_reset()
 	m_halted = 0;
 
 	if (m_chip_type == V33_TYPE)
-		m_aex = false;
+		m_xa = false;
 
 	Sreg(PS) = 0xffff;
 	Sreg(SS) = 0;
@@ -464,7 +465,7 @@ void nec_common_device::device_start()
 	}
 	else if (m_chip_type == V33_TYPE)
 	{
-		save_item(NAME(m_aex));
+		save_item(NAME(m_xa));
 		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 		m_dr8 = [cache, this](offs_t address) -> u8 { return cache->read_byte(v33_translate(address)); };
 	}
@@ -493,7 +494,7 @@ void nec_common_device::device_start()
 	state_add( NEC_DS,    "DS0", Sreg(DS0)).formatstr("%04X");
 
 	if (m_chip_type == V33_TYPE)
-		state_add(NEC_AEX, "AEX", m_aex);
+		state_add(NEC_XA, "XA", m_xa);
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
