@@ -62,8 +62,9 @@ TODO:
 #include <fstream>
 #include <cmath>
 
-#define EMPHASIS_CUTOFF_BASE 0xc00
+#define EMPHASIS_CUTOFF_BASE 0x800
 #define EMPHASIS_CUTOFF_SHIFT 1
+#define EMPHASIS_OUTPUT_SHIFT 15
 
 // device type definition
 DEFINE_DEVICE_TYPE(ZSG2, zsg2_device, "zsg2", "ZOOM ZSG-2")
@@ -232,7 +233,7 @@ void zsg2_device::filter_samples(zchan *ch)
 		// not sure if the filter works exactly this way, however I am pleased
 		// with the output for now.
 		ch->emphasis_filter_state += (raw_samples[i]-(ch->emphasis_filter_state>>16)) * (EMPHASIS_CUTOFF_BASE - ch->emphasis_cutoff);
-		ch->samples[i+1] = (ch->emphasis_filter_state) >> 16;
+		ch->samples[i+1] = (ch->emphasis_filter_state) >> EMPHASIS_OUTPUT_SHIFT;
 	}
 }
 
