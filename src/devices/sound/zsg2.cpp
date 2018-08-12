@@ -414,9 +414,8 @@ uint16_t zsg2_device::chan_r(int ch, int reg)
 {
 	switch (reg)
 	{
-		case 0xb:
-			return m_chan[ch].output_cutoff;
-
+		case 0xb: // Only later games (taitogn) read this register...
+			return m_chan[ch].is_playing << 13;
 		default:
 			break;
 	}
@@ -450,9 +449,9 @@ inline int16_t zsg2_device::ramp(int32_t current, int32_t target, int32_t top, i
 	if(current == target)
 		return current;
 
-	int16_t delta = (target-current)>>5;
-	if(!delta)
-		++delta;
+	int16_t delta = 0x40 ;//(target-current)>>5;
+	if(current > target)
+		delta = -delta;
 
 	int32_t new_current = current + delta;
 
