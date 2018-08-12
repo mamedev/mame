@@ -222,6 +222,21 @@ void v53_base_device::device_start()
 	m_out_dack_3_cb.resolve_safe();
 
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pic8259_device::inta_cb), (pic8259_device*)m_v53icu));
+
+	save_item(NAME(m_SCTL));
+	save_item(NAME(m_OPSEL));
+	save_item(NAME(m_SULA));
+	save_item(NAME(m_TULA));
+	save_item(NAME(m_IULA));
+	save_item(NAME(m_DULA));
+	save_item(NAME(m_OPHA));
+
+	save_item(NAME(m_simk));
+}
+
+void v53_base_device::device_post_load()
+{
+	install_peripheral_io();
 }
 
 void v53_base_device::install_peripheral_io()
@@ -262,6 +277,7 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_v53icu), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_v53icu), 0xffff);
 		}
 		else
 		{
@@ -277,6 +293,10 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::tmu_tst0_r), this), write8_delegate(FUNC(v53_base_device::tmu_tct0_w), this), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::tmu_tst1_r), this), write8_delegate(FUNC(v53_base_device::tmu_tct1_w), this), 0xff00);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x02, read8_delegate(FUNC(v53_base_device::tmu_tst2_r), this), write8_delegate(FUNC(v53_base_device::tmu_tct2_w), this), 0x00ff);
+			space(AS_IO).install_write_handler(base+0x02, base+0x03, write8_delegate(FUNC(v53_base_device::tmu_tmd_w), this), 0xff00);
 		}
 		else
 		{
@@ -294,6 +314,10 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::data_r), (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::data_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::status_r),  (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::command_w),  (v53_scu_device*)m_v53scu), 0xff00);
+			space(AS_IO).install_write_handler(base+0x02, base+0x02, write8_delegate(FUNC(v53_scu_device::mode_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0xff00);
 		}
 		else
 		{

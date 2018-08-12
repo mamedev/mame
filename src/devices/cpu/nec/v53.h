@@ -197,6 +197,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	void install_peripheral_io();
