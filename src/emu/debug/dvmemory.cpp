@@ -637,9 +637,9 @@ bool debug_view_memory::needs_recompute()
 		if (source.m_space)
 			val = source.m_space->address_to_byte(val & (m_no_translation ? source.m_space->addrmask() : source.m_space->logaddrmask()));
 		recompute = true;
-		m_topleft.y = (val - m_byte_offset) / m_bytes_per_row;
-		m_topleft.y = std::max(m_topleft.y, 0);
-		m_topleft.y = std::min(m_topleft.y, m_total.y - 1);
+
+		m_byte_offset = val % m_bytes_per_row;
+		m_topleft.y = std::min(s32(val / m_bytes_per_row), m_total.y - 1);
 
 		set_cursor_pos(cursor_pos(val, m_bytes_per_chunk * 8 - 4));
 	}
