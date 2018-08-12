@@ -300,9 +300,9 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			}
 
 			// Apply transitions (This is not accurate yet)
-			elem.vol = ramp(elem.vol, elem.vol_target, 0xffff, 0);
-			elem.output_cutoff = ramp(elem.output_cutoff, elem.output_cutoff_target, 0xffff, 0);
-			elem.emphasis_cutoff = ramp(elem.emphasis_cutoff, elem.emphasis_cutoff_target, 0x7fff, -0x8000);
+			elem.vol = ramp(elem.vol, elem.vol_target);
+			elem.output_cutoff = ramp(elem.output_cutoff, elem.output_cutoff_target);
+			elem.emphasis_cutoff = ramp(elem.emphasis_cutoff, elem.emphasis_cutoff_target);
 		}
 
 		ch = 0;
@@ -445,23 +445,19 @@ int16_t zsg2_device::expand_reg(uint8_t val)
 // There are two sets of the volume and filter cutoff registers.
 // At key on, the CPU writes to the "direct" registers, after that it will
 // write to the "target" register instead.
-inline int16_t zsg2_device::ramp(int32_t current, int32_t target, int32_t top, int32_t bottom)
+inline int32_t zsg2_device::ramp(int32_t current, int32_t target)
 {
-	if(current == target)
-		return current;
-
-	int16_t delta = 0x40 ;//(target-current)>>5;
-	if(current > target)
-		delta = -delta;
-
-	int32_t new_current = current + delta;
-
-	if(new_current > top)
-		new_current = top;
-	if(new_current < bottom)
-		new_current = bottom;
-
-	return new_current;
+	int32_t difference = abs(target-current);
+	difference -= 0x40;
+	
+	if(difference < 0)
+		return target;
+	else if(target < current)
+		return target + difference;
+	else if(target > current)
+		return target - difference;
+	
+	return target;
 }
 
 /******************************************************************************/

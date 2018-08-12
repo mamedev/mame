@@ -101,7 +101,7 @@ private:
 	int16_t *prepare_samples(uint32_t offset);
 	void filter_samples(zchan *ch);
 	int16_t expand_reg(uint8_t val);
-	inline int16_t ramp(int32_t current, int32_t target, int32_t top, int32_t bottom);
+	inline int32_t ramp(int32_t current, int32_t target);
 };
 
 DECLARE_DEVICE_TYPE(ZSG2, zsg2_device)
