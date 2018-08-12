@@ -62,6 +62,9 @@ TODO:
 #include <fstream>
 #include <cmath>
 
+#define EMPHASIS_CUTOFF_BASE 0xc00
+#define EMPHASIS_CUTOFF_SHIFT 1
+
 // device type definition
 DEFINE_DEVICE_TYPE(ZSG2, zsg2_device, "zsg2", "ZOOM ZSG-2")
 
@@ -228,7 +231,7 @@ void zsg2_device::filter_samples(zchan *ch)
 
 		// not sure if the filter works exactly this way, however I am pleased
 		// with the output for now.
-		ch->emphasis_filter_state += (raw_samples[i]-(ch->emphasis_filter_state>>16)) * (0x1000 - ch->emphasis_cutoff);
+		ch->emphasis_filter_state += (raw_samples[i]-(ch->emphasis_filter_state>>16)) * (EMPHASIS_CUTOFF_BASE - ch->emphasis_cutoff);
 		ch->samples[i+1] = (ch->emphasis_filter_state) >> 16;
 	}
 }
@@ -429,14 +432,11 @@ uint16_t zsg2_device::chan_r(int ch, int reg)
 // calculate this value, for now I'm generating an opproximate inverse.
 int16_t zsg2_device::expand_reg(uint8_t val)
 {
-//	int8_t base = (val & 0x08) ? -(val & 0x0f) : ~val & 0x0f;
-//	return base << (12 - (val>>4));
 	static const signed char frac_tab[16] = {8,9,10,11,12,13,14,15,-15,-14,-13,-12,-11,-10,-9,-8};
 	static const unsigned char shift_tab[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 
-	return (frac_tab[val&0x0f] << shift_tab[val>>4])>>1;
+	return (frac_tab[val&0x0f] << shift_tab[val>>4])>>EMPHASIS_CUTOFF_SHIFT;
 }
-
 
 // ramp registers
 // The CPU does not write often enough to make the transitions always sound
