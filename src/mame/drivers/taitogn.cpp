@@ -749,8 +749,10 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
-	MCFG_TAITO_ZOOM_USE_FLASH
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->set_use_flash();
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
 	MCFG_ZSG2_EXT_READ_HANDLER(READ32(*this, taitogn_state, zsg2_ext_r))

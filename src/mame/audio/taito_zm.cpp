@@ -38,9 +38,11 @@ DEFINE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device, "taito_zoom", "Taito Zoom Soun
 //  taito_zoom_device - constructor
 //-------------------------------------------------
 
-taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TAITO_ZOOM, tag, owner, clock),
+taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TAITO_ZOOM, tag, owner, clock),
+	device_mixer_interface(mconfig, *this, 2),
 	m_soundcpu(*this, "mn10200"),
+	m_tms57002(*this, "tms57002"),
 	m_zsg2(*this, "zsg2"),
 	m_reg_address(0),
 	m_tms_ctrl(0),
@@ -98,12 +100,10 @@ READ8_MEMBER(taito_zoom_device::tms_ctrl_r)
 
 WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
 {
-#if 0
-	tms57002_reset_w(data & 4);
-	tms57002_cload_w(data & 2);
-	tms57002_pload_w(data & 1);
-#endif
-
+	m_tms57002->set_input_line(INPUT_LINE_RESET, data & 4 ? CLEAR_LINE : ASSERT_LINE);
+	m_tms57002->cload_w(data & 2);
+	m_tms57002->pload_w(data & 1);
+	// Other bits unknown (0x9F at most games)
 	m_tms_ctrl = data;
 }
 
@@ -116,11 +116,17 @@ void taito_zoom_device::taitozoom_mn_map(address_map &map)
 		map(0x080000, 0x0fffff).rom().region("mn10200", 0);
 	}
 	map(0x400000, 0x41ffff).ram();
-	map(0x800000, 0x8007ff).rw("zsg2", FUNC(zsg2_device::read), FUNC(zsg2_device::write));
-	map(0xc00000, 0xc00001).ram(); // TMS57002 comms
+	map(0x800000, 0x8007ff).rw(m_zsg2, FUNC(zsg2_device::read), FUNC(zsg2_device::write));
+	map(0xc00000, 0xc00000).rw(m_tms57002, FUNC(tms57002_device::data_r), FUNC(tms57002_device::data_w)); // TMS57002 comms
 	map(0xe00000, 0xe000ff).rw(FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with maincpu
 }
 
+#ifdef USE_DSP
+void taito_zoom_device::tms57002_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
+#endif
 
 /***************************************************************************
 
@@ -149,6 +155,7 @@ WRITE16_MEMBER(taito_zoom_device::reg_data_w)
 			if (data & 0xc0c0)
 				popmessage("ZOOM gain L %04X, contact MAMEdev", data);
 			m_zsg2->set_output_gain(0, (data & 0x3f) / 63.0);
+			m_tms57002->set_output_gain(0, (data & 0x3f) / 63.0);
 			break;
 
 		case 0x05:
@@ -156,6 +163,7 @@ WRITE16_MEMBER(taito_zoom_device::reg_data_w)
 			if (data & 0xc0c0)
 				popmessage("ZOOM gain R %04X, contact MAMEdev", data);
 			m_zsg2->set_output_gain(1, (data & 0x3f) / 63.0);
+			m_tms57002->set_output_gain(1, (data & 0x3f) / 63.0);
 			break;
 
 		default:
@@ -184,13 +192,24 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_ZSG2_ADD("zsg2", XTAL(25'000'000))
+	TMS57002(config, m_tms57002, XTAL(25'000'000)/2);
+#ifdef USE_DSP
+	m_tms57002->set_addrmap(AS_DATA, &taito_zoom_device::tms57002_map);
+	m_tms57002->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_tms57002->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+#else // Unsupported opcode issue
+	m_tms57002->set_disable();
+#endif
 
-	// we assume the parent machine has created lspeaker/rspeaker
-	MCFG_SOUND_ROUTE(0, "^lspeaker", 1.0) // bypass DSP
-	MCFG_SOUND_ROUTE(1, "^rspeaker", 1.0)
-
-	//MCFG_SOUND_ROUTE(2, "^lspeaker", 1.0) // DSP reverb
-	//MCFG_SOUND_ROUTE(3, "^rspeaker", 1.0) // DSP chorus
+	ZSG2(config, m_zsg2, XTAL(25'000'000));
+#ifdef USE_DSP
+	m_zsg2->add_route(0, *m_tms57002, 1.0, 0);
+	m_zsg2->add_route(1, *m_tms57002, 1.0, 1);
+	m_zsg2->add_route(2, *m_tms57002, 1.0, 2);
+	m_zsg2->add_route(3, *m_tms57002, 1.0, 3);
+#else
+	m_zsg2->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_zsg2->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+#endif
 
 MACHINE_CONFIG_END

@@ -14,11 +14,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ZSG2_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, ZSG2, _clock)
-#define MCFG_ZSG2_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, ZSG2, _clock)
-
 #define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
 	downcast<zsg2_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
 
