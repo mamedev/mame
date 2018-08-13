@@ -149,7 +149,7 @@ constexpr uint16_t MSB_MASK = 0x8000;   // Mask of MSB
 #define HPGPU_VRAM_SIZE 16384
 
 // Index of words in configuration vector
-enum
+enum : unsigned
 {
 	CONF_HOR_0 = 0,     // Horizontal timing, 1st word
 	CONF_HOR_1 = 1,     // Horizontal timing, 2nd word
@@ -165,7 +165,7 @@ enum
 };
 
 // Fields of hor/ver timing words
-enum
+enum : uint16_t
 {
 	HV_CNT_MASK  = 0x3ff,   // Mask of counter part
 	HV_ZONE_MASK = 0xc000,  // Mask of zone part
