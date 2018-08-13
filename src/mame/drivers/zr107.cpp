@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	adc0838_device &adc(ADC0838(config, "adc", 0));
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	adc0838_device &adc(ADC0838(config, "adc", 0));
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
