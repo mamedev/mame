@@ -11,7 +11,7 @@
 #include "machine/input_merger.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-//#include "machine/msm58321.h"
+#include "machine/msm58321.h"
 //#include "video/sed1330.h"
 
 
@@ -21,16 +21,51 @@ public:
 	textelcomp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
 		, m_chargen(*this, "chargen")
 	{ }
 
 	void textelcomp(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	void rtc_w(u8 data);
+
 	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
+	required_device<msm58321_device> m_rtc;
 	required_region_ptr<u8> m_chargen;
 };
+
+
+void textelcomp_state::machine_start()
+{
+	m_rtc->cs1_w(1);
+}
+
+void textelcomp_state::rtc_w(u8 data)
+{
+	// Minimum address/data setup time is given as 0 µs in Oki and Epson datasheets
+	// Address and data are written to the VIA at the same time as the control strobes
+	if (!BIT(data, 5))
+		m_rtc->write_w(0);
+	if (!BIT(data, 6))
+		m_rtc->read_w(0);
+	if (!BIT(data, 7))
+		m_rtc->address_write_w(0);
+
+	m_rtc->d0_w(BIT(data, 0));
+	m_rtc->d1_w(BIT(data, 1));
+	m_rtc->d2_w(BIT(data, 2));
+	m_rtc->d3_w(BIT(data, 3));
+
+	if (BIT(data, 5))
+		m_rtc->write_w(1);
+	if (BIT(data, 6))
+		m_rtc->read_w(1);
+	if (BIT(data, 7))
+		m_rtc->address_write_w(1);
+}
 
 
 void textelcomp_state::mem_map(address_map &map)
@@ -65,7 +100,11 @@ void textelcomp_state::textelcomp(machine_config &config)
 
 	VIA6522(config, "via1", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
 	VIA6522(config, "via2", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
-	VIA6522(config, "via3", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
+
+	via6522_device &via3(VIA6522(config, "via3", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
+	via3.writepa_handler().set(FUNC(textelcomp_state::rtc_w));
+	via3.ca2_handler().set(m_rtc, FUNC(msm58321_device::cs2_w)).invert();
+	via3.ca2_handler().append(m_rtc, FUNC(msm58321_device::stop_w)).invert();
 
 	mos6551_device &acia(MOS6551(config, "acia", 3.6864_MHz_XTAL / 2)); // GS65SC51P-2
 	acia.set_xtal(3.6864_MHz_XTAL / 2);
@@ -73,7 +112,11 @@ void textelcomp_state::textelcomp(machine_config &config)
 
 	//SED1330(config, "lcdc", 6.4_MHz_XTAL); // SED1330F + B&W LCD
 
-	//MSM58321(config, "rtc", 32.768_kHz_XTAL); // RTC58321A
+	MSM58321(config, m_rtc, 32.768_kHz_XTAL); // RTC58321A
+	m_rtc->d0_handler().set("via3", FUNC(via6522_device::write_pa0));
+	m_rtc->d1_handler().set("via3", FUNC(via6522_device::write_pa1));
+	m_rtc->d2_handler().set("via3", FUNC(via6522_device::write_pa2));
+	m_rtc->d3_handler().set("via3", FUNC(via6522_device::write_pa3));
 }
 
 
