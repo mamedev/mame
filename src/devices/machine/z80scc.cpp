@@ -2834,11 +2834,11 @@ WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 	LOGSYNC("\"%s\": %c : SYNC %u\n", owner()->tag(), 'A' + m_index, state);
 
 	/*
-	* The /SYNC pin is a general purpose input whose state is reported in the
-	* Sync/Hunt bit in RR0. If the crystal oscillator is enabled, this pin is
-	* not available and the Sync/Hunt bit is forced to 0. Otherwise, the /SYNC
-	* pin may be used to carry the Ring Indicator signal.
-	*/
+	 * The /SYNC pin is a general purpose input whose state is reported in the
+	 * Sync/Hunt bit in RR0. If the crystal oscillator is enabled, this pin is
+	 * not available and the Sync/Hunt bit is forced to 0. Otherwise, the /SYNC
+	 * pin may be used to carry the Ring Indicator signal.
+	 */
 	if (!(m_wr11 & WR11_RCVCLK_TYPE))
 	{
 		// check for state change
