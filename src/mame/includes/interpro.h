@@ -140,8 +140,7 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	void ioga(machine_config &config);
-	void interpro_scc1(machine_config &config);
-	void interpro_scc2(machine_config &config);
+	void interpro_serial(machine_config &config);
 	void interpro(machine_config &config);
 	static void interpro_scsi_adapter(device_t *device);
 	static void interpro_cdrom(device_t *device);
