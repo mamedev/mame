@@ -9,7 +9,7 @@
     SNK Hyper NeoGeo 64 (arcade platform)
     AKAI MPC3000 (synth)
 
-    both are driven by a V53, the MPC3000 isn't dumped.
+    both are driven by a V53.
 
     appears to write a register number and channel/voice using
     l7a1045_sound_select_w (offset 0)
