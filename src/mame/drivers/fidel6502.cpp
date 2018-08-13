@@ -1839,14 +1839,14 @@ MACHINE_CONFIG_START(fidel6502_state::rsc)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(546) - attotime::from_usec(38)) // active for 38us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(546))
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0) // MOS 6520
-	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0)); // MOS 6520
+	pia.readpa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_r));
+	pia.readca1_handler().set(FUNC(fidel6502_state::csc_pia1_ca1_r));
+	pia.readcb1_handler().set(FUNC(fidel6502_state::csc_pia1_cb1_r));
+	pia.writepa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_w));
+	pia.writepb_handler().set(FUNC(fidel6502_state::csc_pia1_pb_w));
+	pia.ca2_handler().set(FUNC(fidel6502_state::csc_pia1_ca2_w));
+	pia.cb2_handler().set(FUNC(fidel6502_state::csc_pia1_cb2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_rsc_v2);
@@ -1867,20 +1867,20 @@ MACHINE_CONFIG_START(fidel6502_state::csc)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, fidel6502_state, csc_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia0_ca2_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpb_handler().set(FUNC(fidel6502_state::csc_pia0_pb_r));
+	pia0.writepa_handler().set(FUNC(fidel6502_state::csc_pia0_pa_w));
+	pia0.writepb_handler().set(FUNC(fidel6502_state::csc_pia0_pb_w));
+	pia0.ca2_handler().set(FUNC(fidel6502_state::csc_pia0_ca2_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_r));
+	pia1.readca1_handler().set(FUNC(fidel6502_state::csc_pia1_ca1_r));
+	pia1.readcb1_handler().set(FUNC(fidel6502_state::csc_pia1_cb1_r));
+	pia1.writepa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_w));
+	pia1.writepb_handler().set(FUNC(fidel6502_state::csc_pia1_pb_w));
+	pia1.ca2_handler().set(FUNC(fidel6502_state::csc_pia1_ca2_w));
+	pia1.cb2_handler().set(FUNC(fidel6502_state::csc_pia1_cb2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_csc);

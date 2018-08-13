@@ -291,7 +291,6 @@
 #include "screen.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
 
 #include "sf2049.lh"
 
@@ -325,7 +324,6 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
-		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
 		m_io_analog(*this, "AN.%u", 0U),
@@ -386,7 +384,6 @@ private:
 	required_device<smc91c94_device> m_ethernet;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
-	optional_device<generic_terminal_device> m_uart0;
 	optional_device<ns16550_device> m_uart1;
 	optional_device<ns16550_device> m_uart2;
 	optional_ioport_array<8> m_io_analog;

@@ -299,7 +299,7 @@ READ8_MEMBER(dragon_fdc_device_base::scs_read)
 	case 1:
 	case 2:
 	case 3:
-		result = m_wd2797->read(space, offset & 0xef);
+		result = m_wd2797->read(offset & 0xef);
 		break;
 	}
 	return result;
@@ -315,7 +315,7 @@ READ8_MEMBER(premier_fdc_device_base::scs_read)
 	case 1:
 	case 2:
 	case 3:
-		result = m_wd2791->read(space, offset);
+		result = m_wd2791->read(offset);
 		break;
 	}
 	return result;
@@ -334,7 +334,7 @@ WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 	case 1:
 	case 2:
 	case 3:
-		m_wd2797->write(space, offset & 0xef, data);
+		m_wd2797->write(offset & 0xef, data);
 		break;
 	case 8: case 9: case 10: case 11:
 	case 12: case 13: case 14: case 15:
@@ -352,7 +352,7 @@ WRITE8_MEMBER(premier_fdc_device_base::scs_write)
 	case 1:
 	case 2:
 	case 3:
-		m_wd2791->write(space, offset, data);
+		m_wd2791->write(offset, data);
 		break;
 	case 4:
 		dskreg_w(data);

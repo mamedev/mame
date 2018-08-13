@@ -695,27 +695,27 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// Monoflops
-	MCFG_DEVICE_ADD(MTRD_TAG, TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(200))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(47))
-	MCFG_TTL74123_A_PIN_VALUE(0)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hx5102_device, motor_w))
+	TTL74123(config, m_motormf, 0);
+	m_motormf->set_connection_type(TTL74123_GROUNDED);
+	m_motormf->set_resistor_value(RES_K(200));
+	m_motormf->set_capacitor_value(CAP_U(47));
+	m_motormf->set_a_pin_value(0);
+	m_motormf->set_b_pin_value(1);
+	m_motormf->set_clear_pin_value(1);
+	m_motormf->out_cb().set(FUNC(hx5102_device::motor_w));
 
-	MCFG_DEVICE_ADD(MTSPD_TAG, TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(200))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(10))
-	MCFG_TTL74123_A_PIN_VALUE(0)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hx5102_device, mspeed_w))
+	TTL74123(config, m_speedmf, 0);
+	m_speedmf->set_connection_type(TTL74123_GROUNDED);
+	m_speedmf->set_resistor_value(RES_K(200));
+	m_speedmf->set_capacitor_value(CAP_U(10));
+	m_speedmf->set_a_pin_value(0);
+	m_speedmf->set_b_pin_value(1);
+	m_speedmf->set_clear_pin_value(1);
+	m_speedmf->out_cb().set(FUNC(hx5102_device::mspeed_w));
 
 	// READY flipflop
-	MCFG_DEVICE_ADD(READYFF_TAG, TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, hx5102_device, board_ready))
+	TTL7474(config, m_readyff, 0);
+	m_readyff->comp_output_cb().set(FUNC(hx5102_device::board_ready));
 
 	// RAM
 	MCFG_RAM_ADD(RAM1_TAG)

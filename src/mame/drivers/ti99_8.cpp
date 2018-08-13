@@ -192,10 +192,17 @@ Known Issues (MZ, 2010-11-07)
 #include "speaker.h"
 
 // Debugging
-#define TRACE_READY 0
-#define TRACE_INTERRUPTS 0
-#define TRACE_RESET 0
-#define TRACE_CRU 0
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_READY       (1U<<3)
+#define LOG_INTERRUPTS  (1U<<4)
+#define LOG_CRU         (1U<<5)
+#define LOG_CRUREAD     (1U<<6)
+#define LOG_RESETLOAD   (1U<<7)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
+
+#include "logmacro.h"
 
 /*
     READY bits.
@@ -429,7 +436,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( ti99_8_state::cruread )
 {
-//  if (VERBOSE>6) logerror("read access to CRU address %04x\n", offset << 4);
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 4);
 	uint8_t value = 0;
 
 	// Let the mapper, the gromport, and the p-box decide whether they want
@@ -439,13 +446,13 @@ READ8_MEMBER( ti99_8_state::cruread )
 	m_gromport->crureadz(space, offset<<4, &value);
 	m_ioport->crureadz(space, offset<<4, &value);
 
-	if (TRACE_CRU) logerror("ti99_8: CRU %04x -> %02x\n", offset<<4, value);
+	LOGMASKED(LOG_CRU, "CRU %04x -> %02x\n", offset<<4, value);
 	return value;
 }
 
 WRITE8_MEMBER( ti99_8_state::cruwrite )
 {
-	if (TRACE_CRU) logerror("ti99_8: CRU %04x <- %x\n", offset<<1, data);
+	LOGMASKED(LOG_CRU, "CRU %04x <- %x\n", offset<<1, data);
 	m_mainboard->cruwrite(space, offset<<1, data);
 	m_gromport->cruwrite(space, offset<<1, data);
 	m_ioport->cruwrite(space, offset<<1, data);
@@ -606,7 +613,7 @@ WRITE8_MEMBER( ti99_8_state::tms9901_interrupt )
 */
 WRITE_LINE_MEMBER( ti99_8_state::video_interrupt )
 {
-	if (TRACE_INTERRUPTS) logerror("VDP int 2 on tms9901, level=%02x\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP int 2 on tms9901, level=%02x\n", state);
 	m_int2 = (line_state)state;
 	m_tms9901->set_single_int(2, state);
 }
@@ -620,11 +627,8 @@ WRITE_LINE_MEMBER( ti99_8_state::video_interrupt )
 */
 void ti99_8_state::console_ready(int state)
 {
-	if (TRACE_READY)
-	{
-		if (m_ready_old != state) logerror("READY = %d\n", state);
-	}
-
+	if (m_ready_old != state)
+		LOGMASKED(LOG_READY, "READY = %d\n", state);
 	m_ready_old = (line_state)state;
 	m_cpu->ready_line(state);
 }
@@ -634,7 +638,7 @@ void ti99_8_state::console_ready(int state)
 */
 WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 {
-	if (TRACE_RESET) logerror("Incoming RESET line = %d\n", state);
+	LOGMASKED(LOG_RESETLOAD, "Incoming RESET line = %d\n", state);
 	if (machine().phase() != machine_phase::INIT)
 	{
 		// RESET the 9901
@@ -655,20 +659,20 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 */
 WRITE_LINE_MEMBER( ti99_8_state::cpu_hold )
 {
-	if (TRACE_INTERRUPTS) logerror("Incoming HOLD line = %d\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "Incoming HOLD line = %d\n", state);
 	m_cpu->hold_line(state);
 }
 
 WRITE_LINE_MEMBER( ti99_8_state::extint )
 {
-	if (TRACE_INTERRUPTS) logerror("EXTINT level = %02x\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "EXTINT level = %02x\n", state);
 	m_int1 = (line_state)state;
 	m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 {
-	if (TRACE_INTERRUPTS) logerror("Setting a not connected line ... ignored\n");
+	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
 
 WRITE8_MEMBER( ti99_8_state::external_operation )
@@ -676,9 +680,7 @@ WRITE8_MEMBER( ti99_8_state::external_operation )
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset == IDLE_OP) return;
 	else
-	{
-		logerror("External operation %s not implemented on TI-99/8 board\n", extop[offset]);
-	}
+		LOGMASKED(LOG_WARN, "External operation %s not implemented on TI-99/8 board\n", extop[offset]);
 }
 
 /*

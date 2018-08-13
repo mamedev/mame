@@ -47,6 +47,7 @@ public:
 	void set_rowshift(uint8_t rowshift) { m_rowshift = rowshift; }
 	void set_vram_size(uint32_t vramsize) { m_vramsize = vramsize; }
 	template <class Object> devcb_base &set_interrupt_callback(Object &&cb) { return m_interrupt_cb.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return m_interrupt_cb.bind(); }
 
 	/* reads/writes to the 34061 */
 	uint8_t read(address_space &space, int col, int row, int func);

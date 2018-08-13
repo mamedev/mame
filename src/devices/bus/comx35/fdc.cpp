@@ -221,7 +221,7 @@ uint8_t comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 		}
 		else
 		{
-			data = m_fdc->gen_r(m_addr);
+			data = m_fdc->read(m_addr);
 			if (m_addr==3) logerror("%s FDC read %u:%02x\n", machine().describe_context(), m_addr,data);
 		}
 	}
@@ -271,7 +271,7 @@ void comx_fd_device::comx_io_w(address_space &space, offs_t offset, uint8_t data
 		else
 		{
 			// write data to WD1770
-			m_fdc->gen_w(m_addr, data);
+			m_fdc->write(m_addr, data);
 		}
 	}
 }

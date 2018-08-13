@@ -1825,7 +1825,6 @@ MACHINE_CONFIG_END
 void sega_32x_device::device_start()
 {
 	m_32x_pwm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_32x_device::handle_pwm_callback), this));
-	m_32x_pwm_timer->adjust(attotime::never);
 
 	m_32x_dram0 = std::make_unique<uint16_t[]>(0x40000/2);
 	m_32x_dram1 = std::make_unique<uint16_t[]>(0x40000/2);
@@ -1880,8 +1879,9 @@ void sega_32x_device::device_reset()
 	m_32x_fb_swap = 0;
 
 	m_pwm_tm_reg = 0;
-	m_pwm_cycle = 0;
+	m_pwm_cycle = m_pwm_cycle_reg = 0;
 	m_pwm_ctrl = 0;
+	calculate_pwm_timer();
 
 	m_lch_index_w = 0;
 	m_rch_index_w = 0;

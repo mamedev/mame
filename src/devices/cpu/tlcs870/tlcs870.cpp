@@ -340,7 +340,7 @@ TIMER_CALLBACK_MEMBER(tlcs870_device::tc2_cb)
 
 void tlcs870_device::tc2_reload()
 {
-	m_tcx_timer[1]->adjust(cycles_to_attotime(5000)); // TODO: use real value
+	m_tcx_timer[1]->adjust(cycles_to_attotime(1500)); // TODO: use real value
 }
 
 void tlcs870_device::tc2_cancel()

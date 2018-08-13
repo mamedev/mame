@@ -268,8 +268,8 @@ void xor100_state::xor100_io(address_map &map)
 	map(0x0b, 0x0b).portr("DSW0").w(COM5016_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x0c, 0x0f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0xf8, 0xfb).lrw8("fdc",
-					[this](address_space &space, offs_t offset, u8 mem_mask) { return m_fdc->read(space, offset, mem_mask) ^ 0xff; },
-					[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_fdc->write(space, offset, data ^ 0xff, mem_mask); });
+					[this](offs_t offset) { return m_fdc->read(offset) ^ 0xff; },
+					[this](offs_t offset, u8 data) { m_fdc->write(offset, data ^ 0xff); });
 	map(0xfc, 0xfc).rw(FUNC(xor100_state::fdc_wait_r), FUNC(xor100_state::fdc_dcont_w));
 	map(0xfd, 0xfd).w(FUNC(xor100_state::fdc_dsel_w));
 }

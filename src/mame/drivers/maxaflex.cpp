@@ -340,11 +340,11 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, maxaflex_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, maxaflex_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, maxaflex_state, pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, maxaflex_state, pia_cb2_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set(FUNC(maxaflex_state::pia_pa_r));
+	pia.readpb_handler().set(FUNC(maxaflex_state::pia_pb_r));
+	pia.writepb_handler().set(FUNC(maxaflex_state::pia_pb_w));
+	pia.cb2_handler().set(FUNC(maxaflex_state::pia_cb2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

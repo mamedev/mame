@@ -98,6 +98,7 @@ protected:
 
 	void wswan_io(address_map &map);
 	void wswan_mem(address_map &map);
+	void wswan_snd(address_map &map);
 
 	void register_save();
 	void handle_irqs();

@@ -434,7 +434,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
-	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
+	double adc12138_input_callback(uint8_t input);
 	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
 	DECLARE_READ8_MEMBER(comm_eeprom_r);
 	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
@@ -1052,7 +1052,7 @@ void hornet_state::machine_reset()
 	}
 }
 
-ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
+double hornet_state::adc12138_input_callback(uint8_t input)
 {
 	int value = 0;
 	switch (input)
@@ -1118,8 +1118,8 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 
 	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
-	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
-	MCFG_ADC1213X_IPT_CONVERT_CB(hornet_state, adc12138_input_callback)
+	ADC12138(config, m_adc12138, 0);
+	m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::adc12138_input_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)

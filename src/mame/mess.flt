@@ -40,6 +40,7 @@ altos8600.cpp
 amico2k.cpp
 amiga.cpp
 ampex.cpp
+ampex210.cpp
 ampro.cpp
 ampscarp.cpp
 amstr_pc.cpp
@@ -200,6 +201,7 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+emate.cpp
 enmirage.cpp
 ep64.cpp
 esprit.cpp
@@ -400,6 +402,7 @@ microkit.cpp
 micronic.cpp
 microtan.cpp
 microterm.cpp
+microterm_f8.cpp
 microvsn.cpp
 mikro80.cpp
 mikromik.cpp
@@ -426,6 +429,7 @@ modellot.cpp
 modena.cpp
 molecular.cpp
 monty.cpp
+mpc3000.cpp
 mpf1.cpp
 mps1230.cpp
 mpz80.cpp
@@ -693,8 +697,10 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 terco.cpp
+terminal.cpp
 test_t400.cpp
 testconsole.cpp
+textelcomp.cpp
 tg100.cpp
 thomson.cpp
 ti630.cpp

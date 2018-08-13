@@ -15,39 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-#define MCFG_TTL74145_OUTPUT_LINE_0_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_0_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_1_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_1_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_2_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_2_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_3_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_3_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_4_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_4_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_5_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_5_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_6_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_6_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_7_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_7_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_8_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_8_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL74145_OUTPUT_LINE_9_CB(_devcb) \
-	downcast<ttl74145_device &>(*device).set_output_line_9_callback(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -57,29 +24,9 @@ class ttl74145_device :  public device_t
 {
 public:
 	// construction/destruction
-	ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_output_line_0_callback(Object &&cb) { return m_output_line_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_1_callback(Object &&cb) { return m_output_line_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_2_callback(Object &&cb) { return m_output_line_2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_3_callback(Object &&cb) { return m_output_line_3_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_4_callback(Object &&cb) { return m_output_line_4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_5_callback(Object &&cb) { return m_output_line_5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_6_callback(Object &&cb) { return m_output_line_6_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_7_callback(Object &&cb) { return m_output_line_7_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_8_callback(Object &&cb) { return m_output_line_8_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_line_9_callback(Object &&cb) { return m_output_line_9_cb.set_callback(std::forward<Object>(cb)); }
-
-	auto output_line0_callback() { return m_output_line_0_cb.bind(); }
-	auto output_line1_callback() { return m_output_line_1_cb.bind(); }
-	auto output_line2_callback() { return m_output_line_2_cb.bind(); }
-	auto output_line3_callback() { return m_output_line_3_cb.bind(); }
-	auto output_line4_callback() { return m_output_line_4_cb.bind(); }
-	auto output_line5_callback() { return m_output_line_5_cb.bind(); }
-	auto output_line6_callback() { return m_output_line_6_cb.bind(); }
-	auto output_line7_callback() { return m_output_line_7_cb.bind(); }
-	auto output_line8_callback() { return m_output_line_8_cb.bind(); }
-	auto output_line9_callback() { return m_output_line_9_cb.bind(); }
+	template <std::size_t Bit> auto output_line_callback() { return m_output_line_cb[Bit].bind(); }
 
 	uint16_t read();
 	void write(uint8_t data);
@@ -90,16 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	devcb_write_line m_output_line_0_cb;
-	devcb_write_line m_output_line_1_cb;
-	devcb_write_line m_output_line_2_cb;
-	devcb_write_line m_output_line_3_cb;
-	devcb_write_line m_output_line_4_cb;
-	devcb_write_line m_output_line_5_cb;
-	devcb_write_line m_output_line_6_cb;
-	devcb_write_line m_output_line_7_cb;
-	devcb_write_line m_output_line_8_cb;
-	devcb_write_line m_output_line_9_cb;
+	devcb_write_line m_output_line_cb[10];
 
 	/* decoded number */
 	uint16_t m_number;

@@ -335,14 +335,14 @@ public:
 	lufykzku_state(const machine_config &mconfig, device_type type, const char *tag) :
 		sigmab98_state(mconfig, type, tag),
 		m_watchdog(*this, "watchdog_mb3773"),
-		m_dsw_shifter{ {*this, "ttl165_1"}, {*this, "ttl165_2"} },
+		m_dsw_shifter(*this, "ttl165_%u", 1U),
 		m_dsw_bit(0)
 	{
 		new_sprite_chip = true;
 	}
 
 	required_device<mb3773_device> m_watchdog;
-	required_device<ttl165_device> m_dsw_shifter[2];
+	required_device_array<ttl165_device, 2> m_dsw_shifter;
 
 	int m_dsw_bit;
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
@@ -2940,13 +2940,13 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	// 2 x 8-bit parallel/serial converters
-	MCFG_DEVICE_ADD("ttl165_1", TTL165)
-	MCFG_TTL165_DATA_CB(IOPORT("DSW2"))
-	MCFG_TTL165_QH_CB(WRITELINE("ttl165_2", ttl165_device, serial_w))
+	TTL165(config, m_dsw_shifter[0]);
+	m_dsw_shifter[0]->data_callback().set_ioport("DSW2");
+	m_dsw_shifter[0]->qh_callback().set(m_dsw_shifter[1], FUNC(ttl165_device::serial_w));
 
-	MCFG_DEVICE_ADD("ttl165_2", TTL165)
-	MCFG_TTL165_DATA_CB(IOPORT("DSW1"))
-	MCFG_TTL165_QH_CB(WRITELINE(*this, lufykzku_state, dsw_w))
+	TTL165(config, m_dsw_shifter[1]);
+	m_dsw_shifter[1]->data_callback().set_ioport("DSW1");
+	m_dsw_shifter[1]->qh_callback().set(FUNC(lufykzku_state::dsw_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

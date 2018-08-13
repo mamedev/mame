@@ -130,20 +130,12 @@ static uint32_t log_line_counter = 0;
  cpu_context - return a string describing which CPU is currently executing and their PC
  ***************************************************************************/
 
-const char *apollo_cpu_context(device_t *cpu) {
-	static char statebuf[64]; /* string buffer containing state description */
+std::string apollo_cpu_context(running_machine &machine) {
+	osd_ticks_t t = osd_ticks();
+	int s = (t / osd_ticks_per_second()) % 3600;
+	int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
-	/* if we have an executing CPU, output data */
-	if (cpu != nullptr) {
-		osd_ticks_t t = osd_ticks();
-		int s = (t / osd_ticks_per_second()) % 3600;
-		int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
-
-		sprintf(statebuf, "%s %d.%03d", cpu->machine().describe_context().c_str(), s, ms);
-	} else {
-		strcpy(statebuf, "(no context)");
-	}
-	return statebuf;
+	return util::string_format("%s %d.%03d", machine.describe_context().c_str(), s, ms);
 }
 
 /*-------------------------------------------------
@@ -941,8 +933,8 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
 
 	if (!apollo_is_dsp3x00())
 	{
-		machine().device(APOLLO_SCREEN_TAG)->reset();
-		machine().device(APOLLO_KBD_TAG )->reset();
+		m_graphics->reset();
+		m_keyboard->reset();
 #ifdef APOLLO_XXL
 		machine().device(APOLLO_STDIO_TAG )->reset();
 #endif

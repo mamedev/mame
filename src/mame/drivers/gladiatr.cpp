@@ -959,14 +959,14 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ppking_state, spritebuffer_w))
-//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gladiatr_state, spritebank_w))
-//  MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
-//  MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ppking_state, nmi_mask_w))
-//  MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
+	mainlatch.q_out_cb<0>().set(FUNC(ppking_state::spritebuffer_w));
+//  mainlatch.q_out_cb<1>().set(FUNC(gladiatr_state::spritebank_w));
+//  mainlatch.q_out_cb<2>().set_membank("bank1");
+//  mainlatch.q_out_cb<3>().set(FUNC(ppking_state::nmi_mask_w));
+//  mainlatch.q_out_cb<4>().set("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
 //  Q6 used
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ppking_state, flipscreen_w))
+	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1021,12 +1021,12 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
 	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gladiatr_state, spritebuffer_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gladiatr_state, spritebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gladiatr_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
+	mainlatch.q_out_cb<0>().set(FUNC(gladiatr_state::spritebuffer_w));
+	mainlatch.q_out_cb<1>().set(FUNC(gladiatr_state::spritebank_w));
+	mainlatch.q_out_cb<2>().set_membank("bank1");
+	mainlatch.q_out_cb<4>().set_inputline("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
+	mainlatch.q_out_cb<7>().set(FUNC(gladiatr_state::flipscreen_w));
 
 	I8741(config, m_cctl, 12_MHz_XTAL/2); /* verified on pcb */
 	m_cctl->t0_in_cb().set_ioport("COINS").bit(3);

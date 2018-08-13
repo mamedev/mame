@@ -40,7 +40,6 @@ TODO:
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
@@ -134,7 +133,7 @@ void spcforce_state::spcforce_map(address_map &map)
 	map(0x7000, 0x7000).portr("DSW").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x7001, 0x7001).portr("P1").w(FUNC(spcforce_state::soundtrigger_w));
 	map(0x7002, 0x7002).portr("P2").w(FUNC(spcforce_state::misc_outputs_w));
-	map(0x7008, 0x700f).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x7008, 0x700f).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x8000, 0x83ff).ram().share("videoram");
 	map(0x9000, 0x93ff).ram().share("colorram");
 	map(0xa000, 0xa3ff).ram().share("scrollram");
@@ -300,10 +299,10 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, spcforce_state, SN76496_select_w))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, spcforce_state, t0_r))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, spcforce_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, spcforce_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, spcforce_state, unknown_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<3>().set(FUNC(spcforce_state::flip_screen_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(spcforce_state::irq_mask_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(spcforce_state::unknown_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -336,13 +335,13 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, spcforce_state, write_sn3_ready))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(spcforce_state::meteors)
+void spcforce_state::meteors(machine_config &config)
+{
 	spcforce(config);
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, spcforce_state, irq_mask_w)) // ??
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, spcforce_state, flip_screen_w)) // irq mask isn't here, gets written too early causing the game to not boot, see startup code
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<3>().set_nop();
+	m_mainlatch->q_out_cb<5>().set(FUNC(spcforce_state::irq_mask_w)); // ??
+	m_mainlatch->q_out_cb<6>().set(FUNC(spcforce_state::flip_screen_w)); // irq mask isn't here, gets written too early causing the game to not boot, see startup code
+}
 
 
 /***************************************************************************

@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "ps2vif1.h"
+#include <cmath>
 
 #include "video/ps2gif.h"
 

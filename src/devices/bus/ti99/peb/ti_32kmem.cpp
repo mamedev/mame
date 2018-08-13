@@ -101,9 +101,9 @@ void ti_32k_expcard_device::device_start()
 }
 
 MACHINE_CONFIG_START(ti_32k_expcard_device::device_add_mconfig)
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("32k")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("32k");
+	m_ram->set_default_value(0);
 MACHINE_CONFIG_END
 
 } } } // end namespace bus::ti99::peb

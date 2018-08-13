@@ -121,7 +121,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 	m_k007232->set_bank(bank_A, bank_B);
 
 	/* bits 4-5 select the UPD7759 bank */
-	m_upd7759->set_bank_base(((data >> 4) & 0x03) * 0x20000);
+	m_upd7759->set_rom_bank((data >> 4) & 0x03);
 }
 
 WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)

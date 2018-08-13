@@ -617,13 +617,13 @@ READ8_MEMBER(bfm_sc1_state::triac_r)
 WRITE8_MEMBER(bfm_sc1_state::nec_reset_w)
 {
 	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data);
+	m_upd7759->reset_w(data != 0);
 }
 #endif
 /////////////////////////////////////////////////////////////////////////////////////
 WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
 {
-	m_upd7759->port_w (space, 0, data&0x3F);   // setup sample
+	m_upd7759->port_w(data & 0x3f); // setup sample
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);         // start
 }

@@ -83,6 +83,7 @@ protected:
 	void namcona1_main_map(address_map &map);
 	void namcona1_mcu_io_map(address_map &map);
 	void namcona1_mcu_map(address_map &map);
+	void namcona1_c140_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

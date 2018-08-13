@@ -503,9 +503,9 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_DEVICE_ADD("snsnd", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 3))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.irq_callback().set_inputline("maincpu", 3);
 
 	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -529,10 +529,10 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, guab_state, watchdog_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, guab_state, watchdog_w))
 
-	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", 4))
+	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
+	acia1.txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
+	acia1.rts_handler().set("rs232_1", FUNC(rs232_port_device::write_rts));
+	acia1.irq_handler().set_inputline("maincpu", 4);
 
 	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia6850_1", FUNC(acia6850_device::write_rxc));
 
-	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
+	ACIA6850(config, "acia6850_2", 0);
 
 	// floppy
 	MCFG_DEVICE_ADD("fdc", WD1773, 8000000)

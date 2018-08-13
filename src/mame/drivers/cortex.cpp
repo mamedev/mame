@@ -186,14 +186,14 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	// No lines connected yet
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map)
 
-	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
-	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cortex_state, basic_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cortex_state, keyboard_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cortex_state, ebus_int_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cortex_state, ebus_to_en_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cortex_state, disk_size_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, cortex_state, romsw_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("beeper", beep_device, set_state))
+	ls259_device &control(LS259(config, "control")); // IC64
+	//control.q_out_cb<0>().set(FUNC(cortex_state::basic_led_w));
+	control.q_out_cb<1>().set(FUNC(cortex_state::keyboard_ack_w));
+	//control.q_out_cb<2>().set(FUNC(cortex_state::ebus_int_ack_w));
+	//control.q_out_cb<3>().set(FUNC(cortex_state::ebus_to_en_w));
+	//control.q_out_cb<4>().set(FUNC(cortex_state::disk_size_w));
+	control.q_out_cb<5>().set(FUNC(cortex_state::romsw_w));
+	control.q_out_cb<6>().set("beeper", FUNC(beep_device::set_state));
 
 	/* video hardware */
 	tms9929a_device &crtc(TMS9929A(config, "crtc", XTAL(10'738'635) / 2));

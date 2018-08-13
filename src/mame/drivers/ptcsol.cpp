@@ -752,19 +752,19 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("sol20_cass")
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // TMS6011NC
-	MCFG_AY51013_TX_CLOCK(4800.0)
-	MCFG_AY51013_RX_CLOCK(4800.0)
-	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
+	AY51013(config, m_uart); // TMS6011NC
+	m_uart->set_tx_clock(4800.0);
+	m_uart->set_rx_clock(4800.0);
+	m_uart->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 
-	MCFG_DEVICE_ADD("uart_s", AY51013, 0) // TMS6011NC
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_AY51013_TX_CLOCK(4800.0)
-	MCFG_AY51013_RX_CLOCK(4800.0)
-	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
+	AY51013(config, m_uart_s); // TMS6011NC
+	m_uart_s->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart_s->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart_s->set_tx_clock(4800.0);
+	m_uart_s->set_rx_clock(4800.0);
+	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(sol20_state, kbd_put))

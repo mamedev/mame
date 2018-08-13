@@ -27,7 +27,7 @@ class address_map_bank_device :
 {
 public:
 	// construction/destruction
-	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
 	template <typename... T> void set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); }

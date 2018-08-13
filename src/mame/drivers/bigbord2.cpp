@@ -601,8 +601,8 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc1", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("proglatch", LS259, 0) // U41
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("outlatch1", ls259_device, clear_w)) // FCRST - also resets the 8877
+	ls259_device &proglatch(LS259(config, "proglatch")); // U41
+	proglatch.q_out_cb<6>().set("outlatch1", FUNC(ls259_device::clear_w)); // FCRST - also resets the 8877
 
 	LS259(config, m_syslatch1, 0); // U14
 	m_syslatch1->q_out_cb<0>().set_membank(m_bankr); // D_S

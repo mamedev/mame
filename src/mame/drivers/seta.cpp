@@ -1969,7 +1969,7 @@ void seta_state::blandiap_map(address_map &map)
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-ADC083X_INPUT_CB(seta_state::zombraid_adc_cb)
+double seta_state::zombraid_adc_cb(uint8_t input)
 {
 	if (input == ADC083X_AGND)
 		return 0.0;
@@ -8782,8 +8782,8 @@ MACHINE_CONFIG_START(seta_state::zombraid)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("adc", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(seta_state, zombraid_adc_cb)
+	adc0834_device &adc(ADC0834(config, "adc", 0));
+	adc.set_input_callback(FUNC(seta_state::zombraid_adc_cb));
 
 	MCFG_DEVICE_MODIFY("x1snd")
 	MCFG_DEVICE_ADDRESS_MAP(0, zombraid_x1_map)

@@ -31,6 +31,11 @@ public:
 	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dskblk_wr_callback(Object &&cb) { return m_write_dskblk.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dsksyn_wr_callback(Object &&cb) { return m_write_dsksyn.set_callback(std::forward<Object>(cb)); }
+	auto index_callback() { return m_write_index.bind(); }
+	auto read_dma_callback() { return m_read_dma.bind(); }
+	auto write_dma_callback() { return m_write_dma.bind(); }
+	auto dskblk_callback() { return m_write_dskblk.bind(); }
+	auto dsksyn_callback() { return m_write_dsksyn.bind(); }
 
 	DECLARE_WRITE8_MEMBER(ciaaprb_w);
 

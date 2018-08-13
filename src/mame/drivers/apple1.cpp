@@ -607,10 +607,10 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(m_pia, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, apple1_state, pia_keyboard_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apple1_state, pia_display_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, apple1_state, pia_display_gate_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));
+	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
+	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
 	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
 	MCFG_A1BUS_CPU(m_maincpu)

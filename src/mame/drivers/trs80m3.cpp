@@ -385,12 +385,12 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_brg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 
-	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	AY31015(config, m_uart);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
-	MCFG_AY31015_AUTO_RDAV(true)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	m_uart->set_auto_rdav(true);
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m3_state::model4)

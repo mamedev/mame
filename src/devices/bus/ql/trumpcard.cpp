@@ -182,7 +182,7 @@ uint8_t ql_trump_card_device::read(address_space &space, offs_t offset, uint8_t 
 
 	if (offset >= 0x1c000 && offset <= 0x1c003)
 	{
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 
 	if (offset >= 0x40000 && offset < 0xc0000)
@@ -223,7 +223,7 @@ void ql_trump_card_device::write(address_space &space, offs_t offset, uint8_t da
 {
 	if (offset >= 0x1c000 && offset <= 0x1c003)
 	{
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 
 	if (offset == 0x1e000)

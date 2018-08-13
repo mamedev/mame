@@ -201,9 +201,11 @@ namespace sol
 					case AMH_UNMAP:
 						typestr = "unmap";
 						break;
-					case AMH_DEVICE_DELEGATE_F:
+					case AMH_DEVICE_DELEGATE:
+					case AMH_DEVICE_DELEGATE_M:
 					case AMH_DEVICE_DELEGATE_S:
 					case AMH_DEVICE_DELEGATE_SM:
+					case AMH_DEVICE_DELEGATE_MO:
 					case AMH_DEVICE_DELEGATE_SMO:
 						typestr = "delegate";
 						break;

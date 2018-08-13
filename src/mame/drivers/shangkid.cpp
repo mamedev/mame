@@ -488,10 +488,10 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	MCFG_DEVICE_PROGRAM_MAP(dynamski_map)
 	MCFG_DEVICE_IO_MAP(dynamski_portmap)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, shangkid_state, int_enable_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // screen flip?
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // screen flip?
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(shangkid_state::int_enable_1_w));
+	mainlatch.q_out_cb<1>().set_nop(); // screen flip?
+	mainlatch.q_out_cb<2>().set_nop(); // screen flip?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

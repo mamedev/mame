@@ -30,6 +30,8 @@ public:
 
 	template <class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_gromready.set_callback(std::forward<Object>(cb)); }
 
+	auto ready_cb() { return m_gromready.bind(); }
+	
 	void readz(uint8_t *value);
 	void write(uint8_t data);
 	void set_lines(line_state mline, line_state moline, line_state gsq);

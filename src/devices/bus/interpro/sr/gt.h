@@ -296,81 +296,69 @@ private:
 	gt_t m_gt[GT_SCREEN_COUNT];
 };
 
-class mpcb963_device : public single_gt_device_base, public cbus_card_device_base
+class mpcb963_device : public single_gt_device_base, public device_cbus_card_interface
 {
 public:
 	mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
+	virtual void map(address_map &map) override { single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class mpcba79_device : public dual_gt_device_base, public cbus_card_device_base
+class mpcba79_device : public dual_gt_device_base, public device_cbus_card_interface
 {
 public:
 	mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); dual_gt_device_base::map(map); }
+	virtual void map(address_map &map) override { dual_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
-class msmt070_device : public single_gt_device_base, public cbus_card_device_base
+class msmt070_device : public single_gt_device_base, public device_cbus_card_interface
 {
 public:
 	msmt070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
+	virtual void map(address_map &map) override { single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class msmt071_device : public dual_gt_device_base, public cbus_card_device_base
+class msmt071_device : public dual_gt_device_base, public device_cbus_card_interface
 {
 public:
 	msmt071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); dual_gt_device_base::map(map); }
+	virtual void map(address_map &map) override { dual_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class msmt081_device : public single_gt_device_base, public cbus_card_device_base
+class msmt081_device : public single_gt_device_base, public device_cbus_card_interface
 {
 public:
 	msmt081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
+	virtual void map(address_map &map) override { single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class mpcbb92_device : public single_gt_device_base, public srx_card_device_base
+class mpcbb92_device : public single_gt_device_base, public device_srx_card_interface
 {
 public:
 	mpcbb92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { srx_card_device_base::map(map); single_gt_device_base::map(map); }
+	virtual void map(address_map &map) override { single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };

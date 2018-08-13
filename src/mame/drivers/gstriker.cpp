@@ -493,11 +493,7 @@ INPUT_PORTS_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-MACHINE_CONFIG_START(gstriker_state::gstriker)
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(gstriker_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
-
+MACHINE_CONFIG_START(gstriker_state::base)
 	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
@@ -512,11 +508,6 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	io.porth_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(3);
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
-
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("link", rs232_port_device, write_rts))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -563,15 +554,27 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(gstriker_state::gstriker)
+	base(config);
+
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(gstriker_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
+
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_2);
+	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(gstriker_state::twc94)
-	gstriker(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, 16000000)
+	base(config);
+
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(twcup94_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
 	subdevice<vs9209_device>("io")->porth_output_cb().append(FUNC(gstriker_state::twcup94_prot_reg_w));
-
-	MCFG_DEVICE_REMOVE("acia")
 MACHINE_CONFIG_END
 
 

@@ -8,17 +8,9 @@
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"
+#include "machine/mb8421.h"
 #include "emupal.h"
 #include "screen.h"
-
-enum
-{
-	FIGHT_MCU = 1,
-	SHOOT_MCU,
-	RACING_MCU,
-	SAMSHO_MCU,
-	BURIKI_MCU
-};
 
 enum hng64trans_t
 {
@@ -144,13 +136,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_iomcu(*this, "iomcu"),
+		m_dt7133_dpram(*this, "dt7133_dpram"),
 		m_dsp(*this, "l7a1045"),
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
 		m_cart(*this, "cart"),
 		m_sysregs(*this, "sysregs"),
-		m_dualport(*this, "dualport"),
 		m_rombase(*this, "rombase"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteregs(*this, "spriteregs"),
@@ -161,23 +153,18 @@ public:
 		m_3d_1(*this, "3d_1"),
 		m_3d_2(*this, "3d_2"),
 		m_com_ram(*this, "com_ram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_intest(*this, "IN%u", 0U),
+		m_samsho64_3d_hack(0)
 	{}
 
 	void hng64(machine_config &config);
 
 	void init_hng64_race();
-	void init_fatfurwa();
-	void init_buriki();
 	void init_hng64();
 	void init_hng64_shoot();
 	void init_ss64();
 	void init_hng64_fght();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 
 	uint8_t *m_texturerom;
 	required_device<screen_device> m_screen;
@@ -187,6 +174,7 @@ private:
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
 	required_device<tmp87ph40an_device> m_iomcu;
+	required_device<mb8421_device> m_dt7133_dpram;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
@@ -194,7 +182,6 @@ private:
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_cart;
 	required_shared_ptr<uint32_t> m_sysregs;
-	required_shared_ptr<uint32_t> m_dualport;
 	required_shared_ptr<uint32_t> m_rombase;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_spriteregs;
@@ -212,7 +199,9 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	int m_mcu_type;
+	optional_ioport_array<8> m_intest;
+
+	int m_samsho64_3d_hack;
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -226,7 +215,6 @@ private:
 	int32_t m_dma_dst;
 	int32_t m_dma_len;
 
-	uint32_t m_mcu_fake_time;
 	uint16_t m_mcu_en;
 
 	uint32_t m_activeDisplayList;
@@ -270,12 +258,11 @@ private:
 	DECLARE_READ8_MEMBER(hng64_com_share_mips_r);
 	DECLARE_READ32_MEMBER(hng64_sysregs_r);
 	DECLARE_WRITE32_MEMBER(hng64_sysregs_w);
-	DECLARE_READ32_MEMBER(fight_io_r);
-	DECLARE_READ32_MEMBER(samsho_io_r);
-	DECLARE_READ32_MEMBER(shoot_io_r);
-	DECLARE_READ32_MEMBER(racing_io_r);
-	DECLARE_READ32_MEMBER(hng64_dualport_r);
-	DECLARE_WRITE32_MEMBER(hng64_dualport_w);
+	
+	DECLARE_READ8_MEMBER(fake_io_r);
+	DECLARE_READ8_MEMBER(hng64_dualport_r);
+	DECLARE_WRITE8_MEMBER(hng64_dualport_w);
+
 	DECLARE_READ32_MEMBER(hng64_3d_1_r);
 	DECLARE_READ32_MEMBER(hng64_3d_2_r);
 	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
@@ -335,7 +322,6 @@ private:
 
 	int m_ex_ramaddr;
 	int m_ex_ramaddr_upper;
-	std::unique_ptr<uint8_t[]> m_ioram;
 
 	TIMER_CALLBACK_MEMBER(tempio_irqon_callback);
 	TIMER_CALLBACK_MEMBER(tempio_irqoff_callback);

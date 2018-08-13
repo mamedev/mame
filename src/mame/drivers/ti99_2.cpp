@@ -339,6 +339,8 @@ WRITE8_MEMBER(ti99_2_state::intflag_write)
 */
 READ8_MEMBER(ti99_2_state::mem_read)
 {
+	if (m_maincpu->is_onchip(offset)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
+
 	int page = offset >> 12;
 
 	if (page>=0 && page<4)

@@ -73,6 +73,10 @@ public:
 	template <class Object> devcb_base &set_phi2_callback(Object &&phi2) { return m_write_phi2.set_callback(std::forward<Object>(phi2)); }
 	template <class Object> devcb_base &set_dtrd_callback(Object &&dtrd) { return m_write_dtrd.set_callback(std::forward<Object>(dtrd)); }
 	template <class Object> devcb_base &set_apd_callback(Object &&apd) { return m_write_apd.set_callback(std::forward<Object>(apd)); }
+	auto eos_handler() { return m_write_eos.bind(); }
+	auto phi2_handler() { return m_write_phi2.bind(); }
+	auto dtrd_handler() { return m_write_dtrd.bind(); }
+	auto apd_handler() { return m_write_apd.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

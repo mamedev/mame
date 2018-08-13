@@ -862,15 +862,15 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	/* rtc pcf8573 */
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	VIA6522(config, m_via, XTAL(16'000'000) / 16);
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", G65816_LINE_IRQ))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set_inputline("maincpu", G65816_LINE_IRQ);
 
 	MCFG_DEVICE_ADD("serial", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
