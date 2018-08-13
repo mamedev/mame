@@ -1717,13 +1717,14 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8563_TAG, mos8563_device, screen_update)
 
-	MCFG_DEVICE_ADD(MOS8564_TAG, MOS8564, XTAL(14'318'181)*2/3.5)
-	MCFG_MOS6566_CPU(M8502_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c128_state, vic_irq_w))
-	MCFG_MOS8564_K_CALLBACK(WRITE8(*this, c128_state, vic_k_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos8564_device &mos8564(MOS8564(config, MOS8564_TAG, XTAL(14'318'181)*2/3.5));
+	mos8564.set_cpu(M8502_TAG);
+	mos8564.irq_callback().set(FUNC(c128_state::vic_irq_w));
+	mos8564.k_callback().set(FUNC(c128_state::vic_k_w));
+	mos8564.set_screen(SCREEN_VIC_TAG);
+	mos8564.set_addrmap(0, &c128_state::vic_videoram_map);
+	mos8564.set_addrmap(1, &c128_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_VIC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
@@ -1891,13 +1892,14 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8563_TAG, mos8563_device, screen_update)
 
-	MCFG_DEVICE_ADD(MOS8566_TAG, MOS8566, XTAL(17'734'472)*2/4.5)
-	MCFG_MOS6566_CPU(M8502_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c128_state, vic_irq_w))
-	MCFG_MOS8564_K_CALLBACK(WRITE8(*this, c128_state, vic_k_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos8566_device &mos8566(MOS8566(config, MOS8566_TAG, XTAL(17'734'472)*2/4.5));
+	mos8566.set_cpu(M8502_TAG);
+	mos8566.irq_callback().set(FUNC(c128_state::vic_irq_w));
+	mos8566.k_callback().set(FUNC(c128_state::vic_k_w));
+	mos8566.set_screen(SCREEN_VIC_TAG);
+	mos8566.set_addrmap(0, &c128_state::vic_videoram_map);
+	mos8566.set_addrmap(1, &c128_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_VIC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)

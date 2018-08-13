@@ -1337,12 +1337,13 @@ MACHINE_CONFIG_START(c64_state::ntsc)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6567_TAG, MOS6567, XTAL(14'318'181)/14)
-	MCFG_MOS6566_CPU(M6510_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c64_state, vic_irq_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
+	mos6567.set_cpu(M6510_TAG);
+	mos6567.irq_callback().set(FUNC(c64_state::vic_irq_w));
+	mos6567.set_screen(SCREEN_TAG);
+	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
+	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
@@ -1495,12 +1496,13 @@ MACHINE_CONFIG_START(c64_state::pal)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6569_TAG, MOS6569, XTAL(17'734'472)/18)
-	MCFG_MOS6566_CPU(M6510_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c64_state, vic_irq_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
+	mos6569.set_cpu(M6510_TAG);
+	mos6569.irq_callback().set(FUNC(c64_state::vic_irq_w));
+	mos6569.set_screen(SCREEN_TAG);
+	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
+	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
@@ -1631,12 +1633,13 @@ MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6569_TAG, MOS8565, XTAL(17'734'472)/18)
-	MCFG_MOS6566_CPU(M6510_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c64_state, vic_irq_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
+	mos8565.set_cpu(M6510_TAG);
+	mos8565.irq_callback().set(FUNC(c64_state::vic_irq_w));
+	mos8565.set_screen(SCREEN_TAG);
+	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
+	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)

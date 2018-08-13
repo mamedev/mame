@@ -85,27 +85,6 @@
 
 
 
-//***************************************************************************
-// DEVICE CONFIGURATION MACROS
-//***************************************************************************
-
-#define MCFG_MOS6566_CPU(_tag) \
-	downcast<mos6566_device &>(*device).set_cpu_tag(_tag);
-
-#define MCFG_MOS6566_IRQ_CALLBACK(_write) \
-	downcast<mos6566_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS6566_BA_CALLBACK(_write) \
-	downcast<mos6566_device &>(*device).set_ba_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS6566_AEC_CALLBACK(_write) \
-	downcast<mos6566_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
-
-#define MCFG_MOS8564_K_CALLBACK(_write) \
-	downcast<mos6566_device &>(*device).set_k_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -212,11 +191,11 @@ public:
 	// construction/destruction
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ba_wr_callback(Object &&cb) { return m_write_ba.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_aec_wr_callback(Object &&cb) { return m_write_aec.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_k_wr_callback(Object &&cb) { return m_write_k.set_callback(std::forward<Object>(cb)); }
+	template <class T> void set_cpu(T &&tag) { m_cpu.set_tag(tag); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto ba_callback() { return m_write_ba.bind(); }
+	auto aec_callback() { return m_write_aec.bind(); }
+	auto k_callback() { return m_write_k.bind(); }
 
 	virtual space_config_vector memory_space_config() const override;
 
