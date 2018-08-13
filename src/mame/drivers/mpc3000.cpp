@@ -84,6 +84,14 @@ private:
 
 	void mpc3000_map(address_map &map);
 	void mpc3000_io_map(address_map &map);
+
+	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
+	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
+	DECLARE_READ8_MEMBER(dma_memr_cb);
+	DECLARE_WRITE8_MEMBER(lcd_w)
+	{
+		printf("%c", data);
+	}
 };
 
 void mpc3000_state::machine_start()
@@ -101,15 +109,48 @@ void mpc3000_state::mpc3000_map(address_map &map)
 	map(0x500000, 0x500fff).ram(); // actually 8-bit battery-backed RAM
 }
 
+WRITE16_MEMBER(mpc3000_state::dsp_0008_hack_w)
+{
+	// this is related to the DSP's DMA capability.  The DSP
+	// connects to the V53's DMA3 channel on both the MPCs and HNG64.
+	m_maincpu->dreq3_w(data&0x1);
+	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
+}
+
+
+READ16_MEMBER(mpc3000_state::dsp_0008_hack_r)
+{
+	// read in irq5
+	return 0;
+}
+
 void mpc3000_state::mpc3000_io_map(address_map &map)
 {
+	map(0x0060, 0x0067).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
+	map(0x0068, 0x0069).rw(FUNC(mpc3000_state::dsp_0008_hack_r), FUNC(mpc3000_state::dsp_0008_hack_w));
+	map(0x00e0, 0x00e0).w(FUNC(mpc3000_state::lcd_w));
+}
+
+READ8_MEMBER(mpc3000_state::dma_memr_cb)
+{
+	//logerror("dma_memr_cb: offset %x\n", offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 void mpc3000_state::mpc3000(machine_config &config)
 {
-	V53A(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
-	m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
+	// V53A isn't devcb3 compliant yet.
+	//V53A(config, m_maincpu, 16_MHz_XTAL);
+	//m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
+	//m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
+	device_t *device = nullptr;
+	MCFG_DEVICE_ADD("maincpu", V53A, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mpc3000_map)
+	MCFG_DEVICE_IO_MAP(mpc3000_io_map)
+	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE("maincpu", v53_base_device, hack_w))
+	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, mpc3000_state, dma_memr_cb))
+	MCFG_V53_DMAU_IN_IOR_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_r_cb))
+	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_w_cb))
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
