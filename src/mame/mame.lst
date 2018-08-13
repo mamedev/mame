@@ -38495,6 +38495,7 @@ pac90                           // bootleg
 twcup90                            // (c) 1989 Tecmo
 twcup90a                           // (c) 1989 Tecmo
 twcup90b                           // (c) 1989 Tecmo
+twcup90c                           // (c) 1989 Tecmo
 twcup90t                           // (c) 1989 Tecmo
 
 @source:wc90b.cpp
