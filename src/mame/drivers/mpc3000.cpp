@@ -56,9 +56,11 @@
 #include "emu.h"
 #include "cpu/nec/v53.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
+#include "video/hd61830.h"
 #include "bus/midi/midi.h"
 #include "speaker.h"
 #include "screen.h"
+#include "emupal.h"
 
 class mpc3000_state : public driver_device
 {
@@ -66,6 +68,7 @@ public:
 	mpc3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "lcdc")
 		, m_dsp(*this, "dsp")
 		, m_mdout(*this, "mdout")
 	{ }
@@ -76,6 +79,7 @@ public:
 
 private:
 	required_device<v53_base_device> m_maincpu;
+	required_device<hd61830_device> m_lcdc;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<midi_port_device> m_mdout;
 
@@ -88,10 +92,7 @@ private:
 	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
 	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
 	DECLARE_READ8_MEMBER(dma_memr_cb);
-	DECLARE_WRITE8_MEMBER(lcd_w)
-	{
-		printf("%c", data);
-	}
+	DECLARE_PALETTE_INIT(mpc3000);
 };
 
 void mpc3000_state::machine_start()
@@ -128,13 +129,20 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 {
 	map(0x0060, 0x0067).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
 	map(0x0068, 0x0069).rw(FUNC(mpc3000_state::dsp_0008_hack_r), FUNC(mpc3000_state::dsp_0008_hack_w));
-	map(0x00e0, 0x00e0).w(FUNC(mpc3000_state::lcd_w));
+	map(0x00e0, 0x00e0).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
+	map(0x00e2, 0x00e2).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 }
 
 READ8_MEMBER(mpc3000_state::dma_memr_cb)
 {
 	//logerror("dma_memr_cb: offset %x\n", offset);
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+PALETTE_INIT_MEMBER(mpc3000_state, mpc3000)
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 void mpc3000_state::mpc3000(machine_config &config)
@@ -151,6 +159,18 @@ void mpc3000_state::mpc3000(machine_config &config)
 	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, mpc3000_state, dma_memr_cb))
 	MCFG_V53_DMAU_IN_IOR_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_r_cb))
 	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_w_cb))
+
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(80)
+	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
+	MCFG_SCREEN_SIZE(240, 64)   //6x20, 8x8
+	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mpc3000_state, mpc3000)
+
+	HD61830(config, m_lcdc, 4.9152_MHz_XTAL / 2 / 2);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -184,4 +204,4 @@ void mpc3000_state::init_mpc3000()
 {
 }
 
-CONS( 1994, mpc3000, 0, 0, mpc3000, mpc3000, mpc3000_state, init_mpc3000, "Akai / Roger Linn", "MPC-3000", MACHINE_IMPERFECT_SOUND )
+CONS( 1994, mpc3000, 0, 0, mpc3000, mpc3000, mpc3000_state, init_mpc3000, "Akai / Roger Linn", "MPC-3000", MACHINE_NOT_WORKING )
