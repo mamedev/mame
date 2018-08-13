@@ -233,27 +233,6 @@ namespace bus { namespace ti99 { namespace peb {
 #define PEBSLOT7 "slot7"
 #define PEBSLOT8 "slot8"
 
-peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	bus::ti99::internal::ioport_attached_device(mconfig, TI99_PERIBOX, tag, owner, clock),
-	m_slot1_inta(*this),
-	m_slot1_intb(*this),
-	m_slot1_lcp(*this),
-	m_slot1_ready(*this),
-	m_inta_flag(0),
-	m_intb_flag(0),
-	m_lcp_flag(0),
-	m_ready_flag(0),
-	m_msast(false),
-	m_memen(false),
-	m_ioport_connected(false)
-{
-	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
-	// The address prefix is actually created by the "Flex cable interface"
-	// which sits in slot 1.
-	m_address_prefix = 0x70000;
-	m_genmod = false;
-}
-
 /*
     Constructor called from subclasses.
 */
@@ -263,6 +242,13 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 	m_slot1_intb(*this),
 	m_slot1_lcp(*this),
 	m_slot1_ready(*this),
+	m_slot2(*this, PEBSLOT2),
+	m_slot3(*this, PEBSLOT3),
+	m_slot4(*this, PEBSLOT4),
+	m_slot5(*this, PEBSLOT5),
+	m_slot6(*this, PEBSLOT6),
+	m_slot7(*this, PEBSLOT7),
+	m_slot8(*this, PEBSLOT8),
 	m_inta_flag(0),
 	m_intb_flag(0),
 	m_ready_flag(0),
@@ -270,7 +256,16 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 	m_msast(false),
 	m_memen(false)
 {
+	// The address prefix is actually created by the "Flex cable interface"
+	// which sits in slot 1.
 	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
+}
+
+peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: peribox_device(mconfig, TI99_PERIBOX, tag, owner, clock)
+{
+	m_address_prefix = 0x70000;
+	m_genmod = false;
 }
 
 READ8Z_MEMBER(peribox_device::readz)
@@ -469,31 +464,42 @@ void peribox_device::device_config_complete()
 	m_ready_flag = 0;
 }
 
-void peribox_slot(device_slot_interface &device)
+void peribox_device::configure_slot(peribox_slot_device &slot, int number)
 {
-	device.option_add("32kmem",   TI99_32KMEM);
-	device.option_add("myarcmem", TI99_MYARCMEM);
-	device.option_add("samsmem",  TI99_SAMSMEM);
-	device.option_add("pcode",    TI99_P_CODE);
-	device.option_add("hsgpl",    TI99_HSGPL);
-	device.option_add("tirs232",  TI99_RS232);
-	device.option_add("speech",   TI99_SPEECH);
-	device.option_add("horizon",  TI99_HORIZON);
-	device.option_add("ide",      TI99_IDE);
-	device.option_add("usbsm",    TI99_USBSM);
-	device.option_add("bwg",      TI99_BWG);
-	device.option_add("hfdc",     TI99_HFDC);
-	device.option_add("tifdc",    TI99_FDC);
+	slot.set_number(number);
+	slot.option_reset();
+	slot.option_add("32kmem",   TI99_32KMEM);
+	slot.option_add("myarcmem", TI99_MYARCMEM);
+	slot.option_add("samsmem",  TI99_SAMSMEM);
+	slot.option_add("pcode",    TI99_P_CODE);
+	slot.option_add("hsgpl",    TI99_HSGPL);
+	slot.option_add("tirs232",  TI99_RS232);
+	slot.option_add("speech",   TI99_SPEECH);
+	slot.option_add("horizon",  TI99_HORIZON);
+	slot.option_add("ide",      TI99_IDE);
+	slot.option_add("usbsm",    TI99_USBSM);
+	slot.option_add("bwg",      TI99_BWG);
+	slot.option_add("hfdc",     TI99_HFDC);
+	slot.option_add("tifdc",    TI99_FDC);
+	slot.set_default_option(nullptr);
+	slot.set_fixed(false);
 }
 
 MACHINE_CONFIG_START(peribox_device::device_add_mconfig)
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT2, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot )
+	TI99_PERIBOX_SLOT(config, m_slot2, 0 );
+	m_slot2->configure_slot(2);
+	TI99_PERIBOX_SLOT(config, m_slot3, 0 );
+	m_slot3->configure_slot(3);
+	TI99_PERIBOX_SLOT(config, m_slot4, 0 );
+	m_slot4->configure_slot(4);
+	TI99_PERIBOX_SLOT(config, m_slot5, 0 );
+	m_slot5->configure_slot(5);
+	TI99_PERIBOX_SLOT(config, m_slot6, 0 );
+	m_slot6->configure_slot(6);
+	TI99_PERIBOX_SLOT(config, m_slot7, 0 );
+	m_slot7->configure_slot(7);
+	TI99_PERIBOX_SLOT(config, m_slot8, 0 );
+	m_slot8->configure_slot(8);
 MACHINE_CONFIG_END
 
 /****************************************************************************
@@ -507,33 +513,27 @@ peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *
 	m_genmod = false;
 }
 
-void peribox_slotv(device_slot_interface &device)
+void peribox_ev_device::configure_slot(peribox_slot_device &slot, int number)
 {
-	device.option_add("evpc",     TI99_EVPC);
-	device.option_add("32kmem",   TI99_32KMEM);
-	device.option_add("myarcmem", TI99_MYARCMEM);
-	device.option_add("samsmem",  TI99_SAMSMEM);
-	device.option_add("pcode",    TI99_P_CODE);
-	device.option_add("hsgpl",    TI99_HSGPL);
-	device.option_add("tirs232",  TI99_RS232);
-	device.option_add("speech",   TI99_SPEECH);
-	device.option_add("horizon",  TI99_HORIZON);
-	device.option_add("ide",      TI99_IDE);
-	device.option_add("usbsm",    TI99_USBSM);
-	device.option_add("bwg",      TI99_BWG);
-	device.option_add("hfdc",     TI99_HFDC);
-	device.option_add("tifdc",    TI99_FDC);
+	slot.set_number(number);
+	slot.option_reset();
+	slot.option_add("evpc",     TI99_EVPC);
+	slot.option_add("32kmem",   TI99_32KMEM);
+	slot.option_add("myarcmem", TI99_MYARCMEM);
+	slot.option_add("samsmem",  TI99_SAMSMEM);
+	slot.option_add("pcode",    TI99_P_CODE);
+	slot.option_add("hsgpl",    TI99_HSGPL);
+	slot.option_add("tirs232",  TI99_RS232);
+	slot.option_add("speech",   TI99_SPEECH);
+	slot.option_add("horizon",  TI99_HORIZON);
+	slot.option_add("ide",      TI99_IDE);
+	slot.option_add("usbsm",    TI99_USBSM);
+	slot.option_add("bwg",      TI99_BWG);
+	slot.option_add("hfdc",     TI99_HFDC);
+	slot.option_add("tifdc",    TI99_FDC);
+	if (number==2) slot.set_default_option("evpc");
+	slot.set_fixed(false);
 }
-
-MACHINE_CONFIG_START(peribox_ev_device::device_add_mconfig)
-	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_slotv, "evpc" )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotv )
-MACHINE_CONFIG_END
 
 /****************************************************************************
     A variant of the box used for the Geneve.
@@ -563,37 +563,36 @@ peribox_genmod_device::peribox_genmod_device(const machine_config &mconfig, cons
 // The BwG controller will not run with the Geneve due to its wait state
 // logic (see bwg.c)
 
-void peribox_slotg(device_slot_interface &device)
+void peribox_gen_device::configure_slot(peribox_slot_device &slot, int number)
 {
-	device.option_add("memex",   TI99_MEMEX);
-	device.option_add("tirs232", TI99_RS232);
-	device.option_add("speech",  TI99_SPEECH);
-	device.option_add("horizon", TI99_HORIZON);
-	device.option_add("ide",     TI99_IDE);
-	device.option_add("usbsm",   TI99_USBSM);
-	device.option_add("hfdc",    TI99_HFDC);
-	device.option_add("tifdc",   TI99_FDC);
+	slot.set_number(number);
+	slot.option_reset();
+	slot.option_add("memex",    TI99_MEMEX);
+	slot.option_add("tirs232",  TI99_RS232);
+	slot.option_add("speech",   TI99_SPEECH);
+	slot.option_add("horizon",  TI99_HORIZON);
+	slot.option_add("ide",      TI99_IDE);
+	slot.option_add("usbsm",    TI99_USBSM);
+	slot.option_add("hfdc",     TI99_HFDC);
+	slot.option_add("tifdc",    TI99_FDC);
+	slot.set_fixed(false);
 }
 
-MACHINE_CONFIG_START(peribox_gen_device::device_add_mconfig)
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT2, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotg )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(peribox_genmod_device::device_add_mconfig)
-	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_slotg, "memex" )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotg )
-MACHINE_CONFIG_END
+void peribox_genmod_device::configure_slot(peribox_slot_device &slot, int number)
+{
+	slot.set_number(number);
+	slot.option_reset();
+	slot.option_add("memex",    TI99_MEMEX);
+	slot.option_add("tirs232",  TI99_RS232);
+	slot.option_add("speech",   TI99_SPEECH);
+	slot.option_add("horizon",  TI99_HORIZON);
+	slot.option_add("ide",      TI99_IDE);
+	slot.option_add("usbsm",    TI99_USBSM);
+	slot.option_add("hfdc",     TI99_HFDC);
+	slot.option_add("tifdc",    TI99_FDC);
+	if (number==2) slot.set_default_option("memex");
+	slot.set_fixed(false);
+}
 
 /****************************************************************************
     A variant of the box used for the SGCPU (aka TI-99/4P).
@@ -606,47 +605,31 @@ peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *
 	m_genmod = false;
 }
 
-void peribox_slotp(device_slot_interface &device)
+void peribox_sg_device::configure_slot(peribox_slot_device &slot, int number)
 {
-	device.option_add("evpc",     TI99_EVPC);
-	device.option_add("myarcmem", TI99_MYARCMEM);
-	device.option_add("samsmem",  TI99_SAMSMEM);
-	device.option_add("pcode",    TI99_P_CODE);
-	device.option_add("hsgpl",    TI99_HSGPL);
-	device.option_add("tirs232",  TI99_RS232);
-	device.option_add("speech",   TI99_SPEECH);
-	device.option_add("horizon",  TI99_HORIZON);
-	device.option_add("ide",      TI99_IDE);
-	device.option_add("usbsm",    TI99_USBSM);
-	device.option_add("bwg",      TI99_BWG);
-	device.option_add("hfdc",     TI99_HFDC);
-	device.option_add("tifdc",    TI99_FDC);
+	slot.set_number(number);
+	slot.option_reset();
+	slot.option_add("evpc",     TI99_EVPC);
+	slot.option_add("myarcmem", TI99_MYARCMEM);
+	slot.option_add("samsmem",  TI99_SAMSMEM);
+	slot.option_add("pcode",    TI99_P_CODE);
+	slot.option_add("hsgpl",    TI99_HSGPL);
+	slot.option_add("tirs232",  TI99_RS232);
+	slot.option_add("speech",   TI99_SPEECH);
+	slot.option_add("horizon",  TI99_HORIZON);
+	slot.option_add("ide",      TI99_IDE);
+	slot.option_add("usbsm",    TI99_USBSM);
+	slot.option_add("bwg",      TI99_BWG);
+	slot.option_add("hfdc",     TI99_HFDC);
+	slot.option_add("tifdc",    TI99_FDC);
+	if (number==2) slot.set_default_option("evpc");
+	else if (number==3) slot.set_default_option("hsgpl");
+	slot.set_fixed(false);
 }
-
-MACHINE_CONFIG_START(peribox_sg_device::device_add_mconfig)
-	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_slotp, "evpc" )
-	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT3, peribox_slotp, "hsgpl" )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotp )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotp )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotp )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotp )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotp )
-MACHINE_CONFIG_END
 
 /***************************************************************************
     Implementation of a slot within the box.
 ****************************************************************************/
-
-int peribox_slot_device::get_index_from_tagname()
-{
-	const char *mytag = tag();
-	int maxlen = strlen(mytag);
-	int i;
-	for (i=maxlen-1; i >=0; i--)
-		if (mytag[i] < 48 || mytag[i] > 57) break;
-
-	return atoi(mytag+i+1);
-}
 
 peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock),
@@ -710,11 +693,16 @@ void peribox_slot_device::device_start()
 
 void peribox_slot_device::device_config_complete()
 {
-	m_slotnumber = get_index_from_tagname();
-	m_card = dynamic_cast<device_ti99_peribox_card_interface *>(subdevices().first());
+	m_card = dynamic_cast<device_ti99_peribox_card_interface *>(get_card_device());
 	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
 	if (peb)
 		peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
+}
+
+void peribox_slot_device::configure_slot(int number)
+{
+	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
+	if (peb) peb->configure_slot(*this, number);
 }
 
 /*

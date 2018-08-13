@@ -696,27 +696,30 @@ void geneve_state::machine_reset()
 
 MACHINE_CONFIG_START(geneve_state::geneve)
 	geneve_common(config);
+
 	// Mapper
 	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENEVE_MAPPER, 0)
 	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
-	// Peripheral expansion box (Geneve composition)
-	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
 
+	// Peripheral expansion box (Geneve composition)
+	TI99_PERIBOX_GEN(config, m_peribox, 0);
+	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
+	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
+	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(geneve_state::genmod)
 	geneve_common(config);
+
 	// Mapper
 	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENMOD_MAPPER, 0)
 	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
+
 	// Peripheral expansion box (Geneve composition with Genmod and plugged-in Memex)
-	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GENMOD, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
+	TI99_PERIBOX_GENMOD(config, m_peribox, 0);
+	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
+	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
+	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(geneve_state::geneve_common)
@@ -761,8 +764,11 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 	// User interface devices
 	MCFG_DEVICE_ADD( GENEVE_KEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
 	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(*this, geneve_state, keyboard_interrupt) )
-	MCFG_GENEVE_JOYPORT_ADD( TI_JOYPORT_TAG )
-	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
+	TI99_JOYPORT(config, m_joyport, 0);
+	m_joyport->configure_slot(false, false);
+
+	TI99_COLORBUS(config, m_colorbus, 0);
+	m_colorbus->configure_slot();
 
 	// PFM expansion
 	MCFG_AT29C040_ADD( GENEVE_PFM512_TAG )

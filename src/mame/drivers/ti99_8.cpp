@@ -762,9 +762,11 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_MAINBOARD8_RESET_CALLBACK(WRITELINE(*this, ti99_8_state, console_reset))
 	MCFG_MAINBOARD8_HOLD_CALLBACK(WRITELINE(*this, ti99_8_state, cpu_hold))
 
-	MCFG_GROMPORT8_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_8_state, console_reset) )
+	// Cartridge port
+	TI99_GROMPORT(config, m_gromport, 0);
+	m_gromport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
+	m_gromport->reset_cb().set(FUNC(ti99_8_state::console_reset));
+	m_gromport->configure_slot(true);
 
 	// RAM
 	MCFG_RAM_ADD(TI998_SRAM_TAG)
@@ -778,9 +780,10 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// I/O port
-	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_8_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
+	TI99_IOPORT(config, m_ioport, 0);
+	m_ioport->configure_slot(false);
+	m_ioport->extint_cb().set(FUNC(ti99_8_state::extint));
+	m_ioport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::pbox_ready));
 
 	// Hexbus
 	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
@@ -833,7 +836,9 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_GROM_ADD( TI998_GLIB32_TAG, 2, TI998_GROMLIB3_REG, 0x4000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
+	TI99_JOYPORT(config, m_joyport, 0);
+	m_joyport->configure_slot(true, false);
+
 MACHINE_CONFIG_END
 
 /*

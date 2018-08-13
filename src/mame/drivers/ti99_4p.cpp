@@ -1031,13 +1031,13 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4p_state, tms9901_interrupt) )
 
 	// Peripheral expansion box (SGCPU composition)
-	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_SG, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, ti99_4p_state, extint) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, ti99_4p_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, ti99_4p_state, ready_line) )
+	TI99_PERIBOX_SG(config, m_peribox, 0);
+	m_peribox->inta_cb().set(FUNC(ti99_4p_state::extint));
+	m_peribox->intb_cb().set(FUNC(ti99_4p_state::notconnected));
+	m_peribox->ready_cb().set(FUNC(ti99_4p_state::ready_line));
 
 	// The SGCPU actually makes use of this pin which was unused before
-	MCFG_PERIBOX_LCP_HANDLER( WRITELINE(*this, ti99_4p_state, video_interrupt_in) )
+	m_peribox->lcp_cb().set(FUNC(ti99_4p_state::video_interrupt_in));
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -1056,7 +1056,8 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
+	TI99_JOYPORT(config, m_joyport, 0);
+	m_joyport->configure_slot(false, false);
 
 MACHINE_CONFIG_END
 
