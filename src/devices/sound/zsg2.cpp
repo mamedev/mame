@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont, hap
+// copyright-holders:Olivier Galibert, R. Belmont, hap, superctr
 /*
     ZOOM ZSG-2 custom wavetable synthesizer
 
     Written by Olivier Galibert
     MAME conversion by R. Belmont
     Working emulation by The Talentuous Hands Of The Popularious hap
+	Improvements by superctr
     ---------------------------------------------------------
 
     Additional notes on the sample format, reverse-engineered
@@ -44,9 +45,9 @@
     ---------------------------------------------------------
 
 TODO:
-- volume/panning is linear? volume slides are too steep
-- most music sounds tinny, probably due to missing DSP?
-- what is reg 0xa/0xc? seems related to volume
+- Filter behavior might not be perfect.
+- Volume ramping probably behaves differently on hardware.
+- hook up DSP, it's used for reverb and chorus effects.
 - identify sample flags
   * bassdrum in shikigam level 1 music is a good hint: it should be one octave
     lower, indicating possible stereo sample, or base octave(like in ymf278)
@@ -57,6 +58,13 @@ TODO:
 #include "emu.h"
 #include "zsg2.h"
 
+#include <algorithm>
+#include <fstream>
+#include <cmath>
+
+#define EMPHASIS_CUTOFF_BASE 0x800
+#define EMPHASIS_CUTOFF_SHIFT 1
+#define EMPHASIS_OUTPUT_SHIFT 15
 
 // device type definition
 DEFINE_DEVICE_TYPE(ZSG2, zsg2_device, "zsg2", "ZOOM ZSG-2")
@@ -74,7 +82,6 @@ zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -85,7 +92,7 @@ void zsg2_device::device_start()
 
 	memset(&m_chan, 0, sizeof(m_chan));
 
-	m_stream = stream_alloc(0, 2, clock() / 768);
+	m_stream = stream_alloc(0, 4, clock() / 768);
 
 	m_mem_blocks = m_mem_base.length();
 	m_mem_copy = make_unique_clear<uint32_t[]>(m_mem_blocks);
@@ -95,6 +102,13 @@ void zsg2_device::device_start()
 	save_pointer(NAME(m_mem_copy), m_mem_blocks / sizeof(uint32_t));
 	save_pointer(NAME(m_full_samples), (m_mem_blocks * 4 + 4) / sizeof(int16_t));
 	save_item(NAME(m_read_address));
+
+	// Generate the output gain table. Assuming -1dB per step for now.
+	for (int i = 0; i < 32; i++)
+	{
+		double val = pow(10, -(31 - i) / 20.) * 65535.;
+		gain_tab[i] = val;
+	}
 
 	for (int ch = 0; ch < 48; ch++)
 	{
@@ -107,13 +121,27 @@ void zsg2_device::device_start()
 		save_item(NAME(m_chan[ch].end_pos), ch);
 		save_item(NAME(m_chan[ch].loop_pos), ch);
 		save_item(NAME(m_chan[ch].page), ch);
+
 		save_item(NAME(m_chan[ch].vol), ch);
-		save_item(NAME(m_chan[ch].flags), ch);
-		save_item(NAME(m_chan[ch].panl), ch);
-		save_item(NAME(m_chan[ch].panr), ch);
+		save_item(NAME(m_chan[ch].vol_initial), ch);
+		save_item(NAME(m_chan[ch].vol_target), ch);
+
+		save_item(NAME(m_chan[ch].emphasis_cutoff), ch);
+		save_item(NAME(m_chan[ch].emphasis_cutoff_initial), ch);
+		save_item(NAME(m_chan[ch].emphasis_cutoff_target), ch);
+
+		save_item(NAME(m_chan[ch].output_cutoff), ch);
+		save_item(NAME(m_chan[ch].output_cutoff_initial), ch);
+		save_item(NAME(m_chan[ch].output_cutoff_target), ch);
+
+		save_item(NAME(m_chan[ch].emphasis_filter_state), ch);
+		save_item(NAME(m_chan[ch].output_filter_state), ch);
+
+		save_item(NAME(m_chan[ch].output_gain), ch);
+
+		save_item(NAME(m_chan[ch].samples), ch);
 	}
 }
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -147,7 +175,6 @@ void zsg2_device::device_reset()
 	fclose(f);
 #endif
 }
-
 
 /******************************************************************************/
 
@@ -193,6 +220,22 @@ int16_t *zsg2_device::prepare_samples(uint32_t offset)
 	return &m_full_samples[offset];
 }
 
+// Fill the buffer with filtered samples
+void zsg2_device::filter_samples(zchan *ch)
+{
+	int16_t *raw_samples = prepare_samples(ch->page | ch->cur_pos);
+	ch->samples[0] = ch->samples[4]; // we want to remember the last sample
+
+	for (int i = 0; i < 4; i++)
+	{
+		ch->samples[i+1] = raw_samples[i];
+
+		// not sure if the filter works exactly this way, however I am pleased
+		// with the output for now.
+		ch->emphasis_filter_state += (raw_samples[i]-(ch->emphasis_filter_state>>16)) * (EMPHASIS_CUTOFF_BASE - ch->emphasis_cutoff);
+		ch->samples[i+1] = (ch->emphasis_filter_state) >> EMPHASIS_OUTPUT_SHIFT;
+	}
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -202,12 +245,15 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 {
 	for (int i = 0; i < samples; i++)
 	{
-		int32_t mix_l = 0;
-		int32_t mix_r = 0;
+		int32_t mix[4] = {};
+
+		int ch = 0;
 
 		// loop over all channels
 		for (auto & elem : m_chan)
+		//auto & elem = m_chan[0];
 		{
+			ch++;
 			if (!elem.is_playing)
 				continue;
 
@@ -226,20 +272,46 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						continue;
 					}
 				}
-				elem.samples = prepare_samples(elem.page | elem.cur_pos);
+				filter_samples(&elem);
+				//elem.samples = prepare_samples(elem.page | elem.cur_pos);
 			}
 
-			int32_t sample = (elem.samples[elem.step_ptr >> 14 & 3] * elem.vol) >> 16;
+			uint8_t sample_pos = elem.step_ptr >> 14 & 3;
+			int32_t sample; // = elem.samples[sample_pos];
 
-			mix_l += (sample * elem.panl + sample * (0x1f - elem.panr)) >> 5;
-			mix_r += (sample * elem.panr + sample * (0x1f - elem.panl)) >> 5;
+			// linear interpolation (hardware certainly does something similar)
+			sample = elem.samples[sample_pos];
+			sample += ((uint16_t)(elem.step_ptr<<2&0xffff) * (int16_t)(elem.samples[sample_pos+1] - sample))>>16;
+			sample = (sample * elem.vol) >> 16;
+
+			// another filter...
+			elem.output_filter_state += (sample - (elem.output_filter_state>>16)) * elem.output_cutoff;
+			sample = elem.output_filter_state >> 16;
+
+			for(int output=0; output<4; output++)
+			{
+				int output_gain = elem.output_gain[output] & 0x1f; // left / right
+				int32_t output_sample = sample;
+
+				if (elem.output_gain[output] & 0x80) // perhaps ?
+					output_sample = -output_sample;
+
+				mix[output] += (output_sample * gain_tab[output_gain&0x1f]) >> 13;
+			}
+
+			// Apply transitions (This is not accurate yet)
+			elem.vol = ramp(elem.vol, elem.vol_target);
+			elem.output_cutoff = ramp(elem.output_cutoff, elem.output_cutoff_target);
+			elem.emphasis_cutoff = ramp(elem.emphasis_cutoff, elem.emphasis_cutoff_target);
 		}
 
-		outputs[0][i] = mix_l;
-		outputs[1][i] = mix_r;
+		ch = 0;
+
+		for(int output=0; output<4; output++)
+			outputs[output][i] = mix[output];
+
 	}
 }
-
 
 /******************************************************************************/
 
@@ -275,9 +347,9 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 
 		case 0x5:
 			// lo byte: loop address low
-			// hi byte: right panning (high bits always 0)
+			// hi byte: right output gain (bypass DSP)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0xff00) | (data & 0xff);
-			m_chan[ch].panr = data >> 8 & 0x1f;
+			m_chan[ch].output_gain[1] = data >> 8;
 			break;
 
 		case 0x6:
@@ -287,13 +359,23 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 
 		case 0x7:
 			// lo byte: loop address high
-			// hi byte: left panning (high bits always 0)
+			// hi byte: left output gain (bypass DSP)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0x00ff) | (data << 8 & 0xff00);
-			m_chan[ch].panl = data >> 8 & 0x1f;
+			m_chan[ch].output_gain[0] = data >> 8;
+			break;
+
+		case 0x8:
+			// Filter cutoff (Direct)
+			m_chan[ch].output_cutoff_initial = data;
 			break;
 
 		case 0x9:
 			// no function? always 0
+			break;
+
+		case 0xa:
+			// volume (Direct)
+			m_chan[ch].vol_initial = data;
 			break;
 
 		case 0xb:
@@ -301,14 +383,28 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 			// this register is read-only
 			break;
 
+		case 0xc:
+			// filter gain ?
+			m_chan[ch].output_cutoff_target = data;
+			break;
+
+		case 0xd:
+			// hi byte: DSP Chorus volume
+			// lo byte: Emphasis filter time constant (direct value)
+			m_chan[ch].output_gain[3] = data >> 8;
+			m_chan[ch].emphasis_cutoff_initial = expand_reg(data & 0xff);
+			break;
+
 		case 0xe:
-			// volume
-			m_chan[ch].vol = data;
+			// volume (Target)
+			m_chan[ch].vol_target = data;
 			break;
 
 		case 0xf:
-			// flags
-			m_chan[ch].flags = data;
+			// hi byte: DSP Reverb volume
+			// lo byte: Emphasis filter time constant
+			m_chan[ch].output_gain[2] = data >> 8;
+			m_chan[ch].emphasis_cutoff_target = expand_reg(data & 0xff);
 			break;
 
 		default:
@@ -322,10 +418,8 @@ uint16_t zsg2_device::chan_r(int ch, int reg)
 {
 	switch (reg)
 	{
-		case 0xb:
-			// ?
-			return 0;
-
+		case 0xb: // Only later games (taitogn) read this register...
+			return m_chan[ch].is_playing << 13;
 		default:
 			break;
 	}
@@ -333,6 +427,38 @@ uint16_t zsg2_device::chan_r(int ch, int reg)
 	return m_chan[ch].v[reg];
 }
 
+// expand 8-bit reg to 16-bit value. This is used for the emphasis filter
+// register. Not sure about how this works, the sound
+// CPU uses a lookup table (stored in gdarius sound cpu ROM at 0x6332) to
+// calculate this value, for now I'm generating an opproximate inverse.
+int16_t zsg2_device::expand_reg(uint8_t val)
+{
+	static const signed char frac_tab[16] = {8,9,10,11,12,13,14,15,-15,-14,-13,-12,-11,-10,-9,-8};
+	static const unsigned char shift_tab[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+
+	return (frac_tab[val&0x0f] << shift_tab[val>>4])>>EMPHASIS_CUTOFF_SHIFT;
+}
+
+// ramp registers
+// The CPU does not write often enough to make the transitions always sound
+// smooth, so the sound chip probably helps by smoothing the changes.
+// There are two sets of the volume and filter cutoff registers.
+// At key on, the CPU writes to the "direct" registers, after that it will
+// write to the "target" register instead.
+inline int32_t zsg2_device::ramp(int32_t current, int32_t target)
+{
+	int32_t difference = abs(target-current);
+	difference -= 0x40;
+	
+	if(difference < 0)
+		return target;
+	else if(target < current)
+		return target + difference;
+	else if(target > current)
+		return target - difference;
+	
+	return target;
+}
 
 /******************************************************************************/
 
@@ -352,7 +478,11 @@ void zsg2_device::control_w(int reg, uint16_t data)
 					m_chan[ch].is_playing = true;
 					m_chan[ch].cur_pos = m_chan[ch].start_pos;
 					m_chan[ch].step_ptr = 0;
-					m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
+					m_chan[ch].emphasis_filter_state = 0;
+					m_chan[ch].vol = m_chan[ch].vol_initial;
+					m_chan[ch].output_cutoff = m_chan[ch].output_cutoff_initial;
+					m_chan[ch].emphasis_cutoff = m_chan[ch].emphasis_cutoff_initial;
+					filter_samples(&m_chan[ch]);
 				}
 			}
 			break;
@@ -373,8 +503,15 @@ void zsg2_device::control_w(int reg, uint16_t data)
 			break;
 		}
 
-		case 0x18:
-			break;
+//		case 0x0c: //These registers are sometimes written to by the CPU. Unknown purpose.
+//			break;
+//		case 0x0d:
+//			break;
+//		case 0x10:
+//			break;
+
+//		case 0x18:
+//			break;
 
 		case 0x1c:
 			// rom readback address low (low 2 bits always 0)
@@ -387,6 +524,7 @@ void zsg2_device::control_w(int reg, uint16_t data)
 			break;
 
 		default:
+			logerror("ZSG2 control   %02X = %04X\n", reg, data & 0xffff);
 			break;
 	}
 }
@@ -413,7 +551,6 @@ uint16_t zsg2_device::control_r(int reg)
 
 	return 0;
 }
-
 
 /******************************************************************************/
 
