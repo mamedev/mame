@@ -248,7 +248,9 @@ void jpmmps_state::machine_reset()
 MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
+	TMS9995(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmmps_state::jpmmps_map);
+	m_maincpu->set_addrmap(AS_IO, &jpmmps_state::jpmmps_io_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC10
 	mainlatch.q_out_cb<0>().set_nop(); // watchdog

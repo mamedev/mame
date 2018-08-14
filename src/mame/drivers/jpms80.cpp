@@ -135,7 +135,10 @@ void jpms80_state::machine_reset()
 
 MACHINE_CONFIG_START(jpms80_state::jpms80)
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
+	TMS9995(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpms80_state::jpms80_map);
+	m_maincpu->set_addrmap(AS_IO, &jpms80_state::jpms80_io_map);
+
 	SPEAKER(config, "mono").front_center();
 
 	LS259(config, "outlatch0"); // I/O IC5

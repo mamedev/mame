@@ -678,9 +678,11 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	MCFG_HEXBUS_ADD("hexbus")
 
 	// TMS9995 CPU @ 12.0 MHz
-	MCFG_TMS99xx_ADD(TMS9995_TAG, TMS9995, XTAL(12'000'000), memmap, crumap)
-	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, hx5102_device, external_operation) )
-	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, hx5102_device, clock_out) )
+	TMS9995(config, m_flopcpu, XTAL(12'000'000));
+	m_flopcpu->set_addrmap(AS_PROGRAM, &hx5102_device::memmap);
+	m_flopcpu->set_addrmap(AS_IO, &hx5102_device::crumap);
+	m_flopcpu->extop_cb().set(FUNC(hx5102_device::external_operation));
+	m_flopcpu->clkout_cb().set(FUNC(hx5102_device::clock_out));
 
 	// Disk controller i8272A
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
