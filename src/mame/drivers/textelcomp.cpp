@@ -97,14 +97,20 @@ void textelcomp_state::textelcomp(machine_config &config)
 
 	via6522_device &via0(VIA6522(config, "via0", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	// TODO: CA1 falling edge generates interrupt
+	// TODO: PB6 falling edges are counted to generate another interrupt
 
 	VIA6522(config, "via1", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
+	// IRQ might be connected on hardware, but is never enabled
+
 	VIA6522(config, "via2", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
+	// TODO: CB1, CB2 and PB4 control 2x TC4094BP driving keyboard lights
 
 	via6522_device &via3(VIA6522(config, "via3", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
 	via3.writepa_handler().set(FUNC(textelcomp_state::rtc_w));
 	via3.ca2_handler().set(m_rtc, FUNC(msm58321_device::cs2_w)).invert();
 	via3.ca2_handler().append(m_rtc, FUNC(msm58321_device::stop_w)).invert();
+	// TODO: PB7 toggling generates beeps?
 
 	mos6551_device &acia(MOS6551(config, "acia", 3.6864_MHz_XTAL / 2)); // GS65SC51P-2
 	acia.set_xtal(3.6864_MHz_XTAL / 2);
