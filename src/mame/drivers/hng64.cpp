@@ -30,10 +30,8 @@ Notes:
   * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
   * Xrally and Roads Edge have a symbols table at respectively 0xb2f30 and 0xe10c0
-    Also, to enter into service mode you need to change value of 0xa2363  / 0xcfb53 to 1 during gameplay (of course, if you put into free play mode games are playable)
 
 ToDo:
-  * Buriki One / Xrally and Roads Edge doesn't coin it up, irq issue?
   * Sprite garbage in Beast Busters 2nd Nightmare, another irq issue?
   * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
     seem to be just an input port but controls program flow too.
@@ -59,11 +57,11 @@ ToDo:
   Other:
   * Translate KL5C80 docs and finish up the implementation
   * Figure out what IO $54 & $72 are on the communications CPU
-  * Hook up CPU2 (v30 based?) no rom? (maybe its the 'sound driver' the game uploads?)
-  * Add sound
+  * Fix sound
   * Backup ram etc.
   * Correct cpu speed
-  * What is ROM1?  Data for the KL5C80?  There's plenty of physical space to map it to.
+  * How to use the FPGA data ('ROM1')
+
 */
 
 /*
@@ -107,7 +105,7 @@ No.  PCB Label  IC Markings               IC Package
 06   ASIC10     NEO64-SCC                 QFP208
 07   CPU1       NEC D30200GD-100 VR4300   QFP120
 08   CPU3       KL5C80A12CFP              QFP80
-09   DPRAM1     DT7133 LA35J              PLCC68
+09   DPRAM1*    IDT7133 LA35J             PLCC68
 10   DSP1       L7A1045 L6028 DSP-A       QFP120
 11   FPGA1      ALTERA EPF10K10QC208-4    QFP208
 12   FROM1      MBM29F400B-12             TSOP48 (archived as FROM1.BIN)
@@ -123,6 +121,10 @@ No.  PCB Label  IC Markings               IC Package
 22   PSRAM2     TC551001BFL-70L           SOP32
 23   ROM1       ALTERA EPC1PC8            DIP8   (130817 bytes, archived as ROM1.BIN)
 24   SRAM5      TC55257DFL-85L            SOP28
+
+	* The IDT 7133 / 7143 lack interrupts and just act as 0x1000 bytes (2x 0x800 16-bit words) of RAM
+	 IDT 7133 - 32K (2K X 16 Bit) MASTER Dual-Port SRAM
+	 IDT 7143 - 32K (2K X 16 Bit) SLAVE Dual-Port SRAM
 
 
 PCB Layout (Bottom)
@@ -188,7 +190,7 @@ LVS-JAM SNK 1999.1.20
 
 No.  PCB Label  IC Markings               IC Package
 ----------------------------------------------------
-01   DPRAM1     DT 71321 LA55PF           QFP64 *
+01   DPRAM1     IDT 71321 LA55PF          QFP64 *
 02   IC1        MC44200FT                 QFP44
 03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64
 04   BACKUP     EPSON RTC62423            SOP24
@@ -445,6 +447,8 @@ or Fatal Fury for example).
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
+#define VERBOSE 1
+#include "logmacro.h"
 
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
@@ -458,28 +462,17 @@ or Fatal Fury for example).
 #define VBSTART             (224*2)
 
 
-#ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(hng64_state::trap_write)
-{
-	logerror("Remapped write... %08x %08x\n",offset,data);
-}
-
-READ32_MEMBER(hng64_state::hng64_random_read)
-{
-	return machine().rand()&0xffffffff;
-}
-#endif
 
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
-	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
-	return m_com_ram[offset];
+	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
+	return m_idt7133_dpram[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_w)
 {
-	//logerror("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
-	COMBINE_DATA(&m_com_ram[offset]);
+	//LOG("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
+	COMBINE_DATA(&m_idt7133_dpram[offset]);
 }
 
 /* TODO: fully understand this */
@@ -531,11 +524,11 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		//case 0x106c:
 		//case 0x107c:
 		case 0x1084:
-			logerror("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
+			LOG("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
 			return 0x00000002; //MCU->MIPS latch port
 		//case 0x108c:
 		case 0x1104:
-			logerror("%s: irq level READ %04x\n", machine().describe_context(),m_irq_level);
+			LOG("%s: irq level READ %04x\n", machine().describe_context(),m_irq_level);
 			return m_irq_level;
 		case 0x111c:
 			//printf("Read to IRQ ACK?\n");
@@ -597,7 +590,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			logerror("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
+			LOG("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
 		//0x110c global irq mask?
 		/* irq ack */
@@ -610,12 +603,12 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			break;
 		case 0x21c4:
 			// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
-			logerror("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), offset*4, data, mem_mask);
 			if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
 			break;
 
 		default:
-			logerror("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
 }
 
@@ -627,7 +620,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 
 READ8_MEMBER(hng64_state::hng64_dualport_r)
 {
-	logerror("%s: dualport R %04x\n", machine().describe_context(), offset);
+	LOG("%s: dualport R %04x\n", machine().describe_context(), offset);
 
 	/*
 	I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
@@ -648,7 +641,7 @@ READ8_MEMBER(hng64_state::hng64_dualport_r)
 		}
 	}
 
-	return m_dt7133_dpram->right_r(space, offset);
+	return m_dt71321_dpram->right_r(space, offset);
 }
 
 /*
@@ -679,8 +672,8 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 WRITE8_MEMBER(hng64_state::hng64_dualport_w)
 {
-	m_dt7133_dpram->right_w(space,offset, data);
-	logerror("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
+	m_dt71321_dpram->right_w(space,offset, data);
+	LOG("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
 }
 
 
@@ -891,7 +884,7 @@ void hng64_state::hng_map(address_map &map)
 
 	// Communications
 	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
-	map(0xc0001000, 0xc0001007).rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
+	map(0xc0001000, 0xc0001007).ram().share("comhack");//.rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
 
 	/* 6e000000-6fffffff */
 	/* 80000000-81ffffff */
@@ -1129,16 +1122,16 @@ static INPUT_PORTS_START( hng64_fight )
 	PORT_INCLUDE( hng64 )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1269,7 +1262,7 @@ static INPUT_PORTS_START( hng64_shoot )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_LOW)
 
-	PORT_MODIFY("IN3") // Debug Port?
+	PORT_MODIFY("IN3") // Debug Port? - there are inputs to pause game, bring up a test menu, move the camera around etc.
 	PORT_DIPNAME( 0x01, 0x01, "DEBUG" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1778,9 +1771,18 @@ void hng64_state::machine_start()
 	}
 
 	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
+	m_comhack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::comhack_callback), this));
 
 	init_io();
 }
+
+TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
+{
+	printf("comhack_callback %04x\n\n", m_comhack[0]);
+
+	m_comhack[0] = m_comhack[0] | 0x0002;
+}
+
 
 void hng64_state::machine_reset()
 {
@@ -1789,6 +1791,9 @@ void hng64_state::machine_reset()
 
 	reset_net();
 	reset_sound();
+
+	// on real hardware, even with no network, it takes until the counter reaches about 37 (Xtreme Rally) to boot, this kicks in at around 7
+	m_comhack_timer->adjust(m_maincpu->cycles_to_attotime(400000000));
 }
 
 /***********************************************
@@ -1801,7 +1806,7 @@ void hng64_state::machine_reset()
 
 WRITE8_MEMBER(hng64_state::ioport1_w)
 {
-	logerror("%s: ioport1_w %02x\n", machine().describe_context(), data);
+	LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
 
 	/* Port bits
 	
@@ -1824,14 +1829,14 @@ WRITE8_MEMBER(hng64_state::ioport3_w)
 {
 	int addr = (m_port1&0xe0)>>5;
 
-	logerror("%s: ioport3_w %02x (to address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), data, addr, m_port1 & 0x1f);
+	LOG("%s: ioport3_w %02x (to address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), data, addr, m_port1 & 0x1f);
 }
 
 READ8_MEMBER(hng64_state::ioport3_r)
 {
 	int addr = (m_port1&0xe0)>>5;
 
-	//logerror("%s: ioport3_r (from address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), addr, m_port1 & 0x1f);
+	//LOG("%s: ioport3_r (from address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), addr, m_port1 & 0x1f);
 	return m_intest[addr]->read();
 }
 
@@ -1861,13 +1866,13 @@ WRITE8_MEMBER(hng64_state::ioport7_w)
 
 	*/
 
-	//logerror("%s: ioport7_w %02x\n", machine().describe_context(), data);
+	//LOG("%s: ioport7_w %02x\n", machine().describe_context(), data);
 
 	m_ex_ramaddr_upper = (data & 0x0c) >> 2;
 
 	if ((!(data & 0x80)) && (m_port7 & 0x80))
 	{
-		logerror("%s: MCU request MIPS IRQ?\n", machine().describe_context());
+		LOG("%s: MCU request MIPS IRQ?\n", machine().describe_context());
 		set_irq(0x00020000);
 	}
 
@@ -1888,18 +1893,18 @@ WRITE8_MEMBER(hng64_state::ioport7_w)
 READ8_MEMBER(hng64_state::ioport0_r)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
-	uint8_t ret = m_dt7133_dpram->left_r(space, addr);
+	uint8_t ret = m_dt71321_dpram->left_r(space, addr);
 
-	logerror("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
+	LOG("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
 	return ret;
 }
 
 WRITE8_MEMBER(hng64_state::ioport0_w)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
-	m_dt7133_dpram->left_w(space, addr, data);
+	m_dt71321_dpram->left_w(space, addr, data);
 
-	logerror("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
+	LOG("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
 }
 
 
@@ -1914,7 +1919,7 @@ WRITE8_MEMBER(hng64_state::ioport0_w)
 */
 WRITE8_MEMBER(hng64_state::ioport4_w)
 {
-	logerror("%s: ioport4_w %02x\n", machine().describe_context(), data);
+	LOG("%s: ioport4_w %02x\n", machine().describe_context(), data);
 }
 
 /***********************************************
@@ -1955,16 +1960,17 @@ WRITE_LINE_MEMBER( hng64_state::sio0_w )
 
 TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqon_callback)
 {
-	logerror("timer_hack_on\n");
+	LOG("timer_hack_on\n");
 	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE );
 	m_tempio_irqoff_timer->adjust(m_maincpu->cycles_to_attotime(1000));
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
 {
-	logerror("timer_hack_off\n");
+	LOG("timer_hack_off\n");
 	m_iomcu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
 }
+
 
 void hng64_state::init_io()
 {
@@ -2032,7 +2038,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	iomcu.serial0_out_cb().set(FUNC(hng64_state::sio0_w));
 	//iomcu.serial1_out_cb().set(FUNC(hng64_state::sio1_w)); // not initialized / used
 
-	MCFG_DEVICE_ADD("dt7133_dpram", MB8421, 0)
+	MCFG_DEVICE_ADD("dt71321_dpram", IDT71321, 0)
 	//MCFG_MB8421_INTL_AN0R(INPUTLINE("xxx", 0)) // I don't think the IRQs are connected
 
 MACHINE_CONFIG_END
