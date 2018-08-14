@@ -19,13 +19,6 @@
     - windows with blitter (copy, fill and scroll) and clipping
 
     To do:
-    . proper cursor and mouse pointers [cursor can be offset from the pen location]
-    + variable width fonts [?? placed relative to current window]
-    + basic lines
-    - patterned lines
-    . bit blits & scroll
-    . meaning of WRRR bits
-    . meaning of CONF data [+ autoconfiguration]
     - interrupt generation
     - realistic timing?
     - &c.
@@ -145,9 +138,6 @@ constexpr uint16_t MSB_MASK = 0x8000;   // Mask of MSB
 		} \
 	} while (0)
 
-// This is the size for 9807. To be made configurable.
-#define HPGPU_VRAM_SIZE 16384
-
 // Index of words in configuration vector
 enum : unsigned
 {
@@ -161,18 +151,18 @@ enum : unsigned
 	CONF_VER_3 = 7,     // Vertical timing, 4th word
 	CONF_WPL   = 8,     // Words per line
 	CONF_LINES = 9,     // Lines
-	CONF_RAM_SIZE = 10  // RAM size (?)
+	CONF_OPTS  = 10     // RAM size or option bits (more likely)
 };
 
 // Fields of hor/ver timing words
 enum : uint16_t
 {
 	HV_CNT_MASK  = 0x3ff,   // Mask of counter part
-	HV_ZONE_MASK = 0xc000,  // Mask of zone part
-	HV_ZONE_0    = 0x0000,  // Value for zone 0
-	HV_ZONE_1    = 0x4000,  // Value for zone 1
-	HV_ZONE_2    = 0x8000,  // Value for zone 2
-	HV_ZONE_3    = 0xc000   // Value for zone 3
+	HV_ZONE_MASK = 0xc00,   // Mask of zone part
+	HV_ZONE_0    = 0x000,   // Value for zone 0
+	HV_ZONE_1    = 0x400,   // Value for zone 1
+	HV_ZONE_2    = 0x800,   // Value for zone 2
+	HV_ZONE_3    = 0xc00    // Value for zone 3
 };
 
 //**************************************************************************
@@ -194,9 +184,9 @@ DEFINE_DEVICE_TYPE(HP1LL3, hp1ll3_device, "hp1ll3", "Hewlett-Packard 1LL3-0005 G
 hp1ll3_device::hp1ll3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HP1LL3, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, m_vram_size(16)
 {
 }
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -211,17 +201,17 @@ void hp1ll3_device::device_start()
 
 	screen().register_screen_bitmap(m_bitmap);
 
-	m_videoram = std::make_unique<uint16_t[]>(HPGPU_VRAM_SIZE);
+	m_videoram = std::make_unique<uint16_t[]>(m_vram_size);
 
-	save_pointer(NAME(m_videoram), HPGPU_VRAM_SIZE);
-	m_ram_addr_mask = 0x3fff;
+	save_pointer(NAME(m_videoram) , m_vram_size);
+	m_ram_addr_mask = uint16_t(m_vram_size - 1);
 	m_horiz_pix_total = visarea.max_x + 1;
 	m_vert_pix_total = visarea.max_y + 1;
 }
 
 void hp1ll3_device::device_reset()
 {
-	m_io_ptr = m_command = 0;
+	m_rd_ptr = m_wr_ptr = m_command = 0;
 	m_sad = m_fad = m_dad = m_org = m_rr = m_udl = 0;
 	m_enable_video = m_enable_cursor = m_enable_sprite = m_busy = false;
 }
@@ -357,13 +347,23 @@ void hp1ll3_device::line(int x1, int y1, int x2, int y2)
 	}
 }
 
+void hp1ll3_device::get_font(uint16_t& font_data, uint16_t& font_height) const
+{
+	font_data = m_fad + rd_video(m_fad + 1) + 2;
+	font_height = rd_video(m_fad);
+}
+
 void hp1ll3_device::label(uint8_t chr, int width)
 {
 	draw_cursor_sprite();
 
+	uint16_t font_data;
+	uint16_t font_height;
+	get_font(font_data, font_height);
+
 	Rectangle clip = get_window();
-	Rectangle dst{{ m_cursor_x, m_cursor_y }, { uint16_t(width), m_fontheight }};
-	bitblt(m_fontdata + chr * 16, 16, 16, Point { 0, 0 }, clip, dst, m_rr);
+	Rectangle dst{{ m_cursor_x, m_cursor_y }, { uint16_t(width), font_height }};
+	bitblt(font_data + chr * 16, 16, 16, Point { 0, 0 }, clip, dst, m_rr);
 	m_cursor_x += width;
 	draw_cursor_sprite();
 }
@@ -639,6 +639,18 @@ void hp1ll3_device::set_sprite_pos(Point p)
 	}
 }
 
+void hp1ll3_device::disable_cursor()
+{
+	draw_cursor();
+	m_enable_cursor = false;
+}
+
+void hp1ll3_device::disable_sprite()
+{
+	draw_sprite();
+	m_enable_sprite = false;
+}
+
 hp1ll3_device::Rectangle hp1ll3_device::get_window() const
 {
 	return Rectangle{{ m_window.org_x, m_window.org_y }, { m_window.width, m_window.height }};
@@ -649,9 +661,49 @@ hp1ll3_device::Rectangle hp1ll3_device::get_screen() const
 	return Rectangle{{ 0, 0 }, { uint16_t(m_horiz_pix_total), uint16_t(m_vert_pix_total) }};
 }
 
+void hp1ll3_device::get_hv_timing(bool vertical, unsigned& total, unsigned& active) const
+{
+	unsigned idx = vertical ? CONF_VER_0 : CONF_HOR_0;
+	// Look for active part (zone 1) & compute total time
+	total = 0;
+	active = 0;
+	for (unsigned i = 0; i < 4; ++i) {
+		unsigned cnt = (m_conf[idx + i] & HV_CNT_MASK) + 1;
+		total += cnt;
+		if ((m_conf[idx + i] & HV_ZONE_MASK) == HV_ZONE_1) {
+			active = cnt;
+			// It seems that if a zone 2 comes immediately before a zone 1, it's
+			// counted in the active part
+			unsigned idx_1 = (i + 3) % 4 + idx;
+			if ((m_conf[idx_1] & HV_ZONE_MASK) == HV_ZONE_2) {
+				active += (m_conf[idx_1] & HV_CNT_MASK) + 1;
+			}
+		}
+	}
+	DBG_LOG(2, 0, ("H/V=%d total=%u active=%u\n", vertical, total, active));
+}
+
 void hp1ll3_device::apply_conf()
 {
-	// TODO:
+	unsigned h_total;
+	unsigned h_active;
+	unsigned v_total;
+	unsigned v_active;
+
+	get_hv_timing(false, h_total, h_active);
+	get_hv_timing(true, v_total, v_active);
+
+	// Dot clock is 4 times the GPU clock, H timings are in units of half the GPU clock
+	// I suspect that the GPU has a kind of "double clock" mode that is enabled by option bits in the last conf word.
+	// Without clock doubling, the HP-9808A video has a strange frame rate (~32Hz).
+	h_total *= 8;
+	h_active *= 8;
+
+	attotime frame_rate{clocks_to_attotime(h_total * v_total)};
+	screen().configure(h_total, v_total, rectangle{0, int32_t(h_active - 1), 0, int32_t(v_active - 1)}, frame_rate.attoseconds() / 4);
+
+	m_horiz_pix_total = h_active;
+	m_vert_pix_total = v_active;
 }
 
 uint32_t hp1ll3_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -662,10 +714,9 @@ uint32_t hp1ll3_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		return 0;
 	}
 
-	// XXX last line is not actually drawn on real hw
 	for (int y = 0; y < m_vert_pix_total; y++)
 	{
-		int const offset = m_sad + y * (m_horiz_pix_total / 16);
+		int const offset = m_sad + y*m_conf[CONF_WPL];
 		uint16_t *p = &m_bitmap.pix16(y);
 
 		for (int x = offset; x < offset + m_horiz_pix_total / 16; x++)
@@ -723,7 +774,7 @@ READ8_MEMBER( hp1ll3_device::read )
 	}
 	else
 	{
-		if (!(m_io_ptr & 1))
+		if (!(m_rd_ptr & 1))
 		{
 			switch (m_command)
 			{
@@ -762,17 +813,37 @@ READ8_MEMBER( hp1ll3_device::read )
 				break;
 
 			case RDP:
-				if (m_io_ptr == 0)
+				if (m_rd_ptr == 0)
 					m_io_word = m_cursor_x;
-				else if (m_io_ptr == 2)
+				else if (m_rd_ptr == 2)
 					m_io_word = m_cursor_y;
 				break;
 
 			case RDSP:
-				if (m_io_ptr == 0)
+				if (m_rd_ptr == 0)
 					m_io_word = m_sprite_x;
-				else if (m_io_ptr == 2)
+				else if (m_rd_ptr == 2)
 					m_io_word = m_sprite_y;
+				break;
+
+			case RDWINPARM:
+				switch (m_rd_ptr)
+				{
+				case 0:
+					m_io_word = m_window.org_x;
+					break;
+				case 2:
+					m_io_word = m_window.org_y;
+					break;
+				case 4:
+					m_io_word = m_window.width;
+					break;
+				case 6:
+					m_io_word = m_window.height;
+					break;
+				default:
+					break;
+				}
 				break;
 
 			case ID:
@@ -788,7 +859,7 @@ READ8_MEMBER( hp1ll3_device::read )
 		{
 			data = m_io_word & 0xff;
 		}
-		m_io_ptr++;
+		m_rd_ptr++;
 	}
 
 	DBG_LOG(1,"HPGPU", ("R @ %d == %02x\n", offset, data));
@@ -811,7 +882,7 @@ WRITE8_MEMBER( hp1ll3_device::write )
 	}
 	else
 	{
-		if (!(m_io_ptr & 1))
+		if (!(m_wr_ptr & 1))
 		{
 			m_io_word = uint16_t(data) << 8;
 		}
@@ -821,11 +892,11 @@ WRITE8_MEMBER( hp1ll3_device::write )
 			switch (m_command)
 			{
 			case CONF:
-				m_conf[m_io_ptr >> 1] = m_io_word;
-				DBG_LOG(1,"HPGPU",("CONF data word %d received: %04X\n", m_io_ptr >> 1, m_io_word));
-				if ((m_io_ptr >> 1) == 10) {
+				m_conf[m_wr_ptr >> 1] = m_io_word;
+				DBG_LOG(1,"HPGPU",("CONF data word %d received: %04X\n", m_wr_ptr >> 1, m_io_word));
+				if ((m_wr_ptr >> 1) == 10) {
 					apply_conf();
-					m_io_ptr = -1;
+					m_wr_ptr = -1;
 					m_command = NOP;
 				}
 				break;
@@ -844,10 +915,7 @@ WRITE8_MEMBER( hp1ll3_device::write )
 					unsigned bit = m_rw_win_x % WS;
 					int width = m_window.width + m_window.org_x - m_rw_win_x;
 					if (width <= 0)
-					{
 						m_command = NOP;
-						draw_cursor_sprite();
-					}
 					else
 					{
 						unsigned w = std::min(WS, unsigned(width));
@@ -871,22 +939,19 @@ WRITE8_MEMBER( hp1ll3_device::write )
 							m_rw_win_x = m_window.org_x;
 							m_rw_win_y++;
 							if (m_rw_win_y >= (m_window.height + m_window.org_y))
-							{
 								m_command = NOP;
-								draw_cursor_sprite();
-							}
 						}
 					}
 				}
 				break;
 
 			default:
-				if (m_io_ptr <= 4)
-					m_input[m_io_ptr / 2] = m_io_word;
-				DBG_LOG(2,"HPGPU",("wrote %02x at %d, input buffer is %04X %04X\n", data, m_io_ptr, m_input[0], m_input[1]));
+				if (m_wr_ptr <= 4)
+					m_input[m_wr_ptr / 2] = m_io_word;
+				DBG_LOG(2,"HPGPU",("wrote %02x at %d, input buffer is %04X %04X\n", data, m_wr_ptr, m_input[0], m_input[1]));
 			}
 		}
-		m_io_ptr++;
+		m_wr_ptr++;
 	}
 }
 
@@ -909,10 +974,6 @@ void hp1ll3_device::command(int command)
 		case WRMEM:
 			DBG_LOG(1,"HPGPU",("WRMEM of %d words to %04X complete\n", m_memory_ptr - m_input[0], m_input[0]));
 			break;
-
-		case WRWIN:
-			draw_cursor_sprite();
-			break;
 		}
 		break;
 
@@ -930,8 +991,7 @@ void hp1ll3_device::command(int command)
 
 	case DISSP:
 		DBG_LOG(2,"HPGPU",("command: DISSP [%d, 0x%x]\n", command, command));
-		draw_sprite();
-		m_enable_sprite = false;
+		disable_sprite();
 		break;
 
 	case ENSP:
@@ -945,8 +1005,7 @@ void hp1ll3_device::command(int command)
 
 	case DISCURS:
 		DBG_LOG(2,"HPGPU",("command: DISCURS [%d, 0x%x]\n", command, command));
-		draw_cursor();
-		m_enable_cursor = false;
+		disable_cursor();
 		break;
 
 	// type 1 commands -- 1 word of data expected in the buffer
@@ -961,13 +1020,11 @@ void hp1ll3_device::command(int command)
 	case WRFAD:
 		DBG_LOG(2,"HPGPU",("command: WRFAD [%d, 0x%x] (0x%04x)\n", command, command, m_input[0]));
 		m_fad = m_input[0];
+		break;
 
 	// ?? used by diagnostic ROM
 	case 6:
-		m_fontheight = rd_video(m_fad);
-		m_fontdata = m_fad + rd_video(m_fad + 1) + 2;
-		DBG_LOG(1,"HPGPU",("font data set: FAD %04X header %d bitmaps %04X height %d\n",
-						   m_fad, rd_video(m_fad + 1), m_fontdata, m_fontheight));
+		DBG_LOG(1,"HPGPU",("command: 6\n"));
 		break;
 
 	// start of data area
@@ -1018,19 +1075,15 @@ void hp1ll3_device::command(int command)
 
 		// Write window
 	case WRWIN:
-		DBG_LOG(2,"HPGPU",("command: WRWIN [%d, 0x%x] offset=%u size(%d,%d)\n",command, command, m_input[0], m_window.width, m_window.height));
-		// m_input[0] is offset (to be implemented)
-		m_rw_win_x = m_window.org_x;
-		m_rw_win_y = m_window.org_y;
-		draw_cursor_sprite();
-		break;
-
 		// Read window
 	case RDWIN:
-		DBG_LOG(2,"HPGPU",("command: RDWIN [%d, 0x%x] offset=%u\n",command, command, m_input[0]));
+		DBG_LOG(2,"HPGPU",("command: %s [%d, 0x%x] offset=%u size(%d,%d)\n",
+						   command == RDWIN ? "RDWIN":"WRWIN", command, command, m_input[0], m_window.width, m_window.height));
 		// m_input[0] is offset (to be implemented)
 		m_rw_win_x = m_window.org_x;
 		m_rw_win_y = m_window.org_y;
+		disable_cursor();
+		disable_sprite();
 		break;
 
 	// type 2 commands -- 2 words of data expected in the buffer
@@ -1079,6 +1132,13 @@ void hp1ll3_device::command(int command)
 		m_saved_x = m_cursor_x;
 		break;
 
+	// move pointer incremental
+	case IMOVEP:
+		DBG_LOG(2,"HPGPU",("command: IMOVEP [%d, 0x%x] (%d, %d)\n", command, command, m_input[0], m_input[1]));
+		set_pen_pos(Point{ uint16_t(m_cursor_x + m_input[0]), uint16_t(m_cursor_y + m_input[1]) });
+		m_saved_x = m_cursor_x;
+		break;
+
 		// Scroll UP
 	case SCROLUP:
 		{
@@ -1087,7 +1147,8 @@ void hp1ll3_device::command(int command)
 			Point src_p{ m_window.org_x, uint16_t(m_window.org_y + m_input[1]) };
 			Rectangle dst_rect = get_window();
 			dst_rect.size.y -= m_input[1];
-			bitblt(m_org, m_horiz_pix_total, m_vert_pix_total, src_p, get_window(), dst_rect, m_rr);
+			unsigned rounded_width = m_conf[CONF_WPL] * WS;
+			bitblt(m_org, rounded_width, m_vert_pix_total, src_p, get_window(), dst_rect, m_rr);
 			dst_rect.origin.y += dst_rect.size.y;
 			dst_rect.size.y = m_input[1];
 			fill(dst_rect, m_input[0]);
@@ -1104,7 +1165,8 @@ void hp1ll3_device::command(int command)
 			Rectangle dst_rect = get_window();
 			dst_rect.origin.y += m_input[1];
 			dst_rect.size.y -= m_input[1];
-			bitblt(m_org, m_horiz_pix_total, m_vert_pix_total, src_p, get_window(), dst_rect, m_rr);
+			unsigned rounded_width = m_conf[CONF_WPL] * WS;
+			bitblt(m_org, rounded_width, m_vert_pix_total, src_p, get_window(), dst_rect, m_rr);
 			dst_rect.origin.y = m_window.org_y;
 			dst_rect.size.y = m_input[1];
 			fill(dst_rect, m_input[0]);
@@ -1124,8 +1186,15 @@ void hp1ll3_device::command(int command)
 
 	// carriage return, line feed
 	case CRLFx:
-		DBG_LOG(2,"HPGPU",("command: CRLF [%d, 0x%x] (%d, %d)\n", command, command, m_input[0], m_input[1]));
-		set_pen_pos(Point{ m_saved_x, uint16_t(m_cursor_y + m_fontheight) });
+		{
+			DBG_LOG(2,"HPGPU",("command: CRLF [%d, 0x%x]\n", command, command));
+
+			uint16_t font_data;
+			uint16_t font_height;
+			get_font(font_data, font_height);
+
+			set_pen_pos(Point{ m_saved_x, uint16_t(m_cursor_y + font_height) });
+		}
 		break;
 
 	// move sprite absolute
@@ -1154,11 +1223,25 @@ void hp1ll3_device::command(int command)
 		DBG_LOG(2,"HPGPU",("command: %s [%d, 0x%x] (0x%04x)\n",
 			command == RDMEM?"RDMEM":"WRMEM", command, command, m_input[0]));
 		m_memory_ptr = m_input[0]; // memory is word-addressable
+		disable_cursor();
+		disable_sprite();
 		break;
 
 	// type 3 read commands
 	case RDP:
+		DBG_LOG(2,"HPGPU",("command: RDP [%d, 0x%x]\n", command, command));
+		break;
+
 	case RDSP:
+		DBG_LOG(2,"HPGPU",("command: RDSP [%d, 0x%x]\n", command, command));
+		break;
+
+	case RDWINPARM:
+		DBG_LOG(2,"HPGPU",("command: RDWINPARM [%d, 0x%x]\n", command, command));
+		break;
+
+	case ID:
+		DBG_LOG(2,"HPGPU",("command: ID [%d, 0x%x]\n", command, command));
 		break;
 
 	default:
@@ -1166,6 +1249,7 @@ void hp1ll3_device::command(int command)
 		break;
 	}
 
-	m_io_ptr = 0;
+	m_rd_ptr = 0;
+	m_wr_ptr = 0;
 	m_command = command;
 }
