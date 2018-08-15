@@ -1099,9 +1099,9 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, twinkle_state, spu_ata_irq))
-	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(*this, twinkle_state, spu_ata_dmarq))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
+	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 

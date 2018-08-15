@@ -780,8 +780,7 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
 	MCFG_TIMER_DRIVER_ADD("mcu_timer", pgm2_state, igs_interrupt2)
 
-	MCFG_ARM_AIC_ADD("arm_aic")
-	MCFG_IRQ_LINE_CB(WRITELINE(*this, pgm2_state, irq))
+	ARM_AIC(config, "arm_aic", 0).irq_callback().set(FUNC(pgm2_state::irq));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

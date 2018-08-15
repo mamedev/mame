@@ -1407,11 +1407,11 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	// floppy drives
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
+	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
+	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
@@ -1742,8 +1742,8 @@ MACHINE_CONFIG_START(a600_state::a600)
 	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
+	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
 	// todo: pcmcia
 
@@ -1797,8 +1797,8 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
+	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
 	// keyboard
 #if 0
@@ -1859,8 +1859,8 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 
 	// ide
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, a4000_state, ide_interrupt_w))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
+	ata.irq_handler().set(FUNC(a4000_state::ide_interrupt_w));
 
 	// todo: zorro3
 

@@ -832,13 +832,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	m_rtc->reset_cb().set(FUNC(atlantis_state::watchdog_reset));
 	m_rtc->irq_cb().set(FUNC(atlantis_state::watchdog_irq));
 
-	MCFG_DEVICE_ADD(m_ide, IDE_PCI, 0, 0x10950646, 0x07, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(WRITELINE(*this, atlantis_state, ide_irq))
-	// The pci-ide by default expects the system controller to be pci:00.0 so need to fix here
-	MCFG_DEVICE_MODIFY(PCI_ID_IDE":ide")
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(PCI_ID_NILE, AS_DATA)
-	MCFG_DEVICE_MODIFY(PCI_ID_IDE":ide2")
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(PCI_ID_NILE, AS_DATA)
+	IDE_PCI(config, m_ide, 0, 0x10950646, 0x07, 0x0, PCI_ID_NILE, AS_DATA).irq_handler().set(FUNC(atlantis_state::ide_irq));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(m_zeus, ZEUS2, ZEUS2_VIDEO_CLOCK)

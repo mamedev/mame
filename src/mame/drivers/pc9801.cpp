@@ -2292,10 +2292,10 @@ void pc9801_state::cdrom_headphones(device_t *device)
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
 	SPEAKER(config, "lheadphone").front_left();
 	SPEAKER(config, "rheadphone").front_right();
-	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("ideirq", input_merger_device, in_w<0>))
-	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("ideirq", input_merger_device, in_w<1>))
+	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+	m_ide[0]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<0>));
+	ATA_INTERFACE(config, m_ide[1]).options(pc9801_atapi_devices, "pc9801_cd", nullptr, false);
+	m_ide[1]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<1>));
 	MCFG_DEVICE_MODIFY("ide2:0")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("pc9801_cd", cdrom_headphones)
 

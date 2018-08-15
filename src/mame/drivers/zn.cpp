@@ -1467,8 +1467,8 @@ MACHINE_CONFIG_START(zn_state::coh1000w)
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 
-	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	VT83C461(config, m_vt83c461).options(ata_devices, "hdd", nullptr, true);
+	m_vt83c461->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&zn_state::atpsx_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&zn_state::atpsx_dma_write, this ) )
 MACHINE_CONFIG_END
@@ -2218,8 +2218,8 @@ MACHINE_CONFIG_START(zn_state::jdredd)
 	MCFG_DEVICE_MODIFY("gpu")
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 MACHINE_CONFIG_END
 
 /*

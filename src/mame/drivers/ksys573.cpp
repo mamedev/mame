@@ -2102,7 +2102,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_DEVICE_ADD( m_duart, MB89371, 0 )
 
 	MCFG_DEVICE_ADD( m_ata, ATA_INTERFACE, 0 )
-	MCFG_ATA_INTERFACE_IRQ_HANDLER( WRITELINE( *this, ksys573_state, ata_interrupt ) )
+	m_ata->irq_handler().set( FUNC( ksys573_state::ata_interrupt ) );
 
 	MCFG_DEVICE_MODIFY( "ata:0" )
 	MCFG_SLOT_OPTION_ADD( "cr589", CR589 )
