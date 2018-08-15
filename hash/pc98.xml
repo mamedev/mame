@@ -3793,7 +3793,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="usage" value="Expansion disk for Albatross. Load the main game, then mount this disk and select DISK CHANGE on the course menu." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="albatross (visual course).hdm" size="1261568" crc="b744b49a" sha1="df4e8364c2546431c97bb078296a964d0038a944" offset="0" />
+				<rom name="albatross (visual course).hdm" size="1261568" crc="fc6a29d8" sha1="f127c6b0e85e1a7f42a5e3de78573b7b671fb694" offset="0" />
 			</dataarea>
 		</part>
 	</software>
