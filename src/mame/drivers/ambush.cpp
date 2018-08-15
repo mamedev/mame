@@ -75,6 +75,7 @@ public:
 	void ambush_base(machine_config &config);
 	void ambush(machine_config &config);
 	void mariobl(machine_config &config);
+	void mariobla(machine_config &config);
 	void dkong3abl(machine_config &config);
 
 private:
@@ -766,6 +767,14 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(ambush_state::mariobla)
+	mariobl(config);
+
+	auto &outlatch(*subdevice<ls259_device>("outlatch"));
+	outlatch->q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	outlatch->q_out_cb<6>().set_nop();
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
@@ -957,5 +966,5 @@ GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, empty_init, 
 GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariobla,  mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, empty_init, ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)",      MACHINE_SUPPORTS_SAVE )
