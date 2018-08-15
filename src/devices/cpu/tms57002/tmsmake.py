@@ -69,7 +69,7 @@ def expand_wd1(v):
 WA2 = (
 "  if(r < -2147483648 || r > 2147483647) {\n"
 "    st1 |= ST1_AOV;\n"
-"    if(st1 & ST1_AOVM) r = std::max(int64_t(2147483648), std::min(int64_t(2147483647), r));\n"
+"    if(st1 & ST1_AOVM) r = std::max(int64_t(-2147483648), std::min(int64_t(2147483647), r));\n"
 "  }"
 "  aacc = r;")
 
