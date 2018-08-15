@@ -771,8 +771,8 @@ MACHINE_CONFIG_START(ambush_state::mariobla)
 	mariobl(config);
 
 	auto &outlatch(*subdevice<ls259_device>("outlatch"));
-	outlatch->q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
-	outlatch->q_out_cb<6>().set_nop();
+	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	outlatch.q_out_cb<6>().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
