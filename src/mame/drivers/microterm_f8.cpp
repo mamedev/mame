@@ -85,7 +85,6 @@ private:
 
 void microterm_f8_state::machine_start()
 {
-	m_port00 = 0;
 	m_keylatch = 0;
 	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
 
@@ -101,6 +100,7 @@ void microterm_f8_state::machine_start()
 void microterm_f8_state::machine_reset()
 {
 	m_scroll = 0;
+	m_port00 = 0xff;
 
 	// UART parameters
 	ioport_value dsw3 = m_dsw[2]->read();
@@ -190,15 +190,23 @@ READ8_MEMBER(microterm_f8_state::vram_r)
 {
 	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
 	assert(vaddr < 0x800);
+
+	u16 vdata = m_vram[vaddr];
 	if ((m_port00 & 0x05) == 0 && !machine().side_effects_disabled())
-		m_port00 = (m_port00 & 0x0f) | ((m_vram[vaddr] >> 4) & 0xf0);
-	return m_vram[vaddr] & 0xff;
+		m_port00 = (m_port00 & 0x0f) | (vdata & 0xf00) >> 4;
+
+	// Bit 7 indicates protected attribute
+	if ((~vdata & (~m_jumpers->read() >> 1) & 0xf00) != 0)
+		return vdata | 0x80;
+	else
+		return vdata & 0x7f;
 }
 
 WRITE8_MEMBER(microterm_f8_state::vram_w)
 {
 	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
 	assert(vaddr < 0x800);
+
 	m_vram[vaddr] = data | (m_port00 & 0xf0) << 4;
 }
 
