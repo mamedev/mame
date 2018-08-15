@@ -789,12 +789,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	hp_ipc_base(config);
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner_9807a)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9807a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
 
 	// 16kw/32kb video RAM
 	m_gpu->set_vram_size(16);
@@ -815,12 +810,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	hp_ipc_base(config);
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner_9808a)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9808a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
 
 	// 64kw/128kb video RAM
 	m_gpu->set_vram_size(64);

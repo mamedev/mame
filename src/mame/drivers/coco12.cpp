@@ -407,13 +407,10 @@ void coco_state::coco_floating_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(coco_state::coco_floating)
-	MCFG_DEVICE_ADD(FLOATING_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(coco_floating_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-MACHINE_CONFIG_END
+void coco_state::coco_floating(machine_config &config)
+{
+	ADDRESS_MAP_BANK(config, FLOATING_TAG).set_map(&coco_state::coco_floating_map).set_options(ENDIANNESS_BIG, 8, 16);
+}
 
 
 //-------------------------------------------------

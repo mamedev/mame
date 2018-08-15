@@ -491,12 +491,9 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+
+	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&crgolf_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(crgolf_state, crgolf)

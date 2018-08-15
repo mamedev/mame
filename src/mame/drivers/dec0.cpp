@@ -2005,20 +2005,8 @@ MACHINE_CONFIG_START(dec0_state::slyspy)
 	audiocpu.set_addrmap(AS_PROGRAM, &dec0_state::slyspy_s_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(slyspy_protection_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("sndprotect", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(slyspy_sound_protection_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000)
-
+	ADDRESS_MAP_BANK(config, "pfprotect").set_map(&dec0_state::slyspy_protection_map).set_options(ENDIANNESS_BIG, 16, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "sndprotect").set_map(&dec0_state::slyspy_sound_protection_map).set_options(ENDIANNESS_LITTLE, 8, 21, 0x80000);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

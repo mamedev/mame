@@ -538,11 +538,7 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 
-	MCFG_DEVICE_ADD("io", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(svi3x8_io_bank)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(9)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
+	ADDRESS_MAP_BANK(config, "io").set_map(&svi3x8_state::svi3x8_io_bank).set_data_width(8).set_addr_width(9).set_stride(0x100);
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, svi3x8_state, ppi_port_a_r))
