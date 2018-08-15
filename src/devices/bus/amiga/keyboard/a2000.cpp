@@ -4,9 +4,9 @@
 
     Amiga 2000 Keyboard
 
-    Manufactured by Cherry
+    Manufactured by Cherry (G80 series)
 
-    Very simple electronics:
+    Very simple electronics (parts from dumped German variant):
     * Philips crystal labelled 6000.000
     * U1 Philips MAB 8039HL 11P (microcontroller)
     * U2 RCA CD74HCT373E (latches low address bits from data bus)
@@ -28,10 +28,20 @@
     populated).  The program reads keys using movx a,@r0 when running
     from external ROM, or ins a,bus when running from internal ROM.
 
+    German and Swedish variants have been seen with the same 467 label
+    on the external EPROM.  The Swedish variant uses the same buffers
+    at U2 and U3, but has a Mitsubishi M5L8039P-11 microcontroller at
+    U1.
+
     Photos of a Swedish variant with a Philips MAB 8049H P A198 at U1,
     and U2, U3 and U4 unpopulated have been posted on forums.  The
     internal ROM of this single-chip version needs to be dumped for
     verification.
+
+    The later cost-reduced Amiga 2000 keyboard manufactured by Mitsumi
+    uses different electronics.  It has a MOS 6570-036 MCU with a
+    ceramic resonator, a TI SN74HC00N, and a Hitachi HD74HC123AP.  The
+    header for the host connection has four positions and pins.
 
 ***************************************************************************/
 
