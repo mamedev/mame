@@ -718,18 +718,15 @@ void sol20_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(sol20_state::sol20)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
+	MCFG_DEVICE_ADD("maincpu", I8080, 14.318181_MHz_XTAL / 7) // divider selectable as 5, 6 or 7 through jumpers
 	MCFG_DEVICE_PROGRAM_MAP(sol20_mem)
 	MCFG_DEVICE_IO_MAP(sol20_io)
 	MCFG_I8085A_INTE(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(14.318181_MHz_XTAL, 918, 0, 576, 260, 0, 208)
 	MCFG_SCREEN_UPDATE_DRIVER(sol20_state, screen_update)
-	MCFG_SCREEN_SIZE(576, 208)
-	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sol20)
