@@ -22,8 +22,12 @@ and a Zoom Corp. ZFX-2 DSP instead of the TMS57002.
 
 
 TODO:
-- Fix DSP emulation for GNet. Currently no sound
-- add DSP, sound is tinny without it
+- Raycrisis song 9 gets cut off due to clipping. Possible DSP emulation bug,
+  or just have to change the volumes. in the sound test, it will start to cut
+  at about 55%. and the timbre doesn't sound right anyway.
+
+- check DSP behavior
+- Implement the ramping control registers in zsg2.cpp
 
 ***************************************************************************/
 
@@ -213,10 +217,10 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 
 	ZSG2(config, m_zsg2, XTAL(25'000'000));
 #ifdef USE_DSP
-	m_zsg2->add_route(0, *m_tms57002, 1, 0); // reverb effect
-	m_zsg2->add_route(1, *m_tms57002, 1, 1); // chorus effect
-	m_zsg2->add_route(2, *m_tms57002, 1, 2); // left direct
-	m_zsg2->add_route(3, *m_tms57002, 1, 3); // right direct
+	m_zsg2->add_route(0, *m_tms57002, 0.5, 0); // reverb effect
+	m_zsg2->add_route(1, *m_tms57002, 0.5, 1); // chorus effect
+	m_zsg2->add_route(2, *m_tms57002, 0.5, 2); // left direct
+	m_zsg2->add_route(3, *m_tms57002, 0.5, 3); // right direct
 #else
 	m_zsg2->add_route(2, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_zsg2->add_route(3, *this, 1.0, AUTO_ALLOC_INPUT, 1);
