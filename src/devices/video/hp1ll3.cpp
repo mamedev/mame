@@ -327,9 +327,8 @@ void hp1ll3_device::line(int x1, int y1, int x2, int y2)
 		{
 			point(x, y, m_udl & udl_scan,rop_masks);
 			udl_scan >>= 1;
-			if (!udl_scan) {
+			if (!udl_scan)
 				udl_scan = MSB_MASK;
-			}
 
 			if (e > 0)
 			{
@@ -471,7 +470,8 @@ bool hp1ll3_device::bitblt(uint16_t src_base_addr, unsigned src_width, unsigned 
 		p1_pix += dst_height * src_width + dst_width - 1;
 		p2_pix += dst_height * dst_rounded_width + dst_width - 1;
 		DBG_LOG(3,0,("bitblt rev p1_pix=%u p2_pix=%u\n", p1_pix, p2_pix));
-		while (dst_height--) {
+		while (dst_height--)
+		{
 			p1_pix -= src_width;
 			p2_pix -= dst_rounded_width;
 			rowbltneg(p1_pix, p2_pix, dst_width, rop_masks);
@@ -538,9 +538,9 @@ void hp1ll3_device::rowbltneg(unsigned p1_pix, unsigned p2_pix, int width, const
 		unsigned p1_bit = p1_pix % WS;
 		// Get src pixels and align to LSB
 		uint16_t new_pix = rd_video(p1_word) >> (WS - 1 - p1_bit);
-		if (p1_bit != (WS - 1)) {
+		if (p1_bit != (WS - 1))
 			new_pix |= rd_video(p1_word - 1) << (p1_bit + 1);
-		}
+
 		unsigned p2_word = p2_pix / WS;
 		unsigned p2_bit = p2_pix % WS;
 		uint16_t old_pix = rd_video(p2_word);
@@ -667,17 +667,18 @@ void hp1ll3_device::get_hv_timing(bool vertical, unsigned& total, unsigned& acti
 	// Look for active part (zone 1) & compute total time
 	total = 0;
 	active = 0;
-	for (unsigned i = 0; i < 4; ++i) {
+	for (unsigned i = 0; i < 4; ++i)
+	{
 		unsigned cnt = (m_conf[idx + i] & HV_CNT_MASK) + 1;
 		total += cnt;
-		if ((m_conf[idx + i] & HV_ZONE_MASK) == HV_ZONE_1) {
+		if ((m_conf[idx + i] & HV_ZONE_MASK) == HV_ZONE_1)
+		{
 			active = cnt;
 			// It seems that if a zone 2 comes immediately before a zone 1, it's
 			// counted in the active part
 			unsigned idx_1 = (i + 3) % 4 + idx;
-			if ((m_conf[idx_1] & HV_ZONE_MASK) == HV_ZONE_2) {
+			if ((m_conf[idx_1] & HV_ZONE_MASK) == HV_ZONE_2)
 				active += (m_conf[idx_1] & HV_CNT_MASK) + 1;
-			}
 		}
 	}
 	DBG_LOG(2, 0, ("H/V=%d total=%u active=%u\n", vertical, total, active));
@@ -894,7 +895,8 @@ WRITE8_MEMBER( hp1ll3_device::write )
 			case CONF:
 				m_conf[m_wr_ptr >> 1] = m_io_word;
 				DBG_LOG(1,"HPGPU",("CONF data word %d received: %04X\n", m_wr_ptr >> 1, m_io_word));
-				if ((m_wr_ptr >> 1) == 10) {
+				if ((m_wr_ptr >> 1) == 10)
+				{
 					apply_conf();
 					m_wr_ptr = -1;
 					m_command = NOP;
