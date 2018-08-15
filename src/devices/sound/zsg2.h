@@ -76,6 +76,8 @@ private:
 	};
 
 	uint16_t gain_tab[256];
+	uint16_t gain_tab_frac[256];
+
 	zchan m_chan[48];
 
 	required_region_ptr<uint32_t> m_mem_base;

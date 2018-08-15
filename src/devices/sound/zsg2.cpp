@@ -47,6 +47,7 @@
 TODO:
 - Filter behavior might not be perfect.
 - Volume ramping probably behaves differently on hardware.
+  Perhaps this is what the the "filter cutoff" register is for...
 - hook up DSP, it's used for reverb and chorus effects.
 - identify sample flags
   * bassdrum in shikigam level 1 music is a good hint: it should be one octave
@@ -104,10 +105,12 @@ void zsg2_device::device_start()
 	save_item(NAME(m_read_address));
 
 	// Generate the output gain table. Assuming -1dB per step for now.
-	for (int i = 0; i < 32; i++)
+	for (int i = 0, history=0; i < 32; i++)
 	{
 		double val = pow(10, -(31 - i) / 20.) * 65535.;
 		gain_tab[i] = val;
+		gain_tab_frac[i] = val-history;
+		history = val;
 	}
 
 	for (int ch = 0; ch < 48; ch++)
@@ -232,7 +235,7 @@ void zsg2_device::filter_samples(zchan *ch)
 
 		// not sure if the filter works exactly this way, however I am pleased
 		// with the output for now.
-		ch->emphasis_filter_state += (raw_samples[i]-(ch->emphasis_filter_state>>16)) * (EMPHASIS_CUTOFF_BASE - ch->emphasis_cutoff);
+		ch->emphasis_filter_state += (raw_samples[i]-(ch->emphasis_filter_state>>16)) * (EMPHASIS_CUTOFF_BASE /* - ch->emphasis_cutoff*/);
 		ch->samples[i+1] = (ch->emphasis_filter_state) >> EMPHASIS_OUTPUT_SHIFT;
 	}
 }
@@ -243,6 +246,7 @@ void zsg2_device::filter_samples(zchan *ch)
 
 void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	// DSP is programmed to expect 24-bit samples! So we're not limiting to 16-bit here
 	for (int i = 0; i < samples; i++)
 	{
 		int32_t mix[4] = {};
@@ -282,7 +286,11 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			// linear interpolation (hardware certainly does something similar)
 			sample = elem.samples[sample_pos];
 			sample += ((uint16_t)(elem.step_ptr<<2&0xffff) * (int16_t)(elem.samples[sample_pos+1] - sample))>>16;
+
 			sample = (sample * elem.vol) >> 16;
+			//uint8_t vol_base = ~elem.vol >> 11 & 0x1f;
+			//uint16_t vol = (~gain_tab[vol_base]) + ((gain_tab_frac[vol_base]*(elem.vol&0x7ff))>>11);
+			//sample = (sample * vol) >> 16;
 
 			// another filter...
 			elem.output_filter_state += (sample - (elem.output_filter_state>>16)) * elem.output_cutoff;
@@ -347,9 +355,9 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 
 		case 0x5:
 			// lo byte: loop address low
-			// hi byte: right output gain (bypass DSP)
+			// hi byte: right output gain (direct)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0xff00) | (data & 0xff);
-			m_chan[ch].output_gain[1] = data >> 8;
+			m_chan[ch].output_gain[3] = data >> 8;
 			break;
 
 		case 0x6:
@@ -359,9 +367,9 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 
 		case 0x7:
 			// lo byte: loop address high
-			// hi byte: left output gain (bypass DSP)
+			// hi byte: left output gain (direct)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0x00ff) | (data << 8 & 0xff00);
-			m_chan[ch].output_gain[0] = data >> 8;
+			m_chan[ch].output_gain[2] = data >> 8;
 			break;
 
 		case 0x8:
@@ -384,14 +392,14 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 			break;
 
 		case 0xc:
-			// filter gain ?
+			// IIR lowpass time constant
 			m_chan[ch].output_cutoff_target = data;
 			break;
 
 		case 0xd:
-			// hi byte: DSP Chorus volume
-			// lo byte: Emphasis filter time constant (direct value)
-			m_chan[ch].output_gain[3] = data >> 8;
+			// hi byte: DSP channel 1 (chorus) gain
+			// lo byte: Filter ramping speed
+			m_chan[ch].output_gain[1] = data >> 8;
 			m_chan[ch].emphasis_cutoff_initial = expand_reg(data & 0xff);
 			break;
 
@@ -401,9 +409,9 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 			break;
 
 		case 0xf:
-			// hi byte: DSP Reverb volume
-			// lo byte: Emphasis filter time constant
-			m_chan[ch].output_gain[2] = data >> 8;
+			// hi byte: DSP channel 0 (reverb) gain
+			// lo byte: Volume ramping speed
+			m_chan[ch].output_gain[0] = data >> 8;
 			m_chan[ch].emphasis_cutoff_target = expand_reg(data & 0xff);
 			break;
 
@@ -448,7 +456,7 @@ int16_t zsg2_device::expand_reg(uint8_t val)
 inline int32_t zsg2_device::ramp(int32_t current, int32_t target)
 {
 	int32_t difference = abs(target-current);
-	difference -= 0x40;
+	difference -= 6;
 	
 	if(difference < 0)
 		return target;
