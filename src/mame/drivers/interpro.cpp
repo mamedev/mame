@@ -708,40 +708,48 @@ static void interpro_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-MACHINE_CONFIG_START(interpro_state::interpro_scc1)
-	MCFG_DEVICE_MODIFY(INTERPRO_SCC1_TAG)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(INTERPRO_SERIAL_PORT1_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(INTERPRO_SERIAL_PORT2_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(m_ioga, interpro_ioga_device, ir11_w))
-	MCFG_Z80SCC_OUT_WREQA_CB(WRITELINE(m_ioga, interpro_ioga_device, drq_serial1))
-	MCFG_Z80SCC_OUT_WREQB_CB(WRITELINE(m_ioga, interpro_ioga_device, drq_serial2))
+void interpro_state::interpro_serial(machine_config &config)
+{
+	// scc1 channel A (serial port 1)
+	rs232_port_device &port1(RS232_PORT(config, INTERPRO_SERIAL_PORT1_TAG, default_rs232_devices, nullptr));
+	port1.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsa_w));
+	port1.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcda_w));
+	port1.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	m_scc1->out_dtra_callback().set(port1, FUNC(rs232_port_device::write_dtr));
+	m_scc1->out_rtsa_callback().set(port1, FUNC(rs232_port_device::write_rts));
+	m_scc1->out_txda_callback().set(port1, FUNC(rs232_port_device::write_txd));
+	m_scc1->out_wreqa_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial1)).invert();
 
-	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT1_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsa_w))
+	// scc1 channel B (serial port 2)
+	rs232_port_device &port2(RS232_PORT(config, INTERPRO_SERIAL_PORT2_TAG, default_rs232_devices, nullptr));
+	port2.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsb_w));
+	port2.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcdb_w));
+	port2.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
+	m_scc1->out_dtrb_callback().set(port2, FUNC(rs232_port_device::write_dtr));
+	m_scc1->out_rtsb_callback().set(port2, FUNC(rs232_port_device::write_rts));
+	m_scc1->out_txdb_callback().set(port2, FUNC(rs232_port_device::write_txd));
+	m_scc1->out_wreqb_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial2)).invert();
 
-	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsb_w))
-MACHINE_CONFIG_END
+	m_scc1->out_int_callback().set(m_ioga, FUNC(interpro_ioga_device::ir11_w));
 
-MACHINE_CONFIG_START(interpro_state::interpro_scc2)
-	MCFG_DEVICE_MODIFY(INTERPRO_SCC2_TAG)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(m_keyboard, interpro_keyboard_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(INTERPRO_SERIAL_PORT0_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(m_ioga, interpro_ioga_device, ir11_w))
-	MCFG_Z80SCC_OUT_WREQB_CB(WRITELINE(m_ioga, interpro_ioga_device, drq_serial0))
-
-	INTERPRO_KEYBOARD_PORT(config, m_keyboard, interpro_keyboard_devices, "lle_en_us");
+	// scc2 channel A (keyboard)
+	INTERPRO_KEYBOARD_PORT(config, m_keyboard, interpro_keyboard_devices, nullptr);
 	m_keyboard->rxd_handler_cb().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	m_scc2->out_txda_callback().set(m_keyboard, FUNC(interpro_keyboard_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT0_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
-MACHINE_CONFIG_END
+	// scc2 channel B (serial port 0)
+	rs232_port_device &port0(RS232_PORT(config, INTERPRO_SERIAL_PORT0_TAG, default_rs232_devices, nullptr));
+	port0.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
+	port0.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	port0.ri_handler().set(m_scc2, FUNC(z80scc_device::syncb_w));
+	port0.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	m_scc2->out_dtrb_callback().set(port0, FUNC(rs232_port_device::write_dtr));
+	m_scc2->out_rtsb_callback().set(port0, FUNC(rs232_port_device::write_rts));
+	m_scc2->out_txdb_callback().set(port0, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_wreqb_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial0)).invert();
+
+	m_scc2->out_int_callback().set(m_ioga, FUNC(interpro_ioga_device::ir11_w));
+}
 
 static void interpro_scsi_devices(device_slot_interface &device)
 {
@@ -885,9 +893,8 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
-	interpro_scc1(config);
 	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
-	interpro_scc2(config);
+	interpro_serial(config);
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", emerald_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
@@ -937,9 +944,8 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
-	interpro_scc1(config);
 	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
-	interpro_scc2(config);
+	interpro_serial(config);
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", turquoise_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
@@ -985,9 +991,8 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 
 	// serial controllers and ports
 	SCC85230(config, m_scc1, 4.9152_MHz_XTAL);
-	interpro_scc1(config);
 	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
-	interpro_scc2(config);
+	interpro_serial(config);
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", sapphire_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
@@ -1012,6 +1017,8 @@ MACHINE_CONFIG_START(turquoise_state::ip2000)
 	turquoise(config);
 	//m_maincpu->set_clock(40_MHz_XTAL);
 
+	m_keyboard->set_default_option("lle_en_us");
+
 	// bus and slots (default to 2020 with GT graphics)
 	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
 
@@ -1031,6 +1038,8 @@ MACHINE_CONFIG_START(sapphire_state::ip2400)
 	//m_maincpu->set_clock(50_MHz_XTAL);
 
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
+
+	m_keyboard->set_default_option("lle_en_us");
 
 	// bus and slots (default to 2430 with GT+ graphics)
 	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
@@ -1053,6 +1062,8 @@ MACHINE_CONFIG_START(sapphire_state::ip2500)
 	// FIXME: don't know which cammu revision
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
+	m_keyboard->set_default_option("lle_en_us");
+
 	// bus and slots (default to 2530 with GT+ graphics)
 	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
 
@@ -1073,6 +1084,8 @@ MACHINE_CONFIG_START(sapphire_state::ip2700)
 	//m_maincpu->set_clock(?);
 
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
+
+	m_keyboard->set_default_option("lle_en_us");
 
 	// bus and slots (default to 2730 with GT+ graphics)
 	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
@@ -1096,6 +1109,8 @@ MACHINE_CONFIG_START(sapphire_state::ip2800)
 	// FIXME: don't know which cammu revision
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
+	m_keyboard->set_default_option("lle_en_us");
+
 	// bus and slots (default to 2830 with GT+ graphics)
 	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
 
@@ -1114,9 +1129,6 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(emerald_state::ip6000)
 	emerald(config);
 	//m_maincpu->set_clock(80_MHz_XTAL / 2);
-
-	// EDGE systems use graphics keyboard
-	m_keyboard->set_default_option(nullptr);
 
 	// bus and slots (default to 6040 with EDGE-1 graphics)
 	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
@@ -1139,6 +1151,8 @@ MACHINE_CONFIG_START(sapphire_state::ip6400)
 	//m_maincpu->set_clock(36_MHz_XTAL);
 
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
+
+	m_keyboard->set_default_option("lle_en_us");
 
 	// bus and slots (default to 6450 with GT II graphics)
 	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
@@ -1170,9 +1184,6 @@ MACHINE_CONFIG_START(sapphire_state::ip6700)
 	// FIXME: don't know which cammu revision
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
-	// EDGE systems use graphics keyboard
-	m_keyboard->set_default_option(nullptr);
-
 	// bus and slots (default to 6780 with EDGE-2 Plus graphics)
 	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
 
@@ -1195,9 +1206,6 @@ MACHINE_CONFIG_START(sapphire_state::ip6800)
 
 	// FIXME: don't know which cammu revision
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
-
-	// EDGE systems use graphics keyboard
-	m_keyboard->set_default_option(nullptr);
 
 	// bus and slots (default to 6880 with EDGE-2 Plus graphics)
 	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
@@ -1223,17 +1231,18 @@ ROM_START(ip2000)
 	ROM_LOAD32_BYTE("mpcb962a.bin", 0x0, 0x20, CRC(e391342c) SHA1(02e03aad760b6651b8599c3a41c7c457983ee97d))
 
 	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2000", "InterPro 2000 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2000", "InterPro/InterServe 20x0 EPROM")
 	ROMX_LOAD("mprgm530e__26_apr_91k.u171", 0x00001, 0x20000, CRC(e4c470cb) SHA1(ff1917bfa963988d739a9dbf0b8f034fe49f2f8c), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgm540e__06_may_91k.u172", 0x00000, 0x20000, CRC(03225843) SHA1(03cfcd5b8ae0057240ef808a40108cb5d082eb63), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(ip2400)
+	// feature[0] & 0x02: C4I cammu if set
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt0470.bin", 0x0, 0x20, CRC(498c80df) SHA1(18a49732ac9d04b20a77747c1b946c2e88abb087))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro 2400 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro/InterServe 24x0 EPROM")
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1248,7 +1257,7 @@ ROM_START(ip2500)
 	ROM_LOAD32_BYTE("msmt1000.bin", 0x0, 0x20, CRC(548046c0) SHA1(ce7646e868f3aa35642d7f9348f6b9e91693918e))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro 2500 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro/InterServe 25x0 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1259,11 +1268,12 @@ ROM_START(ip2500)
 ROM_END
 
 ROM_START(ip2700)
+	// feature[0] & 0x04: supports RETRY if clear
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt1280.bin", 0x0, 0x20, CRC(32d833af) SHA1(7225c5f5670fe49d86556a2cb453ae6fe09e3e19))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro 2700 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro/InterServe 27x0 EPROM")
 	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1278,7 +1288,7 @@ ROM_START(ip2800)
 	ROM_LOAD32_BYTE("msmt1450.bin", 0x0, 0x20, CRC(61c7a305) SHA1(efcd045cbdfda8df44eaad761b0ba99367973cd7))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro 2800 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro/InterServe 28x0 EPROM")
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1292,11 +1302,13 @@ ROM_START(ip6000)
 	ROM_REGION(0x80, INTERPRO_NODEID_TAG, 0)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
+	// feature[0] & 0x01: 1/4 bus clock if clear
+	// feature[0] & 0x02: configurable console port if clear
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
-	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(100f4f94) SHA1(64242eadd40ce5b9d12625db8707a07ff9e4d05c))
+	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(6da05794) SHA1(fef8a9c17491f3d3ceb35c56a628f47d49166b57))
 
 	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro 6000 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro/InterServe 60x0 EPROM")
 	ROMX_LOAD("mprgg360f__04_may_90v.u336", 0x00001, 0x20000, CRC(9e8b798b) SHA1(54412e26a468e038fb44ffa322ed3ddfae423c17), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgg350f__04_may_90v.u349", 0x00000, 0x20000, CRC(32ab99fd) SHA1(202a6082bade8a084b8cd25109daff8443f6a5c7), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
@@ -1307,7 +1319,7 @@ ROM_START(ip6400)
 
 	// FIXME: use 2400 eprom until we have a 6400 dump
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6400", "InterPro 6400 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6400", "InterPro/InterServe 64x0 EPROM")
 	ROMX_LOAD("ip6400_eprom.bin", 0x00000, 0x20000, BAD_DUMP CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1322,7 +1334,7 @@ ROM_START(ip6700)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro 6700 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro/InterServe 67x0 EPROM")
 	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1337,7 +1349,7 @@ ROM_START(ip6800)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro 6800 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro/InterServe 68x0 EPROM")
 	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1347,13 +1359,13 @@ ROM_START(ip6800)
 	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
-/*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY        FULLNAME         FLAGS */
-COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,init_common,"Intergraph",  "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1990,  ip6000,  0,      0,      ip6000,  interpro, emerald_state,  init_common,"Intergraph",  "InterPro 6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip6400,  0,      0,      ip6400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6700,  0,      0,      ip6700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6800,  0,      0,      ip6800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY        FULLNAME                    FLAGS */
+COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,init_common,"Intergraph",  "InterPro/InterServe 20x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 24x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 25x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 27x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 28x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1990,  ip6000,  0,      0,      ip6000,  interpro, emerald_state,  init_common,"Intergraph",  "InterPro/InterServe 60x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip6400,  0,      0,      ip6400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 64x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6700,  0,      0,      ip6700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 67x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6800,  0,      0,      ip6800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 68x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

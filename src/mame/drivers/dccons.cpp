@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_AICARTC_ADD("aicartc", XTAL(32'768))
+	AICARTC(config, "aicartc", XTAL(32'768));
 
 	MCFG_DEVICE_ADD("ata", ATA_INTERFACE, 0)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, dc_cons_state, ata_interrupt))

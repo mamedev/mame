@@ -1161,9 +1161,9 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<0>().set(FUNC(equites_state::flip_screen_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::mcu_start_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(equites_state::mcu_switch_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(equites_state::mcu_start_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(equites_state::mcu_switch_w));
 
 	common_sound(config);
 

@@ -495,7 +495,8 @@ MACHINE_CONFIG_START(snug_enhanced_video_device::device_add_mconfig)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, snug_enhanced_video_device, ready_line) )
 
 	// Mouse connected to the color bus of the v9938
-	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
+	TI99_COLORBUS(config, m_colorbus, 0);
+	m_colorbus->configure_slot();
 
 MACHINE_CONFIG_END
 

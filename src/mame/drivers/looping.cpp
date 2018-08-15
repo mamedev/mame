@@ -624,11 +624,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(looping_state::looping)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", looping_state,  looping_interrupt)
+	TMS9995(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::looping_map);
+	m_maincpu->set_addrmap(AS_IO, &looping_state::looping_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(looping_state::looping_interrupt));
 
 	// CPU TMS9980A for audio subsystem; no line connections
-	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map)
+	TMS9980A(config, m_audiocpu, SOUND_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
 
 	MCFG_DEVICE_ADD("mcu", COP420, COP_CLOCK)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )

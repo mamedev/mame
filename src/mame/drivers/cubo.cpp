@@ -1047,13 +1047,13 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	MCFG_I2CMEM_PAGE_SIZE(16)
 	MCFG_I2CMEM_DATA_SIZE(1024)
 
-	MCFG_AKIKO_ADD("akiko")
-	MCFG_AKIKO_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AKIKO_INT_CB(WRITELINE(*this, cubo_state, akiko_int_w))
-	MCFG_AKIKO_SCL_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_scl))
-	MCFG_AKIKO_SDA_READ_HANDLER(READLINE("i2cmem", i2cmem_device, read_sda))
-	MCFG_AKIKO_SDA_WRITE_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_sda))
+	akiko_device &akiko(AKIKO(config, "akiko", 0));
+	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
+	akiko.mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
+	akiko.int_callback().set(FUNC(cubo_state::akiko_int_w));
+	akiko.scl_callback().set("i2cmem", FUNC(i2cmem_device::write_scl));
+	akiko.sda_r_callback().set("i2cmem", FUNC(i2cmem_device::read_sda));
+	akiko.sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
 
 	// video hardware
 	pal_video(config);
@@ -1067,13 +1067,13 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_PAL)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
-	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
+	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_PAL));
+	paula.add_route(0, "lspeaker", 0.25);
+	paula.add_route(1, "rspeaker", 0.25);
+	paula.add_route(2, "rspeaker", 0.25);
+	paula.add_route(3, "lspeaker", 0.25);
+	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	MCFG_DEVICE_ADD("cdda", CDDA)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

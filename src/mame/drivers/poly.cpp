@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	/* video control */
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pa_w));
-	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pb_w));
+	m_pia[0]->writepb_handler().set(FUNC(poly_state::pia0_pb_w));
 	m_pia[0]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_pia[0]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 

@@ -2931,7 +2931,7 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
-	MCFG_AICARTC_ADD("aicartc", XTAL(32'768) )
+	AICARTC(config, "aicartc", XTAL(32'768));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomi_base)

@@ -26,7 +26,7 @@ void sega_315_5641_pcm_device::advance_state()
 	switch (m_state)
 	{
 	case STATE_DROP_DRQ:
-		if (m_rombase == nullptr)
+		if (!m_md)
 		{
 			// Slave Mode: get data from FIFO buffer
 			uint8_t fiforead = (m_fifo_read + 1) & 0x3F;
@@ -43,9 +43,9 @@ void sega_315_5641_pcm_device::advance_state()
 }
 
 
-WRITE8_MEMBER( sega_315_5641_pcm_device::port_w )
+void sega_315_5641_pcm_device::port_w(u8 data)
 {
-	if (m_rombase != nullptr)
+	if (m_md)
 	{
 		// update the FIFO value
 		m_fifo_in = data;

@@ -519,7 +519,7 @@ private:
 	DECLARE_WRITE8_MEMBER( dmx_output_callback );
 	DECLARE_WRITE8_MEMBER( mamboagg_output_callback );
 	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
-	ADC083X_INPUT_CB(analogue_inputs_callback);
+	double analogue_inputs_callback(uint8_t input);
 
 	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
@@ -1751,7 +1751,7 @@ WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
 /* punch mania */
 
 
-ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
+double konami573_cassette_xi_device::punchmania_inputs_callback(uint8_t input)
 {
 	ksys573_state *state = machine().driver_data<ksys573_state>();
 	double *pad_position = state->m_pad_position;
@@ -2058,7 +2058,7 @@ READ16_MEMBER( ksys573_state::gunmania_r )
 
 /* ADC0834 Interface */
 
-ADC083X_INPUT_CB(ksys573_state::analogue_inputs_callback)
+double ksys573_state::analogue_inputs_callback(uint8_t input)
 {
 	switch( input )
 	{
@@ -2145,8 +2145,8 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 
 	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
-	MCFG_DEVICE_ADD( "adc0834", ADC0834, 0 )
-	MCFG_ADC083X_INPUT_CB( ksys573_state, analogue_inputs_callback )
+	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
 MACHINE_CONFIG_END
 
 // Variants with additional digital sound board

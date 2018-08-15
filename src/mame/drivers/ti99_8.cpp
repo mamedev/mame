@@ -732,29 +732,31 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	// basic machine hardware */
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
-	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL(10'738'635), memmap, crumap)
-	MCFG_DEVICE_ADDRESS_MAP(tms9995_device::AS_SETOFFSET, memmap_setoffset)
-	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, ti99_8_state, external_operation) )
-	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, ti99_8_state, clock_out) )
-	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(*this, ti99_8_state, dbin_line) )
-	MCFG_TMS9995_HOLDA_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, holda_line) )
+	TMS9995_MP9537(config, m_cpu, XTAL(10'738'635));
+	m_cpu->set_addrmap(AS_PROGRAM, &ti99_8_state::memmap);
+	m_cpu->set_addrmap(AS_IO, &ti99_8_state::crumap);
+	m_cpu->set_addrmap(tms9995_device::AS_SETOFFSET, &ti99_8_state::memmap_setoffset);
+	m_cpu->extop_cb().set(FUNC(ti99_8_state::external_operation));
+	m_cpu->clkout_cb().set(FUNC(ti99_8_state::clock_out));
+	m_cpu->dbin_cb().set(FUNC(ti99_8_state::dbin_line));
+	m_cpu->holda_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::holda_line));
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
 	// 9901 configuration
-	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, XTAL(10'738'635)/4.0)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_8_state, read_by_9901) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, ti99_8_state, keyC0) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, ti99_8_state, keyC1) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_8_state, keyC2) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_8_state, keyC3) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, crus_in) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptgen_in) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_8_state, cassette_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_8_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_8_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_8_state, tms9901_interrupt) )
+	TMS9901(config, m_tms9901, XTAL(10'738'635)/4.0);
+	m_tms9901->read_cb().set(FUNC(ti99_8_state::read_by_9901));
+	m_tms9901->p_out_cb(0).set(FUNC(ti99_8_state::keyC0));
+	m_tms9901->p_out_cb(1).set(FUNC(ti99_8_state::keyC1));
+	m_tms9901->p_out_cb(2).set(FUNC(ti99_8_state::keyC2));
+	m_tms9901->p_out_cb(3).set(FUNC(ti99_8_state::keyC3));
+	m_tms9901->p_out_cb(4).set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::crus_in));
+	m_tms9901->p_out_cb(5).set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptgen_in));
+	m_tms9901->p_out_cb(6).set(FUNC(ti99_8_state::cassette_motor));
+	m_tms9901->p_out_cb(8).set(FUNC(ti99_8_state::audio_gate));
+	m_tms9901->p_out_cb(9).set(FUNC(ti99_8_state::cassette_output));
+	m_tms9901->intlevel_cb().set(FUNC(ti99_8_state::tms9901_interrupt));
 
 	// Mainboard with custom chips
 	MCFG_DEVICE_ADD(TI998_MAINBOARD_TAG, TI99_MAINBOARD8, 0)
@@ -762,9 +764,11 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_MAINBOARD8_RESET_CALLBACK(WRITELINE(*this, ti99_8_state, console_reset))
 	MCFG_MAINBOARD8_HOLD_CALLBACK(WRITELINE(*this, ti99_8_state, cpu_hold))
 
-	MCFG_GROMPORT8_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_8_state, console_reset) )
+	// Cartridge port
+	TI99_GROMPORT(config, m_gromport, 0);
+	m_gromport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
+	m_gromport->reset_cb().set(FUNC(ti99_8_state::console_reset));
+	m_gromport->configure_slot(true);
 
 	// RAM
 	MCFG_RAM_ADD(TI998_SRAM_TAG)
@@ -778,9 +782,10 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// I/O port
-	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_8_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
+	TI99_IOPORT(config, m_ioport, 0);
+	m_ioport->configure_slot(false);
+	m_ioport->extint_cb().set(FUNC(ti99_8_state::extint));
+	m_ioport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::pbox_ready));
 
 	// Hexbus
 	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
@@ -833,7 +838,9 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_GROM_ADD( TI998_GLIB32_TAG, 2, TI998_GROMLIB3_REG, 0x4000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
+	TI99_JOYPORT(config, m_joyport, 0);
+	m_joyport->configure_slot(true, false);
+
 MACHINE_CONFIG_END
 
 /*

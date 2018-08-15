@@ -629,12 +629,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE("adc_daisy", z80daisy_generic_device, int_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("analogue_1_x"))
-	MCFG_ADC0844_CH2_CB(IOPORT("analogue_1_y"))
-	MCFG_ADC0844_CH3_CB(IOPORT("analogue_2_x"))
-	MCFG_ADC0844_CH4_CB(IOPORT("analogue_2_y"))
+	adc0844_device &adc(ADC0844(config, "adc", 0));
+	adc.intr_callback().set("adc_daisy", FUNC(z80daisy_generic_device::int_w));
+	adc.ch1_callback().set_ioport("analogue_1_x");
+	adc.ch2_callback().set_ioport("analogue_1_y");
+	adc.ch3_callback().set_ioport("analogue_2_x");
+	adc.ch4_callback().set_ioport("analogue_2_y");
 
 	/* printer */
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")

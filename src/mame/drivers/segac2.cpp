@@ -309,7 +309,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(space, 0, data & 0xff);
+		m_upd7759->port_w(data & 0xff);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}
@@ -485,7 +485,7 @@ WRITE8_MEMBER(segac2_state::io_porth_w)
 	if (m_sound_banks > 1)
 	{
 		newbank = (data >> 2) & (m_sound_banks - 1);
-		m_upd7759->set_bank_base(newbank * 0x20000);
+		m_upd7759->set_rom_bank(newbank);
 	}
 }
 

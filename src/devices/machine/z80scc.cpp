@@ -2125,6 +2125,8 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 		update_serial();
 		safe_transmit_register_reset();
 		update_rts(); // Will also update DTR accordingly
+
+		check_waitrequest();
 	}
 }
 
@@ -2832,11 +2834,11 @@ WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 	LOGSYNC("\"%s\": %c : SYNC %u\n", owner()->tag(), 'A' + m_index, state);
 
 	/*
-	* The /SYNC pin is a general purpose input whose state is reported in the
-	* Sync/Hunt bit in RR0. If the crystal oscillator is enabled, this pin is
-	* not available and the Sync/Hunt bit is forced to 0. Otherwise, the /SYNC
-	* pin may be used to carry the Ring Indicator signal.
-	*/
+	 * The /SYNC pin is a general purpose input whose state is reported in the
+	 * Sync/Hunt bit in RR0. If the crystal oscillator is enabled, this pin is
+	 * not available and the Sync/Hunt bit is forced to 0. Otherwise, the /SYNC
+	 * pin may be used to carry the Ring Indicator signal.
+	 */
 	if (!(m_wr11 & WR11_RCVCLK_TYPE))
 	{
 		// check for state change
@@ -3109,7 +3111,7 @@ void z80scc_channel::check_waitrequest()
 	// if dma request function is enabled
 	if (m_wr1 & WR1_WREQ_FUNCTION)
 	{
-		// assert /W//REQ if transmit buffer is empty, clear if it's not
-		m_uart->m_out_wreq_cb[m_index]((m_rr0 & RR0_TX_BUFFER_EMPTY) ? ASSERT_LINE : CLEAR_LINE);
+		// assert /W//REQ if transmit buffer is empty and transmitter is enabled
+		m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
 	}
 }

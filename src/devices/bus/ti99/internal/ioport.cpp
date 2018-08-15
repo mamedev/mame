@@ -165,15 +165,21 @@ WRITE_LINE_MEMBER(ioport_attached_device::set_ready)
 	m_ioport->m_console_ready(state);
 }
 
+void ioport_device::configure_slot(bool withevpc)
+{
+	option_reset();
+	if (withevpc)
+	{
+		option_add("peb", TI99_PERIBOX_EV);
+		set_default_option("peb");
+	}
+	else
+	{
+		option_add("peb", TI99_PERIBOX);
+		set_default_option(nullptr);
+	}
+	set_fixed(false);
+}
+
 }   }   } // end namespace bus::ti99::internal
-
-void ti99_io_port(device_slot_interface &device)
-{
-	device.option_add("peb", TI99_PERIBOX);
-}
-
-void ti99_io_port_ev(device_slot_interface &device)
-{
-	device.option_add("peb", TI99_PERIBOX_EV);
-}
 

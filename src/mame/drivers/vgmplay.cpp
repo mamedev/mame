@@ -64,6 +64,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <queue>
 
 #define AS_IO16             1
 
@@ -192,18 +193,21 @@ public:
 	template<int Chip> DECLARE_READ8_MEMBER(ymf271_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(ymz280b_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(multipcm_rom_r);
-	template<int Chip> DECLARE_READ8_MEMBER(c140_rom_r);
-	template<int Chip> DECLARE_READ8_MEMBER(k053260_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(upd7759_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(okim6295_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(k054539_rom_r);
-	template<int Chip> DECLARE_READ8_MEMBER(c352_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(c140_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(k053260_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(qsound_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(es5505_rom_r);
-	template<int Chip> DECLARE_READ8_MEMBER(ga20_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(x1_010_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(c352_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ga20_rom_r);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
+
+	template<int Chip> DECLARE_WRITE8_MEMBER(upd7759_bank_w);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
@@ -345,6 +349,8 @@ private:
 	uint32_t m_multipcm_bank_r[2];
 	uint32_t m_multipcm_banked[2];
 
+	uint32_t m_upd7759_bank[2];
+
 	uint32_t m_okim6295_nmk112_enable[2];
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
@@ -372,6 +378,9 @@ public:
 	DECLARE_READ8_MEMBER(file_size_r);
 	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
+	template<int Chip> DECLARE_WRITE8_MEMBER(upd7759_reset_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(upd7759_data_w);
+	template<int Chip> DECLARE_WRITE_LINE_MEMBER(upd7759_drq_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(scc_w);
@@ -388,6 +397,7 @@ public:
 	template<int Chip> void rf5c164_map(address_map &map);
 	template<int Chip> void nescpu_map(address_map &map);
 	template<int Chip> void multipcm_map(address_map &map);
+	template<int Chip> void upd7759_map(address_map &map);
 	template<int Chip> void okim6295_map(address_map &map);
 	template<int Chip> void k054539_map(address_map &map);
 	template<int Chip> void c140_map(address_map &map);
@@ -451,6 +461,11 @@ private:
 	uint32_t m_okim6295_pin7[2];
 	uint8_t m_scc_reg[2];
 
+	int m_upd7759_md[2];
+	int m_upd7759_reset[2];
+	int m_upd7759_drq[2];
+	std::queue<uint8_t> m_upd7759_slave_data[2];
+
 	uint32_t r32(int offset) const;
 	uint8_t r8(int offset) const;
 };
@@ -494,6 +509,7 @@ void vgmplay_device::device_reset()
 	m_paused = false;
 
 	m_ym2612_stream_offset = 0;
+	std::fill(std::begin(m_upd7759_bank), std::end(m_upd7759_bank), 0);
 	blocks_clear();
 
 	for (int i = 0; i < 0xff; i++)
@@ -1147,7 +1163,12 @@ void vgmplay_device::execute_run()
 			case 0xb6:
 			{
 				pulse_act_led(LED_UPD7759);
-				// TODO: upd7759
+				uint8_t offset = m_file->read_byte(m_pc + 1);
+
+				if (offset & 0x80)
+					m_io->write_byte(A_UPD7759_1 + (offset & 0x7f), m_file->read_byte(m_pc + 2));
+				else
+					m_io->write_byte(A_UPD7759_0 + (offset & 0x7f), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 			}
@@ -2001,6 +2022,12 @@ READ8_MEMBER(vgmplay_device::multipcm_rom_r)
 }
 
 template<int Chip>
+READ8_MEMBER(vgmplay_device::upd7759_rom_r)
+{
+	return rom_r(Chip, 0x8a, m_upd7759_bank[Chip] | offset);
+}
+
+template<int Chip>
 READ8_MEMBER(vgmplay_device::okim6295_rom_r)
 {
 	if (m_okim6295_nmk112_enable[Chip])
@@ -2116,6 +2143,9 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_c352(*this, "c352.%d", 0)
 	, m_ga20(*this, "ga20.%d", 0)
 {
+	std::fill(std::begin(m_upd7759_md), std::end(m_upd7759_md), 0);
+	std::fill(std::begin(m_upd7759_reset), std::end(m_upd7759_drq), 0);
+	std::fill(std::begin(m_upd7759_drq), std::end(m_upd7759_drq), 0);
 }
 
 uint32_t vgmplay_state::r32(int off) const
@@ -2305,8 +2335,14 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 		m_multipcm[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0x8c ? r32(0x88) & ~0x40000000 : 0);
 		m_multipcm[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0x8c && (r32(0x88) & 0x40000000) ? r32(0x88) & ~0x40000000 : 0);
-		m_upd7759[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0x90 ? r32(0x8c) & ~0x40000000 : 0);
-		m_upd7759[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0x90 && (r32(0x8c) & 0x40000000) ? r32(0x8c) & ~0x40000000 : 0);
+
+		m_upd7759[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0x90 ? r32(0x8c) & ~0xc0000000 : 0);
+		m_upd7759[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0x90 && (r32(0x8c) & 0x40000000) ? r32(0x8c) & ~0xc0000000 : 0);
+		m_upd7759_md[0] = r32(0x8c) & 0x80000000 ? 0 : 1;
+		m_upd7759_md[1] = r32(0x8c) & 0x80000000 ? 0 : 1;
+		m_upd7759[0]->md_w(m_upd7759_md[0]);
+		m_upd7759[1]->md_w(m_upd7759_md[1]);
+
 		m_okim6258[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0x94 ? r32(0x90) & ~0x40000000 : 0);
 		m_okim6258[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0x94 && (r32(0x90) & 0x40000000) ? r32(0x90) & ~0x40000000 : 0);
 
@@ -2456,6 +2492,61 @@ WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_w)
 		m_multipcm_bank_r[Chip] = (m_multipcm_bank_r[Chip] & 0xff00) | data;
 
 	m_multipcm_banked[Chip] = 1;
+}
+
+template<int Chip>
+WRITE8_MEMBER(vgmplay_state::upd7759_reset_w)
+{
+	int reset = data != 0;
+
+	m_upd7759[Chip]->reset_w(reset);
+
+	if (m_upd7759_reset[Chip] != reset)
+	{
+		m_upd7759_reset[Chip] = reset;
+
+		if (!reset)
+			std::queue<uint8_t>().swap(m_upd7759_slave_data[Chip]);
+	}
+}
+
+template<int Chip>
+WRITE8_MEMBER(vgmplay_state::upd7759_data_w)
+{
+	if (!m_upd7759_md[Chip] && !m_upd7759_drq[Chip])
+	{
+		m_upd7759_slave_data[Chip].push(data);
+	}
+	else
+	{
+		m_upd7759[Chip]->port_w(data);
+		m_upd7759_drq[Chip] = 0;
+	}
+}
+
+template<int Chip>
+WRITE_LINE_MEMBER(vgmplay_state::upd7759_drq_w)
+{
+	if (m_upd7759_drq[Chip] && !state)
+		logerror("upd7759.%d underflow\n", Chip);
+
+	m_upd7759_drq[Chip] = state;
+
+	if (!m_upd7759_md[Chip] && m_upd7759_drq[Chip] && !m_upd7759_slave_data[Chip].empty())
+	{
+		const uint8_t data(m_upd7759_slave_data[Chip].front());
+		m_upd7759_slave_data[Chip].pop();
+		m_upd7759[Chip]->port_w(data);
+		m_upd7759_drq[Chip] = 0;
+	}
+}
+
+template<int Chip>
+WRITE8_MEMBER(vgmplay_device::upd7759_bank_w)
+{
+	// TODO: upd7759 update stream
+
+	m_upd7759_bank[Chip] = data * 0x20000;
 }
 
 template<int Chip>
@@ -2635,11 +2726,24 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_MULTIPCM_1, vgmplay_device::A_MULTIPCM_1 + 3).w(m_multipcm[1], FUNC(multipcm_device::write));
 	map(vgmplay_device::A_MULTIPCM_1 + 4, vgmplay_device::A_MULTIPCM_1 + 7).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_hi_w<1>));
 	map(vgmplay_device::A_MULTIPCM_1 + 8, vgmplay_device::A_MULTIPCM_1 + 11).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_lo_w<1>));
-	// TODO: upd7759
-	map(vgmplay_device::A_OKIM6258_0 + 0, vgmplay_device::A_OKIM6295_0 + 0).w(m_okim6258[0], FUNC(okim6258_device::ctrl_w));
-	map(vgmplay_device::A_OKIM6258_0 + 1, vgmplay_device::A_OKIM6295_0 + 1).w(m_okim6258[0], FUNC(okim6258_device::data_w));
-	map(vgmplay_device::A_OKIM6258_1 + 0, vgmplay_device::A_OKIM6295_1 + 0).w(m_okim6258[1], FUNC(okim6258_device::ctrl_w));
-	map(vgmplay_device::A_OKIM6258_1 + 1, vgmplay_device::A_OKIM6295_1 + 1).w(m_okim6258[1], FUNC(okim6258_device::data_w));
+	map(vgmplay_device::A_UPD7759_0 + 0, vgmplay_device::A_UPD7759_0 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<0>));
+	map(vgmplay_device::A_UPD7759_0 + 1, vgmplay_device::A_UPD7759_0 + 1).lw8("upd7759.0.start", [this](uint8_t data) {m_upd7759[0]->start_w(data != 0); });
+	map(vgmplay_device::A_UPD7759_0 + 2, vgmplay_device::A_UPD7759_0 + 2).w(FUNC(vgmplay_state::upd7759_data_w<0>));
+	map(vgmplay_device::A_UPD7759_0 + 3, vgmplay_device::A_UPD7759_0 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<0>));
+	map(vgmplay_device::A_UPD7759_1 + 0, vgmplay_device::A_UPD7759_1 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<1>));
+	map(vgmplay_device::A_UPD7759_1 + 1, vgmplay_device::A_UPD7759_1 + 1).lw8("upd7759.1.start", [this](uint8_t data) {m_upd7759[1]->start_w(data != 0); });
+	map(vgmplay_device::A_UPD7759_1 + 2, vgmplay_device::A_UPD7759_1 + 2).w(FUNC(vgmplay_state::upd7759_data_w<1>));
+	map(vgmplay_device::A_UPD7759_1 + 3, vgmplay_device::A_UPD7759_1 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<1>));
+	map(vgmplay_device::A_OKIM6258_0 + 0x0, vgmplay_device::A_OKIM6258_0 + 0x0).w(m_okim6258[0], FUNC(okim6258_device::ctrl_w));
+	map(vgmplay_device::A_OKIM6258_0 + 0x1, vgmplay_device::A_OKIM6258_0 + 0x1).w(m_okim6258[0], FUNC(okim6258_device::data_w));
+	map(vgmplay_device::A_OKIM6258_0 + 0x2, vgmplay_device::A_OKIM6258_0 + 0x2).nopw(); // TODO: okim6258 pan
+	map(vgmplay_device::A_OKIM6258_0 + 0x8, vgmplay_device::A_OKIM6258_0 + 0xb).nopw(); // TODO: okim6258 clock
+	map(vgmplay_device::A_OKIM6258_0 + 0xc, vgmplay_device::A_OKIM6258_0 + 0xc).nopw(); // TODO: okim6258 divider
+	map(vgmplay_device::A_OKIM6258_1 + 0x0, vgmplay_device::A_OKIM6258_1 + 0x0).w(m_okim6258[1], FUNC(okim6258_device::ctrl_w));
+	map(vgmplay_device::A_OKIM6258_1 + 0x1, vgmplay_device::A_OKIM6258_1 + 0x1).w(m_okim6258[1], FUNC(okim6258_device::data_w));
+	map(vgmplay_device::A_OKIM6258_1 + 0x2, vgmplay_device::A_OKIM6258_1 + 0x2).nopw(); // TODO: okim6258 pan
+	map(vgmplay_device::A_OKIM6258_1 + 0x8, vgmplay_device::A_OKIM6258_1 + 0xb).nopw(); // TODO: okim6258 clock
+	map(vgmplay_device::A_OKIM6258_1 + 0xc, vgmplay_device::A_OKIM6258_1 + 0xc).nopw(); // TODO: okim6258 divider
 	map(vgmplay_device::A_OKIM6295_0, vgmplay_device::A_OKIM6295_0).w(m_okim6295[0], FUNC(okim6295_device::write));
 	map(vgmplay_device::A_OKIM6295_0 + 0x8, vgmplay_device::A_OKIM6295_0 + 0xb).w(FUNC(vgmplay_state::okim6295_clock_w<0>));
 	map(vgmplay_device::A_OKIM6295_0 + 0xc, vgmplay_device::A_OKIM6295_0 + 0xc).w(FUNC(vgmplay_state::okim6295_pin7_w<0>));
@@ -2732,6 +2836,12 @@ template<int Chip>
 void vgmplay_state::multipcm_map(address_map &map)
 {
 	map(0, 0x3fffff).r("vgmplay", FUNC(vgmplay_device::multipcm_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::upd7759_map(address_map &map)
+{
+	map(0, 0x1ffff).r("vgmplay", FUNC(vgmplay_device::upd7759_rom_r<Chip>));
 }
 
 template<int Chip>
@@ -3029,10 +3139,14 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_multipcm[1]->add_route(1, "rspeaker", 1);
 
 	UPD7759(config, m_upd7759[0], 0);
+	m_upd7759[0]->set_drq_callback(DEVCB_WRITELINE(*this, vgmplay_state, upd7759_drq_w<0>));
+	m_upd7759[0]->set_addrmap(0, &vgmplay_state::upd7759_map<0>);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	UPD7759(config, m_upd7759[1], 0);
+	m_upd7759[1]->set_drq_callback(DEVCB_WRITELINE(*this, vgmplay_state, upd7759_drq_w<1>));
+	m_upd7759[1]->set_addrmap(0, &vgmplay_state::upd7759_map<1>);
 	m_upd7759[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_upd7759[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
@@ -3211,8 +3325,6 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2610.1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "y8950.0", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "y8950.1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "upd7759.0", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "upd7759.1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "scsp", ROMREGION_ERASE00 )
 	// TODO: split up 32x to remove dependencies
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )

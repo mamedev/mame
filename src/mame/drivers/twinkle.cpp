@@ -1095,9 +1095,9 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("am53cf96", AM53CF96, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_AM53CF96_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	AM53CF96(config, m_am53cf96, 0);
+	m_am53cf96->set_scsi_port("scsi");
+	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, twinkle_state, spu_ata_irq))
