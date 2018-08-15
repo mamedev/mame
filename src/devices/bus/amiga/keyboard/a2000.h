@@ -65,6 +65,17 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
+// ======================> a2000_kbd_de_device
+
+class a2000_kbd_de_device : public a2000_kbd_device
+{
+public:
+	a2000_kbd_de_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
 // ======================> a2000_kbd_gb_device
 
 class a2000_kbd_gb_device : public a2000_kbd_device
@@ -84,6 +95,7 @@ protected:
 //**************************************************************************
 
 DECLARE_DEVICE_TYPE_NS(A2000_KBD_US, bus::amiga::keyboard, a2000_kbd_us_device)
+DECLARE_DEVICE_TYPE_NS(A2000_KBD_DE, bus::amiga::keyboard, a2000_kbd_de_device)
 DECLARE_DEVICE_TYPE_NS(A2000_KBD_GB, bus::amiga::keyboard, a2000_kbd_gb_device)
 
 #endif // MAME_BUS_AMIGA_KEYBOARD_A2000_H
