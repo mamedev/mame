@@ -75,7 +75,6 @@ public:
 	void ambush_base(machine_config &config);
 	void ambush(machine_config &config);
 	void mariobl(machine_config &config);
-	void mariobla(machine_config &config);
 	void dkong3abl(machine_config &config);
 
 private:
@@ -586,24 +585,6 @@ static GFXDECODE_START( gfx_mariobl )
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout_mariobl, 0, 32)
 GFXDECODE_END
 
-// wrong
-static const gfx_layout mariobla_charlayoutx1 =
-{
-	8,8,
-	512,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-// wrong
-static GFXDECODE_START( gfx_mariobla )
-	GFXDECODE_ENTRY("gfx1", 0x2000, mariobla_charlayoutx1, 0, 64)
-	GFXDECODE_ENTRY("gfx2", 0, spritelayout_mariobl, 0, 32)
-GFXDECODE_END
-
 static GFXDECODE_START( gfx_dkong3abl )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar, 0, 64)
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,     0, 32)
@@ -785,12 +766,6 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ambush_state::mariobla)
-	mariobl(config);
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mariobla)
-MACHINE_CONFIG_END
-
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
@@ -920,12 +895,24 @@ ROM_START( mariobla )
 	ROM_LOAD("3.7g", 0x4000, 0x2000, CRC(5c50209c) SHA1(e3fb4dbf9c866a346b20ec21a03d13e85b58669d))
 	ROM_LOAD("2.7f", 0xe000, 0x2000, CRC(5718fe0e) SHA1(dad7158f4e7a5552f6107b825387cb6aab8dd652))
 
-	ROM_REGION(0x6000, "gfx1", ROMREGION_INVERT)
-	ROM_LOAD("5.4n", 0x0000, 0x4000, CRC(903615df) SHA1(d20cdf64894ad9f48af71cf2e4e4c457ccb3d365))
-	ROM_LOAD("6.4l", 0x4000, 0x2000, CRC(7b58c92e) SHA1(25dfce7a4a93f661f495cc80378d445a2b064ba7))
+	ROM_REGION(0x8000, "gfx", 0)
+	ROM_LOAD("5.4n", 0x0000, 0x2000, CRC(903615df) SHA1(d20cdf64894ad9f48af71cf2e4e4c457ccb3d365)) // mbjba-3.3ns
+	ROM_CONTINUE(0x6000, 0x0800) // mbjba-5.4n [1/2]
+	ROM_CONTINUE(0x6000, 0x0800) // mbjba-5.4n [1/2]
+	ROM_CONTINUE(0x6800, 0x0800) // mbjba-5.4n [2/2]
+	ROM_CONTINUE(0x6800, 0x0800) // mbjba-5.4n [2/2]
+	ROM_LOAD("6.4l", 0x2000, 0x2000, CRC(7b58c92e) SHA1(25dfce7a4a93f661f495cc80378d445a2b064ba7)) // mbjba-2.3ls
+	ROM_LOAD("7.4n", 0x4000, 0x2000, CRC(04ef8165) SHA1(71d0ee903f2e442fd7f1c76e48d99a8bec49d482)) // mbjba-1.3l
+	ROM_CONTINUE(0x7000, 0x0800) // mbjba-4.4l [1/2]
+	ROM_CONTINUE(0x7000, 0x0800) // mbjba-4.4l [1/2]
+	ROM_CONTINUE(0x7800, 0x0800) // mbjba-4.4l [2/2]
+	ROM_CONTINUE(0x7800, 0x0800) // mbjba-4.4l [2/2]
 
-	ROM_REGION(0x4000, "gfx2", 0)
-	ROM_LOAD("7.4n", 0x0000, 0x4000, CRC(04ef8165) SHA1(71d0ee903f2e442fd7f1c76e48d99a8bec49d482))
+	ROM_REGION(0x2000, "gfx1", ROMREGION_INVERT)
+	ROM_COPY("gfx", 0x6000, 0x0000, 0x2000)
+
+	ROM_REGION(0x6000, "gfx2", 0)
+	ROM_COPY("gfx", 0x0000, 0x0000, 0x6000)
 
 	ROM_REGION(0xeb, "prom", 0)
 	ROM_LOAD("82s153.7n", 0x00, 0xeb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
@@ -970,5 +957,5 @@ GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, empty_init, 
 GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobla,  mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, empty_init, ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)",      MACHINE_SUPPORTS_SAVE )
