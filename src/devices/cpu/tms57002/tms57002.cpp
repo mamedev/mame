@@ -181,11 +181,6 @@ void tms57002_device::update_dready()
 	m_dready_callback(sti & S_HOST ? 0 : 1);
 }
 
-void tms57002_device::update_dready()
-{
-	m_dready_callback(sti & S_HOST ? 0 : 1);
-}
-
 READ_LINE_MEMBER(tms57002_device::pc0_r)
 {
 	return pc == 0 ? 0 : 1;
