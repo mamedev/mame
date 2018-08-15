@@ -14,7 +14,7 @@
 #include "cpu/tms57002/tms57002.h"
 #include "sound/zsg2.h"
 
-//#define USE_DSP               // Uncomment when DSP emulation is working
+#define USE_DSP               // Uncomment when DSP emulation is working
 
 class taito_zoom_device : public device_t, public device_mixer_interface
 
@@ -57,6 +57,8 @@ private:
 	uint8_t m_tms_ctrl;
 	bool m_use_flash;
 	std::unique_ptr<uint8_t[]> m_snd_shared_ram;
+	
+	void update_status_pin(int state);
 };
 
 DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)
