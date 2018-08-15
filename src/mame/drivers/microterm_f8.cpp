@@ -237,8 +237,8 @@ READ8_MEMBER(microterm_f8_state::port00_r)
 {
 	u8 flags = m_port00;
 
-	// On-line/Local mode switch?
-	if (BIT(m_special->read(), 1))
+	// Full duplex switch
+	if (!BIT(m_dsw[2]->read(), 0))
 		flags |= 0x02;
 
 	return flags;
@@ -264,6 +264,10 @@ READ8_MEMBER(microterm_f8_state::port01_r)
 	// ???
 	if (!m_screen->vblank())
 		flags |= 0x20;
+
+	// Local mode switch
+	if (!BIT(m_special->read(), 1))
+		flags |= 0x10;
 
 	// Protected field setting
 	flags |= ~m_dsw[2]->read() & 0x06;
@@ -429,7 +433,7 @@ static INPUT_PORTS_START(act5a)
 	PORT_DIPSETTING(0xfe, "19,200")
 
 	PORT_START("DSW3")
-	PORT_DIPNAME(0x001, 0x001, "Conversation Mode") PORT_DIPLOCATION("S3:1")
+	PORT_DIPNAME(0x001, 0x000, "Conversation Mode") PORT_DIPLOCATION("S3:1")
 	PORT_DIPSETTING(0x001, "Half Duplex")
 	PORT_DIPSETTING(0x000, "Full Duplex")
 	PORT_DIPNAME(0x006, 0x006, "Protected Field Attribute") PORT_DIPLOCATION("S3:2,3")
