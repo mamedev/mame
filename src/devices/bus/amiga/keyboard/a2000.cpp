@@ -43,6 +43,15 @@
     ceramic resonator, a TI SN74HC00N, and a Hitachi HD74HC123AP.  The
     header for the host connection has four positions and pins.
 
+    When the third key of the Ctrl-Amiga-Amiga sequence is pressed, the
+    keyboard will pull CLOCK low for 272,007 machine cycles (680ms - a
+    normal CLOCK pulse is 4 machine cycles, or 10µs), followed by the
+    power-up code 0xFE 1,706 machine cycles (4.265ms) later.  This is
+    repeated every 280,787 machine cycles (702ms) as long as the keys
+    are held.  Supposedly if the host chipset detects CLOCK has been
+    pulled low for at least 60ms, it will generate a 250ms reset pulse
+    when CLOCK is released.
+
 ***************************************************************************/
 
 #include "emu.h"
