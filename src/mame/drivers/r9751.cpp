@@ -507,7 +507,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 		/* SMIOC region (0x9C, device 0x27) */
 
 		case 0x1098: /* Serial word count register */
-			data = m_serial_wordcount;
+			data = m_smioc->m_wordcount;
 			break;
 
 		case 0x2898: /* SMIOC DMA Busy register - nonzero = busy */

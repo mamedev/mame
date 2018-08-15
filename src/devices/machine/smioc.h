@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(boardlogic_mmio_w);
 
 
+	int m_activePortIndex;
+
 	u16 m_status;
 	u16 m_status2;
 	u16 m_wordcount;
@@ -58,12 +60,15 @@ public:
 
 	u16 m_dmaSendAddress;
 	u16 m_dmaSendLength;
-
+	u16 m_dmaSendAddress2;
+	u16 m_dmaSendLength2;
 
 	u8 m_requestFlags_11D;
 	u16 m_commandValue;
+	u16 m_commandValue2;
 
 	void SendCommand(u16 command);
+	void SendCommand2(u16 command);
 	void ClearStatus();
 	void ClearStatus2();
 

@@ -257,11 +257,10 @@ void smioc_device::SendCommand(u16 command)
 {
 	LOG_COMMAND("%s SMIOC Command %04x (Address %04x, Length %04x)\n", machine().time().as_string(), command, m_dmaSendAddress, m_dmaSendLength);
 
-	// Assume that command 0 is a hard reset command handled by the logic in the board rather than the cpu.
-	// It's difficult to be sure that this is what actually should happen, but given the context and how it's used, this seems likely.
-	if (command == 0)
+	// Command 0xxx is a special value that tells the hardware what channel/port it's working with for the purpose of writing DMA base / length registers
+	if (command < 0x1000)
 	{
-		m_smioccpu->reset();
+		m_activePortIndex = command & 7;
 		return;
 	}
 
@@ -273,6 +272,20 @@ void smioc_device::SendCommand(u16 command)
 	m_smioccpu->int2_w(HOLD_LINE);
 	
 }
+
+void smioc_device::SendCommand2(u16 command)
+{
+	LOG_COMMAND("%s SMIOC Command2 %04x (Address %04x, Length %04x)\n", machine().time().as_string(), command, m_dmaSendAddress2, m_dmaSendLength2);
+
+	m_commandValue2 = command;
+	m_requestFlags_11D |= 4;
+	m_deviceBusy = 1;
+
+	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
+	m_smioccpu->int2_w(HOLD_LINE);
+
+}
+
 
 void smioc_device::ClearStatus()
 {
@@ -295,57 +308,87 @@ void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_n
 
 READ8_MEMBER(smioc_device::ram2_mmio_r)
 {
+	const char * description = "";
 	u8 data = 0;
 	switch (offset)
 	{
-	case 0xB83: // Unclear
-		LOG_COMMAND("SMIOC Read B83 (Unknown)\n");
+
+
+	case 0xB82:
+		data = m_commandValue2 & 0xFF;
+		description = "(Command2)";
+		break;
+	case 0xB83:
+		data = m_commandValue2 >> 8;
+		LOG_COMMAND("SMIOC Read B83 (Command)\n");
+		description = "(Command2)";
 		break;
 
-	case 0xB87: // Unclear
+	case 0xB86: 
+		description = "(Unimplemented - Bit 7 Parameter)";
+		break;
+	case 0xB87: 
+		description = "(Unimplemented - Bit 7 Parameter)";
 		LOG_COMMAND("SMIOC Read B87 (Unknown)\n");
 		break;
 
 
 	case 0xCC2: // Command from 68k?
 		data = m_commandValue & 0xFF;
+		description = "(Command)";
 		break;
 	case 0xCC3:
 		data = m_commandValue >> 8;
+		description = "(Command)";
 		LOG_COMMAND("SMIOC Read CC3 (Command)\n");
 		break;
 
+	case 0xCC6:
+		description = "(Unimplemented - Bit 6 Parameter)";
+		break;
 	case 0xCC7:
+		description = "(Unimplemented - Bit 6 Parameter)";
 		LOG_COMMAND("SMIOC Read CC7 (Unknown)\n");
 		break;
 
 
 	case 0xCD8: // DMA source address (for writing characters) - Port 0
 		data = m_dmaSendAddress & 0xFF;
+		description = "(DMA Source)";
 		break;
 	case 0xCD9:
 		data = m_dmaSendAddress >> 8;
+		description = "(DMA Source)";
 		break;
 
 	case 0xCE8: // DMA Length (for writing characters) - Port 0
 		data = m_dmaSendLength & 0xFF;
+		description = "(DMA Length)";
 		break;
 	case 0xCE9:
 		data = m_dmaSendLength >> 8;
+		description = "(DMA Length)";
 		break;
 
 	}
 
 
-	logerror("ram2[%04X] => %02X\n", offset, data);
+	logerror("ram2[%04X] => %02X %s\n", offset, data, description);
 	return data;
 }
 
 WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 {
+	const char * description = "";
+
 	switch (offset) // Offset based on C0100 register base
 	{
-		
+	case 0x11D:
+		// This value is written after the CPU resets, it may be accessible to the 68k via some register but that is not clear.
+		description = "(Indicate Reset)";
+		break;
+
+
 	case 0xC84:
 		//update_and_log(m_wordcount, (m_wordcount & 0xFF00) | data, "Wordcount[40C84]");
 		return;
@@ -360,26 +403,37 @@ WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 		//update_and_log(m_wordcount2, (m_wordcount2 & 0xFF) | (data<<8), "Wordcount2[40C89]");
 		return;
 
+	case 0xB84:
+		update_and_log(m_status2, (m_status2 & 0xFF00) | (data), "Status2[40B84]");
+		return;
+	case 0xB85:
+		update_and_log(m_status2, (m_status2 & 0xFF) | (data << 8), "Status2[40B85]");
+		m_status2 |= 0x40;
+		return;
+
 	case 0xCC4:
 		update_and_log(m_status, (m_status & 0xFF00) | (data), "Status[40CC4]");
+		//update_and_log(m_status2, (m_status2 & 0xFF) | (data << 8), "Status2[40CC4]");
 		return;
 	case 0xCC5:
 		update_and_log(m_status, (m_status & 0xFF) | (data << 8), "Status[40CC5]");
+		//update_and_log(m_status2, (m_status2 & 0xFF00) | (data), "Status2[40CC5]");
 		m_status |= 0x40;
 		return;
 
 	case 0xCC8:
-		update_and_log(m_status2, (m_status2 & 0xFF) | (data << 8), "Status2[40CC8]");
+		update_and_log(m_wordcount, (m_wordcount & 0xFF00) | (data), "Wordcount[40CC8]");
+		//update_and_log(m_status, (m_status & 0xFF) | (data << 8), "Status[40CC8]");
 		return;
 	case 0xCC9:
-		update_and_log(m_status2, (m_status2 & 0xFF00) | data, "Status2[40CC9]");
-		m_status2 |= 0x40;
+		update_and_log(m_wordcount, (m_wordcount & 0xFF) | (data << 8), "Wordcount[40CC9]");
+		//update_and_log(m_status, (m_status & 0xFF00) | (data), "Status[40CC9]");
+		//m_status3 |= 0x40;
 		return;
-
 	}
 
 
-	logerror("ram2[%04X] <= %02X\n", offset, data);
+	logerror("ram2[%04X] <= %02X %s\n", offset, data, description);
 }
 
 READ8_MEMBER(smioc_device::dma68k_r)
@@ -446,7 +500,7 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 	switch (offset)
 	{
 	case 0x10: // C0110 (Clear interrupt? This seems to happen a lot but without being related to actually completing anything.)		
-		logerror("%s C0110 Write, DeviceBusy = %02X\n", machine().time().as_string(), m_deviceBusy);
+		logerror("%s C0110 Write, DeviceBusy = %02X, RequestFlags = %02X\n", machine().time().as_string(), m_deviceBusy, m_requestFlags_11D);
 		m_deviceBusy = m_requestFlags_11D;
 		m_smioccpu->int2_w(CLEAR_LINE);
 		if (m_requestFlags_11D)
@@ -458,11 +512,13 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 	case 0x11: // C0111 - Set to 1 after providing a status - Acknowledge by hardware by raising bit 4 in C011D (SMIOC E2E flag 0x200
 		m_requestFlags_11D |= 0x10; // bit 4
 		m_smioccpu->int2_w(HOLD_LINE);
+		logerror("%s C0111 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
 	case 0x12: // C0112 - Set to 1 after providing a status(2?) - Acknowledge by hardware by raising bit 5 in C011D (SMIOC E2E flag 0x100)
 		m_requestFlags_11D |= 0x20; // bit 5
 		m_smioccpu->int2_w(HOLD_LINE);
+		logerror("%s C0112 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
 	case 0x16: // C0116 - Set to 1 after processing 11D & 0x40
