@@ -356,7 +356,11 @@ VIDEOS["PS2GIF"] = true
 --------------------------------------------------
 
 MACHINES["AKIKO"] = true
+MACHINES["AUTOCONFIG"] = true
 MACHINES["BUSMOUSE"] = true
+MACHINES["CR511B"] = true
+MACHINES["DMAC"] = true
+MACHINES["GAYLE"] = true
 MACHINES["NCR53C7XX"] = true
 MACHINES["LSI53C810"] = true
 MACHINES["6522VIA"] = true
@@ -651,6 +655,7 @@ MACHINES["PS2INTC"] = true
 --BUSES["ADAM"] = true
 --BUSES["ADAMNET"] = true
 --BUSES["APF"] = true
+BUSES["AMIGA_KEYBOARD"] = true
 --BUSES["ARCADIA"] = true
 --BUSES["ASTROCADE"] = true
 --BUSES["BML3"] = true
@@ -731,7 +736,7 @@ BUSES["VECTREX"] = true
 --BUSES["WSWAN"] = true
 --BUSES["X68K"] = true
 --BUSES["Z88"] = true
---BUSES["ZORRO"] = true
+BUSES["ZORRO"] = true
 
 
 --------------------------------------------------
@@ -973,6 +978,7 @@ files {
 createMAMEProjects(_target, _subtarget, "amiga")
 files {
 	MAME_DIR .. "src/mame/drivers/alg.cpp",
+	MAME_DIR .. "src/mame/drivers/amiga.cpp",
 	MAME_DIR .. "src/mame/machine/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amigaaga.cpp",
