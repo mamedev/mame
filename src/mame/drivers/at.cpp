@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(at_state::neat)
 	MCFG_DS12885_ADD("mb:rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
-	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
+	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "bios");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::xb42639)
@@ -610,7 +610,7 @@ MACHINE_CONFIG_START(at_state::ct386sx)
 	at386sx(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(neat_io)
-	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
+	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "maincpu");
 MACHINE_CONFIG_END
 
 // Commodore PC 30-III
