@@ -915,7 +915,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-#if 1
+#if 0
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
@@ -927,15 +927,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		{
 			space.write_byte(0x2f27c8, 0x2);
 		}
-		else if (!strcmp(machine().system().name, "roadedge")) // hack to get test mode (useful for sound test)
-		{
-			space.write_byte(0xcfb53, 0x1);
-		}
-		else if (!strcmp(machine().system().name, "xrally")) // hack to get test mode (useful for sound test)
-		{
-			space.write_byte(0xa2363, 0x1);
-		}
-
 	}
 #endif
 

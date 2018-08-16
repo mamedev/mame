@@ -17,12 +17,18 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 
 
 
-// Hardware calls these '3d buffers'
-//   They're only read during the startup check of fatfurwa.  Z-buffer memory?  Front buffer, back buffer?
-//   They're definitely mirrored in the startup test, according to ElSemi
-//   30100000-3011ffff is framebuffer A0
-//   30120000-3013ffff is framebuffer A1
-//   30140000-3015ffff is ZBuffer A
+/* Hardware calls these '3d buffers'
+
+	They're only read during the startup check, never written
+
+	They're definitely mirrored in the startup test, according to ElSemi
+
+	The games run in interlace mode, so buffer resolution can be half the effective screen height
+
+	30100000-3011ffff is framebuffer A0 (512x256 8-bit?) (pal data?)
+	30120000-3013ffff is framebuffer A1 (512x256 8-bit?) (pal data?)
+	30140000-3015ffff is ZBuffer A  (512x256 8-bit?)
+*/
 
 READ32_MEMBER(hng64_state::hng64_3d_1_r)
 {
@@ -48,6 +54,35 @@ WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
 WRITE16_MEMBER(hng64_state::dl_w)
 {
 	COMBINE_DATA(&m_dl[offset]);
+}
+
+READ32_MEMBER(hng64_state::hng64_3d_regs_r)
+{
+	logerror("%s: hng64_3d_regs_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+	return m_3dregs[offset];
+}
+
+WRITE32_MEMBER(hng64_state::hng64_3d_regs_w)
+{
+	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
+       ':maincpu' (8001EDE0): hng64_3d_regs_w (000) 00001000 (0000ff00) (disable frame buffer clear)
+       ':maincpu' (8001FE4C): hng64_3d_regs_w (000) 00003800 (0000ff00) (normal)
+
+	   during the Hyper Neogeo 64 logo it has a value of
+	   ':maincpu' (8005AA44): hng64_3d_regs_w (000) 00001800 (0000ff00)
+	   
+	   sams64 does
+	   ':maincpu' (800C13C4): hng64_3d_regs_r (000) (0000ff00) (ANDs with 0x07, ORs with 0x18)
+	   ':maincpu' (800C13D0): hng64_3d_regs_w (000) 00001800 (0000ff00)
+
+	   other games use either mix of 0x18 and 0x38, meaning of bit 0x20 unknown.  bit 0x08 must prevent the framebuffer clear tho
+
+	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
+
+	*/
+	logerror("%s: hng64_3d_regs_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+
+	COMBINE_DATA(&m_3dregs[offset]);
 }
 
 
@@ -82,29 +117,43 @@ TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 
 WRITE32_MEMBER(hng64_state::dl_control_w)
 {
-	// This could be a multiple display list thing, but the palette seems to be lost between lists?
-	// Many games briefly set this to 0x4 on startup. Maybe there are 3 display lists?
-	// The sams64 games briefly set this value to 0x0c00 on boot.  Maybe there are 4 lists and they can be combined?
+	/* m_activeDisplayList is not currently connected to anything, it seems unlikely there are different banks.
+	   games typically write up to 8 lots of 0x200 data, writing bit 0 between them
+
+		bit 0 (0x01)  process DMA from 3d FIFO to framebuffer?
+		bit 1 (0x02)  written before first set of dl data each frame on some games, but not on SS?
+	    bit 2 (0x04)  reset buffer count (startup only)
+	*/
+
+	/*
 	if (data & 0x01)
 		m_activeDisplayList = 0;
 	else if (data & 0x02)
 		m_activeDisplayList = 1;
+	*/
 
-//  printf("dl_control_w %08x %08x\n", data, mem_mask);
-//
-//  if(data & 2) // swap buffers
-//  {
-//      clear3d();
-//  }
-//
-//  printf("%02x\n",data);
-//
-//  if(data & 1) // process DMA from 3d FIFO to framebuffer
-//  if(data & 4) // reset buffer count
+	/*
+	printf("dl_control_w %08x %08x\n", data, mem_mask);
+
+	if(data & 2) // swap buffers
+	{
+		clear3d();
+	}
+	*/
 }
 
+READ32_MEMBER(hng64_state::dl_vreg_r)
+{
+	/* tested with possible masked bits 0xf003 (often masking 0xf000 or 0x0003)
+	
+	  various wait loops on bit 0x02 (bit 1) after sending 3d commands
+	  tests failing on other bits can cause display list writes to be skipped
 
+	  Sams64 after the title screen) tests bit 15 of this to be high, unknown reason
 
+	*/
+	return 0;
+}
 
 ////////////////////
 // 3d 'Functions' //
@@ -522,7 +571,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//        So instead we're looking for a bit that is on for XRally & Buriki, but noone else.
 			if (m_3dregs[0x00/4] & 0x2000)
 			{
-				if (strcmp(machine().basename(), "roadedge"))
+				if (!m_roadedge_3d_hack)
 					currentPoly.palOffset += 0x800;
 			}
 
@@ -785,30 +834,25 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				}
 			}
 
-
-			// BACKFACE CULL //
-			// (empirical evidence seems to show the hng64 hardware does not backface cull) //
-#if 0
+			// BACKFACE CULL
+			// roadedge has various one-way barriers that you can drive through, but need to be invisible from behind, so needs this culling
 			float cullRay[4];
 			float cullNorm[4];
 
 			// Cast a ray out of the camera towards the polygon's point in eyespace.
-			vecmatmul4(cullRay, modelViewMatrix, currentPoly.vert[0].worldCoords);
+			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
 			normalize(cullRay);
 
 			// Dot product that with the normal to see if you're negative...
-			vecmatmul4(cullNorm, modelViewMatrix, currentPoly.faceNormal);
+			vecmatmul4(cullNorm, m_modelViewMatrix, currentPoly.faceNormal);
 
 			const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
 			if (backfaceCullResult < 0.0f)
 				currentPoly.visible = 1;
 			else
 				currentPoly.visible = 0;
-#endif
-
 
 			// BEHIND-THE-CAMERA CULL //
-			float cullRay[4];
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
 			if (cullRay[2] > 0.0f)              // Camera is pointing down -Z
 			{
@@ -910,7 +954,9 @@ void hng64_state::hng64_command3d(const uint16_t* packet)
 
 	switch (packet[0])
 	{
-	case 0x0000:    // Appears to be a NOP.
+	case 0x0000:	// NOP?
+		 /* Appears to be a NOP (or 'end of list for this frame, ignore everything after' doesn't stop stray 3d objects in game for xrally/roadedge
+		    although does stop a partial hng64 logo being displayed assuming that's meant to be kept onscreen by some other means without valid data) */
 		break;
 
 	case 0x0001:    // Camera transformation.
@@ -935,15 +981,6 @@ void hng64_state::hng64_command3d(const uint16_t* packet)
 		break;
 
 	case 0x0102:    // Geometry with only translation
-		// HACK.  Give up on strange calls to 0102.
-		if (packet[8] != 0x0102)
-		{
-			// It appears as though packet[7] might hold the magic #
-			// Almost looks like there is a chain mode for these guys.  Same for 0101?
-			// printf("WARNING: "); printPacket(packet, 1);
-			break;
-		}
-
 		// Split the packet and call recoverPolygonBlock on each half.
 		uint16_t miniPacket[16];
 		memset(miniPacket, 0, sizeof(uint16_t)*16);
@@ -953,12 +990,23 @@ void hng64_state::hng64_command3d(const uint16_t* packet)
 		miniPacket[15] = 0x7fff;
 		recoverPolygonBlock(miniPacket, numPolys);
 
-		memset(miniPacket, 0, sizeof(uint16_t)*16);
-		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
-		miniPacket[7] = 0x7fff;
-		miniPacket[11] = 0x7fff;
-		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock(miniPacket, numPolys);
+
+		if (packet[8] == 0x0102)
+		{
+			memset(miniPacket, 0, sizeof(uint16_t) * 16);
+			for (int i = 0; i < 7; i++) miniPacket[i] = packet[i + 8];
+			miniPacket[7] = 0x7fff;
+			miniPacket[11] = 0x7fff;
+			miniPacket[15] = 0x7fff;
+			recoverPolygonBlock(miniPacket, numPolys);
+		}
+		else
+		{
+			/* if the 2nd value isn't 0x0102 don't render it
+			   it could just be that the display list is corrupt at this point tho, see note above
+			*/
+		}
+
 		break;
 
 	case 0x1000:    // Unknown: Some sort of global flags?

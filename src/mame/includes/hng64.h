@@ -156,11 +156,13 @@ public:
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_intest(*this, "IN%u", 0U),
-		m_samsho64_3d_hack(0)
+		m_samsho64_3d_hack(0),
+		m_roadedge_3d_hack(0)
 	{}
 
 	void hng64(machine_config &config);
 
+	void init_roadedge();
 	void init_hng64_race();
 	void init_hng64();
 	void init_hng64_shoot();
@@ -204,6 +206,7 @@ private:
 	optional_ioport_array<8> m_intest;
 
 	int m_samsho64_3d_hack;
+	int m_roadedge_3d_hack;
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -265,17 +268,24 @@ private:
 	DECLARE_READ8_MEMBER(hng64_dualport_r);
 	DECLARE_WRITE8_MEMBER(hng64_dualport_w);
 
+	DECLARE_READ32_MEMBER(hng64_3d_regs_r);
+	DECLARE_WRITE32_MEMBER(hng64_3d_regs_w);
+
 	DECLARE_READ32_MEMBER(hng64_3d_1_r);
-	DECLARE_READ32_MEMBER(hng64_3d_2_r);
 	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
+
+	DECLARE_READ32_MEMBER(hng64_3d_2_r);
 	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
+
 	DECLARE_WRITE16_MEMBER(dl_w);
 	//DECLARE_READ32_MEMBER(dl_r);
 	DECLARE_WRITE32_MEMBER(dl_control_w);
 	DECLARE_WRITE32_MEMBER(dl_upload_w);
+	DECLARE_READ32_MEMBER(dl_vreg_r);
+
 	DECLARE_WRITE32_MEMBER(tcram_w);
 	DECLARE_READ32_MEMBER(tcram_r);
-	DECLARE_READ32_MEMBER(unk_vreg_r);
+
 	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
 	DECLARE_READ32_MEMBER(hng64_soundram_r);
 	DECLARE_WRITE32_MEMBER(hng64_vregs_w);

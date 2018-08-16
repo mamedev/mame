@@ -709,29 +709,13 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 
 READ32_MEMBER(hng64_state::tcram_r)
 {
-	//printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
-	if(offset == 0x12)
+	/* is this really a port? this seems treated like RAM otherwise, check if there's code anywhere
+	   to write the desired value here instead */
+	if ((offset*4) == 0x48)
 		return ioport("VBLANK")->read();
 
 	return m_tcram[offset];
 }
-
-/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high,
-   unknown purpose (vblank? related to the display list?).
-
-   bit 1 needs to be off, otherwise Fatal Fury WA locks up (FIFO full?)
-   bit 0 is likely to be fifo empty (active low)
-   */
-READ32_MEMBER(hng64_state::unk_vreg_r)
-{
-//  m_unk_vreg_toggle^=0x8000;
-
-	return 0;
-
-//  return ++m_unk_vreg_toggle;
-}
-
-
 
 /************************************************************************************************************/
 
@@ -781,18 +765,6 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 		mspace.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}
 }
-
-/*
-<ElSemi> 0xE0000000 sound
-<ElSemi> 0xD0100000 3D bank A
-<ElSemi> 0xD0200000 3D bank B
-<ElSemi> 0xC0000000-0xC000C000 Sprite
-<ElSemi> 0xC0200000-0xC0204000 palette
-<ElSemi> 0xC0100000-0xC0180000 Tilemap
-<ElSemi> 0xBF808000-0xBF808800 Dualport ram
-<ElSemi> 0xBF800000-0xBF808000 S-RAM
-<ElSemi> 0x60000000-0x60001000 Comm dualport ram
-*/
 
 WRITE32_MEMBER(hng64_state::hng64_vregs_w)
 {
@@ -855,22 +827,30 @@ void hng64_state::hng_map(address_map &map)
 	// BIOS
 	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
 
-	// Video
+	// Sprites
 	map(0x20000000, 0x2000bfff).ram().share("spriteram");
 	map(0x2000d800, 0x2000e3ff).w(FUNC(hng64_state::hng64_sprite_clear_even_w));
 	map(0x2000e400, 0x2000efff).w(FUNC(hng64_state::hng64_sprite_clear_odd_w));
 	map(0x20010000, 0x20010013).ram().share("spriteregs");
+	
+	// Backgrounds
 	map(0x20100000, 0x2017ffff).ram().w(FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
 	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
+
+	// Mixing
 	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x20208000, 0x2020805f).rw(FUNC(hng64_state::tcram_r), FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
+
+
+	// 3D display list control
 	map(0x20300000, 0x203001ff).w(FUNC(hng64_state::dl_w)); // 3d Display List
 	map(0x20300200, 0x20300203).w(FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
 	map(0x20300214, 0x20300217).w(FUNC(hng64_state::dl_control_w));
-	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::unk_vreg_r));
+	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::dl_vreg_r));
 
-	// 3d?
-	map(0x30000000, 0x3000002f).ram().share("3dregs");
+	// 3D framebuffer
+	map(0x30000000, 0x3000002f).rw(FUNC(hng64_state::hng64_3d_regs_r), FUNC(hng64_state::hng64_3d_regs_w)).share("3dregs");
 	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
 	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
 
@@ -1473,6 +1453,12 @@ void hng64_state::init_hng64_race()
 {
 	m_no_machine_error_code = 0x02;
 	init_hng64();
+}
+
+void hng64_state::init_roadedge()
+{
+	init_hng64_race();
+	m_roadedge_3d_hack = 1;
 }
 
 void hng64_state::init_hng64_shoot()
@@ -2497,7 +2483,7 @@ ROM_END
 GAME( 1997, hng64,    0,     hng64, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64, hng64_drive,    hng64_state, init_hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1997, roadedge, hng64, hng64, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
 GAME( 1998, sams64,   hng64, hng64, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
 GAME( 1998, xrally,   hng64, hng64, hng64_drive,    hng64_state, init_hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
 GAME( 1998, bbust2,   hng64, hng64, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
