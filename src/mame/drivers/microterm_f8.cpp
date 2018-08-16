@@ -77,6 +77,7 @@ private:
 
 	u8 m_port00;
 	u8 m_keylatch;
+	u8 m_attrlatch;
 	u8 m_scroll;
 	std::unique_ptr<u16[]> m_vram;
 
@@ -86,6 +87,7 @@ private:
 void microterm_f8_state::machine_start()
 {
 	m_keylatch = 0;
+	m_attrlatch = 0;
 	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
 
 	m_baud_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microterm_f8_state::baud_clock), this));
@@ -93,6 +95,7 @@ void microterm_f8_state::machine_start()
 
 	save_item(NAME(m_port00));
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_attrlatch));
 	save_item(NAME(m_scroll));
 	save_pointer(NAME(m_vram), 0x800);
 }
@@ -192,8 +195,8 @@ READ8_MEMBER(microterm_f8_state::vram_r)
 	assert(vaddr < 0x800);
 
 	u16 vdata = m_vram[vaddr];
-	if ((m_port00 & 0x05) == 0 && !machine().side_effects_disabled())
-		m_port00 = (m_port00 & 0x0f) | (vdata & 0xf00) >> 4;
+	if (!machine().side_effects_disabled())
+		m_attrlatch = (vdata & 0xf00) >> 4;
 
 	// Bit 7 indicates protected attribute
 	if ((~vdata & (~m_jumpers->read() >> 1) & 0xf00) != 0)
@@ -207,7 +210,9 @@ WRITE8_MEMBER(microterm_f8_state::vram_w)
 	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
 	assert(vaddr < 0x800);
 
-	m_vram[vaddr] = data | (m_port00 & 0xf0) << 4;
+	m_vram[vaddr] = data | u16(m_port00 & 0xf0) << 4;
+	if (BIT(m_port00, 0))
+		m_vram[vaddr] |= u16(m_attrlatch) << 4;
 }
 
 WRITE8_MEMBER(microterm_f8_state::uart_transmit_w)
@@ -248,6 +253,9 @@ READ8_MEMBER(microterm_f8_state::port00_r)
 	// Full duplex switch
 	if (!BIT(m_dsw[2]->read(), 0))
 		flags |= 0x02;
+
+	if (BIT(m_port00, 0))
+		flags |= m_attrlatch;
 
 	return flags;
 }
