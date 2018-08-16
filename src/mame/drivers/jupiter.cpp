@@ -309,8 +309,7 @@ MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -344,8 +343,7 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(jupiter3_state, kbd_put))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

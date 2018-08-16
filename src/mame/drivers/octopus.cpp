@@ -1017,9 +1017,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 
 	ADDRESS_MAP_BANK(config, "z80_bank").set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,512K,768K")
+	RAM(config, "ram").set_default_size("256K").set_extra_options("128K,512K,768K");
 
 MACHINE_CONFIG_END
 

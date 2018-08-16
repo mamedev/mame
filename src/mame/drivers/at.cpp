@@ -179,6 +179,7 @@ public:
 	megapc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
 		m_wd7600(*this, "wd7600"),
 		m_isabus(*this, "isabus"),
 		m_speaker(*this, "speaker")
@@ -192,6 +193,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<wd7600_device> m_wd7600;
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
@@ -459,9 +461,7 @@ MACHINE_CONFIG_START(at_state::ibm5170)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+	RAM(config, m_ram).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ibm5170a)
@@ -480,8 +480,7 @@ MACHINE_CONFIG_START(at_state::ews286)
 
 	MCFG_SOFTWARE_LIST_ADD("ews286_disk_list","ews286_flop")
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+	m_ram->set_default_size("640K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ec1842)
@@ -573,9 +572,7 @@ MACHINE_CONFIG_START(at_state::at386)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M")
+	RAM(config, m_ram).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::at386l)
@@ -693,9 +690,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,15M,16M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,15M,16M");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -742,9 +737,7 @@ MACHINE_CONFIG_START(at_vrom_fix_state::megapcpla)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,8M,15M,16M,32M,64M,128M,256M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("2M,8M,15M,16M,32M,64M,128M,256M");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
@@ -765,9 +758,7 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M");
 
 	// on board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
@@ -817,9 +808,7 @@ MACHINE_CONFIG_START(at_state::comportiii)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4736K,6784K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("1152K,1664K,2176K,2688K,4736K,6784K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::comportii)
@@ -830,9 +819,7 @@ MACHINE_CONFIG_START(at_state::comportii)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_360K)
 	MCFG_DEVICE_MODIFY("isa4")
 	MCFG_SLOT_DEFAULT_OPTION("hdc")
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4224K")
+	m_ram->set_default_size("640K").set_extra_options("1152K,1664K,2176K,2688K,4224K");
 MACHINE_CONFIG_END
 
 //**************************************************************************

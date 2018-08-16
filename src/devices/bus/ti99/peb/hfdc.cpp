@@ -1094,9 +1094,7 @@ MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
 	MCFG_MM58274C_MODE24(1) // 24 hour
 	MCFG_MM58274C_DAY1(0)   // sunday
 
-	MCFG_RAM_ADD(BUFFER)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *myarc_hfdc_device::device_rom_region() const

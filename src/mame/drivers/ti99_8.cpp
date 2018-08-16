@@ -771,12 +771,8 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	m_gromport->configure_slot(true);
 
 	// RAM
-	MCFG_RAM_ADD(TI998_SRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_ADD(TI998_DRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI998_SRAM_TAG).set_default_size("2K").set_default_value(0);
+	RAM(config, TI998_DRAM_TAG).set_default_size("64K").set_default_value(0);
 
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")

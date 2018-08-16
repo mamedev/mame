@@ -656,8 +656,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
@@ -761,8 +760,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_DEVICE_ADD("sasi_ctrl_in", INPUT_BUFFER, 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820ii")
@@ -775,9 +773,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox168)
 	MCFG_DEVICE_PROGRAM_MAP(xerox168_mem)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("192K")
-	MCFG_RAM_EXTRA_OPTIONS("320K")
+	m_ram->set_default_size("192K").set_extra_options("320K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820_state::mk83)

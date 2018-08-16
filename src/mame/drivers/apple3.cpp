@@ -162,9 +162,7 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 512K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 512K");
 MACHINE_CONFIG_END
 
 

@@ -1767,8 +1767,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 
@@ -1950,8 +1949,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 

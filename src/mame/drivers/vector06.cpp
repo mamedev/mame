@@ -212,9 +212,7 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vector06_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("320K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, RAM_TAG).set_default_size("320K").set_default_value(0);
 
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

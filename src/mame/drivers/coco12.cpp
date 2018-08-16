@@ -488,9 +488,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	coco_sound(config);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,16K,32K")
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("4K,16K,32K");
 
 	// floating space
 	coco_floating(config);
@@ -507,8 +505,7 @@ MACHINE_CONFIG_START(coco12_state::cocoh)
 	coco(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::cocoe)
@@ -525,8 +522,7 @@ MACHINE_CONFIG_START(coco12_state::cocoeh)
 	cocoe(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::coco2)
@@ -543,8 +539,7 @@ MACHINE_CONFIG_START(coco12_state::coco2h)
 	coco2(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::coco2b)
@@ -560,8 +555,7 @@ MACHINE_CONFIG_START(coco12_state::coco2bh)
 	coco2b(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 void coco12_state::cp400(machine_config &config)

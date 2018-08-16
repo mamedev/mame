@@ -616,10 +616,7 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	MCFG_DEVICE_ADD("maincpu", M68010, 19.6608_MHz_XTAL / 2) // or 24_MHz_XTAL / 2 by jumper setting
 	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,6M,8M").set_default_value(0);
 
 	// MMU Type 0 device space
 	ADDRESS_MAP_BANK(config, "type0").set_map(&sun2_state::vmetype0space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
@@ -672,10 +669,7 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	MCFG_DEVICE_ADD("maincpu", M68010, 39.3216_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M").set_default_value(0);
 
 	// MMU Type 0 device space
 	ADDRESS_MAP_BANK(config, "type0").set_map(&sun2_state::mbustype0space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);

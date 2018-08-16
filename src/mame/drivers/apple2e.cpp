@@ -3998,9 +3998,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_DS1315_BACKING_HANDLER(READ8(*this, apple2e_state, nsc_backing_r))
 
 	/* RAM */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
 
 	/* 0000 banking */
 	ADDRESS_MAP_BANK(config, A2_0000_TAG).set_map(&apple2e_state::r0000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
@@ -4083,12 +4081,12 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apple2e_state::mprof3)
+void apple2e_state::mprof3(machine_config &config)
+{
 	apple2e(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("128K");
+}
 
 MACHINE_CONFIG_START(apple2e_state::apple2ee)
 	apple2e(config);
@@ -4163,9 +4161,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
 	MCFG_DEVICE_REMOVE(A2_AUXSLOT_TAG)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
+	m_ram->set_default_size("128K").set_extra_options("128K");
 MACHINE_CONFIG_END
 
 static void apple2cp_set_lines(device_t *device, uint8_t lines)
@@ -4281,9 +4277,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2cp)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
@@ -4301,9 +4295,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
 	MCFG_DEVICE_REMOVE("sl6")
 	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 const applefdc_interface fdc_interface =
@@ -4335,9 +4327,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::laser128ex2)
@@ -4359,9 +4349,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::ceci)
@@ -4380,8 +4368,7 @@ MACHINE_CONFIG_START(apple2e_state::ceci)
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
 	MCFG_DEVICE_REMOVE(A2_AUXSLOT_TAG)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

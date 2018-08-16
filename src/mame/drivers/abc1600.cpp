@@ -968,8 +968,7 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(WRITELINE(Z8410AB1_2_TAG, z80dma_device, rdy_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, RAM_TAG).set_default_size("1M");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc1600")

@@ -598,8 +598,7 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_cts))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
@@ -612,8 +611,7 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bitgraph_state, system_clock_write))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

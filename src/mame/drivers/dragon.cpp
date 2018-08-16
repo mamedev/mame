@@ -247,9 +247,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon_state::dragon32)
 	dragon_base(config);
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, m_ram).set_default_size("32K").set_extra_options("64K");
 
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
@@ -261,8 +259,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::dragon64)
 	dragon_base(config);
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
@@ -284,8 +281,7 @@ MACHINE_CONFIG_START(dragon64_state::dragon64h)
 	// Replace M6809 with HD6309
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon200e_state::dragon200e)
@@ -316,8 +312,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	dragon_base(config);
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// cartridge
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
@@ -380,8 +375,7 @@ MACHINE_CONFIG_START(dragon64_state::tanodr64h)
 	// Replace M6809 CPU with HD6309 CPU
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(dragon_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

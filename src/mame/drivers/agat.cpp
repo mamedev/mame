@@ -1088,10 +1088,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 
 	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
 
-	MCFG_RAM_ADD(m_ram)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-//  MCFG_RAM_EXTRA_OPTIONS("64K,128K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("32K").set_default_value(0);//.set_extra_options("64K,128K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

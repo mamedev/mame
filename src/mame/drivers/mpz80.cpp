@@ -739,8 +739,7 @@ MACHINE_CONFIG_START(mpz80_state::mpz80)
 	MCFG_S100_SLOT_ADD(S100_TAG ":14", mpz80_s100_cards, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("65K")
+	RAM(config, RAM_TAG).set_default_size("65K"); // 65K???
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mpz80")

@@ -979,9 +979,7 @@ MACHINE_CONFIG_START(amstrad_state::cpc464)
 	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,320K,576K")
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,320K,576K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpc664)
@@ -999,9 +997,7 @@ MACHINE_CONFIG_START(amstrad_state::cpc664)
 	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,320K,576K")
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,320K,576K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpc6128)
@@ -1019,9 +1015,7 @@ MACHINE_CONFIG_START(amstrad_state::cpc6128)
 	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("320K,576K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("320K,576K");
 MACHINE_CONFIG_END
 
 
@@ -1109,9 +1103,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K,320K,576K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K,320K,576K");
 MACHINE_CONFIG_END
 
 
@@ -1162,8 +1154,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	cpcplus_cartslot(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1201,8 +1192,7 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cpc_list", "cpc_flop")
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	m_ram->set_default_size("2M");
 MACHINE_CONFIG_END
 
 

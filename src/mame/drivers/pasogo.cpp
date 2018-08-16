@@ -556,8 +556,7 @@ MACHINE_CONFIG_START(pasogo_state::pasogo)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 
 	// It's a CGA device right so lets use isa_cga!  Well, not so much.
 	// The carts use vg230 specific registers and mostly ignore the mc6845.

@@ -339,8 +339,7 @@ MACHINE_CONFIG_START(eti660_state::eti660)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("3K")
+	RAM(config, RAM_TAG).set_default_size("3K");
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", eti660_state, eti660, "bin,c8,ch8", 2)

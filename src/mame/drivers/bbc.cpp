@@ -840,10 +840,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K").set_default_value(0);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbca)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbca)
@@ -929,9 +926,7 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcb)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	m_ram->set_default_size("32K").set_default_value(0);
 
 	/* speech hardware */
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
@@ -1317,9 +1312,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)

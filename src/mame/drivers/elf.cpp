@@ -278,8 +278,7 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	MCFG_QUICKLOAD_ADD("quickload", elf2_state, elf, "bin", 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
+	RAM(config, RAM_TAG).set_default_size("256");
 MACHINE_CONFIG_END
 
 /* ROMs */

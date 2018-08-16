@@ -333,9 +333,7 @@ MACHINE_CONFIG_START(risc2500_state::risc2500)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_RAM_ADD(m_ram)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K, 1M, 2M")
+	RAM(config, m_ram).set_default_size("2M").set_extra_options("128K, 256K, 512K, 1M, 2M");
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 

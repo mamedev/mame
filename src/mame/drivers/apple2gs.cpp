@@ -4599,10 +4599,7 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* RAM */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,3M,4M,5M,6M,7M,8M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0);
 
 	/* C100 banking */
 	ADDRESS_MAP_BANK(config, A2GS_C100_TAG).set_map(&apple2gs_state::c100bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
@@ -4706,10 +4703,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( apple2gs_state::apple2gsr1 )
 	apple2gs(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1280K")  // 256K on board + 1M in the expansion slot was common for ROM 01
-	MCFG_RAM_EXTRA_OPTIONS("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+
+	// 256K on board + 1M in the expansion slot was common for ROM 01
+	m_ram->set_default_size("1280K").set_extra_options("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M").set_default_value(0);
 
 	MCFG_DEVICE_REPLACE(A2GS_ADBMCU_TAG, M50740, A2GS_MASTER_CLOCK/8)
 	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))

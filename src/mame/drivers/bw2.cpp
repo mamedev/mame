@@ -605,9 +605,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");
 MACHINE_CONFIG_END
 
 

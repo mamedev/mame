@@ -2091,8 +2091,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( konami573_map )
 
-	MCFG_RAM_MODIFY( "maincpu:ram" )
-	MCFG_RAM_DEFAULT_SIZE( "4M" )
+	subdevice<ram_device>( "maincpu:ram" )->set_default_size( "4M" );
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, this ) )

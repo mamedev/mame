@@ -556,9 +556,7 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	}
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("56K,256K,512K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("56K,256K,512K");
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","gimix")
 

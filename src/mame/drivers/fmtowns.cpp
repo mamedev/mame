@@ -2876,9 +2876,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
+	RAM(config, m_ram).set_default_size("6M").set_extra_options("2M,4M,8M,16M,32M,64M,96M");
 
 	MCFG_DEVICE_ADD("rtc58321", MSM58321, 32768_Hz_XTAL)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, towns_state, rtc_d0_w))
@@ -2904,9 +2902,7 @@ MACHINE_CONFIG_START(towns16_state::townsux)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("10M")
+	m_ram->set_default_size("2M").set_extra_options("10M");
 
 	MCFG_NVRAM_ADD_0FILL("nvram16")
 MACHINE_CONFIG_END
@@ -2920,9 +2916,7 @@ MACHINE_CONFIG_START(towns_state::townssj)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("40M,72M")
+	m_ram->set_default_size("8M").set_extra_options("40M,72M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townshr)
@@ -2933,9 +2927,7 @@ MACHINE_CONFIG_START(towns_state::townshr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("12M,20M,28M")
+	m_ram->set_default_size("4M").set_extra_options("12M,20M,28M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townsftv)
@@ -2946,9 +2938,7 @@ MACHINE_CONFIG_START(towns_state::townsftv)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
-	MCFG_RAM_EXTRA_OPTIONS("32M,68M")
+	m_ram->set_default_size("6M").set_extra_options("32M,68M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(marty_state::marty)
@@ -2960,8 +2950,7 @@ MACHINE_CONFIG_START(marty_state::marty)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
+	m_ram->set_default_size("6M");
 
 	MCFG_NVRAM_ADD_0FILL("nvram16")
 MACHINE_CONFIG_END

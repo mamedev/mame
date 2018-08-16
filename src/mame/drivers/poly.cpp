@@ -280,9 +280,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K");
 
 	/* network */
 	MC6854(config, m_adlc);
@@ -352,8 +350,7 @@ MACHINE_CONFIG_START(poly_state::poly2)
 	poly(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY2")

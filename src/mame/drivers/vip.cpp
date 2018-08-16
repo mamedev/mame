@@ -745,9 +745,7 @@ MACHINE_CONFIG_START(vip_state::vip)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vip")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
+	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");
 MACHINE_CONFIG_END
 
 
@@ -755,13 +753,12 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( vp111 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vip_state::vp111)
+void vip_state::vp111(machine_config &config)
+{
 	vip(config);
 	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,4K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1K").set_extra_options("2K,4K");
+}
 
 
 

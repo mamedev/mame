@@ -443,8 +443,7 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	MCFG_KS0066_F05_ADD("ks0066_1")
 	MCFG_HD44780_LCD_SIZE(2, 40)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

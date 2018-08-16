@@ -130,9 +130,7 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	// speaker
 	m_cs4031->spkr().set(FUNC(ct486_state::cs4031_spkr));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M");
 
 	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.system_reset_cb().set("cs4031", FUNC(cs4031_device::kbrst_w));

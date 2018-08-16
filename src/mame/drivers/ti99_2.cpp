@@ -462,9 +462,7 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// Early documents indicate 2 KiB RAM, but this does not work with
 	// either ROM version, so we have to assume that the 2 KiB were never
 	// sufficient, not even in the initial design
-	MCFG_RAM_ADD(TI992_RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4096")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI992_RAM_TAG).set_default_size("4096").set_default_value(0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_2_state, ti99_2 )
 

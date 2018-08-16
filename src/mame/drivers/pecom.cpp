@@ -192,9 +192,7 @@ MACHINE_CONFIG_START(pecom_state::pecom64)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","pecom_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

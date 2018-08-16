@@ -608,9 +608,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8500_state::pc8500)
@@ -650,9 +648,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
 MACHINE_CONFIG_END
 
 /* ROMs */

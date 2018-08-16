@@ -896,14 +896,10 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	m_gromport->configure_slot(false);
 
 	// Scratch pad RAM 256 bytes
-	MCFG_RAM_ADD(TI99_PADRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_PADRAM_TAG).set_default_size("256").set_default_value(0);
 
 	// Optional RAM expansion
-	MCFG_RAM_ADD(TI99_EXPRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_EXPRAM_TAG).set_default_size("32K").set_default_value(0);
 
 	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
@@ -1020,14 +1016,10 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	m_gromport->configure_slot(false);
 
 	// Scratch pad RAM 256 bytes
-	MCFG_RAM_ADD(TI99_PADRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_PADRAM_TAG).set_default_size("256").set_default_value(0);
 
 	// Optional RAM expansion
-	MCFG_RAM_ADD(TI99_EXPRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_EXPRAM_TAG).set_default_size("32K").set_default_value(0);
 
 	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
@@ -1187,14 +1179,10 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	m_gromport->configure_slot(false);
 
 	// Scratch pad RAM 256 bytes
-	MCFG_RAM_ADD(TI99_PADRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_PADRAM_TAG).set_default_size("256").set_default_value(0);
 
 	// Optional RAM expansion
-	MCFG_RAM_ADD(TI99_EXPRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_EXPRAM_TAG).set_default_size("32K").set_default_value(0);
 
 	// EVPC connector
 	MCFG_ADD_EVPC_CONNECTOR( TI99_EVPC_CONN_TAG, WRITELINE( *this, ti99_4x_state, video_interrupt_evpc_in ) )

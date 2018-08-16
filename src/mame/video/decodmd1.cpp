@@ -211,8 +211,7 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
+	RAM(config, RAM_TAG).set_default_size("8K");
 
 	HC259(config, m_bitlatch); // U4
 	m_bitlatch->parallel_out_cb().set_membank(m_rombank1).mask(0x07).invert();

@@ -781,9 +781,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib" , tms9914_device , ren_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)

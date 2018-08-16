@@ -230,9 +230,7 @@ MACHINE_CONFIG_START(miniframe_state::miniframe)
 	MCFG_DEVICE_PROGRAM_MAP(miniframe_mem)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
+	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");
 
 	// RAM/ROM bank
 	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&miniframe_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);

@@ -72,12 +72,12 @@ class digel804_state : public driver_device
 public:
 	digel804_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_ram(*this, RAM_TAG),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_acia(*this, "acia"),
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
-		m_ram(*this, RAM_TAG),
 		m_rambank(*this, "bankedram"),
 		m_func_leds(*this, "func_led%u", 0U)
 	{
@@ -118,13 +118,14 @@ protected:
 	void z80_mem_804_1_4(address_map &map);
 	void z80_io_1_4(address_map &map);
 
+	required_device<ram_device> m_ram;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6551_device> m_acia;
 	required_device<roc10937_device> m_vfd;
 	required_device<mm74c922_device> m_kb;
-	required_device<ram_device> m_ram;
 	required_memory_bank m_rambank;
 
 	output_finder<16> m_func_leds;
@@ -664,9 +665,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", digel804_rs232_defaults)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", digel804_rs232_defaults)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,64K,128K")
+	RAM(config, m_ram).set_default_size("256K").set_extra_options("32K,64K,128K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -685,9 +684,7 @@ MACHINE_CONFIG_START(ep804_state::ep804)
 	MCFG_DEVICE_MODIFY("acia")
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, ep804_state, ep804_acia_irq_w))
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("32K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 

@@ -587,9 +587,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("48K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("48K");
 MACHINE_CONFIG_END
 
 /* ROMs */

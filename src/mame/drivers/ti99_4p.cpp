@@ -1042,14 +1042,10 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	m_peribox->lcp_cb().set(FUNC(ti99_4p_state::video_interrupt_in));
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
-	MCFG_RAM_ADD(TI99_PADRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1k")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_PADRAM_TAG).set_default_size("1K").set_default_value(0);
 
 	// AMS RAM 1 MiB
-	MCFG_RAM_ADD(TI99_AMSRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();

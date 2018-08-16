@@ -358,8 +358,7 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( konamigv_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this ) )

@@ -693,9 +693,7 @@ MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_RAM_ADD(BUFFER)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
 MACHINE_CONFIG_END
 
 ioport_constructor snug_bwg_device::device_input_ports() const

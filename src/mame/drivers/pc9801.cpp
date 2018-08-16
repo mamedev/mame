@@ -2399,9 +2399,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
 
 	// TODO: maybe force dips to avoid beep error
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,256K,384K,512K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
 	UPD765A(config, m_fdc_2dd, false, true);
 	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
@@ -2439,9 +2437,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	pc9801_ide(config);
 	MCFG_UPD4990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K,14M")
+	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
 
 	MCFG_DEVICE_MODIFY("upd7220_btm")
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_grcg_2_map)
@@ -2457,9 +2453,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801vm)
 	MCFG_DEVICE_IO_MAP(pc9801ux_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("640K")
+	m_ram->set_default_size("640K").set_extra_options("640K"); // ???
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)

@@ -238,8 +238,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	m_tms5501->xo_callback().set(FUNC(dai_state::dai_keyboard_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
+	RAM(config, RAM_TAG).set_default_size("48K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")

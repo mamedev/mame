@@ -454,9 +454,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("8K,16K,32K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sorcerer_state::sorcererd)

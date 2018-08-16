@@ -385,8 +385,7 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
@@ -432,8 +431,7 @@ MACHINE_CONFIG_START(zn_state::zn2)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8661R, XTAL(100'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
@@ -1464,8 +1462,7 @@ MACHINE_CONFIG_START(zn_state::coh1000w)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(coh1000w_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("8M");
 
 	VT83C461(config, m_vt83c461).options(ata_devices, "hdd", nullptr, true);
 	m_vt83c461->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));

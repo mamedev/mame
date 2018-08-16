@@ -534,8 +534,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 2)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "abc80_cass")

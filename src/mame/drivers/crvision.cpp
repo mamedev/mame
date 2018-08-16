@@ -774,9 +774,9 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K") // MAIN RAM
-	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+	RAM(config, RAM_TAG)
+		.set_default_size("1K") // MAIN RAM
+		.set_extra_options("15K"); // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "crvision")
@@ -857,9 +857,7 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")

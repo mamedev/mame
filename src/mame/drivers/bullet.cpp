@@ -1177,8 +1177,7 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 
@@ -1272,8 +1271,7 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 

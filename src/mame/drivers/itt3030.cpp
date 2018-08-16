@@ -741,8 +741,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)
 
 	/* internal ram */
-	MCFG_RAM_ADD("mainram")
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, "mainram").set_default_size("256K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

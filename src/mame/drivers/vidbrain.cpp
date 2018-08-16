@@ -431,8 +431,7 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, RAM_TAG).set_default_size("1K");
 MACHINE_CONFIG_END
 
 

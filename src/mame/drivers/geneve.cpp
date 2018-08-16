@@ -777,15 +777,10 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 	AT29C040A(config, GENEVE_PFM512A_TAG);
 
 	// DRAM 512K
-	MCFG_RAM_ADD(GENEVE_DRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, GENEVE_DRAM_TAG).set_default_size("512K").set_default_value(0);
 
 	// SRAM 384K (max; stock Geneve: 32K, but later MDOS releases require 64K)
-	MCFG_RAM_ADD(GENEVE_SRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("384K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
+	RAM(config, GENEVE_SRAM_TAG).set_default_size("384K").set_default_value(0);
 MACHINE_CONFIG_END
 
 /*

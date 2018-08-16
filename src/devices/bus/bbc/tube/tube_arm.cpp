@@ -60,9 +60,7 @@ MACHINE_CONFIG_START(bbc_tube_arm_device::device_add_mconfig)
 	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("arm", ARM_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("4M").set_default_value(0);
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_flop_arm")

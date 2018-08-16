@@ -953,8 +953,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_FUJITSU_29DL16X_ADD(m_flash1b) //bank 1 of second flash
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	RAM(config, RAM_TAG).set_default_size("32K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1010,8 +1009,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_SHARP_LH28F016S_ADD(m_flash1a)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

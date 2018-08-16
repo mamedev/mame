@@ -992,8 +992,7 @@ MACHINE_CONFIG_START(laser3k_state::laser3k)
 	ADDRESS_MAP_BANK(config, "bank2").set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "bank3").set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	MCFG_RAM_ADD("mainram")
-	MCFG_RAM_DEFAULT_SIZE("192K")
+	RAM(config, "mainram").set_default_size("192K");
 
 	/* the 8048 isn't dumped, so substitute modified real Apple II h/w */
 	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
