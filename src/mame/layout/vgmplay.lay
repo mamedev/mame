@@ -84,7 +84,7 @@
 	<element name="act_label_k053260"><text string="K053260" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_pokey"><text string="POKEY" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_qsound"><text string="QSound™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="act_label_scsp"><text string="SCSP" align="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="act_label_scsp"><text string="SCSP" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_wswan"><text string="WonderSwan" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_vsu_vue"><text string="VSU-VUE" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_saa1099"><text string="SAA1099" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>

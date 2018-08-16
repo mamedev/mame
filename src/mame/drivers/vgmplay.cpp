@@ -149,7 +149,9 @@ public:
 		A_POKEY_1 = 0x9e000000,
 		A_QSOUND = 0x1f000000,
 		A_SCSP_0 = 0x20000000,
+		A_SCSP_RAM_0 = 0x20010000,
 		A_SCSP_1 = 0xa0000000,
+		A_SCSP_RAM_1 = 0xa0010000,
 		A_WSWAN_0 = 0x21000000,
 		A_WSWAN_RAM_0 = 0x21000100,
 		A_WSWAN_1 = 0xa1000000,
@@ -340,8 +342,8 @@ private:
 
 	std::list<rom_block> m_rom_blocks[2][0x40];
 
-	std::vector<uint8_t> m_data_streams[0x40];
-	std::vector<uint32_t> m_data_stream_starts[0x40];
+	std::array<std::vector<uint8_t>, 0x40> m_data_streams;
+	std::array<std::vector<uint32_t>, 0x40> m_data_stream_starts;
 
 	uint32_t m_ym2612_stream_offset = 0U;
 
@@ -403,6 +405,7 @@ public:
 	template<int Chip> void c140_map(address_map &map);
 	template<int Chip> void k053260_map(address_map &map);
 	template<int Chip> void qsound_map(address_map &map);
+	template<int Chip> void scsp_map(address_map &map);
 	template<int Chip> void wswan_map(address_map &map);
 	template<int Chip> void es5503_map(address_map &map);
 	template<int Chip> void es5505_map(address_map &map);
@@ -649,10 +652,11 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 	}
 	else if (type >= 0xe0 && type <= 0xe1)
 	{
-		uint16_t start = m_file->read_dword(m_pc + 7);
+		uint32_t start = m_file->read_dword(m_pc + 7);
 		uint32_t data_size = size - 4;
 		if (type == 0xe0)
-			; // TODO: SCSP
+			for (int i = 0; i < data_size; i++)
+				m_io16->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((start + i) ^ 1), m_file->read_byte(m_pc + 0xb + i));
 		else if (type == 0xe1)
 			for (int i = 0; i < data_size; i++)
 				m_io->write_byte((second ? A_ES5503_RAM_1 : A_ES5503_RAM_0) + start + i, m_file->read_byte(m_pc + 0xb + i));
@@ -670,11 +674,12 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	uint32_t src = m_file->read_dword(m_pc + 3) & 0xffffff;
 	uint32_t dst = m_file->read_dword(m_pc + 6) & 0xffffff;
 	uint32_t size = m_file->read_dword(m_pc + 9) & 0xffffff;
+	if (size == 0) size = 0x01000000;
 
 	int second = (type & 0x80) ? 1 : 0;
 	type &= 0x7f;
 
-	if (m_data_streams->size() <= type || m_data_streams[type].size() <= src + size)
+	if (m_data_streams.size() <= type || m_data_streams[type].size() <= src + size)
 		logerror("ignored pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
 	else if (type == 0x01 && !second)
 	{
@@ -688,9 +693,8 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	}
 	else if (type == 0x06)
 	{
-		// TODO: SCSP
-		//for (int i = 0; i < size; i++)
-		//m_io->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + dst + i, m_data_streams[type][src + i]);
+		for (int i = 0; i < size; i++)
+			m_io16->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((dst + i) ^ 1), m_data_streams[type][src + i]);
 	}
 	else if (type == 0x07)
 	{
@@ -1336,7 +1340,11 @@ void vgmplay_device::execute_run()
 			case 0xc5:
 			{
 				pulse_act_led(LED_SCSP);
-				// TODO: SCSP memory
+				uint8_t offset = m_file->read_byte(m_pc + 1);
+				if (offset & 0x80)
+					m_io16->write_byte(A_SCSP_1 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
+				else
+					m_io16->write_byte(A_SCSP_0 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
 				m_pc += 4;
 				break;
 			}
@@ -1555,6 +1563,18 @@ uint32_t vgmplay_disassembler::opcode_alignment() const
 
 offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
+	static const char *const basic_types[8] =
+	{
+		"ym2612.%d pcm",
+		"rf5c68 pcm",
+		"rf5c164 pcm",
+		"sega32x.%d pcm",
+		"okim6258.%d adpcm",
+		"huc6280.%d pcm",
+		"scsp.%d pcm",
+		"nesapu.%d dpcm",
+	};
+
 	switch (opcodes.r8(pc))
 	{
 	case 0x30:
@@ -1642,80 +1662,100 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case 0x67:
 	{
-		static const char *const basic_types[8] =
-		{
-			"ym2612 pcm",
-			"rf5c68 pcm",
-			"rf5c164 pcm",
-			"pwm pcm",
-			"okim6258 adpcm",
-			"huc6280 pcm",
-			"scsp pcm",
-			"nes apu dpcm"
-		};
-
 		static const char *const rom_types[20] =
 		{
-			"sega pcm rom",
-			"ym2608 delta-t rom",
-			"ym2610 adpcm rom",
-			"ym2610 delta-t rom",
-			"ymf278b rom",
-			"ymf271 rom",
-			"ymz280b rom",
-			"ymf278b rom",
-			"y8950 delta-t rom",
-			"multipcm rom",
-			"upd7759 rom",
-			"okim6295 rom",
-			"k054539 rom",
-			"c140 rom",
-			"k053260 rom",
-			"qsound rom",
-			"es5505/es5506 rom",
-			"x1-010 rom",
-			"c352 rom",
-			"ga20 rom"
+			"segapcm.%d rom",
+			"ym2608.%d delta-t rom",
+			"ym2610.%d adpcm rom",
+			"ym2610.%d delta-t rom",
+			"ymf278b.%d rom",
+			"ymf271.%d rom",
+			"ymz280b.%d rom",
+			"ymf278b.%d rom",
+			"y8950.%d delta-t rom",
+			"multipcm.%d rom",
+			"upd7759.%d rom",
+			"okim6295.%d rom",
+			"k054539.%d rom",
+			"c140.%d rom",
+			"k053260.%d rom",
+			"qsound.%d rom",
+			"es5505.%d rom",
+			"x1-010.%d rom",
+			"c352.%d rom",
+			"ga20.%d rom"
 		};
 
-		static const char *const ram_types[3] =
+		static const char *const small_ram_types[3] =
 		{
 			"rf5c68 ram",
 			"rf5c164 ram",
-			"nes apu ram"
+			"nesapu.%d ram"
 		};
 
-		static const char *const ram2_types[2] =
+		static const char *const large_ram_types[2] =
 		{
-			"scsp ram",
-			"es5503 ram"
+			"scsp.%d ram",
+			"es5503.%d ram"
 		};
 
 		uint8_t type = opcodes.r8(pc + 2);
-		uint32_t size = opcodes.r8(pc + 3) | (opcodes.r8(pc + 4) << 8) | (opcodes.r8(pc + 5) << 16) | (opcodes.r8(pc + 6) << 24);
+		uint32_t size = opcodes.r32(pc + 3);
+		int second = (size & 0x80000000) ? 1 : 0;
+		size &= 0x7fffffff;
+
 		if (type < 0x8)
-			util::stream_format(stream, "data-block %x, %s", size, basic_types[type]);
+		{
+			util::stream_format(stream, basic_types[type], second);  util::stream_format(stream, " data-block %x", size);
+		}
 		else if (type < 0x40)
-			util::stream_format(stream, "data-block %x, %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d stream data-block %x", type, second, size);
 		else if (type < 0x48)
-			util::stream_format(stream, "data-block %x comp., %s", size, basic_types[type & 0x3f]);
+		{
+			util::stream_format(stream, basic_types[type - 0x40], second); util::stream_format(stream, " comp. data-block %x", size);
+		}
 		else if (type < 0x7f)
-			util::stream_format(stream, "data-block %x comp., %02x", size, type & 0x3f);
+			util::stream_format(stream, "unknown%02x.%d stream comp. data-block %x", type - 0x40, second, size);
 		else if (type < 0x80)
 			util::stream_format(stream, "decomp-table %x, %02x/%02x", size, opcodes.r8(pc + 7), opcodes.r8(pc + 8));
 		else if (type < 0x94)
-			util::stream_format(stream, "data-block %x, %s", size, rom_types[type & 0x7f]);
+		{
+			util::stream_format(stream, rom_types[type - 0x80], second); util::stream_format(stream, " data-block %x", size);
+		}
 		else if (type < 0xc0)
-			util::stream_format(stream, "data-block %x, rom %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d rom data-block %x", type - 0x80, second, size);
 		else if (type < 0xc3)
-			util::stream_format(stream, "data-block %x, %s", size, ram_types[type & 0x1f]);
+		{
+			util::stream_format(stream, small_ram_types[type - 0xc0], second);  util::stream_format(stream, " data-block %x", size);
+		}
 		else if (type < 0xe0)
-			util::stream_format(stream, "data-block %x, ram %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d small ram data-block %x", type - 0xc0, second, size);
 		else if (type < 0xe2)
-			util::stream_format(stream, "data-block %x, %s", size, ram2_types[type & 0x1f]);
+		{
+			util::stream_format(stream, large_ram_types[type - 0xe0], second); util::stream_format(stream, " data-block %x", size);
+		}
 		else
-			util::stream_format(stream, "data-block %x, ram %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d large ram data-block %x", type - 0xe0, second, size);
 		return (7 + size) | SUPPORTED;
+	}
+
+	case 0x68:
+	{
+		uint8_t type = opcodes.r8(pc + 2);
+		uint32_t src = opcodes.r32(pc + 3) & 0xffffff;
+		uint32_t dst = opcodes.r32(pc + 6) & 0xffffff;
+		uint32_t size = opcodes.r32(pc + 9) & 0xffffff;
+		if (size == 0) size = 0x01000000;
+		int second = (type & 0x80) ? 1 : 0;
+
+		if (type < 8)
+		{
+			util::stream_format(stream, basic_types[type], second); util::stream_format(stream, " write src %x dst %x size %x\n", src, dst, size);
+		}
+		else
+			util::stream_format(stream, "unknown%02x.%d pcm write src %x dst %x size %x\n", type, second, src, dst, size);
+
+		return 12 | SUPPORTED;
 	}
 
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
@@ -2769,7 +2809,6 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
 	map(vgmplay_device::A_POKEY_1, vgmplay_device::A_POKEY_1 + 0xf).w(m_pokey[1], FUNC(pokey_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND + 0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
-	// TODO: scsp
 	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
 	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
 	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
@@ -2791,9 +2830,13 @@ void vgmplay_state::soundchips_map(address_map &map)
 
 void vgmplay_state::soundchips16_map(address_map &map)
 {
+	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::_32x_pwm_w));
+	map(vgmplay_device::A_SCSP_0, vgmplay_device::A_SCSP_0 + 0xfff).w(m_scsp[0], FUNC(scsp_device::write));
+	map(vgmplay_device::A_SCSP_1, vgmplay_device::A_SCSP_1 + 0xfff).w(m_scsp[1], FUNC(scsp_device::write));
+	map(vgmplay_device::A_SCSP_RAM_0, vgmplay_device::A_SCSP_RAM_0 + 0xfffff).ram().share("scsp_ram.0");
+	map(vgmplay_device::A_SCSP_RAM_1, vgmplay_device::A_SCSP_RAM_1 + 0xfffff).ram().share("scsp_ram.1");
 	map(vgmplay_device::A_C352_0, vgmplay_device::A_C352_0 + 0x7fff).w(m_c352[0], FUNC(c352_device::write));
 	map(vgmplay_device::A_C352_1, vgmplay_device::A_C352_1 + 0x7fff).w(m_c352[1], FUNC(c352_device::write));
-	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::_32x_pwm_w));
 }
 
 template<int Chip>
@@ -2875,6 +2918,12 @@ void vgmplay_state::qsound_map(address_map &map)
 }
 
 template<int Chip>
+void vgmplay_state::scsp_map(address_map &map)
+{
+	map(0, 0xfffff).ram().share(Chip ? "scsp_ram.1" : "scsp_ram.0");
+}
+
+template<int Chip>
 void vgmplay_state::wswan_map(address_map &map)
 {
 	map(0, 0x3fff).ram().share(Chip ? "wswan_ram.1" : "wswan_ram.0");
@@ -2928,9 +2977,6 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOFTWARE_LIST_ADD("vgm_list", "vgmplay")
 
 	config.set_default_layout(layout_vgmplay);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
 
 	SN76496(config, m_sn76496[0], 0);
 	m_sn76496[0]->add_route(0, "lspeaker", 0.5);
@@ -3090,8 +3136,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	PALETTE(config, "sega32x_palette", 0xc0 * 2);
 
-	dynamic_cast<cpu_device *>(config.device_find(m_sega32x, "32x_master_sh2"))->set_disable();
-	dynamic_cast<cpu_device *>(config.device_find(m_sega32x, "32x_slave_sh2"))->set_disable();
+	m_sega32x->subdevice<cpu_device>("32x_master_sh2")->set_disable();
+	m_sega32x->subdevice<cpu_device>("32x_slave_sh2")->set_disable();
 
 	// TODO: prevent error.log spew
 	AY8910(config, m_ay8910[0], 0);
@@ -3231,10 +3277,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_qsound->add_route(1, "rspeaker", 1);
 
 	SCSP(config, m_scsp[0], 0);
+	m_scsp[0]->set_addrmap(0, &vgmplay_state::scsp_map<0>);
 	m_scsp[0]->add_route(0, "lspeaker", 1);
 	m_scsp[0]->add_route(1, "rspeaker", 1);
 
 	SCSP(config, m_scsp[1], 0);
+	m_scsp[1]->set_addrmap(0, &vgmplay_state::scsp_map<1>);
 	m_scsp[1]->add_route(0, "lspeaker", 1);
 	m_scsp[1]->add_route(1, "rspeaker", 1);
 
@@ -3315,6 +3363,9 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_ga20[1]->set_addrmap(0, &vgmplay_state::ga20_map<1>);
 	m_ga20[1]->add_route(0, "lspeaker", 1);
 	m_ga20[1]->add_route(1, "rspeaker", 1);
+
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
@@ -3325,7 +3376,6 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2610.1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "y8950.0", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "y8950.1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "scsp", ROMREGION_ERASE00 )
 	// TODO: split up 32x to remove dependencies
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )
 	ROM_REGION( 0x4000, "slave", ROMREGION_ERASE00 )
