@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	cxd1095_device &io2(CXD1095(config, "io2", 0));
 	io2.in_porta_cb().set_ioport("TEST");
 	io2.in_portb_cb().set_ioport("COIN");
-	io2.in_portb_cb().set(FUNC(mplay_state::bios_6402_r));
+	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));
 	io2.out_portc_cb().set(FUNC(mplay_state::bios_6402_w));
 	io2.out_portd_cb().set(FUNC(mplay_state::bios_gamesel_w));
 	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
