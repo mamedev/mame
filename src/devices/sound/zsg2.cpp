@@ -306,7 +306,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					if ((elem.cur_pos + 1) >= elem.end_pos)
 					{
 						// end of sample
-						elem.status &= STATUS_ACTIVE;
+						elem.status &= ~STATUS_ACTIVE;
 						continue;
 					}
 				}
@@ -531,7 +531,7 @@ void zsg2_device::control_w(int reg, uint16_t data)
 				if (data & (1 << i))
 				{
 					int ch = base | i;
-					m_chan[ch].status &= STATUS_ACTIVE;
+					m_chan[ch].status &= ~STATUS_ACTIVE;
 				}
 			}
 			break;
