@@ -2353,7 +2353,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 
 	if(m_fdc)
 	{
-		track = m_fdc->track_r(space, 0);
+		track = m_fdc->track_r();
 		if(track == 0)
 			tk00 = 1;
 
@@ -2363,7 +2363,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 		last_dir = track > last_track ? 0 : 1; // see WD_FDC
 		last_track = track;
 
-		fdc_status = m_fdc->read_status();
+		fdc_status = m_fdc->status_r();
 
 		if ( (fdc_status & 0x80) == 0) // (see WD_FDC: S_WP = 0x40, S_NRDY = 0x80, S_TR00 = 0x04)
 			fdc_ready = 1;
@@ -2404,7 +2404,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	{
 		data |= m_fdc->drq_r()   ? 0x80 : 0x00;
 		data |= m_fdc->intrq_r() ? 0x40 : 0x00;
-		track = m_fdc->track_r(space, 0);
+		track = m_fdc->track_r();
 
 		// D2: TG43 * LOW ACTIVE * :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
 		// (asserted when writing data to tracks 44 through 79)

@@ -415,8 +415,8 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	// machine
 	/* rtc */
 	MCFG_PCF8593_ADD("rtc")
-	MCFG_AT45DB041_ADD("flash1")
-	MCFG_AT45DBXXX_SO_CALLBACK(WRITELINE("maincpu:sci1", h8_sci_device, rx_w))
+	AT45DB041(config, m_flash1, 0);
+	m_flash1->so_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -295,9 +295,9 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 	MCFG_S2650_SENSE_INPUT(READLINE(*this, cd2650_state, cass_r))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cd2650_state, cass_w))
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // IC26
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cd2650_state, tape_deck_on_w)) // TD ON
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("beeper", beep_device, set_state)) // OUT6
+	f9334_device &outlatch(F9334(config, "outlatch")); // IC26
+	outlatch.q_out_cb<0>().set(FUNC(cd2650_state::tape_deck_on_w)); // TD ON
+	outlatch.q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // OUT6
 	// Q1-Q7 = OUT 0-6, not defined in RE
 	// The connection of OUT6 to a 700-1200 Hz noise generator is suggested
 	// in Central Data 2650 Newsletter, Volume 1, Issue 3 for use with the

@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(at_state::neat)
 	MCFG_DS12885_ADD("mb:rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
-	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
+	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "bios");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::xb42639)
@@ -610,7 +610,7 @@ MACHINE_CONFIG_START(at_state::ct386sx)
 	at386sx(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(neat_io)
-	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
+	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "maincpu");
 MACHINE_CONFIG_END
 
 // Commodore PC 30-III
@@ -680,12 +680,13 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	// ISA cards
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, 12_MHz_XTAL)
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE("wd7600", wd7600_device, kbrst_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE("wd7600", wd7600_device, gatea20_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("wd7600", wd7600_device, irq01_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
+	keybc.system_reset_cb().set("wd7600", FUNC(wd7600_device::kbrst_w));
+	keybc.gate_a20_cb().set("wd7600", FUNC(wd7600_device::gatea20_w));
+	keybc.input_buffer_full_cb().set("wd7600", FUNC(wd7600_device::irq01_w));
+	keybc.keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
@@ -773,10 +774,10 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
 	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "lpt", true)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir6_w))
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir7_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("mb:pic8259_slave", FUNC(pic8259_device::ir6_w));
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, "cdrom", nullptr, true));
+	ide2.irq_handler().set("mb:pic8259_slave", FUNC(pic8259_device::ir7_w));
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "vt82c505", true)

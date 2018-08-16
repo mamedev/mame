@@ -247,8 +247,8 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
 
-	MCFG_DEVICE_ADD("pit", PIT68230, XTAL(8'000'000)) // MC68230P8
-	MCFG_PIT68230_TIMER_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_2))
+	PIT68230(config, m_pit, XTAL(8'000'000)); // MC68230P8
+	m_pit->timer_irq_callback().set_inputline("maincpu", M68K_IRQ_2);
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))

@@ -568,6 +568,11 @@ void namcona1_state::namcona1_main_map(address_map &map)
 	map(0xfff000, 0xffffff).ram().share("spriteram");   /* spriteram */
 }
 
+void namcona1_state::namcona1_c140_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("workram");
+}
+
 READ8_MEMBER(xday2_namcona2_state::printer_r)
 {
 	// --xx ---- printer status related, if bit 5 held 1 long enough causes printer error
@@ -718,8 +723,6 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 void namcona1_state::machine_start()
 {
 	m_mEnableInterrupts = 0;
-	m_c140->set_base(m_workram);
-
 	save_item(NAME(m_mEnableInterrupts));
 	save_item(NAME(m_count));
 	save_item(NAME(m_mcu_mailbox));
@@ -993,6 +996,7 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 
 	C140(config, m_c140, 44100);
 	m_c140->set_bank_type(c140_device::C140_TYPE::ASIC219);
+	m_c140->set_addrmap(0, &namcona1_state::namcona1_c140_map);
 	m_c140->add_route(0, "rspeaker", 1.00);
 	m_c140->add_route(1, "lspeaker", 1.00);
 MACHINE_CONFIG_END

@@ -895,11 +895,11 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("soundbd", venture_sound_device, pb_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("soundbd", venture_sound_device, pa_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("soundbd", venture_sound_device, cb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("soundbd", venture_sound_device, ca_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
+	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
+	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
+	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
 	MCFG_DEVICE_ADD("soundbd", EXIDY_VENTURE, 0)
 	MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(WRITE8("pia", pia6821_device, portb_w))
@@ -931,11 +931,11 @@ MACHINE_CONFIG_START(exidy_state::mtrap)
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("soundbd", venture_sound_device, pb_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("soundbd", venture_sound_device, pa_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("soundbd", venture_sound_device, cb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("soundbd", venture_sound_device, ca_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
+	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
+	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
+	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
 	MCFG_DEVICE_ADD("soundbd", EXIDY_MTRAP, 0)
 	MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(WRITE8("pia", pia6821_device, portb_w))

@@ -219,7 +219,6 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(apogee_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/9)

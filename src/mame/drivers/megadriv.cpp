@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
@@ -688,7 +688,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0, m_maincpu, m_scan_timer)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")

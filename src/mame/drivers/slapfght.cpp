@@ -896,11 +896,11 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_DEVICE_PROGRAM_MAP(perfrman_map)
 	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, slapfght_state, palette_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
+	mainlatch.q_out_cb<6>().set(FUNC(slapfght_state::palette_bank_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
 	MCFG_DEVICE_PROGRAM_MAP(perfrman_sound_map)
@@ -947,10 +947,10 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
@@ -1018,11 +1018,11 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_DEVICE_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
+	mainlatch.q_out_cb<4>().set_membank("bank1");
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)

@@ -2499,10 +2499,10 @@ MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(*this, segas32_cd_state, lamps1_w))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segas32_cd_state, lamps2_w))
-	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff)) // Ports C-E used for IEEE-488 printer interface
+	cxd1095_device &cxdio(CXD1095(config, "cxdio", 0));
+	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
+	cxdio.out_portb_cb().set(FUNC(segas32_cd_state::lamps2_w));
+	cxdio.in_portd_cb().set_constant(0xff); // Ports C-E used for IEEE-488 printer interface
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")

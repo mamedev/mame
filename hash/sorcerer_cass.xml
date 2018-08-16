@@ -777,7 +777,8 @@
 	<software name="interceptor">
 		<description>Interceptor</description>
 		<year>1983</year>
-		<publisher>Blair Rideout</publisher>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Blair Rideout"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="7201560">
@@ -1034,7 +1035,7 @@
 	<software name="grotnik">
 		<description>Grotnik Wars</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>System Software</publisher>
 		<info name="developer" value="Ross Williams" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">

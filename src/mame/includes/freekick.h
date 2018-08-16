@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina,David Haywood
 
+#include "machine/74259.h"
 #include "emupal.h"
 
 class freekick_state : public driver_device
@@ -13,6 +14,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch"),
 		m_bank1(*this, "bank1"),
 		m_bank1d(*this, "bank1d") { }
 
@@ -81,6 +83,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_outlatch;
 	optional_memory_bank m_bank1, m_bank1d;
 	void decrypted_opcodes_map(address_map &map);
 	void freekick_io_map(address_map &map);

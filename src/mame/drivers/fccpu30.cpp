@@ -72,10 +72,10 @@
  *---------------------------
  * 1981 Force Computers was founded in San Jose, California. Over time a European headquarter was opened
  *      in Munich, Germany, and a Japanese headquarter in Tokyo
- * 1996 Force was aquired by Solectron Corporation in 1996
+ * 1996 Force was acquired by Solectron Corporation in 1996
  * 2004 Force was sold off from Solectron to Motorola
- * 2008 Force was aquired by Emerson as part of the Motorola Embedded Division
- * 2016 Force was aquired by Platinum Equity as part of the Emerson Network Power Division
+ * 2008 Force was acquired by Emerson as part of the Motorola Embedded Division
+ * 2016 Force was acquired by Platinum Equity as part of the Emerson Network Power Division
  *
  * Force developed and produced VME board products based on SPARC, Pentium, PowerPC and 68K.
  *
@@ -660,13 +660,13 @@ static void fccpu30_vme_cards(device_slot_interface &device)
  */
 MACHINE_CONFIG_START(cpu30_state::cpu30)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68030, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP (cpu30_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cpu30_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, fccpu30_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, fccpu30_vme_cards, nullptr)
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
@@ -713,38 +713,38 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
 	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq5_w))
 
-	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc", duscc68562_device, ctsb_w))
 
-	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc2", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc2", duscc68562_device, ctsa_w))
 
-	MCFG_DEVICE_ADD (RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc2", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc2", duscc68562_device, ctsb_w))
 
-	MCFG_DEVICE_ADD (RS232P4_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232P4_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc", duscc68562_device, ctsa_w))
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
-	MCFG_DEVICE_ADD ("pit1", PIT68230, XTAL(16'000'000) / 2) // The PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, rotary_rd))
-	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, flop_dmac_r))
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, cpu30_state, flop_dmac_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit1c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit1c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	PIT68230(config, m_pit1, XTAL(16'000'000) / 2); // The PIT clock is not verified on schema but reversed from behaviour
+	m_pit1->pa_in_callback().set(FUNC(cpu30_state::rotary_rd));
+	m_pit1->pb_in_callback().set(FUNC(cpu30_state::flop_dmac_r));
+	m_pit1->pb_out_callback().set(FUNC(cpu30_state::flop_dmac_w));
+	m_pit1->pc_in_callback().set(FUNC(cpu30_state::pit1c_r));
+	m_pit1->pc_out_callback().set(FUNC(cpu30_state::pit1c_w));
+//  m_pit1->timer_irq_callback().set("fga002", FUNC(fga002_device::lirq2_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
-	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL(16'000'000) / 2) // Th PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, board_mem_id_rd))
-	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, pit2a_r))
-	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2a_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit2c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq3_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	PIT68230(config, m_pit2, XTAL(16'000'000) / 2); // Th PIT clock is not verified on schema but reversed from behaviour
+	m_pit2->pb_in_callback().set(FUNC(cpu30_state::board_mem_id_rd));
+	m_pit2->pa_in_callback().set(FUNC(cpu30_state::pit2a_r));
+	m_pit2->pa_out_callback().set(FUNC(cpu30_state::pit2a_w));
+	m_pit2->pc_in_callback().set(FUNC(cpu30_state::pit2c_r));
+	m_pit2->pc_out_callback().set(FUNC(cpu30_state::pit2c_w));
+//  m_pit2->timer_irq_callback().set("fga002", FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
 	MCFG_FGA002_ADD("fga002", 0)

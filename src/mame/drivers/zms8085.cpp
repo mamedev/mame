@@ -129,15 +129,15 @@ MACHINE_CONFIG_START(zms8085_state::zephyr)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'582'000), 980, 0, 800, 265, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(zms8085_state, screen_update)
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // SMC COM2017
-	MCFG_AY51013_TX_CLOCK(153600) // should actually be configurable somehow
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_AY51013_WRITE_DAV_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_AY51013_AUTO_RDAV(true)
+	AY51013(config, m_uart); // SMC COM2017
+	m_uart->set_tx_clock(153600); // should actually be configurable somehow
+	m_uart->set_rx_clock(153600);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->write_dav_callback().set_inputline("maincpu", I8085_RST65_LINE);
+	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

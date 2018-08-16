@@ -208,7 +208,7 @@ void tlcs870_device::do_RETI(const uint8_t opbyte0)
 
 	m_sp.d += 3;
 	m_addr = RM16(m_sp.d - 2);
-	set_PSW(RM8(m_sp.d - 1));
+	set_PSW(RM8(m_sp.d));
 
 	// Interrupts always get reenabled after a RETI.  The RETN behavior is different
 	m_EIR |= 1;
@@ -234,8 +234,8 @@ void tlcs870_device::do_POP_PSW(const uint8_t opbyte0)
 	*/
 	m_cycles = 3;
 
-	m_sp.d += 2;
-	const uint16_t val = RM16(m_sp.d - 1);
+	m_sp.d += 1;
+	const uint8_t val = RM8(m_sp.d);
 	set_PSW(val);
 }
 
@@ -247,9 +247,9 @@ void tlcs870_device::do_PUSH_PSW(const uint8_t opbyte0)
 	*/
 	m_cycles = 2;
 
-	const uint16_t val = get_PSW();
-	WM16(m_sp.d - 1, val);
-	m_sp.d -= 2;
+	const uint8_t val = get_PSW();
+	WM8(m_sp.d, val);
+	m_sp.d -= 1;
 }
 
 void tlcs870_device::do_DAA_A(const uint8_t opbyte0)
@@ -410,7 +410,7 @@ void tlcs870_device::do_DEC_rr(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -619,7 +619,7 @@ void tlcs870_device::do_DEC_inx(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -653,7 +653,7 @@ void tlcs870_device::do_DEC_inHL(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -926,7 +926,7 @@ void tlcs870_device::do_DEC_r(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -1130,13 +1130,13 @@ void tlcs870_device::do_JP_mn(const uint8_t opbyte0)
 void tlcs870_device::do_ff_opcode(const uint8_t opbyte0)
 {
 	/*
-	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
+		OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
 		SWI               1111 1111                                            -  -  -  -    9 (1 if already in NMI)
 	*/
 	m_cycles = 9; // TODO: 1 if in NMI this acts as a NOP
 
 	// set interrupt latch
-	m_IL |= 1<<TLCS870_IRQ_INTSW;
+	m_IL |= 1 << (15 - TLCS870_IRQ_INTSW);
 }
 
 /**********************************************************************************************************************/

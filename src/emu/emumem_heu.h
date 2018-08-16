@@ -8,8 +8,7 @@
 template<int Width, int AddrShift, int Endian> class handler_entry_read_units : public handler_entry_read<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
-	using READ = typename handler_entry_size<Width>::READ;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_read<Width, AddrShift, Endian>;
 
 	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space);
@@ -50,8 +49,7 @@ private:
 template<int Width, int AddrShift, int Endian> class handler_entry_write_units : public handler_entry_write<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
-	using WRITE = typename handler_entry_size<Width>::WRITE;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_write<Width, AddrShift, Endian>;
 
 	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space);

@@ -563,8 +563,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 
 	// CPU TMS9980A; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
+	TMS9980A(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::tmspoker_map);
+	m_maincpu->set_addrmap(AS_IO, &tmspoker_state::tmspoker_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::tmspoker_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

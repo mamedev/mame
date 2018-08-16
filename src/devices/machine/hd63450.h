@@ -59,6 +59,11 @@ public:
 	template <int Ch, class Object> devcb_base &set_dma_read_callback(Object &&cb) { return m_dma_read[Ch].set_callback(std::forward<Object>(cb)); }
 	template <int Ch, class Object> devcb_base &set_dma_write_callback(Object &&cb) { return m_dma_write[Ch].set_callback(std::forward<Object>(cb)); }
 
+	auto dma_end() { return m_dma_end.bind(); }
+	auto dma_error() { return m_dma_error.bind(); }
+	template<int Ch> auto dma_read() { return m_dma_read[Ch].bind(); }
+	template<int Ch> auto dma_write() { return m_dma_write[Ch].bind(); }
+
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
 	void set_our_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{

@@ -21,17 +21,15 @@ real hardware.
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class imds_state : public driver_device
 {
 public:
-	imds_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+	imds_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	void imds(machine_config &config);
 
@@ -105,7 +103,7 @@ MACHINE_CONFIG_START(imds_state::imds)
 //  MCFG_INS8250_ADD( "ins8250", imds_com_interface )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(imds_state, kbd_put))
 MACHINE_CONFIG_END
 

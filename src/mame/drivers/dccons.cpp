@@ -629,8 +629,8 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	m_aica->add_route(0, "lspeaker", 1.0);
 	m_aica->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ata", ATA_INTERFACE, 0)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, dc_cons_state, ata_interrupt))
+	ATA_INTERFACE(config, m_ata, 0);
+	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
 
 	MCFG_DEVICE_MODIFY("ata:0")
 	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)

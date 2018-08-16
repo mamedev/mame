@@ -9832,6 +9832,22 @@ ROM_START( clubkcyc )
 	//PIC16C622A (317-0358-COM)
 	//(sticker 253-5508-0358)
 	ROM_LOAD( "317-0358-com.pic", 0x000000, 0x004000, CRC(dd33e50f) SHA1(c51712754022fc3adc350fa0714bf60fd0d163cf) )
+
+/*
+	Cycraft Motion PC:
+	Mainboard Advantech PCM-5820
+	CAN Module PCM-3680
+	IO Module PCM-3724
+	128mb PC133 Ram
+
+	SanDisk CF With Linux:
+	  Simuline CYCRAFT
+	  SMCP: V1.65
+	  GAME: Club-Kart
+	  (c) 2003 Simuline Inc.
+*/
+	DISK_REGION( "cycraft" )
+	DISK_IMAGE( "cycraft_clubkart_smcp_v1.65", 0, SHA1(c77df6eaf425e4e86f871914aa024debc1940713) )
 ROM_END
 
 ROM_START( initdv3j )
@@ -9923,6 +9939,9 @@ ROM_START( inidv3cy )
 	//PIC16C621A (317-0406-COM)
 	//(sticker 253-5508-0406)
 	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, CRC(fe91a7af) SHA1(3562d8d454ac6e5b73a24d4dc8928ef24687cdf7) )
+
+	DISK_REGION( "cycraft" )
+	DISK_IMAGE( "initiald3_smcp_v1.66", 0, SHA1(8ade7c0bb85ceebf9e45e4d8053ad76009258a38) )
 ROM_END
 
 ROM_START( inidv3ca )
@@ -9936,6 +9955,9 @@ ROM_START( inidv3ca )
 	//PIC16C621A (317-0406-COM)
 	//(sticker 253-5508-0406)
 	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, CRC(fe91a7af) SHA1(3562d8d454ac6e5b73a24d4dc8928ef24687cdf7) )
+
+	DISK_REGION( "cycraft" )
+	DISK_IMAGE( "initiald3_smcp_v1.66", 0, SHA1(8ade7c0bb85ceebf9e45e4d8053ad76009258a38) )
 ROM_END
 
 /**********************************************

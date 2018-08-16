@@ -1160,10 +1160,10 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_DEVICE_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, equites_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, equites_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, equites_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(equites_state::mcu_start_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(equites_state::mcu_switch_w));
 
 	common_sound(config);
 
@@ -1211,11 +1211,11 @@ MACHINE_CONFIG_START(splndrbt_state::splndrbt)
 	MCFG_DEVICE_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", splndrbt_state, splndrbt_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, equites_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, equites_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, equites_state, mcu_switch_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, splndrbt_state, splndrbt_selchar_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(equites_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::mcu_start_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(equites_state::mcu_switch_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(splndrbt_state::splndrbt_selchar_w));
 
 	common_sound(config);
 

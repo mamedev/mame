@@ -147,9 +147,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
 
 	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
@@ -193,6 +190,9 @@ protected:
 
 	virtual void update_irq() override;
 	void remap();
+	void port_314_w(u8 data);
+	u8 port_314_r();
+	u8 port_318_r();
 };
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
 	update_irq();
 }
 
-WRITE8_MEMBER(telestrat_state::port_314_w)
+void telestrat_state::port_314_w(u8 data)
 {
 	m_port_314 = data;
 	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
@@ -490,12 +490,12 @@ WRITE8_MEMBER(telestrat_state::port_314_w)
 	update_irq();
 }
 
-READ8_MEMBER(telestrat_state::port_314_r)
+u8 telestrat_state::port_314_r()
 {
 	return (m_fdc_irq && (m_port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(telestrat_state::port_318_r)
+u8 telestrat_state::port_318_r()
 {
 	return m_fdc_drq ? 0x7f : 0xff;
 }
@@ -809,14 +809,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
 
 	OUTPUT_LATCH(config, m_cent_data_out);
-	m_cent_data_out->bit_handler<0>().set(m_centronics, FUNC(centronics_device::write_data0));
-	m_cent_data_out->bit_handler<1>().set(m_centronics, FUNC(centronics_device::write_data1));
-	m_cent_data_out->bit_handler<2>().set(m_centronics, FUNC(centronics_device::write_data2));
-	m_cent_data_out->bit_handler<3>().set(m_centronics, FUNC(centronics_device::write_data3));
-	m_cent_data_out->bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_data4));
-	m_cent_data_out->bit_handler<5>().set(m_centronics, FUNC(centronics_device::write_data5));
-	m_cent_data_out->bit_handler<6>().set(m_centronics, FUNC(centronics_device::write_data6));
-	m_cent_data_out->bit_handler<7>().set(m_centronics, FUNC(centronics_device::write_data7));
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	/* cassette */
 	CASSETTE(config, m_cassette, 0);

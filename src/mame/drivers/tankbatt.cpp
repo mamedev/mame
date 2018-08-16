@@ -276,20 +276,20 @@ MACHINE_CONFIG_START(tankbatt_state::tankbatt)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tankbatt_state,  interrupt)
 
-	MCFG_DEVICE_ADD("mainlatch", CD4099, 0) // latches at 4H and 5H (are the empty 4J and 5J locations for LS259 substitution?)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) //coin counter mirror?
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tankbatt_state, interrupt_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tankbatt_state, sh_engine_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tankbatt_state, sh_fire_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tankbatt_state, sh_expl_w)) // bit 7 also set by ASL instruction
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bit 7 also set by ASL instruction
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tankbatt_state, demo_interrupt_enable_w))
+	cd4099_device &mainlatch(CD4099(config, "mainlatch")); // latches at 4H and 5H (are the empty 4J and 5J locations for LS259 substitution?)
+	mainlatch.q_out_cb<0>().set_nop(); //coin counter mirror?
+	mainlatch.q_out_cb<2>().set(FUNC(tankbatt_state::interrupt_enable_w));
+	mainlatch.q_out_cb<3>().set(FUNC(tankbatt_state::sh_engine_w));
+	mainlatch.q_out_cb<4>().set(FUNC(tankbatt_state::sh_fire_w));
+	mainlatch.q_out_cb<5>().set(FUNC(tankbatt_state::sh_expl_w)); // bit 7 also set by ASL instruction
+	mainlatch.q_out_cb<6>().set_nop(); // bit 7 also set by ASL instruction
+	mainlatch.q_out_cb<7>().set(FUNC(tankbatt_state::demo_interrupt_enable_w));
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tankbatt_state, coincounter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tankbatt_state, coinlockout_w))
+	cd4099_device &outlatch(CD4099(config, "outlatch"));
+	outlatch.q_out_cb<0>().set_output("led0");
+	outlatch.q_out_cb<1>().set_output("led1");
+	outlatch.q_out_cb<2>().set(FUNC(tankbatt_state::coincounter_w));
+	outlatch.q_out_cb<3>().set(FUNC(tankbatt_state::coinlockout_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

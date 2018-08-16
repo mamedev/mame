@@ -1467,8 +1467,8 @@ MACHINE_CONFIG_START(zn_state::coh1000w)
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 
-	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	VT83C461(config, m_vt83c461).options(ata_devices, "hdd", nullptr, true);
+	m_vt83c461->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&zn_state::atpsx_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&zn_state::atpsx_dma_write, this ) )
 MACHINE_CONFIG_END
@@ -2200,12 +2200,7 @@ MACHINE_CONFIG_START(zn_state::nbajamex)
 	MCFG_MACHINE_START_OVERRIDE(zn_state, nbajamex)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)
 
-	MCFG_DEVICE_ADD("nbajamex_bankmap", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nbajamex_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800000)
+	ADDRESS_MAP_BANK(config, "nbajamex_bankmap").set_map(&zn_state::nbajamex_bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
@@ -2218,8 +2213,8 @@ MACHINE_CONFIG_START(zn_state::jdredd)
 	MCFG_DEVICE_MODIFY("gpu")
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 MACHINE_CONFIG_END
 
 /*
@@ -2690,8 +2685,8 @@ MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	MCFG_DEVICE_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_DEVICE_IO_MAP(cbaj_z80_port_map)
 
-	MCFG_FIFO7200_ADD("cbaj_fifo1", 0x400) // LH540202
-	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // "
+	FIFO7200(config, m_cbaj_fifo[0], 0x400); // LH540202
+	FIFO7200(config, m_cbaj_fifo[1], 0x400); // "
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -5437,7 +5432,7 @@ GAME( 1995, sfchampu,  sfchamp,  coh1000ta,   znt,      zn_state, empty_init, RO
 GAME( 1995, sfchampj,  sfchamp,  coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, psyforce,  coh1000t, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, psyforcej, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforcex, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) 
+GAME( 1995, psyforcex, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgcldate,  mgcldtex, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, mgcldtex,  coh1000t, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

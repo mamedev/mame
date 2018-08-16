@@ -207,7 +207,7 @@ public:
 		set_extensions(exts);
 	}
 
-	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 };

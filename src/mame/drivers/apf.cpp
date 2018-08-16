@@ -540,13 +540,13 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia0_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apf_state, pia0_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, apf_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set(FUNC(apf_state::pia0_porta_r));
+	m_pia0->writepb_handler().set(FUNC(apf_state::pia0_portb_w));
+	m_pia0->ca2_handler().set(FUNC(apf_state::pia0_ca2_w));
+	m_pia0->cb2_handler().set("speaker", FUNC(speaker_sound_device::level_w));
+	m_pia0->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, nullptr)
 
@@ -566,10 +566,10 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia1_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, apf_state, pia1_portb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apf_state, pia1_portb_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(apf_state::pia1_porta_r));
+	m_pia1->readpb_handler().set(FUNC(apf_state::pia1_portb_r));
+	m_pia1->writepb_handler().set(FUNC(apf_state::pia1_portb_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(apf_cassette_formats)

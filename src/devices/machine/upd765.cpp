@@ -584,6 +584,15 @@ void upd765_family_device::disable_transfer()
 
 void upd765_family_device::fifo_push(uint8_t data, bool internal)
 {
+	// MZ: A bit speculative. These lines help to avoid some FIFO mess-up
+	// with the HX5102 that happens when WRITE DATA fails to find the sector
+	// but the host already starts pushing the sector data. Should not hurt.
+	if (fifo_expected == 0)
+	{
+		LOGFIFO("Fifo not expecting data, discarding\n");
+		return;
+	}
+
 	if(fifo_pos == 16) {
 		if(internal) {
 			if(!(st1 & ST1_OR))

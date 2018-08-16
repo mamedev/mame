@@ -45,16 +45,6 @@
 
 #pragma once
 
-
-#define MCFG_AM2847_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AM2847, 0)
-
-#define MCFG_AM2849_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AM2849, 0)
-
-#define MCFG_TMS3409_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TMS3409, 0)
-
 class am2847_base_device : public device_t
 {
 public:
@@ -62,13 +52,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( in_b_w );
 	DECLARE_WRITE_LINE_MEMBER( in_c_w );
 	DECLARE_WRITE_LINE_MEMBER( in_d_w );
-	void in_w(uint8_t data); // Or if you prefer...
+	void in_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( rc_a_w );
 	DECLARE_WRITE_LINE_MEMBER( rc_b_w );
 	DECLARE_WRITE_LINE_MEMBER( rc_c_w );
 	DECLARE_WRITE_LINE_MEMBER( rc_d_w );
-	void rc_w(uint8_t data); // Or if you prefer...
+	void rc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( cp_w );
 

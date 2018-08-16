@@ -106,7 +106,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x04: // FLOP
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 		break;
 
 	case 0x05: // VIPS
@@ -149,7 +149,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x04: // FLOP
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 		break;
 
 	case 0x05: // VIPS

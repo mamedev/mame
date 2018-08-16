@@ -16,10 +16,6 @@
 //#include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/terminal.h"
 
-/* Defines */
-
-#define TERMINAL_TAG "terminal"
-
 /* Components */
 
 struct hd63701y0_t
@@ -77,8 +73,10 @@ class rvoice_state : public driver_device
 {
 public:
 	rvoice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+			{ }
 
 	void rvoicepc(machine_config &config);
 
@@ -92,6 +90,7 @@ private:
 	virtual void machine_reset() override;
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 	void hd63701_main_io(address_map &map);
 	void hd63701_main_mem(address_map &map);
 };
@@ -382,10 +381,9 @@ MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* video hardware */
-	//config.set_default_layout(layout_dectalk); // hack to avoid screenless system crash
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(rvoice_state, null_kbd_put))
 
 MACHINE_CONFIG_END

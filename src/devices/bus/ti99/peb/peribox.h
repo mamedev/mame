@@ -34,11 +34,6 @@ class peribox_device : public bus::ti99::internal::ioport_attached_device
 public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_inta_callback(Object &&cb)  { return m_slot1_inta.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_intb_callback(Object &&cb)  { return m_slot1_intb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ready_callback(Object &&cb) { return m_slot1_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_lcp_callback(Object &&cb)   { return m_slot1_lcp.set_callback(std::forward<Object>(cb)); }
-
 	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -58,13 +53,20 @@ public:
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
 
+	// Callbacks
+	auto inta_cb() { return m_slot1_inta.bind(); }
+	auto intb_cb() { return m_slot1_intb.bind(); }
+	auto ready_cb() { return m_slot1_ready.bind(); }
+	auto lcp_cb() { return m_slot1_lcp.bind(); }
+
 protected:
 	peribox_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_add_mconfig(machine_config &config) override;
+	virtual void configure_slot(peribox_slot_device &slot, int number);
 
 	// Next three methods call back the console via slot 1
 	devcb_write_line m_slot1_inta;   // INTA line (Box to console)
@@ -74,6 +76,14 @@ protected:
 
 	void set_slot_loaded(int slot, peribox_slot_device* slotdev);
 	peribox_slot_device *m_slot[9];     // for the sake of simplicity we donate the first two positions (0,1)
+
+	required_device<peribox_slot_device> m_slot2;
+	required_device<peribox_slot_device> m_slot3;
+	required_device<peribox_slot_device> m_slot4;
+	required_device<peribox_slot_device> m_slot5;
+	required_device<peribox_slot_device> m_slot6;
+	required_device<peribox_slot_device> m_slot7;
+	required_device<peribox_slot_device> m_slot8;
 
 	// Propagators for the slot signals. All signals are active low, and
 	// if any one slot asserts the line, the joint line is asserted.
@@ -116,7 +126,7 @@ public:
 	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	void configure_slot(peribox_slot_device &slot, int number) override;
 };
 
 /*
@@ -128,7 +138,7 @@ public:
 	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	void configure_slot(peribox_slot_device &slot, int number) override;
 };
 
 
@@ -138,11 +148,11 @@ protected:
 class peribox_gen_device : public peribox_device
 {
 public:
-	peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void configure_slot(peribox_slot_device &slot, int number) override;
 };
 
 /*
@@ -154,7 +164,7 @@ public:
 	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
+	void configure_slot(peribox_slot_device &slot, int number) override;
 };
 
 /*****************************************************************************
@@ -229,6 +239,8 @@ public:
 
 	// called from the box itself
 	void set_genmod(bool set);
+	void configure_slot(int number);
+	void set_number(int number) { m_slotnumber = number; }
 
 protected:
 	void device_start() override;
@@ -240,26 +252,6 @@ private:
 	int m_slotnumber;
 	const char* card_name() { return m_card->device().tag(); }
 };
-
-#define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \
-	MCFG_DEVICE_ADD(_tag, TI99_PERIBOX_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
-
-#define MCFG_PERIBOX_SLOT_ADD_DEF(_tag, _slot_intf, _default) \
-	MCFG_DEVICE_ADD(_tag, TI99_PERIBOX_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false)
-
-#define MCFG_PERIBOX_INTA_HANDLER( _inta ) \
-	downcast<bus::ti99::peb::peribox_device &>(*device).set_inta_callback(DEVCB_##_inta);
-
-#define MCFG_PERIBOX_INTB_HANDLER( _intb ) \
-	downcast<bus::ti99::peb::peribox_device &>(*device).set_intb_callback(DEVCB_##_intb);
-
-#define MCFG_PERIBOX_READY_HANDLER( _ready ) \
-	downcast<bus::ti99::peb::peribox_device &>(*device).set_ready_callback(DEVCB_##_ready);
-
-#define MCFG_PERIBOX_LCP_HANDLER( _lcp ) \
-	downcast<bus::ti99::peb::peribox_device &>(*device).set_lcp_callback(DEVCB_##_lcp);
 
 } } } // end namespace bus::ti99::peb
 

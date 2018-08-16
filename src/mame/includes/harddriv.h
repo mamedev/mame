@@ -96,7 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 
-private:
+protected:
 
 	void init_video();
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);

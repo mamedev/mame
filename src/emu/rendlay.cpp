@@ -20,6 +20,7 @@
 
 #include <ctype.h>
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
@@ -69,23 +70,26 @@ enum
 
 std::locale const f_portable_locale("C");
 
+constexpr layout_group::transform identity_transform{{ {{ 1.0F, 0.0F, 0.0F }}, {{ 0.0F, 1.0F, 0.0F }}, {{ 0.0F, 0.0F, 1.0F }} }};
+
 
 
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  render_bounds_transform - apply translation/
-//  scaling
-//-------------------------------------------------
-
-inline void render_bounds_transform(render_bounds &bounds, render_bounds const &transform)
+inline void render_bounds_transform(render_bounds &bounds, layout_group::transform const &trans)
 {
-	bounds.x0 = (bounds.x0 * transform.x1) + transform.x0;
-	bounds.y0 = (bounds.y0 * transform.y1) + transform.y0;
-	bounds.x1 = (bounds.x1 * transform.x1) + transform.x0;
-	bounds.y1 = (bounds.y1 * transform.y1) + transform.y0;
+	bounds = render_bounds{
+			(bounds.x0 * trans[0][0]) + (bounds.y0 * trans[0][1]) + trans[0][2],
+			(bounds.x0 * trans[1][0]) + (bounds.y0 * trans[1][1]) + trans[1][2],
+			(bounds.x1 * trans[0][0]) + (bounds.y1 * trans[0][1]) + trans[0][2],
+			(bounds.x1 * trans[1][0]) + (bounds.y1 * trans[1][1]) + trans[1][2] };
+}
+
+constexpr render_color render_color_multiply(render_color const &x, render_color const &y)
+{
+	return render_color{ x.a * y.a, x.r * y.r, x.g * y.g, x.b * y.b };
 }
 
 
@@ -788,53 +792,50 @@ public:
 		}
 	}
 
-	void parse_color(util::xml::data_node const *node, render_color &result)
+	render_color parse_color(util::xml::data_node const *node)
 	{
-		// default to white
+		// default to opaque white
 		if (!node)
-		{
-			result.r = result.g = result.b = result.a = 1.0F;
-		}
-		else
-		{
-			// parse attributes
-			result.r = get_attribute_float(*node, "red", 1.0F);
-			result.g = get_attribute_float(*node, "green", 1.0F);
-			result.b = get_attribute_float(*node, "blue", 1.0F);
-			result.a = get_attribute_float(*node, "alpha", 1.0F);
+			return render_color{ 1.0F, 1.0F, 1.0F, 1.0F };
 
-			// check for errors
-			if ((0.0F > (std::min)({ result.r, result.g, result.b, result.a })) || (1.0F < (std::max)({ result.r, result.g, result.b, result.a })))
-				throw layout_syntax_error(util::string_format("illegal RGBA color %f,%f,%f,%f", result.r, result.g, result.b, result.a));
-		}
+		// parse attributes
+		render_color const result{
+				get_attribute_float(*node, "alpha", 1.0F),
+				get_attribute_float(*node, "red", 1.0F),
+				get_attribute_float(*node, "green", 1.0F),
+				get_attribute_float(*node, "blue", 1.0F) };
+
+		// check for errors
+		if ((0.0F > (std::min)({ result.r, result.g, result.b, result.a })) || (1.0F < (std::max)({ result.r, result.g, result.b, result.a })))
+			throw layout_syntax_error(util::string_format("illegal RGBA color %f,%f,%f,%f", result.r, result.g, result.b, result.a));
+
+		return result;
 	}
 
-	void parse_orientation(util::xml::data_node const *node, int &result)
+	int parse_orientation(util::xml::data_node const *node)
 	{
 		// default to no transform
 		if (!node)
+			return ROT0;
+
+		// parse attributes
+		int result;
+		int const rotate(get_attribute_int(*node, "rotate", 0));
+		switch (rotate)
 		{
-			result = ROT0;
+		case 0:     result = ROT0;      break;
+		case 90:    result = ROT90;     break;
+		case 180:   result = ROT180;    break;
+		case 270:   result = ROT270;    break;
+		default:    throw layout_syntax_error(util::string_format("invalid rotate attribute %d", rotate));
 		}
-		else
-		{
-			// parse attributes
-			int const rotate(get_attribute_int(*node, "rotate", 0));
-			switch (rotate)
-			{
-				case 0:     result = ROT0;      break;
-				case 90:    result = ROT90;     break;
-				case 180:   result = ROT180;    break;
-				case 270:   result = ROT270;    break;
-				default:    throw layout_syntax_error(util::string_format("invalid rotate attribute %d", rotate));
-			}
-			if (!std::strcmp("yes", get_attribute_string(*node, "swapxy", "no")))
-				result ^= ORIENTATION_SWAP_XY;
-			if (!std::strcmp("yes", get_attribute_string(*node, "flipx", "no")))
-				result ^= ORIENTATION_FLIP_X;
-			if (!std::strcmp("yes", get_attribute_string(*node, "flipy", "no")))
-				result ^= ORIENTATION_FLIP_Y;
-		}
+		if (!std::strcmp("yes", get_attribute_string(*node, "swapxy", "no")))
+			result ^= ORIENTATION_SWAP_XY;
+		if (!std::strcmp("yes", get_attribute_string(*node, "flipx", "no")))
+			result ^= ORIENTATION_FLIP_X;
+		if (!std::strcmp("yes", get_attribute_string(*node, "flipy", "no")))
+			result ^= ORIENTATION_FLIP_Y;
+		return result;
 	}
 };
 
@@ -965,25 +966,65 @@ layout_group::~layout_group()
 //  matrix for given destination bounds
 //-------------------------------------------------
 
-render_bounds layout_group::make_transform(render_bounds const &dest) const
+layout_group::transform layout_group::make_transform(int orientation, render_bounds const &dest) const
 {
 	assert(m_bounds_resolved);
 
-	return render_bounds{
-			dest.x0 - (m_bounds.x0 * (dest.x1 - dest.x0) / (m_bounds.x1 - m_bounds.x0)),
-			dest.y0 - (m_bounds.y0 * (dest.y1 - dest.y0) / (m_bounds.y1 - m_bounds.y0)),
-			(dest.x1 - dest.x0) / (m_bounds.x1 - m_bounds.x0),
-			(dest.y1 - dest.y0) / (m_bounds.y1 - m_bounds.y0) };
+	// make orientation matrix
+	transform result{{ {{ 1.0F, 0.0F, 0.0F }}, {{ 0.0F, 1.0F, 0.0F }}, {{ 0.0F, 0.0F, 1.0F }} }};
+	if (orientation & ORIENTATION_SWAP_XY)
+	{
+		std::swap(result[0][0], result[0][1]);
+		std::swap(result[1][0], result[1][1]);
+	}
+	if (orientation & ORIENTATION_FLIP_X)
+	{
+		result[0][0] = -result[0][0];
+		result[0][1] = -result[0][1];
+	}
+	if (orientation & ORIENTATION_FLIP_Y)
+	{
+		result[1][0] = -result[1][0];
+		result[1][1] = -result[1][1];
+	}
+
+	// apply to bounds and force into destination rectangle
+	render_bounds bounds(m_bounds);
+	render_bounds_transform(bounds, result);
+	result[0][0] *= (dest.x1 - dest.x0) / std::fabs(bounds.x1 - bounds.x0);
+	result[0][1] *= (dest.x1 - dest.x0) / std::fabs(bounds.x1 - bounds.x0);
+	result[0][2] = dest.x0 - ((std::min)(bounds.x0, bounds.x1) * (dest.x1 - dest.x0) / std::fabs(bounds.x1 - bounds.x0));
+	result[1][0] *= (dest.y1 - dest.y0) / std::fabs(bounds.y1 - bounds.y0);
+	result[1][1] *= (dest.y1 - dest.y0) / std::fabs(bounds.y1 - bounds.y0);
+	result[1][2] = dest.y0 - ((std::min)(bounds.y0, bounds.y1) * (dest.y1 - dest.y0) / std::fabs(bounds.y1 - bounds.y0));
+	return result;
 }
 
-render_bounds layout_group::make_transform(render_bounds const &dest, render_bounds const &transform) const
+layout_group::transform layout_group::make_transform(int orientation, transform const &trans) const
 {
-	render_bounds const next(make_transform(dest));
-	return render_bounds{
-			(transform.x0 * next.x1) + next.x0,
-			(transform.y0 * next.y1) + next.y0,
-			transform.x1 * next.x1,
-			transform.y1 * next.y1 };
+	assert(m_bounds_resolved);
+
+	render_bounds const dest{
+			m_bounds.x0,
+			m_bounds.y0,
+			(orientation & ORIENTATION_SWAP_XY) ? (m_bounds.x0 + m_bounds.y1 - m_bounds.y0) : m_bounds.x1,
+			(orientation & ORIENTATION_SWAP_XY) ? (m_bounds.y0 + m_bounds.x1 - m_bounds.x0) : m_bounds.y1 };
+	return make_transform(orientation, dest, trans);
+}
+
+layout_group::transform layout_group::make_transform(int orientation, render_bounds const &dest, transform const &trans) const
+{
+	transform const next(make_transform(orientation, dest));
+	transform result{{ {{ 0.0F, 0.0F, 0.0F }}, {{ 0.0F, 0.0F, 0.0F }}, {{ 0.0F, 0.0F, 0.0F }} }};
+	for (unsigned y = 0; 3U > y; ++y)
+	{
+		for (unsigned x = 0; 3U > x; ++x)
+		{
+			for (unsigned i = 0; 3U > i; ++i)
+				result[y][x] += trans[y][i] * next[i][x];
+		}
+	}
+	return result;
 }
 
 
@@ -1013,8 +1054,8 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 		// a wild loop appears!
 		std::ostringstream path;
 		for (layout_group const *const group : seen)
-			path << ' ' << group->m_groupnode.get_name();
-		path << ' ' << m_groupnode.get_name();
+			path << ' ' << group->m_groupnode.get_attribute_string("name", nullptr);
+		path << ' ' << m_groupnode.get_attribute_string("name", nullptr);
 		throw layout_syntax_error(util::string_format("recursively nested groups %s", path.str()));
 	}
 
@@ -1024,6 +1065,7 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 		environment local(env);
 		resolve_bounds(local, m_groupnode, groupmap, seen, false, true);
 	}
+	seen.pop_back();
 }
 
 void layout_group::resolve_bounds(
@@ -1071,17 +1113,33 @@ void layout_group::resolve_bounds(
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
-			char const *ref(env.get_attribute_string(*itemnode, "ref", nullptr));
-			if (!ref)
-				throw layout_syntax_error("nested group must have ref attribute");
+			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
+			if (itemboundsnode)
+			{
+				render_bounds itembounds;
+				env.parse_bounds(itemboundsnode, itembounds);
+				union_render_bounds(m_bounds, itembounds);
+			}
+			else
+			{
+				char const *ref(env.get_attribute_string(*itemnode, "ref", nullptr));
+				if (!ref)
+					throw layout_syntax_error("nested group must have ref attribute");
 
-			group_map::iterator const found(groupmap.find(ref));
-			if (groupmap.end() == found)
-				throw layout_syntax_error(util::string_format("unable to find group %s", ref));
+				group_map::iterator const found(groupmap.find(ref));
+				if (groupmap.end() == found)
+					throw layout_syntax_error(util::string_format("unable to find group %s", ref));
 
-			environment local(env);
-			found->second.resolve_bounds(local, groupmap, seen);
-			union_render_bounds(m_bounds, found->second.m_bounds);
+				int const orientation(env.parse_orientation(itemnode->get_child("orientation")));
+				environment local(env);
+				found->second.resolve_bounds(local, groupmap, seen);
+				render_bounds const itembounds{
+						found->second.m_bounds.x0,
+						found->second.m_bounds.y0,
+						(orientation & ORIENTATION_SWAP_XY) ? (found->second.m_bounds.x0 + found->second.m_bounds.y1 - found->second.m_bounds.y0) : found->second.m_bounds.x1,
+						(orientation & ORIENTATION_SWAP_XY) ? (found->second.m_bounds.y0 + found->second.m_bounds.x1 - found->second.m_bounds.x0) : found->second.m_bounds.y1 };
+				union_render_bounds(m_bounds, itembounds);
+			}
 		}
 		else if (!strcmp(itemnode->get_name(), "repeat"))
 		{
@@ -2576,12 +2634,10 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //-------------------------------------------------
 
 layout_element::component::component(environment &env, util::xml::data_node const &compnode, const char *dirname)
-	: m_state(0)
+	: m_state(env.get_attribute_int(compnode, "state", -1))
+	, m_color(env.parse_color(compnode.get_child("color")))
 {
-	// fetch common data
-	m_state = env.get_attribute_int(compnode, "state", -1);
 	env.parse_bounds(compnode.get_child("bounds"), m_bounds);
-	env.parse_color(compnode.get_child("color"), m_color);
 }
 
 
@@ -2904,7 +2960,7 @@ layout_view::layout_view(
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	environment local(env);
 	local.set_parameter("viewname", std::string(m_name));
-	add_items(local, viewnode, elemmap, groupmap, render_bounds{ 0.0f, 0.0f, 1.0f, 1.0f }, true, false, true);
+	add_items(local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
 	recompute(render_layer_config());
 	for (group_map::value_type &group : groupmap)
 		group.second.set_bounds_unresolved();
@@ -3065,7 +3121,9 @@ void layout_view::add_items(
 		util::xml::data_node const &parentnode,
 		element_map &elemmap,
 		group_map &groupmap,
-		render_bounds const &transform,
+		int orientation,
+		layout_group::transform const &trans,
+		render_color const &color,
 		bool root,
 		bool repeat,
 		bool init)
@@ -3096,27 +3154,27 @@ void layout_view::add_items(
 		}
 		else if (!strcmp(itemnode->get_name(), "backdrop"))
 		{
-			m_backdrop_list.emplace_back(env, *itemnode, elemmap, transform);
+			m_backdrop_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 		}
 		else if (!strcmp(itemnode->get_name(), "screen"))
 		{
-			m_screen_list.emplace_back(env, *itemnode, elemmap, transform);
+			m_screen_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 		}
 		else if (!strcmp(itemnode->get_name(), "overlay"))
 		{
-			m_overlay_list.emplace_back(env, *itemnode, elemmap, transform);
+			m_overlay_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 		}
 		else if (!strcmp(itemnode->get_name(), "bezel"))
 		{
-			m_bezel_list.emplace_back(env, *itemnode, elemmap, transform);
+			m_bezel_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 		}
 		else if (!strcmp(itemnode->get_name(), "cpanel"))
 		{
-			m_cpanel_list.emplace_back(env, *itemnode, elemmap, transform);
+			m_cpanel_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 		}
 		else if (!strcmp(itemnode->get_name(), "marquee"))
 		{
-			m_marquee_list.emplace_back(env, *itemnode, elemmap, transform);
+			m_marquee_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
@@ -3130,17 +3188,33 @@ void layout_view::add_items(
 			unresolved = false;
 			found->second.resolve_bounds(env, groupmap);
 
-			render_bounds grouptrans(transform);
+			layout_group::transform grouptrans(trans);
 			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
+			util::xml::data_node const *const itemorientnode(itemnode->get_child("orientation"));
+			int const grouporient(env.parse_orientation(itemorientnode));
 			if (itemboundsnode)
 			{
 				render_bounds itembounds;
 				env.parse_bounds(itemboundsnode, itembounds);
-				grouptrans = found->second.make_transform(itembounds, transform);
+				grouptrans = found->second.make_transform(grouporient, itembounds, trans);
+			}
+			else if (itemorientnode)
+			{
+				grouptrans = found->second.make_transform(grouporient, trans);
 			}
 
 			environment local(env);
-			add_items(local, found->second.get_groupnode(), elemmap, groupmap, grouptrans, false, false, true);
+			add_items(
+					local,
+					found->second.get_groupnode(),
+					elemmap,
+					groupmap,
+					orientation_add(grouporient, orientation),
+					grouptrans,
+					render_color_multiply(env.parse_color(itemnode->get_child("color")), color),
+					false,
+					false,
+					true);
 		}
 		else if (!strcmp(itemnode->get_name(), "repeat"))
 		{
@@ -3150,7 +3224,7 @@ void layout_view::add_items(
 			environment local(env);
 			for (int i = 0; count > i; ++i)
 			{
-				add_items(local, *itemnode, elemmap, groupmap, transform, false, true, !i);
+				add_items(local, *itemnode, elemmap, groupmap, orientation, trans, color, false, true, !i);
 				local.increment_parameters();
 			}
 		}
@@ -3200,7 +3274,9 @@ layout_view::item::item(
 		environment &env,
 		util::xml::data_node const &itemnode,
 		element_map &elemmap,
-		render_bounds const &transform)
+		int orientation,
+		layout_group::transform const &trans,
+		render_color const &color)
 	: m_element(nullptr)
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
@@ -3208,7 +3284,8 @@ layout_view::item::item(
 	, m_input_port(nullptr)
 	, m_input_mask(0)
 	, m_screen(nullptr)
-	, m_orientation(ROT0)
+	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
+	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
 {
 	// find the associated element
 	char const *const name(env.get_attribute_string(itemnode, "element", nullptr));
@@ -3234,9 +3311,11 @@ layout_view::item::item(
 	if (m_have_output && m_element)
 		m_output = m_element->default_state();
 	env.parse_bounds(itemnode.get_child("bounds"), m_rawbounds);
-	render_bounds_transform(m_rawbounds, transform);
-	env.parse_color(itemnode.get_child("color"), m_color);
-	env.parse_orientation(itemnode.get_child("orientation"), m_orientation);
+	render_bounds_transform(m_rawbounds, trans);
+	if (m_rawbounds.x0 > m_rawbounds.x1)
+		std::swap(m_rawbounds.x0, m_rawbounds.x1);
+	if (m_rawbounds.y0 > m_rawbounds.y1)
+		std::swap(m_rawbounds.y0, m_rawbounds.y1);
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)

@@ -389,21 +389,21 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mekd2_state, mekd2_key_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, mekd2_state, mekd2_key40_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mekd2_state, mekd2_segment_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mekd2_state, mekd2_digit_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mekd2_state, mekd2_nmi_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PIA6821(config, m_pia_s, 0);
+	m_pia_s->readpa_handler().set(FUNC(mekd2_state::mekd2_key_r));
+	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::mekd2_key40_r));
+	m_pia_s->writepa_handler().set(FUNC(mekd2_state::mekd2_segment_w));
+	m_pia_s->writepb_handler().set(FUNC(mekd2_state::mekd2_digit_w));
+	m_pia_s->ca2_handler().set(FUNC(mekd2_state::mekd2_nmi_w));
+	m_pia_s->irqa_handler().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_pia_s->irqb_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u, 0);
+	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, mekd2_state, cass_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(mekd2_state::cass_w));
 
 	MCFG_DEVICE_ADD("acia_tx_clock", CLOCK, XTAL_MEKD2 / 256) // 4800Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))

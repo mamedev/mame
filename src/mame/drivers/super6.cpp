@@ -7,7 +7,7 @@ ToDo:
 - peripheral interfaces
 
 - Fix floppy. It needs to WAIT the cpu whenever port 0x14 is read, wait
-  for either DRQ ir INTRQ to assert, then release the cpu and then do the
+  for either DRQ or INTRQ to assert, then release the cpu and then do the
   actual port read. Our Z80 cannot do that.
   The schematic isn't clear, but it seems the 2 halves of U16 (as shown) have
   a common element, so that activity on one side can affect what happens on

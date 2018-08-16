@@ -23,7 +23,9 @@ WY-50   8031            2764                2672/80-435-00      2x2Kx8  1Kx8    
 WY-55   8032            (251352-12)         211019-05           8k      (8kx2)                                      battery     16C452      49.423          14.7456
 WY-60   8051(202008-03) 27512(193003-01)    211003-02/205001-02 2064    ( 2064/2016/2016/2064)                      X24C04      2661        39.710/26.580   11.000  4.9152
 WY-85   8032            27128(250151-04)    2672                4x6116  6116                        9265            M5G1400     2681        48.5568         11.000  3.6864
+WY-120  8032            27256(250412-01)    SLA7490(211009-01)  6264/5564               6264                        battery     -           48.000          11.000  4.9152
 WY-150  8032            27512(251167-06)    211009-02           6264    (2x6264)                                    battery     -           48.000          11.000
+WY-120  8032            27C512(251169-03)   211009-02           6264                                                battery     MC68661                     ?  4.9152
 
 
 ************************************************************************************************************************************/
@@ -98,6 +100,11 @@ ROM_START( wy85 )
 	ROM_LOAD( "am9265.1h",         0x0000, 0x2000, CRC(5ee65b55) SHA1(a0b38a38838f262aaea22d212351e7441e4b07e8) )
 ROM_END
 
+ROM_START( wy120 ) // b&w
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wy120_ver1.4.bin", 0x000000, 0x010000, CRC(6de23624) SHA1(ad90087237347662b5ae4fcc8a05d66d76c46a26) )
+ROM_END
+
 ROM_START( wy150 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "251167-01.bin",           0x00000, 0x10000, CRC(4f425b11) SHA1(e44f54aa98d9f9c668a6ad674ec07e47879fc2a0) )
@@ -114,6 +121,7 @@ ROM_END
 COMP( 1984, wy50,  0,    0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-50",  MACHINE_IS_SKELETON )
 COMP( 1986, wy60,  wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-60",  MACHINE_IS_SKELETON )
 COMP( 1985, wy85,  wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-85",  MACHINE_IS_SKELETON )
+COMP( 1987, wy120, wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-120", MACHINE_IS_SKELETON )
 COMP( 1988, wy150, wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-150", MACHINE_IS_SKELETON )
 COMP( 1990, wy160, wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-160", MACHINE_IS_SKELETON )
 COMP( 1991, wy30p, wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-30+", MACHINE_IS_SKELETON )

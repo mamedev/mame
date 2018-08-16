@@ -141,6 +141,8 @@ enum BREGS {
 #define PUSH(val) { Wreg(SP) -= 2; write_mem_word(((Sreg(SS)<<4)+Wreg(SP)), val); }
 #define POP(var) { Wreg(SP) += 2; var = read_mem_word(((Sreg(SS)<<4) + ((Wreg(SP)-2) & 0xffff))); }
 
+#define BRKXA(xa) { logerror("%06x: %sXA instruction is V33 exclusive\n", PC(), xa ? "BRK" : "RET"); }
+
 #define GetModRM uint32_t ModRM=fetch()
 
 /* Cycle count macros:

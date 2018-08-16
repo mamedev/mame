@@ -500,20 +500,20 @@ MACHINE_CONFIG_START(mjsister_state::mjsister)
 	MCFG_DEVICE_IO_MAP(mjsister_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mjsister_state, interrupt, 2*60)
 
-	MCFG_DEVICE_ADD("mainlatch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mjsister_state, rombank_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mjsister_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mjsister_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mjsister_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mjsister_state, vrambank_w))
+	LS259(config, m_mainlatch[0]);
+	m_mainlatch[0]->q_out_cb<0>().set(FUNC(mjsister_state::rombank_w));
+	m_mainlatch[0]->q_out_cb<1>().set(FUNC(mjsister_state::flip_screen_w));
+	m_mainlatch[0]->q_out_cb<2>().set(FUNC(mjsister_state::colorbank_w));
+	m_mainlatch[0]->q_out_cb<3>().set(FUNC(mjsister_state::colorbank_w));
+	m_mainlatch[0]->q_out_cb<4>().set(FUNC(mjsister_state::colorbank_w));
+	m_mainlatch[0]->q_out_cb<5>().set(FUNC(mjsister_state::video_enable_w));
+	m_mainlatch[0]->q_out_cb<6>().set(FUNC(mjsister_state::irq_enable_w));
+	m_mainlatch[0]->q_out_cb<7>().set(FUNC(mjsister_state::vrambank_w));
 
-	MCFG_DEVICE_ADD("mainlatch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mjsister_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mjsister_state, dac_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mjsister_state, rombank_w))
+	LS259(config, m_mainlatch[1]);
+	m_mainlatch[1]->q_out_cb<2>().set(FUNC(mjsister_state::coin_counter_w));
+	m_mainlatch[1]->q_out_cb<5>().set(FUNC(mjsister_state::dac_bank_w));
+	m_mainlatch[1]->q_out_cb<6>().set(FUNC(mjsister_state::rombank_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

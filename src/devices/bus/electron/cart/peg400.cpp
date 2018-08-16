@@ -92,7 +92,7 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			data = m_fdc->read(space, offset & 0x03);
+			data = m_fdc->read(offset & 0x03);
 			break;
 		}
 	}
@@ -137,7 +137,7 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			m_fdc->write(space, offset & 0x03, data);
+			m_fdc->write(offset & 0x03, data);
 			break;
 		}
 	}

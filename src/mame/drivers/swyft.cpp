@@ -642,7 +642,7 @@ static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2
 READ8_MEMBER( swyft_state::swyft_via0_r )
 {
 	if (offset&0x000C3F) logerror("VIA0: read from invalid offset in 68k space: %06X!\n", offset);
-	uint8_t data = m_via[0]->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via[0]->read((offset>>6)&0xF);
 	LOGMASKED(LOG_VIA0, "VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	return data;
 }
@@ -651,13 +651,13 @@ WRITE8_MEMBER( swyft_state::swyft_via0_w )
 {
 	LOGMASKED(LOG_VIA0, "VIA0 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	if (offset&0x000C3F) logerror("VIA0: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via[1]->write(space, (offset>>6)&0xF, data);
+	m_via[1]->write((offset>>6)&0xF, data);
 }
 
 READ8_MEMBER( swyft_state::swyft_via1_r )
 {
 	if (offset&0x000C3F) logerror("VIA1: read from invalid offset in 68k space: %06X!\n", offset);
-	uint8_t data = m_via[1]->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via[1]->read((offset>>6)&0xF);
 	LOGMASKED(LOG_VIA1, "VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	return data;
 }
@@ -666,7 +666,7 @@ WRITE8_MEMBER( swyft_state::swyft_via1_w )
 {
 	LOGMASKED(LOG_VIA1, "VIA1 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	if (offset&0x000C3F) logerror("VIA1: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via[0]->write(space, (offset>>6)&0xF, data);
+	m_via[0]->write((offset>>6)&0xF, data);
 }
 
 // first via

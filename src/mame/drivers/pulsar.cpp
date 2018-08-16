@@ -17,7 +17,7 @@ The terminal must be set for 9600 baud, 7 bits, even parity, 1 stop bit.
 
 ToDo:
 - Fix floppy. It needs to WAIT the cpu whenever port 0xD3 is read, wait
-  for either DRQ ir INTRQ to assert, then release the cpu and then do the
+  for either DRQ or INTRQ to assert, then release the cpu and then do the
   actual port read. Our Z80 cannot do that.
 - Fix FDC so MAME doesn't crash when a certain disk is inserted.
 

@@ -8,7 +8,7 @@
 template<int HighBits, int Width, int AddrShift, int Endian> class handler_entry_write_dispatch : public handler_entry_write<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_write<Width, AddrShift, Endian>;
 	using mapping = typename inh::mapping;
 
@@ -36,7 +36,7 @@ public:
 	void enumerate_references(handler_entry::reflist &refs) const override;
 
 protected:
-	static constexpr u32    LowBits  = handler_entry_dispatch_lowbits(HighBits, Width, AddrShift);
+	static constexpr u32    LowBits  = emu::detail::handler_entry_dispatch_lowbits(HighBits, Width, AddrShift);
 	static constexpr u32    BITCOUNT = HighBits > LowBits ? HighBits - LowBits : 0;
 	static constexpr u32    COUNT    = 1 << BITCOUNT;
 	static constexpr offs_t BITMASK  = make_bitmask<offs_t>(BITCOUNT);

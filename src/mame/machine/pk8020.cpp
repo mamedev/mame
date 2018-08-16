@@ -156,7 +156,7 @@ READ8_MEMBER(pk8020_state::devices_r)
 						case 1 : return m_rs232->status_r(space,0);
 					}
 					break;
-		case 0x18: return m_wd1793->read(space, offset & 0x03);
+		case 0x18: return m_wd1793->read(offset & 0x03);
 		case 0x20: switch(offset & 1) {
 						case 0 : return m_lan->data_r(space,0);
 						case 1 : return m_lan->status_r(space,0);
@@ -181,7 +181,7 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 					}
 					break;
 		case 0x18:
-			m_wd1793->write(space, offset & 0x03, data);
+			m_wd1793->write(offset & 0x03, data);
 			break;
 		case 0x20: switch(offset & 1) {
 						case 0 : m_lan->data_w(space,0,data); break;

@@ -489,16 +489,16 @@ READ8_MEMBER(wicat_state::fdc_r)
 	switch(offset)
 	{
 	case 0x00:
-		ret = m_fdc->status_r(space,0);
+		ret = m_fdc->status_r();
 		break;
 	case 0x01:
-		ret = m_fdc->track_r(space,0);
+		ret = m_fdc->track_r();
 		break;
 	case 0x02:
-		ret = m_fdc->sector_r(space,0);
+		ret = m_fdc->sector_r();
 		break;
 	case 0x03:
-		ret = m_fdc->data_r(space,0);
+		ret = m_fdc->data_r();
 		break;
 	case 0x08:
 		// Interrupt status (TODO, not part of the FD1795)
@@ -513,16 +513,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_fdc->cmd_w(space,0,data);
+		m_fdc->cmd_w(data);
 		break;
 	case 0x01:
-		m_fdc->track_w(space,0,data);
+		m_fdc->track_w(data);
 		break;
 	case 0x02:
-		m_fdc->sector_w(space,0,data);
+		m_fdc->sector_w(data);
 		break;
 	case 0x03:
-		m_fdc->data_w(space,0,data);
+		m_fdc->data_w(data);
 		break;
 	case 0x08:
 		// Interrupt disable / Drive select (TODO, not part of the FD1795)
@@ -533,16 +533,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 READ16_MEMBER(wicat_state::via_r)
 {
 	if(ACCESSING_BITS_0_7)
-		return m_via->read(space,offset);
+		return m_via->read(offset);
 	return 0x00;
 }
 
 WRITE16_MEMBER(wicat_state::via_w)
 {
 	if(ACCESSING_BITS_0_7)
-		m_via->write(space,offset,data);
+		m_via->write(offset,data);
 	else if(ACCESSING_BITS_8_15)
-		m_via->write(space,offset,data>>8);
+		m_via->write(offset,data>>8);
 }
 
 READ8_MEMBER(wicat_state::video_r)

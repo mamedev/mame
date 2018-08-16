@@ -82,6 +82,13 @@ public:
 	template <class Object> devcb_base &set_in_rl_callback(Object &&cb) { return m_in_rl_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_shift_callback(Object &&cb) { return m_in_shift_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_ctrl_callback(Object &&cb) { return m_in_ctrl_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_irq_callback() { return m_out_irq_cb.bind(); }
+	auto out_sl_callback() { return m_out_sl_cb.bind(); }
+	auto out_disp_callback() { return m_out_disp_cb.bind(); }
+	auto out_bd_callback() { return m_out_bd_cb.bind(); }
+	auto in_rl_callback() { return m_in_rl_cb.bind(); }
+	auto in_shift_callback() { return m_in_shift_cb.bind(); }
+	auto in_ctrl_callback() { return m_in_ctrl_cb.bind(); }
 
 	// read & write handlers
 	DECLARE_READ8_MEMBER(read);

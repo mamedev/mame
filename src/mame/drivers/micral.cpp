@@ -409,12 +409,12 @@ MACHINE_CONFIG_START(micral_state::micral)
 	//MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // CDP6402
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	AY31015(config, m_uart); // CDP6402
+	m_uart->set_tx_clock(153600);
+	m_uart->set_rx_clock(153600);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	RS232_PORT(config, "rs232", default_rs232_devices, "keyboard");
 MACHINE_CONFIG_END
 
 ROM_START( micral )

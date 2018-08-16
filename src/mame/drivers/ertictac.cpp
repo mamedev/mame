@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(ertictac_state::ertictac)
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
 	MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
-//  MCFG_AAKART_ADD("kart", XTAL(24'000'000)/3) // TODO: frequency
+//  AAKART(config, m_kart, XTAL(24'000'000)/3); // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000),1024,0,735,624/2,0,292) // RiscOS 3 default screen settings

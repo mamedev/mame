@@ -23,7 +23,7 @@
     - Keyboard is not interfaced through 8255
     - Non standard graphics board
 
-    These and other incompatibilities required many PC software's to be
+    These and other incompatibilities required many PC softwares to be
     recompiled to work on this computer.
 
 ****************************************************************************/

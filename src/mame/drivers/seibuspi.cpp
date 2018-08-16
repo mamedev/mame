@@ -1883,8 +1883,8 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	MCFG_INTEL_E28F008SA_ADD("soundflash1") // Sharp LH28F008 on newer mainboard revision
 	MCFG_INTEL_E28F008SA_ADD("soundflash2") // "
 
-	MCFG_FIFO7200_ADD("soundfifo1", 0x200) // LH5496D, but on single board hw it's one CY7C421
-	MCFG_FIFO7200_ADD("soundfifo2", 0x200) // "
+	FIFO7200(config, m_soundfifo[0], 0x200); // LH5496D, but on single board hw it's one CY7C421
+	FIFO7200(config, m_soundfifo[1], 0x200); // "
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
