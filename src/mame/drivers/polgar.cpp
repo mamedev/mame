@@ -364,13 +364,13 @@ MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("outlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led100"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led101"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led102"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led103"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led104"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led105"))
+	hc259_device &outlatch(HC259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set_output("led100");
+	outlatch.q_out_cb<1>().set_output("led101");
+	outlatch.q_out_cb<2>().set_output("led102");
+	outlatch.q_out_cb<3>().set_output("led103");
+	outlatch.q_out_cb<4>().set_output("led104");
+	outlatch.q_out_cb<5>().set_output("led105");
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")

@@ -280,24 +280,21 @@ void SCSPDSP::Step()
 				ADDR &= RBL - 1;
 			else
 				ADDR &= 0xFFFF;
-			//ADDR <<= 1;
-			//ADDR += RBP << 13;
-			//MEMVAL = SCSPRAM[ADDR >> 1];
 			ADDR += RBP << 12;
-			if (ADDR > 0x7ffff) ADDR = 0;
+			ADDR <<= 1;
 			if (MRD && (step & 1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if (NOFL)
-					MEMVAL = SCSPRAM[ADDR] << 8;
+					MEMVAL = space->read_word(ADDR) << 8;
 				else
-					MEMVAL = UNPACK(SCSPRAM[ADDR]);
+					MEMVAL = UNPACK(space->read_word(ADDR));
 			}
 			if (MWT && (step & 1))
 			{
 				if (NOFL)
-					SCSPRAM[ADDR] = SHIFTED >> 8;
+					space->write_word(ADDR, SHIFTED >> 8);
 				else
-					SCSPRAM[ADDR] = PACK(SHIFTED);
+					space->write_word(ADDR, PACK(SHIFTED));
 			}
 		}
 

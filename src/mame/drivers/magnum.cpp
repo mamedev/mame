@@ -284,8 +284,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_DEVICE_PROGRAM_MAP(magnum_map)
 	MCFG_DEVICE_IO_MAP(magnum_io)
 
-	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
-	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(*this, magnum_state, rtcirq_w))
+	CDP1879(config, "rtc", XTAL(32'768)).irq_callback().set(FUNC(magnum_state::rtcirq_w));
 
 	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)

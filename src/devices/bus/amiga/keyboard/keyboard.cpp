@@ -10,6 +10,7 @@
 #include "keyboard.h"
 #include "a500.h"
 #include "a1200.h"
+#include "a2000.h"
 
 
 //**************************************************************************
@@ -117,4 +118,9 @@ void amiga_keyboard_devices(device_slot_interface &device)
 	device.option_add("a500_no", A500_KBD_NO);
 	device.option_add("a500_gb", A500_KBD_GB);
 	device.option_add("a1200_us", A1200_KBD);
+	device.option_add("a2000_us", A2000_KBD_US);
+	device.option_add("a2000_de", A2000_KBD_DE);
+	device.option_add("a2000_se", A2000_KBD_SE);
+	device.option_add("a2000_dk", A2000_KBD_DK);
+	device.option_add("a2000_gb", A2000_KBD_GB);
 }

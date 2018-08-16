@@ -76,23 +76,10 @@ private:
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( f3853_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
 	DECLARE_READ8_MEMBER(memory_read_byte);
-
-	F3853_INTERRUPT_REQ_CB(f3853_int_req_w);
-
-	IRQ_CALLBACK_MEMBER(vidbrain_int_ack);
-
-	void interrupt_check();
-
-	// F3853 SMI state
-	uint16_t m_vector;
-	int m_int_enable;
-	int m_ext_int_latch;
-	int m_timer_int_latch;
 
 	// keyboard state
 	uint8_t m_keylatch;

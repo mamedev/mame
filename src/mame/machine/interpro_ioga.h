@@ -248,7 +248,7 @@ protected:
 
 	required_device<device_memory_interface> m_memory_device;
 	int m_memory_spacenum;
-	address_space *m_memory_space;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
 
 	// callbacks
 	devcb_write_line m_out_nmi_func;
@@ -296,12 +296,18 @@ private:
 	u32 dma_r(address_space &space, offs_t offset, u32 mem_mask, dma_channel channel) const;
 	void dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, dma_channel channel);
 
-	enum serial_dma_ctrl_mask
+	enum serial_dma_ctrl_mask : u32
 	{
-		SDMA_COUNT   = 0x0000ffff,
+		SDMA_COUNT   = 0x000000ff,
+		SDMA_TAG     = 0x0000ff00, // bus tag?
+
 		SDMA_TCZERO  = 0x00200000,
-		SDMA_SEND    = 0x04000000, // transfer from memory to device
-		SDMA_CONTROL = 0xffff0000,
+
+		SDMA_WRITE   = 0x01000000, // transfer from memory to device
+		SDMA_ENABLE  = 0x02000000,
+		SDMA_0400    = 0x04000000,
+
+		SDMA_1000    = 0x10000000, // set on Sapphire systems?
 	};
 	u32 serial_dma_addr_r(address_space &space, offs_t offset, u32 mem_mask, int channel) const { return m_serial_dma_channel[channel].address; }
 	void serial_dma_addr_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);

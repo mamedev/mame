@@ -73,8 +73,8 @@ private:
 
 	DECLARE_MACHINE_RESET(ti990_4);
 
-	void cru_map(address_map &map);
-	void cru_map_v(address_map &map);
+	void crumap(address_map &map);
+	void crumap_v(address_map &map);
 	void memmap(address_map &map);
 
 	void        hold_load();
@@ -246,7 +246,7 @@ void ti990_4_state::memmap(address_map &map)
     0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
-void ti990_4_state::cru_map(address_map &map)
+void ti990_4_state::crumap(address_map &map)
 {
 	map(0x00, 0x01).r("asr733", FUNC(asr733_device::cru_r));
 	map(0x00, 0x0f).w("asr733", FUNC(asr733_device::cru_w));
@@ -258,7 +258,7 @@ void ti990_4_state::cru_map(address_map &map)
 	map(0xff0, 0xfff).w(FUNC(ti990_4_state::panel_write));
 }
 
-void ti990_4_state::cru_map_v(address_map &map)
+void ti990_4_state::crumap_v(address_map &map)
 {
 	map(0x10, 0x11).r("vdt911", FUNC(vdt911_device::cru_r));
 	map(0x80, 0x8f).w("vdt911", FUNC(vdt911_device::cru_w));
@@ -294,9 +294,11 @@ void ti990_4_state::init_ti990_4()
 MACHINE_CONFIG_START(ti990_4_state::ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
+	TMS9900(config, m_maincpu, 3000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_4_state::memmap);
+	m_maincpu->set_addrmap(AS_IO, &ti990_4_state::crumap);
+	m_maincpu->extop_cb().set(FUNC(ti990_4_state::external_operation));
+	m_maincpu->intlevel_cb().set(FUNC(ti990_4_state::interrupt_level));
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
@@ -315,10 +317,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
-	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
+	TMS9900(config, m_maincpu, 3000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_4_state::memmap);
+	m_maincpu->set_addrmap(AS_IO, &ti990_4_state::crumap_v);
+	m_maincpu->extop_cb().set(FUNC(ti990_4_state::external_operation));
+	m_maincpu->intlevel_cb().set(FUNC(ti990_4_state::interrupt_level));
 
 	// Terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)

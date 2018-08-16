@@ -893,10 +893,10 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_a", "bbca_cass")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bbc_state, bbc_txd_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bbc_state::bbc_txd_w));
+	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))
@@ -907,12 +907,12 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bbc_state, write_acia_clock))
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_porta))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
+	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);
+	m_via6522_0->readpa_handler().set(FUNC(bbc_state::bbcb_via_system_read_porta));
+	m_via6522_0->readpb_handler().set(FUNC(bbc_state::bbcb_via_system_read_portb));
+	m_via6522_0->writepa_handler().set(FUNC(bbc_state::bbcb_via_system_write_porta));
+	m_via6522_0->writepb_handler().set(FUNC(bbc_state::bbcb_via_system_write_portb));
+	m_via6522_0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* EPROM sockets */
 	bbc_eprom_sockets(config);
@@ -940,12 +940,12 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8("userport", bbc_userport_slot_device, pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("userport", bbc_userport_slot_device, pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
+	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
+	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via6522_1->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
+	m_via6522_1->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
+	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
 	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
@@ -1390,10 +1390,10 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_flop_orig")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bbc_state, bbc_txd_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bbc_state::bbc_txd_w));
+	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))
@@ -1409,20 +1409,20 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_porta))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
+	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);
+	m_via6522_0->readpa_handler().set(FUNC(bbc_state::bbcb_via_system_read_porta));
+	m_via6522_0->readpb_handler().set(FUNC(bbc_state::bbcb_via_system_read_portb));
+	m_via6522_0->writepa_handler().set(FUNC(bbc_state::bbcb_via_system_write_porta));
+	m_via6522_0->writepb_handler().set(FUNC(bbc_state::bbcb_via_system_write_portb));
+	m_via6522_0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8("userport", bbc_userport_slot_device, pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("userport", bbc_userport_slot_device, pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
+	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
+	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via6522_1->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
+	m_via6522_1->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
+	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
 	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
@@ -1640,10 +1640,9 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
 
 	/* user via */
-	MCFG_DEVICE_MODIFY("via6522_1")
 	// TODO: Joyport connected to PB0-PB4 only. PB5-PB7 are expansion port.
-	MCFG_VIA6522_READPB_HANDLER(READ8("joyport", bbc_joyport_slot_device, pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("joyport", bbc_joyport_slot_device, pb_w))
+	m_via6522_1->readpb_handler().set("joyport", FUNC(bbc_joyport_slot_device::pb_r));
+	m_via6522_1->writepb_handler().set("joyport", FUNC(bbc_joyport_slot_device::pb_w));
 
 	/* cartridge sockets */
 	MCFG_DEVICE_REMOVE("exp_rom1")

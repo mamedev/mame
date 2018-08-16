@@ -339,6 +339,8 @@ WRITE8_MEMBER(ti99_2_state::intflag_write)
 */
 READ8_MEMBER(ti99_2_state::mem_read)
 {
+	if (m_maincpu->is_onchip(offset)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
+
 	int page = offset >> 12;
 
 	if (page>=0 && page<4)
@@ -451,8 +453,10 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// TMS9995, standard variant
 	// Documents state that there is a divider by 2 for the clock rate
 	// Experiments with real consoles proved them wrong.
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), memmap, crumap)
-	MCFG_TMS9995_HOLDA_HANDLER( WRITELINE(*this, ti99_2_state, holda) )
+	TMS9995(config, m_maincpu, XTAL(10'738'635));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti99_2_state::memmap);
+	m_maincpu->set_addrmap(AS_IO, &ti99_2_state::crumap);
+	m_maincpu->holda_cb().set(FUNC(ti99_2_state::holda));
 
 	// RAM 4 KiB
 	// Early documents indicate 2 KiB RAM, but this does not work with

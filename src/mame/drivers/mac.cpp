@@ -1142,7 +1142,7 @@ void mac_state::macse(machine_config &config)
 {
 	mac512ke_base(config);
 	add_macplus_additions(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, mac_state::macse_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse_map);
 
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_bbadb));
 	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));

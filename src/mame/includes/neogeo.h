@@ -14,6 +14,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
@@ -49,6 +50,7 @@ protected:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_memcard(*this, "memcard")
+		, m_systemlatch(*this, "systemlatch")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_region_maincpu(*this, "maincpu")
@@ -123,6 +125,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
+	required_device<hc259_device> m_systemlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 

@@ -227,7 +227,7 @@ protected:
 	DECLARE_READ16_MEMBER(usclssic_dsw_r);
 
 	DECLARE_WRITE8_MEMBER(usclssic_lockout_w);
-	ADC083X_INPUT_CB(zombraid_adc_cb);
+	double zombraid_adc_cb(uint8_t input);
 	DECLARE_READ16_MEMBER(zombraid_gun_r);
 	DECLARE_WRITE16_MEMBER(zombraid_gun_w);
 	DECLARE_READ16_MEMBER(zingzipbl_unknown_r);

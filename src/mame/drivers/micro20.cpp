@@ -181,11 +181,11 @@ MACHINE_CONFIG_START(micro20_state::micro20)
 
 	MCFG_DEVICE_ADD(FDC_TAG, WD1772, 16.67_MHz_XTAL / 2)
 
-	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, 16.67_MHz_XTAL / 2)
-	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE(*this, micro20_state, timerirq_w))
-	MCFG_PIT68230_H4_CB(WRITELINE(*this, micro20_state, h4_w))
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, micro20_state, portb_w))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, micro20_state, portc_w))
+	PIT68230(config, m_pit, 16.67_MHz_XTAL / 2);
+	m_pit->timer_irq_callback().set(FUNC(micro20_state::timerirq_w));
+	m_pit->h4_out_callback().set(FUNC(micro20_state::h4_w));
+	m_pit->pb_out_callback().set(FUNC(micro20_state::portb_w));
+	m_pit->pc_out_callback().set(FUNC(micro20_state::portc_w));
 
 	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, 32.768_kHz_XTAL)
 	MCFG_MSM58321_DEFAULT_24H(false)

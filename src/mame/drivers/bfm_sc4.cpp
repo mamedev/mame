@@ -893,11 +893,11 @@ WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 }
 
 MACHINE_CONFIG_START(sc4_state::sc4_common)
-	MCFG_DEVICE_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
-	MCFG_DEVICE_PROGRAM_MAP(sc4_map)
-	MCFG_MC68307_SERIAL_A_TX_CALLBACK(WRITELINE(*this, sc4_state, m68307_duart_txa))
-	MCFG_MC68307_SERIAL_INPORT_CALLBACK(READ8(*this, sc4_state, m68307_duart_input_r))
-	MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(WRITE8(*this, sc4_state, m68307_duart_output_w))
+	M68307(config, m_maincpu, 16000000);    // 68307! (EC000 core)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc4_state::sc4_map);
+	m_maincpu->serial_a_tx_callback().set(FUNC(sc4_state::m68307_duart_txa));
+	m_maincpu->serial_inport_callback().set(FUNC(sc4_state::m68307_duart_input_r));
+	m_maincpu->serial_outport_callback().set(FUNC(sc4_state::m68307_duart_output_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

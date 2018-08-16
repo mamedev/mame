@@ -123,41 +123,15 @@ for cassette unit 1 are duplicated on a set of phono plugs.
 We emulate the use of two cassette units. An option allows you to hear the sound
 of the tape during playback.
 
-
 ********************************************************************************
 
-NOTES (2011-01-09)
-1. Converted to MODERN driver as much as possible.
-2. Added 2 defines for work that needs doing at some time:
-- SORCERER_USING_RS232 - this is for when we can connect a serial interface.
-- SORCERER_USING_DISKS - the disk controller I believe most likely to be a
-                         'Micropolis Floppy Disk System' at 143KB on 13cm disks.
-                         There was a hard-sector system (top of ram = BBFF),
-                         and a soft-sector system (top of RAM = BDFF). You could
-                         use alternate systems (since you could attach a S-100
-                         unit), so not sure how this could be developed. The
-                         Micropolis seems completely undocumented in the technical
-                         sense. When using the hard-sector system, in the monitor
-                         enter GO BC00 to boot the disk. No idea how in other
-                         disk systems.
+Disk system on sorcererd:
+- Uses a Micropolis controller, disks holding 143KB. Top of RAM is BBFF.
+- To boot CP/M, insert the disk, then type GO BC00 at the monitor prompt.
 
-                         Note that the code within the defines has NOT been
-                         compiled or tested. You are on your own!
-
-
-NOTES (2011-08-08)
-1. SORCERER_USING_DISKS removed, replaced with a new driver "sorcererd".
-                         This is disk-enabled, allowing CP/M to run.
-                         To initialise the disk system, you must enter
-                         GO BC00
-                         after the computer has booted. It is not particularly
-                         stable, so be prepared to cold boot whenever something
-                         goes wrong.
-
-NOTES (2016-06-06)
-1. SORCERER_USING_RS232 removed, since the core now supports RS-232 as a device.
-                         Not actually tested due to the bios bugs making it
-                         pretty much impossible to use.
+Other rumoured disk possibilities (not emulated):
+- Soft-sectored, top of RAM is BDFF
+- Having the option of a S100 box, any random system could be used in theory.
 
 ********************************************************************************/
 
@@ -440,10 +414,10 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
-	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(ES_UART_CLOCK);
+	m_uart->set_rx_clock(ES_UART_CLOCK);
+	m_uart->set_auto_rdav(true);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
@@ -540,7 +514,7 @@ ROM_START(sorcerer2)
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "dwmon", "DWMON 2.2C")
 	ROMX_LOAD("dwmon.1e",    0xe000, 0x0800, CRC(a22db498) SHA1(ebedbce7454007f5a02fafe449fd09169173d7b3), ROM_BIOS(2) )
-	ROMX_LOAD("dwmon.2e",    0xe800, 0x0800, CRC(8a4e287f) SHA1(b0620cc844aa2eaae57164caee7477856bc5a0ed), ROM_BIOS(2) )
+	ROMX_LOAD("dwmon.2e",    0xe800, 0x0800, CRC(7b22b65a) SHA1(7f23dd308f34b6d795d6df06f2387dfd17f69edd), ROM_BIOS(2) )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */

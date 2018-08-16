@@ -43,9 +43,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/mc68681.h" /* DUART0, DUART1 */
-#include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class sgi_ip2_state : public driver_device
 {

@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(namco_53xx_device::read_request)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	machine().scheduler().timer_set(attotime::from_usec(21), timer_expired_delegate(FUNC(namco_53xx_device::irq_clear),this), 0);
+	m_irq_cleared_timer->adjust(attotime::from_usec(21), 0);
 }
 
 READ8_MEMBER( namco_53xx_device::read )
@@ -160,6 +160,8 @@ void namco_53xx_device::device_start()
 	for (devcb_read8 &cb : m_in)
 		cb.resolve_safe(0);
 	m_p.resolve_safe();
+
+	m_irq_cleared_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_53xx_device::irq_clear), this));
 
 	save_item(NAME(m_portO));
 }

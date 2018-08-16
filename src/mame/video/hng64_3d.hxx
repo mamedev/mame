@@ -742,7 +742,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// TODO: We can eliminate this step with a matrix stack (maybe necessary?)
 			// Note: fatfurwa's helicopter tracking in scene 3 of its intro shows one of these matrices isn't quite correct
 			setIdentity(m_modelViewMatrix);
-			if (m_mcu_type != SAMSHO_MCU)
+			if (!m_samsho64_3d_hack)
 			{
 				// The sams64 games transform the geometry in front of a stationary camera.
 				// This is fine in sams64_2, since it never calls the 'camera transformation' function

@@ -42,52 +42,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define C64_EXPANSION_SLOT_TAG      "exp"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C64_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, C64_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, c64_expansion_cards, nullptr) \
-	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, irq_w)) \
-	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, nmi_w)) \
-	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)) \
-	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_r)) \
-	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_w)) \
-	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_w))
-
-
-#define MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	downcast<c64_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
-
-#define MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -101,6 +55,16 @@ class c64_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: c64_expansion_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
@@ -109,6 +73,12 @@ public:
 	template <class Object> devcb_base &set_cd_rd_callback(Object &&cb) { return m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_cd_wr_callback(Object &&cb) { return m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto nmi_callback() { return m_write_nmi.bind(); }
+	auto reset_callback() { return m_write_reset.bind(); }
+	auto cd_input_callback() { return m_read_dma_cd.bind(); }
+	auto cd_output_callback() { return m_write_dma_cd.bind(); }
+	auto dma_callback() { return m_write_dma.bind(); }
 
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
@@ -126,6 +96,8 @@ public:
 	int phi2() { return clock(); }
 	int dotclock() { return phi2() * 8; }
 	int hiram() { return m_hiram; }
+
+	void set_passthrough();
 
 protected:
 	// device-level overrides

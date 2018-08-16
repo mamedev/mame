@@ -57,6 +57,7 @@ private:
 	bool m_int_pending;
 	bool m_incoming_message;
 	bool m_message_started;
+	bool m_latch_inhibit;
 
 	uint8_t m_data;
 	uint8_t m_transmit;

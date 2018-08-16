@@ -338,7 +338,7 @@ private:
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
-	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
+	double adc12138_input_callback(uint8_t input);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
 	virtual void machine_start() override;
@@ -809,7 +809,7 @@ static INPUT_PORTS_START( nwktr )
 INPUT_PORTS_END
 
 
-ADC12138_IPT_CONVERT_CB(nwktr_state::adc12138_input_callback)
+double nwktr_state::adc12138_input_callback(uint8_t input)
 {
 	int value = 0;
 	switch (input)
@@ -851,8 +851,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
-	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
-	MCFG_ADC1213X_IPT_CONVERT_CB(nwktr_state, adc12138_input_callback)
+	ADC12138(config, m_adc12138, 0);
+	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
 	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo0")

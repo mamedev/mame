@@ -254,12 +254,12 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 READ8_MEMBER( trs80m2_state::fdc_r )
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( trs80m2_state::fdc_w )
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER( trs80m16_state::tcl_w )
@@ -856,8 +856,8 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(AM9519A_TAG, AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
+	AM9519(config, m_uic, 0);
+	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))

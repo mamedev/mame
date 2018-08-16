@@ -74,8 +74,8 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	// d5: d7756 reset pin(?)
 	if (m_d7756 != nullptr)
 	{
-		m_d7756->reset_w(~data & 0x20);
-		m_d7756->start_w(~data & 0x10);
+		m_d7756->reset_w(!BIT(data, 5));
+		m_d7756->start_w(!BIT(data, 4));
 	}
 	if (m_samples != nullptr)
 	{
@@ -100,7 +100,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 	m_sample = data;
 
 	if (m_d7756 != nullptr)
-		m_d7756->port_w(space, 0, data);
+		m_d7756->port_w(data);
 }
 
 void homerun_state::homerun_memmap(address_map &map)

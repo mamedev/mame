@@ -72,8 +72,10 @@ public:
 		m_color_bank(0)
 	{ }
 
-	void mariobl(machine_config &config);
+	void ambush_base(machine_config &config);
 	void ambush(machine_config &config);
+	void mariobl(machine_config &config);
+	void mariobla(machine_config &config);
 	void dkong3abl(machine_config &config);
 
 private:
@@ -690,20 +692,11 @@ WRITE8_MEMBER(ambush_state::output_latches_w)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(ambush_state::ambush)
+MACHINE_CONFIG_START(ambush_state::ambush_base)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IO_MAP(main_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
-
-	// addressable latches at 8B and 8C
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ambush_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ambush_state, color_bank_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ambush_state, coin_counter_1_w))
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ambush_state, color_bank_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ambush_state, coin_counter_2_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -731,17 +724,29 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(ambush_state::ambush)
+	ambush_base(config);
+
+	// addressable latches at 8B and 8C
+	LS259(config, m_outlatch[0]);
+	m_outlatch[0]->q_out_cb<4>().set(FUNC(ambush_state::flip_screen_w));
+	m_outlatch[0]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	m_outlatch[0]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_1_w));
+
+	LS259(config, m_outlatch[1]);
+	m_outlatch[1]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_2_w));
+	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_2_w));
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(ambush_state::mariobl)
-	ambush(config);
+	ambush_base(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	// To be verified: do these bootlegs only have one LS259?
-	MCFG_DEVICE_REMOVE("outlatch1")
-	MCFG_DEVICE_REMOVE("outlatch2")
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ambush_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ambush_state, color_bank_1_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<4>().set(FUNC(ambush_state::coin_counter_1_w));
+	outlatch.q_out_cb<6>().set(FUNC(ambush_state::color_bank_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
 
@@ -760,6 +765,14 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_DEVICE_REPLACE("ay2", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(ambush_state::mariobla)
+	mariobl(config);
+
+	auto &outlatch(*subdevice<ls259_device>("outlatch"));
+	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	outlatch.q_out_cb<6>().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
@@ -885,6 +898,40 @@ ROM_START( mariobl )
 	ROM_LOAD("tma1-c-4p.4p", 0x000, 0x200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801))
 ROM_END
 
+ROM_START( mariobla )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("4.7i", 0x0000, 0x4000, CRC(9a364905) SHA1(82215e4724cc01cdf552adce0df739cb2a6bc3cd))
+	ROM_LOAD("3.7g", 0x4000, 0x2000, CRC(5c50209c) SHA1(e3fb4dbf9c866a346b20ec21a03d13e85b58669d))
+	ROM_LOAD("2.7f", 0xe000, 0x2000, CRC(5718fe0e) SHA1(dad7158f4e7a5552f6107b825387cb6aab8dd652))
+
+	ROM_REGION(0x8000, "gfx", 0)
+	ROM_LOAD("5.4n", 0x0000, 0x2000, CRC(903615df) SHA1(d20cdf64894ad9f48af71cf2e4e4c457ccb3d365)) // mbjba-3.3ns
+	ROM_CONTINUE(0x6000, 0x0800) // mbjba-5.4n [1/2]
+	ROM_CONTINUE(0x6000, 0x0800) // mbjba-5.4n [1/2]
+	ROM_CONTINUE(0x6800, 0x0800) // mbjba-5.4n [2/2]
+	ROM_CONTINUE(0x6800, 0x0800) // mbjba-5.4n [2/2]
+	ROM_LOAD("6.4l", 0x2000, 0x2000, CRC(7b58c92e) SHA1(25dfce7a4a93f661f495cc80378d445a2b064ba7)) // mbjba-2.3ls
+	ROM_LOAD("7.4n", 0x4000, 0x2000, CRC(04ef8165) SHA1(71d0ee903f2e442fd7f1c76e48d99a8bec49d482)) // mbjba-1.3l
+	ROM_CONTINUE(0x7000, 0x0800) // mbjba-4.4l [1/2]
+	ROM_CONTINUE(0x7000, 0x0800) // mbjba-4.4l [1/2]
+	ROM_CONTINUE(0x7800, 0x0800) // mbjba-4.4l [2/2]
+	ROM_CONTINUE(0x7800, 0x0800) // mbjba-4.4l [2/2]
+
+	ROM_REGION(0x2000, "gfx1", ROMREGION_INVERT)
+	ROM_COPY("gfx", 0x6000, 0x0000, 0x2000)
+
+	ROM_REGION(0x6000, "gfx2", 0)
+	ROM_COPY("gfx", 0x0000, 0x0000, 0x6000)
+
+	ROM_REGION(0xeb, "prom", 0)
+	ROM_LOAD("82s153.7n", 0x00, 0xeb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
+
+	ROM_REGION(0x200, "colors", 0)
+	ROM_LOAD("prom.8i", 0x000, 0x200, NO_DUMP)
+	// taken from mario
+	ROM_LOAD("tma1-c-4p.4p", 0x000, 0x200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801))
+ROM_END
+
 ROM_START( dkong3abl )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("dk3ba-7.7i", 0x0000, 0x4000, CRC(a9263275) SHA1(c3867f6b0d379b70669b3b954e582533406db203))
@@ -913,10 +960,11 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   MACHINE    INPUT      CLASS         INIT        ROTATION  COMPANY                              FULLNAME                                      FLAGS
-GAME( 1983, ambush,    0,       ambush,    ambusht,   ambush_state, empty_init, ROT0,     "Tecfri",                            "Ambush",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, empty_init, ROT0,     "Tecfri",                            "Ambush (hack?)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, empty_init, ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE    INPUT      CLASS         INIT        ROTATION  COMPANY                              FULLNAME                                           FLAGS
+GAME( 1983, ambush,    0,       ambush,    ambusht,   ambush_state, empty_init, ROT0,     "Tecfri",                            "Ambush",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, empty_init, ROT0,     "Tecfri",                            "Ambush (hack?)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, empty_init, ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)",      MACHINE_SUPPORTS_SAVE )

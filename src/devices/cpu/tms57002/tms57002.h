@@ -16,6 +16,8 @@ class tms57002_device : public cpu_device, public device_sound_interface {
 public:
 	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto dready_callback() { return m_dready_callback.bind(); }
+
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 
@@ -28,6 +30,7 @@ public:
 
 	void internal_pgm(address_map &map);
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -136,6 +139,8 @@ private:
 
 	cd cache;
 
+	devcb_write_line m_dready_callback;
+
 	const address_space_config program_config, data_config;
 
 	address_space *program, *data;
@@ -157,6 +162,8 @@ private:
 	inline int rnd(uint32_t st1);
 	inline int movm(uint32_t st1);
 	inline int sfma(uint32_t st1);
+
+	void update_dready();
 
 	void xm_init();
 	void xm_step_read();

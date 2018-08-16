@@ -53,25 +53,6 @@ The following chips are functionally equivalent and pin-compatible.
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_FIFO7200_ADD(_tag, _ramsize) \
-	MCFG_DEVICE_ADD(_tag, FIFO7200, 0) \
-	downcast<fifo7200_device &>(*device).set_ram_size(_ramsize);
-
-#define MCFG_FIFO7200_EF_HANDLER(_devcb) \
-	downcast<fifo7200_device &>(*device).set_ef_handler(DEVCB_##_devcb);
-
-#define MCFG_FIFO7200_FF_HANDLER(_devcb) \
-	downcast<fifo7200_device &>(*device).set_ff_handler(DEVCB_##_devcb);
-
-#define MCFG_FIFO7200_HF_HANDLER(_devcb) \
-	downcast<fifo7200_device &>(*device).set_hf_handler(DEVCB_##_devcb);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -80,12 +61,17 @@ The following chips are functionally equivalent and pin-compatible.
 class fifo7200_device : public device_t
 {
 public:
+	fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, int size)
+		: fifo7200_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_ram_size(size);
+	}
+
 	fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> devcb_base &set_ef_handler(Object &&cb) { return m_ef_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ff_handler(Object &&cb) { return m_ff_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hf_handler(Object &&cb) { return m_hf_handler.set_callback(std::forward<Object>(cb)); }
+	auto ef_handler() { return m_ef_handler.bind(); }
+	auto ff_handler() { return m_ff_handler.bind(); }
+	auto hf_handler() { return m_hf_handler.bind(); }
 	void set_ram_size(int size) { m_ram_size = size; }
 
 	DECLARE_READ_LINE_MEMBER( ef_r ) { return !m_ef; } // _EF

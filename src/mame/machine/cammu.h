@@ -8,19 +8,10 @@
 
 #include "cpu/clipper/common.h"
 
-#define MCFG_CAMMU_ID(_id) \
-	downcast<cammu_c4_device &>(*device).set_cammu_id(_id);
-
-#define MCFG_CAMMU_EXCEPTION_CB(_exceptioncb) \
-	downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
-
-#define MCFG_CAMMU_LINK(_tag) \
-	downcast<cammu_c3_device &>(*device).add_linked(_tag);
-
 class cammu_device : public device_t
 {
 public:
-	template <class Object> devcb_base &set_exception_callback(Object &&cb) { return m_exception_func.set_callback(std::forward<Object>(cb)); }
+	auto exception_callback() { return m_exception_func.bind(); }
 
 	static const u32 CAMMU_PAGE_SIZE = 0x1000;
 	static const u32 CAMMU_PAGE_MASK = (CAMMU_PAGE_SIZE - 1);
@@ -51,7 +42,8 @@ public:
 		PTE_LOCK  = 0x00000100  // page lock (software)
 	};
 
-	static const int PTE_ST_SHIFT = 9;
+	static constexpr int PL_SHIFT = 3;
+	static constexpr int ST_SHIFT = 9;
 
 	enum va_mask : u32
 	{
@@ -72,112 +64,132 @@ public:
 		ST7 = 7  // slave i/o
 	};
 
-	virtual void map(address_map &map) = 0;
+	void set_spaces(address_space &main_space, address_space &io_space, address_space &boot_space);
 
-	void set_spaces(std::vector<address_space *> spaces);
+	// translation lookaside buffer and register access
+	virtual u32 cammu_r(const u32 address) = 0;
+	virtual void cammu_w(const u32 address, const u32 data) = 0;
 
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(const u32 ssw, const u32 address, U &&apply)
 	{
-		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), READ);
-
-		if (t.space != nullptr)
+		// check for cammu access
+		if ((ssw & (SSW_UU | SSW_U)) || ((address & ~0x7ff) != 0x00004800))
 		{
+			translated_t t = translate_address(ssw, address, access_size(sizeof(T)), READ);
+
+			if (!t.cache)
+				return false;
+
 			switch (sizeof(T))
 			{
-			case 1: apply(T(t.space->read_byte(t.address))); break;
-			case 2: apply(T(t.space->read_word(t.address))); break;
-			case 4: apply(T(t.space->read_dword(t.address))); break;
-			case 8: apply(T(t.space->read_qword(t.address))); break;
-			default: fatalerror("unhandled load size %d\n", access_size(sizeof(T)));
+			case 1: apply(T(t.cache->read_byte(t.address))); break;
+			case 2: apply(T(t.cache->read_word(t.address))); break;
+			case 4: apply(T(t.cache->read_dword(t.address))); break;
+			case 8: apply(T(t.cache->read_qword(t.address))); break;
+			default:
+				fatalerror("unhandled load 0x%08x size %d (%s)",
+					address, access_size(sizeof(T)), machine().describe_context().c_str());
 			}
-
-			return true;
 		}
+		else if (sizeof(T) == 4)
+			apply(cammu_r(address));
 		else
-			return false;
+			fatalerror("unhandled cammu load 0x%08x size %d (%s)",
+				address, access_size(sizeof(T)), machine().describe_context().c_str());
+
+		return true;
 	}
 
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(const u32 ssw, const u32 address, U data)
 	{
-		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), WRITE);
-
-		if (t.space != nullptr)
+		// check for cammu access
+		if ((ssw & (SSW_UU | SSW_U)) || ((address & ~0x7ff) != 0x00004800))
 		{
+			translated_t t = translate_address(ssw, address, access_size(sizeof(T)), WRITE);
+
+			if (!t.cache)
+				return false;
+
 			switch (sizeof(T))
 			{
-			case 1: t.space->write_byte(t.address, T(data)); break;
-			case 2: t.space->write_word(t.address, T(data)); break;
-			case 4: t.space->write_dword(t.address, T(data)); break;
-			case 8: t.space->write_qword(t.address, T(data)); break;
-			default: fatalerror("unhandled store size %d\n", access_size(sizeof(T)));
+			case 1: t.cache->write_byte(t.address, T(data)); break;
+			case 2: t.cache->write_word(t.address, T(data)); break;
+			case 4: t.cache->write_dword(t.address, T(data)); break;
+			case 8: t.cache->write_qword(t.address, T(data)); break;
+			default:
+				fatalerror("unhandled store 0x%08x size %d (%s)",
+					address, access_size(sizeof(T)), machine().describe_context().c_str());
 			}
-
-			return true;
 		}
+		else if (sizeof(T) == 4)
+			cammu_w(address, data);
 		else
-			return false;
+			fatalerror("unhandled cammu store 0x%08x size %d (%s)",
+				address, access_size(sizeof(T)), machine().describe_context().c_str());
+
+		return true;
 	}
 
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<T(T)>>::value, bool> modify(const u32 ssw, const u32 address, U &&apply)
 	{
 		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), access_type(READ | WRITE));
 
-		if (t.space != nullptr)
-		{
-			switch (sizeof(T))
-			{
-			case 4: t.space->write_dword(t.address, apply(T(t.space->read_dword(t.address)))); break;
-			default: fatalerror("unhandled modify size %d\n", access_size(sizeof(T)));
-			}
-
-			return true;
-		}
-		else
+		if (!t.cache)
 			return false;
+
+		switch (sizeof(T))
+		{
+		case 4: t.cache->write_dword(t.address, apply(T(t.cache->read_dword(t.address)))); break;
+		default:
+			fatalerror("unhandled modify 0x%08x size %d (%s)",
+				address, access_size(sizeof(T)), machine().describe_context().c_str());
+		}
+
+		return true;
 	}
 
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> fetch(const u32 ssw, const u32 address, U &&apply)
 	{
 		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), EXECUTE);
 
-		if (t.space != nullptr)
-		{
-			switch (sizeof(T))
-			{
-			case 2: apply(T(t.space->read_word(t.address))); break;
-			case 4:
-				{
-					// check for unaligned access
-					if (address & 0x2)
-					{
-						// check for page span
-						if ((address & CAMMU_PAGE_MASK) == (CAMMU_PAGE_SIZE - 2))
-						{
-							translated_t u = translate_address(ssw, address + 2, access_size(sizeof(u16)), EXECUTE);
-							if (u.space != nullptr)
-							{
-								const u16 lsw = t.space->read_word(t.address);
-								const u16 msw = u.space->read_word(u.address);
+		if (!t.cache)
+			return false;
 
-								apply((T(msw) << 16) | lsw);
-							}
-							else
-								return false;
+		switch (sizeof(T))
+		{
+		case 2: apply(T(t.cache->read_word(t.address))); break;
+		case 4:
+			{
+				// check for unaligned access
+				if (address & 0x2)
+				{
+					// check for page span
+					if ((address & CAMMU_PAGE_MASK) == (CAMMU_PAGE_SIZE - 2))
+					{
+						translated_t u = translate_address(ssw, address + 2, access_size(sizeof(u16)), EXECUTE);
+						if (u.cache)
+						{
+							const u16 lsw = t.cache->read_word(t.address);
+							const u16 msw = t.cache->read_word(u.address);
+
+							apply((T(msw) << 16) | lsw);
 						}
 						else
-							apply(T(t.space->read_dword_unaligned(t.address)));
+							return false;
 					}
 					else
-						apply(T(t.space->read_dword(t.address)));
+						apply(T(t.cache->read_dword_unaligned(t.address)));
 				}
-			break;
-			default: fatalerror("unhandled fetch size %d\n", access_size(sizeof(T)));
+				else
+					apply(T(t.cache->read_dword(t.address)));
 			}
-
-			return true;
+		break;
+		default:
+			fatalerror("unhandled fetch 0x%08x size %d (%s)\n",
+				address, access_size(sizeof(T)), machine().describe_context().c_str());
 		}
-		else
-			return false;
+
+		return true;
 	}
 
 	// address translation for debugger
@@ -213,20 +225,26 @@ protected:
 		RWE     = READ | WRITE | EXECUTE,
 	};
 
-private:
-	// address translation
 	struct translated_t
 	{
-		address_space *const space;
+		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *const cache;
 		const u32 address;
 	};
-	translated_t translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode);
 
 	struct pte_t
 	{
-		const u32 entry;
-		const u32 address;
+		u32 entry;
+		u32 address;
 	};
+
+	struct memory_t
+	{
+		address_space *space;
+		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *cache;
+	};
+
+	// address translation
+	virtual translated_t translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode);
 	pte_t get_pte(const u32 va, const bool user);
 
 	// helpers
@@ -234,16 +252,21 @@ private:
 	virtual bool get_alignment() const = 0;
 	virtual u32 get_pdo(const bool user) const = 0;
 	virtual system_tag_t get_ust_space() const = 0;
+	virtual void set_fault(const u32 address, const exception_vector type) = 0;
 
-	virtual void set_fault_address(const u32 va) = 0;
-
+	// device state
 	devcb_write16 m_exception_func;
-	address_space *m_space[8];
+	memory_t m_memory[8];
 };
 
 class cammu_c4_device : public cammu_device
 {
 public:
+	// TODO: translation lookaside buffer and register access
+	virtual void map(address_map &map) = 0;
+	virtual u32 cammu_r(const u32 address) override { return 0; }
+	virtual void cammu_w(const u32 address, const u32 data) override {}
+
 	void set_cammu_id(const u32 cammu_id) { m_control = cammu_id; }
 
 	DECLARE_READ32_MEMBER(s_pdo_r) { return m_s_pdo; }
@@ -277,7 +300,7 @@ protected:
 	virtual bool get_access(const access_type mode, const u32 pte, const u32 ssw) const override;
 	virtual u32 get_pdo(const bool user) const override { return user ? m_u_pdo : m_s_pdo; }
 
-	virtual void set_fault_address(const u32 va) override { m_fault_address_1 = va; }
+	virtual void set_fault(const u32 address, const exception_vector type) override { m_fault_address_1 = address; m_exception_func(type); }
 
 	u32 m_s_pdo;
 	u32 m_u_pdo;
@@ -484,10 +507,87 @@ class cammu_c3_device : public cammu_device
 public:
 	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
-	virtual void map_global(address_map &map);
+	void add_linked(cammu_c3_device *child) { m_linked.push_back(child); }
 
-	void add_linked(const char *const tag) { m_linked.push_back(downcast<cammu_c3_device *>(siblingdevice(tag))); }
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+	virtual void device_start() override;
+
+	// translation lookaside buffer and register access
+	virtual u32 cammu_r(const u32 address) override;
+	virtual void cammu_w(const u32 address, const u32 data) override;
+
+	// address translation
+	virtual translated_t translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode) override;
+
+private:
+	enum cammu_address_mask : u32
+	{
+		CAMMU_TLB_VA  = 0x00000001, // tlb va/ra select
+		CAMMU_TLB_X   = 0x00000002, // tlb x/w line select
+		CAMMU_TLB_SET = 0x000000fc, // tlb set select
+		CAMMU_REG     = 0x000000ff, // register select
+		CAMMU_SELECT  = 0x00000700, // cammu select
+	};
+	enum tlb_ra_mask : u32
+	{
+		TLB_RA_U  = 0x00000001, // used flag
+		TLB_RA_R  = 0x00000002, // referenced flag
+		TLB_RA_D  = 0x00000004, // dirty flag
+		TLB_RA_PL = 0x00000078, // protection level
+		TLB_RA_ST = 0x00000e00, // system tag
+		TLB_RA_RA = 0xfffff000, // real address
+	};
+	enum tlb_va_mask : u32
+	{
+		TLB_VA_UV = 0x00000002, // user valid flag
+		TLB_VA_SV = 0x00000004, // supervisor valid flag
+		TLB_VA_VA = 0xfffc0000, // virtual address tag
+	};
+
+	/*
+	* The C1/C3 CAMMU has 64-entry, two-way set associative TLB, with lines
+	* grouped into W and X compartments. The associated U flag is set to
+	* indicate that the W line of the set was most recently accessed, and
+	* cleared when the X line was most recently accessed. On TLB miss, the
+	* least recently used line as indicated by this flag is replaced.
+	*
+	* Each line consists of a real address field and a virtual address field.
+	* The real address field format is practically identical to the page table
+	* entry format.
+	*/
+	struct tlb_line_t
+	{
+		u32 ra; // real address field
+		u32 va; // virtual address field
+
+		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *cache;
+	};
+	struct tlb_set_t
+	{
+		tlb_line_t w;
+		tlb_line_t x;
+		bool u;
+	};
+
+	enum cammu_select_mask : u32
+	{
+		CAMMU_D_TLB = 0x000, // d-cammu tlb
+		CAMMU_D_REG = 0x100, // d-cammu register
+		CAMMU_I_TLB = 0x200, // i-cammu tlb
+		CAMMU_I_REG = 0x300, // i-cammu register
+		CAMMU_G_TLB = 0x400, // global tlb
+		CAMMU_G_REG = 0x500, // global register
+	};
+	enum cammu_register_mask : u8
+	{
+		CAMMU_REG_SPDO    = 0x04, // supervisor pdo register
+		CAMMU_REG_UPDO    = 0x08, // user pdo register
+		CAMMU_REG_FAULT   = 0x10, // fault register
+		CAMMU_REG_CONTROL = 0x40, // control register
+		CAMMU_REG_RESET   = 0x80, // reset register
+	};
 
 	enum control_mask : u32
 	{
@@ -500,59 +600,61 @@ public:
 		CNTL_ATE  = 0x00000200, // alignment trap enable
 		CNTL_CID  = 0xff000000  // cammu id
 	};
-
-	enum ust_mask : u32
+	enum control_ust_mask : u32
 	{
 		UST_0 = 0x00000000, // private, write-through, main memory space
 		UST_1 = 0x00000010, // shared, write-through, main memory space
 		UST_2 = 0x00000020, // private, copy-back, main memory space
 		UST_3 = 0x00000030  // noncacheable, main memory space
 	};
-
 	enum control_cid_mask : u32
 	{
 		CID_C3 = 0x00000000 // unknown
 	};
 
-	DECLARE_READ32_MEMBER(s_pdo_r) { return m_s_pdo; }
-	DECLARE_WRITE32_MEMBER(s_pdo_w) { m_s_pdo = ((m_s_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
-	DECLARE_READ32_MEMBER(u_pdo_r) { return m_u_pdo; }
-	DECLARE_WRITE32_MEMBER(u_pdo_w) { m_u_pdo = ((m_u_pdo & ~mem_mask) | (data & mem_mask)) & PDO_MASK; }
-	DECLARE_READ32_MEMBER(fault_r) { return m_fault; }
-	DECLARE_WRITE32_MEMBER(fault_w) { m_fault = data; }
-	DECLARE_READ32_MEMBER(control_r) { return m_control; }
-	DECLARE_WRITE32_MEMBER(control_w) { m_control = ((m_control & (~mem_mask | CNTL_CID)) | (data & (mem_mask & ~CNTL_CID))); }
-	DECLARE_READ32_MEMBER(reset_r) { return m_reset; }
-	DECLARE_WRITE32_MEMBER(reset_w) { m_reset = data; }
+	enum reset_mask : u32
+	{
+		RESET_RLVW = 0x00000001, // reset all W line LV flags in cache
+		RESET_RLVX = 0x00000002, // reset all X line LV flags in cache
+		RESET_RSV  = 0x00000004, // reset all SV flags in tlb
+		RESET_RUV  = 0x00000008, // reset all UV flags in tlb
+		RESET_RD   = 0x00000010, // reset all D flags in tlb
+		RESET_RR   = 0x00000020, // reset all R flags in tlb
+		RESET_RU   = 0x00000040, // reset all U flags in cache
+	};
 
-	// global methods - relay to each linked device
-	DECLARE_WRITE32_MEMBER(g_s_pdo_w)   { for (cammu_c3_device *dev : m_linked) dev->s_pdo_w(space, offset, data, mem_mask); }
-	DECLARE_WRITE32_MEMBER(g_u_pdo_w)   { for (cammu_c3_device *dev : m_linked) dev->u_pdo_w(space, offset, data, mem_mask); }
-	DECLARE_WRITE32_MEMBER(g_fault_w)   { for (cammu_c3_device *dev : m_linked) dev->fault_w(space, offset, data, mem_mask); }
-	DECLARE_WRITE32_MEMBER(g_control_w) { for (cammu_c3_device *dev : m_linked) dev->control_w(space, offset, data, mem_mask); }
-	DECLARE_WRITE32_MEMBER(g_reset_w)   { for (cammu_c3_device *dev : m_linked) dev->reset_w(space, offset, data, mem_mask); }
+	u32 tlb_r(const u8 address) const;
+	void tlb_w(const u8 address, const u32 data);
+	tlb_line_t &tlb_lookup(const bool user, const u32 virtual_address, const access_type mode);
 
-protected:
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	u32 s_pdo_r() const { return m_s_pdo; }
+	void s_pdo_w(const u32 data) { m_s_pdo = data & PDO_MASK; }
+	u32 u_pdo_r() const { return m_u_pdo; }
+	void u_pdo_w(const u32 data) { m_u_pdo = data & PDO_MASK; }
+	u32 fault_r() const { return m_fault; }
+	void fault_w(const u32 data) { m_fault = data; }
+	u32 control_r() const { return m_control; }
+	void control_w(const u32 data) { m_control = (m_control & CNTL_CID) | (data & ~CNTL_CID); }
+	void reset_w(const u32 data);
 
-	virtual bool get_access(const access_type mode, const u32 pte, const u32 ssw) const override;
 	virtual bool get_alignment() const override { return m_control & CNTL_ATE; }
-	virtual u32 get_pdo(const bool user) const override { return user ? m_u_pdo : m_s_pdo; }
 	virtual system_tag_t get_ust_space() const override { return system_tag_t((m_control & CNTL_UST) >> 4); }
+	virtual bool get_access(const access_type mode, const u32 pte, const u32 ssw) const override;
+	virtual u32 get_pdo(const bool user) const override { return user ? m_u_pdo : m_s_pdo; }
 
-	virtual void set_fault_address(const u32 va) override { m_fault = va; }
+	virtual void set_fault(const u32 address, const exception_vector type) override { m_fault = address; m_exception_func(type); }
 
-private:
 	static const u8 protection_matrix[4][16];
+
+	// device state
+	std::vector<cammu_c3_device *> m_linked;
 
 	u32 m_s_pdo;
 	u32 m_u_pdo;
 	u32 m_fault;
 	u32 m_control;
-	u32 m_reset;
 
-	std::vector<cammu_c3_device *> m_linked;
+	tlb_set_t m_tlb[64];
 };
 
 // device type definitions

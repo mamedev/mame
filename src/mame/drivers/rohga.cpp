@@ -314,8 +314,6 @@ void rohga_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -880,8 +878,10 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_DEVICE_PROGRAM_MAP(rohga_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, 32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -970,8 +970,10 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_DEVICE_PROGRAM_MAP(wizdfire_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1065,8 +1067,10 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_DEVICE_PROGRAM_MAP(nitrobal_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1161,8 +1165,10 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_DEVICE_PROGRAM_MAP(schmeisr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)

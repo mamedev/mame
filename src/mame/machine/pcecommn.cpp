@@ -20,7 +20,6 @@
 /* todo: how many input ports does the PCE have? */
 WRITE8_MEMBER(pce_common_state::pce_joystick_w)
 {
-	m_maincpu->io_set_buffer(data);
 	/* bump counter on a low-to-high transition of bit 1 */
 	if((!m_joystick_data_select) && (data & JOY_CLOCK))
 	{

@@ -2931,7 +2931,7 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
-	MCFG_AICARTC_ADD("aicartc", XTAL(32'768) )
+	AICARTC(config, "aicartc", XTAL(32'768));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomi_base)
@@ -9940,6 +9940,9 @@ ROM_START( inidv3cy )
 	//PIC16C621A (317-0406-COM)
 	//(sticker 253-5508-0406)
 	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, CRC(fe91a7af) SHA1(3562d8d454ac6e5b73a24d4dc8928ef24687cdf7) )
+
+	DISK_REGION( "cycraft" )
+	DISK_IMAGE( "initiald3_smcp_v1.66", 0, SHA1(8ade7c0bb85ceebf9e45e4d8053ad76009258a38) )
 ROM_END
 
 ROM_START( inidv3ca )
@@ -9953,6 +9956,9 @@ ROM_START( inidv3ca )
 	//PIC16C621A (317-0406-COM)
 	//(sticker 253-5508-0406)
 	ROM_LOAD("317-0406-com.pic", 0x00, 0x4000, CRC(fe91a7af) SHA1(3562d8d454ac6e5b73a24d4dc8928ef24687cdf7) )
+
+	DISK_REGION( "cycraft" )
+	DISK_IMAGE( "initiald3_smcp_v1.66", 0, SHA1(8ade7c0bb85ceebf9e45e4d8053ad76009258a38) )
 ROM_END
 
 /**********************************************

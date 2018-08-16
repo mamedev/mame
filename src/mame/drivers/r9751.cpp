@@ -61,7 +61,6 @@
 
 #include <queue>
 
-#define TERMINAL_TAG "terminal"
 
 /* Log defines */
 #define TRACE_FDC 0
@@ -92,7 +91,7 @@ public:
 		m_pdc(*this, "pdc"),
 		m_smioc(*this, "smioc"),
 		m_wd33c93(*this, "wd33c93"),
-		m_terminal(*this, TERMINAL_TAG),
+		m_terminal(*this, "terminal"),
 		m_main_ram(*this, "main_ram")
 	{
 	}
@@ -650,7 +649,7 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(r9751_state, kbd_put))
 
 	/* i/o hardware */

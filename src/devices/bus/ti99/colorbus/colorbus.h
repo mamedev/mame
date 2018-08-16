@@ -46,6 +46,7 @@ public:
 	ti99_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	line_state left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
 	void poll();
+	void configure_slot();
 
 protected:
 	void device_start() override { }
@@ -58,12 +59,6 @@ private:
 };
 
 } } } // end namespace bus::ti99::colorbus
-
-void ti99_colorbus_port(device_slot_interface &device);
-
-#define MCFG_COLORBUS_MOUSE_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_COLORBUS, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_colorbus_port, "busmouse", false)
 
 DECLARE_DEVICE_TYPE_NS(TI99_COLORBUS, bus::ti99::colorbus, ti99_colorbus_device)
 

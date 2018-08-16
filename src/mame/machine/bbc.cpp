@@ -425,8 +425,8 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x18) && (myo<=0x1f))                   return m_upd7002 ? m_upd7002->read(space, myo-0x18) : 0xfe;     /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   return 0xfe;                                                    /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27))                   return bbcm_wd177xl_read(space, myo-0x24);                      /* 177x Control Latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(space, myo-0x28);                         /* 1770 Controller */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(space, myo-0x28);                         /* 1772 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(myo-0x28);                         /* 1770 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(myo-0x28);                         /* 1772 Controller */
 		if ((myo>=0x28) && (myo<=0x2f))                   return 0xfe;                                                    /* No Controller */
 		if ((myo>=0x30) && (myo<=0x33))                   return 0xfe;
 		if ((myo>=0x34) && (myo<=0x37))                   return bbcm_acccon_r(space, myo-0x34);                          /* ACCCON */
@@ -459,9 +459,9 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		if ((myo>=0x18) && (myo<=0x1f) && (m_upd7002))    m_upd7002->write(space, myo-0x18, data);                        /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   bbc_videoULA_w(space, myo-0x20, data);                          /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27) && (m_wd1770))     bbcm_wd1770l_write(space, myo-0x24, data);                      /* disc control latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     m_wd1770->write(space, myo-0x28, data);                         /* 1770 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     m_wd1770->write(myo-0x28, data);                         /* 1770 Controller */
 		if ((myo>=0x24) && (myo<=0x27) && (m_wd1772))     bbcm_wd1772l_write(space, myo-0x24, data);                      /* disc control latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     m_wd1772->write(space, myo-0x28, data);                         /* 1772 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     m_wd1772->write(myo-0x28, data);                         /* 1772 Controller */
 		if ((myo>=0x30) && (myo<=0x33))                   page_selectbm_w(space, myo-0x30, data);                         /* ROMSEL */
 		if ((myo>=0x34) && (myo<=0x37))                   bbcm_acccon_w(space, myo-0x34, data);                           /* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f))                                                                                 /* NC ?? */

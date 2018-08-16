@@ -1704,8 +1704,7 @@ void apollo_graphics_15i::register_vblank_callback()
 	MLOG1(("register_vblank_callback"));
 
 	/* register for VBLANK callbacks */
-	screen_device *screen = (screen_device *)machine().device(VIDEO_SCREEN_TAG);
-	screen->register_vblank_callback(vblank_state_delegate(&apollo_graphics_15i::vblank_state_changed,this));
+	m_screen->register_vblank_callback(vblank_state_delegate(&apollo_graphics_15i::vblank_state_changed,this));
 }
 
 
@@ -1725,6 +1724,7 @@ DEFINE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i, "apollo_graphics_15i", 
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, tag, owner, clock),
+	m_screen(*this, "^" VIDEO_SCREEN_TAG),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {
@@ -1732,6 +1732,7 @@ apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const cha
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_screen(*this, "^" VIDEO_SCREEN_TAG),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {

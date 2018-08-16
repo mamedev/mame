@@ -748,7 +748,9 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), tutor_memmap, tutor_io)
+	TMS9995(config, m_maincpu, XTAL(10'738'635));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tutor_state::tutor_memmap);
+	m_maincpu->set_addrmap(AS_IO, &tutor_state::tutor_io);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )

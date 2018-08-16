@@ -420,24 +420,10 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank2").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank3").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank4").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
 MACHINE_CONFIG_END
 
 /* ROM definition */

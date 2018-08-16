@@ -130,7 +130,7 @@ void bbc_opus3_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfcf8, 0xfcfb, READ8_DEVICE_DELEGATE(m_fdc, wd1770_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_device, write));
+	space.install_readwrite_handler(0xfcf8, 0xfcfb, read8sm_delegate(FUNC(wd1770_device::read), m_fdc.target()), write8sm_delegate(FUNC(wd1770_device::write), m_fdc.target()));
 	space.install_write_handler(0xfcfc, 0xfcfc, WRITE8_DELEGATE(bbc_opus3_device, wd1770l_write));
 	space.install_write_handler(0xfcfe, 0xfcff, WRITE8_DELEGATE(bbc_opus3_device, page_w));
 	space.install_readwrite_handler(0xfd00, 0xfdff, READ8_DELEGATE(bbc_opus3_device, ramdisk_r), WRITE8_DELEGATE(bbc_opus3_device, ramdisk_w));

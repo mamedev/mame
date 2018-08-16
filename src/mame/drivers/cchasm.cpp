@@ -194,9 +194,9 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, CCHASM_68K_CLOCK/10)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, (CCHASM_68K_CLOCK / 10).value(), 0)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 4))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", CCHASM_68K_CLOCK/10));
+	ptm.set_external_clocks(0, (CCHASM_68K_CLOCK / 10).value(), 0);
+	ptm.irq_callback().set_inputline("maincpu", 4);
 MACHINE_CONFIG_END
 
 

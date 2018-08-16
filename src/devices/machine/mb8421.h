@@ -114,11 +114,21 @@ public:
 	DECLARE_READ8_MEMBER(right_r);
 
 protected:
+	mb8421_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
 	std::unique_ptr<u8[]> m_ram;
+};
+
+// ======================> mb8421_device
+
+class idt71321_device : public mb8421_device
+{
+public:
+	idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> mb8421_mb8431_16_device
@@ -145,6 +155,7 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(MB8421, mb8421_device)
+DECLARE_DEVICE_TYPE(IDT71321, idt71321_device)
 DECLARE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device)
 
 #endif // MAME_MACHINE_MB8421_H

@@ -1191,8 +1191,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, ata_interrupt))
+	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
+	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
 
 	MCFG_DEVICE_MODIFY("ata:1")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
@@ -1249,8 +1249,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, ata_interrupt))
+	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
+	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
 
 	MCFG_DEVICE_MODIFY("ata:1")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
@@ -1317,8 +1317,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ATA_INTERFACE_ADD("spu_ata", firebeat_ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, spu_ata_interrupt))
+	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
+	m_spuata->irq_handler().set(FUNC(firebeat_state::spu_ata_interrupt));
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

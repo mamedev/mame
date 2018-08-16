@@ -56,13 +56,13 @@ public:
 	void set_hold(int state);
 
 	// Callbacks
-	template<class Object> devcb_base &set_extop_callback(Object &&cb) { return m_external_operation.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_intlevel_callback(Object &&cb) { return m_get_intlevel.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_iaq_callback(Object &&cb) { return m_iaq_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_clkout_callback(Object &&cb) { return m_clock_out_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_wait_callback(Object &&cb) { return m_wait_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_dbin_callback(Object &&cb) { return m_dbin_line.set_callback(std::forward<Object>(cb)); }
+	auto extop_cb() { return m_external_operation.bind(); }
+	auto intlevel_cb() { return m_get_intlevel.bind(); }
+	auto iaq_cb() { return m_iaq_line.bind(); }
+	auto clkout_cb() { return m_clock_out_line.bind(); }
+	auto wait_cb() { return m_wait_line.bind(); }
+	auto holda_cb() { return m_holda_line.bind(); }
+	auto dbin_cb() { return m_dbin_line.bind(); }
 
 protected:
 	tms99xx_device(const machine_config &mconfig, device_type type,
