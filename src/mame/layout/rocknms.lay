@@ -2,10 +2,10 @@
 <mamelayout version="2">
 
 	<view name="Rockn Megasession Custom">
-		<screen index="0">
+		<screen tag="lscreen">
 			<bounds x="0" y="0" width="12" height="9" />
 		</screen>
-		<screen index="1">
+		<screen tag="rscreen">
 			<bounds x="0" y="9" width="12" height="16" />
 		</screen>
 	</view>

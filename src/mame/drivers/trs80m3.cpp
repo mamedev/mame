@@ -58,10 +58,9 @@ To Do / Status:
 --------------
 
 trs80m3:   works
-           floppy not working
 
 trs80m4:   works
-           floppy not working
+           will boot model 3 floppies, but not model 4 ones
 
 trs80m4p:  floppy not working, so machine is useless
 
@@ -108,6 +107,11 @@ void trs80m3_state::m3_io(address_map &map)
 	map(0xfc, 0xff).rw(FUNC(trs80m3_state::port_ff_r), FUNC(trs80m3_state::port_ff_w));
 }
 
+void trs80m3_state::m4_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_m4_bank, FUNC(address_map_bank_device::amap8));
+}
+
 void trs80m3_state::m4_banked_mem(address_map &map)
 {
 	// Memory Map I - Model III Mode
@@ -144,6 +148,11 @@ void trs80m3_state::m4_io(address_map &map)
 	map(0x84, 0x87).w(FUNC(trs80m3_state::port_84_w));
 	map(0x88, 0x89).w(FUNC(trs80m3_state::port_88_w));
 	map(0x90, 0x93).w(FUNC(trs80m3_state::port_90_w));
+}
+
+void trs80m3_state::m4p_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_m4p_bank, FUNC(address_map_bank_device::amap8));
 }
 
 void trs80m3_state::m4p_banked_mem(address_map &map)
@@ -376,17 +385,18 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_brg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 
-	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	AY31015(config, m_uart);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
-	MCFG_AY31015_AUTO_RDAV(true)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	m_uart->set_auto_rdav(true);
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m3_state::model4)
 	model3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m4_mem)
 	MCFG_DEVICE_IO_MAP(m4_io)
 
 	RAM(config, m_mainram, 0);
@@ -404,11 +414,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(trs80m3_state::model4p)
 	model3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m4p_mem)
 	MCFG_DEVICE_IO_MAP(m4p_io)
 
 	RAM(config, m_mainram, 0);
 	m_mainram->set_default_size("64K");
-	m_mainram->set_extra_options("16K,128K");
+	m_mainram->set_extra_options("128K");
 
 	ADDRESS_MAP_BANK(config, m_m4p_bank, 0);
 	m_m4p_bank->set_map(&trs80m3_state::m4p_banked_mem);

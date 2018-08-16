@@ -124,6 +124,14 @@ public:
 
 	template <unsigned Ch, class Object> devcb_base &set_out_dack_callback(Object &&cb) { return m_out_dack_cb[Ch].set_callback(std::forward<Object>(cb)); }
 
+	auto out_hrq_cb() { return m_out_hrq_cb.bind(); }
+	auto out_tc_cb() { return m_out_tc_cb.bind(); }
+	auto in_memr_cb() { return m_in_memr_cb.bind(); }
+	auto out_memw_cb() { return m_out_memw_cb.bind(); }
+	template <unsigned Ch> auto in_ior_cb() { return m_in_ior_cb[Ch].bind(); }
+	template <unsigned Ch> auto out_iow_cb() { return m_out_iow_cb[Ch].bind(); }
+	template <unsigned Ch> auto out_dack_cb() { return m_out_dack_cb[Ch].bind(); }
+
 	void set_reverse_rw_mode(bool flag) { m_reverse_rw = flag; }
 
 protected:

@@ -226,12 +226,12 @@ WRITE_LINE_MEMBER( isa8_myb3k_fdc4711_device::drq_w )
 //-------------------------------------------------
 uint8_t isa8_myb3k_fdc4710_device::dack_r(int line)
 {
-	return ~(m_fdc->read_data());
+	return ~(m_fdc->data_r());
 }
 
 uint8_t isa8_myb3k_fdc4711_device::dack_r(int line)
 {
-	return ~(m_fdc->read_data());
+	return ~(m_fdc->data_r());
 }
 
 //-------------------------------------------------
@@ -239,12 +239,12 @@ uint8_t isa8_myb3k_fdc4711_device::dack_r(int line)
 //-------------------------------------------------
 void isa8_myb3k_fdc4710_device::dack_w(int line, uint8_t data)
 {
-	return m_fdc->write_data(data);
+	return m_fdc->data_w(data);
 }
 
 void isa8_myb3k_fdc4711_device::dack_w(int line, uint8_t data)
 {
-	return m_fdc->write_data(data);
+	return m_fdc->data_w(data);
 }
 
 #if 0 // eop/tc is used to for logic around multi sector transfers
@@ -264,14 +264,14 @@ void isa8_myb3k_fdc4711_device::eop_w(int state)
 //--------------------------------------------------------
 READ8_MEMBER( isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_r )
 {
-	uint8_t tmp = m_fdc->read(space, offset);
+	uint8_t tmp = m_fdc->read(offset);
 	LOGR("%s: %02x -> %02x\n", FUNCNAME, tmp, (~tmp) & 0xff);
 	return ~tmp;
 }
 
 READ8_MEMBER( isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_r )
 {
-	uint8_t tmp = m_fdc->read(space, offset);
+	uint8_t tmp = m_fdc->read(offset);
 	LOGR("%s: %02x -> %02x\n", FUNCNAME, tmp, (~tmp) & 0xff);
 	return ~tmp;
 }
@@ -282,13 +282,13 @@ READ8_MEMBER( isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_r )
 WRITE8_MEMBER( isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_w )
 {
 	LOG("%s: %02x -> %02x\n", FUNCNAME, data, (~data) & 0xff);
-	m_fdc->write(space, offset, (~data) & 0xff);
+	m_fdc->write(offset, (~data) & 0xff);
 }
 
 WRITE8_MEMBER( isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_w )
 {
 	LOG("%s: %02x -> %02x\n", FUNCNAME, data, (~data) & 0xff);
-	m_fdc->write(space, offset, (~data) & 0xff);
+	m_fdc->write(offset, (~data) & 0xff);
 }
 
 //-------------------------------------------------

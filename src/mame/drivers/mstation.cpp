@@ -63,7 +63,7 @@ private:
 
 	uint8_t m_bank1[2];
 	uint8_t m_bank2[2];
-	uint8_t *m_vram;
+	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t m_screen_column;
 	uint8_t m_port2;
 	uint8_t m_irq;
@@ -396,7 +396,7 @@ INPUT_PORTS_END
 void mstation_state::machine_start()
 {
 	// allocate the videoram
-	m_vram = (uint8_t*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
+	m_vram = make_unique_clear<uint8_t[]>(9600);
 
 	// map firsh RAM bank at 0xc000-0xffff
 	membank("sysram")->set_base(m_nvram);
@@ -407,7 +407,6 @@ void mstation_state::machine_reset()
 {
 	m_bank1[0] =  m_bank1[1] = 0;
 	m_bank2[0] =  m_bank2[1] = 0;
-	memset(m_vram, 0, 9600);
 
 	// reset banks
 	m_bankdev1->set_bank(0);
@@ -475,17 +474,8 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, mstation_state, rtc_irq))
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

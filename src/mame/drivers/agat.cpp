@@ -1099,11 +1099,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(m_upperbank, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* keyboard controller -- XXX must be replaced */
 	MCFG_DEVICE_ADD(m_ay3600, AY3600, 0)

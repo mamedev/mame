@@ -131,12 +131,7 @@ MACHINE_CONFIG_START(pcvideo_t1000_device::device_add_mconfig)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_t1000_device, t1000_vsync_changed))
 
-	MCFG_DEVICE_ADD("vram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 MACHINE_CONFIG_END
 
 
@@ -154,12 +149,8 @@ MACHINE_CONFIG_START(pcvideo_pcjr_device::device_add_mconfig)
 	MCFG_MC6845_UPDATE_ROW_CB(pcvideo_pcjr_device, crtc_update_row)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_pcjr_device, pcjr_vsync_changed))
-	MCFG_DEVICE_ADD("vram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 MACHINE_CONFIG_END
 
 

@@ -134,7 +134,7 @@ void bbc_cumanafdc_device::device_start()
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_cumanafdc_device, ctrl_r), WRITE8_DELEGATE(bbc_cumanafdc_device, ctrl_w));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, mb8877_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, mb8877_device, write));
+	space.install_readwrite_handler(0xfe84, 0xfe9f, read8sm_delegate(FUNC(mb8877_device::read), m_fdc.target()), write8sm_delegate(FUNC(mb8877_device::write), m_fdc.target()));
 }
 
 //-------------------------------------------------

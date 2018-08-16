@@ -10,10 +10,12 @@ Undumped prom at IC55 type 74S287
 Keyboard has 8048 and 2758, both undumped.
 
 ToDo:
-- Everything
+- Printer
+- Hard drive, ports 0x60-0x67. Extra CTC on HD board, ports 0x44-0x47
+- Other things
 
 Issues:
-- Floppy disc error.
+- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 1)
 
 
 ****************************************************************************************************************/
@@ -55,8 +57,7 @@ public:
 		, m_7474(*this, "7474")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
-	{
-	}
+	{ }
 
 	void rc702(machine_config &config);
 
@@ -67,12 +68,11 @@ private:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
 	DECLARE_WRITE8_MEMBER(port1c_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
+	DECLARE_WRITE_LINE_MEMBER(eop_w);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
@@ -86,8 +86,8 @@ private:
 	bool m_qbar_state;
 	bool m_drq_state;
 	uint16_t m_beepcnt;
-	uint8_t m_dack;
-	bool m_tc;
+	bool m_eop;
+	bool m_dack1;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -117,7 +117,7 @@ void rc702_state::rc702_io(address_map &map)
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).w(FUNC(rc702_state::port18_w)); // memory banking
+	map(0x18, 0x1b).lw8("banking",[this](u8 data){membank("bankr0")->set_entry(1);}); // replace roms with ram
 	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
@@ -156,8 +156,8 @@ void rc702_state::machine_reset()
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	m_beepcnt = 0xffff;
-	m_dack = 0;
-	m_tc = 0;
+	m_dack1 = 0;
+	m_eop = 0;
 	m_7474->preset_w(1);
 	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
 	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
@@ -199,28 +199,32 @@ WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
 		m_dma->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::tc_w )
+WRITE_LINE_MEMBER( rc702_state::eop_w )
 {
-	m_tc = state;
-	if ((m_dack == 1) && m_tc)
-	{
-		m_dack = 0;
+	if (state == m_eop)
+		return;
+
+	m_eop = state;
+
+	if (!m_eop && !m_dack1)
 		m_fdc->tc_w(1);
-	}
 	else
 		m_fdc->tc_w(0);
 }
 
 WRITE_LINE_MEMBER( rc702_state::dack1_w )
 {
-	m_dack = 1;
-	if ((m_dack == 1) && m_tc)
-	{
-		m_dack = 0;
+	if (state == m_dack1)
+		return;
+
+	m_dack1 = state;
+
+	if (!m_eop && !m_dack1)
 		m_fdc->tc_w(1);
-	}
 	else
 		m_fdc->tc_w(0);
+
+	//m_fdc->dack_w = state;  // pin not emulated
 }
 
 WRITE8_MEMBER( rc702_state::port14_w )
@@ -230,15 +234,10 @@ WRITE8_MEMBER( rc702_state::port14_w )
 	floppy->mon_w(!BIT(data, 0));
 }
 
-WRITE8_MEMBER( rc702_state::port18_w )
-{
-	membank("bankr0")->set_entry(1); // replace roms with ram
-}
-
 WRITE8_MEMBER( rc702_state::port1c_w )
 {
-		m_beep->set_state(1);
-		m_beepcnt = 0x3000;
+	m_beep->set_state(1);
+	m_beepcnt = 0x3000;
 }
 
 // monitor is orange even when powered off
@@ -292,23 +291,20 @@ WRITE_LINE_MEMBER( rc702_state::clock_w )
 		m_beepcnt--;
 }
 
-WRITE_LINE_MEMBER( rc702_state::busreq_w )
+WRITE_LINE_MEMBER( rc702_state::hreq_w )
 {
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dma->hack_w(state); // tell dma that bus has been granted
 }
 
 READ8_MEMBER( rc702_state::memory_read_byte )
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 WRITE8_MEMBER( rc702_state::memory_write_byte )
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	prog_space.write_byte(offset, data);
+	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
 static const z80_daisy_config daisy_chain_intf[] =
@@ -354,19 +350,19 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 //  m_pio->out_pb_callback().set(FUNC(rc702_state::portxx_w)); // parallel port
 
 	AM9517A(config, m_dma, 8_MHz_XTAL / 2);
-	m_dma->out_hreq_callback().set(FUNC(rc702_state::busreq_w));
-	m_dma->out_eop_callback().set(FUNC(rc702_state::tc_w)); // inverted
+	m_dma->out_hreq_callback().set(FUNC(rc702_state::hreq_w));
+	m_dma->out_eop_callback().set(FUNC(rc702_state::eop_w)).invert();   // real line is active low, mame has it backwards
 	m_dma->in_memr_callback().set(FUNC(rc702_state::memory_read_byte));
 	m_dma->out_memw_callback().set(FUNC(rc702_state::memory_write_byte));
 	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_r));
 	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_w));
 	m_dma->out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
-	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w)); // inverted
+	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
 
-	MCFG_UPD765A_ADD("fdc", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("ctc1", z80ctc_device, trg3))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma", am9517a_device, dreq1_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
@@ -374,9 +370,9 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(rc702_state, kbd_put))
 
-	MCFG_DEVICE_ADD("7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, rc702_state, q_w))
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, rc702_state, qbar_w))
+	TTL7474(config, m_7474, 0);
+	m_7474->output_cb().set(FUNC(rc702_state::q_w));
+	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -403,16 +399,16 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( rc702 )
 	ROM_REGION( 0x10800, "maincpu", 0 )
-		ROM_SYSTEM_BIOS(0, "rc700", "RC700")
-		ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(0))
-		ROM_SYSTEM_BIOS(1, "rc702", "RC702")
-		ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(1))
-		ROM_SYSTEM_BIOS(2, "rc703", "RC703")
-		ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(0, "rc702", "RC702")
+	ROMX_LOAD( "roa375.ic66", 0x10000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "rc703", "RC703")
+	ROMX_LOAD( "rob357.rom", 0x10000, 0x0800,  CRC(dcf84a48) SHA1(7190d3a898bcbfa212178a4d36afc32bbbc166ef), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "rc700", "RC700")
+	ROMX_LOAD( "rob358.rom", 0x10000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(2))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-		ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
-		ROM_LOAD( "roa327.rom", 0x0800, 0x0800, CRC(bed7ddb0) SHA1(201ae9e4ac3812577244b9c9044fadd04fb2b82f) ) // semi_gfx
+	ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
+	ROM_LOAD( "roa327.rom", 0x0800, 0x0800, CRC(bed7ddb0) SHA1(201ae9e4ac3812577244b9c9044fadd04fb2b82f) ) // semi_gfx
 ROM_END
 
 /* Driver */

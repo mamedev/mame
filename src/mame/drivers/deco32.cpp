@@ -650,8 +650,6 @@ void deco32_state::h6280_sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void deco32_state::h6280_sound_custom_latch_map(address_map &map)
@@ -1869,8 +1867,10 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
 	MCFG_DEVICE_PROGRAM_MAP(captaven_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000)/4/3));  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
+	audiocpu.set_addrmap(AS_PROGRAM, &captaven_state::h6280_sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
@@ -1956,8 +1956,10 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_DEVICE_PROGRAM_MAP(fghthist_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_custom_latch_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_custom_latch_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
@@ -2079,8 +2081,10 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(dragngun_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, 32220000/8)
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
@@ -2469,9 +2473,12 @@ MACHINE_CONFIG_END
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
 MACHINE_CONFIG_START(nslasher_state::nslasheru)
 	nslasher(config);
+	MCFG_DEVICE_REMOVE("audiocpu")
 
-	MCFG_DEVICE_REPLACE("audiocpu", H6280, 32220000/8)
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	audiocpu.set_addrmap(AS_PROGRAM, &nslasher_state::h6280_sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_DEVICE_REMOVE("sound_irq_merger")
 

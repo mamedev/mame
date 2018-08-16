@@ -105,6 +105,19 @@
 #include "emu.h"
 #include "ti_rs232.h"
 
+#define LOG_WARN        (1U<<1)    // Warnings
+#define LOG_CONFIG      (1U<<2)
+#define LOG_LINES       (1U<<3)
+#define LOG_SETTING     (1U<<4)
+#define LOG_STATE       (1U<<5)
+#define LOG_MAP         (1U<<6)
+#define LOG_IN          (1U<<7)
+#define LOG_OUT         (1U<<8)
+#define LOG_ILA         (1U<<9)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
 DEFINE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
 DEFINE_DEVICE_TYPE_NS(TI99_PIO_DEV,   bus::ti99::peb, ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
@@ -117,14 +130,6 @@ namespace bus { namespace ti99 { namespace peb {
 #define RECV_MODE_NORMAL 1
 #define RECV_MODE_ESC 2
 #define RECV_MODE_ESC_LINES 3
-
-#define TRACE_LINES 0
-#define TRACE_SETTING 0
-#define TRACE_STATE 0
-#define TRACE_MAP 0
-#define TRACE_IN 0
-#define TRACE_OUT 0
-#define TRACE_ILA 0
 
 #define ESC 0x1b
 
@@ -212,7 +217,7 @@ image_init_result ti_rs232_attached_device::call_load()
 	}
 	else
 	{
-		logerror("Could not find device tag number\n");
+		LOGMASKED(LOG_WARN, "Could not find device tag number\n");
 		return image_init_result::FAIL;
 	}
 
@@ -397,14 +402,14 @@ WRITE_LINE_MEMBER(ti_rs232_pio_device::flag0_w)
 WRITE_LINE_MEMBER(ti_rs232_pio_device::cts0_w)
 {
 	// Set the CTS line for RS232/1
-	if (TRACE_LINES) logerror("(1/3) Setting CTS* via CRU to %d\n", state);
+	LOGMASKED(LOG_LINES, "(1/3) Setting CTS* via CRU to %d\n", state);
 	output_line_state(0, tms9902_device::CTS, state ? 0 : tms9902_device::CTS);
 }
 
 WRITE_LINE_MEMBER(ti_rs232_pio_device::cts1_w)
 {
 	// Set the CTS line for RS232/2
-	if (TRACE_LINES) logerror("(2/4) Setting CTS* via CRU to %d\n", state);
+	LOGMASKED(LOG_LINES, "(2/4) Setting CTS* via CRU to %d\n", state);
 	output_line_state(1, tms9902_device::CTS, state ? 0 : tms9902_device::CTS);
 }
 
@@ -420,7 +425,7 @@ READ8Z_MEMBER( ti_rs232_pio_device::readz )
 {
 	if (m_senila==ASSERT_LINE)
 	{
-		if (TRACE_ILA) logerror("Sensing ILA\n");
+		LOGMASKED(LOG_ILA, "Sensing ILA\n");
 		*value = m_ila;
 		// The card ROM must be unselected, or we get two values
 		// on the data bus
@@ -464,7 +469,7 @@ WRITE8_MEMBER( ti_rs232_pio_device::write )
 */
 void ti_rs232_pio_device::incoming_dtr(int uartind, line_state value)
 {
-	if (TRACE_LINES) logerror("(RS232/%d) Incoming DTR = %d\n", uartind+1, (value==ASSERT_LINE)? 1:0);
+	LOGMASKED(LOG_LINES, "(RS232/%d) Incoming DTR = %d\n", uartind+1, (value==ASSERT_LINE)? 1:0);
 
 	m_uart[uartind]->rcv_cts(value);
 	m_uart[uartind]->rcv_dsr(value);
@@ -481,21 +486,18 @@ void ti_rs232_pio_device::transmit_data(int uartind, uint8_t value)
 	serial = dynamic_cast<device_image_interface *>(m_serdev[uartind]);
 	if (!serial->exists())
 	{
-		logerror("(RS232/%d) No serial output attached\n", uartind+1);
+		LOGMASKED(LOG_CONFIG, "(RS232/%d) No serial output attached\n", uartind+1);
 		return;
 	}
 
 	// Send a double ESC if this is not a control operation
 	if (buf==0x1b)
 	{
-		if (TRACE_OUT) logerror("(RS232/%d) send ESC (requires another ESC)\n", uartind+1);
+		LOGMASKED(LOG_OUT, "(RS232/%d) send ESC (requires another ESC)\n", uartind+1);
 		serial->fwrite(&buf, 1);
 	}
-	if (TRACE_OUT)
-	{
-		char cbuf = (buf < 0x20 || buf > 0x7e)? '.' : (char)buf;
-		logerror("(RS232/%d) send %c <%02x>\n", uartind+1, cbuf, buf);
-	}
+	char cbuf = (buf < 0x20 || buf > 0x7e)? '.' : (char)buf;
+	LOGMASKED(LOG_OUT, "(RS232/%d) send %c <%02x>\n", uartind+1, cbuf, buf);
 	serial->fwrite(&buf, 1);
 }
 
@@ -547,11 +549,11 @@ uint8_t ti_rs232_pio_device::map_lines_out(int uartind, uint8_t value)
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
 
-	if (TRACE_LINES) logerror("(RS232/%d) out connector pins = 0x%02x; translate for DTE\n", uartind+1, value);
+	LOGMASKED(LOG_LINES, "(RS232/%d) out connector pins = 0x%02x; translate for DTE\n", uartind+1, value);
 
 	if (value & tms9902_device::BRK)
 	{
-		if (TRACE_MAP) logerror("(RS232/%d) Sending BRK\n", uartind+1);
+		LOGMASKED(LOG_MAP, "(RS232/%d) Sending BRK\n", uartind+1);
 		ret |= tms9902_device::EXCEPT | tms9902_device::BRK;
 	}
 
@@ -560,17 +562,17 @@ uint8_t ti_rs232_pio_device::map_lines_out(int uartind, uint8_t value)
 		// V1
 		if (value & tms9902_device::CTS)
 		{
-			if (TRACE_MAP) logerror("(RS232/%d) Cannot map CTS line, ignoring\n", uartind+1);
+			LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map CTS line, ignoring\n", uartind+1);
 		}
 		if (value & tms9902_device::DSR)
 		{
 			ret |= tms9902_device::DTR;
-			if (TRACE_MAP) logerror("(RS232/%d) Setting DTR line\n", uartind+1);
+			LOGMASKED(LOG_MAP, "(RS232/%d) Setting DTR line\n", uartind+1);
 		}
 		if (value & tms9902_device::DCD)
 		{
 			ret |= tms9902_device::RTS;
-			if (TRACE_MAP) logerror("(RS232/%d) Setting RTS line\n", uartind+1);
+			LOGMASKED(LOG_MAP, "(RS232/%d) Setting RTS line\n", uartind+1);
 		}
 	}
 	else
@@ -581,12 +583,12 @@ uint8_t ti_rs232_pio_device::map_lines_out(int uartind, uint8_t value)
 			if (value & tms9902_device::CTS)
 			{
 				ret |= tms9902_device::RTS;
-				if (TRACE_MAP) logerror("(RS232/%d) Setting RTS line\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Setting RTS line\n", uartind+1);
 			}
 			if (value & tms9902_device::DCD)
 			{
 				ret |= tms9902_device::DTR;
-				if (TRACE_MAP) logerror("(RS232/%d) Setting DTR line\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Setting DTR line\n", uartind+1);
 			}
 		}
 		else
@@ -595,16 +597,16 @@ uint8_t ti_rs232_pio_device::map_lines_out(int uartind, uint8_t value)
 			if (value & tms9902_device::CTS)
 			{
 				ret |= tms9902_device::DTR;
-				if (TRACE_MAP) logerror("(RS232/%d) Setting DTR line\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Setting DTR line\n", uartind+1);
 			}
 			if (value & tms9902_device::DSR)
 			{
-				if (TRACE_MAP) logerror("(RS232/%d) Cannot map DSR line, ignoring\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map DSR line, ignoring\n", uartind+1);
 			}
 			if (value & tms9902_device::DCD)
 			{
 				ret |= tms9902_device::RTS;
-				if (TRACE_MAP) logerror("(RS232/%d) Setting RTS line\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Setting RTS line\n", uartind+1);
 			}
 		}
 	}
@@ -619,11 +621,11 @@ uint8_t ti_rs232_pio_device::map_lines_in(int uartind, uint8_t value)
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
 
-	if (TRACE_LINES) logerror("(RS232/%d) in connector pins = 0x%02x; translate from DTE\n", uartind+1, value);
+	LOGMASKED(LOG_LINES, "(RS232/%d) in connector pins = 0x%02x; translate from DTE\n", uartind+1, value);
 
 	if (value & tms9902_device::BRK)
 	{
-		if (TRACE_MAP) logerror("(RS232/%d) Getting BRK\n", uartind+1);
+		LOGMASKED(LOG_MAP, "(RS232/%d) Getting BRK\n", uartind+1);
 		ret |= tms9902_device::EXCEPT | tms9902_device::BRK;
 	}
 
@@ -632,16 +634,16 @@ uint8_t ti_rs232_pio_device::map_lines_in(int uartind, uint8_t value)
 		// V1
 		if (value & tms9902_device::CTS)
 		{
-			if (TRACE_MAP) logerror("(RS232/%d) Cannot map CTS line, ignoring\n", uartind+1);
+			LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map CTS line, ignoring\n", uartind+1);
 		}
 		if (value & tms9902_device::DSR)
 		{
 			ret |= tms9902_device::DTR;
-			if (TRACE_MAP) logerror("(RS232/%d) Setting DTR line\n", uartind+1);
+			LOGMASKED(LOG_MAP, "(RS232/%d) Setting DTR line\n", uartind+1);
 		}
 		if (value & tms9902_device::DCD)
 		{
-			if (TRACE_MAP) logerror("(RS232/%d) Cannot map DCD line, ignoring\n", uartind+1);
+			LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map DCD line, ignoring\n", uartind+1);
 		}
 	}
 	else
@@ -651,15 +653,15 @@ uint8_t ti_rs232_pio_device::map_lines_in(int uartind, uint8_t value)
 			if (value & tms9902_device::DCD)
 			{
 				ret |= tms9902_device::DTR;
-				if (TRACE_MAP) logerror("(RS232/%d) Setting DTR line\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Setting DTR line\n", uartind+1);
 			}
 			if (value & tms9902_device::DSR)
 			{
-				if (TRACE_MAP) logerror("(RS232/%d) Cannot map DSR line, ignoring\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map DSR line, ignoring\n", uartind+1);
 			}
 			if (value & tms9902_device::CTS)
 			{
-				if (TRACE_MAP) logerror("(RS232/%d) Cannot map CTS line, ignoring\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map CTS line, ignoring\n", uartind+1);
 			}
 		}
 		else
@@ -667,15 +669,15 @@ uint8_t ti_rs232_pio_device::map_lines_in(int uartind, uint8_t value)
 			if (value & tms9902_device::CTS)
 			{
 				ret |= tms9902_device::DTR;
-				if (TRACE_MAP) logerror("(RS232/%d) Setting DTR line\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Setting DTR line\n", uartind+1);
 			}
 			if (value & tms9902_device::DSR)
 			{
-				if (TRACE_MAP) logerror("(RS232/%d) Cannot map DSR line, ignoring\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map DSR line, ignoring\n", uartind+1);
 			}
 			if (value & tms9902_device::DCD)
 			{
-				if (TRACE_MAP) logerror("(RS232/%d) Cannot map DCD line, ignoring\n", uartind+1);
+				LOGMASKED(LOG_MAP, "(RS232/%d) Cannot map DCD line, ignoring\n", uartind+1);
 			}
 		}
 	}
@@ -715,7 +717,7 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 
 	if (!serial->exists())
 	{
-		logerror("(RS232/%d) No serial input attached\n", uartind+1);
+		LOGMASKED(LOG_CONFIG, "(RS232/%d) No serial input attached\n", uartind+1);
 		return;
 	}
 
@@ -750,12 +752,12 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 	case RECV_MODE_NORMAL:
 		if (buffer==0x1b)
 		{
-			if (TRACE_IN) logerror("(RS232/%d) Received: %c <%02x>, switch to ESC mode\n", uartind+1, cbuf, buffer);
+			LOGMASKED(LOG_IN, "(RS232/%d) Received: %c <%02x>, switch to ESC mode\n", uartind+1, cbuf, buffer);
 			m_recv_mode[uartind] = RECV_MODE_ESC;
 		}
 		else
 		{
-			if (TRACE_IN) logerror("(RS232/%d) Received: %c <%02x>, pass to UART\n", uartind+1, cbuf, buffer);
+			LOGMASKED(LOG_IN, "(RS232/%d) Received: %c <%02x>, pass to UART\n", uartind+1, cbuf, buffer);
 			m_uart[uartind]->rcv_data(buffer);
 			m_time_hold[uartind] = 0.0;
 		}
@@ -764,17 +766,17 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 		if (buffer==0x1b)
 		{
 			m_recv_mode[uartind] = RECV_MODE_NORMAL;
-			if (TRACE_STATE) logerror("(RS232/%d) Received another ESC, passing to UART, leaving ESC mode\n", uartind+1);
+			LOGMASKED(LOG_STATE, "(RS232/%d) Received another ESC, passing to UART, leaving ESC mode\n", uartind+1);
 			m_uart[uartind]->rcv_data(buffer);
 			m_time_hold[uartind] = 0.0;
 		}
 		else
 		{
 			// the byte in buffer is the length byte
-			if (TRACE_STATE) logerror("(RS232/%d) Received length byte <%02x> in ESC mode\n", uartind+1, buffer);
+			LOGMASKED(LOG_STATE, "(RS232/%d) Received length byte <%02x> in ESC mode\n", uartind+1, buffer);
 			if (buffer != 1)
 			{
-				logerror("(RS232/%d) ** ERROR: Expected length byte 1 but got 0x%02x, leaving ESC mode.\n", uartind+1, buffer);
+				LOGMASKED(LOG_WARN, "(RS232/%d) ** ERROR: Expected length byte 1 but got 0x%02x, leaving ESC mode.\n", uartind+1, buffer);
 				m_recv_mode[uartind] = RECV_MODE_NORMAL;
 			}
 			else
@@ -788,7 +790,7 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 		if (buffer & tms9902_device::EXCEPT)
 		{
 			// Exception states: BRK, FRMERR, PARERR
-			if (TRACE_LINES) logerror("(RS232/%d) Received BRK or ERROR <%02x>\n", uartind+1, buffer);
+			LOGMASKED(LOG_LINES, "(RS232/%d) Received BRK or ERROR <%02x>\n", uartind+1, buffer);
 			m_uart[uartind]->rcv_break(((buffer & tms9902_device::BRK)!=0));
 
 			if (buffer & tms9902_device::FRMERR)    m_uart[uartind]->rcv_framing_error();
@@ -797,7 +799,7 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 		else
 		{
 			buffer = map_lines_in(uartind, buffer);
-			if (TRACE_LINES) logerror("(RS232/%d) Received (remapped) <%02x> in ESC mode\n", uartind+1, buffer);
+			LOGMASKED(LOG_LINES, "(RS232/%d) Received (remapped) <%02x> in ESC mode\n", uartind+1, buffer);
 
 			// The DTR line on the RS232 connector of the board is wired to both the
 			// CTS and the DSR pin of the TMS9902
@@ -809,7 +811,7 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 		break;
 
 	default:
-		logerror("(RS232/%d) Unknown mode: %d\n", uartind+1, m_recv_mode[uartind]);
+		LOGMASKED(LOG_WARN, "(RS232/%d) Unknown mode: %d\n", uartind+1, m_recv_mode[uartind]);
 	}
 }
 
@@ -826,7 +828,7 @@ void ti_rs232_pio_device::configure_interface(int uartind, int type, int value)
 
 	if (!serial->exists())
 	{
-		logerror("(RS232/%d) No serial output attached\n", uartind+1);
+		LOGMASKED(LOG_CONFIG, "(RS232/%d) No serial output attached\n", uartind+1);
 		return;
 	}
 
@@ -836,7 +838,7 @@ void ti_rs232_pio_device::configure_interface(int uartind, int type, int value)
 
 	switch (type) {
 	case tms9902_device::RATERECV:
-		if (TRACE_SETTING) logerror("(RS232/%d) Send receive rate %04x\n", uartind+1, value);
+		LOGMASKED(LOG_SETTING, "(RS232/%d) Send receive rate %04x\n", uartind+1, value);
 		// value has 12 bits
 		// 1ccc xaaa                         = config adapter type a
 		// 1111 xaaa rrrr rrrr rrrr 0000     = config receive rate on a
@@ -847,29 +849,29 @@ void ti_rs232_pio_device::configure_interface(int uartind, int type, int value)
 		bufctrl[3] = (value & 0x0f)<<4;
 		break;
 	case tms9902_device::RATEXMIT:
-		if (TRACE_SETTING) logerror("(RS232/%d) Send transmit rate %04x\n", uartind+1, value);
+		LOGMASKED(LOG_SETTING, "(RS232/%d) Send transmit rate %04x\n", uartind+1, value);
 		bufctrl[0] = 0x03; // length
 		bufctrl[1] |= tms9902_device::RATEXMIT;
 		bufctrl[2] = (value & 0x0ff0)>>4;
 		bufctrl[3] = (value & 0x0f)<<4;
 		break;
 	case tms9902_device::STOPBITS:
-		if (TRACE_SETTING) logerror("(RS232/%d) Send stop bit config %02x\n", uartind+1, value&0x03);
+		LOGMASKED(LOG_SETTING, "(RS232/%d) Send stop bit config %02x\n", uartind+1, value&0x03);
 		bufctrl[1] |= tms9902_device::STOPBITS;
 		bufctrl[2] = (value & 0x03);
 		break;
 	case tms9902_device::DATABITS:
-		if (TRACE_SETTING) logerror("(RS232/%d) Send data bit config %02x\n", uartind+1, value&0x03);
+		LOGMASKED(LOG_SETTING, "(RS232/%d) Send data bit config %02x\n", uartind+1, value&0x03);
 		bufctrl[1] |= tms9902_device::DATABITS;
 		bufctrl[2] = (value & 0x03);
 		break;
 	case tms9902_device::PARITY:
-		if (TRACE_SETTING) logerror("(RS232/%d) Send parity config %02x\n", uartind+1, value&0x03);
+		LOGMASKED(LOG_SETTING, "(RS232/%d) Send parity config %02x\n", uartind+1, value&0x03);
 		bufctrl[1] |= tms9902_device::PARITY;
 		bufctrl[2] = (value & 0x03);
 		break;
 	default:
-		logerror("(RS232/%d) Error - unknown config type %02x\n", uartind+1, type);
+		LOGMASKED(LOG_WARN, "(RS232/%d) Error - unknown config type %02x\n", uartind+1, type);
 	}
 
 	serial->fwrite(bufctrl, bufctrl[0]+1);
@@ -877,18 +879,23 @@ void ti_rs232_pio_device::configure_interface(int uartind, int type, int value)
 
 void ti_rs232_pio_device::set_bit(int uartind, int line, int value)
 {
-	if (TRACE_LINES)
+	switch (line)
 	{
-		switch (line)
-		{
-		case tms9902_device::CTS: logerror("(RS232/%d) Set CTS(out)=%s\n", uartind+1, (value!=0)? "asserted" : "cleared"); break;
-		case tms9902_device::DCD: logerror("(RS232/%d) Set DCD(out)=%s\n", uartind+1, (value!=0)? "asserted" : "cleared"); break;
-		case tms9902_device::BRK: logerror("(RS232/%d) Set BRK(out)=%s\n", uartind+1, (value!=0)? "asserted" : "cleared"); break;
-		}
+	case tms9902_device::CTS:
+		LOGMASKED(LOG_LINES, "(RS232/%d) Set CTS(out)=%s\n", uartind+1, (value!=0)? "asserted" : "cleared");
+		break;
+	case tms9902_device::DCD:
+		LOGMASKED(LOG_LINES, "(RS232/%d) Set DCD(out)=%s\n", uartind+1, (value!=0)? "asserted" : "cleared");
+		break;
+	case tms9902_device::BRK:
+		LOGMASKED(LOG_LINES, "(RS232/%d) Set BRK(out)=%s\n", uartind+1, (value!=0)? "asserted" : "cleared");
+		break;
 	}
 
-	if (value!=0)   m_signals[uartind] |= line;
-	else            m_signals[uartind] &= ~line;
+	if (value!=0)
+		m_signals[uartind] |= line;
+	else
+		m_signals[uartind] &= ~line;
 }
 
 /*
@@ -904,7 +911,7 @@ void ti_rs232_pio_device::output_exception(int uartind, int param, uint8_t value
 
 	if (!serial->exists())
 	{
-		logerror("(RS232/%d) No serial output attached\n", uartind+1);
+		LOGMASKED(LOG_CONFIG, "(RS232/%d) No serial output attached\n", uartind+1);
 		return;
 	}
 
@@ -930,7 +937,7 @@ void ti_rs232_pio_device::output_line_state(int uartind, int mask, uint8_t value
 
 	if (!serial->exists())
 	{
-		logerror("(RS232/%d) No serial output attached\n", uartind+1);
+		LOGMASKED(LOG_CONFIG, "(RS232/%d) No serial output attached\n", uartind+1);
 		return;
 	}
 
@@ -1155,15 +1162,15 @@ MACHINE_CONFIG_START(ti_rs232_pio_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("serdev1", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("piodev", TI99_PIO_DEV, 0)
 
-	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U12
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, selected_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_direction_in_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_handshake_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_spareout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, flag0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, cts0_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, cts1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, led_w))
+	LS259(config, m_crulatch); // U12
+	m_crulatch->q_out_cb<0>().set(FUNC(ti_rs232_pio_device::selected_w));
+	m_crulatch->q_out_cb<1>().set(FUNC(ti_rs232_pio_device::pio_direction_in_w));
+	m_crulatch->q_out_cb<2>().set(FUNC(ti_rs232_pio_device::pio_handshake_out_w));
+	m_crulatch->q_out_cb<3>().set(FUNC(ti_rs232_pio_device::pio_spareout_w));
+	m_crulatch->q_out_cb<4>().set(FUNC(ti_rs232_pio_device::flag0_w));
+	m_crulatch->q_out_cb<5>().set(FUNC(ti_rs232_pio_device::cts0_w));
+	m_crulatch->q_out_cb<6>().set(FUNC(ti_rs232_pio_device::cts1_w));
+	m_crulatch->q_out_cb<7>().set(FUNC(ti_rs232_pio_device::led_w));
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_rs232_pio_device::device_rom_region() const

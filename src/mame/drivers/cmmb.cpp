@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(cmmb_state::cmmb)
 	MCFG_DEVICE_PROGRAM_MAP(cmmb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
 
-	MCFG_AT29C020_ADD("at29c020")
+	AT29C020(config, "at29c020");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

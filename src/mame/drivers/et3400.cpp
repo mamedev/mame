@@ -228,26 +228,25 @@ MACHINE_CONFIG_START(et3400_state::et3400)
 	config.set_default_layout(layout_et3400);
 
 	// Devices
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, et3400_state, pia_aw))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, et3400_state, pia_bw))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, et3400_state, pia_ar))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, et3400_state, pia_br))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(et3400_state::pia_aw));
+	m_pia->writepb_handler().set(FUNC(et3400_state::pia_bw));
+	m_pia->readpa_handler().set(FUNC(et3400_state::pia_ar));
+	m_pia->readpb_handler().set(FUNC(et3400_state::pia_br));
+
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("displatch1", LS259, 0) // IC28
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<1>))
-	MCFG_DEVICE_ADD("displatch2", LS259, 0) // IC27
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<2>))
-	MCFG_DEVICE_ADD("displatch3", LS259, 0) // IC26
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<3>))
-	MCFG_DEVICE_ADD("displatch4", LS259, 0) // IC25
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<4>))
-	MCFG_DEVICE_ADD("displatch5", LS259, 0) // IC24
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<5>))
-	MCFG_DEVICE_ADD("displatch6", LS259, 0) // IC23
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<6>))
+	for (std::size_t i = 0; i < 6; i++)
+		LS259(config, m_displatch[i]);
+
+
+	m_displatch[0]->parallel_out_cb().set(FUNC(et3400_state::led_w<1>));
+	m_displatch[1]->parallel_out_cb().set(FUNC(et3400_state::led_w<2>));
+	m_displatch[2]->parallel_out_cb().set(FUNC(et3400_state::led_w<3>));
+	m_displatch[3]->parallel_out_cb().set(FUNC(et3400_state::led_w<4>));
+	m_displatch[4]->parallel_out_cb().set(FUNC(et3400_state::led_w<5>));
+	m_displatch[5]->parallel_out_cb().set(FUNC(et3400_state::led_w<6>));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

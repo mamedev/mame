@@ -1481,17 +1481,17 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppic_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppic_w))
 
-	MCFG_DEVICE_ADD("7a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc7a_w))
+	TTL7474(config, m_7a, 0);
+	m_7a->comp_output_cb().set(FUNC(inder_state::qc7a_w));
 
-	MCFG_DEVICE_ADD("9a", TTL7474, 0) // HCT74
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, inder_state, q9a_w))
+	TTL7474(config, m_9a, 0); // HCT74
+	m_9a->output_cb().set(FUNC(inder_state::q9a_w));
 
-	MCFG_DEVICE_ADD("9b", TTL7474, 0) // HCT74
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc9b_w))
+	TTL7474(config, m_9b, 0); // HCT74
+	m_9b->comp_output_cb().set(FUNC(inder_state::qc9b_w));
 
-	MCFG_DEVICE_ADD("13", HCT157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	HCT157(config, m_13, 0);
+	m_13->out_callback().set("msm", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 

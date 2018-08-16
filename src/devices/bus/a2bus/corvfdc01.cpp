@@ -159,16 +159,16 @@ uint8_t a2bus_corvfdc01_device::read_c0nx(uint8_t offset)
 			return m_fdc_local_status | LS_8IN_mask;
 
 		case  8:    // WD1793 at 8-11
-			return m_wdfdc->read_status();
+			return m_wdfdc->status_r();
 
 		case  9:
-			return m_wdfdc->read_track();
+			return m_wdfdc->track_r();
 
 		case 10:
-			return m_wdfdc->read_sector();
+			return m_wdfdc->sector_r();
 
 		case 11:
-			return m_wdfdc->read_data();
+			return m_wdfdc->data_r();
 	}
 
 	return 0xff;
@@ -226,19 +226,19 @@ void a2bus_corvfdc01_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
 
 		case  8:    // FDC COMMAMD REG
-			m_wdfdc->write_cmd(data);
+			m_wdfdc->cmd_w(data);
 			break;
 
 		case  9:    // FDC TRACK REG
-			m_wdfdc->write_track(data);
+			m_wdfdc->track_w(data);
 			break;
 
 		case 10:    // FDC SECTOR REG
-			m_wdfdc->write_sector(data);
+			m_wdfdc->sector_w(data);
 			break;
 
 		case 11:    // FDC DATA REG
-			m_wdfdc->write_data(data);
+			m_wdfdc->data_w(data);
 			break;
 	}
 }

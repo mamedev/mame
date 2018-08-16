@@ -45,7 +45,7 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER( host_w ) override;
 
 private:
-	required_device<cpu_device> m_z80;
+	required_device<z80_device> m_z80;
 	required_device<via6522_device> m_via;
 	required_device<i8255_device> m_ppi;
 	required_device<ram_device> m_ram;

@@ -19,10 +19,10 @@
 	EF  H
 
 	(16-bit mode operations)
-    E8  invalid
-	E9  invalid
-	EA  invalid
-	EB  invalid
+    E8  WA
+	E9  BC
+	EA  DE
+	EB  HL
 	EC  WA
 	ED  BC
 	EE  DE
@@ -333,7 +333,7 @@ void tlcs870_device::do_ALUOP_A_g(const uint8_t opbyte0, const uint8_t opbyte1)
 
 	const int aluop = (opbyte1 & 0x7);
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), get_reg8(opbyte0 & 0x7));
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), get_reg8(opbyte0 & 0x7));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -357,7 +357,7 @@ void tlcs870_device::do_ALUOP_g_A(const uint8_t opbyte0, const uint8_t opbyte1)
 	m_cycles = 3;
 
 	const int aluop = (opbyte1 & 0x7);
-	const uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), get_reg8(REG_A));
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(opbyte0 & 0x7), get_reg8(REG_A));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -384,7 +384,7 @@ void tlcs870_device::do_ALUOP_g_n(const uint8_t opbyte0, const uint8_t opbyte1)
 
 	const uint8_t n = READ8();
 
-	const uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), n);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(opbyte0 & 0x7), n);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -413,7 +413,7 @@ void tlcs870_device::do_ALUOP_WA_gg(const uint8_t opbyte0, const uint8_t opbyte1
 
 	const int aluop = (opbyte1 & 0x7);
 
-	const uint16_t result = do_alu(aluop, get_reg16(REG_WA), get_reg16(opbyte0 & 0x3));
+	const uint16_t result = do_alu_16bit(aluop, get_reg16(REG_WA), get_reg16(opbyte0 & 0x3));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -441,7 +441,7 @@ void tlcs870_device::do_ALUOP_gg_mn(const uint8_t opbyte0, const uint8_t opbyte1
 
 	const uint16_t mn = READ16();
 
-	const uint16_t result = do_alu(aluop, get_reg16(opbyte0 & 0x3), mn);
+	const uint16_t result = do_alu_16bit(aluop, get_reg16(opbyte0 & 0x3), mn);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -497,6 +497,7 @@ void tlcs870_device::do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1
 	const uint8_t bitpos = get_reg8(opbyte0 & 7) & 0x7;
 	const uint8_t bitused = 1 << bitpos;
 	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(addr);
 
 	if (val & bitused) // Zero flag gets set based on original value of bit?
@@ -527,6 +528,7 @@ void tlcs870_device::do_CPL_inpp_indirectbit(const uint8_t opbyte0, const uint8_
 	const uint8_t bitpos = get_reg8(opbyte0 & 7) & 0x7;
 	const uint8_t bitused = 1 << bitpos;
 	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(addr);
 
 	uint8_t bit = val & bitused;

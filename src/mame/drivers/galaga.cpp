@@ -1604,8 +1604,9 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
-	MCFG_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/6/2) /* 1.536 MHz */
-	MCFG_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/6/2) /* 1.536 MHz */
+	NAMCO_50XX(config, "50xx_1", MASTER_CLOCK/6/2); /* 1.536 MHz */
+	NAMCO_50XX(config, "50xx_2", MASTER_CLOCK/6/2); /* 1.536 MHz */
+
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_SCREEN("screen")
 	MCFG_NAMCO_51XX_INPUT_0_CB(IOPORT("IN0L"))
@@ -1779,8 +1780,8 @@ MACHINE_CONFIG_START(galaga_state::gatsbee)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gatsbee_main_map)
 
-	MCFG_DEVICE_ADD("extralatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, gatsbee_bank_w))
+	ls259_device &extralatch(LS259(config, "extralatch"));
+	extralatch.q_out_cb<0>().set(FUNC(galaga_state::gatsbee_bank_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xevious_state::xevious)
@@ -1802,7 +1803,7 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
-	MCFG_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/6/2)   /* 1.536 MHz */
+	NAMCO_50XX(config, "50xx", MASTER_CLOCK/6/2);   /* 1.536 MHz */
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_SCREEN("screen")

@@ -29,6 +29,19 @@
 #include "emu.h"
 #include "qsoundhle.h"
 
+#include <algorithm>
+#include <limits>
+
+
+namespace {
+
+constexpr u32 saturate(s64 val)
+{
+	return std::min<s64>(std::max<s64>(val, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
+}
+
+} // anonymous namespace
+
 // device type definition
 DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")
 
@@ -41,7 +54,7 @@ DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")
 //  qsound_hle_device - constructor
 //-------------------------------------------------
 
-qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 24)
@@ -124,14 +137,14 @@ void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_
 			offs_t const addr(ch.reg[1] | (bank << 16));
 
 			// update based on playback rate
-			uint32_t updated(uint32_t(ch.reg[2] << 4) + ((uint32_t(ch.reg[1]) << 16) | ch.reg[3]));
-			ch.reg[3] = uint16_t(updated);
-			if (updated >= (uint32_t(ch.reg[5]) << 16))
-				updated -= uint32_t(ch.reg[4]) << 16;
-			ch.reg[1] = uint16_t(updated >> 16);
+			s64 updated(s32(u32(ch.reg[2]) << 4) + s32((u32(ch.reg[1]) << 16) | ch.reg[3]));
+			ch.reg[3] = u16(saturate(updated));
+			if (updated >= s32(u32(ch.reg[5]) << 16))
+				updated -= s32(u32(ch.reg[4]) << 16);
+			ch.reg[1] = u16(saturate(updated) >> 16);
 
 			// get the scaled sample
-			int32_t const scaled(int32_t(int16_t(ch.reg[6])) * read_sample(addr));
+			s32 const scaled(s32(s16(ch.reg[6])) * read_sample(addr));
 
 			// apply simple panning
 			*lmix++ += (((scaled >> 8) * ch.lvol) >> 14);
@@ -172,7 +185,7 @@ READ8_MEMBER(qsound_hle_device::qsound_r)
 }
 
 
-void qsound_hle_device::write_data(uint8_t address, uint16_t data)
+void qsound_hle_device::write_data(u8 address, u16 data)
 {
 	int ch = 0, reg;
 

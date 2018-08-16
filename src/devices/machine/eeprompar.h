@@ -108,7 +108,7 @@ private:
 class eeprom_parallel_##_lowercase##_device : public eeprom_parallel_##_baseclass##_device \
 { \
 public: \
-	eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
+	eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_PARALLEL_##_uppercase, eeprom_parallel_##_lowercase##_device)
 

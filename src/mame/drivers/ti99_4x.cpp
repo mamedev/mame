@@ -58,9 +58,17 @@
 #include "speaker.h"
 
 // Debugging
-#define TRACE_READY 0
-#define TRACE_INTERRUPTS 0
-#define TRACE_CRU 0
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_READY       (1U<<3)
+#define LOG_INTERRUPTS  (1U<<4)
+#define LOG_CRU         (1U<<5)
+#define LOG_CRUREAD     (1U<<6)
+#define LOG_RESETLOAD   (1U<<7)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
+
+#include "logmacro.h"
 
 /*
     The console.
@@ -159,7 +167,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt_evpc_in );
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void cru_map(address_map &map);
+	void crumap(address_map &map);
 	void memmap(address_map &map);
 	void memmap_setoffset(address_map &map);
 
@@ -260,7 +268,7 @@ void ti99_4x_state::memmap_setoffset(address_map &map)
 
     Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
-void ti99_4x_state::cru_map(address_map &map)
+void ti99_4x_state::crumap(address_map &map)
 {
 	map(0x0000, 0x01ff).r(FUNC(ti99_4x_state::cruread));
 	map(0x0000, 0x0003).mirror(0x003c).r(m_tms9901, FUNC(tms9901_device::read));
@@ -418,7 +426,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( ti99_4x_state::cruread )
 {
-//  if (TRACE_CRU) logerror("read access to CRU address %04x\n", offset << 4);
+	LOGMASKED(LOG_CRUREAD, "read access to CRU address %04x\n", offset << 4);
 	uint8_t value = 0;
 
 	// Let the gromport (not in the QI version) and the p-box behind the I/O port
@@ -433,7 +441,7 @@ READ8_MEMBER( ti99_4x_state::cruread )
 
 WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
-	if (TRACE_CRU) logerror("ti99_4x: write access to CRU address %04x\n", offset << 1);
+	LOGMASKED(LOG_CRU, "Write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
 	if (m_model != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
 	m_ioport->cruwrite(space, offset<<1, data);
@@ -445,9 +453,7 @@ WRITE8_MEMBER( ti99_4x_state::external_operation )
 	// Some games (e.g. Slymoids) actually use IDLE for synchronization
 	if (offset == IDLE_OP) return;
 	else
-	{
-		logerror("ti99_4x: External operation %s not implemented on TI-99 board\n", extop[offset]);
-	}
+		LOGMASKED(LOG_WARN, "External operation %s not implemented on TI-99 board\n", extop[offset]);
 }
 
 /***************************************************************************
@@ -700,7 +706,7 @@ void ti99_4x_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_evpc_in )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: VDP INT2 from EVPC on tms9901, level=%d\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 from EVPC on tms9901, level=%d\n", state);
 	m_int2 = (line_state)state;
 	m_tms9901->set_single_int(2, state);
 }
@@ -710,7 +716,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_evpc_in )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_in )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: VDP INT2 on tms9901, level=%d\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 on tms9901, level=%d\n", state);
 
 	// Pulse for the handset
 	if (m_model == MODEL_4) m_joyport->pulse_clock();
@@ -724,7 +730,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_in )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::handset_interrupt_in)
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: joyport INT12 on tms9901, level=%d\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "joyport INT12 on tms9901, level=%d\n", state);
 	m_int12 = (line_state)state;
 	m_tms9901->set_single_int(12, state);
 }
@@ -735,7 +741,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::handset_interrupt_in)
 */
 INPUT_CHANGED_MEMBER( ti99_4x_state::load_interrupt )
 {
-	logerror("ti99_4x: LOAD interrupt, level=%d\n", newval);
+	LOGMASKED(LOG_RESETLOAD, "LOAD interrupt, level=%d\n", newval);
 	m_cpu->set_input_line(INT_9900_LOAD, (newval==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -755,10 +761,8 @@ void ti99_4x_state::console_ready_join(int id, int state)
 	else
 		m_nready_combined &= ~id;
 
-	if (TRACE_READY)
-	{
-		if (m_nready_prev != m_nready_combined) logerror("ti99_4x: READY bits = %04x\n", ~m_nready_combined);
-	}
+	if (m_nready_prev != m_nready_combined)
+		LOGMASKED(LOG_READY, "READY bits = %04x\n", ~m_nready_combined);
 
 	m_nready_prev = m_nready_combined;
 	m_cpu->set_ready(m_nready_combined==0);
@@ -770,7 +774,7 @@ void ti99_4x_state::console_ready_join(int id, int state)
 */
 WRITE_LINE_MEMBER( ti99_4x_state::console_ready_grom )
 {
-	if (TRACE_READY) logerror("GROM ready = %d\n", state);
+	LOGMASKED(LOG_READY, "GROM ready = %d\n", state);
 	console_ready_join(READY_GROM, state);
 }
 
@@ -802,7 +806,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 {
 	if (machine().phase() != machine_phase::INIT)
 	{
-		logerror("ti99_4x: Console reset line = %d\n", state);
+		LOGMASKED(LOG_RESETLOAD, "Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);
 		m_video->reset_line(state);
 	}
@@ -810,14 +814,14 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 
 WRITE_LINE_MEMBER( ti99_4x_state::extint )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: EXTINT level = %02x\n", state);
+	LOGMASKED(LOG_INTERRUPTS, "EXTINT level = %02x\n", state);
 	m_int1 = (line_state)state;
 	m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 {
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: Setting a not connected line ... ignored\n");
+	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
 
 void ti99_4x_state::register_save_state()
@@ -858,35 +862,38 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
 
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	// CPU
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
-	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
-	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
+	TMS9900(config, m_cpu, 3000000);
+	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4x_state::memmap);
+	m_cpu->set_addrmap(AS_IO, &ti99_4x_state::crumap);
+	m_cpu->set_addrmap(tms99xx_device::AS_SETOFFSET, &ti99_4x_state::memmap_setoffset);
+	m_cpu->extop_cb().set(FUNC(ti99_4x_state::external_operation));
+	m_cpu->intlevel_cb().set(FUNC(ti99_4x_state::interrupt_level));
+	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
+	m_cpu->dbin_cb().set(FUNC(ti99_4x_state::dbin_line));
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4 )
 
 	// Main board
-	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_4x_state, read_by_9901) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, ti99_4x_state, handset_ack) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_4x_state, keyC0) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_4x_state, keyC1) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, ti99_4x_state, keyC2) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_4x_state, cs1_motor) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, ti99_4x_state, cs2_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_4x_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_4x_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4x_state, tms9901_interrupt) )
+	TMS9901(config, m_tms9901, 3000000);
+	m_tms9901->read_cb().set(FUNC(ti99_4x_state::read_by_9901));
+	m_tms9901->p_out_cb(0).set(FUNC(ti99_4x_state::handset_ack));
+	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
+	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));
+	m_tms9901->p_out_cb(4).set(FUNC(ti99_4x_state::keyC2));
+	m_tms9901->p_out_cb(6).set(FUNC(ti99_4x_state::cs1_motor));
+	m_tms9901->p_out_cb(7).set(FUNC(ti99_4x_state::cs2_motor));
+	m_tms9901->p_out_cb(8).set(FUNC(ti99_4x_state::audio_gate));
+	m_tms9901->p_out_cb(9).set(FUNC(ti99_4x_state::cassette_output));
+	m_tms9901->intlevel_cb().set(FUNC(ti99_4x_state::tms9901_interrupt));
 
-	MCFG_DEVICE_ADD( TI99_DATAMUX_TAG, TI99_DATAMUX, 0)
-	MCFG_DMUX_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_dmux) )
+	TI99_DATAMUX(config, m_datamux, 0);
+	m_datamux->ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
 
-	MCFG_GROMPORT4_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_cart) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_4x_state, console_reset) )
+	TI99_GROMPORT(config, m_gromport, 0);
+	m_gromport->ready_cb().set(FUNC(ti99_4x_state::console_ready_cart));
+	m_gromport->reset_cb().set(FUNC(ti99_4x_state::console_reset));
+	m_gromport->configure_slot(false);
 
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -902,9 +909,10 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// Input/output port
-	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_4x_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
+	TI99_IOPORT(config, m_ioport, 0);
+	m_ioport->configure_slot(false);
+	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
+	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
@@ -925,8 +933,9 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
 
 	// Joystick port
-	MCFG_TI_JOYPORT4_ADD( TI_JOYPORT_TAG )
-	MCFG_JOYPORT_INT_HANDLER( WRITELINE(*this, ti99_4x_state, handset_interrupt_in) )
+	TI99_JOYPORT(config, m_joyport, 0);
+	m_joyport->configure_slot(true, true);
+	m_joyport->int_cb().set(FUNC(ti99_4x_state::handset_interrupt_in));
 MACHINE_CONFIG_END
 
 /*
@@ -977,35 +986,38 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	// CPU
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
-	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
-	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
+	TMS9900(config, m_cpu, 3000000);
+	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4x_state::memmap);
+	m_cpu->set_addrmap(AS_IO, &ti99_4x_state::crumap);
+	m_cpu->set_addrmap(tms99xx_device::AS_SETOFFSET, &ti99_4x_state::memmap_setoffset);
+	m_cpu->extop_cb().set(FUNC(ti99_4x_state::external_operation));
+	m_cpu->intlevel_cb().set(FUNC(ti99_4x_state::interrupt_level));
+	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
+	m_cpu->dbin_cb().set(FUNC(ti99_4x_state::dbin_line));
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4a )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4a )
 
 	// Main board
-	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_4x_state, read_by_9901) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_4x_state, keyC0) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_4x_state, keyC1) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, ti99_4x_state, keyC2) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( *this, ti99_4x_state, alphaW) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_4x_state, cs1_motor) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, ti99_4x_state, cs2_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_4x_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_4x_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4x_state, tms9901_interrupt) )
+	TMS9901(config, m_tms9901, 3000000);
+	m_tms9901->read_cb().set(FUNC(ti99_4x_state::read_by_9901));
+	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
+	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));
+	m_tms9901->p_out_cb(4).set(FUNC(ti99_4x_state::keyC2));
+	m_tms9901->p_out_cb(5).set(FUNC(ti99_4x_state::alphaW));
+	m_tms9901->p_out_cb(6).set(FUNC(ti99_4x_state::cs1_motor));
+	m_tms9901->p_out_cb(7).set(FUNC(ti99_4x_state::cs2_motor));
+	m_tms9901->p_out_cb(8).set(FUNC(ti99_4x_state::audio_gate));
+	m_tms9901->p_out_cb(9).set(FUNC(ti99_4x_state::cassette_output));
+	m_tms9901->intlevel_cb().set(FUNC(ti99_4x_state::tms9901_interrupt));
 
-	MCFG_DEVICE_ADD( TI99_DATAMUX_TAG, TI99_DATAMUX, 0)
-	MCFG_DMUX_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_dmux) )
+	TI99_DATAMUX(config, m_datamux, 0);
+	m_datamux->ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
 
-	MCFG_GROMPORT4_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_cart) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_4x_state, console_reset) )
+	TI99_GROMPORT(config, m_gromport, 0);
+	m_gromport->ready_cb().set(FUNC(ti99_4x_state::console_ready_cart));
+	m_gromport->reset_cb().set(FUNC(ti99_4x_state::console_reset));
+	m_gromport->configure_slot(false);
 
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -1021,9 +1033,10 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// Input/output port
-	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_4x_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
+	TI99_IOPORT(config, m_ioport, 0);
+	m_ioport->configure_slot(false);
+	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
+	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
@@ -1044,7 +1057,9 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
+	TI99_JOYPORT(config, m_joyport, 0);
+	m_joyport->configure_slot(true, false);
+
 MACHINE_CONFIG_END
 
 /*
@@ -1138,34 +1153,38 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	// CPU
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
-	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
-	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
+	TMS9900(config, m_cpu, 3000000);
+	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4x_state::memmap);
+	m_cpu->set_addrmap(AS_IO, &ti99_4x_state::crumap);
+	m_cpu->set_addrmap(tms99xx_device::AS_SETOFFSET, &ti99_4x_state::memmap_setoffset);
+	m_cpu->extop_cb().set(FUNC(ti99_4x_state::external_operation));
+	m_cpu->intlevel_cb().set(FUNC(ti99_4x_state::interrupt_level));
+	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
+	m_cpu->dbin_cb().set(FUNC(ti99_4x_state::dbin_line));
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4ev )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4ev )
 
 	// Main board
-	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_4x_state, read_by_9901) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_4x_state, keyC0) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_4x_state, keyC1) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, ti99_4x_state, keyC2) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( *this, ti99_4x_state, alphaW) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_4x_state, cs1_motor) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, ti99_4x_state, cs2_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_4x_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_4x_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4x_state, tms9901_interrupt) )
+	TMS9901(config, m_tms9901, 3000000);
+	m_tms9901->read_cb().set(FUNC(ti99_4x_state::read_by_9901));
+	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
+	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));
+	m_tms9901->p_out_cb(4).set(FUNC(ti99_4x_state::keyC2));
+	m_tms9901->p_out_cb(5).set(FUNC(ti99_4x_state::alphaW));
+	m_tms9901->p_out_cb(6).set(FUNC(ti99_4x_state::cs1_motor));
+	m_tms9901->p_out_cb(7).set(FUNC(ti99_4x_state::cs2_motor));
+	m_tms9901->p_out_cb(8).set(FUNC(ti99_4x_state::audio_gate));
+	m_tms9901->p_out_cb(9).set(FUNC(ti99_4x_state::cassette_output));
+	m_tms9901->intlevel_cb().set(FUNC(ti99_4x_state::tms9901_interrupt));
 
-	MCFG_DEVICE_ADD( TI99_DATAMUX_TAG, TI99_DATAMUX, 0)
-	MCFG_DMUX_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_dmux) )
-	MCFG_GROMPORT4_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_cart) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_4x_state, console_reset) )
+	TI99_DATAMUX(config, m_datamux, 0);
+	m_datamux->ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
+
+	TI99_GROMPORT(config, m_gromport, 0);
+	m_gromport->ready_cb().set(FUNC(ti99_4x_state::console_ready_cart));
+	m_gromport->reset_cb().set(FUNC(ti99_4x_state::console_reset));
+	m_gromport->configure_slot(false);
 
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -1184,9 +1203,10 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// Input/output port
-	MCFG_IOPORT_ADD_WITH_PEB( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_4x_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
+	TI99_IOPORT(config, m_ioport, 0);
+	m_ioport->configure_slot(true);
+	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
+	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();
@@ -1201,7 +1221,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
+	TI99_JOYPORT(config, m_joyport, 0);
+	m_joyport->configure_slot(false, false);
 
 MACHINE_CONFIG_END
 

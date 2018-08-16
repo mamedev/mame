@@ -46,13 +46,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc"),
 		m_via(*this, "via"),
-		m_uart0(*this, "uart0"),
-		m_uart1(*this, "uart1"),
-		m_uart2(*this, "uart2"),
-		m_uart3(*this, "uart3"),
-		m_uart4(*this, "uart4"),
-		m_uart5(*this, "uart5"),
-		m_uart6(*this, "uart6"),
+		m_uart(*this, "uart%u", 0U),
 		m_videocpu(*this, "videocpu"),
 		m_videoctrl(*this, "videoctrl"),
 		m_videoirq(*this, "videoirq"),
@@ -111,13 +105,7 @@ private:
 	required_device<m68000_device> m_maincpu;
 	required_device<mm58274c_device> m_rtc;
 	required_device<via6522_device> m_via;
-	required_device<mc2661_device> m_uart0;
-	required_device<mc2661_device> m_uart1;
-	required_device<mc2661_device> m_uart2;
-	required_device<mc2661_device> m_uart3;
-	required_device<mc2661_device> m_uart4;
-	required_device<mc2661_device> m_uart5;
-	required_device<mc2661_device> m_uart6;
+	required_device_array<mc2661_device, 7> m_uart;
 	required_device<cpu_device> m_videocpu;
 	required_device<ls259_device> m_videoctrl;
 	required_device<input_merger_device> m_videoirq;
@@ -134,11 +122,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void wicat_mem(address_map &map);
-	void wicat_video_io(address_map &map);
-	void wicat_video_mem(address_map &map);
-	void wicat_wd1000_io(address_map &map);
-	void wicat_wd1000_mem(address_map &map);
+	void main_mem(address_map &map);
+	void video_io(address_map &map);
+	void video_mem(address_map &map);
+	void wd1000_io(address_map &map);
+	void wd1000_mem(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -161,7 +149,7 @@ private:
 };
 
 
-void wicat_state::wicat_mem(address_map &map)
+void wicat_state::main_mem(address_map &map)
 {
 	map.unmap_value_low();
 	map.global_mask(0xffffff);
@@ -171,13 +159,13 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
 	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
-	map(0xf00000, 0xf00007).rw(m_uart0, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
-	map(0xf00008, 0xf0000f).rw(m_uart1, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00010, 0xf00017).rw(m_uart2, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00018, 0xf0001f).rw(m_uart3, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00020, 0xf00027).rw(m_uart4, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00028, 0xf0002f).rw(m_uart5, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00030, 0xf00037).rw(m_uart6, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00000, 0xf00007).rw(m_uart[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
+	map(0xf00008, 0xf0000f).rw(m_uart[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00010, 0xf00017).rw(m_uart[2], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00018, 0xf0001f).rw(m_uart[3], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00020, 0xf00027).rw(m_uart[4], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00028, 0xf0002f).rw(m_uart[5], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00030, 0xf00037).rw(m_uart[6], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00040, 0xf0005f).rw(FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
 	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
@@ -186,13 +174,13 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0xf00f00, 0xf00fff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 }
 
-void wicat_state::wicat_video_mem(address_map &map)
+void wicat_state::video_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("g1", 0x0000);
 	map(0x8000, 0xffff).ram();
 }
 
-void wicat_state::wicat_video_io(address_map &map)
+void wicat_state::video_io(address_map &map)
 {
 	// these are largely wild guesses...
 	map(0x0000, 0x0003).rw(FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
@@ -211,13 +199,13 @@ void wicat_state::wicat_video_io(address_map &map)
 	map(0x9000, 0x9fff).rom().region("g2char", 0x0000);
 }
 
-void wicat_state::wicat_wd1000_mem(address_map &map)
+void wicat_state::wd1000_mem(address_map &map)
 {
 	map(0x0000, 0x17ff).rom().region("wd3", 0x0000);
 	map(0x1800, 0x1fff).noprw();
 }
 
-void wicat_state::wicat_wd1000_io(address_map &map)
+void wicat_state::wd1000_io(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();  // left bank  - RAM
 	map(0x0100, 0x01ff).ram();  // right bank - I/O ports (TODO)
@@ -309,12 +297,8 @@ void wicat_state::machine_reset()
 	// on the terminal board /DCD on both INS2651s are tied to GND
 	m_videouart0->dcd_w(0);
 	m_videouart1->dcd_w(0);
-	m_uart0->dcd_w(0);
-	m_uart1->dcd_w(0);
-	m_uart2->dcd_w(0);
-	m_uart3->dcd_w(0);
-	m_uart4->dcd_w(0);
-	m_uart5->dcd_w(0);
+	for (int i = 0; i < 6; i++)
+		m_uart[i]->dcd_w(0);
 
 	// initialise im6402 (terminal board)
 	m_videouart->cls1_w(1);
@@ -505,16 +489,16 @@ READ8_MEMBER(wicat_state::fdc_r)
 	switch(offset)
 	{
 	case 0x00:
-		ret = m_fdc->status_r(space,0);
+		ret = m_fdc->status_r();
 		break;
 	case 0x01:
-		ret = m_fdc->track_r(space,0);
+		ret = m_fdc->track_r();
 		break;
 	case 0x02:
-		ret = m_fdc->sector_r(space,0);
+		ret = m_fdc->sector_r();
 		break;
 	case 0x03:
-		ret = m_fdc->data_r(space,0);
+		ret = m_fdc->data_r();
 		break;
 	case 0x08:
 		// Interrupt status (TODO, not part of the FD1795)
@@ -529,16 +513,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_fdc->cmd_w(space,0,data);
+		m_fdc->cmd_w(data);
 		break;
 	case 0x01:
-		m_fdc->track_w(space,0,data);
+		m_fdc->track_w(data);
 		break;
 	case 0x02:
-		m_fdc->sector_w(space,0,data);
+		m_fdc->sector_w(data);
 		break;
 	case 0x03:
-		m_fdc->data_w(space,0,data);
+		m_fdc->data_w(data);
 		break;
 	case 0x08:
 		// Interrupt disable / Drive select (TODO, not part of the FD1795)
@@ -549,16 +533,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 READ16_MEMBER(wicat_state::via_r)
 {
 	if(ACCESSING_BITS_0_7)
-		return m_via->read(space,offset);
+		return m_via->read(offset);
 	return 0x00;
 }
 
 WRITE16_MEMBER(wicat_state::via_w)
 {
 	if(ACCESSING_BITS_0_7)
-		m_via->write(space,offset,data);
+		m_via->write(offset,data);
 	else if(ACCESSING_BITS_8_15)
-		m_via->write(space,offset,data>>8);
+		m_via->write(offset,data>>8);
 }
 
 READ8_MEMBER(wicat_state::video_r)
@@ -736,96 +720,53 @@ I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 	}
 }
 
-MACHINE_CONFIG_START(wicat_state::wicat)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(wicat_mem)
+void wicat_state::wicat(machine_config &config)
+{
+	M68000(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wicat_state::main_mem);
 
-	MCFG_DEVICE_ADD("via", VIA6522, 8_MHz_XTAL)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, wicat_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, wicat_state, via_b_w))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
+	VIA6522(config, m_via, 8_MHz_XTAL);
+	m_via->writepa_handler().set(FUNC(wicat_state::via_a_w));
+	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
+	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD("rtc", MM58274C, 0)  // actually an MM58174AN, but should be compatible
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	MM58274C(config, m_rtc, 0);  // actually an MM58174AN, but should be compatible
+	m_rtc->set_mode24(0); // 12 hour
+	m_rtc->set_day1(1);   // monday
 
 	// internal terminal
-	MCFG_DEVICE_ADD("uart0", MC2661, 5.0688_MHz_XTAL)  // connected to terminal board
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("videouart0", mc2661_device, rx_w))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("videouart0", mc2661_device, cts_w))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("videouart0", mc2661_device, dsr_w))
+	MC2661(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
+	m_uart[0]->txd_handler().set(m_videouart0, FUNC(mc2661_device::rx_w));
+	m_uart[0]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_uart[0]->rts_handler().set(m_videouart0, FUNC(mc2661_device::cts_w));
+	m_uart[0]->dtr_handler().set(m_videouart0, FUNC(mc2661_device::dsr_w));
 
 	// RS232C ports (x5)
-	MCFG_DEVICE_ADD("uart1", MC2661, 5.0688_MHz_XTAL)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial1", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial1", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial1", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-
-	MCFG_DEVICE_ADD("uart2", MC2661, 5.0688_MHz_XTAL)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial2", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial2", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial2", rs232_port_device, write_dtr))
-
-	MCFG_DEVICE_ADD("uart3", MC2661, 5.0688_MHz_XTAL)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial3", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial3", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial3", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-
-	MCFG_DEVICE_ADD("uart4", MC2661, 5.0688_MHz_XTAL)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial4", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial4", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial4", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-
-	MCFG_DEVICE_ADD("uart5", MC2661, 5.0688_MHz_XTAL)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("serial5", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("serial5", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("serial5", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
+	const char *serial_names[5] = { "serial1", "serial2", "serial3", "serial4", "serial5" };
+	for (int i = 1; i <= 5; i++)
+	{
+		MC2661(config, m_uart[i], 5.0688_MHz_XTAL);
+		m_uart[i]->txd_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_txd));
+		m_uart[i]->rts_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_rts));
+		m_uart[i]->dtr_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_dtr));
+		m_uart[i]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+		m_uart[i]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	}
 
 	// modem
-	MCFG_DEVICE_ADD("uart6", MC2661, 5.0688_MHz_XTAL)  // connected to modem port
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
+	MC2661(config, m_uart[6], 5.0688_MHz_XTAL);  // connected to modem port
+	m_uart[6]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_uart[6]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 
-	MCFG_DEVICE_ADD("serial1",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart1",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1",mc2661_device,cts_w))
-
-	MCFG_DEVICE_ADD("serial2",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart2",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart2",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart2",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart2",mc2661_device,cts_w))
-
-	MCFG_DEVICE_ADD("serial3",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart3",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart3",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart3",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart3",mc2661_device,cts_w))
-
-	MCFG_DEVICE_ADD("serial4",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart4",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart4",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart4",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart4",mc2661_device,cts_w))
-
-	MCFG_DEVICE_ADD("serial5",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart5",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart5",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart5",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart5",mc2661_device,cts_w))
+	const char *uart_names[5] = { "uart1", "uart2", "uart3", "uart4", "uart5" };
+	for (int i = 1; i <= 5; i++)
+	{
+		rs232_port_device &port(RS232_PORT(config, serial_names[i - 1], default_rs232_devices, nullptr));
+		port.rxd_handler().set(uart_names[i - 1], FUNC(mc2661_device::rx_w));
+		port.dcd_handler().set(uart_names[i - 1], FUNC(mc2661_device::dcd_w));
+		port.dsr_handler().set(uart_names[i - 1], FUNC(mc2661_device::dsr_w));
+		port.cts_handler().set(uart_names[i - 1], FUNC(mc2661_device::cts_w));
+	}
 
 	ls259_device &ledlatch(LS259(config, "ledlatch")); // U19 on I/O board
 	ledlatch.q_out_cb<0>().set(FUNC(wicat_state::adir_w));
@@ -838,9 +779,9 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	ledlatch.q_out_cb<7>().set_output("led6").invert();
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("videocpu", Z8002, 8_MHz_XTAL/2)  // AMD AMZ8002DC
-	MCFG_DEVICE_PROGRAM_MAP(wicat_video_mem)
-	MCFG_DEVICE_IO_MAP(wicat_video_io)
+	Z8002(config, m_videocpu, 8_MHz_XTAL/2);  // AMD AMZ8002DC
+	m_videocpu->set_addrmap(AS_PROGRAM, &wicat_state::video_mem);
+	m_videocpu->set_addrmap(AS_IO, &wicat_state::video_io);
 
 	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
 
@@ -859,58 +800,58 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 
 	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
 
-	MCFG_IM6402_ADD("videouart", 0, 1200)
-	MCFG_IM6402_DR_CALLBACK(WRITELINE("videoirq", input_merger_device, in_w<2>))
-	MCFG_IM6402_TBRE_CALLBACK(WRITELINE("tbreirq", input_merger_device, in_w<0>))
+	IM6402(config, m_videouart, 0);
+	m_videouart->set_rrc(0);
+	m_videouart->set_trc(1200);
+	m_videouart->dr_callback().set(m_videoirq, FUNC(input_merger_device::in_w<2>));
+	m_videouart->tbre_callback().set("tbreirq", FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ALL_HIGH(config, "tbreirq").output_handler().set(m_videoirq, FUNC(input_merger_device::in_w<3>));
 
 	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
-	MCFG_DEVICE_ADD("videouart0", MC2661, 5.0688_MHz_XTAL)  // the INS2651 looks similar enough to the MC2661...
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("uart0", mc2661_device, rx_w))
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<0>))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("uart0", mc2661_device, cts_w))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("uart0", mc2661_device, dsr_w))
+	MC2661(config, m_videouart0, 5.0688_MHz_XTAL);  // the INS2651 looks similar enough to the MC2661...
+	m_videouart0->txd_handler().set(m_uart[0], FUNC(mc2661_device::rx_w));
+	m_videouart0->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<0>));
+	m_videouart0->rts_handler().set(m_uart[0], FUNC(mc2661_device::cts_w));
+	m_videouart0->dtr_handler().set(m_uart[0], FUNC(mc2661_device::dsr_w));
 
-	MCFG_DEVICE_ADD("videouart1", MC2661, 5.0688_MHz_XTAL)
-	MCFG_MC2661_RXC(19200)
-	MCFG_MC2661_TXC(19200)
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<4>))
+	MC2661(config, m_videouart1, 5.0688_MHz_XTAL);
+	m_videouart1->set_rxc(19200);
+	m_videouart1->set_txc(19200);
+	m_videouart1->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<4>));
 
 	X2210(config, "vsram");  // XD2210
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300)
-	MCFG_SCREEN_UPDATE_DEVICE("video",i8275_device,screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300);
+	screen.set_screen_update("video", FUNC(i8275_device::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, 2);
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
-	MCFG_DEVICE_ADD("video", I8275, 19.6608_MHz_XTAL/10)
-	MCFG_I8275_CHARACTER_WIDTH(10)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(wicat_state, wicat_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("videodma", am9517a_device, dreq0_w))
-	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, wicat_state, crtc_irq_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
+	m_crtc->set_character_width(10);
+	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_videodma, FUNC(am9517a_device::dreq0_w));
+	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
+	m_crtc->set_screen("screen");
 
 	config.set_default_layout(layout_wicat);
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
-	MCFG_DEVICE_ADD("wd1kcpu", N8X300, 8_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(wicat_wd1000_mem)
-	MCFG_DEVICE_IO_MAP(wicat_wd1000_io)
+	n8x300_cpu_device &wd1kcpu(N8X300(config, "wd1kcpu", 8_MHz_XTAL));
+	wd1kcpu.set_addrmap(AS_PROGRAM, &wicat_state::wd1000_mem);
+	wd1kcpu.set_addrmap(AS_IO, &wicat_state::wd1000_io);
 
-	MCFG_DEVICE_ADD("fdc", FD1795, 8_MHz_XTAL)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FD1795(config, m_fdc, 8_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "wicat")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_type("wicat", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
 /* ROM definition */
 ROM_START( wicat )

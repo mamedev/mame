@@ -242,7 +242,7 @@ image_init_result ti99_cartridge_device::call_load()
 		}
 		catch (rpk_exception& err)
 		{
-			logerror("Failed to load cartridge '%s': %s\n", basename(), err.to_string().c_str());
+			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.to_string().c_str());
 			m_rpk = nullptr;
 			m_err = IMAGE_ERROR_INVALIDIMAGE;
 			return image_init_result::FAIL;

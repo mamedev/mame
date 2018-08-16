@@ -419,8 +419,10 @@ void nsmpoker_state::machine_reset()
 MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nsmpoker_state,  nsmpoker_interrupt)
+	TMS9995(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsmpoker_state::nsmpoker_map);
+	m_maincpu->set_addrmap(AS_IO, &nsmpoker_state::nsmpoker_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(nsmpoker_state::nsmpoker_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

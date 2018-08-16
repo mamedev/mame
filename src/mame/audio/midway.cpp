@@ -593,11 +593,11 @@ MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cpu", M68000, DERIVED_CLOCK(1, 2))
 	MCFG_DEVICE_PROGRAM_MAP(soundsgood_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_sounds_good_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, midway_sounds_good_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_sounds_good_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_sounds_good_device, irq_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(midway_sounds_good_device::porta_w));
+	m_pia->writepb_handler().set(FUNC(midway_sounds_good_device::portb_w));
+	m_pia->irqa_handler().set(FUNC(midway_sounds_good_device::irq_w));
+	m_pia->irqb_handler().set(FUNC(midway_sounds_good_device::irq_w));
 
 	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0) /// ad7533jn.u10
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -748,11 +748,11 @@ MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cpu", MC6809E, DERIVED_CLOCK(1, 4))
 	MCFG_DEVICE_PROGRAM_MAP(turbocs_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_turbo_cheap_squeak_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, midway_turbo_cheap_squeak_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_turbo_cheap_squeak_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_turbo_cheap_squeak_device, irq_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(midway_turbo_cheap_squeak_device::porta_w));
+	m_pia->writepb_handler().set(FUNC(midway_turbo_cheap_squeak_device::portb_w));
+	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
+	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 
 	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -952,16 +952,16 @@ MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cpu", M6802, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(squawkntalk_map)
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_squawk_n_talk_device, porta1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta1_w));
+	m_pia0->irqa_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
+	m_pia0->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, midway_squawk_n_talk_device, porta2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, midway_squawk_n_talk_device, portb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, midway_squawk_n_talk_device, irq_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->writepa_handler().set(FUNC(midway_squawk_n_talk_device::porta2_w));
+	m_pia1->writepb_handler().set(FUNC(midway_squawk_n_talk_device::portb2_w));
+	m_pia1->irqa_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
+	m_pia1->irqb_handler().set(FUNC(midway_squawk_n_talk_device::irq_w));
 
 	// only used on Discs of Tron, which is stereo
 	MCFG_DEVICE_ADD("tms5200", TMS5200, 640000)

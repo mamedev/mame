@@ -115,10 +115,10 @@ READ8_MEMBER( sv801_device::iorq_r )
 {
 	switch (offset)
 	{
-	case 0x30: return m_fdc->status_r(space, 0);
-	case 0x31: return m_fdc->track_r(space, 0);
-	case 0x32: return m_fdc->sector_r(space, 0);
-	case 0x33: return m_fdc->data_r(space, 0);
+	case 0x30: return m_fdc->status_r();
+	case 0x31: return m_fdc->track_r();
+	case 0x32: return m_fdc->sector_r();
+	case 0x33: return m_fdc->data_r();
 	case 0x34: return (m_drq << 6) | (m_irq << 7);
 	}
 
@@ -129,10 +129,10 @@ WRITE8_MEMBER( sv801_device::iorq_w )
 {
 	switch (offset)
 	{
-	case 0x30: m_fdc->cmd_w(space, 0, data); break;
-	case 0x31: m_fdc->track_w(space, 0, data); break;
-	case 0x32: m_fdc->sector_w(space, 0, data); break;
-	case 0x33: m_fdc->data_w(space, 0, data); break;
+	case 0x30: m_fdc->cmd_w(data); break;
+	case 0x31: m_fdc->track_w(data); break;
+	case 0x32: m_fdc->sector_w(data); break;
+	case 0x33: m_fdc->data_w(data); break;
 	case 0x34: motor_w(space, 0, data); break;
 	case 0x38:
 		m_fdc->dden_w(BIT(data, 0));

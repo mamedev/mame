@@ -2,13 +2,13 @@
 <mamelayout version="2">
 
 	<view name="Stepping Stage Custom">
-		<screen index="0">
+		<screen tag="lscreen">
 			<bounds x="0" y="0" width="9" height="13.2" />
 		</screen>
-		<screen index="1">
+		<screen tag="mscreen">
 			<bounds x="9.1" y="0" width="16" height="13.2" />
 		</screen>
-		<screen index="2">
+		<screen tag="rscreen">
 			<bounds x="25.2" y="0" width="9" height="13.2" />
 		</screen>
 	</view>

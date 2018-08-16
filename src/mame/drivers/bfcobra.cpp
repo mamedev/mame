@@ -1397,9 +1397,9 @@ READ8_MEMBER(bfcobra_state::upd_r)
 
 WRITE8_MEMBER(bfcobra_state::upd_w)
 {
-	m_upd7759->reset_w(data & 0x80);
-	m_upd7759->port_w(space, 0, data & 0x3f);
-	m_upd7759->start_w(data & 0x40 ? 0 : 1);
+	m_upd7759->reset_w(BIT(data, 7));
+	m_upd7759->port_w(data & 0x3f);
+	m_upd7759->start_w(!BIT(data, 6));
 }
 
 void bfcobra_state::m6809_prog_map(address_map &map)
@@ -1673,16 +1673,16 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* ACIAs */
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, z80_acia_irq))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(m_acia6850_1, FUNC(acia6850_device::write_rxd));
+	m_acia6850_0->irq_handler().set(FUNC(bfcobra_state::z80_acia_irq));
 
-	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_rxd))
+	ACIA6850(config, m_acia6850_1, 0);
+	m_acia6850_1->txd_handler().set(m_acia6850_0, FUNC(acia6850_device::write_rxd));
 
-	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bfcobra_state, data_acia_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, m6809_data_irq))
+	ACIA6850(config, m_acia6850_2, 0);
+	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
+	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfcobra_state, write_acia_clock))

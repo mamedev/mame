@@ -495,11 +495,11 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gyruss_state, master_nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gyruss_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gyruss_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gyruss_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3C
+	mainlatch.q_out_cb<0>().set(FUNC(gyruss_state::master_nmi_mask_w));
+	mainlatch.q_out_cb<2>().set(FUNC(gyruss_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(gyruss_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set(FUNC(gyruss_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

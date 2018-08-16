@@ -92,9 +92,10 @@ const tiny_rom_entry *qubide_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(qubide_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
+void qubide_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+}
 
 
 

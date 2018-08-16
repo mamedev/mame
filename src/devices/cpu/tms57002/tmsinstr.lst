@@ -240,6 +240,7 @@ lpc  2b 31 1 n
 	host[3] = c;
 	hidx = 0;
 	sti |= S_HOST;
+	update_dready();
 
 lpd  2b 30 1 n
 	lpd %d

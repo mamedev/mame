@@ -138,6 +138,8 @@ public:
 		m_data7_handler.bind().set(tag, FUNC(input_buffer_device::write_bit7));
 	}
 
+	void set_output_latch(output_latch_device &latch);
+
 	DECLARE_WRITE_LINE_MEMBER( write_strobe );
 	DECLARE_WRITE_LINE_MEMBER( write_data0 );
 	DECLARE_WRITE_LINE_MEMBER( write_data1 );

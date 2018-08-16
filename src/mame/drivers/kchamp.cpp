@@ -417,10 +417,10 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_DEVICE_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 8C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kchamp_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, kchamp_state, sound_reset_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 8C
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(kchamp_state::sound_reset_w));
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
@@ -451,8 +451,8 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // at 4C
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0); // at 4C
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, kchamp_state, msmint))         /* interrupt function */
@@ -478,9 +478,9 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC71
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kchamp_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 

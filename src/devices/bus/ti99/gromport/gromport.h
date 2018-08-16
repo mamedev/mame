@@ -46,6 +46,10 @@ public:
 	void    cartridge_inserted();
 	bool    is_grom_idle();
 
+	auto ready_cb() { return m_console_ready.bind(); }
+	auto reset_cb() { return m_console_reset.bind(); }
+	void configure_slot(bool for998);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -91,25 +95,6 @@ protected:
 };
 
 } } } // end namespace bus::ti99::gromport
-
-void gromport4(device_slot_interface &device);
-void gromport8(device_slot_interface &device);
-
-#define MCFG_GROMPORT4_ADD( _tag )   \
-	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
-	downcast<bus::ti99::gromport::gromport_device &>(*device).set_mask(0x1fff); \
-	MCFG_DEVICE_SLOT_INTERFACE(gromport4, "single", false)
-
-#define MCFG_GROMPORT8_ADD( _tag )   \
-	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
-	downcast<bus::ti99::gromport::gromport_device &>(*device).set_mask(0x3fff); \
-	MCFG_DEVICE_SLOT_INTERFACE(gromport8, "single", false)
-
-#define MCFG_GROMPORT_READY_HANDLER( _ready ) \
-	downcast<bus::ti99::gromport::gromport_device &>(*device).set_ready_callback(DEVCB_##_ready);
-
-#define MCFG_GROMPORT_RESET_HANDLER( _reset ) \
-	downcast<bus::ti99::gromport::gromport_device &>(*device).set_reset_callback(DEVCB_##_reset);
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device)
 

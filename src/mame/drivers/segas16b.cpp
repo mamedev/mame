@@ -1151,8 +1151,8 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 	{
 		// it is important to write in this order: if the /START line goes low
 		// at the same time /RESET goes low, no sample should be started
-		m_upd7759->start_w(data & 0x80);
-		m_upd7759->reset_w(data & 0x40);
+		m_upd7759->start_w(BIT(data, 7));
+		m_upd7759->reset_w(BIT(data, 6));
 
 		// banking depends on the ROM board
 		int bankoffs = 0;
@@ -3752,6 +3752,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
+	MCFG_UPD7759_MD(0)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas16b_state,upd7759_generate_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END

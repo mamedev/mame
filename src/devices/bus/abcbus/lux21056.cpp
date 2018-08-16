@@ -247,32 +247,35 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(luxor_55_21056_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(luxor_55_21056_mem)
-	MCFG_DEVICE_IO_MAP(luxor_55_21056_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void luxor_55_21056_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_memory_map(&luxor_55_21056_device::luxor_55_21056_mem);
+	m_maincpu->set_io_map(&luxor_55_21056_device::luxor_55_21056_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(8'000'000)/2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, luxor_55_21056_device, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, luxor_55_21056_device, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, luxor_55_21056_device, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, luxor_55_21056_device, io_write_byte))
+	Z80DMA(config, m_dma, XTAL(8'000'000)/2);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set(FUNC(luxor_55_21056_device::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(luxor_55_21056_device::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(luxor_55_21056_device::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(luxor_55_21056_device::io_write_byte));
 
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
-	MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, luxor_55_21056_device, write_sasi_req))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, luxor_55_21056_device, write_sasi_io))
-	MCFG_SCSI_CD_HANDLER(WRITELINE(*this, luxor_55_21056_device, write_sasi_cd))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE(*this, luxor_55_21056_device, write_sasi_msg))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE(*this, luxor_55_21056_device, write_sasi_bsy))
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
+	SCSI_PORT(config, m_sasibus);
+	m_sasibus->set_data_input_buffer(m_sasi_data_in);
+	m_sasibus->req_handler().set(FUNC(luxor_55_21056_device::write_sasi_req));
+	m_sasibus->io_handler().set(FUNC(luxor_55_21056_device::write_sasi_io));
+	m_sasibus->cd_handler().set(FUNC(luxor_55_21056_device::write_sasi_cd));
+	m_sasibus->msg_handler().set(FUNC(luxor_55_21056_device::write_sasi_msg));
+	m_sasibus->bsy_handler().set(FUNC(luxor_55_21056_device::write_sasi_bsy));
+	m_sasibus->set_slot_device(1, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
-	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
-MACHINE_CONFIG_END
+	OUTPUT_LATCH(config, m_sasi_data_out);
+	m_sasibus->set_output_latch(*m_sasi_data_out);
+
+	INPUT_BUFFER(config, m_sasi_data_in);
+}
 
 
 //-------------------------------------------------

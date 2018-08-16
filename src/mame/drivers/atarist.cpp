@@ -167,7 +167,7 @@ void st_state::fdc_dma_transfer()
 		if (m_fdc_fifo_msb)
 		{
 			// write LSB to disk
-			m_fdc->write_data(data & 0xff);
+			m_fdc->data_w(data & 0xff);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data & 0xff);
 
@@ -176,7 +176,7 @@ void st_state::fdc_dma_transfer()
 		else
 		{
 			// write MSB to disk
-			m_fdc->write_data(data >> 8);
+			m_fdc->data_w(data >> 8);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data >> 8);
 		}
@@ -200,7 +200,7 @@ void st_state::fdc_dma_transfer()
 	else
 	{
 		// read from controller to FIFO
-		uint8_t data = m_fdc->read_data();
+		uint8_t data = m_fdc->data_r();
 
 		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
 
@@ -250,9 +250,9 @@ READ16_MEMBER( st_state::fdc_data_r )
 		if (!(m_fdc_mode & DMA_MODE_FDC_HDC_CS))
 		{
 			// floppy controller
-			int offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
+			offs_t offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
 
-			data = m_fdc->gen_r(offset);
+			data = m_fdc->read(offset);
 
 			if (LOG) logerror("FDC Register %u Read %02x\n", offset, data);
 		}
@@ -294,11 +294,11 @@ WRITE16_MEMBER( st_state::fdc_data_w )
 		if (!(m_fdc_mode & DMA_MODE_FDC_HDC_CS))
 		{
 			// floppy controller
-			int offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
+			offs_t offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
 
 			if (LOG) logerror("FDC Register %u Write %02x\n", offset, data);
 
-			m_fdc->gen_w(offset, data);
+			m_fdc->write(offset, data);
 		}
 	}
 }
@@ -2050,13 +2050,13 @@ MACHINE_CONFIG_START(st_state::st)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, Y2/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2064,13 +2064,13 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
@@ -2144,13 +2144,13 @@ MACHINE_CONFIG_START(megast_state::megast)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, Y2/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2158,13 +2158,13 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
@@ -2246,13 +2246,13 @@ MACHINE_CONFIG_START(ste_state::ste)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, Y2/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2260,13 +2260,13 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
@@ -2344,13 +2344,13 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, U517/8)
-	MCFG_MC68901_TIMER_CLOCK(Y1)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
-	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MC68901(config, m_mfp, U517/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	WD1772(config, m_fdc, U517/2);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
@@ -2370,13 +2370,13 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_RS232_OUT_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	// device hardware
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();

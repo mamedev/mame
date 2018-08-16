@@ -485,8 +485,8 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_p3_w)
 {
 	m_sound_port_latch[3] = data;
 
-	m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
-	m_upd7759->reset_w((data & 0x10) ? 0 : 1);
+	m_upd7759->set_rom_bank(BIT(data, 2));
+	m_upd7759->reset_w(!BIT(data, 4));
 }
 
 READ8_MEMBER(micro3d_state::micro3d_sound_p1_r)
@@ -501,7 +501,7 @@ READ8_MEMBER(micro3d_state::micro3d_sound_p3_r)
 
 WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }

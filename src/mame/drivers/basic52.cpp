@@ -44,19 +44,21 @@ public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
 	{ }
-
-	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(from_term);
 
 	void basic52(machine_config &config);
 	void basic31(machine_config &config);
+
+protected:
+	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(from_term);
 	void basic52_io(address_map &map);
 	void basic52_mem(address_map &map);
-private:
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -109,11 +111,11 @@ MACHINE_CONFIG_START(basic52_state::basic31)
 	MCFG_DEVICE_PROGRAM_MAP(basic52_mem)
 	MCFG_DEVICE_IO_MAP(basic52_io)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, basic52_state, unk_r))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8("terminal", generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(m_terminal, generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, basic52_state, from_term))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(basic52_state, kbd_put))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -126,7 +128,7 @@ MACHINE_CONFIG_START(basic52_state::basic52)
 	MCFG_DEVICE_PROGRAM_MAP(basic52_mem)
 	MCFG_DEVICE_IO_MAP(basic52_io)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, basic52_state, unk_r))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8("terminal", generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(m_terminal, generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, basic52_state, from_term))
 MACHINE_CONFIG_END
 

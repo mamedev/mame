@@ -219,5 +219,5 @@ WRITE8_MEMBER( cgenie_fdc_device::command_w )
 		m_fdc->dden_w(!BIT(data, 0));
 
 	// forward to the controller
-	m_fdc->write_cmd(data);
+	m_fdc->cmd_w(data);
 }

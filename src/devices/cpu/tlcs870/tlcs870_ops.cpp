@@ -208,7 +208,10 @@ void tlcs870_device::do_RETI(const uint8_t opbyte0)
 
 	m_sp.d += 3;
 	m_addr = RM16(m_sp.d - 2);
-	set_PSW(RM8(m_sp.d - 1));
+	set_PSW(RM8(m_sp.d));
+
+	// Interrupts always get reenabled after a RETI.  The RETN behavior is different
+	m_EIR |= 1;
 }
 
 void tlcs870_device::do_RET(const uint8_t opbyte0)
@@ -231,8 +234,8 @@ void tlcs870_device::do_POP_PSW(const uint8_t opbyte0)
 	*/
 	m_cycles = 3;
 
-	m_sp.d += 2;
-	const uint16_t val = RM16(m_sp.d - 1);
+	m_sp.d += 1;
+	const uint8_t val = RM8(m_sp.d);
 	set_PSW(val);
 }
 
@@ -244,9 +247,9 @@ void tlcs870_device::do_PUSH_PSW(const uint8_t opbyte0)
 	*/
 	m_cycles = 2;
 
-	const uint16_t val = get_PSW();
-	WM16(m_sp.d - 1, val);
-	m_sp.d -= 2;
+	const uint8_t val = get_PSW();
+	WM8(m_sp.d, val);
+	m_sp.d -= 1;
 }
 
 void tlcs870_device::do_DAA_A(const uint8_t opbyte0)
@@ -407,7 +410,7 @@ void tlcs870_device::do_DEC_rr(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -616,7 +619,7 @@ void tlcs870_device::do_DEC_inx(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -650,7 +653,7 @@ void tlcs870_device::do_DEC_inHL(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -778,6 +781,7 @@ void tlcs870_device::do_SET_inxbit(const uint8_t opbyte0)
 
 	const uint8_t srcaddr = READ8();
 
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte0 & 0x7;
 
@@ -811,6 +815,7 @@ void tlcs870_device::do_CLR_inxbit(const uint8_t opbyte0)
 
 	const uint8_t srcaddr = READ8();
 
+	m_read_input_port = 0; // not sure, might read
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte0 & 0x7;
 
@@ -921,7 +926,7 @@ void tlcs870_device::do_DEC_r(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -944,8 +949,10 @@ void tlcs870_device::do_JRS_T_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+	
+	// always gets set?
+	set_JF();
 }
 
 void tlcs870_device::do_JRS_F_a(const uint8_t opbyte0)
@@ -967,8 +974,10 @@ void tlcs870_device::do_JRS_F_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+	
+	// manual isn't clear in description, but probably always set?
+	set_JF();
 }
 
 void tlcs870_device::do_CALLV_n(const uint8_t opbyte0)
@@ -1015,8 +1024,10 @@ void tlcs870_device::do_JR_cc_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+
+	// manual isn't clear in description, but probably always set?
+	set_JF();
 }
 
 void tlcs870_device::do_LD_CF_inxbit(const uint8_t opbyte0)
@@ -1119,12 +1130,13 @@ void tlcs870_device::do_JP_mn(const uint8_t opbyte0)
 void tlcs870_device::do_ff_opcode(const uint8_t opbyte0)
 {
 	/*
-	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
+		OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
 		SWI               1111 1111                                            -  -  -  -    9 (1 if already in NMI)
 	*/
-	m_cycles = 9; // TODO: 1 if in NMI (acts as NOP?)
+	m_cycles = 9; // TODO: 1 if in NMI this acts as a NOP
 
-	handle_take_interrupt(0x0e);
+	// set interrupt latch
+	m_IL |= 1 << (15 - TLCS870_IRQ_INTSW);
 }
 
 /**********************************************************************************************************************/
@@ -1149,7 +1161,7 @@ void tlcs870_device::do_ALUOP_A_n(const uint8_t opbyte0)
 	const int aluop = (opbyte0 & 0x7);
 	const uint8_t val = READ8();
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), val);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), val);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -1176,7 +1188,7 @@ void tlcs870_device::do_ALUOP_A_inx(const uint8_t opbyte0)
 	const uint16_t addr = READ8();
 	const uint8_t val = RM8(addr);
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), val);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), val);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{

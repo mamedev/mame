@@ -83,6 +83,14 @@ public:
 		m_default_value = DEFAULT_CUSTOM;
 		m_custom_handler = std::forward<Object>(cb);
 	}
+	template <class FunctionClass> void set_custom_handler(const char *devname, void (FunctionClass::*callback)(nvram_device &, void *, size_t), const char *name)
+	{
+		set_custom_handler(init_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_custom_handler(void (FunctionClass::*callback)(nvram_device &, void *, size_t), const char *name)
+	{
+		set_custom_handler(init_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// controls
 	void set_base(void *base, size_t length) { m_base = base; m_length = length; }

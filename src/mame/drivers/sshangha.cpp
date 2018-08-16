@@ -458,6 +458,26 @@ MACHINE_CONFIG_END
 
 ROM_START( sshangha )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "ss007e.u28", 0x00000, 0x20000, CRC(5f275f6e) SHA1(ca7790d2401c95aff48098800f0da9590a0d88a2) )
+	ROM_LOAD16_BYTE( "ss006e.u27", 0x00001, 0x20000, CRC(111327fe) SHA1(60f9e839a027eab5ef019dcb27cac2f0f9bf04d8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "ss008-1.u82", 0x000000, 0x010000, CRC(ff128b54) SHA1(2cdae94000c695417ebfe302999baa8e8cec09bf) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "ss001.u8",  0x000000, 0x100000, CRC(ebeca5b7) SHA1(1746e757ad9bbef2aa9028c54f25d4aa4dedf79e) )
+	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) ) /* Copy of rom at u47 */
+	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) ) /* Copy of rom at u46 */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
+ROM_END
+
+ROM_START( sshanghaj )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ss007-1.u28", 0x00000, 0x20000, CRC(bc466edf) SHA1(b96525b2c879d15b46a7753fa6ebf12a851cd019) )
 	ROM_LOAD16_BYTE( "ss006-1.u27", 0x00001, 0x20000, CRC(872a2a2d) SHA1(42d7a01465d5c403354aaf0f2dab8adb9afe61b0) )
 
@@ -514,5 +534,6 @@ void sshangha_state::init_sshangha()
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
-GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
+GAME( 1992, sshangha,  0,        sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (World)", 0 )
+GAME( 1992, sshanghaj, sshangha, sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
+GAME( 1992, sshanghab, sshangha, sshanghb, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )

@@ -17,9 +17,7 @@ FDC board contains Z80A DMA and NEC 765A (XTAL on it is 8MHZ)
 Mega board contains 74LS612 and memory chips (32x 41256)
 
 Status:
-  It prints 2 lines of text, then:
-  - If fdc is enabled in address map, it hangs waiting for a fdc response.
-  - Otherwise, it displays an error, and you can press a key to try again.
+  It prints 2 lines of text, then waits for a floppy.
 
 ToDo:
 - Everything... no diagram or manuals, so EVERYTHING below is guesswork.
@@ -49,7 +47,6 @@ I/O ports: These ranges are what is guessed
 #include "machine/z80ctc.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class czk80_state : public driver_device
 {
@@ -61,21 +58,21 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
+	void czk80(machine_config &config);
 	void init_czk80();
+
+private:
 	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
 	DECLARE_READ8_MEMBER(port81_r);
-	DECLARE_READ8_MEMBER(portc0_r);
 	DECLARE_WRITE8_MEMBER(port40_w);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	void czk80(machine_config &config);
 	void czk80_io(address_map &map);
 	void czk80_mem(address_map &map);
-private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -93,11 +90,6 @@ READ8_MEMBER( czk80_state::port80_r )
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
-}
-
-READ8_MEMBER( czk80_state::portc0_r )
-{
-	return 0x80;
 }
 
 READ8_MEMBER( czk80_state::port81_r )
@@ -119,10 +111,9 @@ void czk80_state::czk80_io(address_map &map)
 	map(0x4c, 0x4f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x50, 0x53).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x54, 0x57).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	// 80, 81 - no setup bytes
 	map(0x80, 0x80).r(FUNC(czk80_state::port80_r)).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x81, 0x81).r(FUNC(czk80_state::port81_r));
-	/* Select one of the below */
-	//AM_RANGE(0xc0, 0xc0) AM_READ(portc0_r)
 	map(0xc0, 0xc1).m(m_fdc, FUNC(upd765a_device::map));
 }
 
@@ -201,9 +192,9 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
-	MCFG_UPD765A_ADD("fdc", false, true)
+	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)

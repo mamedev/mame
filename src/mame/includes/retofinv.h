@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "machine/taito68705interface.h"
-
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "machine/taito68705interface.h"
 #include "emupal.h"
 
 class retofinv_state : public driver_device
@@ -21,6 +21,7 @@ public:
 		, m_68705(*this, "68705")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_mainlatch(*this, "mainlatch")
 		, m_soundlatch(*this, "soundlatch")
 		, m_fg_videoram(*this, "fg_videoram")
 		, m_sharedram(*this, "sharedram")
@@ -74,6 +75,7 @@ private:
 	optional_device<taito68705_mcu_device> m_68705;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint8_t> m_fg_videoram;

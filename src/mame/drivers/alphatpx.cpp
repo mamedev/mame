@@ -1049,12 +1049,12 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_12_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_12_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 
@@ -1128,12 +1128,12 @@ READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_34_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_34_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 
@@ -1218,12 +1218,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_12_state, kbd_port2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_port2_w))
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(alphatp2_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_12_state::alphatp2_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -1300,12 +1295,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_34_state, kbd_port2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_port2_w))
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(alphatp3_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_34_state::alphatp3_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

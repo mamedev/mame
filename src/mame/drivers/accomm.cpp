@@ -830,9 +830,9 @@ static INPUT_PORTS_START( accomm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(accomm_state::accomm)
-	MCFG_DEVICE_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
+	G65816(config, m_maincpu, 16_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &accomm_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(accomm_state::vbl_int));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 50.08 )
@@ -862,15 +862,15 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	/* rtc pcf8573 */
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
+	VIA6522(config, m_via, XTAL(16'000'000) / 16);
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", G65816_LINE_IRQ))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set_inputline("maincpu", G65816_LINE_IRQ);
 
 	MCFG_DEVICE_ADD("serial", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
@@ -881,9 +881,9 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, accomm_state, write_acia_clock))
 
 	/* econet */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
-	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", G65816_LINE_NMI))
+	MC6854(config, m_adlc);
+	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
+	m_adlc->out_irq_cb().set_inputline(m_maincpu, G65816_LINE_NMI);
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, accomm_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))

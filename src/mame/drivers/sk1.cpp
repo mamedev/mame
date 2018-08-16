@@ -90,10 +90,8 @@ void sk1_state::sk1_memory(address_map &map)
 
 
 MACHINE_CONFIG_START(sk1_state::sk1)
-	MCFG_DEVICE_ADD("dummy", ADDRESS_MAP_BANK, 0) // just to attach the memory map to something until I can work out what the CPU core is
-	MCFG_DEVICE_PROGRAM_MAP(sk1_memory)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
+	// just to attach the memory map to something until I can work out what the CPU core is
+	ADDRESS_MAP_BANK(config, "dummy").set_map(&sk1_state::sk1_memory).set_data_width(8).set_addr_width(16);
 MACHINE_CONFIG_END
 
 

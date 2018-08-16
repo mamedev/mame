@@ -16,7 +16,8 @@
 // ======================> c140_device
 
 class c140_device : public device_t,
-					public device_sound_interface
+	public device_sound_interface,
+	public device_rom_interface
 {
 public:
 	enum class C140_TYPE
@@ -34,11 +35,12 @@ public:
 	DECLARE_READ8_MEMBER( c140_r );
 	DECLARE_WRITE8_MEMBER( c140_w );
 
-	void set_base(void *base);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
+
+	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -80,8 +82,6 @@ private:
 	std::unique_ptr<int16_t[]> m_mixer_buffer_right;
 
 	int m_baserate;
-	optional_region_ptr<int8_t> m_rom_ptr;
-	int8_t *m_pRom;
 	uint8_t m_REG[0x200];
 
 	int16_t m_pcmtbl[8];        //2000.06.26 CAB

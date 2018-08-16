@@ -136,7 +136,7 @@ MACHINE_CONFIG_START(a1200_kbd_device::device_add_mconfig)
 	MCFG_M68HC05_TCMP_CB(WRITELINE(*this, a1200_kbd_device, mpu_tcmp));
 MACHINE_CONFIG_END
 
-const tiny_rom_entry *a1200_kbd_device::device_rom_region() const
+tiny_rom_entry const *a1200_kbd_device::device_rom_region() const
 {
 	return ROM_NAME(a1200kbd_revB);
 }

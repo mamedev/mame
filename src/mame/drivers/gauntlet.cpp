@@ -538,13 +538,13 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_DEVICE_ADD("soundctl", LS259, 0) // 16T/U
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, gauntlet_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gauntlet_state, coin_counter_left_w))
+	LS259(config, m_soundctl); // 16T/U
+	m_soundctl->q_out_cb<0>().set("ymsnd", FUNC(ym2151_device::reset_w)); // music reset, low reset
+	m_soundctl->q_out_cb<1>().set("tms", FUNC(tms5220_device::wsq_w)); // speech write, active low
+	m_soundctl->q_out_cb<2>().set("tms", FUNC(tms5220_device::rsq_w)); // speech reset, active low
+	m_soundctl->q_out_cb<3>().set(FUNC(gauntlet_state::speech_squeak_w)); // speech squeak, low = 650 Hz
+	m_soundctl->q_out_cb<4>().set(FUNC(gauntlet_state::coin_counter_right_w));
+	m_soundctl->q_out_cb<5>().set(FUNC(gauntlet_state::coin_counter_left_w));
 MACHINE_CONFIG_END
 
 

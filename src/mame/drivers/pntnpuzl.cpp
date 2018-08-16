@@ -226,7 +226,7 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 	if (data & 0x2000)
 		m_serial |= 0x400;
 
-	m_via->write(space, 0x18/2, data >> 8);
+	m_via->write(0x18/2, data >> 8);
 }
 
 READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
@@ -234,7 +234,7 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
 
-	(void)m_via->read(space, 0x14/2);
+	(void)m_via->read(0x14/2);
 
 	if (m_serial_out == 0x11)
 	{

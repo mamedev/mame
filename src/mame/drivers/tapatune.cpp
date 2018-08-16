@@ -30,7 +30,9 @@
     - many connectors for I/O
 
     The sound and I/O board is used by other redemption games such as
-    Colorama and Wheel 'Em In, Super Rock and Bowl
+    Colorama, Wheel 'Em In, Super Rock and Bowl, Feed Big Bertha and Sonic
+    the Hedgehog (Redemption). The CPU location is marked "68A09" on the
+    PCB; some games have a 68B09E here, but others use a Z80 instead.
 
 ****************************************************************************/
 

@@ -1763,7 +1763,7 @@ void seta_state::calibr50_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();                             // ROM
 	map(0x100000, 0x100001).r(FUNC(seta_state::ipl2_ack_r));
-	map(0x200000, 0x200fff).ram();                             // NVRAM
+	map(0x200000, 0x200fff).ram().share("nvram");              // NVRAM (battery backed)
 	map(0x300000, 0x300001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x400000, 0x400001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x500000, 0x500001).nopw();                        // ?
@@ -1831,7 +1831,7 @@ WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 		machine().tilemap().mark_all_dirty();
 	m_tiles_offset = tiles_offset;
 
-	seta_coin_lockout_w(space, 0, data);
+	seta_coin_lockout_w(data);
 }
 
 
@@ -1969,7 +1969,7 @@ void seta_state::blandiap_map(address_map &map)
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-ADC083X_INPUT_CB(seta_state::zombraid_adc_cb)
+double seta_state::zombraid_adc_cb(uint8_t input)
 {
 	if (input == ADC083X_AGND)
 		return 0.0;
@@ -3417,15 +3417,15 @@ void jockeyc_state::inttoote_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_w)
+void seta_state::sub_bankswitch_w(u8 data)
 {
 	m_subbank->set_entry(data >> 4);
 }
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
+void seta_state::sub_bankswitch_lockout_w(u8 data)
 {
-	m_subbank->set_entry(data >> 4);
-	seta_coin_lockout_w(space, 0, data);
+	sub_bankswitch_w(data);
+	seta_coin_lockout_w(data);
 }
 
 
@@ -3528,7 +3528,7 @@ MACHINE_RESET_MEMBER(seta_state,calibr50)
 WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 {
 	// Bits 7-4: BK3-BK0
-	sub_bankswitch_w(space, 0, data);
+	sub_bankswitch_w(data);
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
@@ -3539,6 +3539,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 
 	// Bit 1: PCMMUTE
+	m_x1->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 0.0f : 1.0f);
 }
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
@@ -3549,7 +3550,9 @@ WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 
 void seta_state::calibr50_sub_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(m_x1, FUNC(x1_010_device::read), FUNC(x1_010_device::write)); // Sound
+	map(0x0000, 0x1fff).lrw8("x1_soundram_rw",
+								 [this](offs_t offset) { return m_x1->read(offset ^ 0x1000); },
+								 [this](offs_t offset, u8 data) { m_x1->write(offset ^ 0x1000, data); }); // Sound
 	map(0x4000, 0x4000).r("soundlatch1", FUNC(generic_latch_8_device::read));             // From Main CPU
 	map(0x4000, 0x4000).w(FUNC(seta_state::calibr50_sub_bankswitch_w));        // Bankswitching
 	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
@@ -7927,7 +7930,7 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.42) // Possibly lower than 60Hz, Correct?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
@@ -8030,6 +8033,7 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
@@ -8077,7 +8081,6 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8097,7 +8100,10 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
+
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
@@ -8137,7 +8143,6 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -8777,8 +8782,8 @@ MACHINE_CONFIG_START(seta_state::zombraid)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("adc", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(seta_state, zombraid_adc_cb)
+	adc0834_device &adc(ADC0834(config, "adc", 0));
+	adc.set_input_callback(FUNC(seta_state::zombraid_adc_cb));
 
 	MCFG_DEVICE_MODIFY("x1snd")
 	MCFG_DEVICE_ADDRESS_MAP(0, zombraid_x1_map)
@@ -12112,7 +12117,7 @@ GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_down
 
 GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
 GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 

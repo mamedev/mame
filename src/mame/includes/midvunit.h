@@ -180,7 +180,7 @@ private:
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
-	optional_device<ata_interface_device> m_ata; // TODO(RH): This is horrible and midvplus should be split into its own device_driver that derives from midvunit.
+	optional_device<ata_interface_device> m_ata;
 	required_device_array<timer_device, 2> m_timer;
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;

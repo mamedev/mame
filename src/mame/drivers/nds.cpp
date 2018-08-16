@@ -979,17 +979,8 @@ MACHINE_CONFIG_START(nds_state::nds)
 	MCFG_DEVICE_PROGRAM_MAP(nds_arm9_map)
 
 	// WRAM
-	MCFG_DEVICE_ADD("nds7wram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nds7_wram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
-
-	MCFG_DEVICE_ADD("nds9wram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nds9_wram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "nds7wram").set_map(&nds_state::nds7_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
+	ADDRESS_MAP_BANK(config, "nds9wram").set_map(&nds_state::nds9_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
 MACHINE_CONFIG_END
 
 /* Help identifying the region and revisions of the set would be greatly appreciated! */

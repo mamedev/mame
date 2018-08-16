@@ -291,7 +291,6 @@
 #include "screen.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
 
 #include "sf2049.lh"
 
@@ -325,7 +324,6 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
-		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
 		m_io_analog(*this, "AN.%u", 0U),
@@ -386,7 +384,6 @@ private:
 	required_device<smc91c94_device> m_ethernet;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
-	optional_device<generic_terminal_device> m_uart0;
 	optional_device<ns16550_device> m_uart1;
 	optional_device<ns16550_device> m_uart2;
 	optional_ioport_array<8> m_io_analog;
@@ -1760,9 +1757,9 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_VRC5074_SET_CS(6, vegas_state::vegas_cs6_map)
 	MCFG_VRC5074_SET_CS(7, vegas_state::vegas_cs7_map)
 
-	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x10950646, 0x05, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(WRITELINE(PCI_ID_NILE, vrc5074_device, pci_intr_d))
-	//MCFG_IDE_PCI_SET_PIF(0x8f)
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x10950646, 0x05, 0x0));
+	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
+	//ide.set_pif(0x8f);
 
 	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_2_PCI, 0, m_maincpu, "screen")
 	MCFG_VOODOO_PCI_FBMEM(2)
@@ -1770,9 +1767,9 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
 
-	MCFG_DEVICE_ADD(m_timekeeper, M48T37, 0)
-	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, vegas_state, watchdog_reset))
-	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, vegas_state, watchdog_irq))
+	M48T37(config, m_timekeeper);
+	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
+	m_timekeeper->irq_cb().set(FUNC(vegas_state::watchdog_irq));
 
 	MCFG_SMC91C94_ADD(m_ethernet)
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ethernet_interrupt))

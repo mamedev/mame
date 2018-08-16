@@ -26,6 +26,7 @@ tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, macc(0), st0(0), st1(0), sti(0), txrd(0)
+	, m_dready_callback(*this)
 	, program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(tms57002_device::internal_pgm), this))
 	, data_config("data", ENDIANNESS_LITTLE, 8, 20)
 {
@@ -80,6 +81,7 @@ void tms57002_device::device_reset()
 			ST0_PBCO | ST0_CNS);
 	st1 &= ~(ST1_AOV | ST1_SFAI | ST1_SFAO | ST1_MOVM | ST1_MOV |
 			ST1_SFMA | ST1_SFMO | ST1_RND | ST1_CRM | ST1_DBP);
+	update_dready();
 
 	xba = 0;
 	xoa = 0;
@@ -152,6 +154,7 @@ READ8_MEMBER(tms57002_device::data_r)
 	if(hidx == 4) {
 		hidx = 0;
 		sti &= ~S_HOST;
+		update_dready();
 	}
 
 	return res;
@@ -165,6 +168,11 @@ READ_LINE_MEMBER(tms57002_device::empty_r)
 READ_LINE_MEMBER(tms57002_device::dready_r)
 {
 	return sti & S_HOST ? 0 : 1;
+}
+
+void tms57002_device::update_dready()
+{
+	m_dready_callback(sti & S_HOST ? 0 : 1);
 }
 
 READ_LINE_MEMBER(tms57002_device::pc0_r)
@@ -812,6 +820,11 @@ void tms57002_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	outputs[3][0] = int16_t(so[3] >> 8);
 
 	sync_w(1);
+}
+
+void tms57002_device::device_resolve_objects()
+{
+	m_dready_callback.resolve_safe();
 }
 
 void tms57002_device::device_start()

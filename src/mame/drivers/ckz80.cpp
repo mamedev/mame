@@ -440,11 +440,7 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(429) - attotime::from_nsec(22870)) // active for 22.87us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", ckz80_state, irq_off, attotime::from_hz(429))
 
-	MCFG_DEVICE_ADD("master_map", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
+	ADDRESS_MAP_BANK(config, "master_map").set_map(&ckz80_state::master_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ckz80_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_ck_master);

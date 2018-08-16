@@ -76,18 +76,15 @@ WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 
 WRITE8_MEMBER(_88games_state::speech_control_w)
 {
-	m_speech_chip = (data & 4) ? 1 : 0;
-	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
+	m_speech_chip = BIT(data, 2);
 
-	upd->reset_w(data & 2);
-	upd->start_w(data & 1);
+	m_upd7759[m_speech_chip]->reset_w(BIT(data, 1));
+	m_upd7759[m_speech_chip]->start_w(BIT(data, 0));
 }
 
 WRITE8_MEMBER(_88games_state::speech_msg_w)
 {
-	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
-
-	upd->port_w(space, 0, data);
+	m_upd7759[m_speech_chip]->port_w(data);
 }
 
 /* special handlers to combine 052109 & 051960 */

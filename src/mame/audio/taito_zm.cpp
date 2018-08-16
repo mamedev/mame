@@ -187,6 +187,10 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 	MCFG_ZSG2_ADD("zsg2", XTAL(25'000'000))
 
 	// we assume the parent machine has created lspeaker/rspeaker
-	MCFG_SOUND_ROUTE(0, "^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^lspeaker", 1.0) // bypass DSP
 	MCFG_SOUND_ROUTE(1, "^rspeaker", 1.0)
+
+	//MCFG_SOUND_ROUTE(2, "^lspeaker", 1.0) // DSP reverb
+	//MCFG_SOUND_ROUTE(3, "^rspeaker", 1.0) // DSP chorus
+
 MACHINE_CONFIG_END
