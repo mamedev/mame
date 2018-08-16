@@ -722,8 +722,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 			   see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
 
 			   Xtreme Rally seems to have an issue with this mode on the communication check
-			   screen at startup, but according to videos that should scroll, and no scroll
-			   values are updated, so it might be an unrelated bug.
+			   screen at startup, however during the period in which the values are invalid
+			   it looks like the display shouldn't even be enabled (only gets enabled when
+			   the value starts counting up)
 
 			*/
 
