@@ -683,10 +683,8 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 
 
 /**************************************
-* MCU simulation / hacks
+* MIPS side Dual Port RAM hookup for MCU
 **************************************/
-
-// real IO MCU only has 8 multiplexed 8-bit digital input ports, so some of these fake inputs are probably processed representations of the same thing
 
 READ8_MEMBER(hng64_state::hng64_dualport_r)
 {
