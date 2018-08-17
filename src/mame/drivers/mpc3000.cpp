@@ -61,6 +61,7 @@
 #include "speaker.h"
 #include "screen.h"
 #include "emupal.h"
+#include "machine/upd765.h"
 
 class mpc3000_state : public driver_device
 {
@@ -71,6 +72,7 @@ public:
 		, m_lcdc(*this, "lcdc")
 		, m_dsp(*this, "dsp")
 		, m_mdout(*this, "mdout")
+		, m_fdc(*this, "upd72068")
 	{ }
 
 	void mpc3000(machine_config &config);
@@ -82,7 +84,7 @@ private:
 	required_device<hd61830_device> m_lcdc;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<midi_port_device> m_mdout;
-
+	required_device<upd72065_device> m_fdc;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -131,6 +133,7 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x0068, 0x0069).rw(FUNC(mpc3000_state::dsp_0008_hack_r), FUNC(mpc3000_state::dsp_0008_hack_w));
 	map(0x00e0, 0x00e0).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x00e2, 0x00e2).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
+	map(0x00e8, 0x00eb).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
 }
 
 READ8_MEMBER(mpc3000_state::dma_memr_cb)
@@ -169,6 +172,10 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mpc3000_state, mpc3000)
+
+	MCFG_UPD72065_ADD("upd72068", true, true) // TODO: upd72068 supports motor control
+	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("maincpu", v53a_device, ir?_w))
+	//MCFG_UPD765_DRQ_CALLBACK(WRITELINE("maincpu", v53a_device, drq?_w))
 
 	HD61830(config, m_lcdc, 4.9152_MHz_XTAL / 2 / 2);
 
