@@ -29,6 +29,8 @@ public:
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
 
+	DECLARE_INPUT_CHANGED_MEMBER(layout_changed);
+
 protected:
 	// MPU I/O
 	DECLARE_READ8_MEMBER(mpu_portb_r);
@@ -42,7 +44,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 
 private:
 	required_ioport_array<15>   m_rows;
