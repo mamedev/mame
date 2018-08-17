@@ -280,6 +280,9 @@ private:
 	DECLARE_READ32_MEMBER(hng64_rtc_r);
 	DECLARE_WRITE32_MEMBER(hng64_rtc_w);
 
+	DECLARE_READ32_MEMBER(hng64_dmac_r);
+	DECLARE_WRITE32_MEMBER(hng64_dmac_w);
+
 	DECLARE_WRITE32_MEMBER(hng64_mips_to_iomcu_irq_w);
 
 	DECLARE_READ8_MEMBER(fake_io_r);

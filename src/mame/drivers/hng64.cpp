@@ -508,6 +508,58 @@ READ32_MEMBER(hng64_state::hng64_rtc_r)
 	}
 }
 
+/* preliminary dma code, dma is used to copy program code -> ram */
+void hng64_state::do_dma(address_space &space)
+{
+	// check if this determines how long the crosshatch is visible for, we might need to put it on a timer.
+
+	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
+	while (m_dma_len >= 0)
+	{
+		uint32_t dat;
+
+		dat = space.read_dword(m_dma_start);
+		space.write_dword(m_dma_dst, dat);
+		m_dma_start += 4;
+		m_dma_dst += 4;
+		m_dma_len--;
+	}
+}
+
+READ32_MEMBER(hng64_state::hng64_dmac_r)
+{
+	// DMAC seems to be mapped as 4 bytes in every 8
+	if ((offset * 4) == 0x54)
+		return 0x00000000; //dma status, 0x800
+
+	logerror("%s: unhandled hng64_dmac_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(hng64_state::hng64_dmac_w)
+{
+	// DMAC seems to be mapped as 4 bytes in every 8
+	switch (offset * 4)
+	{
+	case 0x04: COMBINE_DATA(&m_dma_start); break;
+	case 0x14: COMBINE_DATA(&m_dma_dst); break;
+	case 0x24: COMBINE_DATA(&m_dma_len);
+		do_dma(space);
+		break;
+
+	// these are touched during startup when setting up the DMA, maybe mode selection?
+	case 0x34: // (0x0075)
+	case 0x44: // (0x0000)
+
+	// written immediately after length, maybe one of these is the actual trigger?, 4c is explicitly set to 0 after all operations are complete
+	case 0x4c: // (0x0101 - trigger) (0x0000 - after DMA)
+	case 0x5c: // (0x0008 - trigger?) after 0x4c
+	default:
+		logerror("%s: unhandled hng64_dmac_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		break;
+	}
+}
 
 WRITE32_MEMBER(hng64_state::hng64_rtc_w)
 {
@@ -519,9 +571,17 @@ WRITE32_MEMBER(hng64_state::hng64_rtc_w)
 	else
 	{
 		// shouldn't happen unless something else is mapped here too
-		logerror("%s: unhandled hng64_rtc_w (%04x) %04x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		logerror("%s: unhandled hng64_rtc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
 }
+
+WRITE32_MEMBER(hng64_state::hng64_mips_to_iomcu_irq_w)
+{
+	// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
+	LOG("%s: HNG64 writing to SYSTEM Registers %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), data, mem_mask);
+	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
+}
+
 
 
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
@@ -546,37 +606,10 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		case 0x111c:
 			//printf("Read to IRQ ACK?\n");
 			break;
-		case 0x1254: return 0x00000000; //dma status, 0x800
 	}
 
 	return m_sysregs[offset];
 }
-
-/* preliminary dma code, dma is used to copy program code -> ram */
-void hng64_state::do_dma(address_space &space)
-{
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
-
-	while (m_dma_len >= 0)
-	{
-		uint32_t dat;
-
-		dat = space.read_dword(m_dma_start);
-		space.write_dword(m_dma_dst, dat);
-		m_dma_start += 4;
-		m_dma_dst += 4;
-		m_dma_len--;
-	}
-}
-
-
-WRITE32_MEMBER(hng64_state::hng64_mips_to_iomcu_irq_w)
-{
-	// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
-	LOG("%s: HNG64 writing to SYSTEM Registers %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), data, mem_mask);
-	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
-}
-
 
 WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 {
@@ -596,12 +629,6 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 		//0x110c global irq mask?
 		/* irq ack */
 		case 0x111c: m_irq_pending &= ~m_sysregs[offset]; set_irq(0x0000); break;
-		case 0x1204: m_dma_start = m_sysregs[offset]; break;
-		case 0x1214: m_dma_dst = m_sysregs[offset]; break;
-		case 0x1224:
-			m_dma_len = m_sysregs[offset];
-			do_dma(space);
-			break;
 
 		default:
 			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
@@ -771,8 +798,10 @@ void hng64_state::hng_map(address_map &map)
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
-	// Ports
-	map(0x1f700000, 0x1f701fff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	// Misc Peripherals
+	map(0x1f700000, 0x1f7011ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	map(0x1f701200, 0x1f70127f).rw(FUNC(hng64_state::hng64_dmac_r), FUNC(hng64_state::hng64_dmac_w));
+	// 1f702004 used (rarely writes 01 or a random looking value as part of init sequences)
 	map(0x1f702100, 0x1f70217f).rw(FUNC(hng64_state::hng64_rtc_r), FUNC(hng64_state::hng64_rtc_w));
 	map(0x1f7021c4, 0x1f7021c7).w(FUNC(hng64_state::hng64_mips_to_iomcu_irq_w));
 
