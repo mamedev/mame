@@ -509,10 +509,10 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	genpin_audio(config);
 
 	CDP1802(config, m_audiocpu, 3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &play_3_state::play_3_audio_map);
-	m_maincpu->set_addrmap(AS_IO, &play_3_state::play_3_audio_io);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &play_3_state::play_3_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &play_3_state::play_3_audio_io);
 	m_audiocpu->wait_cb().set_constant(1);
-	m_maincpu->clear_cb().set(FUNC(play_3_state::clear_a_r));
+	m_audiocpu->clear_cb().set(FUNC(play_3_state::clear_a_r));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
