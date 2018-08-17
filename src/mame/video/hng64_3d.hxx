@@ -542,7 +542,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// FIXME: This isn't correct.
 			//        Buriki & Xrally need this line.  Roads Edge needs it removed.
 			//        So instead we're looking for a bit that is on for XRally & Buriki, but noone else.
-			if (m_fbcontrol[3] & 0x20)
+			if (m_fbcontrol[2] & 0x20)
 			{
 				if (!m_roadedge_3d_hack)
 					currentPoly.palOffset += 0x800;
