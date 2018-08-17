@@ -61,6 +61,7 @@
 #include "speaker.h"
 #include "screen.h"
 #include "emupal.h"
+#include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
@@ -131,6 +132,8 @@ READ16_MEMBER(mpc3000_state::dsp_0008_hack_r)
 
 void mpc3000_state::mpc3000_io_map(address_map &map)
 {
+	map(0x0000, 0x0000).w("loledlatch", FUNC(hc259_device::write_nibble_d3));
+	map(0x0020, 0x0020).w("hiledlatch", FUNC(hc259_device::write_nibble_d3));
 	map(0x0060, 0x0067).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
 	map(0x0068, 0x0069).rw(FUNC(mpc3000_state::dsp_0008_hack_r), FUNC(mpc3000_state::dsp_0008_hack_w));
 	map(0x0080, 0x0087).rw("dioexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -172,6 +175,26 @@ void mpc3000_state::mpc3000(machine_config &config)
 	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, mpc3000_state, dma_memr_cb))
 	MCFG_V53_DMAU_IN_IOR_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_r_cb))
 	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_w_cb))
+
+	hc259_device &loledlatch(HC259(config, "loledlatch"));
+	loledlatch.q_out_cb<0>().set_output("led0").invert(); // Edit Loop
+	loledlatch.q_out_cb<1>().set_output("led1").invert(); // Simul Seq
+	loledlatch.q_out_cb<2>().set_output("led2").invert(); // Transpose
+	loledlatch.q_out_cb<3>().set_output("led3").invert(); // Wait For
+	loledlatch.q_out_cb<4>().set_output("led4").invert(); // Count In
+	loledlatch.q_out_cb<5>().set_output("led5").invert(); // Auto Punch
+	loledlatch.q_out_cb<6>().set_output("led6").invert(); // Rec
+	loledlatch.q_out_cb<7>().set_output("led7").invert(); // Over Dub
+
+	hc259_device &hiledlatch(HC259(config, "hiledlatch"));
+	hiledlatch.q_out_cb<0>().set_output("led8").invert(); // Play
+	hiledlatch.q_out_cb<1>().set_output("led9").invert(); // Bank A
+	hiledlatch.q_out_cb<2>().set_output("led10").invert(); // Bank B
+	hiledlatch.q_out_cb<3>().set_output("led11").invert(); // Bank C
+	hiledlatch.q_out_cb<4>().set_output("led12").invert(); // Bank D
+	hiledlatch.q_out_cb<5>().set_output("led13").invert(); // Full Level
+	hiledlatch.q_out_cb<6>().set_output("led14").invert(); // 16 Levels
+	hiledlatch.q_out_cb<7>().set_output("led15").invert(); // After
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
