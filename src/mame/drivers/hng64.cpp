@@ -727,7 +727,8 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 	the MIPS (at least in Fatal Fury) uploads this data to shared RAM prior to the call.
 
 	need to work out what triggers the interrupt, as a write to 0 wouldn't as the Dual Port RAM interrupts
-	are on addresses 0x7fe and 0x7ff
+	are on addresses 0x7fe and 0x7ff (we're using an address near the system regs, based on code analysis
+	it seems correct, see hng64_mips_to_iomcu_irq_w )
 */
 
 WRITE8_MEMBER(hng64_state::hng64_dualport_w)
