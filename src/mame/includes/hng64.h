@@ -220,6 +220,8 @@ private:
 	int m_samsho64_3d_hack;
 	int m_roadedge_3d_hack;
 
+	uint8_t m_fbcontrol[4];
+
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
 
@@ -280,6 +282,9 @@ private:
 	DECLARE_READ8_MEMBER(hng64_dualport_r);
 	DECLARE_WRITE8_MEMBER(hng64_dualport_w);
 
+	DECLARE_READ8_MEMBER(hng64_fbcontrol_r);
+	DECLARE_WRITE8_MEMBER(hng64_fbcontrol_w);
+
 	DECLARE_READ32_MEMBER(hng64_3d_regs_r);
 	DECLARE_WRITE32_MEMBER(hng64_3d_regs_w);
 
@@ -293,6 +298,7 @@ private:
 	//DECLARE_READ32_MEMBER(dl_r);
 	DECLARE_WRITE32_MEMBER(dl_control_w);
 	DECLARE_WRITE32_MEMBER(dl_upload_w);
+	DECLARE_WRITE32_MEMBER(dl_unk_w);
 	DECLARE_READ32_MEMBER(dl_vreg_r);
 
 	DECLARE_WRITE32_MEMBER(tcram_w);

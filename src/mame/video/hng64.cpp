@@ -993,7 +993,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	hng64_drawtilemap(screen,bitmap,cliprect, 0);
 
 	// 3d gets drawn next
-	if(!(m_3dregs[0] & 0x1000000))
+	if(!(m_fbcontrol[0] & 0x01))
 	{
 		int x, y;
 
@@ -1045,12 +1045,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		m_videoregs[0x0b],
 		m_videoregs[0x0c],
 		m_videoregs[0x0d]);
-
-	if (0)
-	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
-		m_3dregs[0x00/4], m_3dregs[0x04/4], m_3dregs[0x08/4], m_3dregs[0x0c/4],
-		m_3dregs[0x10/4], m_3dregs[0x14/4], m_3dregs[0x18/4], m_3dregs[0x1c/4],
-		m_3dregs[0x20/4], m_3dregs[0x24/4], m_3dregs[0x28/4], m_3dregs[0x2c/4]);
 
 	if (0)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",

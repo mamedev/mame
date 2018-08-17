@@ -791,11 +791,14 @@ void hng64_state::hng_map(address_map &map)
 	// 3D display list control
 	map(0x20300000, 0x203001ff).w(FUNC(hng64_state::dl_w)); // 3d Display List
 	map(0x20300200, 0x20300203).w(FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
+	map(0x20300210, 0x20300213).w(FUNC(hng64_state::dl_unk_w)); // once, on startup
 	map(0x20300214, 0x20300217).w(FUNC(hng64_state::dl_control_w));
 	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::dl_vreg_r));
 
 	// 3D framebuffer
-	map(0x30000000, 0x3000002f).rw(FUNC(hng64_state::hng64_3d_regs_r), FUNC(hng64_state::hng64_3d_regs_w)).share("3dregs");
+	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);;
+
+	map(0x30000004, 0x3000002f).rw(FUNC(hng64_state::hng64_3d_regs_r), FUNC(hng64_state::hng64_3d_regs_w)).share("3dregs");
 	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
 	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
 
@@ -1718,6 +1721,13 @@ void hng64_state::machine_reset()
 
 	// on real hardware, even with no network, it takes until the counter reaches about 37 (Xtreme Rally) to boot, this kicks in at around 7
 	m_comhack_timer->adjust(m_maincpu->cycles_to_attotime(400000000));
+
+	// does the HW init these to anything?
+	m_fbcontrol[0] = 0x00;
+	m_fbcontrol[1] = 0x00;
+	m_fbcontrol[2] = 0x00;
+	m_fbcontrol[3] = 0x00;
+
 }
 
 /***********************************************

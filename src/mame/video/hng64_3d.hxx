@@ -56,6 +56,11 @@ WRITE16_MEMBER(hng64_state::dl_w)
 	COMBINE_DATA(&m_dl[offset]);
 }
 
+WRITE32_MEMBER(hng64_state::dl_unk_w)
+{
+	logerror("%s: dl_unk_w %08x (%08x)\n", machine().describe_context(), data, mem_mask);
+}
+
 WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
 	// Data is:
@@ -537,7 +542,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// FIXME: This isn't correct.
 			//        Buriki & Xrally need this line.  Roads Edge needs it removed.
 			//        So instead we're looking for a bit that is on for XRally & Buriki, but noone else.
-			if (m_3dregs[0x00/4] & 0x2000)
+			if (m_fbcontrol[3] & 0x20)
 			{
 				if (!m_roadedge_3d_hack)
 					currentPoly.palOffset += 0x800;
@@ -1022,16 +1027,57 @@ void hng64_state::clear3d()
 /* 3D/framebuffer video registers
  * ------------------------------
  *
- * uint32_t | Bits                                    | Use
- *        | 3322 2222 2222 1111 1111 11             |
- * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *      0 | ---- --x- ---- ---- ---- ---- ---- ---- | Reads in Fatal Fury WA, if on then there isn't a 3d refresh (busy flag?).
- *      0 | ---- ---x ---- ---- ---- ---- ---- ---- | set at POST/service modes, almost likely fb disable
- *      0 | ???? ???? ???? ???? ccc? ???? ???? ???? | framebuffer color base, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One
- *      1 |                                         |
- *      2 | ???? ???? ???? ???? ???? ???? ???? ???? | camera / framebuffer global x/y? Actively used by Samurai Shodown 64 2
- *      3 | ---- --?x ---- ---- ---- ---- ---- ---- | unknown, unsetted by Buriki One and set by Fatal Fury WA, buffering mode?
- *   4-11 | ---- ???? ---- ???? ---- ???? ---- ???? | Table filled with 0x0? data
+ *        | Bits      | Use
+ *        |           |
+ * -------+ 7654-3210-+---------------- 
+ *      0 | ---- --xy | x = Reads in Fatal Fury WA, if on then there isn't a 3d refresh (busy flag?).  y = set at POST/service modes, almost likely fb disable
+ *      1 | ---- ---- |
+ *      2 | ccc- b--- | c = framebuffer color base, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One (or not?)  b = don't clear buffer
+ *      3 | ---- ---- | 
+*/
+
+READ8_MEMBER(hng64_state::hng64_fbcontrol_r)
+{
+	logerror("%s: hng64_fbcontrol_r (%03x)\n", machine().describe_context(), offset);
+	return m_fbcontrol[offset];
+}
+
+WRITE8_MEMBER(hng64_state::hng64_fbcontrol_w)
+{
+
+	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
+       ':maincpu' (8001EDE0): hng64_fbcontrol_w (002) 10 (disable frame buffer clear)
+       ':maincpu' (8001FE4C): hng64_fbcontrol_w (002) 38 (normal)
+
+	   during the Hyper Neogeo 64 logo it has a value of
+	   ':maincpu' (8005AA44): hng64_fbcontrol_w (002) 18
+	   
+	   sams64 does
+	   ':maincpu' (800C13C4): hng64_fbcontrol_r (002)     (ANDs with 0x07, ORs with 0x18)
+	   ':maincpu' (800C13D0): hng64_fbcontrol_w (002) 18
+
+	   other games use either mix of 0x18 and 0x38.  bit 0x08 must prevent the framebuffer clear tho
+	   according to above table bit 0x20 is color base, but implementation for it is a hack
+
+	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
+
+	*/
+
+	logerror("%s: hng64_fbcontrol_w (%03x) %02x\n", machine().describe_context(), offset, data);
+	m_fbcontrol[offset] = data;
+}
+
+/*
+treated as 2 16 bit writes
+ *      4 |                                         |
+ treated as 2 16 bit writes
+ *      8 | ???? ???? ???? ???? ???? ???? ???? ???? | camera / framebuffer global x/y? Actively used by Samurai Shodown 64 2
+
+treated as single 8-bit write
+ *      c | ---- --?x ---- ---- ---- ---- ---- ---- | unknown, unsetted by Buriki One and set by Fatal Fury WA, buffering mode?
+
+ treated as 2x 16 bit writes each
+ *   10+  | ---- ???? ---- ???? ---- ???? ---- ???? | Table filled with 0x0? data
  *
  */
 
@@ -1044,23 +1090,6 @@ READ32_MEMBER(hng64_state::hng64_3d_regs_r)
 
 WRITE32_MEMBER(hng64_state::hng64_3d_regs_w)
 {
-	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
-       ':maincpu' (8001EDE0): hng64_3d_regs_w (000) 00001000 (0000ff00) (disable frame buffer clear)
-       ':maincpu' (8001FE4C): hng64_3d_regs_w (000) 00003800 (0000ff00) (normal)
-
-	   during the Hyper Neogeo 64 logo it has a value of
-	   ':maincpu' (8005AA44): hng64_3d_regs_w (000) 00001800 (0000ff00)
-	   
-	   sams64 does
-	   ':maincpu' (800C13C4): hng64_3d_regs_r (000) (0000ff00) (ANDs with 0x07, ORs with 0x18)
-	   ':maincpu' (800C13D0): hng64_3d_regs_w (000) 00001800 (0000ff00)
-
-	   other games use either mix of 0x18 and 0x38.  bit 0x08 must prevent the framebuffer clear tho
-	   according to above table bit 0x20 is color base, but implementation for it is a hack
-
-	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
-
-	*/
 	logerror("%s: hng64_3d_regs_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 
 	COMBINE_DATA(&m_3dregs[offset]);
