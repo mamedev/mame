@@ -624,6 +624,24 @@ WRITE32_MEMBER(hng64_state::hng64_irqc_w)
   the 0x1074 address seems to be the same thing but for the network CPU
   0x20 is written to 0x1074 in the MIPS IRQ handlers that seem to be associated with communication (levels 0x09, 0x0a, 0x0b, 0x0c)
 
+
+  -----
+  the following notes are taken from the old 'fake IO' function, in reality it turned out that these 'commands' were not needed
+  with the real IO MCU hooked up, although we still use the 0x0c one as a hack in order to provide the 'm_no_machine_error_code' value
+  in order to bypass a startup check, in reality it looks like that should be written by the MCU after reading it via serial.
+
+  ---- OUTDATED NOTES ----
+
+  I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
+
+	command table:
+	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
+	0x0c = cut down connections, treats the dualport to be normal RAM
+	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
+	0x20 = asks for MCU machine code (probably not, this is also written in the function after the TLCS870 requests an interrupt on the MIPS)
+
+	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
+  ----
 */
 
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
@@ -674,17 +692,7 @@ READ8_MEMBER(hng64_state::hng64_dualport_r)
 {
 	LOG("%s: dualport R %04x\n", machine().describe_context(), offset);
 
-	/*
-	I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
-
-	command table:
-	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
-	0x0c = cut down connections, treats the dualport to be normal RAM
-	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
-	0x20 = asks for MCU machine code (probably not, this is also written in the function after the TLCS870 requests an interrupt on the MIPS)
-
-	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
-	*/
+	// hack, this should just be put in ram at 0x600 by the MCU.
 	if (!(m_mcu_en == 0x0c))
 	{
 		switch (offset)
