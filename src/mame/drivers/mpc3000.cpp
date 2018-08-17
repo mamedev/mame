@@ -139,9 +139,9 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x0080, 0x0087).rw("dioexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	//map(0x00a0, 0x00bf).rw("spc", FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask(0x00ff);
 	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read0), FUNC(te7774_device::write0)).umask(0x00ff);
-	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read1), FUNC(te7774_device::write1)).umask(0x00ff);
-	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read2), FUNC(te7774_device::write2)).umask(0x00ff);
-	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read3), FUNC(te7774_device::write3)).umask(0x00ff);
+	//map(0x00c8, 0x00cf).rw("sio", FUNC(te7774_device::read1), FUNC(te7774_device::write1)).umask(0x00ff);
+	//map(0x00d0, 0x00d7).rw("sio", FUNC(te7774_device::read2), FUNC(te7774_device::write2)).umask(0x00ff);
+	//map(0x00d8, 0x00df).rw("sio", FUNC(te7774_device::read3), FUNC(te7774_device::write3)).umask(0x00ff);
 	map(0x00e0, 0x00e0).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x00e2, 0x00e2).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x00e8, 0x00eb).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
