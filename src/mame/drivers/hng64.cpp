@@ -503,7 +503,7 @@ READ32_MEMBER(hng64_state::hng64_rtc_r)
 	else
 	{
 		// shouldn't happen unless something else is mapped here too
-		logerror("%s: unhandled hng64_rtc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+		LOG("%s: unhandled hng64_rtc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
 		return 0xffffffff;
 	}
 }
@@ -532,7 +532,7 @@ READ32_MEMBER(hng64_state::hng64_dmac_r)
 	if ((offset * 4) == 0x54)
 		return 0x00000000; //dma status, 0x800
 
-	logerror("%s: unhandled hng64_dmac_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+	LOG("%s: unhandled hng64_dmac_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
 
 	return 0xffffffff;
 }
@@ -556,7 +556,7 @@ WRITE32_MEMBER(hng64_state::hng64_dmac_w)
 	case 0x4c: // (0x0101 - trigger) (0x0000 - after DMA)
 	case 0x5c: // (0x0008 - trigger?) after 0x4c
 	default:
-		logerror("%s: unhandled hng64_dmac_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		LOG("%s: unhandled hng64_dmac_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 		break;
 	}
 }
@@ -571,7 +571,7 @@ WRITE32_MEMBER(hng64_state::hng64_rtc_w)
 	else
 	{
 		// shouldn't happen unless something else is mapped here too
-		logerror("%s: unhandled hng64_rtc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		LOG("%s: unhandled hng64_rtc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
 }
 
@@ -582,14 +582,41 @@ WRITE32_MEMBER(hng64_state::hng64_mips_to_iomcu_irq_w)
 	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
 }
 
+READ32_MEMBER(hng64_state::hng64_irqc_r)
+{
+	if ((offset * 4) == 0x04)
+	{
+		LOG("%s: irq level READ %04x\n", machine().describe_context(), m_irq_level);
+		return m_irq_level;
+	}
+	else
+	{
+		LOG("%s: unhandled hng64_irqc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+	}
 
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(hng64_state::hng64_irqc_w)
+{
+	switch (offset * 4)
+	{
+		//case 0x0c: // global irq mask? (probably not)
+	case 0x1c:
+		// IRQ ack
+		m_irq_pending &= ~(data&mem_mask);
+		set_irq(0x0000);
+		break;
+
+	default:
+		LOG("%s: unhandled hng64_irqc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		break;
+	}
+}
 
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
 {
-	if ((offset * 4) != 0x1104)
-	{
-		//logerror("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context().c_str(), offset * 4, mem_mask);
-	}
+	//LOG("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
 
 	switch(offset*4)
 	{
@@ -599,13 +626,6 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		case 0x1084:
 			LOG("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
 			return 0x00000002; //MCU->MIPS latch port
-		//case 0x108c:
-		case 0x1104:
-			LOG("%s: irq level READ %04x\n", machine().describe_context(),m_irq_level);
-			return m_irq_level;
-		case 0x111c:
-			//printf("Read to IRQ ACK?\n");
-			break;
 	}
 
 	return m_sysregs[offset];
@@ -626,10 +646,6 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
 			LOG("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
-		//0x110c global irq mask?
-		/* irq ack */
-		case 0x111c: m_irq_pending &= ~m_sysregs[offset]; set_irq(0x0000); break;
-
 		default:
 			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
@@ -799,7 +815,9 @@ void hng64_state::hng_map(address_map &map)
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
 	// Misc Peripherals
-	map(0x1f700000, 0x1f7011ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	map(0x1f700000, 0x1f7010ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs"); // various things
+
+	map(0x1f701100, 0x1f70111f).rw(FUNC(hng64_state::hng64_irqc_r), FUNC(hng64_state::hng64_irqc_w));
 	map(0x1f701200, 0x1f70127f).rw(FUNC(hng64_state::hng64_dmac_r), FUNC(hng64_state::hng64_dmac_w));
 	// 1f702004 used (rarely writes 01 or a random looking value as part of init sequences)
 	map(0x1f702100, 0x1f70217f).rw(FUNC(hng64_state::hng64_rtc_r), FUNC(hng64_state::hng64_rtc_w));
