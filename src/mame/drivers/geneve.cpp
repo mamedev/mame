@@ -698,8 +698,8 @@ MACHINE_CONFIG_START(geneve_state::geneve)
 	geneve_common(config);
 
 	// Mapper
-	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENEVE_MAPPER, 0)
-	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
+	GENEVE_MAPPER(config, m_mapper, 0);
+	m_mapper->ready_cb().set(FUNC(geneve_state::mapper_ready));
 
 	// Peripheral expansion box (Geneve composition)
 	TI99_PERIBOX_GEN(config, m_peribox, 0);
@@ -712,8 +712,8 @@ MACHINE_CONFIG_START(geneve_state::genmod)
 	geneve_common(config);
 
 	// Mapper
-	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENMOD_MAPPER, 0)
-	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
+	GENMOD_MAPPER(config, m_mapper, 0);
+	m_mapper->ready_cb().set(FUNC(geneve_state::mapper_ready));
 
 	// Peripheral expansion box (Geneve composition with Genmod and plugged-in Memex)
 	TI99_PERIBOX_GENMOD(config, m_peribox, 0);
@@ -764,11 +764,10 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
 
 	// User interface devices
-	MCFG_DEVICE_ADD( GENEVE_KEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
-	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(*this, geneve_state, keyboard_interrupt) )
+	GENEVE_KEYBOARD(config, m_keyboard, 0);
+	m_keyboard->int_cb().set(FUNC(geneve_state::keyboard_interrupt));
 	TI99_JOYPORT(config, m_joyport, 0);
 	m_joyport->configure_slot(false, false);
-
 	TI99_COLORBUS(config, m_colorbus, 0);
 	m_colorbus->configure_slot();
 

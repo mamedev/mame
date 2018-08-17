@@ -52,7 +52,8 @@ class jpms80_state : public driver_device
 public:
 	jpms80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_duart(*this, "tms9902duart")
 	{ }
 
 	void jpms80(machine_config &config);
@@ -73,6 +74,7 @@ private:
 
 	// devices
 	required_device<tms9995_device> m_maincpu;
+	required_device<tms9902_device> m_duart;
 };
 
 WRITE_LINE_MEMBER(jpms80_state::int1_enable_w)
@@ -158,7 +160,7 @@ MACHINE_CONFIG_START(jpms80_state::jpms80)
 	outlatch10.q_out_cb<2>().set(FUNC(jpms80_state::watchdog_w)); // 52 - Watchdog
 	outlatch10.q_out_cb<3>().set(FUNC(jpms80_state::io_enable_w)); // 53 - I/O Enable
 
-	MCFG_DEVICE_ADD("tms9902duart", TMS9902, DUART_CLOCK)
+	TMS9902(config, m_duart, DUART_CLOCK);
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

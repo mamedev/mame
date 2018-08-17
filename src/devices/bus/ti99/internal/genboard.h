@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
 	uint8_t get_recent_key();
 
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_interrupt.set_callback(std::forward<Object>(cb)); }
+	auto int_cb() { return m_interrupt.bind(); }
 
 protected:
 	void               device_start() override;
@@ -107,9 +107,6 @@ private:
 	emu_timer*      m_timer;
 };
 
-#define MCFG_GENEVE_KBINT_HANDLER( _intcallb ) \
-	downcast<bus::ti99::internal::geneve_keyboard_device &>(*device).set_int_callback(DEVCB_##_intcallb);
-
 /*****************************************************************************/
 
 class geneve_mapper_device : public device_t
@@ -138,7 +135,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
 	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
 
-	template <class Object> devcb_base &set_ready_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
+	auto ready_cb() { return m_ready.bind(); }
 
 protected:
 	geneve_mapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -306,9 +303,6 @@ private:
 	bool    m_gm_timode;
 	bool    m_turbo;
 };
-
-#define MCFG_GENEVE_READY_HANDLER( _intcallb ) \
-	downcast<bus::ti99::internal::geneve_mapper_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
 
 } } } // end namespace bus::ti99::internal
 

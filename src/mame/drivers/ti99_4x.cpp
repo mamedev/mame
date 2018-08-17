@@ -924,9 +924,17 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM devices
-	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	tmc0430_device& grom0(TMC0430(config, TI99_GROM0_TAG, 0));
+	grom0.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom0.set_region_and_ident(TI99_CONSOLEGROM, 0x0000, 0);
+
+	tmc0430_device& grom1(TMC0430(config, TI99_GROM1_TAG, 0));
+	grom1.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom1.set_region_and_ident(TI99_CONSOLEGROM, 0x2000, 1);
+
+	tmc0430_device& grom2(TMC0430(config, TI99_GROM2_TAG, 0));
+	grom2.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom2.set_region_and_ident(TI99_CONSOLEGROM, 0x4000, 2);
 
 	// Joystick port
 	TI99_JOYPORT(config, m_joyport, 0);
@@ -1044,9 +1052,17 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM devices
-	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	tmc0430_device& grom0(TMC0430(config, TI99_GROM0_TAG, 0));
+	grom0.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom0.set_region_and_ident(TI99_CONSOLEGROM, 0x0000, 0);
+
+	tmc0430_device& grom1(TMC0430(config, TI99_GROM1_TAG, 0));
+	grom1.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom1.set_region_and_ident(TI99_CONSOLEGROM, 0x2000, 1);
+
+	tmc0430_device& grom2(TMC0430(config, TI99_GROM2_TAG, 0));
+	grom2.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom2.set_region_and_ident(TI99_CONSOLEGROM, 0x4000, 2);
 
 	// Joystick port
 	TI99_JOYPORT(config, m_joyport, 0);
@@ -1185,7 +1201,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	RAM(config, TI99_EXPRAM_TAG).set_default_size("32K").set_default_value(0);
 
 	// EVPC connector
-	MCFG_ADD_EVPC_CONNECTOR( TI99_EVPC_CONN_TAG, WRITELINE( *this, ti99_4x_state, video_interrupt_evpc_in ) )
+	bus::ti99::internal::evpc_clock_connector& evpcconn(TI99_EVPCCONN(config, TI99_EVPC_CONN_TAG, 0));
+	evpcconn.vdpint_cb().set(FUNC(ti99_4x_state::video_interrupt_evpc_in));
 
 	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
@@ -1204,9 +1221,17 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM devices
-	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	tmc0430_device& grom0(TMC0430(config, TI99_GROM0_TAG, 0));
+	grom0.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom0.set_region_and_ident(TI99_CONSOLEGROM, 0x0000, 0);
+
+	tmc0430_device& grom1(TMC0430(config, TI99_GROM1_TAG, 0));
+	grom1.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom1.set_region_and_ident(TI99_CONSOLEGROM, 0x2000, 1);
+
+	tmc0430_device& grom2(TMC0430(config, TI99_GROM2_TAG, 0));
+	grom2.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	grom2.set_region_and_ident(TI99_CONSOLEGROM, 0x4000, 2);
 
 	// Joystick port
 	TI99_JOYPORT(config, m_joyport, 0);

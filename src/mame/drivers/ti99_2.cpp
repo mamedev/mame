@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_224)
 	MCFG_VIDEO992_SCREEN_ADD( TI992_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI992_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
 	// I/O interface circuit
-	MCFG_DEVICE_ADD(TI992_IO_TAG, IO99224, 0)
+	IO99224(config, m_io992, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_224 )
 MACHINE_CONFIG_END
@@ -442,8 +442,8 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_232)
 	MCFG_SCREEN_UPDATE_DEVICE( TI992_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
 
 	// I/O interface circuit
-	MCFG_DEVICE_ADD(TI992_IO_TAG, IO99232, 0)
-	MCFG_SET_ROMBANK_HANDLER(WRITELINE(*this, ti99_2_state, rombank_set) )
+	IO99232(config, m_io992, 0);
+	m_io992->rombank_cb().set(FUNC(ti99_2_state::rombank_set));
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_232 )
 
