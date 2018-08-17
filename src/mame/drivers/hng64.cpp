@@ -824,10 +824,10 @@ void hng64_state::hng_map(address_map &map)
 	map(0x1f7021c4, 0x1f7021c7).w(FUNC(hng64_state::hng64_mips_to_iomcu_irq_w));
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	map(0x1F800000, 0x1F803fff).ram().share("nvram");
+	map(0x1f800000, 0x1f803fff).ram().share("nvram");
 
 	// Dualport RAM (shared with IO MCU)
-	map(0x1F808000, 0x1F8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
+	map(0x1f808000, 0x1f8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
 
 	// BIOS ROM
 	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
