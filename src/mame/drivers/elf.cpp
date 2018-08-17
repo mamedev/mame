@@ -237,16 +237,16 @@ QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 
 MACHINE_CONFIG_START(elf2_state::elf2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'579'545)/2)
-	MCFG_DEVICE_PROGRAM_MAP(elf2_mem)
-	MCFG_DEVICE_IO_MAP(elf2_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, elf2_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, elf2_state, clear_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, elf2_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, elf2_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, elf2_state, dma_r))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1861_TAG, cdp1861_device, dma_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, elf2_state, sc_w))
+	CDP1802(config, m_maincpu, XTAL(3'579'545)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elf2_state::elf2_mem);
+	m_maincpu->set_addrmap(AS_IO, &elf2_state::elf2_io);
+	m_maincpu->wait_cb().set(FUNC(elf2_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(elf2_state::clear_r));
+	m_maincpu->ef4_cb().set(FUNC(elf2_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(elf2_state::q_w));
+	m_maincpu->dma_rd_cb().set(FUNC(elf2_state::dma_r));
+	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
+	m_maincpu->sc_cb().set(FUNC(elf2_state::sc_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_elf2);

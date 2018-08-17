@@ -508,18 +508,18 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(cosmicos_mem)
-	MCFG_DEVICE_IO_MAP(cosmicos_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, cosmicos_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cosmicos_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, cosmicos_state, ef1_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, cosmicos_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, cosmicos_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, cosmicos_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cosmicos_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, cosmicos_state, dma_r))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, cosmicos_state, sc_w))
+	CDP1802(config, m_maincpu, XTAL(1'750'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmicos_state::cosmicos_mem);
+	m_maincpu->set_addrmap(AS_IO, &cosmicos_state::cosmicos_io);
+	m_maincpu->wait_cb().set(FUNC(cosmicos_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(cosmicos_state::clear_r));
+	m_maincpu->ef1_cb().set(FUNC(cosmicos_state::ef1_r));
+	m_maincpu->ef2_cb().set(FUNC(cosmicos_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(cosmicos_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(cosmicos_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(cosmicos_state::q_w));
+	m_maincpu->dma_rd_cb().set(FUNC(cosmicos_state::dma_r));
+	m_maincpu->sc_cb().set(FUNC(cosmicos_state::sc_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_cosmicos);

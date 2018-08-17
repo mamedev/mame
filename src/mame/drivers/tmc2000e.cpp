@@ -282,15 +282,15 @@ void tmc2000e_state::machine_reset()
 
 MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(tmc2000e_map)
-	MCFG_DEVICE_IO_MAP(tmc2000e_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, tmc2000e_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc2000e_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc2000e_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc2000e_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, tmc2000e_state, dma_w))
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmc2000e_state::tmc2000e_map);
+	m_maincpu->set_addrmap(AS_IO, &tmc2000e_state::tmc2000e_io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(tmc2000e_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(tmc2000e_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(tmc2000e_state::ef3_r));
+	m_maincpu->q_cb().set(FUNC(tmc2000e_state::q_w));
+	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
 
 	// video hardware
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))

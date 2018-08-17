@@ -308,15 +308,15 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 
 MACHINE_CONFIG_START(eti660_state::eti660)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(8'867'238)/5)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, eti660_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, eti660_state, ef2_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, eti660_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, eti660_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, eti660_state, dma_w))
+	CDP1802(config, m_maincpu, XTAL(8'867'238)/5);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eti660_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &eti660_state::io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(eti660_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(eti660_state::ef2_r));
+	m_maincpu->ef4_cb().set(FUNC(eti660_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(eti660_state::q_w));
+	m_maincpu->dma_wr_cb().set(FUNC(eti660_state::dma_w));
 
 	/* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(8'867'238)/5)
