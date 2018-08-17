@@ -174,6 +174,18 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
+	/* TODO: NOT measured! */
+	const int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
+
+	const int HTOTAL = 0x200+0x100;
+	const int HBEND = 0;
+	const int HBSTART = 0x200;
+
+	const int VTOTAL = 264*2;
+	const int VBEND = 0;
+	const int VBSTART = 224*2;
+
+
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
 	required_device<tmp87ph40an_device> m_iomcu;

@@ -1151,6 +1151,46 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
 
+// Transition Control memory.
+WRITE32_MEMBER(hng64_state::tcram_w)
+{
+	uint32_t *hng64_tcram = m_tcram;
+
+	COMBINE_DATA (&hng64_tcram[offset]);
+
+	if(offset == 0x02)
+	{
+		uint16_t min_x, min_y, max_x, max_y;
+		rectangle visarea = m_screen->visible_area();
+
+		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
+		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
+		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
+		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
+
+		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
+		{
+			m_screen_dis = 1;
+			return;
+		}
+
+		m_screen_dis = 0;
+
+		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
+		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds() );
+	}
+}
+
+READ32_MEMBER(hng64_state::tcram_r)
+{
+	/* is this really a port? this seems treated like RAM otherwise, check if there's code anywhere
+	   to write the desired value here instead */
+	if ((offset*4) == 0x48)
+		return ioport("VBLANK")->read();
+
+	return m_tcram[offset];
+}
+
 // Very much a work in progress - no hard testing has been done
 void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

@@ -56,38 +56,6 @@ WRITE16_MEMBER(hng64_state::dl_w)
 	COMBINE_DATA(&m_dl[offset]);
 }
 
-READ32_MEMBER(hng64_state::hng64_3d_regs_r)
-{
-	logerror("%s: hng64_3d_regs_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-	return m_3dregs[offset];
-}
-
-WRITE32_MEMBER(hng64_state::hng64_3d_regs_w)
-{
-	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
-       ':maincpu' (8001EDE0): hng64_3d_regs_w (000) 00001000 (0000ff00) (disable frame buffer clear)
-       ':maincpu' (8001FE4C): hng64_3d_regs_w (000) 00003800 (0000ff00) (normal)
-
-	   during the Hyper Neogeo 64 logo it has a value of
-	   ':maincpu' (8005AA44): hng64_3d_regs_w (000) 00001800 (0000ff00)
-	   
-	   sams64 does
-	   ':maincpu' (800C13C4): hng64_3d_regs_r (000) (0000ff00) (ANDs with 0x07, ORs with 0x18)
-	   ':maincpu' (800C13D0): hng64_3d_regs_w (000) 00001800 (0000ff00)
-
-	   other games use either mix of 0x18 and 0x38, meaning of bit 0x20 unknown.  bit 0x08 must prevent the framebuffer clear tho
-
-	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
-
-	*/
-	logerror("%s: hng64_3d_regs_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-
-	COMBINE_DATA(&m_3dregs[offset]);
-}
-
-
-
-
 WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
 	// Data is:
@@ -1067,6 +1035,36 @@ void hng64_state::clear3d()
  *
  */
 
+
+READ32_MEMBER(hng64_state::hng64_3d_regs_r)
+{
+	logerror("%s: hng64_3d_regs_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+	return m_3dregs[offset];
+}
+
+WRITE32_MEMBER(hng64_state::hng64_3d_regs_w)
+{
+	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
+       ':maincpu' (8001EDE0): hng64_3d_regs_w (000) 00001000 (0000ff00) (disable frame buffer clear)
+       ':maincpu' (8001FE4C): hng64_3d_regs_w (000) 00003800 (0000ff00) (normal)
+
+	   during the Hyper Neogeo 64 logo it has a value of
+	   ':maincpu' (8005AA44): hng64_3d_regs_w (000) 00001800 (0000ff00)
+	   
+	   sams64 does
+	   ':maincpu' (800C13C4): hng64_3d_regs_r (000) (0000ff00) (ANDs with 0x07, ORs with 0x18)
+	   ':maincpu' (800C13D0): hng64_3d_regs_w (000) 00001800 (0000ff00)
+
+	   other games use either mix of 0x18 and 0x38.  bit 0x08 must prevent the framebuffer clear tho
+	   according to above table bit 0x20 is color base, but implementation for it is a hack
+
+	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
+
+	*/
+	logerror("%s: hng64_3d_regs_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+
+	COMBINE_DATA(&m_3dregs[offset]);
+}
 
 /////////////////////
 // 3D UTILITY CODE //

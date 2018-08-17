@@ -450,19 +450,6 @@ or Fatal Fury for example).
 #define VERBOSE 1
 #include "logmacro.h"
 
-/* TODO: NOT measured! */
-#define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
-
-#define HTOTAL              (0x200+0x100)
-#define HBEND               (0)
-#define HBSTART             (0x200)
-
-#define VTOTAL              (264*2)
-#define VBEND               (0)
-#define VBSTART             (224*2)
-
-
-
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
 	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
@@ -676,47 +663,6 @@ WRITE8_MEMBER(hng64_state::hng64_dualport_w)
 	LOG("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
 }
 
-
-// Transition Control memory.
-WRITE32_MEMBER(hng64_state::tcram_w)
-{
-	uint32_t *hng64_tcram = m_tcram;
-
-	COMBINE_DATA (&hng64_tcram[offset]);
-
-	if(offset == 0x02)
-	{
-		uint16_t min_x, min_y, max_x, max_y;
-		rectangle visarea = m_screen->visible_area();
-
-		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
-		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
-		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
-		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
-
-		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
-		{
-			m_screen_dis = 1;
-			return;
-		}
-
-		m_screen_dis = 0;
-
-		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds() );
-	}
-}
-
-READ32_MEMBER(hng64_state::tcram_r)
-{
-	/* is this really a port? this seems treated like RAM otherwise, check if there's code anywhere
-	   to write the desired value here instead */
-	if ((offset*4) == 0x48)
-		return ioport("VBLANK")->read();
-
-	return m_tcram[offset];
-}
-
 /************************************************************************************************************/
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
@@ -811,7 +757,7 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 
 void hng64_state::hng_map(address_map &map)
 {
-
+	// main RAM / ROM
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
@@ -821,10 +767,10 @@ void hng64_state::hng_map(address_map &map)
 	// SRAM.  Coin data, Player Statistics, etc.
 	map(0x1F800000, 0x1F803fff).ram().share("nvram");
 
-	// Dualport RAM
+	// Dualport RAM (shared with IO MCU)
 	map(0x1F808000, 0x1F8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
 
-	// BIOS
+	// BIOS ROM
 	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
 
 	// Sprites
@@ -841,7 +787,6 @@ void hng64_state::hng_map(address_map &map)
 	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
 	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
-
 
 	// 3D display list control
 	map(0x20300000, 0x203001ff).w(FUNC(hng64_state::dl_w)); // 3d Display List
@@ -862,16 +807,9 @@ void hng64_state::hng_map(address_map &map)
 	map(0x68000000, 0x6800000f).rw(FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
 	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::hng64_soundcpu_enable_w));
 
-	// Communications
+	// Dualport RAM (shared with Communications CPU)
 	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
 	map(0xc0001000, 0xc0001007).ram().share("comhack");//.rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
-
-	/* 6e000000-6fffffff */
-	/* 80000000-81ffffff */
-	/* 88000000-89ffffff */
-	/* 90000000-97ffffff */
-	/* 98000000-9bffffff */
-	/* a0000000-a3ffffff */
 }
 
 
@@ -1764,7 +1702,7 @@ void hng64_state::machine_start()
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 {
-	printf("comhack_callback %04x\n\n", m_comhack[0]);
+	LOG("comhack_callback %04x\n\n", m_comhack[0]);
 
 	m_comhack[0] = m_comhack[0] | 0x0002;
 }
