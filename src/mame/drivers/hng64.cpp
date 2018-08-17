@@ -796,9 +796,12 @@ void hng64_state::hng_map(address_map &map)
 	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::dl_vreg_r));
 
 	// 3D framebuffer
-	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);;
+	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);
+	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbunkpair_w)).umask32(0xffff);
+	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).umask32(0xffff);
+	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).umask32(0xffffffff);
+	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_fbtable_r), FUNC(hng64_state::hng64_fbtable_w)).share("fbtable");
 
-	map(0x30000004, 0x3000002f).rw(FUNC(hng64_state::hng64_3d_regs_r), FUNC(hng64_state::hng64_3d_regs_w)).share("3dregs");
 	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
 	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
 

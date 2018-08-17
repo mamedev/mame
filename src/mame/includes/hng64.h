@@ -149,7 +149,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_3dregs(*this, "3dregs"),
+		m_fbtable(*this, "fbtable"),
 		m_comhack(*this, "comhack"),
 		m_3d_1(*this, "3d_1"),
 		m_3d_2(*this, "3d_2"),
@@ -205,7 +205,7 @@ private:
 	required_shared_ptr<uint32_t> m_tcram;
 
 	std::unique_ptr<uint16_t[]> m_dl;
-	required_shared_ptr<uint32_t> m_3dregs;
+	required_shared_ptr<uint32_t> m_fbtable;
 	required_shared_ptr<uint32_t> m_comhack;
 	required_shared_ptr<uint32_t> m_3d_1;
 	required_shared_ptr<uint32_t> m_3d_2;
@@ -284,9 +284,14 @@ private:
 
 	DECLARE_READ8_MEMBER(hng64_fbcontrol_r);
 	DECLARE_WRITE8_MEMBER(hng64_fbcontrol_w);
+	
+	DECLARE_WRITE16_MEMBER(hng64_fbunkpair_w);
+	DECLARE_WRITE16_MEMBER(hng64_fbscroll_w);
 
-	DECLARE_READ32_MEMBER(hng64_3d_regs_r);
-	DECLARE_WRITE32_MEMBER(hng64_3d_regs_w);
+	DECLARE_WRITE8_MEMBER(hng64_fbunkbyte_w);
+
+	DECLARE_READ32_MEMBER(hng64_fbtable_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbtable_w);
 
 	DECLARE_READ32_MEMBER(hng64_3d_1_r);
 	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);

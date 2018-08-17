@@ -1067,32 +1067,44 @@ WRITE8_MEMBER(hng64_state::hng64_fbcontrol_w)
 	m_fbcontrol[offset] = data;
 }
 
-/*
-treated as 2 16 bit writes
- *      4 |                                         |
- treated as 2 16 bit writes
- *      8 | ???? ???? ???? ???? ???? ???? ???? ???? | camera / framebuffer global x/y? Actively used by Samurai Shodown 64 2
-
-treated as single 8-bit write
- *      c | ---- --?x ---- ---- ---- ---- ---- ---- | unknown, unsetted by Buriki One and set by Fatal Fury WA, buffering mode?
-
- treated as 2x 16 bit writes each
- *   10+  | ---- ???? ---- ???? ---- ???? ---- ???? | Table filled with 0x0? data
- *
- */
-
-
-READ32_MEMBER(hng64_state::hng64_3d_regs_r)
+WRITE16_MEMBER(hng64_state::hng64_fbunkpair_w)
 {
-	logerror("%s: hng64_3d_regs_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-	return m_3dregs[offset];
+	// set to fixed values?
+
+	logerror("%s: hng64_fbunkpair_w (%03x) %04x\n", machine().describe_context(), offset, data);
 }
 
-WRITE32_MEMBER(hng64_state::hng64_3d_regs_w)
+WRITE16_MEMBER(hng64_state::hng64_fbscroll_w)
 {
-	logerror("%s: hng64_3d_regs_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+	// this is used ingame on the samsho games, and on the car select screen in xrally (youtube video confirms position of car needs to change)
 
-	COMBINE_DATA(&m_3dregs[offset]);
+	logerror("%s: hng64_fbscroll_w (%03x) %04x\n", machine().describe_context(), offset, data);
+}
+
+WRITE8_MEMBER(hng64_state::hng64_fbunkbyte_w)
+{
+	if (offset == 0)
+	{
+		// | ---- --?x | unknown, unsetted by Buriki One and set by Fatal Fury WA, buffering mode?
+		logerror("%s: hng64_unkbyte_w (%03x) %02x\n", machine().describe_context(), offset, data);
+	}
+	else
+	{
+		logerror("%s: hng64_unkbyte_w (%03x - unexpected) %02x \n", machine().describe_context(), offset, data);	
+	}
+}
+
+// this is a table filled with 0x0? data, seems to be 16-bit values
+READ32_MEMBER(hng64_state::hng64_fbtable_r)
+{
+	logerror("%s: hng64_fbtable_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+	return m_fbtable[offset];
+}
+
+WRITE32_MEMBER(hng64_state::hng64_fbtable_w)
+{
+	logerror("%s: hng64_fbtable_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+	COMBINE_DATA(&m_fbtable[offset]);
 }
 
 /////////////////////
