@@ -61,6 +61,8 @@
 #include "speaker.h"
 #include "screen.h"
 #include "emupal.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
 #include "machine/upd765.h"
 
 class mpc3000_state : public driver_device
@@ -131,9 +133,17 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 {
 	map(0x0060, 0x0067).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
 	map(0x0068, 0x0069).rw(FUNC(mpc3000_state::dsp_0008_hack_r), FUNC(mpc3000_state::dsp_0008_hack_w));
+	map(0x0080, 0x0087).rw("dioexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	//map(0x00a0, 0x00bf).rw("spc", FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask(0x00ff);
+	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read0), FUNC(te7774_device::write0)).umask(0x00ff);
+	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read1), FUNC(te7774_device::write1)).umask(0x00ff);
+	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read2), FUNC(te7774_device::write2)).umask(0x00ff);
+	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read3), FUNC(te7774_device::write3)).umask(0x00ff);
 	map(0x00e0, 0x00e0).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x00e2, 0x00e2).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x00e8, 0x00eb).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
+	map(0x00f0, 0x00f7).rw("synctmr", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
 READ8_MEMBER(mpc3000_state::dma_memr_cb)
@@ -177,13 +187,25 @@ void mpc3000_state::mpc3000(machine_config &config)
 	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("maincpu", v53a_device, ir?_w))
 	//MCFG_UPD765_DRQ_CALLBACK(WRITELINE("maincpu", v53a_device, drq?_w))
 
+	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
+	pit.set_clk<0>(16_MHz_XTAL / 4);
+	pit.set_clk<1>(16_MHz_XTAL / 4);
+	pit.set_clk<2>(16_MHz_XTAL / 4);
+
+	I8255(config, "adcexp"); // MB89255B
+	I8255(config, "dioexp"); // MB89255B
+
 	HD61830(config, m_lcdc, 4.9152_MHz_XTAL / 2 / 2);
+
+	//TE7774(config, "sio", 16_MHz_XTAL / 4);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
 	//mdin.rxd_handler().set(m_maincpu, FUNC());
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
+
+	//MB89352(config, "spc", 16_MHz_XTAL / 2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
