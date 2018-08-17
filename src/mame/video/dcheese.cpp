@@ -183,15 +183,15 @@ void dcheese_state::do_blit(  )
 		for (int x = xstart; x <= xend; x++)
 		{
 			/* compute current X/Y positions */
-			int sx = (srcx + dxdx * (x - xstart) + dxdy * (y - ystart)) & 0xffffff;
-			int sy = (srcy + dydx * (x - xstart) + dydy * (y - ystart)) & 0xffffff;
+			int const sx = (srcx + dxdx * (x - xstart) + dxdy * (y - ystart)) & 0xffffff;
+			int const sy = (srcy + dydx * (x - xstart) + dydy * (y - ystart)) & 0xffffff;
 
 			/* clip to source cliprect */
 			if (sx >= srcminx && sx <= srcmaxx && sy >= srcminy && sy <= srcmaxy)
 			{
 				/* page comes from bit 22 of Y and bit 21 of X */
-				int page = (((sy >> 21) & 2) | ((sx >> 21) & 1) | ((sx >> 20) & 4)) & pagemask;
-				int pix = m_gfxrom[(page << 18) | (((sy >> 12) & 0x1ff) << 9) | ((sx >> 12) & 0x1ff)];
+				int const page = (((sy >> 21) & 2) | ((sx >> 21) & 1) | ((sx >> 20) & 4)) & pagemask;
+				int const pix = m_gfxrom[(page << 18) | (((sy >> 12) & 0x1ff) << 9) | ((sx >> 12) & 0x1ff)];
 
 				/* only non-zero pixels get written */
 				if (pix | opaque)
