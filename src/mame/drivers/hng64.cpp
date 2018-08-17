@@ -450,19 +450,6 @@ or Fatal Fury for example).
 #define VERBOSE 1
 #include "logmacro.h"
 
-/* TODO: NOT measured! */
-#define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
-
-#define HTOTAL              (0x200+0x100)
-#define HBEND               (0)
-#define HBSTART             (0x200)
-
-#define VTOTAL              (264*2)
-#define VBEND               (0)
-#define VBSTART             (224*2)
-
-
-
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
 	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
@@ -676,63 +663,6 @@ WRITE8_MEMBER(hng64_state::hng64_dualport_w)
 	LOG("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
 }
 
-
-// Transition Control memory.
-WRITE32_MEMBER(hng64_state::tcram_w)
-{
-	uint32_t *hng64_tcram = m_tcram;
-
-	COMBINE_DATA (&hng64_tcram[offset]);
-
-	if(offset == 0x02)
-	{
-		uint16_t min_x, min_y, max_x, max_y;
-		rectangle visarea = m_screen->visible_area();
-
-		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
-		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
-		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
-		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
-
-		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
-		{
-			m_screen_dis = 1;
-			return;
-		}
-
-		m_screen_dis = 0;
-
-		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds() );
-	}
-}
-
-READ32_MEMBER(hng64_state::tcram_r)
-{
-	//printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
-	if(offset == 0x12)
-		return ioport("VBLANK")->read();
-
-	return m_tcram[offset];
-}
-
-/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high,
-   unknown purpose (vblank? related to the display list?).
-
-   bit 1 needs to be off, otherwise Fatal Fury WA locks up (FIFO full?)
-   bit 0 is likely to be fifo empty (active low)
-   */
-READ32_MEMBER(hng64_state::unk_vreg_r)
-{
-//  m_unk_vreg_toggle^=0x8000;
-
-	return 0;
-
-//  return ++m_unk_vreg_toggle;
-}
-
-
-
 /************************************************************************************************************/
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
@@ -782,18 +712,6 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 	}
 }
 
-/*
-<ElSemi> 0xE0000000 sound
-<ElSemi> 0xD0100000 3D bank A
-<ElSemi> 0xD0200000 3D bank B
-<ElSemi> 0xC0000000-0xC000C000 Sprite
-<ElSemi> 0xC0200000-0xC0204000 palette
-<ElSemi> 0xC0100000-0xC0180000 Tilemap
-<ElSemi> 0xBF808000-0xBF808800 Dualport ram
-<ElSemi> 0xBF800000-0xBF808000 S-RAM
-<ElSemi> 0x60000000-0x60001000 Comm dualport ram
-*/
-
 WRITE32_MEMBER(hng64_state::hng64_vregs_w)
 {
 //  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
@@ -839,7 +757,7 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 
 void hng64_state::hng_map(address_map &map)
 {
-
+	// main RAM / ROM
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
@@ -849,30 +767,43 @@ void hng64_state::hng_map(address_map &map)
 	// SRAM.  Coin data, Player Statistics, etc.
 	map(0x1F800000, 0x1F803fff).ram().share("nvram");
 
-	// Dualport RAM
+	// Dualport RAM (shared with IO MCU)
 	map(0x1F808000, 0x1F8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
 
-	// BIOS
+	// BIOS ROM
 	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
 
-	// Video
+	// Sprites
 	map(0x20000000, 0x2000bfff).ram().share("spriteram");
 	map(0x2000d800, 0x2000e3ff).w(FUNC(hng64_state::hng64_sprite_clear_even_w));
 	map(0x2000e400, 0x2000efff).w(FUNC(hng64_state::hng64_sprite_clear_odd_w));
 	map(0x20010000, 0x20010013).ram().share("spriteregs");
+	
+	// Backgrounds
 	map(0x20100000, 0x2017ffff).ram().w(FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
 	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
+
+	// Mixing
 	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x20208000, 0x2020805f).rw(FUNC(hng64_state::tcram_r), FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
+
+	// 3D display list control
 	map(0x20300000, 0x203001ff).w(FUNC(hng64_state::dl_w)); // 3d Display List
 	map(0x20300200, 0x20300203).w(FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
+	map(0x20300210, 0x20300213).w(FUNC(hng64_state::dl_unk_w)); // once, on startup
 	map(0x20300214, 0x20300217).w(FUNC(hng64_state::dl_control_w));
-	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::unk_vreg_r));
+	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::dl_vreg_r));
 
-	// 3d?
-	map(0x30000000, 0x3000002f).ram().share("3dregs");
-	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
-	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
+	// 3D framebuffer
+	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);
+	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbunkpair_w)).umask32(0xffff);
+	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).umask32(0xffff);
+	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).umask32(0xffffffff);
+	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_fbtable_r), FUNC(hng64_state::hng64_fbtable_w)).share("fbtable");
+
+	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_fbram1_r), FUNC(hng64_state::hng64_fbram1_w)).share("fbram1");  // 3D Display Buffer A
+	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_fbram2_r), FUNC(hng64_state::hng64_fbram2_w)).share("fbram2");  // 3D Display Buffer B
 
 	// Sound
 	map(0x60000000, 0x601fffff).rw(FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
@@ -882,16 +813,9 @@ void hng64_state::hng_map(address_map &map)
 	map(0x68000000, 0x6800000f).rw(FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
 	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::hng64_soundcpu_enable_w));
 
-	// Communications
+	// Dualport RAM (shared with Communications CPU)
 	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
 	map(0xc0001000, 0xc0001007).ram().share("comhack");//.rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
-
-	/* 6e000000-6fffffff */
-	/* 80000000-81ffffff */
-	/* 88000000-89ffffff */
-	/* 90000000-97ffffff */
-	/* 98000000-9bffffff */
-	/* a0000000-a3ffffff */
 }
 
 
@@ -1475,6 +1399,12 @@ void hng64_state::init_hng64_race()
 	init_hng64();
 }
 
+void hng64_state::init_roadedge()
+{
+	init_hng64_race();
+	m_roadedge_3d_hack = 1;
+}
+
 void hng64_state::init_hng64_shoot()
 {
 	m_no_machine_error_code = 0x03;
@@ -1778,7 +1708,7 @@ void hng64_state::machine_start()
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 {
-	printf("comhack_callback %04x\n\n", m_comhack[0]);
+	LOG("comhack_callback %04x\n\n", m_comhack[0]);
 
 	m_comhack[0] = m_comhack[0] | 0x0002;
 }
@@ -1794,6 +1724,13 @@ void hng64_state::machine_reset()
 
 	// on real hardware, even with no network, it takes until the counter reaches about 37 (Xtreme Rally) to boot, this kicks in at around 7
 	m_comhack_timer->adjust(m_maincpu->cycles_to_attotime(400000000));
+
+	// does the HW init these to anything?
+	m_fbcontrol[0] = 0x00;
+	m_fbcontrol[1] = 0x00;
+	m_fbcontrol[2] = 0x00;
+	m_fbcontrol[3] = 0x00;
+
 }
 
 /***********************************************
@@ -2497,7 +2434,7 @@ ROM_END
 GAME( 1997, hng64,    0,     hng64, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64, hng64_drive,    hng64_state, init_hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1997, roadedge, hng64, hng64, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
 GAME( 1998, sams64,   hng64, hng64, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
 GAME( 1998, xrally,   hng64, hng64, hng64_drive,    hng64_state, init_hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
 GAME( 1998, bbust2,   hng64, hng64, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
