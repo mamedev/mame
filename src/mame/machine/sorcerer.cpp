@@ -451,6 +451,9 @@ void sorcerer_state::machine_reset()
 	m_cass_data.input.length = 0;
 	m_cass_data.input.bit = 1;
 
+	m_drq_off = true;
+	m_intrq_off = true;
+	m_wait = false;
 	m_fe = 0xff;
 	port_fe_w(space, 0, 0, 0xff);
 
