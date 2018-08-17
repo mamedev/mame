@@ -614,13 +614,25 @@ WRITE32_MEMBER(hng64_state::hng64_irqc_w)
 	}
 }
 
+/*
+  These 'sysregs' seem to be multiple sets of the same thing
+  (based on xrally)
+
+  the 0x1084 addresses appear to be related to the IO MCU, but neither sending commands to the MCU, not controlling lines directly
+  0x20 is written to 0x1084 in the MIPS IRQ handlers for the IO MCU (both 0x11 and 0x17 irq levels)
+
+  the 0x1074 address seems to be the same thing but for the network CPU
+  0x20 is written to 0x1074 in the MIPS IRQ handlers that seem to be associated with communication (levels 0x09, 0x0a, 0x0b, 0x0c)
+
+*/
+
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
 {
 	//LOG("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
 
 	switch(offset*4)
 	{
-		case 0x001c: return machine().rand(); // hng64 hangs on start-up if zero.
+		case 0x001c: return 0x00000000; // 0x00000040 must not be set or games won't boot
 		//case 0x106c:
 		//case 0x107c:
 		case 0x1084:
