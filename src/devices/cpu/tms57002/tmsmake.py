@@ -23,11 +23,6 @@ TYPES = {
     "f":  None,
 }
 
-def expand_c(v):
-    fmt =  ["%s", "(%s & 0xffff0000)", "(%s << 16)"][v["crm"]]
-    param = ["cmem[i->param]", "cmem[ca]"][v["cmode"]]
-    return fmt %  param
-
 def expand_d(v):
     index = ["(i->param + ", "(id + "][v["dmode"]]
     mask =  ["ba0) & 0xff] << 8)", "ba1) & 0x1f] << 8)"][v["dbp"]]
@@ -44,6 +39,8 @@ def expand_mv(v):
     c = ["", "s"][v["movm"]]
     return "check_macc_overflow_%d%s()" % (v["sfmo"], c)
 
+
+EXPAND_C = ["get_cmem(i->param)", "get_cmem(ca)"]
 EXPAND_WC = ["cmem[i->param] =", "cmem[ca] ="]
 
 
@@ -70,14 +67,15 @@ def expand_wd1(v):
     return "dmem%d[" % v["dbp"] + index + mask
 
 WA2 = (
-"  if(r < -0x80000000 || r > 0x7fffffff)\n"
+"  if(r < -2147483648 || r > 2147483647) {\n"
 "    st1 |= ST1_AOV;\n"
+"    if(st1 & ST1_AOVM) r = std::max(int64_t(-2147483648), std::min(int64_t(2147483647), r));\n"
+"  }"
 "  aacc = r;")
-
 
 PDESC_EXPAND = {
     "a":     lambda v: ["aacc", "(aacc << 7)"][v["sfao"]],
-    "c":     expand_c,
+    "c":     lambda v: EXPAND_C[v["cmode"]],
     "d":     expand_d,
     "d24":   expand_d24,
     "i":     lambda v: "i->param",
@@ -97,7 +95,7 @@ PDESC_EXPAND = {
 
 PDESC = {
     "a":    (0, ["sfao"]),
-    "c":    (0, ["cmode", "crm"]),
+    "c":    (0, ["cmode"]),
     "d":    (0, ["dmode", "dbp"]),
     "d24":  (0, ["dmode", "dbp"]),
     "i":    (0, []),
@@ -115,7 +113,6 @@ VARIANTS = {
     "cmode": (2, "xmode(opcode, 'c', cs)" ),
     "dmode": (2, "xmode(opcode, 'd', cs)" ),
     "sfai":  (2, "sfai(st1)"),
-    "crm":   (3, "crm(st1)"),
     "dbp":   (2, "dbp(st1)"),
     "sfao":  (2, "sfao(st1)"),
     "sfmo":  (4, "sfmo(st1)"),
@@ -131,7 +128,6 @@ VARIANT_CANONICAL_ORDER = [
     "cmode",
     "dmode",
     "sfai",
-    "crm",
     "dbp",
     "sfao",
     "sfmo",

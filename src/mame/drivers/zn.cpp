@@ -1206,7 +1206,9 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002tb)
@@ -1228,7 +1230,9 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 /*

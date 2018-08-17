@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont, hap
+// copyright-holders:Olivier Galibert, R. Belmont, hap, superctr
 /*
     ZOOM ZSG-2 custom wavetable synthesizer
 */
@@ -13,11 +13,6 @@
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
-
-#define MCFG_ZSG2_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, ZSG2, _clock)
-#define MCFG_ZSG2_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, ZSG2, _clock)
 
 #define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
 	downcast<zsg2_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
@@ -46,11 +41,14 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	const uint16_t STATUS_ACTIVE = 0x2000;
+
 	// 16 registers per channel, 48 channels
 	struct zchan
 	{
 		uint16_t v[16];
-		bool is_playing;
+		
+		uint16_t status;
 		uint32_t cur_pos;
 		uint32_t step_ptr;
 		uint32_t step;
@@ -62,14 +60,12 @@ private:
 		uint16_t vol;
 		uint16_t vol_initial;
 		uint16_t vol_target;
-
-		int16_t emphasis_cutoff;
-		int16_t emphasis_cutoff_initial;
-		int16_t emphasis_cutoff_target;
+		int16_t vol_delta;
 
 		uint16_t output_cutoff;
 		uint16_t output_cutoff_initial;
 		uint16_t output_cutoff_target;
+		int16_t output_cutoff_delta;
 
 		int32_t emphasis_filter_state;
 		int32_t output_filter_state;
@@ -81,7 +77,10 @@ private:
 	};
 
 	uint16_t gain_tab[256];
+	uint16_t gain_tab_frac[256];
+
 	zchan m_chan[48];
+	uint32_t m_sample_count;
 
 	required_region_ptr<uint32_t> m_mem_base;
 	uint32_t m_read_address;
@@ -100,8 +99,8 @@ private:
 	uint16_t control_r(int reg);
 	int16_t *prepare_samples(uint32_t offset);
 	void filter_samples(zchan *ch);
-	int16_t expand_reg(uint8_t val);
-	inline int32_t ramp(int32_t current, int32_t target);
+	int16_t get_ramp(uint8_t val);
+	inline uint16_t ramp(uint16_t current, uint16_t target, int16_t delta);
 };
 
 DECLARE_DEVICE_TYPE(ZSG2, zsg2_device)
