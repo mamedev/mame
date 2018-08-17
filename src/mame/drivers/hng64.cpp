@@ -802,8 +802,8 @@ void hng64_state::hng_map(address_map &map)
 	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).umask32(0xffffffff);
 	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_fbtable_r), FUNC(hng64_state::hng64_fbtable_w)).share("fbtable");
 
-	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
-	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
+	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_fbram1_r), FUNC(hng64_state::hng64_fbram1_w)).share("fbram1");  // 3D Display Buffer A
+	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_fbram2_r), FUNC(hng64_state::hng64_fbram2_w)).share("fbram2");  // 3D Display Buffer B
 
 	// Sound
 	map(0x60000000, 0x601fffff).rw(FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c

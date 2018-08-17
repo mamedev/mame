@@ -151,8 +151,8 @@ public:
 		m_tcram(*this, "tcram"),
 		m_fbtable(*this, "fbtable"),
 		m_comhack(*this, "comhack"),
-		m_3d_1(*this, "3d_1"),
-		m_3d_2(*this, "3d_2"),
+		m_fbram1(*this, "fbram1"),
+		m_fbram2(*this, "fbram2"),
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_intest(*this, "IN%u", 0U),
@@ -207,8 +207,8 @@ private:
 	std::unique_ptr<uint16_t[]> m_dl;
 	required_shared_ptr<uint32_t> m_fbtable;
 	required_shared_ptr<uint32_t> m_comhack;
-	required_shared_ptr<uint32_t> m_3d_1;
-	required_shared_ptr<uint32_t> m_3d_2;
+	required_shared_ptr<uint32_t> m_fbram1;
+	required_shared_ptr<uint32_t> m_fbram2;
 
 	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;
@@ -293,11 +293,11 @@ private:
 	DECLARE_READ32_MEMBER(hng64_fbtable_r);
 	DECLARE_WRITE32_MEMBER(hng64_fbtable_w);
 
-	DECLARE_READ32_MEMBER(hng64_3d_1_r);
-	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
+	DECLARE_READ32_MEMBER(hng64_fbram1_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbram1_w);
 
-	DECLARE_READ32_MEMBER(hng64_3d_2_r);
-	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
+	DECLARE_READ32_MEMBER(hng64_fbram2_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbram2_w);
 
 	DECLARE_WRITE16_MEMBER(dl_w);
 	//DECLARE_READ32_MEMBER(dl_r);

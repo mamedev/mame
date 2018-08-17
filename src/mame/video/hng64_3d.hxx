@@ -30,24 +30,24 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 	30140000-3015ffff is ZBuffer A  (512x256 8-bit?)
 */
 
-READ32_MEMBER(hng64_state::hng64_3d_1_r)
+READ32_MEMBER(hng64_state::hng64_fbram1_r)
 {
-	return m_3d_1[offset];
+	return m_fbram1[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
+WRITE32_MEMBER(hng64_state::hng64_fbram1_w)
 {
-	COMBINE_DATA (&m_3d_1[offset]);
+	COMBINE_DATA (&m_fbram1[offset]);
 }
 
-READ32_MEMBER(hng64_state::hng64_3d_2_r)
+READ32_MEMBER(hng64_state::hng64_fbram2_r)
 {
-	return m_3d_2[offset];
+	return m_fbram2[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
+WRITE32_MEMBER(hng64_state::hng64_fbram2_w)
 {
-	COMBINE_DATA (&m_3d_2[offset]);
+	COMBINE_DATA (&m_fbram2[offset]);
 }
 
 // The 3d 'display list'
