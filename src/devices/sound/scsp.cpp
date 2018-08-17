@@ -597,7 +597,7 @@ void scsp_device::init()
 
 	m_ARTABLE[0]=m_DRTABLE[0]=0;    //Infinite time
 	m_ARTABLE[1]=m_DRTABLE[1]=0;    //Infinite time
-	for(int i=2;i<64;++i)
+	for(i=2;i<64;++i)
 	{
 		double t,step,scale;
 		t=ARTimes[i];   //In ms
