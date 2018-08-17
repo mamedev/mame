@@ -12,6 +12,7 @@
 #include "machine/ay31015.h"
 #include "machine/f3853.h"
 #include "machine/input_merger.h"
+#include "machine/ripple_counter.h"
 #include "sound/beep.h"
 #include "screen.h"
 #include "speaker.h"
@@ -26,6 +27,7 @@ public:
 		, m_io(*this, "io")
 		, m_screen(*this, "screen")
 		, m_bell(*this, "bell")
+		, m_blinkcount(*this, "blinkcount")
 		, m_kbdecode(*this, "kbdecode")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0U)
@@ -67,6 +69,7 @@ private:
 	//required_device<rs232_port_device> m_aux;
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_bell;
+	required_device<ripple_counter_device> m_blinkcount;
 	required_region_ptr<u8> m_kbdecode;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<11> m_keys;
@@ -131,12 +134,22 @@ TIMER_CALLBACK_MEMBER(microterm_f8_state::baud_clock)
 
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (BIT(m_port00, 2))
+	{
+		// Display blanked?
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
 	const ioport_value jumpers = m_jumpers->read();
 	unsigned y = cliprect.top();
 	offs_t rowbase = (((y / 12) + m_scroll) % 24) * 80;
 	unsigned line = y % 12;
 	if (line >= 6)
 		line += 2;
+
+	const bool cursor_on = (m_blinkcount->count() & (~jumpers << 1) & 0x38) == 0;
+	const bool blink_on = (m_blinkcount->count() & (~jumpers >> 3) & 0x38) == 0;
 
 	while (y <= cliprect.bottom())
 	{
@@ -146,8 +159,8 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			u16 ch = m_vram[rowbase + (x / 9)];
 			u8 chdata = m_chargen[(line << 7) | (ch & 0x7f)];
-			bool dot = (!BIT(ch, 8) && allow_underline) || BIT(chdata, 8 - (x % 9));
-			if (BIT(ch, 7) == BIT(ch, 9))
+			bool dot = (!BIT(ch, 8) && allow_underline) || ((BIT(ch, 10) || blink_on) && BIT(chdata, 8 - (x % 9)));
+			if ((BIT(ch, 7) && cursor_on) == BIT(ch, 9))
 				dot = !dot;
 			bitmap.pix32(y, x) = dot ? rgb_t::white() : rgb_t::black();
 		}
@@ -263,6 +276,11 @@ READ8_MEMBER(microterm_f8_state::port00_r)
 WRITE8_MEMBER(microterm_f8_state::port00_w)
 {
 	m_port00 = data;
+
+	// Cursor is supposed to stop blinking temporarily when keys are depressed
+	// This implementation suspends cursor blinking when keys are acknowledged and the cursor is repositioned
+	// It also suspends blinking text, which perhaps is supposed to happen
+	m_blinkcount->reset_w(BIT(data, 0));
 }
 
 READ8_MEMBER(microterm_f8_state::port01_r)
@@ -526,6 +544,9 @@ void microterm_f8_state::act5a(machine_config &config)
 	screen.set_raw(16.572_MHz_XTAL, 918, 0, 720, 301, 0, 288); // more or less guessed
 	screen.set_screen_update(FUNC(microterm_f8_state::screen_update));
 	screen.screen_vblank().set(FUNC(microterm_f8_state::vblank_w));
+	screen.screen_vblank().append(m_blinkcount, FUNC(ripple_counter_device::clock_w)).invert();
+
+	RIPPLE_COUNTER(config, m_blinkcount).set_stages(6);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_bell, 1760);
