@@ -277,7 +277,11 @@ private:
 	DECLARE_READ8_MEMBER(hng64_com_share_mips_r);
 	DECLARE_READ32_MEMBER(hng64_sysregs_r);
 	DECLARE_WRITE32_MEMBER(hng64_sysregs_w);
-	
+	DECLARE_READ32_MEMBER(hng64_rtc_r);
+	DECLARE_WRITE32_MEMBER(hng64_rtc_w);
+
+	DECLARE_WRITE32_MEMBER(hng64_mips_to_iomcu_irq_w);
+
 	DECLARE_READ8_MEMBER(fake_io_r);
 	DECLARE_READ8_MEMBER(hng64_dualport_r);
 	DECLARE_WRITE8_MEMBER(hng64_dualport_w);

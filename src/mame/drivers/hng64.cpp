@@ -486,23 +486,49 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 	return m_com_shared[offset];
 }
 
-READ32_MEMBER(hng64_state::hng64_sysregs_r)
+
+READ32_MEMBER(hng64_state::hng64_rtc_r)
 {
-	uint16_t rtc_addr;
-
-#if 0
-	if((offset*4) != 0x1084)
-		printf("HNG64 port read (PC=%08x) 0x%08x\n", m_maincpu->pc(), offset*4);
-#endif
-
-	rtc_addr = offset >> 1;
-
-	if((rtc_addr & 0xff0) == 0x420)
+	if (offset & 1)
 	{
-		if((rtc_addr & 0xf) == 0xd)
-			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10; // bit 4 disables "system log reader"
+		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
+		int rtc_addr = offset >> 1;
+
+		// bit 4 disables "system log reader" (the device is 4-bit? so this bit is not from the device?)
+		if ((rtc_addr & 0xf) == 0xd)
+			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10; 
 
 		return m_rtc->read(space, (rtc_addr) & 0xf);
+	}
+	else
+	{
+		// shouldn't happen unless something else is mapped here too
+		logerror("%s: unhandled hng64_rtc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+		return 0xffffffff;
+	}
+}
+
+
+WRITE32_MEMBER(hng64_state::hng64_rtc_w)
+{
+	if (offset & 1)
+	{
+		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
+		m_rtc->write(space, (offset >> 1) & 0xf, data);
+	}
+	else
+	{
+		// shouldn't happen unless something else is mapped here too
+		logerror("%s: unhandled hng64_rtc_w (%04x) %04x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+	}
+}
+
+
+READ32_MEMBER(hng64_state::hng64_sysregs_r)
+{
+	if ((offset * 4) != 0x1104)
+	{
+		//logerror("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context().c_str(), offset * 4, mem_mask);
 	}
 
 	switch(offset*4)
@@ -523,9 +549,6 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		case 0x1254: return 0x00000000; //dma status, 0x800
 	}
 
-//  printf("%08x\n",offset*4);
-
-//  return machine().rand()&0xffffffff;
 	return m_sysregs[offset];
 }
 
@@ -546,27 +569,18 @@ void hng64_state::do_dma(address_space &space)
 	}
 }
 
-/*
-//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
-//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
-//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
 
-//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
-*/
+WRITE32_MEMBER(hng64_state::hng64_mips_to_iomcu_irq_w)
+{
+	// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
+	LOG("%s: HNG64 writing to SYSTEM Registers %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), data, mem_mask);
+	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
+}
+
 
 WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
-
-	if(((offset >> 1) & 0xff0) == 0x420)
-	{
-		m_rtc->write(space, (offset >> 1) & 0xf,data);
-		return;
-	}
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
@@ -588,16 +602,12 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			m_dma_len = m_sysregs[offset];
 			do_dma(space);
 			break;
-		case 0x21c4:
-			// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
-			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), offset*4, data, mem_mask);
-			if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
-			break;
 
 		default:
 			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
 }
+
 
 /**************************************
 * MCU simulation / hacks
@@ -762,7 +772,9 @@ void hng64_state::hng_map(address_map &map)
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
 	// Ports
-	map(0x1f700000, 0x1f702fff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	map(0x1f700000, 0x1f701fff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	map(0x1f702100, 0x1f70217f).rw(FUNC(hng64_state::hng64_rtc_r), FUNC(hng64_state::hng64_rtc_w));
+	map(0x1f7021c4, 0x1f7021c7).w(FUNC(hng64_state::hng64_mips_to_iomcu_irq_w));
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	map(0x1F800000, 0x1F803fff).ram().share("nvram");
