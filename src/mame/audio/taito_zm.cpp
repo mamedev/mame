@@ -21,20 +21,10 @@ Newer games have a Panasonic MN1020819DA,
 and a Zoom Corp. ZFX-2 DSP instead of the TMS57002 (Functionally identical).
 
 TODO:
-<<<<<<< HEAD
 - ZSG-2 sound chip emulation might not be perfect, see zsg2.cpp
-
 - check DSP behavior. The DSP is programmed to expect 16-bit samples, but
   the range of the sample values seem really low. Normally the TMS57002 is
   supposed to left-shift 16-bit samples, but is this the case here?
-=======
-- Raycrisis song 9 gets cut off due to clipping. Possible DSP emulation bug,
-  or just have to change the volumes. in the sound test, it will start to cut
-  at about 55%. and the timbre doesn't sound right anyway.
-
-- check DSP behavior
-- Implement the ramping control registers in zsg2.cpp
->>>>>>> upstream/master
 
 ***************************************************************************/
 
