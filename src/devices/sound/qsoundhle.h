@@ -167,6 +167,9 @@ private:
 
 	// sub functions
 	int16_t read_sample(uint16_t bank, uint16_t address);
+
+	inline int16_t pcm_update(struct qsound_voice *v, int32_t *echo_out);
+	inline void adpcm_update(int voice_no, int nibble);
 };
 
 DECLARE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device)
