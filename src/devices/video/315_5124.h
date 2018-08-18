@@ -107,11 +107,10 @@ protected:
 	virtual void sprite_count_overflow(int line, int sprite_index);
 	virtual void draw_scanline(int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line);
-	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line);
+	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line);
 	virtual uint16_t name_table_row_mode4(int row);
 	virtual uint16_t sprite_attributes_addr_mode4(uint16_t base);
 	virtual uint8_t sprite_tile_mask_mode4(uint8_t tile_number);
-	virtual int select_sprite_tile_mode4(int sprite_index, int sprite_line);
 	void process_line_timer();
 	void draw_scanline_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_mode4(int *line_buffer, int *priority_selected, int line);
@@ -246,7 +245,7 @@ protected:
 	virtual void sprite_count_overflow(int line, int sprite_index) override;
 	virtual void select_display_mode() override;
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
-	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line) override;
+	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line) override;
 };
 
 

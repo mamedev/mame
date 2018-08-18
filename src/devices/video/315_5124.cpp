@@ -621,7 +621,7 @@ READ8_MEMBER( sega315_5124_device::data_read )
 
 	if ( !machine().side_effects_disabled() )
 	{
-		/* Load read buffer */
+		/* Load data buffer */
 		m_buffer = this->space().read_byte(m_addr & 0x3fff);
 
 		/* Bump internal address register */
@@ -910,30 +910,35 @@ uint16_t sega315_5246_device::name_table_row_mode4(int row)
 }
 
 
-void sega315_5124_device::draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line)
+void sega315_5124_device::draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line)
 {
-	// To draw the leftmost column when it is incomplete on screen due to
-	// scrolling, Sega Master System has a weird behaviour to select which
-	// palette will be used to obtain the color in entry 0, that depends
-	// on the content of sprite 0.
+	// To draw the leftmost pixels when they aren't part of a tile column
+	// due to scrolling, Sega Master System has a weird behaviour to select
+	// which palette will be used to obtain the color in entry 0, that
+	// depends on the content of tile 0x100.
 	// This implementation mimics the behaviour of the Emulicious emulator,
 	// seen with the test ROM provided by sverx here:
 	//
 	// http://www.smspower.org/forums/15653-CommunityEffortRequestHelpDiscoverHowTheVDPHandlesTheLeftmostPixelsWhenScrolling
 	//
-	// From the sprite 0 tile, it uses bit 1 of the plane that would
+	// From the tile 0x100, it uses bit 1 of the plane that would
 	// select the color for the pixel 4 at the current line.
 
 	const int pixel_x = 4;
+	// The parsing seems to occur before the line counter is incremented
+	// to the number of the line to be drawn.
+	int parse_line = tile_line - 1;
 
-	// Locate the tile number for sprite 0.
-	const int sprite_tile_selected = select_sprite_tile_mode4(0, tile_line & 0x07);
+	// Select tile 0x100.
+	// Tried before with the number stored in m_sprite_tile_selected[0],
+	// but with it the expected behaviour only occurs with some BIOSes.
+	const int tile_selected = 0x100;
 
-	// Load data of bit plane 1 for the sprite tile.
-	const int tmp_bit_plane_1 = space().read_byte((sprite_tile_selected << 5) + ((tile_line & 0x07) << 2) + 0x01);
+	// Load data of bit plane 1 for the selected tile.
+	const int tmp_bit_plane_1 = space().read_byte((tile_selected << 5) + ((parse_line & 0x07) << 2) + 0x01);
 	const uint8_t pen_bit_1 = BIT(tmp_bit_plane_1, 7 - pixel_x);
 
-	for (int pixel_plot_x = 0; pixel_plot_x < x_scroll_fine_adjust; pixel_plot_x++)
+	for (int pixel_plot_x = 0; pixel_plot_x < fine_x_scroll; pixel_plot_x++)
 	{
 		line_buffer[pixel_plot_x] = m_current_palette[pen_bit_1 ? 0x10 : 0x00];
 		priority_selected[pixel_plot_x] = 0;
@@ -941,13 +946,13 @@ void sega315_5124_device::draw_column0_x_scroll_mode4(int *line_buffer, int *pri
 }
 
 
-void sega315_5313_mode4_device::draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line)
+void sega315_5313_mode4_device::draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line)
 {
-	// To draw the leftmost column when it is incomplete on screen due to
-	// scrolling, Sega Genesis/Mega Drive seems to use entry #0 of the
-	// palette selected by the next background tile to be drawn on screen.
+	// To draw the leftmost pixels when they aren't part of a tile column
+	// due to scrolling, Sega Genesis/Mega Drive seems to use entry #0 of
+	// the palette selected by the next background tile to be drawn on screen.
 
-	for (int pixel_plot_x = 0; pixel_plot_x < x_scroll_fine_adjust; pixel_plot_x++)
+	for (int pixel_plot_x = 0; pixel_plot_x < fine_x_scroll; pixel_plot_x++)
 	{
 		line_buffer[pixel_plot_x] = m_current_palette[palette_selected ? 0x10 : 0x00];
 		priority_selected[pixel_plot_x] = 0;
@@ -965,7 +970,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 	const int x_scroll = ((BIT(m_reg[0x00], 6) && (line < 16)) ? 0 : m_reg8copy);
 
 	const int x_scroll_start_column = 32 - (x_scroll >> 3);             /* x starting column tile */
-	const int x_scroll_fine_adjust = (x_scroll & 0x07);
+	const int fine_x_scroll = (x_scroll & 0x07);
 
 	if ( m_y_pixels != 192 )
 	{
@@ -1008,9 +1013,9 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 		/* Column 0 is the leftmost tile column that completely entered in the screen.
 		   If the leftmost pixels aren't part of a complete tile, due to horizontal
 		   scrolling, they are drawn only with color #0 of the selected palette. */
-		if (tile_column == 0 && x_scroll_fine_adjust > 0)
+		if (tile_column == 0 && fine_x_scroll > 0)
 		{
-			draw_column0_x_scroll_mode4(line_buffer, priority_selected, x_scroll_fine_adjust, palette_selected, tile_line);
+			draw_leftmost_pixels_mode4(line_buffer, priority_selected, fine_x_scroll, palette_selected, tile_line);
 		}
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
@@ -1036,7 +1041,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 				pixel_plot_x = 7 - pixel_x;
 			}
 
-			pixel_plot_x = x_scroll_fine_adjust + (tile_column << 3) + pixel_plot_x;
+			pixel_plot_x = fine_x_scroll + (tile_column << 3) + pixel_plot_x;
 			if (pixel_plot_x < 256)
 			{
 				line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
@@ -1068,31 +1073,6 @@ uint8_t sega315_5124_device::sprite_tile_mask_mode4(uint8_t tile_number)
 uint8_t sega315_5246_device::sprite_tile_mask_mode4(uint8_t tile_number)
 {
 	return tile_number;
-}
-
-
-int sega315_5124_device::select_sprite_tile_mode4(int sprite_index, int sprite_line)
-{
-	int sprite_tile_selected = space().read_byte( sprite_attributes_addr_mode4(m_sprite_base + 0x81) + (sprite_index << 1) );
-
-	sprite_tile_selected = sprite_tile_mask_mode4(sprite_tile_selected);
-
-	if (BIT(m_reg[0x06], 2))
-	{
-		sprite_tile_selected += 256; /* pattern table select */
-	}
-
-	if (m_sprite_height == 16)
-	{
-		sprite_tile_selected &= 0x01fe; /* force even index */
-	}
-
-	if (sprite_line > 0x07)
-	{
-		sprite_tile_selected += 1;
-	}
-
-	return sprite_tile_selected;
 }
 
 
@@ -1154,7 +1134,7 @@ void sega315_5124_device::select_sprites( int line )
 				sprite_y -= 256; /* wrap from top if y position is >= 240 */
 			}
 
-			if (m_sprite_zoom_scale > 1 && m_sprite_count <= m_max_sprite_zoom_vcount)
+			if (m_sprite_zoom_scale > 1 && m_sprite_count < m_max_sprite_zoom_vcount)
 			{
 				/* Divide before use the value for comparison, or else an
 				   off-by-one bug could occur, as seen with Tarzan, for Game Gear */
@@ -1220,7 +1200,7 @@ void sega315_5124_device::select_sprites( int line )
 				sprite_y -= 256; /* wrap from top if y position is >= 240 */
 			}
 
-			if (m_sprite_zoom_scale > 1 && m_sprite_count <= m_max_sprite_zoom_vcount)
+			if (m_sprite_zoom_scale > 1 && m_sprite_count < m_max_sprite_zoom_vcount)
 			{
 				/* Divide before use the value for comparison, or else an
 				   off-by-one bug could occur, as seen with Tarzan, for Game Gear */
@@ -1233,12 +1213,29 @@ void sega315_5124_device::select_sprites( int line )
 				if (m_sprite_count < max_sprites)
 				{
 					const int sprite_line = parse_line - sprite_y;
-					const int sprite_tile_selected = select_sprite_tile_mode4(sprite_index, sprite_line);
 					int sprite_x = space().read_byte( sprite_attributes_addr_mode4(m_sprite_base + 0x80) + (sprite_index << 1) );
+					int sprite_tile_selected = space().read_byte( sprite_attributes_addr_mode4(m_sprite_base + 0x81) + (sprite_index << 1) );
+
+					sprite_tile_selected = sprite_tile_mask_mode4(sprite_tile_selected);
 
 					if (BIT(m_reg[0x00], 3))
 					{
 						sprite_x -= 0x08;    /* sprite shift */
+					}
+
+					if (BIT(m_reg[0x06], 2))
+					{
+						sprite_tile_selected += 256; /* pattern table select */
+					}
+
+					if (m_sprite_height == 16)
+					{
+						sprite_tile_selected &= 0x01fe; /* force even index */
+					}
+
+					if (sprite_line > 0x07)
+					{
+						sprite_tile_selected += 1;
 					}
 
 					m_sprite_x[m_sprite_count] = sprite_x;
@@ -1309,8 +1306,13 @@ void sega315_5313_mode4_device::sprite_collision(int line, int sprite_col_x)
 {
 	if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
 	{
-		m_pending_status |= STATUS_SPRCOL;
-		m_pending_sprcol_x = m_line_timing[SPRCOL_BASEHPOS];
+		// This function is been used to check for sprite collision of
+		// the 315-5313 VDP, that occurs before the active screen is
+		// drawn, so it must not flag a collision again when drawing.
+		if (screen().hpos() < m_draw_time) {
+			m_pending_status |= STATUS_SPRCOL;
+			m_pending_sprcol_x = m_line_timing[SPRCOL_BASEHPOS];
+		}
 	}
 }
 
@@ -1332,7 +1334,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 		const int sprite_x = m_sprite_x[sprite_buffer_index];
 		const int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
 		const uint16_t sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
-		const int zoom_scale = sprite_buffer_index <= m_max_sprite_zoom_hcount ? m_sprite_zoom_scale : 1;
+		const int zoom_scale = sprite_buffer_index < m_max_sprite_zoom_hcount ? m_sprite_zoom_scale : 1;
 
 		const uint8_t bit_plane_0 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x00);
 		const uint8_t bit_plane_1 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x01);
@@ -1429,7 +1431,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 		const uint16_t sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
 		const uint8_t flags = m_sprite_flags[sprite_buffer_index];
 		const int pen_selected = m_palette_offset + ( flags & 0x0f );
-		const int zoom_scale = sprite_buffer_index <= m_max_sprite_zoom_hcount ? m_sprite_zoom_scale : 1;
+		const int zoom_scale = sprite_buffer_index < m_max_sprite_zoom_hcount ? m_sprite_zoom_scale : 1;
 
 		if (BIT(flags, 7))
 			sprite_x -= 32;
