@@ -132,7 +132,7 @@ private:
 	// number of profiling ticks before we consider a wait "long"
 	static constexpr osd_ticks_t POLY_LOG_WAIT_THRESHOLD = 1000;
 
-	static constexpr int SCANLINES_PER_BUCKET = 8;
+	static constexpr int SCANLINES_PER_BUCKET = 32;
 	static constexpr int CACHE_LINE_SIZE      = 64;          // this is a general guess
 	static constexpr int TOTAL_BUCKETS        = (512 / SCANLINES_PER_BUCKET);
 	static constexpr int UNITS_PER_POLY       = (100 / SCANLINES_PER_BUCKET);
