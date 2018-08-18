@@ -320,7 +320,9 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io )
+	TI990_10(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::ti990_10_memmap);
+	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::ti990_10_io);
 
 	// VDT 911 terminal
 	MCFG_DEVICE_ADD(m_terminal, VDT911, 0)

@@ -2091,9 +2091,9 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")  // 1040ST
-	MCFG_RAM_EXTRA_OPTIONS("512K,256K") // 520ST, 260ST
+	RAM(config, m_ram)
+		.set_default_size("1M") // 1040ST
+		.set_extra_options("512K,256K"); // 520ST, 260ST
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
@@ -2185,9 +2185,9 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")  //  Mega ST 4
-	MCFG_RAM_EXTRA_OPTIONS("2M,1M") //  Mega ST 2 ,Mega ST 1
+	RAM(config, m_ram)
+		.set_default_size("4M") // Mega ST 4
+		.set_extra_options("2M,1M"); // Mega ST 2, Mega ST 1
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
@@ -2287,9 +2287,9 @@ MACHINE_CONFIG_START(ste_state::ste)
 //  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")  // 1040STe
-	MCFG_RAM_EXTRA_OPTIONS("512K") //  520STe
+	RAM(config, m_ram)
+		.set_default_size("1M") // 1040STe
+		.set_extra_options("512K"); // 520STe
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
@@ -2308,9 +2308,8 @@ MACHINE_CONFIG_START(megaste_state::megaste)
 	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")  //  Mega STe 4
-	MCFG_RAM_EXTRA_OPTIONS("2M,1M") //  Mega STe 2 ,Mega STe 1
+	m_ram->set_default_size("4M") // Mega STe 4
+		.set_extra_options("2M,1M"); // Mega STe 2, Mega STe 1
 MACHINE_CONFIG_END
 
 
@@ -2397,9 +2396,7 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M");
 MACHINE_CONFIG_END
 #endif
 
@@ -2407,27 +2404,30 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ste_state::tt030)
+void ste_state::tt030(machine_config &config)
+{
 	ste(config);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ste_state::falcon)
+void ste_state::falcon(machine_config &config)
+{
 	ste(config);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ste_state::falcon40)
+void ste_state::falcon40(machine_config &config)
+{
 	ste(config);
-MACHINE_CONFIG_END
+}
 
 
 

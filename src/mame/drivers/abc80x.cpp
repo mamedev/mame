@@ -1142,9 +1142,7 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 
@@ -1172,9 +1170,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 
@@ -1205,8 +1201,7 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	MCFG_SLOT_DEFAULT_OPTION("abc834")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1238,9 +1233,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	MCFG_SLOT_DEFAULT_OPTION("abc832")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("160K")
-	MCFG_RAM_EXTRA_OPTIONS("544K")
+	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")

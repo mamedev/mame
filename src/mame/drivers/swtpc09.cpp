@@ -223,12 +223,7 @@ void swtpc09_state::swtpc09i(machine_config &config)
 
 	PIA6821(config, "piaide", 0);
 
-/* old start to adding ide support, needs major updating */
-/* this is to support an add on card driving IDE from a PIA */
-//  MCFG_HARDDISK_ADD("harddisk")
-//  MCFG_IDE_CONTROLLER_ADD("ide", nullptr)
-//  MCFG_IDE_CONTROLLER_REGIONS("harddisk", nullptr)
-//  MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, "hdd", nullptr, false )  /* FIXME */ bebox
+	/* TODO: add ide support, via add-on card driving IDE from a PIA */
 }
 
 

@@ -58,12 +58,14 @@ void buddha_device::mmio_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(buddha_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, nullptr, nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, buddha_device, ide_0_interrupt_w))
-	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, nullptr, nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, buddha_device, ide_1_interrupt_w))
-MACHINE_CONFIG_END
+void buddha_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata_0).options(ata_devices, nullptr, nullptr, false);
+	m_ata_0->irq_handler().set(FUNC(buddha_device::ide_0_interrupt_w));
+
+	ATA_INTERFACE(config, m_ata_1).options(ata_devices, nullptr, nullptr, false);
+	m_ata_1->irq_handler().set(FUNC(buddha_device::ide_1_interrupt_w));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

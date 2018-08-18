@@ -139,7 +139,7 @@ WRITE8_MEMBER(orion_state::orion128_memory_page_w)
 	}
 }
 
-MACHINE_RESET_MEMBER(orion_state,orion128)
+void orion_state::machine_reset()
 {
 	m_orion128_video_page = 0;
 	m_orion128_video_mode = 0;

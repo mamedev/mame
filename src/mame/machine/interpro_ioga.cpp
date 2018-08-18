@@ -374,7 +374,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::interrupt_check)
 			if (m_softint & (1 << i))
 			{
 				// check priority
-				if (m_active_interrupt_type == INT_NONE || (0x8f + i * 0x10) < irq_vector)
+				if ((m_active_interrupt_type == INT_NONE) || (0x8f + i * 0x10) < irq_vector)
 				{
 					m_active_interrupt_type = INT_SOFT;
 					m_active_interrupt_number = i;
@@ -929,12 +929,11 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 		// transfer from the memory to device or device to memory
 		while ((dma_channel.control & SDMA_COUNT) && dma_channel.drq_state)
 		{
-			// TODO: work out which control register bits indicate read from device
-			if (dma_channel.control & SDMA_SEND)
+			if (dma_channel.control & SDMA_WRITE)
 			{
-				u8 data = m_memory->read_byte(dma_channel.address);
+				u8 data = m_memory->read_byte(dma_channel.address++);
 
-				LOGMASKED(LOG_SERIALDMA, "dma: transmitting byte 0x%02x to serial channel %d\n",
+				LOGMASKED(LOG_SERIALDMA, "dma: writing byte 0x%02x to serial channel %d\n",
 					data, dma_channel.channel);
 
 				dma_channel.device_w(data);
@@ -943,24 +942,26 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 			{
 				u8 data = dma_channel.device_r();
 
-				LOGMASKED(LOG_SERIALDMA, "dma: receiving byte 0x%02x from serial channel %d\n",
+				LOGMASKED(LOG_SERIALDMA, "dma: reading byte 0x%02x from serial channel %d\n",
 					data, dma_channel.channel);
 
-				m_memory->write_byte(dma_channel.address, data);
+				m_memory->write_byte(dma_channel.address++, data);
 			}
 
-			// increment address and decrement count
-			dma_channel.address++;
-			dma_channel.control = (dma_channel.control & SDMA_CONTROL) | ((dma_channel.control & SDMA_COUNT) - 1);
+			// decrement transfer count
+			dma_channel.control = (dma_channel.control & ~SDMA_COUNT) | ((dma_channel.control & SDMA_COUNT) - 1);
 		}
 
 		if ((dma_channel.control & SDMA_COUNT) == 0)
 		{
 			// transfer count zero
 			dma_channel.control |= SDMA_TCZERO;
+			dma_channel.control &= ~SDMA_ENABLE;
 
 			// raise an interrupt
+			// FIXME: assume edge-triggered?
 			set_int_line(IRQ_SERDMA, ASSERT_LINE);
+			set_int_line(IRQ_SERDMA, CLEAR_LINE);
 		}
 	}
 }
@@ -974,7 +975,7 @@ void interpro_ioga_device::serial_drq(int state, int channel)
 	LOGMASKED(LOG_SERIALDMA, "dma: drq for serial channel %d %s count 0x%04x\n",
 		channel, state ? "asserted" : "deasserted", dma_channel.control & SDMA_COUNT);
 
-	if (state && (dma_channel.control & SDMA_COUNT))
+	if (state && (dma_channel.control & SDMA_ENABLE))
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 
@@ -995,7 +996,7 @@ void interpro_ioga_device::serial_dma_ctrl_w(address_space &space, offs_t offset
 
 	COMBINE_DATA(&dma_channel.control);
 
-	if (dma_channel.control & SDMA_COUNT)
+	if (dma_channel.control & SDMA_ENABLE)
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 

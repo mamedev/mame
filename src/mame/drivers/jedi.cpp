@@ -339,11 +339,11 @@ MACHINE_CONFIG_START(jedi_state::jedi)
 	X2212(config, "novram12b");
 	X2212(config, "novram12c");
 
-	MCFG_DEVICE_ADD("adc", ADC0809, JEDI_AUDIO_CPU_OSC / 2 / 9) // nominally 666 kHz
-	MCFG_ADC0808_IN0_CB(IOPORT("STICKY"))
-	MCFG_ADC0808_IN1_CB(CONSTANT(0)) // SPARE
-	MCFG_ADC0808_IN2_CB(IOPORT("STICKX"))
-	MCFG_ADC0808_IN3_CB(CONSTANT(0)) // SPARE
+	adc0809_device &adc(ADC0809(config, "adc", JEDI_AUDIO_CPU_OSC / 2 / 9)); // nominally 666 kHz
+	adc.in_callback<0>().set_ioport("STICKY");
+	adc.in_callback<1>().set_constant(0); // SPARE
+	adc.in_callback<2>().set_ioport("STICKX");
+	adc.in_callback<3>().set_constant(0); // SPARE
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // 14J
 	outlatch.q_out_cb<0>().set(FUNC(jedi_state::coin_counter_left_w));

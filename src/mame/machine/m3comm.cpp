@@ -122,8 +122,7 @@ MACHINE_CONFIG_START(m3comm_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(M68K_TAG, M68000, 10000000) // random
 	MCFG_DEVICE_PROGRAM_MAP(m3comm_mem)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 //**************************************************************************

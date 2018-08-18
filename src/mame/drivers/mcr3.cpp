@@ -1128,14 +1128,16 @@ MACHINE_CONFIG_START(mcr3_state::mono_tcs)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mcr3_state::maxrpm)
+void mcr3_state::maxrpm(machine_config &config)
+{
 	mono_tcs(config);
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
-	MCFG_ADC0844_CH3_CB(IOPORT("MONO.IP1.ALT2"))
-	MCFG_ADC0844_CH4_CB(IOPORT("MONO.IP1.ALT3"))
-MACHINE_CONFIG_END
+
+	ADC0844(config, m_maxrpm_adc, 0);
+	m_maxrpm_adc->ch1_callback().set_ioport("MONO.IP1");
+	m_maxrpm_adc->ch2_callback().set_ioport("MONO.IP1.ALT1");
+	m_maxrpm_adc->ch3_callback().set_ioport("MONO.IP1.ALT2");
+	m_maxrpm_adc->ch4_callback().set_ioport("MONO.IP1.ALT3");
+}
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */

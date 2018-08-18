@@ -765,10 +765,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_GENERIC_LOAD(atom_state, cart_load)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,4K,6K,8K,10K,12K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("2K,4K,6K,8K,10K,12K").set_default_value(0);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("rom_list","atom_rom")
@@ -860,10 +857,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_CASSETTE_INTERFACE("atom_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,12K")
-
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

@@ -136,7 +136,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_iomcu(*this, "iomcu"),
-		m_dt7133_dpram(*this, "dt7133_dpram"),
+		m_dt71321_dpram(*this, "dt71321_dpram"),
 		m_dsp(*this, "l7a1045"),
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
@@ -149,17 +149,20 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_3dregs(*this, "3dregs"),
-		m_3d_1(*this, "3d_1"),
-		m_3d_2(*this, "3d_2"),
-		m_com_ram(*this, "com_ram"),
+		m_fbtable(*this, "fbtable"),
+		m_comhack(*this, "comhack"),
+		m_fbram1(*this, "fbram1"),
+		m_fbram2(*this, "fbram2"),
+		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_intest(*this, "IN%u", 0U),
-		m_samsho64_3d_hack(0)
+		m_samsho64_3d_hack(0),
+		m_roadedge_3d_hack(0)
 	{}
 
 	void hng64(machine_config &config);
 
+	void init_roadedge();
 	void init_hng64_race();
 	void init_hng64();
 	void init_hng64_shoot();
@@ -171,10 +174,22 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
+	/* TODO: NOT measured! */
+	const int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
+
+	const int HTOTAL = 0x200+0x100;
+	const int HBEND = 0;
+	const int HBSTART = 0x200;
+
+	const int VTOTAL = 264*2;
+	const int VBEND = 0;
+	const int VBSTART = 224*2;
+
+
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
 	required_device<tmp87ph40an_device> m_iomcu;
-	required_device<mb8421_device> m_dt7133_dpram;
+	required_device<idt71321_device> m_dt71321_dpram;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
@@ -190,11 +205,12 @@ private:
 	required_shared_ptr<uint32_t> m_tcram;
 
 	std::unique_ptr<uint16_t[]> m_dl;
-	required_shared_ptr<uint32_t> m_3dregs;
-	required_shared_ptr<uint32_t> m_3d_1;
-	required_shared_ptr<uint32_t> m_3d_2;
+	required_shared_ptr<uint32_t> m_fbtable;
+	required_shared_ptr<uint32_t> m_comhack;
+	required_shared_ptr<uint32_t> m_fbram1;
+	required_shared_ptr<uint32_t> m_fbram2;
 
-	required_shared_ptr<uint32_t> m_com_ram;
+	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -202,6 +218,9 @@ private:
 	optional_ioport_array<8> m_intest;
 
 	int m_samsho64_3d_hack;
+	int m_roadedge_3d_hack;
+
+	uint8_t m_fbcontrol[4];
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -258,22 +277,44 @@ private:
 	DECLARE_READ8_MEMBER(hng64_com_share_mips_r);
 	DECLARE_READ32_MEMBER(hng64_sysregs_r);
 	DECLARE_WRITE32_MEMBER(hng64_sysregs_w);
-	
-	DECLARE_READ8_MEMBER(fake_io_r);
+	DECLARE_READ32_MEMBER(hng64_rtc_r);
+	DECLARE_WRITE32_MEMBER(hng64_rtc_w);
+	DECLARE_READ32_MEMBER(hng64_dmac_r);
+	DECLARE_WRITE32_MEMBER(hng64_dmac_w);
+	DECLARE_READ32_MEMBER(hng64_irqc_r);
+	DECLARE_WRITE32_MEMBER(hng64_irqc_w);
+	DECLARE_WRITE32_MEMBER(hng64_mips_to_iomcu_irq_w);
+
 	DECLARE_READ8_MEMBER(hng64_dualport_r);
 	DECLARE_WRITE8_MEMBER(hng64_dualport_w);
 
-	DECLARE_READ32_MEMBER(hng64_3d_1_r);
-	DECLARE_READ32_MEMBER(hng64_3d_2_r);
-	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
-	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
+	DECLARE_READ8_MEMBER(hng64_fbcontrol_r);
+	DECLARE_WRITE8_MEMBER(hng64_fbcontrol_w);
+	
+	DECLARE_WRITE16_MEMBER(hng64_fbunkpair_w);
+	DECLARE_WRITE16_MEMBER(hng64_fbscroll_w);
+
+	DECLARE_WRITE8_MEMBER(hng64_fbunkbyte_w);
+
+	DECLARE_READ32_MEMBER(hng64_fbtable_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbtable_w);
+
+	DECLARE_READ32_MEMBER(hng64_fbram1_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbram1_w);
+
+	DECLARE_READ32_MEMBER(hng64_fbram2_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbram2_w);
+
 	DECLARE_WRITE16_MEMBER(dl_w);
 	//DECLARE_READ32_MEMBER(dl_r);
 	DECLARE_WRITE32_MEMBER(dl_control_w);
 	DECLARE_WRITE32_MEMBER(dl_upload_w);
+	DECLARE_WRITE32_MEMBER(dl_unk_w);
+	DECLARE_READ32_MEMBER(dl_vreg_r);
+
 	DECLARE_WRITE32_MEMBER(tcram_w);
 	DECLARE_READ32_MEMBER(tcram_r);
-	DECLARE_READ32_MEMBER(unk_vreg_r);
+
 	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
 	DECLARE_READ32_MEMBER(hng64_soundram_r);
 	DECLARE_WRITE32_MEMBER(hng64_vregs_w);
@@ -340,6 +381,10 @@ private:
 	uint16_t m_mmub[6];
 	uint8_t read_comm_data(uint32_t offset);
 	void write_comm_data(uint32_t offset,uint8_t data);
+	TIMER_CALLBACK_MEMBER(comhack_callback);
+	emu_timer *m_comhack_timer;
+
+
 	int m_irq_level;
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);

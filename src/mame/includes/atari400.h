@@ -15,6 +15,7 @@
 #define MAME_INCLUDES_ATARI400_H
 
 #include "machine/6821pia.h"
+#include "machine/ram.h"
 #include "sound/pokey.h"
 #include "video/antic.h"
 #include "video/gtia.h"
@@ -31,6 +32,7 @@ public:
 	atari_common_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
 		, m_gtia(*this, "gtia")
 		, m_antic(*this, "antic")
 		, m_screen(*this, "screen")
@@ -50,6 +52,7 @@ protected:
 	POKEY_KEYBOARD_CB_MEMBER(a800_keyboard);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<gtia_device> m_gtia;
 	required_device<antic_device> m_antic;
 	required_device<screen_device> m_screen;

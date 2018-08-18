@@ -709,8 +709,7 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_PALETTE_INIT_OWNER(p1_state, p1)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END
 
 ROM_START( poisk1 )

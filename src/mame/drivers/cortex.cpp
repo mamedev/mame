@@ -184,7 +184,9 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map)
+	TMS9995(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cortex_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cortex_state::io_map);
 
 	ls259_device &control(LS259(config, "control")); // IC64
 	//control.q_out_cb<0>().set(FUNC(cortex_state::basic_led_w));

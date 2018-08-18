@@ -604,8 +604,7 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("136K")   /* 128KB Main RAM + RAM in ROM bank (8) */
+	RAM(config, RAM_TAG).set_default_size("136K"); /* 128KB Main RAM + RAM in ROM bank (8) */
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "osborne2")

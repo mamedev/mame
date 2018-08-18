@@ -757,8 +757,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
+	RAM(config, RAM_TAG).set_default_size("48K"); /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 
 	/* cartslot */
 	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)

@@ -75,22 +75,7 @@ public:
 		, m_acia2(*this, "acia2")
 		, m_acia3(*this, "acia3")
 		, m_acia4(*this, "acia4")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
-		, m_bank9(*this, "bank9")
-		, m_bank10(*this, "bank10")
-		, m_bank11(*this, "bank11")
-		, m_bank12(*this, "bank12")
-		, m_bank13(*this, "bank13")
-		, m_bank14(*this, "bank14")
-		, m_bank15(*this, "bank15")
-		, m_bank16(*this, "bank16")
+		, m_bank(*this, "bank%u", 1U)
 		, m_rombank1(*this, "rombank1")
 		, m_rombank2(*this, "rombank2")
 		, m_fixedrombank(*this, "fixedrombank")
@@ -153,22 +138,7 @@ private:
 	required_device<acia6850_device> m_acia3;
 	required_device<acia6850_device> m_acia4;
 
-	required_device<address_map_bank_device> m_bank1;
-	required_device<address_map_bank_device> m_bank2;
-	required_device<address_map_bank_device> m_bank3;
-	required_device<address_map_bank_device> m_bank4;
-	required_device<address_map_bank_device> m_bank5;
-	required_device<address_map_bank_device> m_bank6;
-	required_device<address_map_bank_device> m_bank7;
-	required_device<address_map_bank_device> m_bank8;
-	required_device<address_map_bank_device> m_bank9;
-	required_device<address_map_bank_device> m_bank10;
-	required_device<address_map_bank_device> m_bank11;
-	required_device<address_map_bank_device> m_bank12;
-	required_device<address_map_bank_device> m_bank13;
-	required_device<address_map_bank_device> m_bank14;
-	required_device<address_map_bank_device> m_bank15;
-	required_device<address_map_bank_device> m_bank16;
+	required_device_array<address_map_bank_device, 16> m_bank;
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
 	required_memory_bank m_fixedrombank;
@@ -198,22 +168,10 @@ void gimix_state::gimix_banked_mem(address_map &map)
 
 void gimix_state::gimix_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rw(m_bank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x1000, 0x1fff).rw(m_bank2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x2000, 0x2fff).rw(m_bank3, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x3000, 0x3fff).rw(m_bank4, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x4fff).rw(m_bank5, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x5000, 0x5fff).rw(m_bank6, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x6000, 0x6fff).rw(m_bank7, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x7000, 0x7fff).rw(m_bank8, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x8000, 0x8fff).rw(m_bank9, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x9000, 0x9fff).rw(m_bank10, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xa000, 0xafff).rw(m_bank11, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xb000, 0xbfff).rw(m_bank12, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xc000, 0xcfff).rw(m_bank13, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xd000, 0xdfff).rw(m_bank14, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xe000, 0xefff).rw(m_bank15, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf000, 0xfeff).rw(m_bank16, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	for (int bank = 0; bank < 16; bank++)
+	{
+		map(bank << 12, (bank << 12) | 0x0fff).rw(m_bank[bank], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	}
 	map(0xff00, 0xffff).bankr("fixedrombank").w(FUNC(gimix_state::system_w));
 }
 
@@ -227,13 +185,9 @@ INPUT_PORTS_END
 
 void gimix_state::refresh_memory()
 {
-	int x;
-	address_map_bank_device* banknum[16] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8,
-			m_bank9, m_bank10, m_bank11, m_bank12, m_bank13, m_bank14, m_bank15, m_bank16};
-
-	for(x=0;x<16;x++) // for each bank
+	for (int bank = 0; bank < 16; bank++)
 	{
-		banknum[x]->set_bank(m_task_banks[m_task][x]);
+		m_bank[bank]->set_bank(m_task_banks[m_task][bank]);
 	}
 }
 
@@ -261,10 +215,7 @@ WRITE8_MEMBER( gimix_state::system_w )
 	}
 	if(offset >= 0xf0)  // Dynamic Address Translation RAM (write only)
 	{
-		address_map_bank_device* banknum[16] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8,
-				m_bank9, m_bank10, m_bank11, m_bank12, m_bank13, m_bank14, m_bank15, m_bank16};
-
-		banknum[offset-0xf0]->set_bank(data & 0x0f);
+		m_bank[offset-0xf0]->set_bank(data & 0x0f);
 		m_task_banks[m_task][offset-0xf0] = data & 0x0f;
 		logerror("SYS: Bank %i set to physical bank %02x\n",offset-0xf0,data);
 	}
@@ -490,22 +441,10 @@ void gimix_state::machine_start()
 	// install any extra RAM
 	if(m_ram->size() > 65536)
 	{
-		m_bank1->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank2->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank3->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank4->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank5->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank6->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank7->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank8->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank9->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank10->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank11->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank12->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank13->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank14->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank15->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		m_bank16->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		for (int bank = 0; bank < 16; bank++)
+		{
+			m_bank[bank]->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		}
 	}
 	m_floppy0->get_device()->set_rpm(300);
 	m_floppy1->get_device()->set_rpm(300);
@@ -540,13 +479,6 @@ static void gimix_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("8dd", FLOPPY_8_DSDD);
 }
-
-#define MCFG_ADDRESS_BANK(tag) \
-MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
-MCFG_DEVICE_PROGRAM_MAP(gimix_banked_mem) \
-MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
-MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
-MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 MACHINE_CONFIG_START(gimix_state::gimix)
 	// basic machine hardware
@@ -618,27 +550,13 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	acia_clock.signal_handler().append(m_acia2, FUNC(acia6850_device::write_rxc));
 
 	/* banking */
-	MCFG_ADDRESS_BANK("bank1")
-	MCFG_ADDRESS_BANK("bank2")
-	MCFG_ADDRESS_BANK("bank3")
-	MCFG_ADDRESS_BANK("bank4")
-	MCFG_ADDRESS_BANK("bank5")
-	MCFG_ADDRESS_BANK("bank6")
-	MCFG_ADDRESS_BANK("bank7")
-	MCFG_ADDRESS_BANK("bank8")
-	MCFG_ADDRESS_BANK("bank9")
-	MCFG_ADDRESS_BANK("bank10")
-	MCFG_ADDRESS_BANK("bank11")
-	MCFG_ADDRESS_BANK("bank12")
-	MCFG_ADDRESS_BANK("bank13")
-	MCFG_ADDRESS_BANK("bank14")
-	MCFG_ADDRESS_BANK("bank15")
-	MCFG_ADDRESS_BANK("bank16")
+	for (int bank = 0; bank < 16; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_bank[bank]).set_map(&gimix_state::gimix_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x1000);
+	}
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("56K,256K,512K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("56K,256K,512K");
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","gimix")
 

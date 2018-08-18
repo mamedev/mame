@@ -238,6 +238,10 @@ public:
 	void ti99_8_60hz(machine_config &config);
 	void ti99_8_50hz(machine_config &config);
 
+	// Lifecycle
+	void driver_start() override;
+	void driver_reset() override;
+
 private:
 	// Machine management
 	DECLARE_MACHINE_START(ti99_8);
@@ -699,11 +703,11 @@ WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
 	m_mainboard->dbin_in(state);
 }
 
-MACHINE_START_MEMBER(ti99_8_state,ti99_8)
+void ti99_8_state::driver_start()
 {
 	// Need to configure the speech ROM for inverse bit order
-	speechrom_device* mem = subdevice<speechrom_device>(TI998_SPEECHROM_REG);
-	mem->set_reverse_bit_order(true);
+//  speechrom_device* mem = subdevice<speechrom_device>(TI998_SPEECHROM_REG);
+//  mem->set_reverse_bit_order(true);
 
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_ready_old));
@@ -711,13 +715,13 @@ MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 	save_item(NAME(m_int2));
 }
 
-MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
+void ti99_8_state::driver_reset()
 {
 	m_cpu->hold_line(CLEAR_LINE);
 
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-//  m_cpu->ready_line(ASSERT_LINE);
+	//  m_cpu->ready_line(ASSERT_LINE);
 
 	// m_gromport->set_grom_base(0x9800, 0xfff1);
 
@@ -728,139 +732,225 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 	console_reset(CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(ti99_8_state::ti99_8)
+void ti99_8_state::ti99_8(machine_config& config)
+{
+	using namespace bus::ti99::internal;
 	// basic machine hardware */
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
-	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL(10'738'635), memmap, crumap)
-	MCFG_DEVICE_ADDRESS_MAP(tms9995_device::AS_SETOFFSET, memmap_setoffset)
-	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, ti99_8_state, external_operation) )
-	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, ti99_8_state, clock_out) )
-	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(*this, ti99_8_state, dbin_line) )
-	MCFG_TMS9995_HOLDA_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, holda_line) )
-
-	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
-	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
+	TMS9995_MP9537(config, m_cpu, XTAL(10'738'635));
+	m_cpu->set_addrmap(AS_PROGRAM, &ti99_8_state::memmap);
+	m_cpu->set_addrmap(AS_IO, &ti99_8_state::crumap);
+	m_cpu->set_addrmap(tms9995_device::AS_SETOFFSET, &ti99_8_state::memmap_setoffset);
+	m_cpu->extop_cb().set(FUNC(ti99_8_state::external_operation));
+	m_cpu->clkout_cb().set(FUNC(ti99_8_state::clock_out));
+	m_cpu->dbin_cb().set(FUNC(ti99_8_state::dbin_line));
+	m_cpu->holda_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::holda_line));
 
 	// 9901 configuration
-	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, XTAL(10'738'635)/4.0)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_8_state, read_by_9901) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, ti99_8_state, keyC0) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, ti99_8_state, keyC1) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_8_state, keyC2) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_8_state, keyC3) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, crus_in) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptgen_in) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_8_state, cassette_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_8_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_8_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_8_state, tms9901_interrupt) )
+	TMS9901(config, m_tms9901, XTAL(10'738'635)/4.0);
+	m_tms9901->read_cb().set(FUNC(ti99_8_state::read_by_9901));
+	m_tms9901->p_out_cb(0).set(FUNC(ti99_8_state::keyC0));
+	m_tms9901->p_out_cb(1).set(FUNC(ti99_8_state::keyC1));
+	m_tms9901->p_out_cb(2).set(FUNC(ti99_8_state::keyC2));
+	m_tms9901->p_out_cb(3).set(FUNC(ti99_8_state::keyC3));
+	m_tms9901->p_out_cb(4).set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::crus_in));
+	m_tms9901->p_out_cb(5).set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptgen_in));
+	m_tms9901->p_out_cb(6).set(FUNC(ti99_8_state::cassette_motor));
+	m_tms9901->p_out_cb(8).set(FUNC(ti99_8_state::audio_gate));
+	m_tms9901->p_out_cb(9).set(FUNC(ti99_8_state::cassette_output));
+	m_tms9901->intlevel_cb().set(FUNC(ti99_8_state::tms9901_interrupt));
 
 	// Mainboard with custom chips
-	MCFG_DEVICE_ADD(TI998_MAINBOARD_TAG, TI99_MAINBOARD8, 0)
-	MCFG_MAINBOARD8_READY_CALLBACK(WRITELINE(*this, ti99_8_state, console_ready))
-	MCFG_MAINBOARD8_RESET_CALLBACK(WRITELINE(*this, ti99_8_state, console_reset))
-	MCFG_MAINBOARD8_HOLD_CALLBACK(WRITELINE(*this, ti99_8_state, cpu_hold))
+	TI99_MAINBOARD8(config, m_mainboard, 0);
+	m_mainboard->ready_cb().set(FUNC(ti99_8_state::console_ready));
+	m_mainboard->reset_cb().set(FUNC(ti99_8_state::console_reset));
+	m_mainboard->hold_cb().set(FUNC(ti99_8_state::cpu_hold));
 
-	MCFG_GROMPORT8_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_8_state, console_reset) )
+	// Cartridge port
+	TI99_GROMPORT(config, m_gromport, 0);
+	m_gromport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::system_grom_ready));
+	m_gromport->reset_cb().set(FUNC(ti99_8_state::console_reset));
+	m_gromport->configure_slot(true);
 
 	// RAM
-	MCFG_RAM_ADD(TI998_SRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_ADD(TI998_DRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI998_SRAM_TAG).set_default_size("2K").set_default_value(0);
+	RAM(config, TI998_DRAM_TAG).set_default_size("64K").set_default_value(0);
 
-	/* Software list */
-	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
+	// Software list
+	SOFTWARE_LIST(config, "cart_list_ti99").set_type("ti99_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	// I/O port
-	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_8_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
+	TI99_IOPORT(config, m_ioport, 0);
+	m_ioport->configure_slot(false);
+	m_ioport->extint_cb().set(FUNC(ti99_8_state::extint));
+	m_ioport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::pbox_ready));
 
 	// Hexbus
-	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
+	HEXBUS(config, TI_HEXBUS_TAG, 0).configure_slot();
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, sound_ready))
+	sn76496_device& soundgen(SN76496(config, TI_SOUNDCHIP_TAG, 3579545));
+	soundgen.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::sound_ready));
+	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Speech hardware
 	// Note: SPEECHROM uses its tag for referencing the region
-	MCFG_DEVICE_ADD(TI998_SPEECHROM_REG, SPEECHROM, 0)
+	SPEECHROM(config, TI998_SPEECHROM_REG, 0).set_reverse_bit_order(true);
 	SPEAKER(config, "speech_out").front_center();
-	MCFG_DEVICE_ADD(TI998_SPEECHSYN_TAG, CD2501ECD, 640000L)
-	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, speech_ready))
-	MCFG_TMS52XX_SPEECHROM(TI998_SPEECHROM_REG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech_out", 0.50)
+
+	cd2501ecd_device& vsp(CD2501ECD(config, TI998_SPEECHSYN_TAG, 640000L));
+	vsp.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::speech_ready));
+	vsp.set_speechrom_tag(TI998_SPEECHROM_REG);
+	vsp.add_route(ALL_OUTPUTS, "speech_out", 0.50);
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, "cassette", 0);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
-	MCFG_GROM_ADD( TI998_SYSGROM0_TAG, 0, TI998_SYSGROM_REG, 0x0000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
-	MCFG_GROM_ADD( TI998_SYSGROM1_TAG, 1, TI998_SYSGROM_REG, 0x2000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
-	MCFG_GROM_ADD( TI998_SYSGROM2_TAG, 2, TI998_SYSGROM_REG, 0x4000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
+	tmc0430_device& sgrom0(TMC0430(config, TI998_SYSGROM0_TAG, 0));
+	sgrom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
+	sgrom0.set_region_and_ident(TI998_SYSGROM_REG, 0x0000, 0);
 
-	MCFG_GROM_ADD( TI998_GLIB10_TAG, 0, TI998_GROMLIB1_REG, 0x0000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB11_TAG, 1, TI998_GROMLIB1_REG, 0x2000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB12_TAG, 2, TI998_GROMLIB1_REG, 0x4000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB13_TAG, 3, TI998_GROMLIB1_REG, 0x6000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB14_TAG, 4, TI998_GROMLIB1_REG, 0x8000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB15_TAG, 5, TI998_GROMLIB1_REG, 0xa000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB16_TAG, 6, TI998_GROMLIB1_REG, 0xc000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB17_TAG, 7, TI998_GROMLIB1_REG, 0xe000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	tmc0430_device& sgrom1(TMC0430(config, TI998_SYSGROM1_TAG, 0));
+	sgrom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
+	sgrom1.set_region_and_ident(TI998_SYSGROM_REG, 0x2000, 1);
 
-	MCFG_GROM_ADD( TI998_GLIB20_TAG, 0, TI998_GROMLIB2_REG, 0x0000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB21_TAG, 1, TI998_GROMLIB2_REG, 0x2000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB22_TAG, 2, TI998_GROMLIB2_REG, 0x4000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB23_TAG, 3, TI998_GROMLIB2_REG, 0x6000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB24_TAG, 4, TI998_GROMLIB2_REG, 0x8000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB25_TAG, 5, TI998_GROMLIB2_REG, 0xa000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB26_TAG, 6, TI998_GROMLIB2_REG, 0xc000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB27_TAG, 7, TI998_GROMLIB2_REG, 0xe000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	tmc0430_device& sgrom2(TMC0430(config, TI998_SYSGROM2_TAG, 0));
+	sgrom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
+	sgrom2.set_region_and_ident(TI998_SYSGROM_REG, 0x4000, 2);
 
-	MCFG_GROM_ADD( TI998_GLIB30_TAG, 0, TI998_GROMLIB3_REG, 0x0000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB31_TAG, 1, TI998_GROMLIB3_REG, 0x2000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
-	MCFG_GROM_ADD( TI998_GLIB32_TAG, 2, TI998_GROMLIB3_REG, 0x4000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
+
+	tmc0430_device& tgrom0(TMC0430(config, TI998_GLIB10_TAG, 0));
+	tgrom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom0.set_region_and_ident(TI998_GROMLIB1_REG, 0x0000, 0);
+
+	tmc0430_device& tgrom1(TMC0430(config, TI998_GLIB11_TAG, 0));
+	tgrom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom1.set_region_and_ident(TI998_GROMLIB1_REG, 0x2000, 1);
+
+	tmc0430_device& tgrom2(TMC0430(config, TI998_GLIB12_TAG, 0));
+	tgrom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom2.set_region_and_ident(TI998_GROMLIB1_REG, 0x4000, 2);
+
+	tmc0430_device& tgrom3(TMC0430(config, TI998_GLIB13_TAG, 0));
+	tgrom3.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom3.set_region_and_ident(TI998_GROMLIB1_REG, 0x6000, 3);
+
+	tmc0430_device& tgrom4(TMC0430(config, TI998_GLIB14_TAG, 0));
+	tgrom4.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom4.set_region_and_ident(TI998_GROMLIB1_REG, 0x8000, 4);
+
+	tmc0430_device& tgrom5(TMC0430(config, TI998_GLIB15_TAG, 0));
+	tgrom5.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom5.set_region_and_ident(TI998_GROMLIB1_REG, 0xa000, 5);
+
+	tmc0430_device& tgrom6(TMC0430(config, TI998_GLIB16_TAG, 0));
+	tgrom6.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom6.set_region_and_ident(TI998_GROMLIB1_REG, 0xc000, 6);
+
+	tmc0430_device& tgrom7(TMC0430(config, TI998_GLIB17_TAG, 0));
+	tgrom7.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
+	tgrom7.set_region_and_ident(TI998_GROMLIB1_REG, 0xe000, 7);
+
+
+	tmc0430_device& p8grom0(TMC0430(config, TI998_GLIB20_TAG, 0));
+	p8grom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom0.set_region_and_ident(TI998_GROMLIB2_REG, 0x0000, 0);
+
+	tmc0430_device& p8grom1(TMC0430(config, TI998_GLIB21_TAG, 0));
+	p8grom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom1.set_region_and_ident(TI998_GROMLIB2_REG, 0x2000, 1);
+
+	tmc0430_device& p8grom2(TMC0430(config, TI998_GLIB22_TAG, 0));
+	p8grom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom2.set_region_and_ident(TI998_GROMLIB2_REG, 0x4000, 2);
+
+	tmc0430_device& p8grom3(TMC0430(config, TI998_GLIB23_TAG, 0));
+	p8grom3.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom3.set_region_and_ident(TI998_GROMLIB2_REG, 0x6000, 3);
+
+	tmc0430_device& p8grom4(TMC0430(config, TI998_GLIB24_TAG, 0));
+	p8grom4.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom4.set_region_and_ident(TI998_GROMLIB2_REG, 0x8000, 4);
+
+	tmc0430_device& p8grom5(TMC0430(config, TI998_GLIB25_TAG, 0));
+	p8grom5.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom5.set_region_and_ident(TI998_GROMLIB2_REG, 0xa000, 5);
+
+	tmc0430_device& p8grom6(TMC0430(config, TI998_GLIB26_TAG, 0));
+	p8grom6.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom6.set_region_and_ident(TI998_GROMLIB2_REG, 0xc000, 6);
+
+	tmc0430_device& p8grom7(TMC0430(config, TI998_GLIB27_TAG, 0));
+	p8grom7.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
+	p8grom7.set_region_and_ident(TI998_GROMLIB2_REG, 0xe000, 7);
+
+
+	tmc0430_device& p3grom0(TMC0430(config, TI998_GLIB30_TAG, 0));
+	p3grom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p3_grom_ready));
+	p3grom0.set_region_and_ident(TI998_GROMLIB3_REG, 0x0000, 0);
+
+	tmc0430_device& p3grom1(TMC0430(config, TI998_GLIB31_TAG, 0));
+	p3grom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p3_grom_ready));
+	p3grom1.set_region_and_ident(TI998_GROMLIB3_REG, 0x2000, 1);
+
+	tmc0430_device& p3grom2(TMC0430(config, TI998_GLIB32_TAG, 0));
+	p3grom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p3_grom_ready));
+	p3grom2.set_region_and_ident(TI998_GROMLIB3_REG, 0x4000, 2);
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
-MACHINE_CONFIG_END
+	TI99_JOYPORT(config, m_joyport, 0).configure_slot(true, false);
+}
 
 /*
     TI-99/8 US version (NTSC, 60 Hz)
 */
-MACHINE_CONFIG_START(ti99_8_state::ti99_8_60hz)
+void ti99_8_state::ti99_8_60hz(machine_config& config)
+{
 	ti99_8(config);
 	// Video hardware
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9118, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, ti99_8_state, video_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
-MACHINE_CONFIG_END
+	tms9928a_device& video(TMS9118(config, TI_VDP_TAG, XTAL(10'738'635) / 2));
+	video.out_int_line_callback().set(FUNC(ti99_8_state::video_interrupt));
+	video.set_vram_size(0x4000);
+	video.set_screen(TI_SCREEN_TAG);
+
+	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635) / 2, \
+			tms9928a_device::TOTAL_HORZ, \
+			tms9928a_device::HORZ_DISPLAY_START-12, \
+			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+			tms9928a_device::TOTAL_VERT_NTSC, \
+			tms9928a_device::VERT_DISPLAY_START_NTSC - 12, \
+			tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
+	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+}
 
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
-MACHINE_CONFIG_START(ti99_8_state::ti99_8_50hz)
+void ti99_8_state::ti99_8_50hz(machine_config& config)
+{
 	ti99_8(config);
 	// Video hardware
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9129, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, ti99_8_state,video_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
-MACHINE_CONFIG_END
+	tms9928a_device& video(TMS9129(config, TI_VDP_TAG, XTAL(10'738'635) / 2));
+	video.out_int_line_callback().set(FUNC(ti99_8_state::video_interrupt));
+	video.set_vram_size(0x4000);
+	video.set_screen(TI_SCREEN_TAG);
+
+	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635) / 2, \
+			tms9928a_device::TOTAL_HORZ, \
+			tms9928a_device::HORZ_DISPLAY_START-12, \
+			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+			tms9928a_device::TOTAL_VERT_PAL, \
+			tms9928a_device::VERT_DISPLAY_START_PAL - 12, \
+			tms9928a_device::VERT_DISPLAY_START_PAL + 192 + 12 );
+	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+}
 
 /*
     All ROM dumps except the speech ROM have a CRC16 checksum as the final two

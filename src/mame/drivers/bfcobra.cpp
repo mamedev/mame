@@ -1397,9 +1397,9 @@ READ8_MEMBER(bfcobra_state::upd_r)
 
 WRITE8_MEMBER(bfcobra_state::upd_w)
 {
-	m_upd7759->reset_w(data & 0x80);
-	m_upd7759->port_w(space, 0, data & 0x3f);
-	m_upd7759->start_w(data & 0x40 ? 0 : 1);
+	m_upd7759->reset_w(BIT(data, 7));
+	m_upd7759->port_w(data & 0x3f);
+	m_upd7759->start_w(!BIT(data, 6));
 }
 
 void bfcobra_state::m6809_prog_map(address_map &map)

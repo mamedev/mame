@@ -373,9 +373,8 @@ WRITE8_MEMBER( trs80m3_state::port_ec_w )
     d0 1=select drive 0 */
 WRITE8_MEMBER( trs80m3_state::port_f4_w )
 {
-	if (BIT(data ,6))
+	if (BIT(data, 6))
 	{
-		
 		if (m_drq_off && m_intrq_off)
 		{
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);

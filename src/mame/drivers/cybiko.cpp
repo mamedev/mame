@@ -415,15 +415,13 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	// machine
 	/* rtc */
 	MCFG_PCF8593_ADD("rtc")
-	MCFG_AT45DB041_ADD("flash1")
-	MCFG_AT45DBXXX_SO_CALLBACK(WRITELINE("maincpu:sci1", h8_sci_device, rx_w))
+	AT45DB041(config, m_flash1, 0);
+	m_flash1->so_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1M")
+	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");
 
 	/* serial debug port */
 	MCFG_DEVICE_ADD ("debug_serial", RS232_PORT, default_rs232_devices, nullptr)
@@ -455,9 +453,7 @@ MACHINE_CONFIG_START(cybiko_state::cybikov2)
 	MCFG_SST_39VF020_ADD("flash2")
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
+	m_ram->set_default_size("256K").set_extra_options("512K,1M");
 
 	/* serial debug port */
 	MCFG_DEVICE_MODIFY("debug_serial")
@@ -478,8 +474,7 @@ MACHINE_CONFIG_START(cybiko_state::cybikoxt)
 	MCFG_SST_39VF400A_ADD("flashxt")
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	m_ram->set_default_size("2M");
 
 	/* serial debug port */
 	MCFG_DEVICE_MODIFY("debug_serial")

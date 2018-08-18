@@ -675,12 +675,14 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	MCFG_IBC_HSKLATCH_CALLBACK(WRITELINE(*this, hx5102_device, hsklatch_out))
 
 	// Outgoing socket for downstream devices
-	MCFG_HEXBUS_ADD("hexbus")
+	HEXBUS(config, "hexbus", 0).configure_slot();
 
 	// TMS9995 CPU @ 12.0 MHz
-	MCFG_TMS99xx_ADD(TMS9995_TAG, TMS9995, XTAL(12'000'000), memmap, crumap)
-	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, hx5102_device, external_operation) )
-	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, hx5102_device, clock_out) )
+	TMS9995(config, m_flopcpu, XTAL(12'000'000));
+	m_flopcpu->set_addrmap(AS_PROGRAM, &hx5102_device::memmap);
+	m_flopcpu->set_addrmap(AS_IO, &hx5102_device::crumap);
+	m_flopcpu->extop_cb().set(FUNC(hx5102_device::external_operation));
+	m_flopcpu->clkout_cb().set(FUNC(hx5102_device::clock_out));
 
 	// Disk controller i8272A
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
@@ -714,18 +716,12 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	m_speedmf->out_cb().set(FUNC(hx5102_device::mspeed_w));
 
 	// READY flipflop
-	MCFG_DEVICE_ADD(READYFF_TAG, TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, hx5102_device, board_ready))
+	TTL7474(config, m_readyff, 0);
+	m_readyff->comp_output_cb().set(FUNC(hx5102_device::board_ready));
 
 	// RAM
-	MCFG_RAM_ADD(RAM1_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2048")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-	MCFG_RAM_ADD(RAM2_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2048")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
+	RAM(config, RAM1_TAG).set_default_size("2048").set_default_value(0);
+	RAM(config, RAM2_TAG).set_default_size("2048").set_default_value(0);
 MACHINE_CONFIG_END
 
 ROM_START( hx5102 )

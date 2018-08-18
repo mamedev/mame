@@ -757,9 +757,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("fga002", fga002_device, lirq0_w))
 
 	// dual ported ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M, 16M, 32M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("8M, 16M, 32M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30X Part No.1 01300: 16.7 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. */
@@ -771,9 +769,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30x)
 //  MCFG_DEVICE_REMOVE("")
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("1M, 2M, 4M")
+	m_ram->set_default_size("1M").set_extra_options("1M, 2M, 4M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30XA Part No.1 01301: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
@@ -790,9 +786,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30za)
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M, 2M, 4M")
+	m_ram->set_default_size("4M").set_extra_options("1M, 2M, 4M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30ZBE 68030/68882 CPU, 25 MHz,  4 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface */
@@ -802,9 +796,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30zbe)
 	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
+	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-33 */
@@ -814,31 +806,28 @@ MACHINE_CONFIG_START(cpu30_state::cpu33)
 	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
+	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30BE/8 68030/68882 CPU, 25 MHz,  8 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-MACHINE_CONFIG_START(cpu30_state::cpu30be8)
+void cpu30_state::cpu30be8(machine_config &config)
+{
 	cpu30zbe(config);
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("8M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* SYS68K/CPU-30BE/16 68030/68882 CPU, 25 MHz, 16 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-MACHINE_CONFIG_START(cpu30_state::cpu30be16)
+void cpu30_state::cpu30be16(machine_config &config)
+{
 	cpu30zbe(config);
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("16M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* SYS68K/CPU-30Lite/4 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 4 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-MACHINE_CONFIG_START(cpu30_state::cpu30lite4)
+void cpu30_state::cpu30lite4(machine_config &config)
+{
 	cpu30zbe(config);
 // Enable these when added to main config
 //  MCFG_DEVICE_REMOVE("fpu")
@@ -846,19 +835,16 @@ MACHINE_CONFIG_START(cpu30_state::cpu30lite4)
 //  MCFG_DEVICE_REMOVE("eth")
 //  MCFG_DEVICE_REMOVE("fdc")
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("4M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* SYS68K/CPU-30Lite/8 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 8 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-MACHINE_CONFIG_START(cpu30_state::cpu30lite8)
+void cpu30_state::cpu30lite8(machine_config &config)
+{
 	cpu30lite4(config);
 	// dual ported ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("8M").set_extra_options("256K, 512K, 1M, 2M, 4M, 8M, 16M, 32M");
+}
 
 /* ROM definitions */
 ROM_START (fccpu30) /* This is an original rom dump */

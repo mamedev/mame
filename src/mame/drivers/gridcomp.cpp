@@ -425,16 +425,14 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 
 	MCFG_DEVICE_ADD("modem", I8255, 0)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1109)
+void gridcomp_state::grid1109(machine_config &config)
+{
 	grid1101(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 MACHINE_CONFIG_START(gridcomp_state::grid1121)
 	grid1101(config);
@@ -443,11 +441,11 @@ MACHINE_CONFIG_START(gridcomp_state::grid1121)
 	MCFG_DEVICE_PROGRAM_MAP(grid1121_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1129)
+void gridcomp_state::grid1129(machine_config &config)
+{
 	grid1121(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 MACHINE_CONFIG_START(gridcomp_state::grid1131)
 	grid1121(config);
@@ -456,11 +454,11 @@ MACHINE_CONFIG_START(gridcomp_state::grid1131)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240) // XXX
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1139)
+void gridcomp_state::grid1139(machine_config &config)
+{
 	grid1131(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 
 ROM_START( grid1101 )

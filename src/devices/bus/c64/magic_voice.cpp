@@ -241,7 +241,7 @@ void c64_magic_voice_cartridge_device::device_add_mconfig(machine_config &config
 	m_vslsi->apd_handler().set(FUNC(c64_magic_voice_cartridge_device::apd_w));
 	m_vslsi->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	C64_EXPANSION_SLOT(config, m_exp, c64_expansion_cards, nullptr);
+	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
 	m_exp->set_passthrough();
 }
 
@@ -261,7 +261,8 @@ c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine
 	m_vslsi(*this, T6721A_TAG),
 	m_tpi(*this, MOS6525_TAG),
 	m_fifo(*this, CD40105_TAG),
-	m_exp(*this, C64_EXPANSION_SLOT_TAG), m_ca(0),
+	m_exp(*this, "exp"),
+	m_ca(0),
 	m_tpi_pb(0x60),
 	m_tpi_pc6(1),
 	m_pd(0)

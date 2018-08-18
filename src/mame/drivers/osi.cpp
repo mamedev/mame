@@ -737,9 +737,7 @@ MACHINE_CONFIG_START(sb2m600_state::osi600)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("8K")
+	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(uk101_state::uk101)
@@ -762,9 +760,7 @@ MACHINE_CONFIG_START(uk101_state::uk101)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("8K")
+	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c1p_state::c1p)
@@ -799,9 +795,7 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("20K")
+	RAM(config, m_ram).set_default_size("8K").set_extra_options("20K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c1pmf_state::c1pmf)
@@ -825,8 +819,7 @@ MACHINE_CONFIG_START(c1pmf_state::c1pmf)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("20K")
+	m_ram->set_default_size("20K");
 MACHINE_CONFIG_END
 
 /* ROMs */

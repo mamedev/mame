@@ -510,6 +510,7 @@ public:
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+	DECLARE_WRITE8_MEMBER(auxcmd_w);
 };
 
 class n82077aa_device : public upd765_family_device {

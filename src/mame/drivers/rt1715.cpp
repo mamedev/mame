@@ -321,9 +321,7 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	MCFG_DEVICE_ADD("a72", Z80PIO, 9.832_MHz_XTAL / 4)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rt1715_state::rt1715w)

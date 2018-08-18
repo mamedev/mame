@@ -47,7 +47,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
 
-	rtc65271_device*    m_rtc;
+	required_device<rtc65271_device> m_rtc;
 	required_device<ata_interface_device> m_ata;
 
 	bool    m_clk_irq;

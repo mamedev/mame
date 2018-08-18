@@ -660,9 +660,9 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_XTAL/16) // nominally 900 kHz
-	MCFG_ADC0808_IN0_CB(IOPORT("PITCH"))
-	MCFG_ADC0808_IN1_CB(IOPORT("YAW"))
+	adc0809_device &adc(ADC0809(config, "adc", MASTER_XTAL/16)); // nominally 900 kHz
+	adc.in_callback<0>().set_ioport("PITCH");
+	adc.in_callback<1>().set_ioport("YAW");
 
 	ls259_device &latch0(LS259(config, "latch0")); // 7F
 	latch0.q_out_cb<0>().set(m_nvram_1c, FUNC(x2212_device::recall));      // NVRECALL

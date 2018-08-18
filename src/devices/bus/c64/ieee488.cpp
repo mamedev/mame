@@ -154,7 +154,7 @@ void c64_ieee488_device::device_add_mconfig(machine_config &config)
 	IEEE488(config, m_bus, 0);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 
-	C64_EXPANSION_SLOT(config, m_exp, c64_expansion_cards, nullptr);
+	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
 	m_exp->set_passthrough();
 }
 
@@ -173,7 +173,7 @@ c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_tpi(*this, MOS6525_TAG),
 	m_bus(*this, IEEE488_TAG),
-	m_exp(*this, C64_EXPANSION_SLOT_TAG),
+	m_exp(*this, "exp"),
 	m_roml_sel(1)
 {
 }

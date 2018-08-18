@@ -214,7 +214,6 @@ void ide_controller_32_device::write_cs1(offs_t offset, uint32_t data, uint32_t 
 	}
 }
 
-
 #define IDE_BUSMASTER_STATUS_ACTIVE         0x01
 #define IDE_BUSMASTER_STATUS_ERROR          0x02
 #define IDE_BUSMASTER_STATUS_IRQ            0x04

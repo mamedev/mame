@@ -429,6 +429,7 @@ modellot.cpp
 modena.cpp
 molecular.cpp
 monty.cpp
+mpc3000.cpp
 mpf1.cpp
 mps1230.cpp
 mpz80.cpp

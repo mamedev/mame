@@ -1513,8 +1513,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64k")
+	RAM(config, RAM_TAG).set_default_size("64K");
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	// centronics printer

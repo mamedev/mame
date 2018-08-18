@@ -800,8 +800,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

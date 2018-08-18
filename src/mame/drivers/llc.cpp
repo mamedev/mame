@@ -283,8 +283,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_K7659_KEYBOARD_ADD()
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 /* ROM definition */
 

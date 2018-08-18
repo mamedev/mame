@@ -353,7 +353,9 @@ void pachifev_state::machine_start()
 MACHINE_CONFIG_START(pachifev_state::pachifev)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), pachifev_map, pachifev_cru)
+	TMS9995(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pachifev_state::pachifev_map);
+	m_maincpu->set_addrmap(AS_IO, &pachifev_state::pachifev_cru);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )

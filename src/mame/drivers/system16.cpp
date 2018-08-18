@@ -487,7 +487,8 @@ WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
 	int offs, size = m_soundcpu_region->bytes() - 0x10000;
 
-	m_upd7759->reset_w(data & 0x40);
+	m_upd7759->start_w(BIT(data, 7));
+	m_upd7759->reset_w(BIT(data, 6));
 	offs = 0x10000 + (data * 0x4000) % size;
 	membank("bank1")->set_base(m_soundcpu_region->base() + offs);
 }
@@ -2076,8 +2077,8 @@ MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 {
-	/* upd7759 callback */
-	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (state)
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
@@ -2095,6 +2096,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 
 	MCFG_DEVICE_ADD("7759", UPD7759)
+	MCFG_UPD7759_MD(0)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas1x_bootleg_state,sound_cause_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)

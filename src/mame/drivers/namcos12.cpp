@@ -1762,8 +1762,7 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 	MCFG_DEVICE_ADD("maincpu", CXD8661R, XTAL(100'000'000))
 	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 
@@ -1779,8 +1778,7 @@ MACHINE_CONFIG_START(namcos12_state::coh716)
 	MCFG_DEVICE_ADD("maincpu", CXD8606BQ, XTAL(100'000'000))
 	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("16M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("16M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 

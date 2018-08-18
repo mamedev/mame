@@ -1067,7 +1067,9 @@ ROM_START( ti99_hfdc )
 ROM_END
 
 
-MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
+void myarc_hfdc_device::device_add_mconfig(machine_config& config)
+{
+	device_t *device = nullptr;
 	HDC9234(config, m_hdc9234, 0);
 	m_hdc9234->intrq_cb().set(FUNC(myarc_hfdc_device::intrq_w));
 	m_hdc9234->dmarq_cb().set(FUNC(myarc_hfdc_device::dmarq_w));
@@ -1090,14 +1092,10 @@ MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
 	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
 	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
 
-	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(0)   // sunday
+	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
-	MCFG_RAM_ADD(BUFFER)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
+}
 
 const tiny_rom_entry *myarc_hfdc_device::device_rom_region() const
 {

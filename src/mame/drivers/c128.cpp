@@ -25,6 +25,7 @@
 #include "cpu/m6502/m8502.h"
 #include "cpu/z80/z80.h"
 #include "machine/cbm_snqk.h"
+#include "machine/input_merger.h"
 #include "machine/mos6526.h"
 #include "machine/mos8722.h"
 #include "machine/pla.h"
@@ -56,6 +57,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80A_TAG),
 		m_subcpu(*this, M8502_TAG),
+		m_nmi(*this, "nmi"),
 		m_mmu(*this, MOS8722_TAG),
 		m_pla(*this, MOS8721_TAG),
 		m_vdc(*this, MOS8563_TAG),
@@ -66,7 +68,7 @@ public:
 		m_iec(*this, CBM_IEC_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
-		m_exp(*this, C64_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
@@ -91,12 +93,6 @@ public:
 		m_cnt1(1),
 		m_sp1(1),
 		m_iec_data_out(1),
-		m_restore(1),
-		m_cia1_irq(CLEAR_LINE),
-		m_cia2_irq(CLEAR_LINE),
-		m_vic_irq(CLEAR_LINE),
-		m_exp_irq(CLEAR_LINE),
-		m_exp_nmi(CLEAR_LINE),
 		m_cass_rd(1),
 		m_iec_srq(1),
 		m_vic_k(0x07),
@@ -105,6 +101,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<m8502_device> m_subcpu;
+	required_device<input_merger_device> m_nmi;
 	required_device<mos8722_device> m_mmu;
 	required_device<pla_device> m_pla;
 	required_device<mos8563_device> m_vdc;
@@ -153,13 +150,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( mmu_exrom_r );
 	DECLARE_READ_LINE_MEMBER( mmu_sense40_r );
 
-	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_WRITE8_MEMBER( vic_k_w );
 
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
 
-	DECLARE_WRITE_LINE_MEMBER( cia1_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( cia1_cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( cia1_sp_w );
 	DECLARE_READ8_MEMBER( cia1_pa_r );
@@ -167,7 +162,6 @@ public:
 	DECLARE_READ8_MEMBER( cia1_pb_r );
 	DECLARE_WRITE8_MEMBER( cia1_pb_w );
 
-	DECLARE_WRITE_LINE_MEMBER( cia2_irq_w );
 	DECLARE_READ8_MEMBER( cia2_pa_r );
 	DECLARE_WRITE8_MEMBER( cia2_pa_w );
 
@@ -179,8 +173,6 @@ public:
 
 	DECLARE_READ8_MEMBER( exp_dma_cd_r );
 	DECLARE_WRITE8_MEMBER( exp_dma_cd_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
@@ -222,12 +214,6 @@ public:
 	int m_iec_data_out;
 
 	// interrupt state
-	int m_restore;
-	int m_cia1_irq;
-	int m_cia2_irq;
-	int m_vic_irq;
-	int m_exp_irq;
-	int m_exp_nmi;
 	int m_exp_dma;
 	int m_cass_rd;
 	int m_iec_srq;
@@ -309,16 +295,11 @@ QUICKLOAD_LOAD_MEMBER( c128_state, cbm_c64 )
 
 inline void c128_state::check_interrupts()
 {
-	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
-	int nmi = m_cia2_irq || !m_restore || m_exp_nmi;
+	//int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
+	//int nmi = m_cia2_irq || !m_restore || m_exp_nmi;
 	//int aec = m_exp_dma && m_z80_busack;
 	//int rdy = m_vic_aec && m_z80en && m_vic_ba;
 	//int busreq = !m_z80en || !(m_z80_busack && !aec)
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, irq);
-
-	m_subcpu->set_input_line(M8502_IRQ_LINE, irq);
-	m_subcpu->set_input_line(M8502_NMI_LINE, nmi);
 }
 
 
@@ -737,9 +718,7 @@ void c128_state::vdc_videoram_map(address_map &map)
 
 WRITE_LINE_MEMBER( c128_state::write_restore )
 {
-	m_restore = state;
-
-	check_interrupts();
+	m_nmi->in_w<1>(!state);
 }
 
 INPUT_CHANGED_MEMBER( c128_state::caps_lock )
@@ -1118,13 +1097,6 @@ GFXDECODE_END
 //  MOS8564_INTERFACE( vic_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c128_state::vic_irq_w )
-{
-	m_vic_irq = state;
-
-	check_interrupts();
-}
-
 WRITE8_MEMBER( c128_state::vic_k_w )
 {
 	m_vic_k = data;
@@ -1193,13 +1165,6 @@ READ8_MEMBER( c128_state::sid_poty_r )
 //-------------------------------------------------
 //  MOS6526_INTERFACE( cia1_intf )
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER( c128_state::cia1_irq_w )
-{
-	m_cia1_irq = state;
-
-	check_interrupts();
-}
 
 READ8_MEMBER( c128_state::cia1_pa_r )
 {
@@ -1355,13 +1320,6 @@ WRITE_LINE_MEMBER( c128_state::cia1_sp_w )
 //-------------------------------------------------
 //  MOS6526_INTERFACE( cia2_intf )
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER( c128_state::cia2_irq_w )
-{
-	m_cia2_irq = state;
-
-	check_interrupts();
-}
 
 READ8_MEMBER( c128_state::cia2_pa_r )
 {
@@ -1565,20 +1523,6 @@ WRITE8_MEMBER( c128_state::exp_dma_cd_w )
 	return write_memory(space, offset, data, vma, ba, aec, z80io);
 }
 
-WRITE_LINE_MEMBER( c128_state::exp_irq_w )
-{
-	m_exp_irq = state;
-
-	check_interrupts();
-}
-
-WRITE_LINE_MEMBER( c128_state::exp_nmi_w )
-{
-	m_exp_nmi = state;
-
-	check_interrupts();
-}
-
 WRITE_LINE_MEMBER( c128_state::exp_dma_w )
 {
 	m_exp_dma = state;
@@ -1653,11 +1597,6 @@ void c128_state::machine_start()
 	save_item(NAME(m_cnt1));
 	save_item(NAME(m_sp1));
 	save_item(NAME(m_iec_data_out));
-	save_item(NAME(m_cia1_irq));
-	save_item(NAME(m_cia2_irq));
-	save_item(NAME(m_vic_irq));
-	save_item(NAME(m_exp_irq));
-	save_item(NAME(m_exp_nmi));
 	save_item(NAME(m_exp_dma));
 	save_item(NAME(m_vic_k));
 	save_item(NAME(m_caps_lock));
@@ -1707,6 +1646,13 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_DEVICE_PROGRAM_MAP(m8502_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
+	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
+	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	irq.output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
+
+	INPUT_MERGER_ANY_HIGH(config, m_nmi);
+	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
+
 	// video hardware
 	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, XTAL(16'000'000), vdc_videoram_map)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -1717,13 +1663,14 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8563_TAG, mos8563_device, screen_update)
 
-	MCFG_DEVICE_ADD(MOS8564_TAG, MOS8564, XTAL(14'318'181)*2/3.5)
-	MCFG_MOS6566_CPU(M8502_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c128_state, vic_irq_w))
-	MCFG_MOS8564_K_CALLBACK(WRITE8(*this, c128_state, vic_k_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos8564_device &mos8564(MOS8564(config, MOS8564_TAG, XTAL(14'318'181)*2/3.5));
+	mos8564.set_cpu(M8502_TAG);
+	mos8564.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos8564.k_callback().set(FUNC(c128_state::vic_k_w));
+	mos8564.set_screen(SCREEN_VIC_TAG);
+	mos8564.set_addrmap(0, &c128_state::vic_videoram_map);
+	mos8564.set_addrmap(1, &c128_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_VIC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
@@ -1749,7 +1696,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_MOS8721_ADD(MOS8721_TAG)
 	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(14'318'181)*2/3.5/8)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia1_irq_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE("irq", input_merger_device, in_w<0>))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c128_state, cia1_cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c128_state, cia1_sp_w))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia1_pa_r))
@@ -1758,7 +1705,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia1_pb_w))
 	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(14'318'181)*2/3.5/8)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia2_irq_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(m_nmi, input_merger_device, in_w<0>))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia2_pa_r))
@@ -1770,31 +1717,32 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS8564_TAG, mos8564_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL(14'318'181)*2/3.5/8, c64_expansion_cards, nullptr)
-	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, c128_state, exp_irq_w))
-	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(*this, c128_state, exp_nmi_w))
-	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(*this, c128_state, exp_reset_w))
-	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, c128_state, exp_dma_cd_r))
-	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c128_state, exp_dma_cd_w))
-	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c128_state, exp_dma_w))
 
-	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, c64_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c128_state, exp_reset_w))
-	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, host_atn_w))
-	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c128_state, write_user_pb0))
-	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c128_state, write_user_pb1))
-	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(*this, c128_state, write_user_pb2))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(*this, c128_state, write_user_pb3))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(*this, c128_state, write_user_pb4))
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(*this, c128_state, write_user_pb5))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(*this, c128_state, write_user_pb6))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(*this, c128_state, write_user_pb7))
-	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(*this, c128_state, write_user_pa2))
+	C64_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)*2/3.5/8, c64_expansion_cards, nullptr);
+	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
+	m_exp->reset_callback().set(FUNC(c128_state::exp_reset_w));
+	m_exp->cd_input_callback().set(FUNC(c128_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c128_state::exp_dma_cd_w));
+	m_exp->dma_callback().set(FUNC(c128_state::exp_dma_w));
+
+	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
+	m_user->p3_handler().set(FUNC(c128_state::exp_reset_w));
+	m_user->p4_handler().set(m_cia1, FUNC(mos6526_device::cnt_w));
+	m_user->p5_handler().set(m_cia1, FUNC(mos6526_device::sp_w));
+	m_user->p6_handler().set(m_cia2, FUNC(mos6526_device::cnt_w));
+	m_user->p7_handler().set(m_cia2, FUNC(mos6526_device::sp_w));
+	m_user->p9_handler().set(m_iec, FUNC(cbm_iec_device::host_atn_w));
+	m_user->pb_handler().set(m_cia2, FUNC(mos6526_device::flag_w));
+	m_user->pc_handler().set(FUNC(c128_state::write_user_pb0));
+	m_user->pd_handler().set(FUNC(c128_state::write_user_pb1));
+	m_user->pe_handler().set(FUNC(c128_state::write_user_pb2));
+	m_user->pf_handler().set(FUNC(c128_state::write_user_pb3));
+	m_user->ph_handler().set(FUNC(c128_state::write_user_pb4));
+	m_user->pj_handler().set(FUNC(c128_state::write_user_pb5));
+	m_user->pk_handler().set(FUNC(c128_state::write_user_pb6));
+	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
+	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
 	MCFG_QUICKLOAD_ADD("quickload", c128_state, cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1819,8 +1767,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 
@@ -1881,6 +1828,13 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_DEVICE_PROGRAM_MAP(m8502_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
+	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
+	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	irq.output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
+
+	INPUT_MERGER_ANY_HIGH(config, m_nmi);
+	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
+
 	// video hardware
 	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, XTAL(16'000'000), vdc_videoram_map)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -1891,13 +1845,14 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8563_TAG, mos8563_device, screen_update)
 
-	MCFG_DEVICE_ADD(MOS8566_TAG, MOS8566, XTAL(17'734'472)*2/4.5)
-	MCFG_MOS6566_CPU(M8502_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, c128_state, vic_irq_w))
-	MCFG_MOS8564_K_CALLBACK(WRITE8(*this, c128_state, vic_k_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_VIC_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos8566_device &mos8566(MOS8566(config, MOS8566_TAG, XTAL(17'734'472)*2/4.5));
+	mos8566.set_cpu(M8502_TAG);
+	mos8566.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos8566.k_callback().set(FUNC(c128_state::vic_k_w));
+	mos8566.set_screen(SCREEN_VIC_TAG);
+	mos8566.set_addrmap(0, &c128_state::vic_videoram_map);
+	mos8566.set_addrmap(1, &c128_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_VIC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
@@ -1923,7 +1878,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_MOS8721_ADD(MOS8721_TAG)
 	MCFG_DEVICE_ADD(MOS6526_1_TAG, MOS6526, XTAL(17'734'472)*2/4.5/8)
 	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia1_irq_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE("irq", input_merger_device, in_w<0>))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c128_state, cia1_cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c128_state, cia1_sp_w))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia1_pa_r))
@@ -1932,7 +1887,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c128_state, cia1_pb_w))
 	MCFG_DEVICE_ADD(MOS6526_2_TAG, MOS6526, XTAL(17'734'472)*2/4.5/8)
 	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c128_state, cia2_irq_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(m_nmi, input_merger_device, in_w<0>))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c128_state, cia2_pa_r))
@@ -1944,31 +1899,32 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS8566_TAG, mos8566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, XTAL(17'734'472)*2/4.5/8, c64_expansion_cards, nullptr)
-	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, c128_state, exp_irq_w))
-	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(*this, c128_state, exp_nmi_w))
-	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(*this, c128_state, exp_reset_w))
-	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, c128_state, exp_dma_cd_r))
-	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c128_state, exp_dma_cd_w))
-	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c128_state, exp_dma_w))
 
-	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, c64_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c128_state, exp_reset_w))
-	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
-	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, host_atn_w))
-	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c128_state, write_user_pb0))
-	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c128_state, write_user_pb1))
-	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(*this, c128_state, write_user_pb2))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(*this, c128_state, write_user_pb3))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(*this, c128_state, write_user_pb4))
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(*this, c128_state, write_user_pb5))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(*this, c128_state, write_user_pb6))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(*this, c128_state, write_user_pb7))
-	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(*this, c128_state, write_user_pa2))
+	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)*2/4.5/8, c64_expansion_cards, nullptr);
+	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
+	m_exp->reset_callback().set(FUNC(c128_state::exp_reset_w));
+	m_exp->cd_input_callback().set(FUNC(c128_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c128_state::exp_dma_cd_w));
+	m_exp->dma_callback().set(FUNC(c128_state::exp_dma_w));
+
+	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
+	m_user->p3_handler().set(FUNC(c128_state::exp_reset_w));
+	m_user->p4_handler().set(m_cia1, FUNC(mos6526_device::cnt_w));
+	m_user->p5_handler().set(m_cia1, FUNC(mos6526_device::sp_w));
+	m_user->p6_handler().set(m_cia2, FUNC(mos6526_device::cnt_w));
+	m_user->p7_handler().set(m_cia2, FUNC(mos6526_device::sp_w));
+	m_user->p9_handler().set(m_iec, FUNC(cbm_iec_device::host_atn_w));
+	m_user->pb_handler().set(m_cia2, FUNC(mos6526_device::flag_w));
+	m_user->pc_handler().set(FUNC(c128_state::write_user_pb0));
+	m_user->pd_handler().set(FUNC(c128_state::write_user_pb1));
+	m_user->pe_handler().set(FUNC(c128_state::write_user_pb2));
+	m_user->pf_handler().set(FUNC(c128_state::write_user_pb3));
+	m_user->ph_handler().set(FUNC(c128_state::write_user_pb4));
+	m_user->pj_handler().set(FUNC(c128_state::write_user_pb5));
+	m_user->pk_handler().set(FUNC(c128_state::write_user_pb6));
+	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
+	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
 	MCFG_QUICKLOAD_ADD("quickload", c128_state, cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1993,8 +1949,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 

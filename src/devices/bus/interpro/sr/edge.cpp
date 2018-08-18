@@ -468,13 +468,8 @@ MACHINE_CONFIG_START(mpcb828_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb828_device, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, mpcb828_device, vblank))
 
-	MCFG_DEVICE_ADD("sram", RAM, 0)
-	MCFG_RAM_DEFAULT_SIZE("128KiB")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-	MCFG_DEVICE_ADD("vram", RAM, 0)
-	MCFG_RAM_DEFAULT_SIZE("2560KiB")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, "sram").set_default_size("128K").set_default_value(0);
+	RAM(config, "vram").set_default_size("2560K").set_default_value(0);
 
 	MCFG_DEVICE_ADD("dsp", TMS32030, 1) // 30_MHz_XTAL
 	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
@@ -503,13 +498,8 @@ MACHINE_CONFIG_START(mpcb849_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb849_device, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, vblank))
 
-	MCFG_DEVICE_ADD("sram", RAM, 0)
-	MCFG_RAM_DEFAULT_SIZE("128KiB")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-	MCFG_DEVICE_ADD("vram", RAM, 0)
-	MCFG_RAM_DEFAULT_SIZE("5120KiB") // guess
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, "sram").set_default_size("128K").set_default_value(0);
+	RAM(config, "vram").set_default_size("5120K").set_default_value(0); // size is a guess
 
 	MCFG_DEVICE_ADD("dsp", TMS32030, 1) // 30_MHz_XTAL
 	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
@@ -559,9 +549,7 @@ MACHINE_CONFIG_START(msmt094_device::device_add_mconfig)
 	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, msmt094_device, holda))
 	MCFG_DEVICE_ADDRESS_MAP(0, dsp1_map)
 
-	MCFG_DEVICE_ADD("ram", RAM, 0)
-	MCFG_RAM_DEFAULT_SIZE("6MiB")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, "ram").set_default_size("6M").set_default_value(0);
 
 	//MCFG_DEVICE_ADD("dsp2", TMS32030, 40_MHz_XTAL)
 	//MCFG_DEVICE_ADD("dsp3", TMS32030, 40_MHz_XTAL)
@@ -580,13 +568,8 @@ MACHINE_CONFIG_START(mpcb896_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb896_device, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, vblank))
 
-	MCFG_DEVICE_ADD("sram", RAM, 0)
-	MCFG_RAM_DEFAULT_SIZE("256KiB")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-	MCFG_DEVICE_ADD("vram", RAM, 0)
-	MCFG_RAM_DEFAULT_SIZE("18MiB")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, "sram").set_default_size("256K").set_default_value(0);
+	RAM(config, "vram").set_default_size("18M").set_default_value(0);
 
 	MCFG_DEVICE_ADD("ramdac0", BT457, 164'609'300)
 	MCFG_DEVICE_ADD("ramdac1", BT457, 164'609'300)

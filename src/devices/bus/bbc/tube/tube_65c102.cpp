@@ -52,9 +52,7 @@ MACHINE_CONFIG_START(bbc_tube_65c102_device::device_add_mconfig)
 	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_6502", "bbc_flop_6502")

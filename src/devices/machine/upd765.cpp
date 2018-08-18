@@ -72,7 +72,7 @@ void i8272a_device::map(address_map &map)
 
 void upd72065_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(FUNC(upd72065_device::msr_r));
+	map(0x0, 0x0).rw(FUNC(upd72065_device::msr_r), FUNC(upd72065_device::auxcmd_w));
 	map(0x1, 0x1).rw(FUNC(upd72065_device::fifo_r), FUNC(upd72065_device::fifo_w));
 }
 
@@ -2987,5 +2987,19 @@ WRITE8_MEMBER(tc8566af_device::cr1_w)
 	if(m_cr1 & 0x02) {
 		// Not sure if this inverted or not
 		tc_w((m_cr1 & 0x01) ? true : false);
+	}
+}
+
+WRITE8_MEMBER(upd72065_device::auxcmd_w)
+{
+	switch(data)
+	{
+		case 0x36: // reset
+			soft_reset();
+			break;
+		case 0x35: // set standby
+			break;
+		case 0x34: // reset standby
+			break;
 	}
 }

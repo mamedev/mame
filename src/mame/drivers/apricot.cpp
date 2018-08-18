@@ -374,8 +374,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_I8089_SINTR2(WRITELINE("ic31", pic8259_device, ir1_w))
 
 	// ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256k")
+	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

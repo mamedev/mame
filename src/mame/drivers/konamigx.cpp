@@ -719,7 +719,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 
 /* National Semiconductor ADC0834 4-channel serial ADC emulation */
 
-ADC083X_INPUT_CB(konamigx_state::adc0834_callback)
+double konamigx_state::adc0834_callback(uint8_t input)
 {
 	switch (input)
 	{
@@ -1791,8 +1791,8 @@ MACHINE_CONFIG_START(konamigx_state::opengolf)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gx_type1_map)
 
-	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
+	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::racinfrc)
@@ -1816,8 +1816,8 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gx_type1_map)
 
-	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
+	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::gxtype3)

@@ -1458,9 +1458,8 @@ MACHINE_CONFIG_START(m5_state::m5)
 	//MCFG_SOFTWARE_LIST_ADD("flop_list", "m5_flop")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("36K,64K") //68K is not possible, 'cos internal ram always overlays any expansion memory in that area
+	//68K is not possible, 'cos internal ram always overlays any expansion memory in that area
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("36K,64K");
 MACHINE_CONFIG_END
 
 

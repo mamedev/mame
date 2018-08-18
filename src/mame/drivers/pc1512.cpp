@@ -1254,9 +1254,7 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("544K,576K,608K,640K")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512_flop")
@@ -1389,8 +1387,7 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+	RAM(config, RAM_TAG).set_default_size("640K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640_flop")

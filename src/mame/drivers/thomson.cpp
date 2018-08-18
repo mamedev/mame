@@ -752,9 +752,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_GENERIC_LOAD(thomson_state, to7_cartridge)
 
 /* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("40K")
-	MCFG_RAM_EXTRA_OPTIONS("24K,48K")
+	RAM(config, m_ram).set_default_size("40K").set_extra_options("24K,48K");
 
 /* software lists */
 	MCFG_SOFTWARE_LIST_ADD("to7_cart_list","to7_cart")
@@ -944,9 +942,7 @@ MACHINE_CONFIG_START(thomson_state::to770)
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to770_timer_port_out))
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("128K").set_extra_options("64K");
 
 	MCFG_DEVICE_REMOVE("to7_cart_list")
 	MCFG_SOFTWARE_LIST_ADD("t770_cart_list","to770_cart")
@@ -1160,8 +1156,7 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_SOFTWARE_LIST_ADD("mo5_qd_list","mo5_qd")
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("112K")
+	m_ram->set_default_size("112K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thomson_state::mo5e)
@@ -1504,9 +1499,7 @@ MACHINE_CONFIG_START(thomson_state::to9)
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("192K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
+	m_ram->set_default_size("192K").set_extra_options("128K");
 MACHINE_CONFIG_END
 
 
@@ -1731,9 +1724,7 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to8_timer_port_in))
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
+	m_ram->set_default_size("512K").set_extra_options("256K");
 
 	MCFG_DEVICE_REMOVE("to7_cass_list")
 	MCFG_DEVICE_REMOVE("to7_qd_list")
@@ -1897,8 +1888,7 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to9p_timer_port_in))
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	m_ram->set_default_size("512K");
 
 	MCFG_DEVICE_REMOVE("to7_cass_list")
 	MCFG_DEVICE_REMOVE("to7_qd_list")
@@ -2256,8 +2246,7 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
 	MCFG_DEVICE_REMOVE("to7_cart_list")
 	MCFG_DEVICE_REMOVE("to7_cass_list")
@@ -2525,8 +2514,7 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
 	MCFG_DEVICE_REMOVE("to7_cart_list")
 	MCFG_DEVICE_REMOVE("to7_cass_list")
