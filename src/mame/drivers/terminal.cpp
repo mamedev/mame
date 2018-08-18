@@ -137,15 +137,6 @@ ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppe
 ROM_END
 
 
-ROM_START( vdm79322 ) // Z80 (there's a 8255, 8253, UA857D) // 8k ram // b&w  // 8031 for kbd
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "27512_m322.bin",      0x00000, 0x10000, CRC(24573079) SHA1(b81c17e99493302054d78fbee2e416ab6493b5f3) )
-
-	ROM_REGION( 0x4000, "user1", 0 )  // keyboard?
-	ROM_LOAD( "27128_w322-3700.bin", 0x00000, 0x004000, CRC(e5e76ca2) SHA1(bb18c9fa29ef9fa0563aa07d2b856cf6594fc020) )
-ROM_END
-
-
 ROM_START( ikt5a ) // order unknown // 80C51 (+xtal 15.000) // 8k ram // RGB external, uses XT keyboard
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g26.bin",      0x0000, 0x2000, CRC(657668be) SHA1(212a9eb1fb9b9c16f3cc606c6befbd913ddfa395) )
@@ -174,6 +165,5 @@ COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty
 COMP( 1986, t3210,     0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Bitel T3210",            MACHINE_IS_SKELETON )
 COMP( 1986, feap90,    0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Multitel Fe Ap 90-1.1",  MACHINE_IS_SKELETON )
 COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_IS_SKELETON )
-COMP( 1992, vdm79322,  0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "VDM79322",               MACHINE_IS_SKELETON )
 COMP( 1993, ikt5a,     0,      0,      terminal, terminal, terminal_state, empty_init, "Creator / Fura Elektronik", "IKT-5A",          MACHINE_IS_SKELETON )
 COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )

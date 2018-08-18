@@ -36923,7 +36923,6 @@ loewe715                        //
 loewed                          //
 t3210                           //
 teleguide                       //
-vdm79322                        //
 
 @source:terracre.cpp
 amatelas                        // (c) 1986
@@ -38047,6 +38046,9 @@ vcs80                           //
 @source:vd.cpp
 break86                         //
 papillon                        //
+
+@source:vdm7932x.cpp
+vdm79322                        //
 
 @source:vector06.cpp
 krista2                         //
