@@ -280,7 +280,8 @@ void tmc2000e_state::machine_reset()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
+void tmc2000e_state::tmc2000e(machine_config &config)
+{
 	// basic system hardware
 	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmc2000e_state::tmc2000e_map);
@@ -292,13 +293,9 @@ MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
 	m_maincpu->q_cb().set(FUNC(tmc2000e_state::q_w));
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
 
-	// video hardware
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, 1.75_MHz_XTAL)
-	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
-
-	// sound hardware
+	// video/sound hardware
 	SPEAKER(config, "mono").front_center();
-	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
+	CDP1864(config, m_cti, 1.75_MHz_XTAL, SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
@@ -310,12 +307,11 @@ MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("40K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

@@ -318,13 +318,9 @@ MACHINE_CONFIG_START(eti660_state::eti660)
 	m_maincpu->q_cb().set(FUNC(eti660_state::q_w));
 	m_maincpu->dma_wr_cb().set(FUNC(eti660_state::dma_w));
 
-	/* video hardware */
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(8'867'238)/5)
-	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
-
-	/* sound hardware */
+	/* video/sound hardware */
 	SPEAKER(config, "mono").front_center();
-	CDP1864(config, m_cti, XTAL(8'867'238)/5).set_screen(SCREEN_TAG);
+	CDP1864(config, m_cti, XTAL(8'867'238)/5, SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);

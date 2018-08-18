@@ -45,15 +45,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDP1864_SCREEN_ADD(_tag, _clock) \
-		MCFG_SCREEN_ADD(_tag, RASTER) \
-		MCFG_SCREEN_RAW_PARAMS(_clock, cdp1864_device::SCREEN_WIDTH, cdp1864_device::HBLANK_END, cdp1864_device::HBLANK_START, cdp1864_device::TOTAL_SCANLINES, cdp1864_device::SCANLINE_VBLANK_END, cdp1864_device::SCANLINE_VBLANK_START)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -92,6 +83,7 @@ public:
 
 	// construction/destruction
 	cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, screen_device &screen);
 
 	auto inlace_cb() { return m_read_inlace.bind(); }
 	auto int_cb() { return m_write_int.bind(); }

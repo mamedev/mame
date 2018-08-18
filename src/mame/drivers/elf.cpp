@@ -251,11 +251,11 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	/* video hardware */
 	config.set_default_layout(layout_elf2);
 
-	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(SCREEN_TAG);
+
+	CDP1861(config, m_vdc, XTAL(3'579'545)/2, SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu,  COSMAC_INPUT_LINE_DMAOUT);
 	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
-	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL(3'579'545)/2)
 
 	/* devices */
 	MCFG_DEVICE_ADD(MM74C923_TAG, MM74C923, 0)

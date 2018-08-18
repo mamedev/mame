@@ -51,6 +51,14 @@ cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, screen_device &screen)
+	: cdp1861_device(mconfig, tag, owner, clock)
+{
+	set_screen(screen, DEVICE_SELF);
+	screen.set_screen_update(screen_update_rgb32_delegate(FUNC(cdp1861_device::screen_update), this));
+	screen.set_raw(clock, SCREEN_WIDTH, HBLANK_END, HBLANK_START, TOTAL_SCANLINES, SCANLINE_VBLANK_END, SCANLINE_VBLANK_START);
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
