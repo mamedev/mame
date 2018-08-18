@@ -530,7 +530,7 @@ int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::check_macc_overflow_0()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -543,7 +543,7 @@ int64_t tms57002_device::check_macc_overflow_0()
 
 int64_t tms57002_device::check_macc_overflow_1()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -556,7 +556,7 @@ int64_t tms57002_device::check_macc_overflow_1()
 
 int64_t tms57002_device::check_macc_overflow_2()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -569,12 +569,12 @@ int64_t tms57002_device::check_macc_overflow_2()
 
 int64_t tms57002_device::check_macc_overflow_3()
 {
-	return macc;
+	return macc_read;
 }
 
 int64_t tms57002_device::check_macc_overflow_0s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -591,7 +591,7 @@ int64_t tms57002_device::check_macc_overflow_0s()
 
 int64_t tms57002_device::check_macc_overflow_1s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -608,7 +608,7 @@ int64_t tms57002_device::check_macc_overflow_1s()
 
 int64_t tms57002_device::check_macc_overflow_2s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -625,7 +625,35 @@ int64_t tms57002_device::check_macc_overflow_2s()
 
 int64_t tms57002_device::check_macc_overflow_3s()
 {
-	return macc;
+	return macc_read;
+}
+
+uint32_t tms57002_device::get_cmem(uint8_t addr)
+{
+	if(sa == addr && update_counter_head != update_counter_tail)
+		sti |= S_UPDATE;
+
+	if(sti & S_UPDATE)
+	{
+		cmem[addr] = update[update_counter_tail];
+		update_counter_tail = (update_counter_tail + 1) & 0x0f;
+		update_empty();
+		
+		if(update_counter_head == update_counter_tail)
+			sti &= ~S_UPDATE;
+
+		return cmem[addr]; // The value of crm is ignored during an update.
+	}
+	else
+	{
+		int crm = (st1 & ST1_CRM) >> ST1_CRM_SHIFT;
+		uint32_t cvar = cmem[addr];
+		if(crm == 1)
+			return (cvar & 0xffff0000);
+		else if(crm == 2)
+			return (cvar << 16);
+		return cvar;
+	}
 }
 
 uint32_t tms57002_device::get_cmem(uint8_t addr)

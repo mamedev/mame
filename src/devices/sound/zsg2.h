@@ -41,13 +41,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	const uint16_t STATUS_ACTIVE = 0x2000;
+	const uint16_t STATUS_ACTIVE = 0x8000;
 
 	// 16 registers per channel, 48 channels
 	struct zchan
 	{
 		uint16_t v[16];
-		
 		uint16_t status;
 		uint32_t cur_pos;
 		uint32_t step_ptr;
@@ -68,6 +67,7 @@ private:
 		int16_t output_cutoff_delta;
 
 		int32_t emphasis_filter_state;
+
 		int32_t output_filter_state;
 
 		// Attenuation for output channels
@@ -76,8 +76,8 @@ private:
 		int16_t samples[5]; // +1 history
 	};
 
-	uint16_t gain_tab[256];
-	uint16_t gain_tab_frac[256];
+	uint16_t m_gain_tab[256];
+	uint16_t m_reg[32];
 
 	zchan m_chan[48];
 	uint32_t m_sample_count;
