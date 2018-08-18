@@ -4328,11 +4328,7 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hnoridur_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::hnoridur_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4400,11 +4396,7 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hjingi_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::hjingi_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4622,8 +4614,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dynax_state::mjangels)
 	yarunara(config);
 	MCFG_DEVICE_MODIFY("bankdev")
-	MCFG_DEVICE_PROGRAM_MAP(mjangels_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
+	m_bankdev->set_map(&dynax_state::mjangels_banked_map).set_addr_width(21);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::quiztvqq)
@@ -4877,11 +4868,7 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, dynax_state, tenkai_p8_r))
 	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p8_w))
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(tenkai_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::tenkai_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4955,11 +4942,7 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	MCFG_DEVICE_PROGRAM_MAP(gekisha_map)
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, dynax_state, gekisha_p4_w))
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(gekisha_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::gekisha_banked_map).set_data_width(8).set_addr_width(17).set_stride(0x8000);
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)

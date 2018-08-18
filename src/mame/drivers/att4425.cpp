@@ -300,9 +300,7 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*64)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_keyboard_clock))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
 MACHINE_CONFIG_END
 
 /* ROMs */

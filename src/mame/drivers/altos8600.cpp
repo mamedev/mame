@@ -755,9 +755,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	m_pic3->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir3_w));
 	m_pic3->in_sp_callback().set_constant(0);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	//MCFG_RAM_EXTRA_OPTIONS("512K")
+	RAM(config, RAM_TAG).set_default_size("1M");//.set_extra_options("512K");
 
 	MCFG_DEVICE_ADD("uart8274", I8274_NEW, 16_MHz_XTAL/4)
 	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))

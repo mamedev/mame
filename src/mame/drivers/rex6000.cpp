@@ -918,17 +918,8 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rex6000)
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rex6000_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
-
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rex6000_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
@@ -962,8 +953,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_FUJITSU_29DL16X_ADD(m_flash1b) //bank 1 of second flash
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	RAM(config, RAM_TAG).set_default_size("32K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1006,17 +996,8 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(oz750_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
-
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(oz750_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
@@ -1028,8 +1009,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_SHARP_LH28F016S_ADD(m_flash1a)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

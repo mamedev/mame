@@ -779,9 +779,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
@@ -872,9 +870,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")

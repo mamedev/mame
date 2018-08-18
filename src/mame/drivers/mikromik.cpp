@@ -515,8 +515,7 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	MCFG_MM1_KEYBOARD_KBST_CALLBACK(WRITELINE(I8212_TAG, i8212_device, stb_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mm1_flop")

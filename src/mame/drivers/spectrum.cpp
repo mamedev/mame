@@ -710,15 +710,17 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(spectrum_state::spectrum)
+void spectrum_state::spectrum(machine_config &config)
+{
 	spectrum_common(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)               // This configuration is verified only for the original ZX Spectrum.
-	MCFG_RAM_DEFAULT_SIZE("48K")        // It's likely, but still to be checked, that many clones were produced only
-	MCFG_RAM_EXTRA_OPTIONS("16K")       // in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
-	MCFG_RAM_DEFAULT_VALUE(0xff)        // available via bankswitching.
-MACHINE_CONFIG_END
+	RAM(config, m_ram).set_default_size("48K").set_extra_options("16K").set_default_value(0xff);
+	// This configuration is verified only for the original ZX Spectrum.
+	// It's likely, but still to be checked, that many clones were produced only
+	// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
+	// available via bankswitching.
+}
 
 /***************************************************************************
 

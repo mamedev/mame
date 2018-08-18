@@ -845,9 +845,7 @@ MACHINE_CONFIG_START(pc1350_state::pc1350)
 	MCFG_SCREEN_UPDATE_DRIVER(pc1350_state, screen_update_pc1350)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("12K,20K")
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("12K,20K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1403_state::pc1403)

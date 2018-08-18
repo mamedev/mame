@@ -465,8 +465,7 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("80K") // 64 + 16
+	RAM(config, RAM_TAG).set_default_size("80K"); // 64 + 16
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", fk1_state, keyboard_callback, attotime::from_hz(24000))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vsync_timer", fk1_state, vsync_callback, attotime::from_hz(50))

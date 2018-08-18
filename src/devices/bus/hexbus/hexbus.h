@@ -116,6 +116,7 @@ public:
 	// Read and write operations on the bus
 	uint8_t read(int dir);
 	void write(int dir, uint8_t data);
+	void configure_slot();
 
 protected:
 	void device_start() override;
@@ -128,13 +129,7 @@ private:
 	hexbus_chained_device*  m_chain_element;
 };
 
-#define MCFG_HEXBUS_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, HEXBUS, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE( hexbus_conn, nullptr, false)
-
 }   }   // end namespace bus::hexbus
-
-void hexbus_conn(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device)
 

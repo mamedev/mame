@@ -1857,8 +1857,8 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, jaguar_state, external_int))
+	VT83C461(config, m_ide).options(cojag_devices, "hdd", nullptr, true);
+	m_ide->irq_handler().set(FUNC(jaguar_state::external_int));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

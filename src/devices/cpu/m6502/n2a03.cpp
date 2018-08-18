@@ -63,19 +63,6 @@ std::unique_ptr<util::disasm_interface> n2a03_device::create_disassembler()
 	return std::make_unique<n2a03_disassembler>();
 }
 
-void n2a03_device::device_start()
-{
-	if(!m_apu->started())
-		throw device_missing_dependencies();
-
-	m6502_device::device_start();
-}
-
-void n2a03_device::device_clock_changed()
-{
-	m_apu->set_unscaled_clock(clock());
-}
-
 WRITE_LINE_MEMBER(n2a03_device::apu_irq)
 {
 	// games relying on the APU_IRQ don't seem to work anyway? (nes software list : timelord, mig29sf, firehawk)

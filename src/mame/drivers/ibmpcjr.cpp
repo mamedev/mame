@@ -670,9 +670,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart2)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
@@ -699,9 +697,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
 	/* internal ram */
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
+	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
 MACHINE_CONFIG_END
 
 

@@ -672,8 +672,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// tatung pipe connector
 	MCFG_TATUNG_PIPE_ADD("pipe")

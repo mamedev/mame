@@ -1065,6 +1065,11 @@ void stv_state::sound_mem(address_map &map)
 	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 }
 
+void stv_state::scsp_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+}
+
 
 
 /********************************************
@@ -1172,6 +1177,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp_mem)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1335,8 +1341,6 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 
 MACHINE_START_MEMBER(stv_state, stv)
 {
-	m_scsp->set_ram_base(m_sound_ram);
-
 	// save states
 //  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));

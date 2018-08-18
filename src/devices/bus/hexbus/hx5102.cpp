@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	MCFG_IBC_HSKLATCH_CALLBACK(WRITELINE(*this, hx5102_device, hsklatch_out))
 
 	// Outgoing socket for downstream devices
-	MCFG_HEXBUS_ADD("hexbus")
+	HEXBUS(config, "hexbus", 0).configure_slot();
 
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_flopcpu, XTAL(12'000'000));
@@ -720,14 +720,8 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	m_readyff->comp_output_cb().set(FUNC(hx5102_device::board_ready));
 
 	// RAM
-	MCFG_RAM_ADD(RAM1_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2048")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-	MCFG_RAM_ADD(RAM2_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2048")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
+	RAM(config, RAM1_TAG).set_default_size("2048").set_default_value(0);
+	RAM(config, RAM2_TAG).set_default_size("2048").set_default_value(0);
 MACHINE_CONFIG_END
 
 ROM_START( hx5102 )

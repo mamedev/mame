@@ -694,8 +694,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_DEVICE_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP(taitogn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, taitogn_state, sio0_sck))
@@ -729,11 +728,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_INTEL_TE28F160_ADD("sndflash1")
 	MCFG_INTEL_TE28F160_ADD("sndflash2")
 
-	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000000)
+	ADDRESS_MAP_BANK(config, "flashbank").set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 
 	// 5MHz NEC uPD78081 MCU:
 	// we don't have a 78K0 emulation core yet..

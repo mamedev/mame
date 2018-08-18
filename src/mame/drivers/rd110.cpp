@@ -243,14 +243,12 @@ MACHINE_CONFIG_START(d110_state::d110)
 	MCFG_DEVICE_IO_MAP( d110_io )
 
 // Battery-backed main ram
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
+	RAM( config, "ram" ).set_default_size( "32K" );
 	MCFG_NVRAM_ADD_0FILL( "rams" )
 
 
 // Shall become a proper memcard device someday
-	MCFG_RAM_ADD( "memc" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
+	RAM( config, "memc" ).set_default_size( "32K" );
 	MCFG_NVRAM_ADD_0FILL( "memcs" )
 
 	MCFG_SCREEN_ADD( "screen", LCD )

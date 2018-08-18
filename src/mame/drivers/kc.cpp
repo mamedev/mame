@@ -173,8 +173,7 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, m_ram).set_default_size("16K");
 MACHINE_CONFIG_END
 
 
@@ -255,16 +254,15 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(kc85_4_state::kc85_5)
+void kc85_4_state::kc85_5(machine_config &config)
+{
 	kc85_4(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("256K");
+}
 
 
 ROM_START(kc85_2)

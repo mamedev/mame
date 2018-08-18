@@ -1020,18 +1020,18 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	// saner sync value (avoids crashing after crediting)
 	MCFG_QUANTUM_TIME(attotime::from_hz(CLOCK_2 / 1024))
 
-	MCFG_DEVICE_ADD("io1", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P1"))
-	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P2"))
-	MCFG_CXD1095_IN_PORTE_CB(IOPORT("DSW3"))
+	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	io1.in_portb_cb().set_ioport("SERVICE");
+	io1.in_portc_cb().set_ioport("P1");
+	io1.in_portd_cb().set_ioport("P2");
+	io1.in_porte_cb().set_ioport("DSW3");
 
-	MCFG_DEVICE_ADD("io2", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P4"))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, cyclwarr_state, cyclwarr_control_w))
+	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	io2.in_porta_cb().set_ioport("DSW1");
+	io2.in_portb_cb().set_ioport("DSW2");
+	io2.in_portc_cb().set_ioport("P3");
+	io2.in_portd_cb().set_ioport("P4");
+	io2.out_porte_cb().set(FUNC(cyclwarr_state::cyclwarr_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

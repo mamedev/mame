@@ -47,7 +47,6 @@ private:
 	struct zchan
 	{
 		uint16_t v[16];
-
 		uint16_t status;
 		uint32_t cur_pos;
 		uint32_t step_ptr;

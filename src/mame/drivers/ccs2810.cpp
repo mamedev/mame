@@ -915,8 +915,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2810)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2810_io)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	/* Devices */
 	INS8250(config, m_ins8250, 1.8432_MHz_XTAL);
@@ -939,8 +938,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2422_io)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	/* Devices */
 	INS8250(config, m_ins8250, 1.8432_MHz_XTAL);

@@ -68,8 +68,7 @@ MACHINE_CONFIG_START(bbc_tube_80286_device::device_add_mconfig)
 	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("i80286", INPUT_LINE_INT0))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, RAM_TAG).set_default_size("1M");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_80186", "bbc_flop_80186")

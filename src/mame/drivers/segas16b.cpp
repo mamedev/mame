@@ -3792,9 +3792,10 @@ MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
 	// 834-6602 I/O board
 	MCFG_DEVICE_ADD("upd4701a1", UPD4701A, 0)
 	MCFG_DEVICE_ADD("upd4701a2", UPD4701A, 0)
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("HANDX1"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("HANDX2"))
+
+	CXD1095(config, m_cxdio, 0);
+	m_cxdio->in_porta_cb().set_ioport("HANDX1");
+	m_cxdio->in_portb_cb().set_ioport("HANDX2");
 MACHINE_CONFIG_END
 
 

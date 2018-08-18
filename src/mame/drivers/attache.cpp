@@ -1194,8 +1194,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64k")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
 MACHINE_CONFIG_END
@@ -1285,8 +1284,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64k")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
 MACHINE_CONFIG_END

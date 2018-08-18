@@ -483,6 +483,8 @@ void dragngun_state::dragngun_map(address_map &map)
 	map(0x0130000, 0x0131fff).ram().w(FUNC(dragngun_state::buffered_palette_w)).share("paletteram");
 	map(0x0138000, 0x0138003).noprw(); /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
 	map(0x0138008, 0x013800b).w(FUNC(dragngun_state::palette_dma_w));
+//  map(0x0150000, 0x0150003).nopw(); // Unknown; Masking related?
+//  map(0x0160000, 0x0160003).w(FUNC(dragngun_state::pri_w)); // priority
 	map(0x0170100, 0x0170103).nopw();
 	map(0x0170038, 0x017003b).nopw();
 	map(0x017002C, 0x017002f).nopw();

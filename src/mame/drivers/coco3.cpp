@@ -319,9 +319,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	coco_sound(config);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K,2M,8M");
 
 	// floating space
 	coco_floating(config);

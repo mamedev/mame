@@ -2222,21 +2222,20 @@ MACHINE_RESET_MEMBER( p500_state, p500 )
 //  MACHINE_CONFIG( 128k )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cbm2_state::_128k)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
-MACHINE_CONFIG_END
+void cbm2_state::_128k(machine_config &config)
+{
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K");
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( 256k )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cbm2_state::_256k)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-MACHINE_CONFIG_END
+void cbm2_state::_256k(machine_config &config)
+{
+	RAM(config, RAM_TAG).set_default_size("256K");
+}
 
 
 //-------------------------------------------------

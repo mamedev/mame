@@ -870,8 +870,9 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
 	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD(m_tms9902, TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
-	MCFG_TMS9902_XMIT_CB(WRITE8(*this, tm990189_state, xmit_callback))         /* called when a character is transmitted */
+	TMS9902(config, m_tms9902, 2000000);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+
 	MCFG_DEVICE_ADD("rs232", TM990_189_RS232, 0, m_tms9902)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	// Need to delay the timer, or it will spoil the initial LOAD
@@ -931,8 +932,9 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
 	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD(m_tms9902, TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
-	MCFG_TMS9902_XMIT_CB(WRITE8(*this, tm990189_state, xmit_callback))         /* called when a character is transmitted */
+	TMS9902(config, m_tms9902, 2000000);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+
 	MCFG_DEVICE_ADD("rs232", TM990_189_RS232, 0, m_tms9902)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))

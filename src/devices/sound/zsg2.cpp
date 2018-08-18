@@ -280,6 +280,7 @@ void zsg2_device::filter_samples(zchan *ch)
 
 void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	// DSP is programmed to expect 24-bit samples! So we're not limiting to 16-bit here
 	for (int i = 0; i < samples; i++)
 	{
 		int32_t mix[4] = {};
@@ -486,14 +487,12 @@ int16_t zsg2_device::get_ramp(uint8_t val)
 {
 	int16_t frac = val<<12; // sign extend
 	frac = ((frac>>12) ^ 8) << (val >> 4);
-
 	return (frac >> 4);
 }
 
 inline uint16_t zsg2_device::ramp(uint16_t current, uint16_t target, int16_t delta)
 {
 	int32_t rampval = current + delta;
-
 	if(delta < 0 && rampval < target)
 		rampval = target;
 	else if(delta >= 0 && rampval > target)

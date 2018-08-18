@@ -1396,11 +1396,7 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&napple2_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* soft switches */
 	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
@@ -1455,27 +1451,24 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_CASSETTE_INTERFACE("apple2_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(napple2_state::apple2)
+void napple2_state::apple2(machine_config &config)
+{
 	apple2_common(config);
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,32K,36K,48K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,32K,36K,48K").set_default_value(0);
+}
 
-MACHINE_CONFIG_START(napple2_state::apple2p)
+void napple2_state::apple2p(machine_config &config)
+{
 	apple2_common(config);
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0);
+}
 
-MACHINE_CONFIG_START(napple2_state::space84)
+void napple2_state::space84(machine_config &config)
+{
 	apple2p(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(napple2_state::apple2jp)
 	apple2p(config);

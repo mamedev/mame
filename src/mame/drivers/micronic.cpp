@@ -374,8 +374,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* ram banks */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("224K")
+	RAM(config, RAM_TAG).set_default_size("224K");
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", micronic_state, nvram_init)  // base ram
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)  // additional ram banks

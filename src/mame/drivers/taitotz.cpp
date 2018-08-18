@@ -2598,8 +2598,8 @@ MACHINE_CONFIG_START(taitotz_state::taitotz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, taitotz_state, ide_interrupt))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set(FUNC(taitotz_state::ide_interrupt));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

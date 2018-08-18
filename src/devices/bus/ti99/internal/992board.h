@@ -48,6 +48,11 @@ public:
 	// Video enable
 	DECLARE_WRITE_LINE_MEMBER( videna );
 
+	// Callbacks
+	auto readmem_cb() { return m_mem_read_cb.bind(); }
+	auto hold_cb() { return m_hold_cb.bind(); }
+	auto int_cb() { return m_int_cb.bind(); }
+
 protected:
 	video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	int     m_beol;
@@ -105,8 +110,8 @@ public:
 	DECLARE_READ8_MEMBER( cruread );
 	DECLARE_WRITE8_MEMBER( cruwrite );
 	void device_start() override;
-	template <class Object> devcb_base &set_rombank_callback(Object &&cb) { return m_set_rom_bank.set_callback(std::forward<Object>(cb)); }
 	ioport_constructor device_input_ports() const override;
+	auto rombank_cb() { return m_set_rom_bank.bind(); }
 
 protected:
 	io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -173,9 +178,6 @@ public:
 
 #define MCFG_VIDEO992_INT_CB(_devcb) \
 	downcast<bus::ti99::internal::video992_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SET_ROMBANK_HANDLER( _devcb ) \
-	downcast<bus::ti99::internal::io992_device &>(*device).set_rombank_callback(DEVCB_##_devcb);
 
 DECLARE_DEVICE_TYPE_NS(VIDEO99224, bus::ti99::internal, video992_24_device)
 DECLARE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device)

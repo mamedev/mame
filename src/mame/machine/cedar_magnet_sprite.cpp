@@ -227,12 +227,7 @@ MACHINE_CONFIG_START(cedar_magnet_sprite_device::device_add_mconfig)
 //  MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_sprite_device, pio2_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_sprite_device, pio2_pb_w))
 
-	MCFG_DEVICE_ADD("sp_sub_ram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_sprite_sub_ram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "sp_sub_ram").set_map(&cedar_magnet_sprite_device::cedar_magnet_sprite_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 MACHINE_CONFIG_END
 
 

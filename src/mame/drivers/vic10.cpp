@@ -696,8 +696,7 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic10")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
+	RAM(config, RAM_TAG).set_default_size("4K");
 MACHINE_CONFIG_END
 
 

@@ -560,9 +560,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_DEVICE_PROGRAM_MAP( apfimag_map)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 

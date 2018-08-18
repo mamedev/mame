@@ -519,8 +519,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", nanos_state, keyboard_callback, attotime::from_hz(24000))
 MACHINE_CONFIG_END

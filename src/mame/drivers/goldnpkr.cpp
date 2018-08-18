@@ -4705,11 +4705,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(megadpkr_map)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(megadpkr_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&blitz_state::megadpkr_banked_map).set_data_width(8).set_addr_width(16).set_stride(0x4000);
 
 	MCFG_DEVICE_ADD("mcu", M68705P5, CPU_CLOCK) /* unknown */
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, blitz_state, mcu_portb_w))

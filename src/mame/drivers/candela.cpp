@@ -719,8 +719,7 @@ MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_DEVICE_PROGRAM_MAP(can09_map)
 
 	/* RAM banks */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
+	RAM(config, RAM_TAG).set_default_size("768K");
 
 	// CRTC  init
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CAN09_CPU_CLOCK) // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby

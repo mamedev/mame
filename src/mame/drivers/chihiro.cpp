@@ -1860,7 +1860,7 @@ MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	MCFG_DEVICE_PROGRAM_MAP(chihiro_map)
 	MCFG_DEVICE_IO_MAP(chihiro_map_io)
 
-	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, nullptr, "bb", true)
+	//BUS_MASTER_IDE_CONTROLLER(config, "ide").options(ide_baseboard, nullptr, "bb", true);
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")

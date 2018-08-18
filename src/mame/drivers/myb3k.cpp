@@ -938,9 +938,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
 	/* RAM options */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 256K");
 
 	/* Interrupt controller */
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)

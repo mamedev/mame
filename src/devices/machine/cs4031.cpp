@@ -418,7 +418,7 @@ void cs4031_device::update_dma_clock()
 
     Not emulated here: Parity check NMI
  */
-void cs4031_device::nmi()
+void cs4031_device::trigger_nmi()
 {
 	if (m_nmi_mask & BIT(m_portb, 6))
 	{
@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER( cs4031_device::iochck_w )
 		{
 			// set channel check latch
 			m_portb |= 1 << 6;
-			nmi();
+			trigger_nmi();
 		}
 
 		m_iochck = state;
@@ -547,7 +547,7 @@ WRITE8_MEMBER( cs4031_device::config_data_w )
 			break;
 
 		case SOFT_RESET_AND_GATEA20:
-			a20m();
+			update_a20m();
 			break;
 		}
 	}
@@ -650,7 +650,7 @@ void cs4031_device::update_write_regions()
 //  KEYBOARD / 8042
 //**************************************************************************
 
-void cs4031_device::a20m()
+void cs4031_device::update_a20m()
 {
 	// external signal is ignored when emulation is on
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 5))
@@ -674,20 +674,20 @@ void cs4031_device::emulated_gatea20(int state)
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 5))
 	{
 		m_emu_gatea20 = state;
-		a20m();
+		update_a20m();
 	}
 }
 
 void cs4031_device::fast_gatea20(int state)
 {
 	m_fast_gatea20 = state;
-	a20m();
+	update_a20m();
 }
 
 void cs4031_device::keyboard_gatea20(int state)
 {
 	m_ext_gatea20 = state;
-	a20m();
+	update_a20m();
 }
 
 READ8_MEMBER( cs4031_device::keyb_status_r )

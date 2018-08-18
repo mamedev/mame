@@ -972,8 +972,7 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
@@ -1007,8 +1006,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
@@ -1042,8 +1040,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END

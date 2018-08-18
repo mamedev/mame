@@ -31,6 +31,7 @@ public:
 	void write(uint8_t data);
 	DECLARE_WRITE8_MEMBER( command_w ) { write(data); }
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
+	auto ready_cb() { return m_ready_handler.bind(); }
 
 protected:
 	sn76496_base_device(

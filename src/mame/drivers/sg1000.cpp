@@ -556,8 +556,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, m_ram).set_default_size("1K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -573,8 +572,7 @@ MACHINE_CONFIG_START(sg1000_state::omv)
 	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
 	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	m_ram->set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -611,8 +609,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* the sk1100 device will add sc3000 cart and cass lists */
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	RAM(config, m_ram).set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -667,8 +664,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

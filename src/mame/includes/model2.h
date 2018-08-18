@@ -236,6 +236,7 @@ protected:
 	void model2_5881_mem(address_map &map);
 	void model2_0229_mem(address_map &map);
 	void model2_snd(address_map &map);
+	void scsp_map(address_map &map);
 
 	void debug_init();
 	void debug_commands( int ref, const std::vector<std::string> &params );

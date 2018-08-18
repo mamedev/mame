@@ -252,15 +252,10 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 #endif
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")    // Early XL games had 8 MB RAM, 6000 and later require 32MB
+	RAM(config, RAM_TAG).set_default_size("32M"); // Early XL games had 8 MB RAM, 6000 and later require 32MB
 
 	/* bankdev for dxxxx */
-	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* Flash ROM */
 	MCFG_AMD_29F040_ADD("flash")

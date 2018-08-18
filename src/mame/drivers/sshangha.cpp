@@ -7,14 +7,6 @@
   PCB is manufactured by either Hot-B or Taito, but uses Data East custom
   chips.
 
-  HB-PCB-A4
-  M6100691A (distributed by Taito)
-
-  CPU  : 68000
-  Sound: Z80B YM2203 Y3014 M6295
-  OSC  : 28.0000MHz 16.0000MHz
-
-
   Emulation by Bryan McPhail, mish@tendril.co.uk
   + Charles MacDonald, David Haywood
 
@@ -43,6 +35,49 @@ Stephh's notes (based on the games M68000 code and some tests) :
   - The "Quest Mode" Dip Switch determines if "Shanghai Quest" is available.
   - The "Use Mahjong Tiles" Dip Switch only has an effect when playing
     "Shanghai Advanced".
+
+
+
+HB-PCB-A5   M6100691A (distributed by Taito)
++-----------------------------------------------------------+
+|         GAL.U89  16.000MHz  28.000MHz                     |
+|       YM2203C                                             |
+|                   +----+  +------+    SS004.U46 SS003.U47 |
+|     Y3014B  Z80   |DE71|  |  DE  |                        |
+|                   +----+  |  52  |                        |
+|         SS008-1   +----+  +------+          U36*      U38*|
+|                   |DE71|  +------+                        |
+|                   +----+  |  DE  |                        |
+|J      M6295               |  52  |    SS004.U37 SS003.U39 |
+|A                  GAL.U64 +------+                        |
+|M            58257 GAL.U70                                 |
+|M                   84256 +------+                         |
+|A  SS005.U86 58257  84256 |  DE  |                         |
+|           SS007E.U28     |  55  |                         |
+|           SS006E.U27     +------+                     U9* |
+|                                                           |
+|         MCM2018                                       U10*|
+|         MCM2018  GAL.U94                                  |
+|         MCM2018  GAL.U63                         SS002.U7 |
+|          +-----+ GAL.U66                                  |
+|          |DE146|         MC86000P12F-16MHZ       SS001.U8 |
+|  SW2 SW1 +-----+                                          |
++-----------------------------------------------------------+
+
+* Denotes unpopulated:
+    U9 & U10 are 28pin 27C512
+    U36 & U38 are 42pin 8/16Meg mask
+
+    CPU: MC86000P12F 16 MHZ
+  Sound: Z80B, YM2203C, Y3014B, OKI M6295
+    OSC: 28.0000MHz, 16.0000MHz
+    DSW: 8 position dipswitch x 2
+    RAM: Sony CXK58257P-12L 32K x 8 SRAM x 2
+         Motorola MCM2018AN25 2K x 8 SRAM x 3
+         Fujitsu 84256A-70L 32K x 8 SRAM x 2
+ Custom: Data East 52 x 2 + Data East 71 x 2 (Sprites)
+         Data East 55 (Playfield)
+         Data East 146 (I/O, Protection)
 
 ***************************************************************************/
 
@@ -384,15 +419,14 @@ DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 MACHINE_CONFIG_START(sshangha_state::sshangha)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) /* CPU marked as 16MHz part */
 	MCFG_DEVICE_PROGRAM_MAP(sshangha_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sshangha_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sshangha_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -437,12 +471,12 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	SPEAKER(config, "lspeaker").front_left(); // sure it's stereo?
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.27)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END

@@ -405,8 +405,7 @@ MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 	outlatch.q_out_cb<5>().set_output("led105");
 	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, "ram").set_default_size("1M");
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")

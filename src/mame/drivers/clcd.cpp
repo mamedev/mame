@@ -727,10 +727,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_EXTRA_OPTIONS("32k,64k")
-	MCFG_RAM_DEFAULT_SIZE("128k")
+	RAM(config, "ram").set_default_size("128K").set_extra_options("32K,64K").set_default_value(0);
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", clcd_state, nvram_init)
 MACHINE_CONFIG_END

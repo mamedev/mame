@@ -423,9 +423,7 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	m_dbrg->ft_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("128K");
 MACHINE_CONFIG_END
 
 

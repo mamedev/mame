@@ -657,9 +657,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,1M");
 MACHINE_CONFIG_END
 
 

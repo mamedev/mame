@@ -211,6 +211,14 @@ uint8_t hexbus_device::read(int dir)
 	return value;
 }
 
+void hexbus_device::configure_slot()
+{
+	option_reset();
+	option_add("hx5102", HX5102);
+	set_default_option(nullptr);
+	set_fixed(false);
+}
+
 // ------------------------------------------------------------------------
 
 hexbus_chained_device::hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
@@ -342,9 +350,3 @@ uint8_t hexbus_chained_device::to_line_state(uint8_t data, bool bav, bool hsk)
 // ------------------------------------------------------------------------
 
 }   }   // end namespace bus::hexbus
-
-void hexbus_conn(device_slot_interface &device)
-{
-	device.option_add("hx5102", HX5102);
-}
-

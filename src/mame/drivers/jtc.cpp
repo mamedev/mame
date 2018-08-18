@@ -31,6 +31,7 @@ public:
 	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, UB8830D_TAG)
+		, m_ram(*this, RAM_TAG)
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, CENTRONICS_TAG)
@@ -38,6 +39,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
@@ -764,8 +766,7 @@ MACHINE_CONFIG_START(jtc_state::jtc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	RAM(config, m_ram).set_default_size("2K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtces88_state::jtces88)
@@ -775,8 +776,7 @@ MACHINE_CONFIG_START(jtces88_state::jtces88)
 	MCFG_DEVICE_PROGRAM_MAP(jtc_es1988_mem)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
+	m_ram->set_default_size("4K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtces23_state::jtces23)
@@ -798,8 +798,7 @@ MACHINE_CONFIG_START(jtces23_state::jtces23)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
+	RAM(config, RAM_TAG).set_default_size("4K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtces40_state::jtces40)
@@ -822,9 +821,7 @@ MACHINE_CONFIG_START(jtces40_state::jtces40)
 	MCFG_PALETTE_INIT_OWNER(jtc_state,jtc_es40)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K,32K");
 MACHINE_CONFIG_END
 
 /* ROMs */

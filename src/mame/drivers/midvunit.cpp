@@ -1127,7 +1127,7 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(0)

@@ -1200,12 +1200,7 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&astrocde_state::bank4000_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1464,9 +1459,8 @@ MACHINE_CONFIG_START(astrocde_state::profpac)
 	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
 	MCFG_DEVICE_IO_MAP(port_map_16col_pattern)
 
-	MCFG_DEVICE_MODIFY("bank4000")
-	MCFG_DEVICE_PROGRAM_MAP(profpac_bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
+	m_bank4000->set_map(&astrocde_state::profpac_bank4000_map);
+	m_bank4000->set_addr_width(20);
 
 	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // 74LS174 on game board at U6
 	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
