@@ -669,6 +669,7 @@ Game                                                on cart    IC7#         # of
 -------------------------------------------------------------------------------------------------------------------------------------------
 Akatsuki Blitzkampf Ausf. Achse                     841-0058C    not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
 Dynamite Deka EX / Asian Dynamite                   840-0175C    not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
+Dynamite Deka EX / Asian Dynamite (older)           840-0175C    not present  4 (512Mb)   present  317-0495-COM  present  2x PCBs dumped, 840-0175B and 840-0168B, contents is the same.
 Illvelo (Illmatic Envelope)                         841-0059C    not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
 Mamoru-kun wa Norowarete Shimatta                   841-0060C    not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
 Manic Panic Ghost! (USA)                            840-0170C-01 not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based) - PCB s/n is 840-0170B-01
@@ -6656,6 +6657,7 @@ ROM_START( asndynmt )
 ROM_END
 
 // no revision stickers, presumably older revision but might be release for Asian market.
+// 2x cartridges was dumped: 1st PCB was visually same as common newer(?) revision, 2nd PCB have 840-0168B label, no FPR-xxxx stamps at flash ROMs, no 317-xxxx stamp at security PIC, possible was converted / refurbished from some other game.
 ROM_START( asndynmto )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
