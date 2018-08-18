@@ -706,7 +706,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpt02_state::mpt02)
 	/* basic machine hardware */
-	CDP1802(config, m_maincpu, CDP1864_CLOCK);
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpt02_state::mpt02_map);
 	m_maincpu->set_addrmap(AS_IO, &mpt02_state::mpt02_io_map);
 	m_maincpu->wait_cb().set_constant(1);
@@ -717,17 +717,23 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 	m_maincpu->dma_wr_cb().set(FUNC(mpt02_state::dma_w));
 
 	/* video hardware */
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
+	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, 1.75_MHz_XTAL)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, CDP1864_CLOCK, CONSTANT(0), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, mpt02_state, rdata_r), READLINE(*this, mpt02_state, bdata_r), READLINE(*this, mpt02_state, gdata_r))
-	MCFG_CDP1864_CHROMINANCE(RES_K(4.7), RES_K(8.2), RES_K(4.7), RES_K(22))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
+	m_cti->inlace_cb().set_constant(0);
+	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
+	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
+	m_cti->rdata_cb().set(FUNC(mpt02_state::rdata_r));
+	m_cti->bdata_cb().set(FUNC(mpt02_state::bdata_r));
+	m_cti->gdata_cb().set(FUNC(mpt02_state::gdata_r));
+	m_cti->set_chrominance(RES_K(4.7), RES_K(8.2), RES_K(4.7), RES_K(22));
+	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	studio2_cartslot(config);
 MACHINE_CONFIG_END

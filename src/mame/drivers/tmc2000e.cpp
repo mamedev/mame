@@ -293,14 +293,21 @@ MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
 
 	// video hardware
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))
+	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, 1.75_MHz_XTAL)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), CONSTANT(0), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, tmc2000e_state, rdata_r), READLINE(*this, tmc2000e_state, bdata_r), READLINE(*this, tmc2000e_state, gdata_r))
-	MCFG_CDP1864_CHROMINANCE(RES_K(2.2), RES_K(1), RES_K(5.1), RES_K(4.7)) // unverified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
+	m_cti->inlace_cb().set_constant(0);
+	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
+	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
+	m_cti->rdata_cb().set(FUNC(tmc2000e_state::rdata_r));
+	m_cti->bdata_cb().set(FUNC(tmc2000e_state::bdata_r));
+	m_cti->gdata_cb().set(FUNC(tmc2000e_state::gdata_r));
+	m_cti->set_chrominance(RES_K(2.2), RES_K(1), RES_K(5.1), RES_K(4.7)); // unverified
+	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette")
