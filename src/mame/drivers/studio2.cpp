@@ -660,10 +660,10 @@ MACHINE_CONFIG_START(studio2_state::studio2)
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, 1760000)
-	MCFG_CDP1861_IRQ_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT))
-	MCFG_CDP1861_DMA_OUT_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT))
-	MCFG_CDP1861_EFX_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
+	CDP1861(config, m_vdc, 1760000).set_screen(SCREEN_TAG);
+	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
+	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 1760000)
 
 	/* sound hardware */
@@ -686,10 +686,10 @@ MACHINE_CONFIG_START(visicom_state::visicom)
 	m_maincpu->dma_wr_cb().set(FUNC(visicom_state::dma_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL(3'579'545)/2)
-	MCFG_CDP1861_IRQ_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT))
-	MCFG_CDP1861_DMA_OUT_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT))
-	MCFG_CDP1861_EFX_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
+	CDP1861(config, m_vdc, XTAL(3'579'545)/2);
+	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
+	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL(3'579'545)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(visicom_state, screen_update)
 

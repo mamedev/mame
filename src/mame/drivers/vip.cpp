@@ -716,10 +716,10 @@ MACHINE_CONFIG_START(vip_state::vip)
 	m_maincpu->tpb_cb().set(m_exp, FUNC(vip_expansion_slot_device::tpb_w));
 
 	// video hardware
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, 3.52128_MHz_XTAL / 2)
-	MCFG_CDP1861_IRQ_CALLBACK(WRITELINE(*this, vip_state, vdc_int_w))
-	MCFG_CDP1861_DMA_OUT_CALLBACK(WRITELINE(*this, vip_state, vdc_dma_out_w))
-	MCFG_CDP1861_EFX_CALLBACK(WRITELINE(*this, vip_state, vdc_ef1_w))
+	CDP1861(config, m_vdc, 3.52128_MHz_XTAL / 2).set_screen(SCREEN_TAG);
+	m_vdc->int_cb().set(FUNC(vip_state::vdc_int_w));
+	m_vdc->dma_out_cb().set(FUNC(vip_state::vdc_dma_out_w));
+	m_vdc->efx_cb().set(FUNC(vip_state::vdc_ef1_w));
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 3.52128_MHz_XTAL / 2)
 	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
 
