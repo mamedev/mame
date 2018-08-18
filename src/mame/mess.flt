@@ -195,6 +195,7 @@ e100.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp
+ec7915.cpp
 einstein.cpp
 electron.cpp
 elekscmp.cpp
