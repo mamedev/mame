@@ -154,6 +154,12 @@ WRITE_LINE_MEMBER(sorcerer_state::intrq_w)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 		m_wait = false;
 	}
+	else
+	if (BIT(m_2c, 0) && m_drq_off && !m_wait)
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_wait = true;
+	}
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the byte.
@@ -165,6 +171,12 @@ WRITE_LINE_MEMBER(sorcerer_state::drq_w)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 		m_wait = false;
 	}
+	else
+	if (BIT(m_2c, 0) && m_intrq_off && !m_wait)
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_wait = true;
+	}
 }
 
 // Port 2C control signals for the video/disk unit's floppy disks
@@ -173,19 +185,15 @@ WRITE_LINE_MEMBER(sorcerer_state::drq_w)
 // bit 0 = enable wait generator, bit 2 = drive 0 select, bit 5 = ??
 WRITE8_MEMBER(sorcerer_state::port_2c_w)
 {
+	m_2c = data;
+
 	if (BIT(data, 0))
 	{
-		
-		if (m_drq_off && m_intrq_off)
+		if (!m_wait && m_drq_off && m_intrq_off)
 		{
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 			m_wait = true;
 		}
-	}
-	else
-	{
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-		m_wait = false;
 	}
 
 	floppy_image_device *floppy = nullptr;
@@ -201,7 +209,7 @@ WRITE8_MEMBER(sorcerer_state::port_2c_w)
 		floppy->ss_w(0);     // assume side 0 ? // BIT(data, 4));
 	}
 
-	m_fdc2->dden_w(1);   // assume single density ? //!BIT(data, 0));
+	m_fdc2->dden_w(0);   // assume double density ? //!BIT(data, 0));
 }
 
 WRITE8_MEMBER(sorcerer_state::port_fd_w)
@@ -455,6 +463,7 @@ void sorcerer_state::machine_reset()
 	m_intrq_off = true;
 	m_wait = false;
 	m_fe = 0xff;
+	m_2c = 0;
 	port_fe_w(space, 0, 0, 0xff);
 
 	membank("boot")->set_entry(1);
