@@ -371,7 +371,7 @@ PALETTE_INIT_MEMBER(ambush_state, mariobla)
 
 	for (int c = 0; c < palette.entries(); c++)
 	{
-		int i = bitswap<8>(c, 7, 6, 2, 5, 4, 3, 1, 0);
+		int i = bitswap<9>(c, 2, 7, 6, 8, 5, 4, 3, 1, 0);
 		int bit0, bit1, bit2, r, g, b;
 
 		// red component
@@ -1001,5 +1001,5 @@ GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, empty_init, 
 GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS)
+GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, empty_init, ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)",      MACHINE_SUPPORTS_SAVE )
