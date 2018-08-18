@@ -17,7 +17,7 @@ class qsound_hle_device : public device_t, public device_sound_interface, public
 {
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
-	qsound_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
+	qsound_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 60'000'000);
 
 	DECLARE_WRITE8_MEMBER(qsound_w);
 	DECLARE_READ8_MEMBER(qsound_r);
@@ -39,15 +39,17 @@ private:
 	// DSP ROM sample map
 	enum {
 		DATA_PAN_TAB		= 0x110,
+		DATA_ADPCM_TAB		= 0x9dc,
+		DATA_FILTER_TAB		= 0xd53,	// dual filter mode, 5 tables * 95 taps each
+		DATA_FILTER_TAB2	= 0xf2e,	// overlapping data (95+15+95)
+
+		STATE_BOOT          = 0x000,
 		STATE_INIT1			= 0x288,
 		STATE_INIT2			= 0x61a,
 		STATE_REFRESH1		= 0x039,
 		STATE_REFRESH2		= 0x04f,
 		STATE_NORMAL1		= 0x314,
-		STATE_NORMAL2 		= 0x6b2,
-		DATA_ADPCM_TAB		= 0x9dc,
-		DATA_FILTER_TAB		= 0xd53,	// dual filter mode, 5 tables * 95 taps each
-		DATA_FILTER_TAB2	= 0xf2e		// overlapping data (95+15+95)
+		STATE_NORMAL2 		= 0x6b2
 	};
 
 	const uint16_t PAN_TABLE_DRY = 0;
@@ -58,53 +60,64 @@ private:
 	const uint16_t DELAY_BASE_OFFSET2 = 0x53c;
 
 	struct qsound_voice {
-		uint16_t bank;
-		int16_t addr; // top word is the sample address
-		uint16_t phase;
-		uint16_t rate;
-		int16_t loop_len;
-		int16_t end_addr;
-		int16_t volume;
-		int16_t echo;
+		uint16_t m_bank = 0;
+		int16_t m_addr = 0; // top word is the sample address
+		uint16_t m_phase = 0;
+		uint16_t m_rate = 0;
+		int16_t m_loop_len = 0;
+		int16_t m_end_addr = 0;
+		int16_t m_volume = 0;
+		int16_t m_echo = 0;
+
+		int16_t update(qsound_hle_device &dsp, int32_t *echo_out);
 	};
 
 	struct qsound_adpcm {
-		uint16_t start_addr;
-		uint16_t end_addr;
-		uint16_t bank;
-		int16_t volume;
-		uint16_t flag;
-		int16_t cur_vol;
-		int16_t step_size;
-		uint16_t cur_addr;
+		uint16_t m_start_addr = 0;
+		uint16_t m_end_addr = 0;
+		uint16_t m_bank = 0;
+		int16_t m_volume = 0;
+		uint16_t m_flag = 0;
+		int16_t m_cur_vol = 0;
+		int16_t m_step_size = 0;
+		uint16_t m_cur_addr = 0;
+
+		int16_t update(qsound_hle_device &dsp, int16_t curr_sample, int nibble);
 	};
 
 	// Q1 Filter
 	struct qsound_fir {
-		int tap_count;	// usually 95
-		int delay_pos;
-		uint16_t table_pos;
-		int16_t taps[95];
-		int16_t delay_line[95];
+		int m_tap_count = 0;	// usually 95
+		int m_delay_pos = 0;
+		uint16_t m_table_pos = 0;
+		int16_t m_taps[95] = { 0 };
+		int16_t m_delay_line[95] = { 0 };
+
+		int32_t apply(int16_t input);
 	};
 
 	// Delay line
 	struct qsound_delay {
-		int16_t delay;
-		int16_t volume;
-		int16_t write_pos;
-		int16_t read_pos;
-		int16_t delay_line[51];
+		int16_t m_delay = 0;
+		int16_t m_volume = 0;
+		int16_t m_write_pos = 0;
+		int16_t m_read_pos = 0;
+		int16_t m_delay_line[51] = { 0 };
+
+		int32_t apply(const int32_t input);
+		void update();
 	};
 
 	struct qsound_echo {
-		uint16_t end_pos;
+		uint16_t m_end_pos = 0;
 
-		int16_t feedback;
-		int16_t length;
-		int16_t last_sample;
-		int16_t delay_line[1024];
-		int16_t delay_pos;
+		int16_t m_feedback = 0;
+		int16_t m_length = 0;
+		int16_t m_last_sample = 0;
+		int16_t m_delay_line[1024] = { 0 };
+		int16_t m_delay_pos = 0;
+
+		int16_t apply(int32_t input);
 	};
 
 	// MAME resources
@@ -136,7 +149,7 @@ private:
 	int m_state_counter;
 	int m_ready_flag;
 
-	uint16_t *register_map[256];
+	uint16_t *m_register_map[256];
 
 	inline uint16_t read_dsp_rom(uint16_t addr) { return m_dsp_rom[addr&0xfff]; }
 
@@ -153,15 +166,7 @@ private:
 	void state_normal_update();
 
 	// sub functions
-	inline int16_t get_sample(uint16_t bank,uint16_t address);
-
-	inline int16_t pcm_update(struct qsound_voice *v, int32_t *echo_out);
-	inline void adpcm_update(int voice_no, int nibble);
-
-	inline int16_t echo(struct qsound_echo *r,int32_t input);
-	inline int32_t fir(struct qsound_fir *f, int16_t input);
-	inline int32_t delay(struct qsound_delay *q, int32_t input);
-	inline void delay_update(struct qsound_delay *q);
+	int16_t read_sample(uint16_t bank, uint16_t address);
 };
 
 DECLARE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device)
