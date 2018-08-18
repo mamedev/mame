@@ -1,4 +1,4 @@
-// license: BSD-3-Clause
+﻿// license: BSD-3-Clause
 // copyright-holders: Zsolt Vasvari, Dirk Best
 /***************************************************************************
 
@@ -81,6 +81,7 @@ public:
 private:
 	DECLARE_PALETTE_INIT(ambush);
 	DECLARE_PALETTE_INIT(mario);
+	DECLARE_PALETTE_INIT(mariobla);
 	DECLARE_PALETTE_INIT(dkong3);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -361,6 +362,37 @@ PALETTE_INIT_MEMBER( ambush_state, mario )
 		b = 255 - (0x55 * bit0 + 0xaa * bit1);
 
 		palette.set_pen_color(i, rgb_t(r,g,b));
+	}
+}
+
+PALETTE_INIT_MEMBER(ambush_state, mariobla)
+{
+	const uint8_t *color_prom = memregion("colors")->base();
+
+	for (int c = 0; c < palette.entries(); c++)
+	{
+		int i = bitswap<8>(c, 7, 6, 2, 5, 4, 3, 1, 0);
+		int bit0, bit1, bit2, r, g, b;
+
+		// red component
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(c, rgb_t(r, g, b));
 	}
 }
 
@@ -770,6 +802,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ambush_state::mariobla)
 	mariobl(config);
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(ambush_state, mariobla)
+
 	auto &outlatch(*subdevice<ls259_device>("outlatch"));
 	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
 	outlatch.q_out_cb<6>().set_nop();
@@ -923,13 +958,13 @@ ROM_START( mariobla )
 	ROM_REGION(0x6000, "gfx2", 0)
 	ROM_COPY("gfx", 0x0000, 0x0000, 0x6000)
 
-	ROM_REGION(0xeb, "prom", 0)
-	ROM_LOAD("82s153.7n", 0x00, 0xeb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
+	ROM_REGION(0x2eb, "prom", 0)
+	ROM_LOAD( "6349-2n.2m",     0x000000, 0x000200, CRC(a334e4f3) SHA1(b15e3d9851b43976e98c47e3365c1b69022b0a7d))
+	ROM_LOAD( "6349-2n-cpu.5b", 0x000000, 0x000200, CRC(7250ad28) SHA1(8f5342562cdcc67890cb4c4880d75f9a40e63cf8))
+	ROM_LOAD( "82s153.7n",      0x000000, 0x0000eb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
 
 	ROM_REGION(0x200, "colors", 0)
-	ROM_LOAD("prom.8i", 0x000, 0x200, NO_DUMP)
-	// taken from mario
-	ROM_LOAD("tma1-c-4p.4p", 0x000, 0x200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801))
+	ROM_LOAD("6349-2n.8h", 0x000, 0x200, CRC(6a109f4b) SHA1(b117f85728afc6d3efeff0a7075b797996916f6e))
 ROM_END
 
 ROM_START( dkong3abl )
@@ -966,5 +1001,5 @@ GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, empty_init, 
 GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, empty_init, ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobla,  mario,   mariobla,  mariobl,   ambush_state, empty_init, ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS)
 GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, empty_init, ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)",      MACHINE_SUPPORTS_SAVE )
