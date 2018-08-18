@@ -656,34 +656,6 @@ uint32_t tms57002_device::get_cmem(uint8_t addr)
 	}
 }
 
-uint32_t tms57002_device::get_cmem(uint8_t addr)
-{
-	if(sa == addr && update_counter_head != update_counter_tail)
-		sti |= S_UPDATE;
-
-	if(sti & S_UPDATE)
-	{
-		cmem[addr] = update[update_counter_tail];
-		update_counter_tail = (update_counter_tail + 1) & 0x0f;
-		update_empty();
-		
-		if(update_counter_head == update_counter_tail)
-			sti &= ~S_UPDATE;
-
-		return cmem[addr]; // The value of crm is ignored during an update.
-	}
-	else
-	{
-		int crm = (st1 & ST1_CRM) >> ST1_CRM_SHIFT;
-		uint32_t cvar = cmem[addr];
-		if(crm == 1)
-			return (cvar & 0xffff0000);
-		else if(crm == 2)
-			return (cvar << 16);
-		return cvar;
-	}
-}
-
 void tms57002_device::cache_flush()
 {
 	int i;
