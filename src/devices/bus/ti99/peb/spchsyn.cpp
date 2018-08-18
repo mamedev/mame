@@ -46,7 +46,9 @@ namespace bus { namespace ti99 { namespace peb {
 ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_SPEECH, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_vsp(nullptr), m_reading(false), m_sbe(false)
+	m_vsp(*this, "vsp"),
+	m_reading(false),
+	m_sbe(false)
 {
 }
 
@@ -130,11 +132,6 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 void ti_speech_synthesizer_device::device_start()
 {
-	m_vsp = subdevice<cd2501e_device>("speechsyn");
-	// Need to configure the speech ROM for inverse bit order
-	speechrom_device* mem = subdevice<speechrom_device>("vsm");
-	mem->set_reverse_bit_order(true);
-
 	// We don't need to save m_space because the calling method
 	// combined_rsq_wsq_w only needs the address space formally.
 	save_item(NAME(m_reading));
@@ -164,15 +161,25 @@ ROM_START( ti99_speech )
 	ROM_LOAD("cd2326a.u2b", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020)) // at location u2, top of stack
 ROM_END
 
-MACHINE_CONFIG_START(ti_speech_synthesizer_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
+{
+	SPEECHROM(config, "vsm", 0).set_reverse_bit_order(true);
+	SPEAKER(config, "speech_out").front_center();
+	CD2501E(config, m_vsp, 640000L);
+	m_vsp->set_speechrom_tag("vsm");
+	m_vsp->ready_cb().set(FUNC(ti_speech_synthesizer_device::speech_ready));
+	m_vsp->add_route(ALL_OUTPUTS, "speech_out", 0.50);
 
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speechsyn", CD2501E, 640000L)
-	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(*this, ti_speech_synthesizer_device, speech_ready))
-	MCFG_TMS52XX_SPEECHROM("vsm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+/*
+    // FIXME: Make it work. Guess we need two VSM circuits @16K.
+    TMS6100(config, "vsm", 640_kHz_XTAL/4);
+    m_vsp->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
+    m_vsp->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
+    m_vsp->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
+    m_vsp->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
+    m_vsp->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
+*/
+}
 
 const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {

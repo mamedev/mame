@@ -367,8 +367,8 @@ INPUT_PORTS_START( tn_usbsm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nouspikel_usb_smartmedia_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
-	MCFG_STRATAFLASH_ADD(STRATA_TAG)
+	SMARTMEDIA(config, "smartmedia", 0);
+	STRATAFLASH(config, STRATA_TAG, 0);
 	RAM(config, RAM1_TAG).set_default_size("512K").set_default_value(0);
 	RAM(config, RAM2_TAG).set_default_size("512K").set_default_value(0);
 MACHINE_CONFIG_END

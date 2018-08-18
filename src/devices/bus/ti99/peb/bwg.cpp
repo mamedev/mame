@@ -680,9 +680,7 @@ MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
 	m_wd1773->intrq_wr_callback().set(FUNC(snug_bwg_device::fdc_irq_w));
 	m_wd1773->drq_wr_callback().set(FUNC(snug_bwg_device::fdc_drq_w));
 
-	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(0)   // sunday
+	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
 	MCFG_FLOPPY_DRIVE_ADD("0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

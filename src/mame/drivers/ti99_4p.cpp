@@ -153,6 +153,8 @@ public:
 	{ }
 
 	void ti99_4p_60hz(machine_config &config);
+	void driver_start() override;
+	void driver_reset() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
@@ -184,8 +186,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
-	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(ti99_4p);
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
@@ -211,7 +211,7 @@ private:
 	DECLARE_READ16_MEMBER( debugger_read );
 	DECLARE_WRITE16_MEMBER( debugger_write );
 	void ready_join();
-	void    set_keyboard_column(int number, int data);
+	void set_keyboard_column(int number, int data);
 
 	// Pointer to EPROM
 	uint16_t *m_rom;
@@ -947,7 +947,7 @@ WRITE8_MEMBER( ti99_4p_state::external_operation )
 
 /*****************************************************************************/
 
-void ti99_4p_state::machine_start()
+void ti99_4p_state::driver_start()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -995,7 +995,7 @@ WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 /*
     Reset the machine.
 */
-MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
+void ti99_4p_state::driver_reset()
 {
 	set_9901_int(12, CLEAR_LINE);
 
@@ -1004,11 +1004,11 @@ MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
 	m_9901_int = 0x03; // INT2* and INT1* set to 1, i.e. inactive
 }
 
-
 /*
     Machine description.
 */
-MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
+void ti99_4p_state::ti99_4p_60hz(machine_config& config)
+{
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	TMS9900(config, m_cpu, 3000000);
@@ -1049,15 +1049,13 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, "cassette", 0);
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0);
-	m_joyport->configure_slot(false, false);
-
-MACHINE_CONFIG_END
+	TI99_JOYPORT(config, m_joyport, 0).configure_slot(false, false);
+}
 
 
 ROM_START(ti99_4p)

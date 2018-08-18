@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	MCFG_IBC_HSKLATCH_CALLBACK(WRITELINE(*this, hx5102_device, hsklatch_out))
 
 	// Outgoing socket for downstream devices
-	MCFG_HEXBUS_ADD("hexbus")
+	HEXBUS(config, "hexbus", 0).configure_slot();
 
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_flopcpu, XTAL(12'000'000));

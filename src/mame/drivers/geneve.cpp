@@ -734,9 +734,19 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 	m_cpu->dbin_cb().set(FUNC(geneve_state::dbin_line));
 
 	// Video hardware
-	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, geneve_state, set_tms9901_INT2_from_v9938))
-	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
+	v99x8_device& video(V9938(config, TI_VDP_TAG, XTAL(21'477'272))); // typical 9938 clock, not verified
+	video.set_vram_size(0x20000);
+	video.int_cb().set(FUNC(geneve_state::set_tms9901_INT2_from_v9938));
+	video.set_screen(TI_SCREEN_TAG);
+	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(21'477'272), \
+		v99x8_device::HTOTAL, \
+		0, \
+		v99x8_device::HVISIBLE - 1, \
+		v99x8_device::VTOTAL_NTSC * 2, \
+		v99x8_device::VERTICAL_ADJUST * 2, \
+		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
+	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
 
 	// Main board components
 	TMS9901(config, m_tms9901, 3000000);
@@ -753,23 +763,18 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 	m_tms9901->intlevel_cb().set(FUNC(geneve_state::tms9901_interrupt));
 
 	// Clock
-	MCFG_DEVICE_ADD(GENEVE_CLOCK_TAG, MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(0)   // sunday
+	MM58274C(config, GENEVE_CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
+	sn76496_device& soundgen(SN76496(config, TI_SOUNDCHIP_TAG, 3579545));
+	soundgen.ready_cb().set(FUNC(geneve_state::ext_ready));
+	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// User interface devices
-	GENEVE_KEYBOARD(config, m_keyboard, 0);
-	m_keyboard->int_cb().set(FUNC(geneve_state::keyboard_interrupt));
-	TI99_JOYPORT(config, m_joyport, 0);
-	m_joyport->configure_slot(false, false);
-	TI99_COLORBUS(config, m_colorbus, 0);
-	m_colorbus->configure_slot();
+	GENEVE_KEYBOARD(config, m_keyboard, 0).int_cb().set(FUNC(geneve_state::keyboard_interrupt));
+	TI99_JOYPORT(config, m_joyport, 0).configure_slot(false, false);
+	TI99_COLORBUS(config, m_colorbus, 0).configure_slot();
 
 	// PFM expansion
 	AT29C040(config, GENEVE_PFM512_TAG);
