@@ -15354,6 +15354,9 @@ ibm5160                         // 1982 IBM XT 5160
 ibmpcjr                         // 1984 IBM PC Jr
 ibmpcjx                         // 1985 IBM PC JX
 
+@source:icebox.cpp
+icebox                          // Nutting Icebox
+
 @source:icatel.cpp
 icatel                          //
 

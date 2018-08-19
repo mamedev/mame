@@ -305,6 +305,7 @@ ibm6580.cpp
 ibmpc.cpp
 ibmpcjr.cpp
 icatel.cpp
+icebox.cpp
 ie15.cpp
 if800.cpp
 imds.cpp
