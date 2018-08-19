@@ -346,7 +346,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		}
 
 		for(int output=0; output<4; output++)
-			outputs[output][i] = mix[output];
+			outputs[output][i] = std::min<int32_t>(std::max<int32_t>(mix[output], -32768), 32767);
 
 	}
 	m_sample_count++;

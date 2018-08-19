@@ -206,8 +206,8 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 	m_tms57002->empty_callback().set_inputline(m_soundcpu, MN10200_IRQ1).invert();
 
 	m_tms57002->set_addrmap(AS_DATA, &taito_zoom_device::tms57002_map);
-	m_tms57002->add_route(2, *this, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_tms57002->add_route(3, *this, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_tms57002->add_route(2, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_tms57002->add_route(3, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 #else // Unsupported opcode issue
 	m_tms57002->set_disable();
 #endif
