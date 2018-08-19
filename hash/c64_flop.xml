@@ -51,6 +51,17 @@
 		</part>
 	</software>
 
+	<software name="bbudge">
+		<description>Bill Budge: Pinball Construction Set</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="bill_budge.d64" size="174848" crc="d42c40b4" sha1="75b0a166b29e9ed3834c95acc1f263a084062f5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bionicco">
 		<description>Bionic Commando</description>
 		<year>1988</year>
