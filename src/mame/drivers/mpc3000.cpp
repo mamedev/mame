@@ -29,10 +29,7 @@
         TE7774 hookups: RXD1 is MIDI IN 1, RXD2 is MIDI IN 2, RXD3 and 4 are wire-ORed to the uPD7810's TX line.
                         TXD1-4 are MIDI OUTs 1, 2, 3, and 4.
 
-    MPC2000XL & MPC2000 Classic: same as 3000, except:
-        Dual UART: MB89371A (V53's i8251 is used for panel comms with the 78C10)
-
-    MPC2000 Classic:
+    MPC2000XL &  Classic:
         CPU: NEC V53
         Floppy: uPD72068
         SCSI: MB89352
@@ -41,6 +38,16 @@
         (V53's 8251 is used for panel comms here)
         Panel controller CPU: NEC uPD7810 @ 12 MHz
         Sound DSP: L6048
+
+MPCs on other hardware:
+
+    MPC4000:
+        CPU, LCD, panel controller: SA1110 StrongARM @ 176 MHz
+        SCSI: FAS236 (same as NCR 53C96)
+        IDE, UART, DMA controller: FPGA XC2S100-5TQ144C
+        USB Host: SL811HST
+        USB function controller: NET2890
+        DSP, MIDI: MB87L185PFVS-G-BND (gate array?)
 
     MPC1000:
         CPU, LCD, UART, panel controller, DSP: SH-3 7712 (HD6417712)
@@ -243,8 +250,21 @@ INPUT_PORTS_END
 
 ROM_START( mpc3000 )
 	ROM_REGION(0x80000, "maincpu", 0)   // V53 code
-	ROM_LOAD16_BYTE( "mpc312ls.bin", 0x000000, 0x040000, CRC(d4fb6439) SHA1(555d388ed25f8b85638c325e7d9012eaa271ffa0) )
-	ROM_LOAD16_BYTE( "mpc312ms.bin", 0x000001, 0x040000, CRC(80ee0ab9) SHA1(b8855118d59b8f73a3af5ff2e824cdaa0a9f564a) )
+	ROM_SYSTEM_BIOS(0, "default", "ver 3.12")
+	ROMX_LOAD( "mpc312ls.bin", 0x000000, 0x040000, CRC(d4fb6439) SHA1(555d388ed25f8b85638c325e7d9012eaa271ffa0), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "mpc312ms.bin", 0x000001, 0x040000, CRC(80ee0ab9) SHA1(b8855118d59b8f73a3af5ff2e824cdaa0a9f564a), ROM_SKIP(1) | ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "vailixi", "ver 3.50")
+	ROMX_LOAD( "3.50 vailixi lse.bin", 0x000000, 0x040000, CRC(9f3031b5) SHA1(c270a92f8ed273a1ede16388bb8f30c85ac1faab), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "3.50 vailixi mso.bin", 0x000001, 0x040000, CRC(e62ebb26) SHA1(f6d080481de40bea2c94bbc96b222c5f9b7afaf4), ROM_SKIP(1) | ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "v311", "ver 3.11")
+	ROMX_LOAD( "mpc311ls.bin", 0x000000, 0x040000, CRC(5a272061) SHA1(87cc8aef3233d95ad1febbd77b42f720d718baa3), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "mpc311ms.bin", 0x000001, 0x040000, CRC(a8e177de) SHA1(b63a5c27066c03f7de56659aff183f15d95277c5), ROM_SKIP(1) | ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS(3, "v310", "ver 3.10")
+	ROMX_LOAD( "mpc3000__ls__v3.10.am27c020__id0197.ic13_ls.bin", 0x000000, 0x040000, CRC(cbd1b3a6) SHA1(5464a57137549d9d9c47f9aafc2b89f4c0af8b31), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "mpc3000__ms__v3.10.am27c020__id0197.ic14_ms.bin", 0x000001, 0x040000, CRC(e2ba1904) SHA1(27a9f047c63964fac2b453f2317b77834490983d), ROM_SKIP(1) | ROM_BIOS(3) )
 
 	ROM_REGION(0x80000, "subcpu", 0)    // uPD78C10 panel controller code
 	ROM_LOAD( "mp3000__op_v1.0.am27c256__id0110.ic602.bin", 0x000000, 0x008000, CRC(b0b783d3) SHA1(a60016184fc07ba00dcc19ba4da60e78aceff63c) )
