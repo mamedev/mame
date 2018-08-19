@@ -741,8 +741,8 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_SPU_ADD("spu", XTAL(67'737'600)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
 	TAITO_ZOOM(config, m_zoom);
 	m_zoom->set_use_flash();
