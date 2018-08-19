@@ -165,10 +165,10 @@ WRITE_LINE_MEMBER(ioport_attached_device::set_ready)
 	m_ioport->m_console_ready(state);
 }
 
-void ioport_device::configure_slot(bool withevpc)
+void ioport_device::configure_slot(int flags)
 {
 	option_reset();
-	if (withevpc)
+	if ((flags & WITH_PEB_AND_EVPC)!=0)
 	{
 		option_add("peb", TI99_PERIBOX_EV);
 		set_default_option("peb");

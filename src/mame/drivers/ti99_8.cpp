@@ -782,7 +782,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// I/O port
 	TI99_IOPORT(config, m_ioport, 0);
-	m_ioport->configure_slot(false);
+	m_ioport->configure_slot(bus::ti99::internal::PLAIN);
 	m_ioport->extint_cb().set(FUNC(ti99_8_state::extint));
 	m_ioport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::pbox_ready));
 
@@ -807,8 +807,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);;
 
 	// GROM library
 	tmc0430_device& sgrom0(TMC0430(config, TI998_SYSGROM0_TAG, 0));
@@ -903,7 +902,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	p3grom2.set_region_and_ident(TI998_GROMLIB3_REG, 0x4000, 2);
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0).configure_slot(true, false);
+	TI99_JOYPORT(config, m_joyport, 0).configure_slot(bus::ti99::joyport::MOUSE);
 }
 
 /*

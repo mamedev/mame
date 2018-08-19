@@ -52,6 +52,12 @@ private:
     I/O port
 ********************************************************************/
 
+enum
+{
+	PLAIN=0,
+	WITH_PEB_AND_EVPC
+};
+
 class ioport_device : public device_t, public device_slot_interface
 {
 	friend class ioport_attached_device;
@@ -73,7 +79,7 @@ public:
 	auto extint_cb() { return m_console_extint.bind(); }
 	auto ready_cb() { return m_console_ready.bind(); }
 
-	void configure_slot(bool withevpc);
+	void configure_slot(int flags);
 
 protected:
 	void device_start() override;

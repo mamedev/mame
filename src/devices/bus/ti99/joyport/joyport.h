@@ -24,6 +24,13 @@
 
 namespace bus { namespace ti99 { namespace joyport {
 
+enum
+{
+	PLAIN=0,
+	MOUSE,
+	HANDSET
+};
+
 class joyport_device;
 
 /********************************************************************
@@ -55,7 +62,7 @@ public:
 	void    set_interrupt(int state);
 	void    pulse_clock();
 	auto    int_cb() { return m_interrupt.bind(); }
-	void    configure_slot(bool withmouse, bool withhandset);
+	void    configure_slot(int flags);
 
 protected:
 	void device_start() override;

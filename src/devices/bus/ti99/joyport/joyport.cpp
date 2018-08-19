@@ -95,12 +95,12 @@ void joyport_device::device_config_complete()
 	m_connected = dynamic_cast<device_ti99_joyport_interface*>(subdevices().first());
 }
 
-void joyport_device::configure_slot(bool withmouse, bool withhandset)
+void joyport_device::configure_slot(int flags)
 {
 	option_reset();
 	option_add("twinjoy", TI99_JOYSTICK);
-	if (withmouse) option_add("mecmouse", TI99_MECMOUSE);
-	if (withhandset) option_add("handset", TI99_HANDSET);
+	if ((flags & MOUSE)!=0) option_add("mecmouse", TI99_MECMOUSE);
+	if ((flags & HANDSET)!=0) option_add("handset", TI99_HANDSET);
 	set_default_option("twinjoy");
 	set_fixed(false);
 }

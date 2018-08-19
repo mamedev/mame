@@ -773,7 +773,7 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 
 	// User interface devices
 	GENEVE_KEYBOARD(config, m_keyboard, 0).int_cb().set(FUNC(geneve_state::keyboard_interrupt));
-	TI99_JOYPORT(config, m_joyport, 0).configure_slot(false, false);
+	TI99_JOYPORT(config, m_joyport, 0).configure_slot(bus::ti99::joyport::PLAIN);
 	TI99_COLORBUS(config, m_colorbus, 0).configure_slot();
 
 	// PFM expansion
