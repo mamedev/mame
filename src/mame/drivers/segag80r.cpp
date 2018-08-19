@@ -111,6 +111,7 @@
 #include "machine/segag80.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/segacrpt_device.h"
 #include "speaker.h"
 
@@ -296,17 +297,6 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
  *
  *************************************/
 
-READ8_MEMBER(segag80r_state::sindbadm_sound_data_r)
-{
-	uint8_t result = m_ppi->read_pa();
-	if (!machine().side_effects_disabled())
-	{
-		m_ppi->pc6_w(0);
-		m_ppi->pc6_w(1);
-	}
-	return result;
-}
-
 WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
@@ -401,7 +391,7 @@ void segag80r_state::sindbadm_sound_map(address_map &map)
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
 	map(0xa000, 0xa003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
 	map(0xc000, 0xc003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(segag80r_state::sindbadm_sound_data_r));
+	map(0xe000, 0xe000).mirror(0x1fff).r("ppi8255", FUNC(i8255_device::acka_r));
 }
 
 
@@ -915,7 +905,7 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
-	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(m_soundbrd, monsterb_sound_device, sound_a_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(m_soundbrd, monsterb_sound_device, sound_b_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(m_soundbrd, monsterb_sound_device, n7751_status_r))
