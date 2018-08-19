@@ -1677,8 +1677,10 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("dasp")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3) // reverb output
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.3) // is this connected?
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.3)
 
 	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
