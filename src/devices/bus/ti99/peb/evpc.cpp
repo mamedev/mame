@@ -506,7 +506,9 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Mouse connected to the color bus of the v9938
-	TI99_COLORBUS(config, m_colorbus, 0).configure_slot();
+	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
 }
 
 } } } // end namespace bus::ti99::peb
+
+

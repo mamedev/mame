@@ -52,17 +52,21 @@ private:
     I/O port
 ********************************************************************/
 
-enum
-{
-	PLAIN=0,
-	WITH_PEB_AND_EVPC
-};
-
 class ioport_device : public device_t, public device_slot_interface
 {
 	friend class ioport_attached_device;
 
 public:
+	template <typename U>
+	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: ioport_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Methods called from the console
@@ -79,8 +83,6 @@ public:
 	auto extint_cb() { return m_console_extint.bind(); }
 	auto ready_cb() { return m_console_ready.bind(); }
 
-	void configure_slot(int flags);
-
 protected:
 	void device_start() override;
 	void device_config_complete() override;
@@ -95,5 +97,8 @@ private:
 }   }  } // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device)
+
+void ti99_ioport_options_plain(device_slot_interface &device);
+void ti99_ioport_options_evpc(device_slot_interface &device);
 
 #endif /* __TI99IOPORT__ */

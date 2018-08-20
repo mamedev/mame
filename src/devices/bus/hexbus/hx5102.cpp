@@ -633,7 +633,6 @@ WRITE_LINE_MEMBER( hx5102_device::fdc_drq_w )
 
 /*
     Define the floppy formats.
-    TODO: Define another DSDD format with 16 sectors.
 */
 FLOPPY_FORMATS_MEMBER(hx5102_device::floppy_formats)
 	FLOPPY_TI99_SDF_FORMAT,
@@ -670,12 +669,12 @@ INPUT_PORTS_END
 */
 MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	// Hexbus controller
-	MCFG_DEVICE_ADD(IBC_TAG, IBC, 0)
-	MCFG_IBC_HEXBUS_OUT_CALLBACK(WRITE8(*this, hx5102_device, hexbus_out))
-	MCFG_IBC_HSKLATCH_CALLBACK(WRITELINE(*this, hx5102_device, hsklatch_out))
+	IBC(config, m_hexbus_ctrl, 0);
+	m_hexbus_ctrl->hexbus_cb().set(FUNC(hx5102_device::hexbus_out));
+	m_hexbus_ctrl->hsklatch_cb().set(FUNC(hx5102_device::hsklatch_out));
 
 	// Outgoing socket for downstream devices
-	HEXBUS(config, "hexbus", 0).configure_slot();
+	HEXBUS(config, "hexbus", 0, hexbus_options, nullptr);
 
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_flopcpu, XTAL(12'000'000));

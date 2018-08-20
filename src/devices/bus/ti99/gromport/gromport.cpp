@@ -125,9 +125,6 @@ DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device, "grom
 
 namespace bus { namespace ti99 { namespace gromport {
 
-#define TRACE_READ 0
-#define TRACE_WRITE 0
-
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_GROMPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
@@ -145,7 +142,7 @@ READ8Z_MEMBER(gromport_device::readz)
 {
 	if (m_connector != nullptr)
 	{
-		m_connector->readz(space, offset & m_mask, value);
+		m_connector->readz(space, offset & get_mask(), value);
 		if (m_romgq) LOGMASKED(LOG_READ, "Read %04x -> %02x\n", offset | 0x6000, *value);
 	}
 }
@@ -159,7 +156,7 @@ WRITE8_MEMBER(gromport_device::write)
 	if (m_connector != nullptr)
 	{
 		if (m_romgq) LOGMASKED(LOG_WRITE, "Write %04x <- %02x\n", offset | 0x6000, data);
-		m_connector->write(space, offset & m_mask, data);
+		m_connector->write(space, offset & get_mask(), data);
 	}
 }
 
@@ -263,17 +260,6 @@ ioport_constructor gromport_device::device_input_ports() const
 	return INPUT_PORTS_NAME(gromport);
 }
 
-void gromport_device::configure_slot(bool for998)
-{
-	option_reset();
-	option_add("single", TI99_GROMPORT_SINGLE);
-	option_add("multi", TI99_GROMPORT_MULTI);
-	if (!for998) option_add("gkracker", TI99_GROMPORT_GK);
-	set_default_option("single");
-	set_fixed(false);
-	set_mask(for998? 0x3fff : 0x1fff);
-}
-
 /***************************************************************************
     Different versions of cartridge connections
 
@@ -303,3 +289,15 @@ void cartridge_connector_device::device_config_complete()
 
 } } } // end namespace bus::ti99::gromport
 
+void ti99_gromport_options(device_slot_interface &device)
+{
+	device.option_add("single", TI99_GROMPORT_SINGLE);
+	device.option_add("multi", TI99_GROMPORT_MULTI);
+	device.option_add("gkracker", TI99_GROMPORT_GK);
+}
+
+void ti99_gromport_options_998(device_slot_interface &device)
+{
+	device.option_add("single", TI99_GROMPORT_SINGLE);
+	device.option_add("multi", TI99_GROMPORT_MULTI);
+}

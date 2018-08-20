@@ -169,6 +169,7 @@
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
+#include "bus/hexbus/hexbus.h"
 
 #define TI992_SCREEN_TAG      "screen"
 #define TI992_ROM          "rom_region"
@@ -475,7 +476,7 @@ void ti99_2_state::ti99_2(machine_config& config)
 	CASSETTE(config, "cassette", 0);
 
 	// Hexbus
-	HEXBUS(config, TI_HEXBUS_TAG, 0).configure_slot();
+	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
 }
 
 /*

@@ -883,10 +883,9 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	TI99_DATAMUX(config, m_datamux, 0).ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
 
 	// Cartridge port (aka GROMport)
-	TI99_GROMPORT(config, m_gromport, 0);
+	TI99_GROMPORT(config, m_gromport, 0, ti99_gromport_options, "single");
 	m_gromport->ready_cb().set(FUNC(ti99_4x_state::console_ready_cart));
 	m_gromport->reset_cb().set(FUNC(ti99_4x_state::console_reset));
-	m_gromport->configure_slot(false);
 
 	// Scratch pad RAM 256 bytes
 	RAM(config, TI99_PADRAM_TAG).set_default_size("256").set_default_value(0);
@@ -896,11 +895,6 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 
 	// Software list
 	SOFTWARE_LIST(config, "cart_list_ti99").set_type("ti99_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-
-	// I/O port
-	TI99_IOPORT(config, m_ioport, 0);
-	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
-	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Cassette drives. Second drive is record-only.
 	SPEAKER(config, "cass_out").front_center();
@@ -936,7 +930,9 @@ void ti99_4x_state::ti99_4(machine_config& config)
 	m_tms9901->p_out_cb(0).set(FUNC(ti99_4x_state::handset_ack));
 
 	// Input/output port: normal config
-	m_ioport->configure_slot(bus::ti99::internal::PLAIN);
+	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);
+	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
+	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Sound hardware (not in EVPC variant)
 	SPEAKER(config, "sound_out").front_center();
@@ -945,8 +941,7 @@ void ti99_4x_state::ti99_4(machine_config& config)
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Joystick port. We can connect a joyport mouse or a handset (99/4-specific).
-	TI99_JOYPORT(config, m_joyport, 0);
-	m_joyport->configure_slot(bus::ti99::joyport::MOUSE | bus::ti99::joyport::HANDSET);
+	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_994, "twinjoy");
 	m_joyport->int_cb().set(FUNC(ti99_4x_state::handset_interrupt_in));
 }
 
@@ -1011,7 +1006,9 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 	m_tms9901->p_out_cb(5).set(FUNC(ti99_4x_state::alphaW));
 
 	// Input/output port: Normal config
-	m_ioport->configure_slot(bus::ti99::internal::PLAIN);
+	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);
+	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
+	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Sound hardware (not in EVPC variant)
 	SPEAKER(config, "sound_out").front_center();
@@ -1020,7 +1017,7 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0).configure_slot(bus::ti99::joyport::MOUSE);
+	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_mouse, "twinjoy");
 }
 
 /*
@@ -1128,11 +1125,13 @@ void ti99_4x_state::ti99_4ev_60hz(machine_config& config)
 	TI99_EVPCCONN(config, TI99_EVPC_CONN_TAG, 0).vdpint_cb().set(FUNC(ti99_4x_state::video_interrupt_evpc_in));
 
 	// Input/output port: Configure for EVPC
-	m_ioport->configure_slot(bus::ti99::internal::WITH_PEB_AND_EVPC);
+	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_evpc, "peb");
+	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
+	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Joystick port
 	// No joyport mouse, since we have a bus mouse with the EVPC
-	TI99_JOYPORT(config, m_joyport, 0).configure_slot(bus::ti99::joyport::PLAIN);
+	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
 }
 
 /*****************************************************************************

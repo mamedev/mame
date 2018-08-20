@@ -55,15 +55,6 @@ void ti99_colorbus_device::device_config_complete()
 	m_connected = dynamic_cast<device_ti99_colorbus_interface*>(subdevices().first());
 }
 
-void ti99_colorbus_device::configure_slot()
-{
-	option_reset();
-	option_add("busmouse", TI99_BUSMOUSE);
-	set_default_option("busmouse");
-	set_fixed(false);
-}
-
-
 /*****************************************************************************/
 
 void device_ti99_colorbus_interface::interface_config_complete()
@@ -72,3 +63,8 @@ void device_ti99_colorbus_interface::interface_config_complete()
 }
 
 } } } // end namespace bus::ti99::colorbus
+
+void ti99_colorbus_options(device_slot_interface &device)
+{
+	device.option_add("busmouse", TI99_BUSMOUSE);
+}

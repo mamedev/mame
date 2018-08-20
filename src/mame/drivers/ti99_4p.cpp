@@ -1052,7 +1052,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0).configure_slot(bus::ti99::joyport::PLAIN);
+	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
 }
 
 
