@@ -4134,25 +4134,25 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	MCFG_DEVICE_REMOVE("sl6")
 	MCFG_DEVICE_REMOVE("sl7")
 
-	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(14'318'181) / 8) // ~1.789 MHz
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd))
+	MOS6551(config, m_acia1, 0);
+	m_acia1->set_xtal(XTAL(14'318'181) / 8); // ~1.789 MHz
+	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(IIC_ACIA2_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))   // matches SSC so modem software is compatible
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("modem", rs232_port_device, write_txd))
+	MOS6551(config, m_acia2, 0);
+	m_acia2->set_xtal(XTAL(1'843'200));   // matches SSC so modem software is compatible
+	m_acia2->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(PRINTER_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_cts))
+	rs232_port_device &printer(RS232_PORT(config, PRINTER_PORT_TAG, default_rs232_devices, nullptr));
+	printer.rxd_handler().set(m_acia1, FUNC(mos6551_device::write_rxd));
+	printer.dcd_handler().set(m_acia1, FUNC(mos6551_device::write_dcd));
+	printer.dsr_handler().set(m_acia1, FUNC(mos6551_device::write_dsr));
+	printer.cts_handler().set(m_acia1, FUNC(mos6551_device::write_cts));
 
-	MCFG_DEVICE_ADD(MODEM_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
+	rs232_port_device &modem(RS232_PORT(config, MODEM_PORT_TAG, default_rs232_devices, nullptr));
+	modem.rxd_handler().set(m_acia2, FUNC(mos6551_device::write_rxd));
+	modem.dcd_handler().set(m_acia2, FUNC(mos6551_device::write_dcd));
+	modem.dsr_handler().set(m_acia2, FUNC(mos6551_device::write_dsr));
+	modem.cts_handler().set(m_acia2, FUNC(mos6551_device::write_cts));
 
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
 	A2BUS_MOCKINGBOARD(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus); // Mockingboard 4C

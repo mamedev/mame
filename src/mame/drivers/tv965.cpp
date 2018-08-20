@@ -88,11 +88,11 @@ MACHINE_CONFIG_START(tv965_state::tv965)
 	MCFG_SCN2672_INTR_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("acia1", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2) // divider not verified, possibly even programmable
+	mos6551_device &acia1(MOS6551(config, "acia1", 0));
+	acia1.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
 
-	MCFG_DEVICE_ADD("acia2", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2) // divider not verified, possibly even programmable
+	mos6551_device &acia2(MOS6551(config, "acia2", 0));
+	acia2.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

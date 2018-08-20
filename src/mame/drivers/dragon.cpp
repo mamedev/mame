@@ -268,8 +268,8 @@ MACHINE_CONFIG_START(dragon64_state::dragon64)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dragon_flex_list", "dragon_flex")
@@ -321,8 +321,8 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// floppy
 	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)

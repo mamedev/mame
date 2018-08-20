@@ -651,12 +651,12 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_MM74C922_X4_CALLBACK(IOPORT("LINE3"))
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL/2)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, digel804_state, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(3.6864_MHz_XTAL/2);
+	acia.irq_handler().set(FUNC(digel804_state::acia_irq_w));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
@@ -681,8 +681,7 @@ MACHINE_CONFIG_START(ep804_state::ep804)
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_DEVICE_IO_MAP(z80_io_1_2)
 
-	MCFG_DEVICE_MODIFY("acia")
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, ep804_state, ep804_acia_irq_w))
+	subdevice<mos6551_device>("acia")->irq_handler().set(FUNC(ep804_state::ep804_acia_irq_w));
 
 	m_ram->set_default_size("32K").set_extra_options("64K");
 MACHINE_CONFIG_END
