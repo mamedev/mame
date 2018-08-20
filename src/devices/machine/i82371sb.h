@@ -37,6 +37,28 @@ public:
 	template <class Object> devcb_base &set_smi_callback(Object &&cb) { return m_smi_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_boot_state_hook(Object &&cb) { return m_boot_state_hook.set_callback(std::forward<Object>(cb)); }
 
+	DECLARE_WRITE_LINE_MEMBER(pc_pirqa_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_pirqb_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_pirqc_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_pirqd_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_mirq0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_mirq1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_ferr_w);
+
+	DECLARE_WRITE_LINE_MEMBER(pc_irq1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq3_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq4_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq5_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq6_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq7_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq8n_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq9_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq10_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq11_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq12m_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq14_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_irq15_w);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -100,8 +122,8 @@ private:
 	DECLARE_WRITE8_MEMBER (tom_w);
 	DECLARE_READ16_MEMBER (mstat_r);
 	DECLARE_WRITE16_MEMBER(mstat_w);
-	DECLARE_READ8_MEMBER  (mbirq0_r);
-	DECLARE_WRITE8_MEMBER (mbirq0_w);
+	DECLARE_READ8_MEMBER  (mbirq01_r);
+	DECLARE_WRITE8_MEMBER (mbirq01_w);
 	DECLARE_READ8_MEMBER  (mbdma_r);
 	DECLARE_WRITE8_MEMBER (mbdma_w);
 	DECLARE_READ16_MEMBER (pcsc_r);
@@ -136,6 +158,8 @@ private:
 	DECLARE_WRITE8_MEMBER(ide2_write_cs1_w);
 	DECLARE_READ8_MEMBER(at_dma8237_2_r);
 	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
+	DECLARE_READ8_MEMBER(eisa_irq_read);
+	DECLARE_WRITE8_MEMBER(eisa_irq_write);
 	DECLARE_READ8_MEMBER(read_apmcapms);
 	DECLARE_WRITE8_MEMBER(write_apmcapms);
 
@@ -147,7 +171,7 @@ private:
 	uint32_t see;
 	uint16_t xbcs, mstat, pcsc, smien, smireq;
 	uint8_t apmc, apms;
-	uint8_t iort, pirqrc[4], tom, mbirq0, mbdma[2], apicbase;
+	uint8_t iort, pirqrc[4], tom, mbirq0, mbirq1, mbdma[2], apicbase;
 	uint8_t dlc, smicntl, ftmr, ctlmtr, cthmtr;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
@@ -169,6 +193,7 @@ private:
 	uint8_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];
 	uint16_t m_dma_high_byte;
+	uint16_t m_eisa_irq_mode;
 	uint8_t m_at_speaker;
 	bool m_refresh;
 	void at_speaker_set_spkrdata(uint8_t data);
@@ -177,6 +202,7 @@ private:
 	uint8_t m_nmi_enabled;
 
 	void pc_select_dma_channel(int channel, bool state);
+	void redirect_irq(int irq, int state);
 };
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
