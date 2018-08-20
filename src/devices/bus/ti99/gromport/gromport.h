@@ -54,12 +54,14 @@ public:
 	auto ready_cb() { return m_console_ready.bind(); }
 	auto reset_cb() { return m_console_reset.bind(); }
 
+	// Configure for 16K ROM space (TI-99/8 only)
+	gromport_device& extend() { m_mask = 0x3fff; return *this; }
+
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_config_complete() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const int get_mask() { return 0x1fff; }
+	void device_start() override;
+	void device_reset() override;
+	void device_config_complete() override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	cartridge_connector_device*    m_connector;
@@ -67,17 +69,7 @@ private:
 	devcb_write_line   m_console_ready;
 	devcb_write_line   m_console_reset;
 	int m_romgq;
-};
-
-// Special subclass for 99/8
-class gromport8_device : public gromport_device
-{
-public:
-	template <typename U>
-	gromport8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
-		: gromport_device(mconfig, tag, owner, clock, opts, dflt) { };
-protected:
-	const int get_mask() override { return 0x3fff; }
+	int m_mask;
 };
 
 class cartridge_connector_device : public device_t
@@ -112,7 +104,6 @@ protected:
 } } } // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device)
-DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT8, bus::ti99::gromport, gromport8_device)
 
 void ti99_gromport_options(device_slot_interface &device);
 void ti99_gromport_options_998(device_slot_interface &device);

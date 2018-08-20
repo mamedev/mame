@@ -131,7 +131,8 @@ gromport_device::gromport_device(const machine_config &mconfig, const char *tag,
 		m_connector(nullptr),
 		m_reset_on_insert(true),
 		m_console_ready(*this),
-		m_console_reset(*this)
+		m_console_reset(*this),
+		m_mask(0x1fff)
 { }
 
 /*
@@ -140,9 +141,10 @@ gromport_device::gromport_device(const machine_config &mconfig, const char *tag,
 */
 READ8Z_MEMBER(gromport_device::readz)
 {
+	logerror("mask = %04x\n", m_mask);
 	if (m_connector != nullptr)
 	{
-		m_connector->readz(space, offset & get_mask(), value);
+		m_connector->readz(space, offset & m_mask, value);
 		if (m_romgq) LOGMASKED(LOG_READ, "Read %04x -> %02x\n", offset | 0x6000, *value);
 	}
 }
@@ -156,7 +158,7 @@ WRITE8_MEMBER(gromport_device::write)
 	if (m_connector != nullptr)
 	{
 		if (m_romgq) LOGMASKED(LOG_WRITE, "Write %04x <- %02x\n", offset | 0x6000, data);
-		m_connector->write(space, offset & get_mask(), data);
+		m_connector->write(space, offset & m_mask, data);
 	}
 }
 

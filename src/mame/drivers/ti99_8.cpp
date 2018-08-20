@@ -768,7 +768,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_mainboard->hold_cb().set(FUNC(ti99_8_state::cpu_hold));
 
 	// Cartridge port
-	TI99_GROMPORT8(config, m_gromport, 0, ti99_gromport_options_998, "single");
+	TI99_GROMPORT(config, m_gromport, 0, ti99_gromport_options_998, "single").extend();
 	m_gromport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::system_grom_ready));
 	m_gromport->reset_cb().set(FUNC(ti99_8_state::console_reset));
 
