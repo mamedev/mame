@@ -320,6 +320,23 @@
 		</part>
 	</software>
 
+	<!-- Flippy disks. The other side is for Atari 8-bit. -->
+	<software name="sargon3">
+		<description>Sargon III</description>
+		<year>1985</year>
+		<publisher>Hayden Software Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="sargon_iii.d64" size="174848" crc="b18720a1" sha1="4001e2ac78fda39df59508e66c2620d415c15214" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="great_game_and_chess_problems_c64.d64" size="174848" crc="129fa72a" sha1="22e8709081125000b24ea2f3485e19e3af21ed4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sthassle">
 		<description>Street Hassle</description>
 		<year>1987</year>
