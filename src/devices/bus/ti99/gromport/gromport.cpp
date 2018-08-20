@@ -141,7 +141,6 @@ gromport_device::gromport_device(const machine_config &mconfig, const char *tag,
 */
 READ8Z_MEMBER(gromport_device::readz)
 {
-	logerror("mask = %04x\n", m_mask);
 	if (m_connector != nullptr)
 	{
 		m_connector->readz(space, offset & m_mask, value);
