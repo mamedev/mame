@@ -1821,7 +1821,7 @@ void hng64_state::machine_reset()
 
 WRITE8_MEMBER(hng64_state::ioport1_w)
 {
-	LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
+	//LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
 
 	/* Port bits
 	
@@ -2143,7 +2143,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	iomcu.p0_out_cb().set(FUNC(hng64_state::ioport0_w)); // writes to shared ram
 	iomcu.p1_out_cb().set(FUNC(hng64_state::ioport1_w));  // configuration / clocking for input port (port 3) accesses
 	//iomcu.p2_out_cb().set(FUNC(hng64_state::ioport2_w)); // the IO MCU uses EXTINT0 which shares one of the pins on this port, but the port is not used for IO
-	iomcu.p3_out_cb().set(FUNC(hng64_state::ioport3_w)); // writes to input ports? maybe lamps, coin counters etc.?
+	iomcu.p3_out_cb().set(FUNC(hng64_state::ioport3_w)); // writes to ports for lamps, coin counters, force feedback etc.
 	iomcu.p4_out_cb().set(FUNC(hng64_state::ioport4_w)); // unknown, lower 2 IO bits accessed along with serial accesses
 	//iomcu.p5_out_cb().set(FUNC(hng64_state::ioport5_w));  // simply seems to be unused, neither used for an IO port, nor any of the other features
 	//iomcu.p6_out_cb().set(FUNC(hng64_state::ioport6_w)); // the IO MCU code uses the ADC which shares pins with port 6, meaning port 6 isn't used as an IO port
