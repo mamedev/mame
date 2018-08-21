@@ -3060,12 +3060,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/marineb.cpp",
 	MAME_DIR .. "src/mame/includes/marineb.h",
 	MAME_DIR .. "src/mame/video/marineb.cpp",
+	MAME_DIR .. "src/mame/video/orca40c.cpp",
+	MAME_DIR .. "src/mame/video/orca40c.h",
 	MAME_DIR .. "src/mame/drivers/vastar.cpp",
 	MAME_DIR .. "src/mame/includes/vastar.h",
 	MAME_DIR .. "src/mame/video/vastar.cpp",
 	MAME_DIR .. "src/mame/drivers/zodiack.cpp",
 	MAME_DIR .. "src/mame/includes/zodiack.h",
-	MAME_DIR .. "src/mame/video/zodiack.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "pacific")
