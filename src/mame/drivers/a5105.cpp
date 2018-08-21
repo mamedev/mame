@@ -59,6 +59,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void a5105(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(key_mux_r);
@@ -73,11 +76,10 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void a5105(machine_config &config);
 	void a5105_io(address_map &map);
 	void a5105_mem(address_map &map);
 	void upd7220_map(address_map &map);
-private:
+
 	uint8_t *m_ram_base;
 	uint8_t *m_rom_base;
 	uint8_t *m_char_ram;
@@ -613,8 +615,7 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525qd", a5105_state::floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

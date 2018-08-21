@@ -835,9 +835,7 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K");
 MACHINE_CONFIG_END
 
 
@@ -853,9 +851,7 @@ MACHINE_CONFIG_START(compis_state::compis2)
 	// TODO 8087
 
 	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K")
+	m_ram->set_default_size("256K").set_extra_options("512K,768K");
 MACHINE_CONFIG_END
 
 

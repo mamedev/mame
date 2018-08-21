@@ -56,6 +56,9 @@ public:
 		: pcat_base_state(mconfig, type, tag)
 			{ }
 
+	void xtom3d(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
@@ -78,7 +81,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void xtom3d(machine_config &config);
+
 	void xtom3d_io(address_map &map);
 	void xtom3d_map(address_map &map);
 

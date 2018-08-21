@@ -76,6 +76,39 @@ public:
 		std::fill(std::begin(m_cat702_dataout), std::end(m_cat702_dataout), 1);
 	}
 
+	void zn1_1mb_vram(machine_config &config);
+	void zn1_2mb_vram(machine_config &config);
+	void zn2(machine_config &config);
+	void jdredd(machine_config &config);
+	void coh1002msnd(machine_config &config);
+	void coh1002tb(machine_config &config);
+	void coh1000a(machine_config &config);
+	void coh1000tb(machine_config &config);
+	void coh1002m(machine_config &config);
+	void coh1002ml(machine_config &config);
+	void coh1001l(machine_config &config);
+	void bam2(machine_config &config);
+	void beastrzrb(machine_config &config);
+	void glpracr(machine_config &config);
+	void coh1000ta(machine_config &config);
+	void coh1002v(machine_config &config);
+	void nbajamex(machine_config &config);
+	void coh1000c(machine_config &config);
+	void coh1000w(machine_config &config);
+	void coh1002e(machine_config &config);
+	void coh3002c(machine_config &config);
+	void coh1002c(machine_config &config);
+
+	void init_coh1000tb();
+	void init_nbajamex();
+	void init_bam2();
+	void init_jdredd();
+	void init_coh1000w();
+	void init_primrag2();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702[0]->write_clock(state);  m_cat702[1]->write_clock(state); m_znmcu->write_clock(state); }
 	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702[0]->write_datain(state);  m_cat702[1]->write_datain(state); }
 	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout){ m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
@@ -83,7 +116,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(znmcu_dsrout){ m_znmcu_dsrout = state; update_sio0_dsr(); }
 	void update_sio0_rxd(){ m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
 	void update_sio0_dsr(){ m_sio0->write_dsr(m_znmcu_dsrout); }
-	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 	DECLARE_READ8_MEMBER(znsecsel_r);
 	DECLARE_WRITE8_MEMBER(znsecsel_w);
 	DECLARE_READ8_MEMBER(boardconfig_r);
@@ -118,12 +150,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
-	void init_coh1000tb();
-	void init_nbajamex();
-	void init_bam2();
-	void init_jdredd();
-	void init_coh1000w();
-	void init_primrag2();
+
 	DECLARE_MACHINE_START(coh1000c);
 	DECLARE_MACHINE_START(coh1000ta);
 	DECLARE_MACHINE_START(coh1002e);
@@ -146,28 +173,6 @@ public:
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 
-	void zn1_1mb_vram(machine_config &config);
-	void zn1_2mb_vram(machine_config &config);
-	void zn2(machine_config &config);
-	void jdredd(machine_config &config);
-	void coh1002msnd(machine_config &config);
-	void coh1002tb(machine_config &config);
-	void coh1000a(machine_config &config);
-	void coh1000tb(machine_config &config);
-	void coh1002m(machine_config &config);
-	void coh1002ml(machine_config &config);
-	void coh1001l(machine_config &config);
-	void bam2(machine_config &config);
-	void beastrzrb(machine_config &config);
-	void glpracr(machine_config &config);
-	void coh1000ta(machine_config &config);
-	void coh1002v(machine_config &config);
-	void nbajamex(machine_config &config);
-	void coh1000c(machine_config &config);
-	void coh1000w(machine_config &config);
-	void coh1002e(machine_config &config);
-	void coh3002c(machine_config &config);
-	void coh1002c(machine_config &config);
 	void atlus_snd_map(address_map &map);
 	void bam2_map(address_map &map);
 	void beastrzrb_snd_map(address_map &map);
@@ -194,10 +199,9 @@ public:
 	void qsound_map(address_map &map);
 	void qsound_portmap(address_map &map);
 	void zn_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	inline void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data );
 
@@ -381,8 +385,7 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
@@ -408,7 +411,7 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
@@ -428,8 +431,7 @@ MACHINE_CONFIG_START(zn_state::zn2)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8661R, XTAL(100'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
@@ -455,7 +457,7 @@ MACHINE_CONFIG_START(zn_state::zn2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
@@ -660,8 +662,7 @@ MACHINE_CONFIG_START(zn_state::coh1000c)
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -686,8 +687,7 @@ MACHINE_CONFIG_START(zn_state::coh1002c)
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -848,8 +848,7 @@ MACHINE_CONFIG_START(zn_state::coh3002c)
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1143,12 +1142,12 @@ MACHINE_CONFIG_START(zn_state::coh1000ta)
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE(m_audiocpu, 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL/2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
 
 	MCFG_MB3773_ADD("mb3773")
 
@@ -1204,10 +1203,12 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002tb)
@@ -1226,10 +1227,12 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 /*
@@ -1463,11 +1466,10 @@ MACHINE_CONFIG_START(zn_state::coh1000w)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(coh1000w_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("8M");
 
-	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	VT83C461(config, m_vt83c461).options(ata_devices, "hdd", nullptr, true);
+	m_vt83c461->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&zn_state::atpsx_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&zn_state::atpsx_dma_write, this ) )
 MACHINE_CONFIG_END
@@ -2199,12 +2201,7 @@ MACHINE_CONFIG_START(zn_state::nbajamex)
 	MCFG_MACHINE_START_OVERRIDE(zn_state, nbajamex)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)
 
-	MCFG_DEVICE_ADD("nbajamex_bankmap", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nbajamex_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800000)
+	ADDRESS_MAP_BANK(config, "nbajamex_bankmap").set_map(&zn_state::nbajamex_bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
@@ -2217,8 +2214,8 @@ MACHINE_CONFIG_START(zn_state::jdredd)
 	MCFG_DEVICE_MODIFY("gpu")
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 MACHINE_CONFIG_END
 
 /*
@@ -2388,13 +2385,13 @@ MACHINE_CONFIG_START(zn_state::coh1001l)
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1001l)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch16")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 3))
+	GENERIC_LATCH_16(config, m_soundlatch16);
+	m_soundlatch16->data_pending_callback().set_inputline(m_audiocpu, 3);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE(m_audiocpu, 2))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.irq_handler().set_inputline(m_audiocpu, 2);
+	ymz.add_route(0, "lspeaker", 0.35);
+	ymz.add_route(1, "rspeaker", 0.35);
 MACHINE_CONFIG_END
 
 /*
@@ -2689,8 +2686,8 @@ MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	MCFG_DEVICE_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_DEVICE_IO_MAP(cbaj_z80_port_map)
 
-	MCFG_FIFO7200_ADD("cbaj_fifo1", 0x400) // LH540202
-	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // "
+	FIFO7200(config, m_cbaj_fifo[0], 0x400); // LH540202
+	FIFO7200(config, m_cbaj_fifo[1], 0x400); // "
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -4685,7 +4682,7 @@ ROM_START( psyforcex )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
-	ROM_LOAD16_BYTE( "e22-11.2",     0x0000001, 0x080000, CRC(a263b41f) SHA1(a797f1eb74a7ba7aeefabd9f5d55e6eec2df46e2) )
+	ROM_LOAD16_BYTE( "e22-11.2",     0x0000001, 0x080000, CRC(29ebebc9) SHA1(48a3371460d69ae5ba58d3e24615f389bf43b2cc) )
 	ROM_LOAD16_BYTE( "e22-12.7",     0x0000000, 0x080000, CRC(7426ffc5) SHA1(24b0132241e2e49109e585b082bf4ab67f86b294) )
 	ROM_LOAD( "e22-02.16",           0x0800000, 0x200000, CRC(03b50064) SHA1(0259537e86b266b3f34308c4fc0bcc04c037da71) )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
@@ -5436,7 +5433,7 @@ GAME( 1995, sfchampu,  sfchamp,  coh1000ta,   znt,      zn_state, empty_init, RO
 GAME( 1995, sfchampj,  sfchamp,  coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, psyforce,  coh1000t, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, psyforcej, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforcex, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // exception in attract after reading 0xbbbbbbbb from 0x8025ed18 leads to watchdog reset
+GAME( 1995, psyforcex, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgcldate,  mgcldtex, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, mgcldtex,  coh1000t, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

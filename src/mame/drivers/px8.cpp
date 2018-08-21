@@ -733,6 +733,10 @@ void px8_state::machine_start()
 	save_item(NAME(m_bk2));
 	save_item(NAME(m_sio));
 	save_item(NAME(m_ksc));
+
+	// not used yet
+	(void)m_icr;
+	(void)m_frc;
 }
 
 void px8_state::machine_reset()
@@ -765,7 +769,7 @@ MACHINE_CONFIG_START(px8_state::px8)
 //  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_px8)
+	config.set_default_layout(layout_px8);
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)
@@ -796,8 +800,7 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "px8_cart")

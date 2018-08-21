@@ -94,8 +94,8 @@ www.andys-arcade.com
 class imolagp_state : public driver_device
 {
 public:
-	imolagp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	imolagp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slavecpu(*this, "slave"),
 		m_steer_pot_timer(*this, "pot"),
@@ -103,6 +103,11 @@ public:
 		m_digits(*this, "digit%u%u", 0U, 0U)
 	{ }
 
+	void imolagp(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<timer_device> m_steer_pot_timer;
@@ -126,7 +131,6 @@ public:
 	DECLARE_READ8_MEMBER(imola_draw_mode_r);
 	DECLARE_WRITE8_MEMBER(vreg_control_w);
 	DECLARE_WRITE8_MEMBER(vreg_data_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
@@ -135,7 +139,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(imolagp);
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void imolagp(machine_config &config);
 	void imolagp_master_io(address_map &map);
 	void imolagp_master_map(address_map &map);
 	void imolagp_slave_io(address_map &map);
@@ -521,12 +524,12 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B"))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_log("PPI8255 - unmapped read port B");
+	ppi.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

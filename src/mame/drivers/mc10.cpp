@@ -37,6 +37,11 @@ class mc10_state : public driver_device
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void alice90(machine_config &config);
+	void alice32(machine_config &config);
+	void mc10(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mc10_bfff_r);
 	DECLARE_WRITE8_MEMBER(mc10_bfff_w);
 	DECLARE_READ8_MEMBER(mc10_port1_r);
@@ -49,18 +54,14 @@ public:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 
-	void alice90(machine_config &config);
-	void alice32(machine_config &config);
-	void mc10(machine_config &config);
 	void alice32_mem(address_map &map);
 	void alice90_mem(address_map &map);
 	void mc10_io(address_map &map);
 	void mc10_mem(address_map &map);
-protected:
+
 	// device-level overrides
 	virtual void driver_start() override;
 
-private:
 	//printer state
 	enum class printer_state : uint8_t
 	{
@@ -536,9 +537,7 @@ MACHINE_CONFIG_START(mc10_state::mc10)
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("20K")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
+	RAM(config, m_ram).set_default_size("20K").set_extra_options("4K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc10")
@@ -578,9 +577,7 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("24K")
-	MCFG_RAM_EXTRA_OPTIONS("8K")
+	RAM(config, m_ram).set_default_size("24K").set_extra_options("8K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "alice32")
@@ -592,8 +589,7 @@ MACHINE_CONFIG_START(mc10_state::alice90)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(alice90_mem)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	m_ram->set_default_size("32K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_MODIFY("cass_list", "alice90")

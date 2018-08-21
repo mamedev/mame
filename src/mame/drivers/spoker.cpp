@@ -54,6 +54,16 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void spoker(machine_config &config);
+	void _3super8(machine_config &config);
+
+	void init_spkleftover();
+	void init_spk116it();
+	void init_3super8();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -89,11 +99,6 @@ public:
 	DECLARE_WRITE8_MEMBER(magic_w);
 	DECLARE_READ8_MEMBER(magic_r);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-
-	void init_spkleftover();
-	void init_spk116it();
-	void init_3super8();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -102,8 +107,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void spoker(machine_config &config);
-	void _3super8(machine_config &config);
 	void _3super8_portmap(address_map &map);
 	void spoker_map(address_map &map);
 	void spoker_portmap(address_map &map);

@@ -1302,8 +1302,8 @@ MACHINE_CONFIG_START(mitchell_state::spangbl)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mitchell_state::pangba)

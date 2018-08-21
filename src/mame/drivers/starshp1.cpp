@@ -302,15 +302,15 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_DEVICE_PROGRAM_MAP(starshp1_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starshp1_state,  starshp1_interrupt)
 
-	MCFG_DEVICE_ADD("misclatch", F9334, 0) // C8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, starshp1_state, ship_explode_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, starshp1_state, circle_mod_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, starshp1_state, circle_kill_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, starshp1_state, starfield_kill_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, starshp1_state, inverse_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // BLACK HOLE, not used
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, starshp1_state, mux_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, starshp1_state, led_w))
+	f9334_device &misclatch(F9334(config, "misclatch")); // C8
+	misclatch.q_out_cb<0>().set(FUNC(starshp1_state::ship_explode_w));
+	misclatch.q_out_cb<1>().set(FUNC(starshp1_state::circle_mod_w));
+	misclatch.q_out_cb<2>().set(FUNC(starshp1_state::circle_kill_w));
+	misclatch.q_out_cb<3>().set(FUNC(starshp1_state::starfield_kill_w));
+	misclatch.q_out_cb<4>().set(FUNC(starshp1_state::inverse_w));
+	misclatch.q_out_cb<5>().set_nop(); // BLACK HOLE, not used
+	misclatch.q_out_cb<6>().set(FUNC(starshp1_state::mux_w));
+	misclatch.q_out_cb<7>().set(FUNC(starshp1_state::led_w));
 
 	/* video hardware */
 
@@ -332,14 +332,14 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_DEVICE_ADD("discrete", DISCRETE, starshp1_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("audiolatch", F9334, 0) // D9
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, starshp1_state, attract_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, starshp1_state, phasor_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<STARSHP1_KICKER>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<STARSHP1_SL1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<STARSHP1_SL2>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<STARSHP1_MOLVL>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<STARSHP1_NOISE_FREQ>))
+	f9334_device &audiolatch(F9334(config, "audiolatch")); // D9
+	audiolatch.q_out_cb<0>().set(FUNC(starshp1_state::attract_w));
+	audiolatch.q_out_cb<1>().set(FUNC(starshp1_state::phasor_w));
+	audiolatch.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_KICKER>));
+	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_SL1>));
+	audiolatch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_SL2>));
+	audiolatch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_MOLVL>));
+	audiolatch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<STARSHP1_NOISE_FREQ>));
 MACHINE_CONFIG_END
 
 

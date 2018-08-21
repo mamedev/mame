@@ -225,12 +225,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void tmspoker(machine_config &config);
+
+	void init_bus();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	void init_bus();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -240,7 +244,7 @@ public:
 	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void tmspoker(machine_config &config);
+
 	void tmspoker_cru_map(address_map &map);
 	void tmspoker_map(address_map &map);
 };
@@ -559,8 +563,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 
 	// CPU TMS9980A; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
+	TMS9980A(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::tmspoker_map);
+	m_maincpu->set_addrmap(AS_IO, &tmspoker_state::tmspoker_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::tmspoker_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

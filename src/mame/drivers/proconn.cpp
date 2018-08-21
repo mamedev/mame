@@ -54,6 +54,11 @@ public:
 		, m_meters(*this, "meters")
 	{ }
 
+	void proconn(machine_config &config);
+
+	void init_proconn();
+
+private:
 	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(space, N, data); }
 
 	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(space, N, data); }
@@ -124,10 +129,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_5_m_out_pb_w)         { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
 	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)   { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
-	void proconn(machine_config &config);
 	void proconn_map(address_map &map);
 	void proconn_portmap(address_map &map);
-protected:
 
 	// devices
 	optional_device<s16lf01_device> m_vfd;
@@ -138,9 +141,7 @@ protected:
 	required_device<ay8910_device> m_ay;
 	required_device<meters_device> m_meters;
 
-public:
 	int m_meter;
-	void init_proconn();
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(meter_w);
 	DECLARE_WRITE16_MEMBER(serial_transmit);
@@ -325,7 +326,7 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 	SPEAKER(config, "rspeaker").front_right();
 
 
-	MCFG_DEFAULT_LAYOUT(layout_proconn)
+	config.set_default_layout(layout_proconn);
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, proconn_state, meter_w))

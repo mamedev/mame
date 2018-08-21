@@ -19,10 +19,10 @@
 	downcast<hp80_io_slot_device &>(*device).set_slot_no(_idx);
 
 #define MCFG_HP80_IO_IRL_CB(_devcb) \
-	devcb = &downcast<hp80_io_slot_device &>(*device).set_irl_cb_func(DEVCB_##_devcb);
+	downcast<hp80_io_slot_device &>(*device).set_irl_cb_func(DEVCB_##_devcb);
 
 #define MCFG_HP80_IO_HALT_CB(_devcb) \
-	devcb = &downcast<hp80_io_slot_device &>(*device).set_halt_cb_func(DEVCB_##_devcb);
+	downcast<hp80_io_slot_device &>(*device).set_halt_cb_func(DEVCB_##_devcb);
 
 #define HP80_IO_FIRST_SC  3   // Lowest SC used by I/O cards
 

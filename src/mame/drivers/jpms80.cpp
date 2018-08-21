@@ -52,8 +52,16 @@ class jpms80_state : public driver_device
 public:
 	jpms80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_duart(*this, "tms9902duart")
 	{ }
+
+	void jpms80(machine_config &config);
+
+	void init_jpms80();
+
+
+private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(int1_enable_w);
@@ -61,15 +69,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
 	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
 
-	void jpms80(machine_config &config);
 	void jpms80_io_map(address_map &map);
 	void jpms80_map(address_map &map);
-protected:
 
 	// devices
 	required_device<tms9995_device> m_maincpu;
-public:
-	void init_jpms80();
+	required_device<tms9902_device> m_duart;
 };
 
 WRITE_LINE_MEMBER(jpms80_state::int1_enable_w)
@@ -132,27 +137,30 @@ void jpms80_state::machine_reset()
 
 MACHINE_CONFIG_START(jpms80_state::jpms80)
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
+	TMS9995(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpms80_state::jpms80_map);
+	m_maincpu->set_addrmap(AS_IO, &jpms80_state::jpms80_io_map);
+
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // I/O IC5
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // I/O IC6
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // I/O IC7
-	MCFG_DEVICE_ADD("outlatch3", LS259, 0) // I/O IC8
-	MCFG_DEVICE_ADD("outlatch4", LS259, 0) // I/O IC9
-	MCFG_DEVICE_ADD("outlatch5", LS259, 0) // I/O IC10
-	MCFG_DEVICE_ADD("outlatch6", LS259, 0) // I/O IC11
-	MCFG_DEVICE_ADD("outlatch7", LS259, 0) // I/O IC12
-	MCFG_DEVICE_ADD("outlatch8", LS259, 0) // I/O IC13
-	MCFG_DEVICE_ADD("outlatch9", LS259, 0) // I/O IC14
+	LS259(config, "outlatch0"); // I/O IC5
+	LS259(config, "outlatch1"); // I/O IC6
+	LS259(config, "outlatch2"); // I/O IC7
+	LS259(config, "outlatch3"); // I/O IC8
+	LS259(config, "outlatch4"); // I/O IC9
+	LS259(config, "outlatch5"); // I/O IC10
+	LS259(config, "outlatch6"); // I/O IC11
+	LS259(config, "outlatch7"); // I/O IC12
+	LS259(config, "outlatch8"); // I/O IC13
+	LS259(config, "outlatch9"); // I/O IC14
 
-	MCFG_DEVICE_ADD("outlatch10", LS259, 0) // I/O IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jpms80_state, int1_enable_w)) // 50 - INT1 enable (lv3)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jpms80_state, int2_enable_w)) // 51 - INT2 enable (lv4)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, jpms80_state, watchdog_w)) // 52 - Watchdog
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, jpms80_state, io_enable_w)) // 53 - I/O Enable
+	ls259_device &outlatch10(LS259(config, "outlatch10")); // I/O IC15
+	outlatch10.q_out_cb<0>().set(FUNC(jpms80_state::int1_enable_w)); // 50 - INT1 enable (lv3)
+	outlatch10.q_out_cb<1>().set(FUNC(jpms80_state::int2_enable_w)); // 51 - INT2 enable (lv4)
+	outlatch10.q_out_cb<2>().set(FUNC(jpms80_state::watchdog_w)); // 52 - Watchdog
+	outlatch10.q_out_cb<3>().set(FUNC(jpms80_state::io_enable_w)); // 53 - I/O Enable
 
-	MCFG_DEVICE_ADD("tms9902duart", TMS9902, DUART_CLOCK)
+	TMS9902(config, m_duart, DUART_CLOCK);
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

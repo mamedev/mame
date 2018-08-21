@@ -55,6 +55,10 @@ public:
 	{
 	}
 
+	void mc7105(machine_config &config);
+	void vt240(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_i8085;
 	required_device<i8251_device> m_i8251;
@@ -123,8 +127,7 @@ public:
 	uint16_t m_irqs;
 	bool m_lb;
 	uint16_t m_scrl;
-	void mc7105(machine_config &config);
-	void vt240(machine_config &config);
+
 	void bank_map(address_map &map);
 	void upd7220_map(address_map &map);
 	void vt240_char_io(address_map &map);
@@ -663,12 +666,7 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_I8085A_SOD(WRITELINE(*this, vt240_state, i8085_rdy_w))
 	MCFG_I8085A_SID(READLINE(*this, vt240_state, i8085_sid_r))
 
-	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bank").set_map(&vt240_state::bank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x1000);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480)
@@ -710,7 +708,7 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip1_w))
 
-	MCFG_X2212_ADD("x2212")
+	X2212(config, "x2212");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt240_state::mc7105)

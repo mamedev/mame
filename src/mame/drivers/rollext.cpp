@@ -289,6 +289,11 @@ public:
 	{
 	}
 
+	void rollext(machine_config &config);
+
+	void init_rollext();
+
+private:
 	required_device<tms32082_mp_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_palette_ram;
 	required_shared_ptr<uint32_t> m_texture_mask;
@@ -305,13 +310,11 @@ public:
 	std::unique_ptr<rollext_renderer> m_renderer;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	void init_rollext();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void preprocess_texture_data();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void rollext(machine_config &config);
 	void memmap(address_map &map);
 };
 

@@ -23,8 +23,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	required_device<cpu_device> m_maincpu;
 	void extrema(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void extrema_map(address_map &map);
 	void extrema_portmap(address_map &map);
 };

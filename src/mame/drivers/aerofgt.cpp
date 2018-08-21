@@ -118,14 +118,14 @@ WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
 
 WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
 {
-	m_upd7759->reset_w(data & 0x80);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 template<int Layer>
@@ -1988,15 +1988,15 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
-	MCFG_DEVICE_ADD("io", VS9209, 0)
-	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
-	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
-	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_IN_PORTG_CB(READLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
-	MCFG_VS9209_OUT_PORTG_CB(WRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(7)
-	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP1"))
+	vs9209_device &io(VS9209(config, "io", 0));
+	io.porta_input_cb().set_ioport("P1");
+	io.portb_input_cb().set_ioport("P2");
+	io.portc_input_cb().set_ioport("SYSTEM");
+	io.portd_input_cb().set_ioport("DSW1");
+	io.porte_input_cb().set_ioport("DSW2");
+	io.portg_input_cb().set(m_soundlatch, FUNC(generic_latch_8_device::pending_r)).lshift(0);
+	io.portg_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(7);
+	io.porth_input_cb().set_ioport("JP1");
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 

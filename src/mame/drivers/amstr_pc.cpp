@@ -38,6 +38,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
+#include "machine/ram.h"
 
 class amstrad_pc_state : public driver_device
 {
@@ -45,6 +46,7 @@ public:
 	amstrad_pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
 		m_lpt1(*this, "lpt_1"),
@@ -53,7 +55,14 @@ public:
 	{
 	}
 
+	void pc200(machine_config &config);
+	void pc2086(machine_config &config);
+	void ppc640(machine_config &config);
+	void ppc512(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
 	required_device<pc_lpt_device> m_lpt1;
@@ -86,10 +95,7 @@ public:
 
 	int m_dipstate;
 	static void cfg_com(device_t *device);
-	void pc200(machine_config &config);
-	void pc2086(machine_config &config);
-	void ppc640(machine_config &config);
-	void ppc512(machine_config &config);
+
 	void pc200_io(address_map &map);
 	void pc2086_map(address_map &map);
 	void ppc512_io(address_map &map);
@@ -518,9 +524,7 @@ MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("512K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_pc_state::pc2086)
@@ -542,12 +546,11 @@ MACHINE_CONFIG_START(amstrad_pc_state::ppc640)
 	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(amstrad_pc_state::ppc512)
+void amstrad_pc_state::ppc512(machine_config &config)
+{
 	ppc640(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("640K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K").set_extra_options("640K");
+}
 
 /*
 Sinclair PC200 ROMs (from a v1.2 PC200):

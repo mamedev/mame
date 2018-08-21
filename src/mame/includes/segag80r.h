@@ -25,11 +25,6 @@ class sega005_sound_device;
 class segag80r_state : public segag80snd_common
 {
 public:
-	enum
-	{
-		TIMER_VBLANK_LATCH_CLEAR
-	};
-
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
 		: segag80snd_common(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
@@ -46,8 +41,44 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_ppi(*this, "ppi8255"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+
+	void g80r_base(machine_config &config);
+	void monsterb(machine_config &config);
+	void sindbadm(machine_config &config);
+	void astrob(machine_config &config);
+	void pignewt(machine_config &config);
+	void monster2(machine_config &config);
+	void sega005(machine_config &config);
+	void spaceod(machine_config &config);
+	void astrob_sound_board(machine_config &config);
+	void sega005_sound_board(machine_config &config);
+	void spaceod_sound_board(machine_config &config);
+	void monsterb_sound_board(machine_config &config);
+
+	void init_spaceod();
+	void init_sindbadm();
+	void init_pignewt();
+	void init_monsterb();
+	void init_005();
+	void init_monster2();
+	void init_astrob();
+
+	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+
+	uint8_t m_sound_state[2];
+	uint8_t m_sound_rate;
+	uint16_t m_sound_addr;
+	uint8_t m_sound_data;
+	uint8_t m_square_state;
+	uint8_t m_square_count;
+	inline void sega005_update_sound_data();
+
+private:
+	enum
+	{
+		TIMER_VBLANK_LATCH_CLEAR
+	};
 
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -64,19 +95,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	std::vector<uint8_t> m_paletteram;
 
 	offs_t m_scrambled_write_pc;
 
-	uint8_t m_sound_state[2];
-	uint8_t m_sound_rate;
-	uint16_t m_sound_addr;
-	uint8_t m_sound_data;
-	uint8_t m_square_state;
-	uint8_t m_square_count;
 	segag80_decrypt_func m_decrypt;
 	uint8_t m_background_pcb;
 	double m_rweights[3];
@@ -123,19 +147,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sindbadm_back_port_w);
 	DECLARE_WRITE8_MEMBER(astrob_sound_w);
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
-	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
-	DECLARE_READ8_MEMBER(sindbadm_sound_data_r);
 	DECLARE_WRITE8_MEMBER(sindbadm_misc_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn1_SN76496_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn2_SN76496_w);
-	void init_spaceod();
-	void init_sindbadm();
-	void init_pignewt();
-	void init_monsterb();
-	void init_005();
-	void init_monster2();
-	void init_astrob();
+
 	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
@@ -147,7 +164,7 @@ public:
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
 	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
 	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
-	inline void sega005_update_sound_data();
+
 	void vblank_latch_set();
 	void g80_set_palette_entry(int entry, uint8_t data);
 	void spaceod_bg_init_palette();
@@ -159,18 +176,6 @@ public:
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 
-	void g80r_base(machine_config &config);
-	void monsterb(machine_config &config);
-	void sindbadm(machine_config &config);
-	void astrob(machine_config &config);
-	void pignewt(machine_config &config);
-	void monster2(machine_config &config);
-	void sega005(machine_config &config);
-	void spaceod(machine_config &config);
-	void astrob_sound_board(machine_config &config);
-	void sega005_sound_board(machine_config &config);
-	void spaceod_sound_board(machine_config &config);
-	void monsterb_sound_board(machine_config &config);
 	void g80r_opcodes_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
@@ -178,7 +183,7 @@ public:
 	void sega_315_opcodes_map(address_map &map);
 	void sindbadm_portmap(address_map &map);
 	void sindbadm_sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_vblank_latch_clear_timer;
 };

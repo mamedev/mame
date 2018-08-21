@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+#ifndef MAME_INCLUDES_MODEL2_H
+#define MAME_INCLUDES_MODEL2_H
+
+#pragma once
+
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
 #include "cpu/i960/i960.h"
@@ -28,8 +33,8 @@ struct triangle;
 class model2_state : public driver_device
 {
 public:
-	model2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	model2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
 		m_workram(*this, "workram"),
@@ -180,6 +185,10 @@ protected:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
 	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	DECLARE_READ32_MEMBER(doa_prot_r);
+	DECLARE_READ32_MEMBER(doa_unk_r);
+	void sega_0229_map(address_map &map);
+	int m_prot_a;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
@@ -225,7 +234,9 @@ protected:
 	void geo_sharc_map(address_map &map);
 	void model2_base_mem(address_map &map);
 	void model2_5881_mem(address_map &map);
+	void model2_0229_mem(address_map &map);
 	void model2_snd(address_map &map);
+	void scsp_map(address_map &map);
 
 	void debug_init();
 	void debug_commands( int ref, const std::vector<std::string> &params );
@@ -464,6 +475,7 @@ public:
 protected:
 	void model2a_crx_mem(address_map &map);
 	void model2a_5881_mem(address_map &map);
+	void model2a_0229_mem(address_map &map);
 };
 
 /*****************************
@@ -504,6 +516,7 @@ protected:
 
 	void model2b_crx_mem(address_map &map);
 	void model2b_5881_mem(address_map &map);
+	void model2b_0229_mem(address_map &map);
 	// TODO: split into own class
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);
@@ -736,3 +749,5 @@ struct quad_m2
 	uint16_t              texheader[4];
 	uint8_t               luma;
 };
+
+#endif // MAME_INCLUDES_MODEL2_H

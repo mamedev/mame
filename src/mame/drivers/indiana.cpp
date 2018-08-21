@@ -35,10 +35,14 @@ public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, M68K_TAG) { }
+
+	void indiana(machine_config &config);
+
 	void init_indiana();
+
+private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	void indiana(machine_config &config);
 	void indiana_mem(address_map &map);
 };
 
@@ -104,11 +108,11 @@ MACHINE_CONFIG_START(indiana_state::indiana)
 	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "comat", false)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "ide", false)
 
-	MCFG_DEVICE_ADD(MFP_TAG, MC68901, XTAL(16'000'000)/4)
-	MCFG_MC68901_TIMER_CLOCK(XTAL(16'000'000)/4)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_SO_CB(WRITELINE("keyboard", rs232_port_device, write_txd))
+	mc68901_device &mfp(MC68901(config, MFP_TAG, XTAL(16'000'000)/4));
+	mfp.set_timer_clock(XTAL(16'000'000)/4);
+	mfp.set_rx_clock(0);
+	mfp.set_tx_clock(0);
+	mfp.out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(MFP_TAG, mc68901_device, write_rx))

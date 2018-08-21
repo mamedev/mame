@@ -33,7 +33,6 @@
 #include "video/mc6845.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -59,6 +58,14 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void p7_base(machine_config &config);
+	void p7_lcd(machine_config &config);
+	void p7_raster(machine_config &config);
+
+	void init_p7_lcd();
+	void init_p7_raster();
+
+private:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(pasopia7_memory_ctrl_w);
@@ -84,18 +91,13 @@ public:
 	DECLARE_READ8_MEMBER(nmi_porta_r);
 	DECLARE_READ8_MEMBER(nmi_portb_r);
 	TIMER_CALLBACK_MEMBER(pio_timer);
-	void init_p7_lcd();
-	void init_p7_raster();
 	DECLARE_VIDEO_START(pasopia7);
 	DECLARE_PALETTE_INIT(p7_lcd);
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void p7_base(machine_config &config);
-	void p7_lcd(machine_config &config);
-	void p7_raster(machine_config &config);
 	void pasopia7_io(address_map &map);
 	void pasopia7_mem(address_map &map);
-private:
+
 	uint8_t m_vram_sel;
 	uint8_t m_mio_sel;
 	std::unique_ptr<uint8_t[]> m_p7_pal;
@@ -1008,8 +1010,6 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -2608,12 +2608,12 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock
-	MCFG_ADC0808_IN0_CB(IOPORT("GUNX1"))
-	MCFG_ADC0808_IN1_CB(IOPORT("GUNY1"))
-	MCFG_ADC0808_IN2_CB(IOPORT("GUNX2"))
-	MCFG_ADC0808_IN3_CB(IOPORT("GUNY2"))
-	MCFG_ADC0808_EOC_CB(WRITELINE(*this, ssv_state, gdfs_adc_int_w))
+	ADC0809(config, m_adc, 1000000); // unknown clock
+	m_adc->in_callback<0>().set_ioport("GUNX1");
+	m_adc->in_callback<1>().set_ioport("GUNY1");
+	m_adc->in_callback<2>().set_ioport("GUNX2");
+	m_adc->in_callback<3>().set_ioport("GUNY2");
+	m_adc->eoc_callback().set(FUNC(ssv_state::gdfs_adc_int_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(CDP1861, cdp1861_device, "cdp1861", "RCA CDP1861")
 cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDP1861, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_write_irq(*this)
+	, m_write_int(*this)
 	, m_write_dma_out(*this)
 	, m_write_efx(*this)
 	, m_disp(0)
@@ -49,6 +49,14 @@ cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, d
 	, m_dmaout(CLEAR_LINE)
 	, m_int_timer(nullptr), m_efx_timer(nullptr), m_dma_timer(nullptr)
 {
+}
+
+cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, screen_device &screen)
+	: cdp1861_device(mconfig, tag, owner, clock)
+{
+	set_screen(screen, DEVICE_SELF);
+	screen.set_screen_update(screen_update_rgb32_delegate(FUNC(cdp1861_device::screen_update), this));
+	screen.set_raw(clock, SCREEN_WIDTH, HBLANK_END, HBLANK_START, TOTAL_SCANLINES, SCANLINE_VBLANK_END, SCANLINE_VBLANK_START);
 }
 
 
@@ -59,7 +67,7 @@ cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, d
 void cdp1861_device::device_start()
 {
 	// resolve callbacks
-	m_write_irq.resolve_safe();
+	m_write_int.resolve_safe();
 	m_write_dma_out.resolve_safe();
 	m_write_efx.resolve_safe();
 
@@ -93,7 +101,7 @@ void cdp1861_device::device_reset()
 	m_dmaout = 0;
 	m_dispon = 0;
 
-	m_write_irq(CLEAR_LINE);
+	m_write_int(CLEAR_LINE);
 	m_write_dma_out(CLEAR_LINE);
 	m_write_efx(CLEAR_LINE);
 }
@@ -114,7 +122,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_write_irq(ASSERT_LINE);
+				m_write_int(ASSERT_LINE);
 			}
 
 			m_int_timer->adjust(screen().time_until_pos( SCANLINE_INT_END, 0));
@@ -123,7 +131,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_write_irq(CLEAR_LINE);
+				m_write_int(CLEAR_LINE);
 			}
 
 			m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_START, 0));
@@ -230,7 +238,7 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 
 	m_dispoff = state;
 
-	m_write_irq(CLEAR_LINE);
+	m_write_int(CLEAR_LINE);
 	m_write_dma_out(CLEAR_LINE);
 }
 

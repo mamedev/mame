@@ -103,8 +103,8 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s100_dj2db_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, s100_dj2db_device, fr_w))
+	COM8116(config, m_dbrg, 5.0688_MHz_XTAL);
+	m_dbrg->fr_handler().set(FUNC(s100_dj2db_device::fr_w));
 
 	MCFG_DEVICE_ADD(MB8866_TAG, MB8866, 10_MHz_XTAL / 5)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, s100_dj2db_device, fdc_intrq_w))
@@ -359,7 +359,7 @@ uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 	{
 		m_bus->rdy_w(ASSERT_LINE);
 
-		data = m_fdc->gen_r(offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{
@@ -459,7 +459,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		m_fdc->gen_w(offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{

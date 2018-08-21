@@ -1458,9 +1458,8 @@ MACHINE_CONFIG_START(m5_state::m5)
 	//MCFG_SOFTWARE_LIST_ADD("flop_list", "m5_flop")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("36K,64K") //68K is not possible, 'cos internal ram always overlays any expansion memory in that area
+	//68K is not possible, 'cos internal ram always overlays any expansion memory in that area
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("36K,64K");
 MACHINE_CONFIG_END
 
 
@@ -1576,7 +1575,7 @@ ROM_START( m5p_brno )
 	ROM_LOAD( "sordint.ic21", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2)) // monitor rom
 	ROM_LOAD( "brno_win.rom", 0x2000, 0x2000, CRC(f4cfb2ee) SHA1(23f41d2d9ac915545409dd0163f3dc298f04eea2)) //windows
 	//ROM_LOAD( "brno_rom12.rom", 0x2000, 0x4000, CRC(cac52406) SHA1(91f6ba97e85a2b3a317689635d425ee97413bbe3)) //windows+BI
-	//ROM_LOAD( "brno_boot.rom", 0x2000, 0xd80, CRC(60008729) SHA1(FB26E2AE9F74B0AE0D723B417A038A8EF3D72782))
+	//ROM_LOAD( "brno_boot.rom", 0x2000, 0xd80, CRC(60008729) SHA1(fb26e2ae9f74b0ae0d723b417a038a8ef3d72782))
 
 	//Ramdisc area (maximum is 1024kB 256x 4kB banks)
 	ROM_REGION(1024*1024,RAMDISK,0)

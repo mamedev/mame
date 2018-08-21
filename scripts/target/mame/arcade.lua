@@ -348,13 +348,19 @@ VIDEOS["VOODOO"] = true
 VIDEOS["VOODOO_PCI"] = true
 VIDEOS["ZEUS2"] = true
 VIDEOS["PPU2C0X"] = true
+VIDEOS["PS2GS"] = true
+VIDEOS["PS2GIF"] = true
 
 --------------------------------------------------
 -- specify available machine cores
 --------------------------------------------------
 
 MACHINES["AKIKO"] = true
+MACHINES["AUTOCONFIG"] = true
 MACHINES["BUSMOUSE"] = true
+MACHINES["CR511B"] = true
+MACHINES["DMAC"] = true
+MACHINES["GAYLE"] = true
 MACHINES["NCR53C7XX"] = true
 MACHINES["LSI53C810"] = true
 MACHINES["6522VIA"] = true
@@ -624,6 +630,17 @@ MACHINES["K054321"] = true
 MACHINES["ADC0844"] = true
 MACHINES["GEN_FIFO"] = true
 MACHINES["Z80DAISY"] = true
+--MACHINES["PS2DMAC"] = true
+MACHINES["PS2INTC"] = true
+--MACHINES["PS2MC"] = true
+--MACHINES["PS2PAD"] = true
+--MACHINES["PS2SIF"] = true
+--MACHINES["PS2TIMER"] = true
+--MACHINES["IOPCDVD"] = true
+--MACHINES["IOPDMA"] = true
+--MACHINES["IOPINTC"] = true
+--MACHINES["IOPSIO2"] = true
+--MACHINES["IOPTIMER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -638,6 +655,7 @@ MACHINES["Z80DAISY"] = true
 --BUSES["ADAM"] = true
 --BUSES["ADAMNET"] = true
 --BUSES["APF"] = true
+BUSES["AMIGA_KEYBOARD"] = true
 --BUSES["ARCADIA"] = true
 --BUSES["ASTROCADE"] = true
 --BUSES["BML3"] = true
@@ -718,7 +736,7 @@ BUSES["VECTREX"] = true
 --BUSES["WSWAN"] = true
 --BUSES["X68K"] = true
 --BUSES["Z88"] = true
---BUSES["ZORRO"] = true
+BUSES["ZORRO"] = true
 
 
 --------------------------------------------------
@@ -960,6 +978,7 @@ files {
 createMAMEProjects(_target, _subtarget, "amiga")
 files {
 	MAME_DIR .. "src/mame/drivers/alg.cpp",
+	MAME_DIR .. "src/mame/drivers/amiga.cpp",
 	MAME_DIR .. "src/mame/machine/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amigaaga.cpp",
@@ -1257,8 +1276,6 @@ files {
 	MAME_DIR .. "src/mame/video/xybots.cpp",
 	MAME_DIR .. "src/mame/machine/asic65.cpp",
 	MAME_DIR .. "src/mame/machine/asic65.h",
-	MAME_DIR .. "src/mame/machine/atari_vg.cpp",
-	MAME_DIR .. "src/mame/machine/atari_vg.h",
 	MAME_DIR .. "src/mame/machine/atarigen.cpp",
 	MAME_DIR .. "src/mame/machine/atarigen.h",
 	MAME_DIR .. "src/mame/machine/mathbox.cpp",

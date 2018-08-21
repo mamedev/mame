@@ -136,6 +136,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void invqix(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(port3_r);
@@ -149,10 +152,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vctl_w);
 
-	void invqix(machine_config &config);
 	void invqix_io_map(address_map &map);
 	void invqix_prg_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -161,7 +163,6 @@ protected:
 	// driver_device overrides
 	virtual void video_start() override;
 
-private:
 	uint16_t m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 

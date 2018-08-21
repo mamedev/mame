@@ -190,6 +190,15 @@ public:
 		m_spuata(*this, "spu_ata")
 	{ }
 
+	void firebeat2(machine_config &config);
+	void firebeat(machine_config &config);
+	void firebeat_spu(machine_config &config);
+
+	void init_ppd();
+	void init_kbm();
+	void init_ppp();
+
+private:
 	required_device<ppc4xx_device> m_maincpu;
 	optional_device<m68000_device> m_audiocpu;
 	required_shared_ptr<uint32_t> m_work_ram;
@@ -203,7 +212,6 @@ public:
 	uint8_t m_extend_board_irq_enable;
 	uint8_t m_extend_board_irq_active;
 //  emu_timer *m_keyboard_timer;
-	int m_tick;
 	int m_layer;
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
@@ -214,9 +222,6 @@ public:
 	int m_ibutton_read_subkey_ptr;
 	uint8_t m_ibutton_subkey_data[0x40];
 
-	void init_ppd();
-	void init_kbm();
-	void init_ppp();
 	DECLARE_MACHINE_START(firebeat);
 	DECLARE_MACHINE_RESET(firebeat);
 	DECLARE_VIDEO_START(firebeat);
@@ -268,9 +273,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gcu0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
 	static void cdrom_config(device_t *device);
-	void firebeat2(machine_config &config);
-	void firebeat(machine_config &config);
-	void firebeat_spu(machine_config &config);
 	void firebeat_map(address_map &map);
 	void firebeat2_map(address_map &map);
 	void spu_map(address_map &map);
@@ -1189,8 +1191,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, ata_interrupt))
+	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
+	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
 
 	MCFG_DEVICE_MODIFY("ata:1")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
@@ -1247,8 +1249,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, ata_interrupt))
+	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
+	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
 
 	MCFG_DEVICE_MODIFY("ata:1")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
@@ -1315,8 +1317,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ATA_INTERFACE_ADD("spu_ata", firebeat_ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, spu_ata_interrupt))
+	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
+	m_spuata->irq_handler().set(FUNC(firebeat_state::spu_ata_interrupt));
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

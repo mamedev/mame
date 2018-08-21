@@ -30,6 +30,9 @@ public:
 		m_vram(64*1024)
 	{ }
 
+	void pwrview(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(bank0_r);
 	DECLARE_WRITE16_MEMBER(bank0_w);
 	DECLARE_READ8_MEMBER(unk1_r);
@@ -55,16 +58,15 @@ public:
 	DECLARE_READ8_MEMBER(err_r);
 	MC6845_UPDATE_ROW(update_row);
 
-	void pwrview(machine_config &config);
 	void bios_bank(address_map &map);
 	void pwrview_fetch_map(address_map &map);
 	void pwrview_io(address_map &map);
 	void pwrview_map(address_map &map);
-protected:
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
+
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_memory_region m_bios;
@@ -432,12 +434,7 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_MC6845_CHAR_WIDTH(32) // ??
 	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
 
-	MCFG_DEVICE_ADD("bios_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bios_bank)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
 MACHINE_CONFIG_END
 
 ROM_START(pwrview)

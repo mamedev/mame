@@ -163,6 +163,9 @@ public:
 		, m_centronics(*this, "centronics")
 	{}
 
+	void spc1000(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(iplk_w);
 	DECLARE_READ8_MEMBER(iplk_r);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
@@ -178,10 +181,9 @@ public:
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
-	void spc1000(machine_config &config);
 	void spc1000_io(address_map &map);
 	void spc1000_mem(address_map &map);
-private:
+
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
 	uint16_t m_page;
@@ -504,8 +506,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1000_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

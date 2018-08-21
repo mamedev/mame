@@ -29,40 +29,25 @@ public:
 	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 		, m_isabus(*this, "isa")
-		, m_inp1(*this, "INP1")
-		, m_inp2(*this, "INP2")
-		, m_inp3(*this, "INP3")
-		, m_inp4(*this, "INP4")
+		, m_inp(*this, "INP%u", 1U)
 	{ }
 
+	void fruitpc(machine_config &config);
+
+private:
 	required_device<isa8_device> m_isabus;
-	required_ioport m_inp1;
-	required_ioport m_inp2;
-	required_ioport m_inp3;
-	required_ioport m_inp4;
+	required_ioport_array<4> m_inp;
 
 	DECLARE_READ8_MEMBER(fruit_inp_r);
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	static void fruitpc_sb_conf(device_t *device);
-	void fruitpc(machine_config &config);
 	void fruitpc_io(address_map &map);
 	void fruitpc_map(address_map &map);
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
 {
-	switch(offset)
-	{
-		case 0:
-			return m_inp1->read();
-		case 1:
-			return m_inp2->read();
-		case 2:
-			return m_inp3->read();
-		case 3:
-			return m_inp4->read();
-	}
-	return 0;
+	return m_inp[offset & 0x03]->read();
 }
 
 void fruitpc_state::fruitpc_map(address_map &map)
@@ -138,14 +123,13 @@ MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
 	pcvideo_vga(config);
 
-	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, fruitpc_state, dma8237_1_dack_w))
+	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")

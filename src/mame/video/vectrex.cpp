@@ -75,7 +75,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 
 READ8_MEMBER(vectrex_base_state::vectrex_via_r)
 {
-	return m_via6522_0->read(space, offset);
+	return m_via6522_0->read(offset);
 }
 
 WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
@@ -102,7 +102,7 @@ WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
 									period);
 		break;
 	}
-	m_via6522_0->write(space, offset, data);
+	m_via6522_0->write(offset, data);
 }
 
 

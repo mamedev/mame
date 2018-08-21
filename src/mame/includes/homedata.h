@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
+#ifndef MAME_INCLUDES_HOMEDATA_H
+#define MAME_INCLUDES_HOMEDATA_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
@@ -9,8 +13,8 @@
 class homedata_state : public driver_device
 {
 public:
-	homedata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	homedata_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vreg(*this, "vreg"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -23,6 +27,20 @@ public:
 	{
 	}
 
+	void reikaids(machine_config &config);
+	void mrokumei(machine_config &config);
+	void mirderby(machine_config &config);
+	void pteacher(machine_config &config);
+	void lemnangl(machine_config &config);
+	void mjkinjas(machine_config &config);
+
+	void init_reikaids();
+	void init_mjikaga();
+	void init_jogakuen();
+	void init_battlcry();
+	void init_mirderby();
+
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -92,11 +110,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mrokumei_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(reikaids_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(pteacher_blitter_start_w);
-	void init_reikaids();
-	void init_mjikaga();
-	void init_jogakuen();
-	void init_battlcry();
-	void init_mirderby();
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info1_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_1);
@@ -142,7 +155,6 @@ public:
 	uint32_t screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_homedata);
 	INTERRUPT_GEN_MEMBER(homedata_irq);
-	INTERRUPT_GEN_MEMBER(upd7807_irq);
 	void mrokumei_handleblit( address_space &space, int rom_base );
 	void reikaids_handleblit( address_space &space, int rom_base );
 	void pteacher_handleblit( address_space &space, int rom_base );
@@ -153,12 +165,6 @@ public:
 	inline void lemnangl_info( tile_data &tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank );
 	inline void mirderby_info0( tile_data &tileinfo, int tile_index, int page, int gfxbank );
 	inline void mirderby_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank );
-	void reikaids(machine_config &config);
-	void mrokumei(machine_config &config);
-	void mirderby(machine_config &config);
-	void pteacher(machine_config &config);
-	void lemnangl(machine_config &config);
-	void mjkinjas(machine_config &config);
 	void cpu0_map(address_map &map);
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);
@@ -170,3 +176,5 @@ public:
 	void reikaids_map(address_map &map);
 	void reikaids_upd7807_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HOMEDATA_H

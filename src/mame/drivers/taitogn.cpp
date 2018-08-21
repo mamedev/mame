@@ -370,6 +370,16 @@ public:
 		std::fill(std::begin(m_cat702_dataout), std::end(m_cat702_dataout), 1);
 	}
 
+	void init_coh3002t_nz();
+
+	void coh3002t_t2_mp(machine_config &config);
+	void coh3002t(machine_config &config);
+	void coh3002t_t1_mp(machine_config &config);
+	void coh3002t_cf(machine_config &config);
+	void coh3002t_t2(machine_config &config);
+	void coh3002t_t1(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702[0]->write_clock(state);  m_cat702[1]->write_clock(state); m_znmcu->write_clock(state); }
 	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702[0]->write_datain(state);  m_cat702[1]->write_datain(state); }
 	DECLARE_WRITE_LINE_MEMBER(cat702_1_dataout){ m_cat702_dataout[0] = state; update_sio0_rxd(); }
@@ -391,22 +401,14 @@ public:
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
 	DECLARE_READ32_MEMBER(zsg2_ext_r);
-	void init_coh3002t_nz();
 
-	void coh3002t_t2_mp(machine_config &config);
-	void coh3002t(machine_config &config);
-	void coh3002t_t1_mp(machine_config &config);
-	void coh3002t_cf(machine_config &config);
-	void coh3002t_t2(machine_config &config);
-	void coh3002t_t1(machine_config &config);
 	void flashbank_map(address_map &map);
 	void taitogn_map(address_map &map);
 	void taitogn_mp_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<psxsio0_device> m_sio0;
 	required_device_array<cat702_device, 2> m_cat702;
 	required_device<znmcu_device> m_znmcu;
@@ -692,8 +694,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_DEVICE_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP(taitogn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, taitogn_state, sio0_sck))
@@ -727,11 +728,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_INTEL_TE28F160_ADD("sndflash1")
 	MCFG_INTEL_TE28F160_ADD("sndflash2")
 
-	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000000)
+	ADDRESS_MAP_BANK(config, "flashbank").set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 
 	// 5MHz NEC uPD78081 MCU:
 	// we don't have a 78K0 emulation core yet..
@@ -744,11 +741,13 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_SPU_ADD("spu", XTAL(67'737'600)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
-	MCFG_TAITO_ZOOM_USE_FLASH
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->set_use_flash();
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
 	MCFG_ZSG2_EXT_READ_HANDLER(READ32(*this, taitogn_state, zsg2_ext_r))

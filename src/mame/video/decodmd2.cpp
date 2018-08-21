@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "decodmd2.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(DECODMD2, decodmd_type2_device, "decodmd2", "Data East Pinball Dot Matrix Display Type 2")
@@ -143,29 +142,27 @@ MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type2_device, crtc_update_row)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
+	screen.set_native_aspect();
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 128-1, 0, 32-1);
+	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
+	screen.set_refresh_hz(60);
 
-	MCFG_SCREEN_ADD("dmd",RASTER)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DEVICE("dmd6845", mc6845_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("12K")
-
+	RAM(config, RAM_TAG).set_default_size("12K");
 MACHINE_CONFIG_END
 
 
 decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECODMD2, tag, owner, clock),
-		m_cpu(*this,"dmdcpu"),
-		m_mc6845(*this,"dmd6845"),
-		m_rombank1(*this,"dmdbank1"),
-		m_rombank2(*this,"dmdbank2"),
-		m_rambank(*this,"dmdram"),
-		m_ram(*this,RAM_TAG)
-{}
+	: device_t(mconfig, DECODMD2, tag, owner, clock)
+	, m_cpu(*this, "dmdcpu")
+	, m_mc6845(*this, "dmd6845")
+	, m_rombank1(*this, "dmdbank1")
+	, m_rombank2(*this, "dmdbank2")
+	, m_rambank(*this, "dmdram")
+	, m_ram(*this, RAM_TAG)
+{
+}
 
 void decodmd_type2_device::device_start()
 {

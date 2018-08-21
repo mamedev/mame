@@ -82,6 +82,17 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_vram_bank(0) { }
 
+	void tandy1000_common(machine_config &config);
+	void tandy1000_90key(machine_config &config);
+	void tandy1000_101key(machine_config &config);
+	void t1000tl(machine_config &config);
+	void t1000sx(machine_config &config);
+	void t1000rl(machine_config &config);
+	void t1000sl2(machine_config &config);
+	void t1000hx(machine_config &config);
+	void t1000tx(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 // Memory regions for the machines that support rom banking
@@ -131,15 +142,7 @@ public:
 	uint8_t m_vram_bank;
 	static void cfg_fdc_35(device_t *device);
 	static void cfg_fdc_525(device_t *device);
-	void tandy1000_common(machine_config &config);
-	void tandy1000_90key(machine_config &config);
-	void tandy1000_101key(machine_config &config);
-	void t1000tl(machine_config &config);
-	void t1000sx(machine_config &config);
-	void t1000rl(machine_config &config);
-	void t1000sl2(machine_config &config);
-	void t1000hx(machine_config &config);
-	void t1000tx(machine_config &config);
+
 	void biosbank_map(address_map &map);
 	void tandy1000_16_io(address_map &map);
 	void tandy1000_286_map(address_map &map);
@@ -670,8 +673,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+	RAM(config, m_ram).set_default_size("640K");
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","t1000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
@@ -697,8 +699,8 @@ MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 
 	// plus cards are isa with a nonstandard conntector
 	MCFG_DEVICE_ADD("plus1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_EXTRA_OPTIONS("256K, 384K")
+
+	m_ram->set_extra_options("256K, 384K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000sx)
@@ -711,9 +713,7 @@ MACHINE_CONFIG_START(tandy1000_state::t1000sx)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
-	/* software lists */
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_EXTRA_OPTIONS("384K")
+	m_ram->set_extra_options("384K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000rl)
@@ -726,16 +726,11 @@ MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 
 	tandy1000_101key(config);
 
-	MCFG_DEVICE_ADD("biosbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(biosbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "biosbank").set_map(&tandy1000_state::biosbank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x10000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_EXTRA_OPTIONS("384K")
+
+	m_ram->set_extra_options("384K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000sl2)

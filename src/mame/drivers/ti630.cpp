@@ -38,7 +38,6 @@ It means we probably would have to emulate a modem device for it to treat commun
 #include "cpu/mcs51/mcs51.h"
 #include "video/hd44780.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -51,15 +50,18 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
+	void ti630(machine_config &config);
+
+	void init_ti630();
+
+private:
 	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
 	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
-	void init_ti630();
 	DECLARE_PALETTE_INIT(ti630);
-	void ti630(machine_config &config);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -153,7 +155,6 @@ MACHINE_CONFIG_START(ti630_state::ti630)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(ti630_state, ti630)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ti630)

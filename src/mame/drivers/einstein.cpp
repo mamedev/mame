@@ -87,7 +87,11 @@ public:
 		m_int(0)
 	{}
 
+	void einstein(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
 	DECLARE_WRITE8_MEMBER(keyboard_line_write);
 	DECLARE_READ8_MEMBER(keyboard_data_read);
@@ -107,14 +111,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
-	void einstein(machine_config &config);
 	void einstein_io(address_map &map);
 	void einstein_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	void einstein_scan_keyboard();
 
 	required_device<cpu_device> m_maincpu;
@@ -600,10 +602,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(IC_I060, i8251_device, write_rxc))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(IC_I058, z80ctc_device, trg3))
 
-	MCFG_CLOCK_ADD("ctc_trigger", XTAL_X002 / 4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(IC_I058, z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(IC_I058, z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(IC_I058, z80ctc_device, trg2))
+	clock_device &ctc_trigger(CLOCK(config, "ctc_trigger", XTAL_X002 / 4));
+	ctc_trigger.signal_handler().set(IC_I058, FUNC(z80ctc_device::trg0));
+	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg1));
+	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg2));
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_Z80DAISY_GENERIC_ADD("keyboard_daisy", 0xf7)
@@ -627,12 +629,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE("adc_daisy", z80daisy_generic_device, int_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("analogue_1_x"))
-	MCFG_ADC0844_CH2_CB(IOPORT("analogue_1_y"))
-	MCFG_ADC0844_CH3_CB(IOPORT("analogue_2_x"))
-	MCFG_ADC0844_CH4_CB(IOPORT("analogue_2_y"))
+	adc0844_device &adc(ADC0844(config, "adc", 0));
+	adc.intr_callback().set("adc_daisy", FUNC(z80daisy_generic_device::int_w));
+	adc.ch1_callback().set_ioport("analogue_1_x");
+	adc.ch2_callback().set_ioport("analogue_1_y");
+	adc.ch3_callback().set_ioport("analogue_2_x");
+	adc.ch4_callback().set_ioport("analogue_2_y");
 
 	/* printer */
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
@@ -670,8 +672,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// tatung pipe connector
 	MCFG_TATUNG_PIPE_ADD("pipe")

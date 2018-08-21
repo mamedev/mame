@@ -36,12 +36,15 @@ public:
 	ertictac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag) { }
 
-	DECLARE_READ32_MEMBER(ertictac_podule_r);
+	void ertictac(machine_config &config);
+
 	void init_ertictac();
+
+private:
+	DECLARE_READ32_MEMBER(ertictac_podule_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
-	void ertictac(machine_config &config);
 	void ertictac_map(address_map &map);
 };
 
@@ -229,7 +232,7 @@ MACHINE_CONFIG_START(ertictac_state::ertictac)
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
 	MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
-//  MCFG_AAKART_ADD("kart", XTAL(24'000'000)/3) // TODO: frequency
+//  AAKART(config, m_kart, XTAL(24'000'000)/3); // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000),1024,0,735,624/2,0,292) // RiscOS 3 default screen settings

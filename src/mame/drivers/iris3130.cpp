@@ -43,9 +43,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/mc68681.h" /* DUART0, DUART1 */
-#include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class sgi_ip2_state : public driver_device
 {
@@ -62,6 +60,11 @@ public:
 	{
 	}
 
+	void sgi_ip2(machine_config &config);
+
+	void init_sgi_ip2();
+
+private:
 	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
 	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_m_quad_r);
@@ -89,20 +92,18 @@ public:
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
-	void init_sgi_ip2();
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
-	void sgi_ip2(machine_config &config);
 	void sgi_ip2_map(address_map &map);
-protected:
+
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
 	required_shared_ptr<uint32_t> m_bss;
 	required_shared_ptr<uint32_t> m_ptmap;
 	required_device<mc146818_device> m_rtc;
-private:
+
 	uint8_t m_mbut;
 	uint16_t m_mquad;
 	uint16_t m_tdbase;

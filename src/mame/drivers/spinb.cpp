@@ -63,6 +63,15 @@ public:
 		, m_switches(*this, "SW.%u", 0)
 	{ }
 
+	void jolypark(machine_config &config);
+	void vrnwrld(machine_config &config);
+	void spinb(machine_config &config);
+
+	void init_game0();
+	void init_game1();
+	void init_game2();
+
+private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p3_r);
 	DECLARE_WRITE8_MEMBER(p3_w);
@@ -90,21 +99,17 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	void init_game0();
-	void init_game1();
-	void init_game2();
 	DECLARE_PALETTE_INIT(spinb);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jolypark(machine_config &config);
-	void vrnwrld(machine_config &config);
-	void spinb(machine_config &config);
+
 	void dmd_io(address_map &map);
 	void dmd_mem(address_map &map);
 	void spinb_audio_map(address_map &map);
 	void spinb_map(address_map &map);
 	void spinb_music_map(address_map &map);
 	void vrnwrld_map(address_map &map);
-private:
+
 	bool m_pc0a;
 	bool m_pc0m;
 	uint8_t m_game;
@@ -722,17 +727,17 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppim_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppim_c_w))
 
-	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5a_w))
+	TTL7474(config, m_ic5a, 0);
+	m_ic5a->comp_output_cb().set(FUNC(spinb_state::ic5a_w));
 
-	MCFG_DEVICE_ADD("ic14a", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(WRITE8("msm_a", msm5205_device, data_w))
+	HC157(config, m_ic14a, 0); // actually IC15 on Jolly Park
+	m_ic14a->out_callback().set("msm_a", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5m_w))
+	TTL7474(config, m_ic5m, 0);
+	m_ic5m->comp_output_cb().set(FUNC(spinb_state::ic5m_w));
 
-	MCFG_DEVICE_ADD("ic14m", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(WRITE8("msm_m", msm5205_device, data_w))
+	HC157(config, m_ic14m, 0); // actually IC15 on Jolly Park
+	m_ic14m->out_callback().set("msm_m", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spinb_state::jolypark)

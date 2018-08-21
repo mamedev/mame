@@ -1313,14 +1313,14 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_DEVICE_IO_MAP(scramble_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
@@ -1587,14 +1587,14 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ad2083_map)
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 

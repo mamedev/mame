@@ -32,11 +32,6 @@
 class plan80_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BOOT
-	};
-
 	plan80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -44,15 +39,23 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void plan80(machine_config &config);
+
+	void init_plan80();
+
+private:
+	enum
+	{
+		TIMER_BOOT
+	};
+
 	DECLARE_READ8_MEMBER(plan80_04_r);
 	DECLARE_WRITE8_MEMBER(plan80_09_w);
-	void init_plan80();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void plan80(machine_config &config);
 	void plan80_io(address_map &map);
 	void plan80_mem(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_kbd_row;
 	virtual void machine_reset() override;

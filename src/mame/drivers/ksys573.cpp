@@ -403,71 +403,6 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	double m_pad_position[ 6 ];
-	optional_ioport m_pads;
-
-	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_tank_shutter_sensor );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_cable_holder_sensor );
-	DECLARE_READ16_MEMBER( control_r );
-	DECLARE_WRITE16_MEMBER( control_w );
-	DECLARE_WRITE16_MEMBER( atapi_reset_w );
-	DECLARE_WRITE16_MEMBER( security_w );
-	DECLARE_READ16_MEMBER( security_r );
-	DECLARE_READ16_MEMBER( ge765pwbba_r );
-	DECLARE_WRITE16_MEMBER( ge765pwbba_w );
-	DECLARE_READ16_MEMBER( gx700pwbf_io_r );
-	DECLARE_WRITE16_MEMBER( gx700pwbf_io_w );
-	DECLARE_WRITE16_MEMBER( gunmania_w );
-	DECLARE_READ16_MEMBER( gunmania_r );
-	void init_salarymc();
-	void init_pnchmn();
-	void init_ddr();
-	void init_hyperbbc();
-	void init_drmn();
-	DECLARE_MACHINE_RESET( konami573 );
-	WRITE_LINE_MEMBER( h8_clk_w );
-	DECLARE_READ_LINE_MEMBER( h8_d0_r );
-	DECLARE_READ_LINE_MEMBER( h8_d1_r );
-	DECLARE_READ_LINE_MEMBER( h8_d2_r );
-	DECLARE_READ_LINE_MEMBER( h8_d3_r );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b0 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b1 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b2 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_rst );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_d );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_clk );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_red );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_green );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_blue );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_start );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe1 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe2 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
-	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
-	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
-	DECLARE_WRITE8_MEMBER( ddr_output_callback );
-	DECLARE_WRITE8_MEMBER( ddrsolo_output_callback );
-	DECLARE_WRITE8_MEMBER( drmn_output_callback );
-	DECLARE_WRITE8_MEMBER( dmx_output_callback );
-	DECLARE_WRITE8_MEMBER( mamboagg_output_callback );
-	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
-	ADC083X_INPUT_CB(analogue_inputs_callback);
-
-	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
-	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
-	void sys573_vblank( screen_device &screen, bool vblank_state );
-
 	void gtfrk10mb(machine_config &config);
 	void ddr(machine_config &config);
 	void pnchmn(machine_config &config);
@@ -517,6 +452,79 @@ public:
 	void casszi(machine_config &config);
 	void cassxzi(machine_config &config);
 
+	void init_salarymc();
+	void init_pnchmn();
+	void init_ddr();
+	void init_hyperbbc();
+	void init_drmn();
+
+	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
+	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_tank_shutter_sensor );
+	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_cable_holder_sensor );
+
+	DECLARE_READ_LINE_MEMBER( h8_d0_r );
+	DECLARE_READ_LINE_MEMBER( h8_d1_r );
+	DECLARE_READ_LINE_MEMBER( h8_d2_r );
+	DECLARE_READ_LINE_MEMBER( h8_d3_r );
+
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b4 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b0 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b1 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b2 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b3 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b4 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b5 );
+	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b3 );
+	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b4 );
+	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b5 );
+	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_rst );
+	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_d );
+	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_clk );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_red );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_green );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_blue );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_start );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe1 );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe2 );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
+
+	WRITE_LINE_MEMBER( h8_clk_w );
+
+	double m_pad_position[ 6 ];
+	optional_ioport m_pads;
+
+private:
+
+	DECLARE_READ16_MEMBER( control_r );
+	DECLARE_WRITE16_MEMBER( control_w );
+	DECLARE_WRITE16_MEMBER( atapi_reset_w );
+	DECLARE_WRITE16_MEMBER( security_w );
+	DECLARE_READ16_MEMBER( security_r );
+	DECLARE_READ16_MEMBER( ge765pwbba_r );
+	DECLARE_WRITE16_MEMBER( ge765pwbba_w );
+	DECLARE_READ16_MEMBER( gx700pwbf_io_r );
+	DECLARE_WRITE16_MEMBER( gx700pwbf_io_w );
+	DECLARE_WRITE16_MEMBER( gunmania_w );
+	DECLARE_READ16_MEMBER( gunmania_r );
+	DECLARE_MACHINE_RESET( konami573 );
+	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
+
+	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	DECLARE_WRITE8_MEMBER( ddr_output_callback );
+	DECLARE_WRITE8_MEMBER( ddrsolo_output_callback );
+	DECLARE_WRITE8_MEMBER( drmn_output_callback );
+	DECLARE_WRITE8_MEMBER( dmx_output_callback );
+	DECLARE_WRITE8_MEMBER( mamboagg_output_callback );
+	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
+	double analogue_inputs_callback(uint8_t input);
+
+	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
+	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
+	void sys573_vblank( screen_device &screen, bool vblank_state );
+
 	void punchmania_cassette_install(device_t *device);
 	void salarymc_cassette_install(device_t *device);
 	void hyperbbc_cassette_install(device_t *device);
@@ -529,7 +537,7 @@ public:
 	void konami573_map(address_map &map);
 	void konami573a_map(address_map &map);
 	void konami573d_map(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void driver_start() override;
 
@@ -538,7 +546,6 @@ protected:
 	required_ioport m_analog2;
 	required_ioport m_analog3;
 
-private:
 	inline void ATTR_PRINTF( 3,4 ) verboselog( int n_level, const char *s_fmt, ... );
 	void update_disc();
 	void gx700pwbf_output( int offset, uint8_t data );
@@ -1744,7 +1751,7 @@ WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
 /* punch mania */
 
 
-ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
+double konami573_cassette_xi_device::punchmania_inputs_callback(uint8_t input)
 {
 	ksys573_state *state = machine().driver_data<ksys573_state>();
 	double *pad_position = state->m_pad_position;
@@ -2051,7 +2058,7 @@ READ16_MEMBER( ksys573_state::gunmania_r )
 
 /* ADC0834 Interface */
 
-ADC083X_INPUT_CB(ksys573_state::analogue_inputs_callback)
+double ksys573_state::analogue_inputs_callback(uint8_t input)
 {
 	switch( input )
 	{
@@ -2084,8 +2091,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( konami573_map )
 
-	MCFG_RAM_MODIFY( "maincpu:ram" )
-	MCFG_RAM_DEFAULT_SIZE( "4M" )
+	subdevice<ram_device>( "maincpu:ram" )->set_default_size( "4M" );
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, this ) )
@@ -2095,7 +2101,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_DEVICE_ADD( m_duart, MB89371, 0 )
 
 	MCFG_DEVICE_ADD( m_ata, ATA_INTERFACE, 0 )
-	MCFG_ATA_INTERFACE_IRQ_HANDLER( WRITELINE( *this, ksys573_state, ata_interrupt ) )
+	m_ata->irq_handler().set( FUNC( ksys573_state::ata_interrupt ) );
 
 	MCFG_DEVICE_MODIFY( "ata:0" )
 	MCFG_SLOT_OPTION_ADD( "cr589", CR589 )
@@ -2118,11 +2124,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_DEVICE_ADD( "pccard1", PCCARD_SLOT, 0 )
 	MCFG_DEVICE_ADD( "pccard2", PCCARD_SLOT, 0 )
 
-	MCFG_DEVICE_ADD( m_flashbank, ADDRESS_MAP_BANK, 0 )
-	MCFG_DEVICE_PROGRAM_MAP( flashbank_map )
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS( ENDIANNESS_LITTLE )
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH( 16 )
-	MCFG_ADDRESS_MAP_BANK_STRIDE( 0x400000 )
+	ADDRESS_MAP_BANK( config, m_flashbank ).set_map( &ksys573_state::flashbank_map ).set_options( ENDIANNESS_LITTLE, 16, 32, 0x400000 );
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
@@ -2138,8 +2140,8 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 
 	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
-	MCFG_DEVICE_ADD( "adc0834", ADC0834, 0 )
-	MCFG_ADC083X_INPUT_CB( ksys573_state, analogue_inputs_callback )
+	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
 MACHINE_CONFIG_END
 
 // Variants with additional digital sound board

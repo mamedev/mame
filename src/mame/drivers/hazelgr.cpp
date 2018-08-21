@@ -23,9 +23,11 @@ public:
 	{ }
 
 	void haze(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -77,14 +79,14 @@ MACHINE_CONFIG_START(haze_state::haze)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 1'000'000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc1", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc2", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc3", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc3", z80ctc_device, trg1))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1'000'000));
+	ctc_clock.signal_handler().set("ctc1", FUNC(z80ctc_device::trg3));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg2));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg3));
+	ctc_clock.signal_handler().append("ctc3", FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append("ctc3", FUNC(z80ctc_device::trg1));
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, 1'000'000 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

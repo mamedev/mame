@@ -219,29 +219,31 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_magic_voice_cartridge_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, c64_magic_voice_cartridge_device, tpi_irq_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(*this, c64_magic_voice_cartridge_device, tpi_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c64_magic_voice_cartridge_device, tpi_pa_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(*this, c64_magic_voice_cartridge_device, tpi_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, c64_magic_voice_cartridge_device, tpi_pb_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, c64_magic_voice_cartridge_device, tpi_ca_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, c64_magic_voice_cartridge_device, tpi_cb_w))
+void c64_magic_voice_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	TPI6525(config, m_tpi, 0);
+	m_tpi->out_irq_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_irq_w));
+	m_tpi->in_pa_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_pa_r));
+	m_tpi->out_pa_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_pa_w));
+	m_tpi->in_pb_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_pb_r));
+	m_tpi->out_pb_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_pb_w));
+	m_tpi->out_ca_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_ca_w));
+	m_tpi->out_cb_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_cb_w));
 
-	MCFG_DEVICE_ADD(CD40105_TAG, CD40105, 0)
-	MCFG_40105_DATA_IN_READY_CB(WRITELINE(MOS6525_TAG, tpi6525_device, i3_w))
+	CD40105(config, m_fifo, 0);
+	m_fifo->in_ready_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(T6721A_TAG, T6721A, XTAL(640'000))
-	MCFG_T6721A_EOS_HANDLER(WRITELINE(MOS6525_TAG, tpi6525_device, i2_w))
-	MCFG_T6721A_PHI2_HANDLER(WRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, phi2_w))
-	MCFG_T6721A_DTRD_HANDLER(WRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, dtrd_w))
-	MCFG_T6721A_APD_HANDLER(WRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, apd_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	T6721A(config, m_vslsi, XTAL(640'000));
+	m_vslsi->eos_handler().set(m_tpi, FUNC(tpi6525_device::i2_w));
+	m_vslsi->phi2_handler().set(FUNC(c64_magic_voice_cartridge_device::phi2_w));
+	m_vslsi->dtrd_handler().set(FUNC(c64_magic_voice_cartridge_device::dtrd_w));
+	m_vslsi->apd_handler().set(FUNC(c64_magic_voice_cartridge_device::apd_w));
+	m_vslsi->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
-MACHINE_CONFIG_END
+	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
+	m_exp->set_passthrough();
+}
 
 
 
@@ -259,7 +261,8 @@ c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine
 	m_vslsi(*this, T6721A_TAG),
 	m_tpi(*this, MOS6525_TAG),
 	m_fifo(*this, CD40105_TAG),
-	m_exp(*this, C64_EXPANSION_SLOT_TAG), m_ca(0),
+	m_exp(*this, "exp"),
+	m_ca(0),
 	m_tpi_pb(0x60),
 	m_tpi_pc6(1),
 	m_pd(0)

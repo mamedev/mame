@@ -379,12 +379,7 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&bwing_state::bank_map).set_options(ENDIANNESS_BIG, 8, 15, 0x2000);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

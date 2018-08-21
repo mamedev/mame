@@ -11,28 +11,13 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BUS_MOUSE_EXTINT_CALLBACK(_write) \
-	devcb = &bus_mouse_device::set_extint_wr_callback(*device, DEVCB_##_write);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> bus_mouse_device
-
 class bus_mouse_device : public device_t
 {
 public:
 	// construction/destruction
 	bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_extint_wr_callback(device_t &device, Object &&cb) { return downcast<bus_mouse_device &>(device).m_write_extint.set_callback(std::forward<Object>(cb)); }
+	auto extint_callback() { return m_write_extint.bind(); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_x_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y_changed);
@@ -66,9 +51,6 @@ private:
 	int8_t m_x, m_y;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(BUS_MOUSE, bus_mouse_device)
-
 
 #endif // MAME_MACHINE_BUSMOUSE_H

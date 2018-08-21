@@ -57,6 +57,7 @@ private:
 	bool m_int_pending;
 	bool m_incoming_message;
 	bool m_message_started;
+	bool m_latch_inhibit;
 
 	uint8_t m_data;
 	uint8_t m_transmit;
@@ -73,13 +74,13 @@ private:
 */
 
 #define MCFG_IBC_HEXBUS_OUT_CALLBACK(_write) \
-	devcb = &ibc_device::set_hexbus_wr_callback(*device, DEVCB_##_write);
+	ibc_device::set_hexbus_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_IBC_HSKLATCH_CALLBACK(_write) \
-	devcb = &ibc_device::set_hsklatch_wr_callback(*device, DEVCB_##_write);
+	ibc_device::set_hsklatch_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_IBC_INT_CALLBACK(_write) \
-	devcb = &ibc_device::set_ibc_int_callback(*device, DEVCB_##_write);
+	ibc_device::set_ibc_int_callback(*device, DEVCB_##_write);
 
 DECLARE_DEVICE_TYPE_NS(IBC, bus::hexbus, ibc_device)
 #endif

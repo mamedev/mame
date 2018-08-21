@@ -85,12 +85,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void lgp(machine_config &config);
+
+	void init_lgp();
+
+private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
-	void init_lgp();
 	virtual void machine_start() override;
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
@@ -99,7 +103,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void lgp(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);

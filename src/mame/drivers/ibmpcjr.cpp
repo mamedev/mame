@@ -45,6 +45,12 @@ public:
 		m_keyboard(*this, "pc_keyboard")
 	{ }
 
+	void ibmpcjx(machine_config &config);
+	void ibmpcjr(machine_config &config);
+
+	void init_pcjr();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
@@ -105,9 +111,6 @@ public:
 	};
 
 	void machine_reset() override;
-	void init_pcjr();
-	void ibmpcjx(machine_config &config);
-	void ibmpcjr(machine_config &config);
 	void ibmpcjr_io(address_map &map);
 	void ibmpcjr_map(address_map &map);
 	void ibmpcjx_io(address_map &map);
@@ -667,9 +670,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart2)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
@@ -696,9 +697,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
 	/* internal ram */
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
+	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
 MACHINE_CONFIG_END
 
 

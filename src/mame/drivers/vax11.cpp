@@ -70,18 +70,19 @@
 #include "machine/terminal.h"
 #include "machine/rx01.h"
 
-#define TERMINAL_TAG "terminal"
 
 class vax11_state : public driver_device
 {
 public:
 	vax11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
+	void vax11(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( term_r );
@@ -91,7 +92,6 @@ public:
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
-	void vax11(machine_config &config);
 	void vax11_mem(address_map &map);
 };
 
@@ -147,7 +147,7 @@ MACHINE_CONFIG_START(vax11_state::vax11)
 	MCFG_DEVICE_PROGRAM_MAP(vax11_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(vax11_state, kbd_put))
 
 	MCFG_RX01_ADD("rx01")

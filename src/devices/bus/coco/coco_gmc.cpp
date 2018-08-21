@@ -63,8 +63,6 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_GMC, device_cococart_interface, coco_pak_gmc_device, "cocopakgmc", "CoCo Games Master Cartridge")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 //-------------------------------------------------
 //  coco_pak_device - constructor

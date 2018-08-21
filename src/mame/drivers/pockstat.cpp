@@ -114,6 +114,11 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
+	void pockstat(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_update);
+
+private:
 	required_shared_ptr<uint32_t> m_lcd_buffer;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -147,7 +152,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
@@ -155,7 +159,6 @@ public:
 	uint32_t ps_intc_get_interrupt_line(uint32_t line);
 	void ps_intc_set_interrupt_line(uint32_t line, int state);
 	void ps_timer_start(int index);
-	void pockstat(machine_config &config);
 	void pockstat_mem(address_map &map);
 };
 

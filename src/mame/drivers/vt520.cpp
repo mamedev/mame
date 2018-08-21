@@ -24,14 +24,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu") { }
 
+	void vt520(machine_config &config);
+	void vt420(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(vt520_some_r);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_rom;
-	void vt520(machine_config &config);
-	void vt420(machine_config &config);
 	void vt520_io(address_map &map);
 	void vt520_mem(address_map &map);
 };
@@ -120,8 +122,7 @@ MACHINE_CONFIG_START(vt520_state::vt520)
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, RAM_TAG).set_default_size("256K");
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

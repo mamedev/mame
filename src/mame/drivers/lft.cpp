@@ -22,15 +22,17 @@ public:
 	{
 	}
 
+	void lft(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(term_w);
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 
-	void lft(machine_config &config);
 	void lft_io(address_map &map);
 	void lft_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -95,7 +97,7 @@ MACHINE_CONFIG_START(lft_state::lft)
 	MCFG_DEVICE_IO_MAP(lft_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(lft_state, kbd_put))
 MACHINE_CONFIG_END
 

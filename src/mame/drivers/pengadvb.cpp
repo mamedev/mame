@@ -49,10 +49,11 @@ public:
 		, m_bank(*this, "bank%u", 0U)
 	{ }
 
-	void init_pengadvb();
 	void pengadvb(machine_config &config);
 
-protected:
+	void init_pengadvb();
+
+private:
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE8_MEMBER(megarom_bank_w);
@@ -70,7 +71,6 @@ protected:
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_page;
 	required_memory_bank_array<4> m_bank;
@@ -222,34 +222,10 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 	MCFG_DEVICE_PROGRAM_MAP(program_mem)
 	MCFG_DEVICE_IO_MAP(io_mem)
 
-	// -_-;
-	MCFG_DEVICE_ADD("page0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("page1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("page2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("page3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "page0").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "page1").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "page2").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "page3").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, pengadvb_state, pengadvb_ppi_port_a_r))

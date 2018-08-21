@@ -53,7 +53,7 @@ public:
 
 	void att4425(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_READ8_MEMBER(port14_r);
@@ -69,7 +69,6 @@ protected:
 	void att4425_io(address_map &map);
 	void att4425_mem(address_map &map);
 
-private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_i8251;
 	required_device<z80sio_device> m_sio;
@@ -301,9 +300,7 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*64)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_keyboard_clock))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
 MACHINE_CONFIG_END
 
 /* ROMs */

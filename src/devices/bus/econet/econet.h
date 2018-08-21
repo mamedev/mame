@@ -36,10 +36,10 @@
 
 
 #define MCFG_ECONET_CLK_CALLBACK(_write) \
-	devcb = &downcast<econet_device &>(*device).set_clk_wr_callback(DEVCB_##_write);
+	downcast<econet_device &>(*device).set_clk_wr_callback(DEVCB_##_write);
 
 #define MCFG_ECONET_DATA_CALLBACK(_write) \
-	devcb = &downcast<econet_device &>(*device).set_data_wr_callback(DEVCB_##_write);
+	downcast<econet_device &>(*device).set_data_wr_callback(DEVCB_##_write);
 
 
 
@@ -59,6 +59,8 @@ public:
 
 	template <class Object> devcb_base &set_clk_wr_callback(Object &&cb) { return m_write_clk.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_data_wr_callback(Object &&cb) { return m_write_data.set_callback(std::forward<Object>(cb)); }
+	auto clk_wr_callback() { return m_write_clk.bind(); }
+	auto data_wr_callback() { return m_write_data.bind(); }
 
 	void add_device(device_t *target, int address);
 
@@ -158,7 +160,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ECONET,      econet_device)
 DECLARE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device)
-
 
 void econet_devices(device_slot_interface &device);
 

@@ -42,6 +42,11 @@ public:
 	{
 	}
 
+	void pse(machine_config &config);
+	void psu(machine_config &config);
+	void psj(machine_config &config);
+
+protected:
 	std::vector<uint8_t> m_exe_buffer;
 	int m_cd_param_p;
 	int m_cd_result_p;
@@ -66,9 +71,6 @@ public:
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	void pse(machine_config &config);
-	void psu(machine_config &config);
-	void psj(machine_config &config);
 
 	void psx_map(address_map &map);
 	void subcpu_map(address_map &map);
@@ -519,8 +521,7 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( psx_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
 	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
 	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
@@ -570,8 +571,7 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( psx_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
 	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
 	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))

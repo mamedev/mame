@@ -193,7 +193,6 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 
 #define MAX_LAYERS    6
 #define MAX_SPRITES   256
-#define MAX_SOUNDS    16
 
 #define SP_2BACK     0x100
 #define SP_ALPHA     0x200
@@ -226,8 +225,16 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void benberob(machine_config &config);
+	void halleys(machine_config &config);
+
+	void init_halley87();
+	void init_benberob();
+	void init_halleys();
+	void init_halleysp();
+
+private:
 	uint16_t *m_render_layer[MAX_LAYERS];
-	uint8_t m_sound_fifo[MAX_SOUNDS];
 	uint8_t *m_gfx_plane02;
 	uint8_t *m_gfx_plane13;
 	std::unique_ptr<uint8_t[]> m_collision_list;
@@ -254,7 +261,6 @@ public:
 	int m_firq_level;
 	emu_timer *m_blitter_reset_timer;
 	offs_t m_collision_detection;
-	int m_latch_delay;
 	std::vector<uint8_t> m_paletteram;
 
 	DECLARE_WRITE8_MEMBER(bgtile_w);
@@ -271,9 +277,6 @@ public:
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
 	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
-	void init_halley87();
-	void init_benberob();
-	void init_halleys();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(halleys);
@@ -293,8 +296,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void benberob(machine_config &config);
-	void halleys(machine_config &config);
 	void halleys_map(address_map &map);
 	void sound_map(address_map &map);
 };
@@ -2012,7 +2013,7 @@ ROM_START( benberob )
 ROM_END
 
 
-ROM_START( halleys )
+ROM_START( halleysc )
 	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62_01.30",   0x0000, 0x4000, CRC(a5e82b3e) SHA1(c16c6a6c23a579454b8a2be4b951c35b04f2a856) )
 	ROM_LOAD( "a62_02.31",   0x4000, 0x4000, CRC(25f5bcd3) SHA1(9d72afe866df363d2ac33dab3ed6c3913f4de12d) )
@@ -2040,7 +2041,7 @@ ROM_START( halleys )
 ROM_END
 
 
-ROM_START( halleycj )
+ROM_START( halleyscj )
 	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62_01.30",   0x0000, 0x4000, CRC(a5e82b3e) SHA1(c16c6a6c23a579454b8a2be4b951c35b04f2a856) )
 	ROM_LOAD( "a62_02.31",   0x4000, 0x4000, CRC(25f5bcd3) SHA1(9d72afe866df363d2ac33dab3ed6c3913f4de12d) )
@@ -2068,7 +2069,7 @@ ROM_START( halleycj )
 ROM_END
 
 
-ROM_START( halleysc )
+ROM_START( halleyscja )
 	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62_01.30",   0x0000, 0x4000, CRC(a5e82b3e) SHA1(c16c6a6c23a579454b8a2be4b951c35b04f2a856) )
 	ROM_LOAD( "a62_02.31",   0x4000, 0x4000, CRC(25f5bcd3) SHA1(9d72afe866df363d2ac33dab3ed6c3913f4de12d) )
@@ -2096,7 +2097,35 @@ ROM_START( halleysc )
 ROM_END
 
 
-ROM_START( halley87 )
+ROM_START( halleyscjp ) /* earliest version, preproduction or possible prototype with all hand written labels */
+	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
+	ROM_LOAD( "p_0_19f8.30",   0x0000, 0x4000, CRC(10acefe8) SHA1(2f64e052999bc98219129206ec73b5d96d20ae60) ) /* hand written label P_0  19F8 */
+	ROM_LOAD( "p_1_87b4.31",   0x4000, 0x4000, CRC(1fe05cff) SHA1(d11c308aac6788233a48abe23b0278dc54254d13) ) /* hand written label P_1  87B4 */
+	ROM_LOAD( "p_2_aaaa.52",   0x8000, 0x4000, CRC(de4a14f0) SHA1(50b23289e00753b421a3373e0a9350124b75af9e) ) /* hand written label P_2  AAAA */
+	ROM_LOAD( "p_3_0341.50",   0xc000, 0x4000, CRC(b4b2b4f1) SHA1(5f01c013984958c689d09f1c85068379ffb3eb45) ) /* hand written label P_3  0341 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) //SOUND
+	ROM_LOAD( "s1_3d02.5",    0x0000, 0x2000, CRC(7ce290db) SHA1(e3c72ba5d97cb07f0f72d2765a068af6fb5cca29) ) /* hand written label S1 3D02 == a62_13.5 */
+	ROM_LOAD( "s2_213d.4",    0x2000, 0x2000, CRC(ea74b1a2) SHA1(7be3b9e9d51cfa753ce97e92f7eebd9723fe5821) ) /* hand written label S2 213D == a62_14.4  */
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) //CHR
+	ROM_LOAD( "ic-78_3441.78",   0x00000, 0x4000, CRC(c5834a7a) SHA1(4a24b3fa707cde89ad5a52d4e994412fcf28e81f) ) /* hand written label IC-78 3441 == a62_12.78  */
+	ROM_LOAD( "ic-77_a097.77",   0x04000, 0x4000, CRC(3ae7231e) SHA1(277f12570001d82104c79d3d0a58a0b57ed18778) ) /* hand written label IC-77 A097 == a62_10.77  */
+	ROM_LOAD( "ic-80_7f98.80",   0x08000, 0x4000, CRC(b9210dbe) SHA1(f72f2307e9acd2dd622a3efce71bd334b68a9b60) ) /* hand written label IC-80 7F98 == a62_08.80  */
+	ROM_LOAD( "ic-79_9383.79",   0x0c000, 0x4000, CRC(600be9ca) SHA1(a705b10be37ee93908b1bbaf806cfe7955aa3ffc) ) /* hand written label IC-79 9383 == a62_06.79  */
+	ROM_LOAD( "ic-89_ef2b.89",   0x10000, 0x4000, CRC(d0e9974e) SHA1(6826cfb4fbf098ed7b9d8b00e2684d7c85a13c11) ) /* hand written label IC-89 EF2B == a62_11.89  */
+	ROM_LOAD( "ic-88_a03d.88",   0x14000, 0x4000, CRC(e93ef281) SHA1(8bfe1ecce1c7107a5bd1b43b531594c8cfc0719d) ) /* hand written label IC-88 A03D == a62_09.88  */
+	ROM_LOAD( "ic-91_8b4c.91",   0x18000, 0x4000, CRC(64c95e8b) SHA1(4c3320a764b13a5751c0019c9fafb899ea2f908f) ) /* hand written label IC-91 8B4C == a62_07.91  */
+	ROM_LOAD( "ic-90_057c.90",   0x1c000, 0x4000, CRC(c3c877ef) SHA1(23180b106e50b7a2a230c5e9948832e5631972ae) ) /* hand written label IC-90 057C == a62_05.90  */
+
+	ROM_REGION( 0x0060, "proms", 0 ) //COLOR (all identical!)
+	ROM_LOAD( "a26-13.109",  0x0000, 0x0020, CRC(ec449aee) SHA1(aa33e82b592276d5ffd540d9a73d1b48d7d4accf) )
+	ROM_LOAD( "a26-13.110",  0x0020, 0x0020, CRC(ec449aee) SHA1(aa33e82b592276d5ffd540d9a73d1b48d7d4accf) )
+	ROM_LOAD( "a26-13.111",  0x0040, 0x0020, CRC(ec449aee) SHA1(aa33e82b592276d5ffd540d9a73d1b48d7d4accf) )
+ROM_END
+
+
+ROM_START( halleysc87 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62-17.30",   0x0000, 0x4000, CRC(fa2a58a6) SHA1(42cb587aad166ff74ece987f275aa7ad16d58300) )
 	ROM_LOAD( "a62-18.31",   0x4000, 0x4000, CRC(f3a078e6) SHA1(f8fa548b5814276d1ae2d575b9a5d3f0cc2f54fa) )
@@ -2215,8 +2244,22 @@ void halleys_state::init_benberob()
 
 void halleys_state::init_halleys()
 {
+/*
+LDA $66     96 66
+BNE +0E     26 0E <-- Intercept here
+ANDCC #$EF  1C EF
+*/
+
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb114;
+
+	init_common();
+}
+
+void halleys_state::init_halleysp()
+{
+	m_game_id = GAME_HALLEYS;
+	m_collision_detection = 0xb038;
 
 	init_common();
 }
@@ -2233,8 +2276,9 @@ void halleys_state::init_halley87()
 //**************************************************************************
 // Game Definitions
 
-GAME( 1984, benberob, 0,       benberob, benberob, halleys_state, init_benberob, ROT0,  "Taito",                                       "Ben Bero Beh (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleys,  0,       halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleysc, halleys, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Newer)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleycj, halleys, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halley87, halleys, halleys,  halleys,  halleys_state, init_halley87, ROT90, "Taito Corporation",                           "Halley's Comet '87",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1984, benberob,   0,        benberob, benberob, halleys_state, init_benberob, ROT0,  "Taito",                                       "Ben Bero Beh (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleysc,   0,        halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleyscj,  halleysc, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, rev 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleyscja, halleysc, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1985, halleyscjp, halleysc, halleys,  halleys,  halleys_state, init_halleysp, ROT90, "Taito Corporation",                           "Halley's Comet (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleysc87, halleysc, halleys,  halleys,  halleys_state, init_halley87, ROT90, "Taito Corporation",                           "Halley's Comet '87",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )

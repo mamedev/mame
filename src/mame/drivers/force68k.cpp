@@ -171,6 +171,10 @@ public:
 	{
 	}
 
+	void fccpu1_eprom_sockets(machine_config &config);
+	void fccpu1(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER (bootvect_r);
 	DECLARE_READ16_MEMBER (vme_a24_r);
 	DECLARE_WRITE16_MEMBER (vme_a24_w);
@@ -202,10 +206,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	DECLARE_READ16_MEMBER (read16_rom);
 
-	void fccpu1_eprom_sockets(machine_config &config);
-	void fccpu1(machine_config &config);
 	void force68k_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
 	required_device<pit68230_device> m_pit;
@@ -543,8 +545,8 @@ static void fccpu1_vme_cards(device_slot_interface &device)
  */
 MACHINE_CONFIG_START(force68k_state::fccpu1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(force68k_mem)
 
 	/* P3/Host Port config
 	 * LO command causes ROM monitor to expect S-records on HOST port by default
@@ -552,30 +554,28 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	 * the ROM momitor is over-run while checking for checksums etc if used with
 	 * UI mount <file> feature.
 	 */
-	MCFG_DEVICE_ADD ("aciahost", ACIA6850, 0)
+	ACIA6850(config, m_aciahost, 0);
+	m_aciahost->txd_handler().set("rs232host", FUNC(rs232_port_device::write_txd));
+	m_aciahost->rts_handler().set("rs232host", FUNC(rs232_port_device::write_rts));
 
-	MCFG_ACIA6850_TXD_HANDLER (WRITELINE ("rs232host", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER (WRITELINE ("rs232host", rs232_port_device, write_rts))
-
-	MCFG_DEVICE_ADD ("rs232host", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("aciahost", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("aciahost", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232host", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("aciahost", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("aciahost", acia6850_device, write_cts))
 
 	/* P4/Terminal Port config */
-	MCFG_DEVICE_ADD ("aciaterm", ACIA6850, 0)
+	ACIA6850(config, m_aciaterm, 0);
+	m_aciaterm->txd_handler().set("rs232trm", FUNC(rs232_port_device::write_txd));
+	m_aciaterm->rts_handler().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_ACIA6850_TXD_HANDLER (WRITELINE ("rs232trm", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER (WRITELINE ("rs232trm", rs232_port_device, write_rts))
-
-	MCFG_DEVICE_ADD ("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("aciaterm", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("aciaterm", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("aciaterm", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("aciaterm", acia6850_device, write_cts))
 
 	/* P5/Remote Port config */
-	MCFG_DEVICE_ADD ("aciaremt", ACIA6850, 0)
+	ACIA6850(config, m_aciaremt, 0);
 
 	/* Bit Rate Generator */
-	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200))
+	MCFG_DEVICE_ADD("brg", MC14411, XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(WRITELINE (*this, force68k_state, write_f1_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (*this, force68k_state, write_f3_clock))
 	MCFG_MC14411_F5_CB(WRITELINE (*this, force68k_state, write_f5_clock))
@@ -587,27 +587,27 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_MC14411_F15_CB(WRITELINE (*this, force68k_state, write_f15_clock))
 
 	/* RTC Real Time Clock device */
-	MCFG_DEVICE_ADD ("rtc", MM58167, XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(16'000'000) / 2)
-	MCFG_PIT68230_PA_OUTPUT_CB (WRITE8 ("cent_data_out", output_latch_device, bus_w))
-	MCFG_PIT68230_H2_CB (WRITELINE (m_centronics, centronics_device, write_strobe))
+	PIT68230(config, m_pit, XTAL(16'000'000) / 2);
+	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pit->h2_out_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// Centronics
-	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, force68k_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, force68k_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, force68k_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (*this, force68k_state, centronics_select_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE (*this, force68k_state, centronics_ack_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE (*this, force68k_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE (*this, force68k_state, centronics_perror_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE (*this, force68k_state, centronics_select_w))
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// EPROM sockets
 	fccpu1_eprom_sockets(config);
 
 	// VME interface
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, fccpu1_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, fccpu1_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 #if 0 /*

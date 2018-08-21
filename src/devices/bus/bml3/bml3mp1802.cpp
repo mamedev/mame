@@ -129,7 +129,7 @@ void bml3bus_mp1802_device::device_start()
 
 	// install into memory
 	address_space &space_prg = m_bml3bus->space();
-	space_prg.install_readwrite_handler(0xff00, 0xff03, read8_delegate(FUNC(mb8866_device::read),(mb8866_device*)m_fdc), write8_delegate(FUNC(mb8866_device::write),(mb8866_device*)m_fdc));
+	space_prg.install_readwrite_handler(0xff00, 0xff03, read8sm_delegate(FUNC(mb8866_device::read), m_fdc.target()), write8sm_delegate(FUNC(mb8866_device::write), m_fdc.target()));
 	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_r), this), write8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_w), this));
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();

@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	MCFG_DEVICE_IO_MAP(poly880_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_poly880 )
+	config.set_default_layout(layout_poly880);
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(7'372'800)/16)
@@ -274,8 +274,7 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, RAM_TAG).set_default_size("1K");
 MACHINE_CONFIG_END
 
 /* ROMs */

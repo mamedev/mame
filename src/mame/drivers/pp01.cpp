@@ -244,9 +244,7 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pp01_state, pp01_8255_portc_w))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

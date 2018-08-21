@@ -19,6 +19,7 @@
 #include "machine/cuda.h"
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
+#include "machine/applefdc.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/mackbd.h"
@@ -74,11 +75,13 @@ public:
 		m_egret(*this, EGRET_TAG),
 		m_cuda(*this, CUDA_TAG),
 		m_ram(*this, RAM_TAG),
+		m_scc(*this, "scc"),
 		m_539x_1(*this, MAC_539X_1_TAG),
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
+		m_fdc(*this, "fdc"),
 		m_mackbd(*this, MACKBD_TAG),
-		m_rtc(*this,"rtc"),
+		m_rtc(*this, "rtc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
@@ -96,44 +99,80 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<via6522_device> m_via1;
-	optional_device<via6522_device> m_via2;
-	optional_device<asc_device> m_asc;
-	optional_device<awacs_device> m_awacs;
-	optional_device<egret_device> m_egret;
-	optional_device<cuda_device> m_cuda;
-	required_device<ram_device> m_ram;
-	optional_device<ncr539x_device> m_539x_1;
-	optional_device<ncr539x_device> m_539x_2;
-	optional_device<ncr5380_device> m_ncr5380;
-	optional_device<mackbd_device> m_mackbd;
-	optional_device<rtc3430042_device> m_rtc;
+	void add_mackbd(machine_config &config);
+	void add_scsi(machine_config &config, bool cdrom = false);
+	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
+	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
+	void add_macplus_additions(machine_config &config);
+	void add_nubus(machine_config &config, bool bank1 = true, bool bank2 = true);
+	template <typename T> void add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts);
+	void add_via1_adb(machine_config &config, bool macii);
+	void add_via2(machine_config &config);
+	void add_pb1xx_vias(machine_config &config);
+	void add_pb1xx_screen(machine_config &config);
+	void add_egret(machine_config &config, int type);
+	void add_cuda(machine_config &config, int type);
 
-	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	optional_ioport_array<7> m_keys;
-	optional_ioport m_montype;
+	void mac512ke_base(machine_config &config);
+	void mac512ke(machine_config &config);
+	void macplus(machine_config &config);
+	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8);
+	void macpb170(machine_config &config);
+	void macclasc(machine_config &config);
+	void maciisi(machine_config &config);
+	void maclc2(machine_config &config, bool egret = true);
+	void macse(machine_config &config);
+	void maclc3(machine_config &config, bool egret = true);
+	void macpd210(machine_config &config);
+	void maciici(machine_config &config);
+	void macprtb(machine_config &config);
+	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
+	void maclc520(machine_config &config);
+	void pwrmac(machine_config &config);
+	void maciivx(machine_config &config);
+	void maccclas(machine_config &config);
+	void maciivi(machine_config &config);
+	void macpb160(machine_config &config);
+	void maciicx(machine_config &config);
+	void macqd700(machine_config &config);
+	void macse30(machine_config &config);
+	void macpb180(machine_config &config);
+	void macpb145(machine_config &config);
+	void macpb180c(machine_config &config);
+	void maciifx(machine_config &config);
+	void macpb140(machine_config &config);
+	void macclas2(machine_config &config);
+	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
+		bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true);
+	void maciihmu(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	/* for Egret and CUDA streaming MCU commands, command types */
-	enum mac_streaming_t
-	{
-		MCU_STREAMING_NONE = 0,
-		MCU_STREAMING_PRAMRD,
-		MCU_STREAMING_PRAMWR,
-		MCU_STREAMING_WRAMRD,
-		MCU_STREAMING_WRAMWR
-	};
-
-	enum
-	{
-		RBV_TYPE_RBV = 0,
-		RBV_TYPE_V8,
-		RBV_TYPE_SONORA,
-		RBV_TYPE_DAFB
-	};
+	void init_maclc2();
+	void init_maciifdhd();
+	void init_macse30();
+	void init_macprtb();
+	void init_maciivx();
+	void init_macpd210();
+	void init_macii();
+	void init_macclassic();
+	void init_macquadra700();
+	void init_macclassic2();
+	void init_maciifx();
+	void init_maclc();
+	void init_macpb160();
+	void init_macse();
+	void init_macpb140();
+	void init_macpm6100();
+	void init_maclc520();
+	void init_maciici();
+	void init_maciix();
+	void init_maclrcclassic();
+	void init_maciisi();
+	void init_maciicx();
+	void init_maclc3();
+	void init_maclc3plus();
+	void init_macpm7100();
+	void init_macpm8100();
+	void init_macpb100();
 
 	/* tells which model is being emulated (set by macxxx_init) */
 	enum model_t
@@ -208,9 +247,52 @@ public:
 	};
 
 	model_t m_model;
+	int m_drive_select;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via1;
+	optional_device<via6522_device> m_via2;
+	optional_device<asc_device> m_asc;
+	optional_device<awacs_device> m_awacs;
+	optional_device<egret_device> m_egret;
+	optional_device<cuda_device> m_cuda;
+	required_device<ram_device> m_ram;
+	required_device<scc8530_t> m_scc;
+	optional_device<ncr539x_device> m_539x_1;
+	optional_device<ncr539x_device> m_539x_2;
+	optional_device<ncr5380_device> m_ncr5380;
+	required_device<applefdc_base_device> m_fdc;
+	optional_device<mackbd_device> m_mackbd;
+	optional_device<rtc3430042_device> m_rtc;
+
+	required_ioport m_mouse0, m_mouse1, m_mouse2;
+	optional_ioport_array<7> m_keys;
+	optional_ioport m_montype;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	/* for Egret and CUDA streaming MCU commands, command types */
+	enum mac_streaming_t
+	{
+		MCU_STREAMING_NONE = 0,
+		MCU_STREAMING_PRAMRD,
+		MCU_STREAMING_PRAMWR,
+		MCU_STREAMING_WRAMRD,
+		MCU_STREAMING_WRAMWR
+	};
+
+	enum
+	{
+		RBV_TYPE_RBV = 0,
+		RBV_TYPE_V8,
+		RBV_TYPE_SONORA,
+		RBV_TYPE_DAFB
+	};
+
 
 	uint32_t m_overlay;
-	int m_drive_select;
 	int m_scsiirq_enable;
 
 	uint32_t m_via2_vbl;
@@ -221,7 +303,6 @@ public:
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	DECLARE_READ32_MEMBER(rom_switch_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
@@ -391,36 +472,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
-	void mac512ke(machine_config &config);
-	void macplus(machine_config &config);
-	void maclc(machine_config &config);
-	void macpb170(machine_config &config);
-	void macclasc(machine_config &config);
-	void maciisi(machine_config &config);
-	void maclc2(machine_config &config);
-	void macse(machine_config &config);
-	void maclc3(machine_config &config);
-	void macpd210(machine_config &config);
-	void maciici(machine_config &config);
-	void macprtb(machine_config &config);
-	void maciix(machine_config &config);
-	void maclc520(machine_config &config);
-	void pwrmac(machine_config &config);
-	void maciivx(machine_config &config);
-	void maccclas(machine_config &config);
-	void maciivi(machine_config &config);
-	void macpb160(machine_config &config);
-	void maciicx(machine_config &config);
-	void macqd700(machine_config &config);
-	void macse30(machine_config &config);
-	void macpb180(machine_config &config);
-	void macpb145(machine_config &config);
-	void macpb180c(machine_config &config);
-	void maciifx(machine_config &config);
-	void macpb140(machine_config &config);
-	void macclas2(machine_config &config);
-	void macii(machine_config &config);
-	void maciihmu(machine_config &config);
+
 	void mac512ke_map(address_map &map);
 	void macii_map(address_map &map);
 	void maciici_map(address_map &map);
@@ -437,7 +489,7 @@ public:
 	void macse_map(address_map &map);
 	void pwrmac_map(address_map &map);
 	void quadra700_map(address_map &map);
-private:
+
 	int has_adb();
 	void adb_reset();
 	void adb_vblank();
@@ -474,40 +526,14 @@ private:
 	optional_device<palette_device> m_palette;
 	optional_device<dac_8bit_pwm_device> m_dac;
 
-public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
-	void init_maclc2();
-	void init_maciifdhd();
-	void init_macse30();
-	void init_macprtb();
-	void init_maciivx();
-	void init_macpd210();
-	void init_macii();
-	void init_macclassic();
-	void init_macquadra700();
-	void init_macclassic2();
-	void init_maciifx();
-	void init_maclc();
-	void init_macpb160();
-	void init_macse();
-	void init_macpb140();
-	void init_macpm6100();
-	void init_maclc520();
-	void init_maciici();
-	void init_maciix();
-	void init_maclrcclassic();
-	void init_maciisi();
-	void init_maciicx();
-	void init_maclc3();
-	void init_maclc3plus();
-	void init_macpm7100();
-	void init_macpm8100();
-	void init_macpb100();
+
+	void palette_init_mac(palette_device &palette);
+	void palette_init_macgsc(palette_device &palette);
+
 	DECLARE_VIDEO_START(mac);
-	DECLARE_PALETTE_INIT(mac);
 	DECLARE_VIDEO_START(macprtb);
-	DECLARE_PALETTE_INIT(macgsc);
 	DECLARE_VIDEO_START(macsonora);
 	DECLARE_VIDEO_RESET(macrbv);
 	DECLARE_VIDEO_START(macdafb);

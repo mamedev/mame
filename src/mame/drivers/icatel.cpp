@@ -25,7 +25,6 @@
 
 #include "debugger.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -38,6 +37,11 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
+	void icatel(machine_config &config);
+
+	void init_icatel();
+
+private:
 	DECLARE_READ8_MEMBER(magic_string);
 
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
@@ -60,16 +64,14 @@ public:
 	DECLARE_READ8_MEMBER(ci16_r);
 	DECLARE_WRITE8_MEMBER(ci16_w);
 
-	void init_icatel();
 	DECLARE_PALETTE_INIT(icatel);
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
-	void icatel(machine_config &config);
 	void i80c31_data(address_map &map);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -270,7 +272,6 @@ MACHINE_CONFIG_START(icatel_state::icatel)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(icatel_state, icatel)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_icatel)

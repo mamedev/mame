@@ -1106,8 +1106,8 @@ class namcos12_state : public driver_device
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "maincpu:ram")
+		, m_maincpu(*this, "maincpu")
 		, m_sub(*this, "sub")
 		, m_adc(*this, "sub:adc")
 		, m_rtc(*this, "rtc")
@@ -1121,8 +1121,38 @@ public:
 	{
 	}
 
-	required_device<psxcpu_device> m_maincpu;
+	void coh700(machine_config &config);
+	void coh716(machine_config &config);
+	void namcos12_mobo(machine_config &config);
+
+	void init_namcos12();
+	void init_ptblank2();
+	void init_technodr();
+	void init_golgo13();
+
+protected:
+	virtual void machine_reset() override;
+
+	void golgo13_h8iomap(address_map &map);
+	void jvsiomap(address_map &map);
+	void jvsmap(address_map &map);
+	void namcos12_map(address_map &map);
+	void plarailjvsiomap(address_map &map);
+	void plarailjvsmap(address_map &map);
+	void ptblank2_map(address_map &map);
+	void s12h8iomap(address_map &map);
+	void s12h8jvsiomap(address_map &map);
+	void s12h8railiomap(address_map &map);
+	void s12h8rwjvsmap(address_map &map);
+	void s12h8rwmap(address_map &map);
+	void tdjvsiomap(address_map &map);
+	void tdjvsmap(address_map &map);
+	void tektagt_map(address_map &map);
+
 	required_device<ram_device> m_ram;
+
+private:
+	required_device<psxcpu_device> m_maincpu;
 	required_device<h83002_device> m_sub;
 	required_device<h8_adc_device> m_adc;
 	required_device<rtc4543_device> m_rtc;
@@ -1175,34 +1205,9 @@ public:
 	DECLARE_READ16_MEMBER(s12_mcu_gun_h_r);
 	DECLARE_READ16_MEMBER(s12_mcu_gun_v_r);
 
-	void init_namcos12();
-	void init_ptblank2();
-	void init_technodr();
-	void init_golgo13();
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
-
-	void coh700(machine_config &config);
-	void coh716(machine_config &config);
-	void namcos12_mobo(machine_config &config);
-	void golgo13_h8iomap(address_map &map);
-	void jvsiomap(address_map &map);
-	void jvsmap(address_map &map);
-	void namcos12_map(address_map &map);
-	void plarailjvsiomap(address_map &map);
-	void plarailjvsmap(address_map &map);
-	void ptblank2_map(address_map &map);
-	void s12h8iomap(address_map &map);
-	void s12h8jvsiomap(address_map &map);
-	void s12h8railiomap(address_map &map);
-	void s12h8rwjvsmap(address_map &map);
-	void s12h8rwmap(address_map &map);
-	void tdjvsiomap(address_map &map);
-	void tdjvsmap(address_map &map);
-	void tektagt_map(address_map &map);
-protected:
-	virtual void machine_reset() override;
 };
 
 
@@ -1217,7 +1222,7 @@ public:
 	void truckk(machine_config &config);
 	void tektagt(machine_config &config);
 	void ptblank2(machine_config &config);
-protected:
+private:
 	virtual void machine_reset() override;
 };
 
@@ -1722,19 +1727,20 @@ void namcos12_state::init_golgo13()
 MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
+	MCFG_DEVICE_ADD(m_sub, H83002, 16934400) // frequency based on research (superctr)
 	MCFG_DEVICE_PROGRAM_MAP(s12h8rwmap)
 	MCFG_DEVICE_IO_MAP(s12h8iomap)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("sub:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("sub:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &sub_sci1(*m_sub->subdevice<h8_sci_device>("sci1"));
+	sub_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	sub_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	sub_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 
@@ -1756,8 +1762,7 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 	MCFG_DEVICE_ADD("maincpu", CXD8661R, XTAL(100'000'000))
 	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 
@@ -1773,8 +1778,7 @@ MACHINE_CONFIG_START(namcos12_state::coh716)
 	MCFG_DEVICE_ADD("maincpu", CXD8606BQ, XTAL(100'000'000))
 	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("16M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("16M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 

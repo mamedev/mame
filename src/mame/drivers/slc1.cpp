@@ -68,7 +68,7 @@ public:
 
 	void slc1(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
@@ -78,7 +78,6 @@ protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-private:
 	uint8_t m_digit = 0;
 	bool m_kbd_type = false;
 
@@ -275,7 +274,7 @@ MACHINE_CONFIG_START(slc1_state::slc1)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_slc1)
+	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

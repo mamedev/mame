@@ -643,8 +643,7 @@ MACHINE_CONFIG_START(pmd85_state::pmd85)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, pmd85_state, write_cas_tx))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::pmd851)

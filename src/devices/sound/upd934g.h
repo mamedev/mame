@@ -15,14 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_UPD934G_DATA_CB(_devcb) \
-	devcb = &downcast<upd934g_device &>(*device).set_data_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -35,7 +27,7 @@ public:
 	upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> devcb_base &set_data_callback(Object &&cb) { return m_data_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_callback() { return m_data_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER(write);
 

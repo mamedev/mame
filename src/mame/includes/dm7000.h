@@ -8,18 +8,20 @@
 #include "cpu/powerpc/ppc.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class dm7000_state : public driver_device
 {
 public:
 	dm7000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
 	{
 	}
 
+	void dm7000(machine_config &config);
+
+private:
 	required_device<ppc4xx_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 
@@ -55,7 +57,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void dm7000(machine_config &config);
 	void dm7000_mem(address_map &map);
 };
 

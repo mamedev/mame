@@ -153,7 +153,8 @@ void gt_device_base::map(address_map &map)
 void single_gt_device_base::map(address_map &map)
 {
 	gt_device_base::map(map);
-	map(0x00000080, 0x0000008f).m("ramdac0", FUNC(bt459_device::map)).umask32(0x000000ff);
+
+	map(0x00000080, 0x0000008f).m(get_gt(0).ramdac, FUNC(bt459_device::map)).umask32(0x000000ff);
 	map(0x00000090, 0x0000009f).nopw(); // second (missing) ramdac
 
 	map(0x00400000, 0x005fffff).rw(FUNC(single_gt_device_base::buffer_r), FUNC(single_gt_device_base::buffer_w));
@@ -163,8 +164,8 @@ void dual_gt_device_base::map(address_map &map)
 {
 	gt_device_base::map(map);
 
-	map(0x00000080, 0x0000008f).m("ramdac0", FUNC(bt459_device::map)).umask32(0x000000ff);
-	map(0x00000090, 0x0000009f).m("ramdac1", FUNC(bt459_device::map)).umask32(0x000000ff);
+	map(0x00000080, 0x0000008f).m(get_gt(0).ramdac, FUNC(bt459_device::map)).umask32(0x000000ff);
+	map(0x00000090, 0x0000009f).m(get_gt(1).ramdac, FUNC(bt459_device::map)).umask32(0x000000ff);
 
 	map(0x00400000, 0x007fffff).rw(FUNC(dual_gt_device_base::buffer_r), FUNC(dual_gt_device_base::buffer_w));
 }
@@ -217,28 +218,28 @@ ROM_END
  * These inputs give htotal=1504 and vtotal=920 with high confidence.
  */
 MACHINE_CONFIG_START(mpcb963_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen0", RASTER)
+	MCFG_SCREEN_ADD(get_gt(0).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(83'020'800, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb963_device, screen_update0)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_cbus_card_interface, vblank))
-	MCFG_DEVICE_ADD("ramdac0", BT459, 83'020'800)
-	MCFG_DEVICE_ADD("bpu0", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(0).ramdac, BT459, 83'020'800)
+	MCFG_DEVICE_ADD(get_gt(0).bpu, DP8510, 0)
 MACHINE_CONFIG_END
 
 // Same as MPCB963, but dual screen.
 MACHINE_CONFIG_START(mpcba79_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen0", RASTER)
+	MCFG_SCREEN_ADD(get_gt(0).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(83'020'800, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcba79_device, screen_update0)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_cbus_card_interface, vblank))
-	MCFG_DEVICE_ADD("ramdac0", BT459, 83'020'800)
-	MCFG_DEVICE_ADD("bpu0", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(0).ramdac, BT459, 83'020'800)
+	MCFG_DEVICE_ADD(get_gt(0).bpu, DP8510, 0)
 
-	MCFG_SCREEN_ADD("screen1", RASTER)
+	MCFG_SCREEN_ADD(get_gt(1).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(83'020'800, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcba79_device, screen_update1)
-	MCFG_DEVICE_ADD("ramdac1", BT459, 83'020'800)
-	MCFG_DEVICE_ADD("bpu1", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(1).ramdac, BT459, 83'020'800)
+	MCFG_DEVICE_ADD(get_gt(1).bpu, DP8510, 0)
 MACHINE_CONFIG_END
 
 /*
@@ -252,28 +253,28 @@ MACHINE_CONFIG_END
  * giving hsync=71.744kHz and vsync~=75.97Hz.
  */
 MACHINE_CONFIG_START(msmt070_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen0", RASTER)
+	MCFG_SCREEN_ADD(get_gt(0).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(105'561'000, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, msmt070_device, screen_update0)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_cbus_card_interface, vblank))
-	MCFG_DEVICE_ADD("ramdac0", BT459, 0)
-	MCFG_DEVICE_ADD("bpu0", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(0).ramdac, BT459, 0)
+	MCFG_DEVICE_ADD(get_gt(0).bpu, DP8510, 0)
 MACHINE_CONFIG_END
 
 // Same as MSMT070, but dual screen.
 MACHINE_CONFIG_START(msmt071_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen0", RASTER)
+	MCFG_SCREEN_ADD(get_gt(0).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(105'561'000, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, msmt071_device, screen_update0)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_cbus_card_interface, vblank))
-	MCFG_DEVICE_ADD("ramdac0", BT459, 0)
-	MCFG_DEVICE_ADD("bpu0", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(0).ramdac, BT459, 0)
+	MCFG_DEVICE_ADD(get_gt(0).bpu, DP8510, 0)
 
-	MCFG_SCREEN_ADD("screen1", RASTER)
+	MCFG_SCREEN_ADD(get_gt(1).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(105'561'000, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, msmt071_device, screen_update1)
-	MCFG_DEVICE_ADD("ramdac1", BT459, 0)
-	MCFG_DEVICE_ADD("bpu1", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(1).ramdac, BT459, 0)
+	MCFG_DEVICE_ADD(get_gt(1).bpu, DP8510, 0)
 MACHINE_CONFIG_END
 
 /*
@@ -288,12 +289,12 @@ MACHINE_CONFIG_END
 * giving pixel clock 209.2608MHz and vsync 76.13Hz.
 */
 MACHINE_CONFIG_START(msmt081_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen0", RASTER)
+	MCFG_SCREEN_ADD(get_gt(0).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(209'260'800, 2076, 391 + GT_X_DELTA, 1664 + 391 + GT_X_DELTA, 1324, 74, 1248 + 74)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, msmt081_device, screen_update0)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_cbus_card_interface, vblank))
-	MCFG_DEVICE_ADD("ramdac0", BT459, 0)
-	MCFG_DEVICE_ADD("bpu0", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(0).ramdac, BT459, 0)
+	MCFG_DEVICE_ADD(get_gt(0).bpu, DP8510, 0)
 MACHINE_CONFIG_END
 
 /*
@@ -306,12 +307,12 @@ MACHINE_CONFIG_END
 * giving pixel clock 209.2608MHz and vsync 76.13Hz.
 */
 MACHINE_CONFIG_START(mpcbb92_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen0", RASTER)
+	MCFG_SCREEN_ADD(get_gt(0).screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(209'260'800, 2076, 391 + GT_X_DELTA, 1664 + 391 + GT_X_DELTA, 1324, 74, 1248 + 74)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcbb92_device, screen_update0)
 	//MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, srx_card_device_base, irq0))
-	MCFG_DEVICE_ADD("ramdac0", BT459, 0)
-	MCFG_DEVICE_ADD("bpu0", DP8510, 0)
+	MCFG_DEVICE_ADD(get_gt(0).ramdac, BT459, 0)
+	MCFG_DEVICE_ADD(get_gt(0).bpu, DP8510, 0)
 MACHINE_CONFIG_END
 
 gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -333,37 +334,37 @@ dual_gt_device_base::dual_gt_device_base(const machine_config &mconfig, device_t
 
 mpcb963_device::mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: single_gt_device_base(mconfig, MPCB963, tag, owner, clock)
-	, cbus_card_device_base(mconfig, *this)
+	, device_cbus_card_interface(mconfig, *this)
 {
 }
 
 mpcba79_device::mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: dual_gt_device_base(mconfig, MPCBA79, tag, owner, clock)
-	, cbus_card_device_base(mconfig, *this)
+	, device_cbus_card_interface(mconfig, *this)
 {
 }
 
 msmt070_device::msmt070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: single_gt_device_base(mconfig, MSMT070, tag, owner, clock)
-	, cbus_card_device_base(mconfig, *this)
+	, device_cbus_card_interface(mconfig, *this)
 {
 }
 
 msmt071_device::msmt071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: dual_gt_device_base(mconfig, MSMT071, tag, owner, clock)
-	, cbus_card_device_base(mconfig, *this)
+	, device_cbus_card_interface(mconfig, *this)
 {
 }
 
 msmt081_device::msmt081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: single_gt_device_base(mconfig, MSMT081, tag, owner, clock)
-	, cbus_card_device_base(mconfig, *this)
+	, device_cbus_card_interface(mconfig, *this)
 {
 }
 
 mpcbb92_device::mpcbb92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: single_gt_device_base(mconfig, MPCBB92, tag, owner, clock)
-	, srx_card_device_base(mconfig, *this)
+	, device_srx_card_interface(mconfig, *this)
 {
 }
 

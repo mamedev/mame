@@ -262,6 +262,10 @@ public:
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
 	{}
+
+	void spc1500(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -292,10 +296,10 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
-	void spc1500(machine_config &config);
+
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
-private:
+
 	uint8_t *m_p_ram;
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
@@ -927,8 +931,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -50,7 +50,7 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update)
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
-	devcb = &downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
+	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
 
 
 //**************************************************************************
@@ -83,6 +83,8 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	auto int_cb() { return m_int_callback.bind(); }
 
 	uint8_t vram_r();
 	uint8_t status_r();

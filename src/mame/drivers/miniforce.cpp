@@ -45,8 +45,8 @@
  *---------------------------
  * See fccpu30.cpp
  *
- * Misc links about Force Computes and this board:
- *------------------------------------------------
+ * Misc links about Force Computers and this board:
+ *-------------------------------------------------
  * http://bitsavers.org/pdf/forceComputers/
  *
  * Description, from datasheets etc
@@ -129,13 +129,16 @@
 class miniforce_state : public driver_device
 {
 public:
-miniforce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device (mconfig, type, tag)
+	miniforce_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 	{
 	}
-	virtual void machine_start () override;
-	virtual void machine_reset () override;
+
 	void miniforce(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void miniforce_mem(address_map &map);
 };
 

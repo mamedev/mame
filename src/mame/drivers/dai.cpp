@@ -232,14 +232,13 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_CASSETTE_INTERFACE("dai_cass")
 
 	/* tms5501 */
-	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
-	MCFG_TMS5501_XI_CALLBACK(READ8(*this, dai_state, dai_keyboard_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(*this, dai_state, dai_keyboard_w))
+	TMS5501(config, m_tms5501, 2000000);
+	m_tms5501->int_callback().set_inputline("maincpu", I8085_INTR_LINE);
+	m_tms5501->xi_callback().set(FUNC(dai_state::dai_keyboard_r));
+	m_tms5501->xo_callback().set(FUNC(dai_state::dai_keyboard_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
+	RAM(config, RAM_TAG).set_default_size("48K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")

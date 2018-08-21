@@ -85,13 +85,18 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+
+	void radica_eu3a14(machine_config &config);
+	void radica_eu3a14_adc(machine_config &config);
+
+	void init_rad_gtg();
+	void init_rad_foot();
+
+private:
 	READ8_MEMBER(irq_vector_r);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void radica_eu3a14(machine_config &config);
-	void radica_eu3a14_adc(machine_config &config);
 
 	int m_custom_irq;
 	uint16_t m_custom_irq_vector;
@@ -114,20 +119,15 @@ public:
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
-	void init_rad_gtg();
-	void init_rad_foot();
-
 	void bank_map(address_map &map);
 	void radica_eu3a14_map(address_map &map);
 
-protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	double hue2rgb(double p, double q, double t);
 
 	required_device<cpu_device> m_maincpu;
@@ -781,12 +781,7 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_DEVICE_PROGRAM_MAP(radica_eu3a14_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a14_state,  interrupt)
 
-	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_helper)
 

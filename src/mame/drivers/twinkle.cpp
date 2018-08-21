@@ -274,7 +274,7 @@ public:
 	void twinklei(machine_config &config);
 	void twinkle(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(twinkle_io_w);
@@ -304,7 +304,6 @@ protected:
 	void rf5c400_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<am53cf96_device> m_am53cf96;
@@ -1078,8 +1077,7 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( main_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this ) )
@@ -1096,13 +1094,13 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("am53cf96", AM53CF96, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_AM53CF96_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	AM53CF96(config, m_am53cf96, 0);
+	m_am53cf96->set_scsi_port("scsi");
+	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, twinkle_state, spu_ata_irq))
-	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(*this, twinkle_state, spu_ata_dmarq))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
+	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 

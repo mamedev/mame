@@ -79,6 +79,9 @@ public:
 	{
 	}
 
+	void m20(machine_config &config);
+
+private:
 	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<i8251_device> m_kbdi8251;
@@ -106,16 +109,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	MC6845_UPDATE_ROW(update_row);
 
-	void m20(machine_config &config);
 	void m20_data_mem(address_map &map);
 	void m20_io(address_map &map);
 	void m20_program_mem(address_map &map);
-private:
+
 	offs_t m_memsize;
 	uint8_t m_port21;
 	void install_memory();
 
-public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
@@ -796,10 +797,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_IO_MAP(m20_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m20_state,m20_irq_callback)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("160K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_EXTRA_OPTIONS("128K,192K,224K,256K,384K,512K")
+	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

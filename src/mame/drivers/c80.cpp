@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(c80_state::c80)
 	MCFG_Z80_DAISY_CHAIN(c80_daisy_chain)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_c80 )
+	config.set_default_layout(layout_c80);
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 2500000)
@@ -282,8 +282,7 @@ MACHINE_CONFIG_START(c80_state::c80)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, RAM_TAG).set_default_size("1K");
 MACHINE_CONFIG_END
 
 /* ROMs */

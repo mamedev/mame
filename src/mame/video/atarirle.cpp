@@ -97,13 +97,12 @@ WRITE8_MEMBER(atari_rle_objects_device::control_write)
 	if ((oldbits & ATARIRLE_CONTROL_ERASE) != 0)
 	{
 		// compute the top and bottom of the rect
-		rectangle cliprect = m_cliprect;
-		if (m_partial_scanline + 1 > cliprect.min_y)
-			cliprect.min_y = m_partial_scanline + 1;
-		if (scanline < cliprect.max_y)
-			cliprect.max_y = scanline;
+		rectangle cliprect(m_cliprect);
+		cliprect.sety(
+				(std::max)(cliprect.top(), m_partial_scanline + 1),
+				(std::min)(cliprect.bottom(), scanline));
 
-//logerror("  partial erase %d-%d (frame %d)\n", cliprect.min_y, cliprect.max_y, (oldbits & ATARIRLE_CONTROL_FRAME) >> 2);
+		//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (oldbits & ATARIRLE_CONTROL_FRAME) >> 2);
 
 		// erase the bitmap
 		m_vram[0][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2].fill(0, cliprect);
@@ -152,10 +151,9 @@ void atari_rle_objects_device::vblank_callback(screen_device &screen, bool state
 		{
 			// compute top only; bottom is equal to visible_area
 			rectangle cliprect = m_cliprect;
-			if (m_partial_scanline + 1 > cliprect.min_y)
-				cliprect.min_y = m_partial_scanline + 1;
+			cliprect.sety((std::max)(cliprect.top(), m_partial_scanline + 1), cliprect.bottom());
 
-	//logerror("  partial erase %d-%d (frame %d)\n", cliprect.min_y, cliprect.max_y, (m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
+			//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
 
 			// erase the bitmap
 			m_vram[0][(m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2].fill(0, cliprect);
@@ -213,10 +211,7 @@ void atari_rle_objects_device::device_start()
 	// set up a cliprect
 	m_cliprect      = screen().visible_area();
 	if (m_rightclip != 0)
-	{
-		m_cliprect.min_x = m_leftclip;
-		m_cliprect.max_x = m_rightclip;
-	}
+		m_cliprect.setx(m_leftclip, m_rightclip);
 
 	// compute the checksums
 	memset(m_checksums, 0, sizeof(m_checksums));
@@ -500,7 +495,7 @@ if (count++ == atarirle_hilite_index)
 					x = (int16_t)(x | ~m_xposmask.mask());
 				if (y & ((m_yposmask.mask() + 1) >> 1))
 					y = (int16_t)(y | ~m_yposmask.mask());
-				x += m_cliprect.min_x;
+				x += m_cliprect.left();
 
 				// merge priority and color
 				color = (color << 4) | (priority << ATARIRLE_PRIORITY_SHIFT);
@@ -536,7 +531,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 	if (hflip)
 		scaled_xoffs = ((xscale * info.width) >> 12) - scaled_xoffs;
 
-//if (clip.min_y == screen().visible_area().min_y)
+//if (clip.top() == screen().visible_area().top())
 //logerror("   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",
 //  code, color, hflip,
 //  x, -scaled_xoffs, (xscale * info.width) >> 12,
@@ -579,30 +574,30 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 	// left edge clip
 	int pixels_to_skip = 0;
 	bool xclipped = false;
-	if (sx < clip.min_x)
-		pixels_to_skip = clip.min_x - sx, xclipped = true;
-	if (sx > clip.max_x)
+	if (sx < clip.left())
+		pixels_to_skip = clip.left() - sx, xclipped = true;
+	if (sx > clip.right())
 		return;
 
 	// right edge clip
-	if (ex > clip.max_x)
-		ex = clip.max_x, xclipped = true;
-	else if (ex < clip.min_x)
+	if (ex > clip.right())
+		ex = clip.right(), xclipped = true;
+	else if (ex < clip.left())
 		return;
 
 	// top edge clip
-	if (sy < clip.min_y)
+	if (sy < clip.top())
 	{
-		sourcey += (clip.min_y - sy) * dy;
-		sy = clip.min_y;
+		sourcey += (clip.top() - sy) * dy;
+		sy = clip.top();
 	}
-	else if (sy > clip.max_y)
+	else if (sy > clip.bottom())
 		return;
 
 	// bottom edge clip
-	if (ey > clip.max_y)
-		ey = clip.max_y;
-	else if (ey < clip.min_y)
+	if (ey > clip.bottom())
+		ey = clip.bottom();
+	else if (ey < clip.top())
 		return;
 
 	// loop top to bottom
@@ -758,30 +753,30 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 	// left edge clip
 	int pixels_to_skip = 0;
 	bool xclipped = false;
-	if (sx < clip.min_x)
-		sx = clip.min_x, xclipped = true;
-	if (sx > clip.max_x)
+	if (sx < clip.left())
+		sx = clip.left(), xclipped = true;
+	if (sx > clip.right())
 		return;
 
 	// right edge clip
-	if (ex > clip.max_x)
-		pixels_to_skip = ex - clip.max_x, xclipped = true;
-	else if (ex < clip.min_x)
+	if (ex > clip.right())
+		pixels_to_skip = ex - clip.right(), xclipped = true;
+	else if (ex < clip.left())
 		return;
 
 	// top edge clip
-	if (sy < clip.min_y)
+	if (sy < clip.top())
 	{
-		sourcey += (clip.min_y - sy) * dy;
-		sy = clip.min_y;
+		sourcey += (clip.top() - sy) * dy;
+		sy = clip.top();
 	}
-	else if (sy > clip.max_y)
+	else if (sy > clip.bottom())
 		return;
 
 	// bottom edge clip
-	if (ey > clip.max_y)
-		ey = clip.max_y;
-	else if (ey < clip.min_y)
+	if (ey > clip.bottom())
+		ey = clip.bottom();
+	else if (ey < clip.top())
 		return;
 
 	// loop top to bottom
@@ -933,10 +928,10 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 		int y = m_yposmask.extract(m_ram, hilite);
 
 		if (x & ((m_xposmask.mask() + 1) >> 1))
-			x = (int16_t)(x | ~m_xposmask.mask());
+			x = int16_t(x | ~m_xposmask.mask());
 		if (y & ((m_yposmask.mask() + 1) >> 1))
-			y = (int16_t)(y | ~m_yposmask.mask());
-		x += m_cliprect.min_x;
+			y = int16_t(y | ~m_yposmask.mask());
+		x += m_cliprect.left();
 
 		// merge priority and color
 		color = (color << 4) | (priority << ATARIRLE_PRIORITY_SHIFT);
@@ -969,27 +964,27 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 
 			// left edge clip
 			const rectangle &visarea = screen().visible_area();
-			if (sx < visarea.min_x)
-				sx = visarea.min_x;
-			if (sx > visarea.max_x)
+			if (sx < visarea.left())
+				sx = visarea.left();
+			if (sx > visarea.right())
 				break;
 
 			// right edge clip
-			if (ex > visarea.max_x)
-				ex = visarea.max_x;
-			else if (ex < visarea.min_x)
+			if (ex > visarea.right())
+				ex = visarea.right();
+			else if (ex < visarea.left())
 				break;
 
 			// top edge clip
-			if (sy < visarea.min_y)
-				sy = visarea.min_y;
-			else if (sy > visarea.max_y)
+			if (sy < visarea.top())
+				sy = visarea.top();
+			else if (sy > visarea.bottom())
 				break;
 
 			// bottom edge clip
-			if (ey > visarea.max_y)
-				ey = visarea.max_y;
-			else if (ey < visarea.min_y)
+			if (ey > visarea.bottom())
+				ey = visarea.bottom();
+			else if (ey < visarea.left())
 				break;
 
 			for (int ty = sy; ty <= ey; ty++)

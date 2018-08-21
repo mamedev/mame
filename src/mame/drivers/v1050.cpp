@@ -1109,13 +1109,13 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
 	// SASI bus
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	MCFG_SCSI_REQ_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_BSY_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
-	MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, v1050_state, write_sasi_io)) MCFG_DEVCB_XOR(1) // bit4
+	SCSI_PORT(config, m_sasibus, 0);
+	m_sasibus->set_data_input_buffer("scsi_data_in");
+	m_sasibus->req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit0)).exor(1);
+	m_sasibus->bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
+	m_sasibus->msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
+	m_sasibus->cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	m_sasibus->io_handler().set(FUNC(v1050_state::write_sasi_io)).exor(1); // bit4
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
 
 	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SASIBUS_TAG)
@@ -1137,8 +1137,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 // ROMs

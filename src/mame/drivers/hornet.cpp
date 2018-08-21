@@ -363,6 +363,19 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
+	void terabrst(machine_config &config);
+	void sscope2(machine_config &config);
+	void hornet_2board(machine_config &config);
+	void hornet_2board_v2(machine_config &config);
+	void hornet(machine_config &config);
+
+	void init_hornet();
+	void init_hornet_2board();
+	void init_gradius4();
+	void init_nbapbp();
+	void init_terabrst();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
 
@@ -421,16 +434,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
-	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
+	double adc12138_input_callback(uint8_t input);
 	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
 	DECLARE_READ8_MEMBER(comm_eeprom_r);
 	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
 
-	void init_hornet();
-	void init_hornet_2board();
-	void init_gradius4();
-	void init_nbapbp();
-	void init_terabrst();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(hornet_2board);
@@ -440,11 +448,6 @@ public:
 	int jvs_encode_data(uint8_t *in, int length);
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
 	void jamma_jvs_cmd_exec();
-	void terabrst(machine_config &config);
-	void sscope2(machine_config &config);
-	void hornet_2board(machine_config &config);
-	void hornet_2board_v2(machine_config &config);
-	void hornet(machine_config &config);
 	void gn680_memmap(address_map &map);
 	void hornet_map(address_map &map);
 	void sharc0_map(address_map &map);
@@ -1049,7 +1052,7 @@ void hornet_state::machine_reset()
 	}
 }
 
-ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
+double hornet_state::adc12138_input_callback(uint8_t input)
 {
 	int value = 0;
 	switch (input)
@@ -1115,8 +1118,8 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 
 	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
-	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
-	MCFG_ADC1213X_IPT_CONVERT_CB(hornet_state, adc12138_input_callback)
+	ADC12138(config, m_adc12138, 0);
+	m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::adc12138_input_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)

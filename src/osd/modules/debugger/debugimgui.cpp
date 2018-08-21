@@ -1236,8 +1236,6 @@ void debug_imgui::draw_create_dialog(const char* label)
 
 void debug_imgui::draw_console()
 {
-	rgb_t bg, fg;
-	rgb_t base(0xe6, 0xff, 0xff, 0xff);
 	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
 	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiCond_Once);

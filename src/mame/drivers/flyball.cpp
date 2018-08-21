@@ -31,13 +31,6 @@ static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
 class flyball_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_POT_ASSERT,
-		TIMER_POT_CLEAR,
-		TIMER_QUARTER
-	};
-
 	flyball_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -51,7 +44,14 @@ public:
 
 	void flyball(machine_config &config);
 
-protected:
+private:
+	enum
+	{
+		TIMER_POT_ASSERT,
+		TIMER_POT_CLEAR,
+		TIMER_QUARTER
+	};
+
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 	DECLARE_READ8_MEMBER(potsense_r);
@@ -80,7 +80,6 @@ protected:
 	void flyball_map(address_map &map);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -466,13 +465,13 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MCFG_DEVICE_PROGRAM_MAP(flyball_map)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F7
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, flyball_state, lamp_w)) // 1 player lamp
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // crowd very loud
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // footstep off-on
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // crowd off-on
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // crowd soft-loud
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // bat hit
+	F9334(config, m_outlatch); // F7
+	m_outlatch->q_out_cb<2>().set_nop(); // bat hit
+	m_outlatch->q_out_cb<3>().set_nop(); // crowd soft-loud
+	m_outlatch->q_out_cb<4>().set_nop(); // crowd off-on
+	m_outlatch->q_out_cb<5>().set_nop(); // footstep off-on
+	m_outlatch->q_out_cb<6>().set_nop(); // crowd very loud
+	m_outlatch->q_out_cb<7>().set(FUNC(flyball_state::lamp_w)); // 1 player lamp
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

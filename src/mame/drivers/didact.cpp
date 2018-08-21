@@ -232,7 +232,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 		m_7segs[digit_nbr] = m_segments;
 }
 
-/* PIA 2 Port B is all outputs to drive the display so it is very unlikelly that this function is called */
+/* PIA 2 Port B is all outputs to drive the display so it is very unlikely that this function is called */
 READ8_MEMBER( md6802_state::pia2_kbB_r )
 {
 	LOG("Warning, trying to read from Port B designated to drive the display, please check why\n");
@@ -379,7 +379,7 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 	uint8_t const digit_nbr = (data >> 4) & 0x07;
 
 	/* There is actually only one 9368 and a 74145 to drive the cathode of the right digit low */
-	/* This can be emulated by prentending there are one 9368 per digit, at least for now      */
+	/* This can be emulated by pretending there are one 9368 per digit, at least for now      */
 	switch (digit_nbr)
 	{
 	case 0:
@@ -584,15 +584,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 MACHINE_CONFIG_START(md6802_state::md6802)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(md6802_map)
-	MCFG_DEFAULT_LAYOUT(layout_md6802)
+	config.set_default_layout(layout_md6802);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("tb16_74145", TTL74145, 0)
+	TTL74145(config, m_tb16_74145, 0);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
+	PIA6821(config, m_pia1, 0);
 
 	/* PIA #2 Keyboard & Display 0xC000-0xC003 */
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
+	PIA6821(config, m_pia2, 0);
 	/* --PIA init----------------------- */
 	/* 0xE007 0xC002 (DDR B)     = 0xFF - Port B all outputs and set to 0 (zero) */
 	/* 0xE00B 0xC000 (DDR A)     = 0x70 - Port A three outputs and set to 0 (zero) */
@@ -604,11 +604,12 @@ MACHINE_CONFIG_START(md6802_state::md6802)
 	/* 0xE068 0xC000 (Port A)    = 0x60 */
 	/* 0xE08A 0xC002 (Port B)    = 0xEE - updating display */
 	/* 0xE090 0xC000 (Port A)    = 0x00 - looping in 0x10,0x20,0x30,0x40,0x50 */
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, md6802_state, pia2_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, md6802_state, pia2_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, md6802_state, pia2_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, md6802_state, pia2_kbB_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, md6802_state, pia2_ca2_w))
+	m_pia2->writepa_handler().set(FUNC(md6802_state::pia2_kbA_w));
+	m_pia2->readpa_handler().set(FUNC(md6802_state::pia2_kbA_r));
+	m_pia2->writepb_handler().set(FUNC(md6802_state::pia2_kbB_w));
+	m_pia2->readpb_handler().set(FUNC(md6802_state::pia2_kbB_r));
+	m_pia2->ca2_handler().set(FUNC(md6802_state::pia2_ca2_w));
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", md6802_state, scan_artwork, attotime::from_hz(10))
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
@@ -619,14 +620,14 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
 	MCFG_DEVICE_ADD("maincpu", M6800, 505000)
 	MCFG_DEVICE_PROGRAM_MAP(mp68a_map)
-	MCFG_DEFAULT_LAYOUT(layout_mp68a)
+	config.set_default_layout(layout_mp68a);
 
 	/* Devices */
 	/* PIA #1 0x500-0x503 - used differently by laborations and loaded software */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6820, 0)
+	PIA6820(config, m_pia1, 0);
 
 	/* PIA #2 Keyboard & Display 0x600-0x603 */
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6820, 0)
+	PIA6820(config, m_pia2, 0);
 	/* --PIA inits----------------------- */
 	/* 0x0BAF 0x601 (Control A) = 0x30 - CA2 is low and enable DDRA */
 	/* 0x0BB1 0x603 (Control B) = 0x30 - CB2 is low and enable DDRB */
@@ -638,13 +639,13 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	/* --execution-wait for key loop-- */
 	/* 0x086B Update display sequnc, see below                            */
 	/* 0x0826 CB1 read          = 0x603 (Control B)  - is a key pressed? */
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mp68a_state, pia2_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mp68a_state, pia2_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mp68a_state, pia2_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mp68a_state, pia2_kbB_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, mp68a_state, pia2_cb1_r))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQB */
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
+	m_pia2->writepa_handler().set(FUNC(mp68a_state::pia2_kbA_w));
+	m_pia2->readpa_handler().set(FUNC(mp68a_state::pia2_kbA_r));
+	m_pia2->writepb_handler().set(FUNC(mp68a_state::pia2_kbB_w));
+	m_pia2->readpb_handler().set(FUNC(mp68a_state::pia2_kbB_r));
+	m_pia2->readcb1_handler().set(FUNC(mp68a_state::pia2_cb1_r));
+	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE); /* Not used by ROM. Combined trace to CPU IRQ with IRQB */
+	m_pia2->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE); /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
 
 	/* Display - sequence outputting all '0':s at start */
 	/* 0x086B 0x600 (Port A)    = 0x00 */

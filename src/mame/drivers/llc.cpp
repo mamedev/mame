@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(llc_state::llc1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEFAULT_LAYOUT(layout_llc1)
+	config.set_default_layout(layout_llc1);
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, llc_state, llc1_port1_a_r))
@@ -283,8 +283,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_K7659_KEYBOARD_ADD()
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 /* ROM definition */
 

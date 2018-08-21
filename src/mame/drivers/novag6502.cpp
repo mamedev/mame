@@ -77,12 +77,23 @@ instead of magnet sensors.
 class novag6502_state : public novagbase_state
 {
 public:
-	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag),
+	novag6502_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag),
 		m_hlcd0538(*this, "hlcd0538"),
 		m_rombank(*this, "rombank")
 	{ }
 
+	void supercon(machine_config &config);
+	void cforte(machine_config &config);
+	void sforte_map(address_map &map);
+	void sexpert(machine_config &config);
+	void sforte(machine_config &config);
+
+	void init_sexpert();
+
+	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
+
+private:
 	optional_device<hlcd0538_device> m_hlcd0538;
 	optional_memory_bank m_rombank;
 
@@ -95,7 +106,6 @@ public:
 	DECLARE_READ8_MEMBER(supercon_input1_r);
 	DECLARE_READ8_MEMBER(supercon_input2_r);
 	void supercon_map(address_map &map);
-	void supercon(machine_config &config);
 
 	// Constellation Forte
 	void cforte_prepare_display();
@@ -103,7 +113,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cforte_mux_w);
 	DECLARE_WRITE8_MEMBER(cforte_control_w);
 	void cforte_map(address_map &map);
-	void cforte(machine_config &config);
 
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
@@ -113,17 +122,12 @@ public:
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
 	DECLARE_MACHINE_RESET(sexpert);
-	void init_sexpert();
-	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_map(address_map &map);
 	void sexpert_set_cpu_freq();
-	void sexpert(machine_config &config);
 
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
-	void sforte_map(address_map &map);
-	void sforte(machine_config &config);
 };
 
 
@@ -877,7 +881,7 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_supercon)
+	config.set_default_layout(layout_novag_supercon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -897,11 +901,11 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("hlcd0538", HLCD0538, 0)
-	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(*this, novag6502_state, cforte_lcd_output_w))
+	HLCD0538(config, m_hlcd0538, 0);
+	m_hlcd0538->write_cols_callback().set(FUNC(novag6502_state::cforte_lcd_output_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
+	config.set_default_layout(layout_novag_cforte);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -948,7 +952,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_sexpert)
+	config.set_default_layout(layout_novag_sexpert);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -965,7 +969,7 @@ MACHINE_CONFIG_START(novag6502_state::sforte)
 	MCFG_TIMER_MODIFY("irq_on")
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
 
-	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
+	config.set_default_layout(layout_novag_sforte);
 MACHINE_CONFIG_END
 
 

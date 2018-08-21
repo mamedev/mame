@@ -94,6 +94,21 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+
+	void statriv2(machine_config &config);
+	void funcsino(machine_config &config);
+	void statriv2v(machine_config &config);
+
+	void init_addr_xlh();
+	void init_addr_lhx();
+	void init_addr_lmh();
+	void init_addr_lmhe();
+	void init_addr_xhl();
+	void init_laserdisc();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -108,14 +123,8 @@ public:
 	uint8_t m_last_coin;
 	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
 	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
-	void init_addr_xlh();
-	void init_addr_lhx();
-	void init_addr_lmh();
-	void init_addr_lmhe();
-	void init_addr_xhl();
-	void init_laserdisc();
+
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
@@ -123,9 +132,7 @@ public:
 	DECLARE_VIDEO_START(vertical);
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
-	void statriv2(machine_config &config);
-	void funcsino(machine_config &config);
-	void statriv2v(machine_config &config);
+
 	void statriv2_io_map(address_map &map);
 	void statriv2_map(address_map &map);
 };

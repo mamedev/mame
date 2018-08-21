@@ -92,6 +92,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void ravens(machine_config &config);
+	void ravens2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_READ8_MEMBER(port17_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -104,12 +108,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 
-	void ravens(machine_config &config);
-	void ravens2(machine_config &config);
 	void ravens2_io(address_map &map);
 	void ravens_io(address_map &map);
 	void ravens_mem(address_map &map);
-private:
+
 	uint8_t m_term_char;
 	uint8_t m_term_data;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -345,7 +347,7 @@ MACHINE_CONFIG_START(ravens_state::ravens)
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_ravens)
+	config.set_default_layout(layout_ravens);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
@@ -367,7 +369,7 @@ MACHINE_CONFIG_START(ravens_state::ravens2)
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ravens_state, kbd_put))
 
 	/* quickload */

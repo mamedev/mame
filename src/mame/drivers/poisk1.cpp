@@ -80,6 +80,11 @@ public:
 		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
+	void poisk1(machine_config &config);
+
+	void init_poisk1();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
@@ -94,7 +99,6 @@ public:
 
 	required_ioport_array<8> m_kbdio;
 
-	void init_poisk1();
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
@@ -142,7 +146,6 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
 	const char *m_cputag;
-	void poisk1(machine_config &config);
 	void poisk1_io(address_map &map);
 	void poisk1_map(address_map &map);
 };
@@ -706,8 +709,7 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_PALETTE_INIT_OWNER(p1_state, p1)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END
 
 ROM_START( poisk1 )

@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(lc80_state::lc80)
 	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_lc80 )
+	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -364,9 +364,7 @@ MACHINE_CONFIG_START(lc80_state::lc80)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,3K,4K")
+	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("2K,3K,4K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lc80_state::lc80_2)
@@ -376,7 +374,7 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_lc80 )
+	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -404,8 +402,7 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
+	RAM(config, RAM_TAG).set_default_size("4K");
 MACHINE_CONFIG_END
 
 #if 0

@@ -1166,8 +1166,7 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
 	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
@@ -1180,25 +1179,25 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
 	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
 
-	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, 24_MHz_XTAL / 6)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pc1512_state, hrq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, pc1512_state, eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, pc1512_state, memr_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, pc1512_state, memw_w))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, pc1512_state, ior1_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, pc1512_state, ior2_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(*this, pc1512_state, ior3_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, pc1512_state, iow0_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, pc1512_state, iow1_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, pc1512_state, iow2_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, pc1512_state, iow3_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, pc1512_state, dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, pc1512_state, dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, pc1512_state, dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, pc1512_state, dack3_w))
+	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
+	m_dmac->out_hreq_callback().set(FUNC(pc1512_state::hrq_w));
+	m_dmac->out_eop_callback().set(FUNC(pc1512_state::eop_w));
+	m_dmac->in_memr_callback().set(FUNC(pc1512_state::memr_r));
+	m_dmac->out_memw_callback().set(FUNC(pc1512_state::memw_w));
+	m_dmac->in_ior_callback<1>().set(FUNC(pc1512_state::ior1_r));
+	m_dmac->in_ior_callback<2>().set(FUNC(pc1512_state::ior2_r));
+	m_dmac->in_ior_callback<3>().set(FUNC(pc1512_state::ior3_r));
+	m_dmac->out_iow_callback<0>().set(FUNC(pc1512_state::iow0_w));
+	m_dmac->out_iow_callback<1>().set(FUNC(pc1512_state::iow1_w));
+	m_dmac->out_iow_callback<2>().set(FUNC(pc1512_state::iow2_w));
+	m_dmac->out_iow_callback<3>().set(FUNC(pc1512_state::iow3_w));
+	m_dmac->out_dack_callback<0>().set(FUNC(pc1512_state::dack0_w));
+	m_dmac->out_dack_callback<1>().set(FUNC(pc1512_state::dack1_w));
+	m_dmac->out_dack_callback<2>().set(FUNC(pc1512_state::dack2_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(pc1512_state::dack3_w));
 
-	MCFG_DEVICE_ADD(I8259A2_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
@@ -1255,9 +1254,7 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("544K,576K,608K,640K")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512_flop")
@@ -1300,8 +1297,7 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
 	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
@@ -1314,25 +1310,25 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
 	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
 
-	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, 24_MHz_XTAL / 6)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pc1512_base_state, hrq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, pc1512_base_state, eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, pc1512_base_state, memr_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, pc1512_base_state, memw_w))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, pc1512_base_state, ior1_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, pc1512_base_state, ior2_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(*this, pc1512_base_state, ior3_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, pc1512_base_state, iow0_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, pc1512_base_state, iow1_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, pc1512_base_state, iow2_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, pc1512_base_state, iow3_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, pc1512_base_state, dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, pc1512_base_state, dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, pc1512_base_state, dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, pc1512_base_state, dack3_w))
+	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
+	m_dmac->out_hreq_callback().set(FUNC(pc1640_state::hrq_w));
+	m_dmac->out_eop_callback().set(FUNC(pc1640_state::eop_w));
+	m_dmac->in_memr_callback().set(FUNC(pc1640_state::memr_r));
+	m_dmac->out_memw_callback().set(FUNC(pc1640_state::memw_w));
+	m_dmac->in_ior_callback<1>().set(FUNC(pc1640_state::ior1_r));
+	m_dmac->in_ior_callback<2>().set(FUNC(pc1640_state::ior2_r));
+	m_dmac->in_ior_callback<3>().set(FUNC(pc1640_state::ior3_r));
+	m_dmac->out_iow_callback<0>().set(FUNC(pc1640_state::iow0_w));
+	m_dmac->out_iow_callback<1>().set(FUNC(pc1640_state::iow1_w));
+	m_dmac->out_iow_callback<2>().set(FUNC(pc1640_state::iow2_w));
+	m_dmac->out_iow_callback<3>().set(FUNC(pc1640_state::iow3_w));
+	m_dmac->out_dack_callback<0>().set(FUNC(pc1640_state::dack0_w));
+	m_dmac->out_dack_callback<1>().set(FUNC(pc1640_state::dack1_w));
+	m_dmac->out_dack_callback<2>().set(FUNC(pc1640_state::dack2_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(pc1640_state::dack3_w));
 
-	MCFG_DEVICE_ADD(I8259A2_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
@@ -1391,8 +1387,7 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+	RAM(config, RAM_TAG).set_default_size("640K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640_flop")

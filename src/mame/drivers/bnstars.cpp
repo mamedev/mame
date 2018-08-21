@@ -832,7 +832,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	MCFG_PALETTE_FORMAT(XBRG)
 	MCFG_PALETTE_MEMBITS(16)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

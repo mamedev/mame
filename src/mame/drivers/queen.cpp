@@ -43,6 +43,9 @@ public:
 	{
 	}
 
+	void queen(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
 	uint8_t m_mtxc_config_reg[256];
@@ -54,7 +57,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void queen(machine_config &config);
 	void queen_io(address_map &map);
 	void queen_map(address_map &map);
 
@@ -292,11 +294,11 @@ MACHINE_CONFIG_START(queen_state::queen)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, queen_state, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, queen_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir7_w))
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	/* video hardware */
 	pcvideo_vga(config);

@@ -17,7 +17,7 @@
 #include "machine/zs01.h"
 
 #define MCFG_KONAMI573_CASSETTE_DSR_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_slot_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_slot_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
 
 
 DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_SLOT, konami573_cassette_slot_device)
@@ -128,7 +128,7 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5) override;
 
-	ADC083X_INPUT_CB(punchmania_inputs_callback);
+	double punchmania_inputs_callback(uint8_t input);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -143,28 +143,28 @@ DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_Y, konami573_cassette_y_device)
 
 
 #define MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d0_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d0_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d1_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d1_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D2_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d2_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d2_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d3_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d3_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d4_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d4_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d5_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d5_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d6_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d6_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER(_devcb) \
-	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d7_handler(DEVCB_##_devcb);
+	downcast<konami573_cassette_y_device &>(*device).set_d7_handler(DEVCB_##_devcb);
 
 class konami573_cassette_y_device: public device_t,
 	public konami573_cassette_interface

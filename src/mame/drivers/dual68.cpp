@@ -26,14 +26,15 @@ public:
 		, m_p_ram(*this, "ram")
 	{ }
 
+	void dual68(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(terminal_w);
 
-	void dual68(machine_config &config);
 	void dual68_mem(address_map &map);
 	void sio4_io(address_map &map);
 	void sio4_mem(address_map &map);
-private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -106,7 +107,7 @@ MACHINE_CONFIG_START(dual68_state::dual68)
 	MCFG_DEVICE_IO_MAP(sio4_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)

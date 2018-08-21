@@ -65,6 +65,11 @@ public:
 	{
 	}
 
+	void tv990(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(color);
+
+private:
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_fontram;
@@ -91,10 +96,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
 
 	INTERRUPT_GEN_MEMBER(vblank);
-	DECLARE_INPUT_CHANGED_MEMBER(color);
-	void tv990(machine_config &config);
 	void tv990_mem(address_map &map);
-private:
+
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;
@@ -409,9 +412,9 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(UART1_TAG, ns16450_device, dcd_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(UART1_TAG, ns16450_device, cts_w))
 
-	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(INPUTLINE("maincpu", M68K_IRQ_2))
+	KBDC8042(config, m_kbdc);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	m_kbdc->input_buffer_full_callback().set_inputline("maincpu", M68K_IRQ_2);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

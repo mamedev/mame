@@ -23,7 +23,6 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -42,6 +41,9 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
+	void microvision(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_PALETTE_INIT(microvision);
@@ -91,8 +93,7 @@ public:
 	pcb_type    m_pcb_type;
 	rc_type     m_rc_type;
 
-	void microvision(machine_config &config);
-protected:
+
 	required_device<dac_byte_interface> m_dac;
 	required_device<cpu_device> m_i8021;
 	required_device<tms1100_cpu_device> m_tms1100;
@@ -664,8 +665,6 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(microvision_state,microvision)
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

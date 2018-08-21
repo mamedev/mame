@@ -15,28 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_OUTPUT_BUFFER_EMPTY_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_keyboard_clock_callback(DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_keyboard_data_callback(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -48,12 +26,12 @@ public:
 	// construction/destruction
 	at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_system_reset_callback(Object &&cb) { return m_system_reset_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gate_a20_callback(Object &&cb) { return m_gate_a20_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_input_buffer_full_callback(Object &&cb) { return m_input_buffer_full_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_buffer_empty_callback(Object &&cb) { return m_output_buffer_empty_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_keyboard_clock_callback(Object &&cb) { return m_keyboard_clock_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_keyboard_data_callback(Object &&cb) { return m_keyboard_data_cb.set_callback(std::forward<Object>(cb)); }
+	auto system_reset_cb() { return m_system_reset_cb.bind(); }
+	auto gate_a20_cb() { return m_gate_a20_cb.bind(); }
+	auto input_buffer_full_cb() { return m_input_buffer_full_cb.bind(); }
+	auto output_buffer_empty_cb() { return m_output_buffer_empty_cb.bind(); }
+	auto keyboard_clock_cb() { return m_keyboard_clock_cb.bind(); }
+	auto keyboard_data_cb() { return m_keyboard_data_cb.bind(); }
 
 	// interface to the host pc
 	DECLARE_READ8_MEMBER( data_r );

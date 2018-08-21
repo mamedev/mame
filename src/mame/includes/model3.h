@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Ville Linde
+#ifndef MAME_INCLUDES_MODEL3_H
+#define MAME_INCLUDES_MODEL3_H
+
+#pragma once
+
 #include "cpu/powerpc/ppc.h"
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
@@ -57,8 +62,8 @@ class model3_renderer;
 class model3_state : public driver_device
 {
 public:
-	model3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	model3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_lsi53c810(*this, "lsi53c810"),
 		m_audiocpu(*this, "audiocpu"),
@@ -66,7 +71,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_rtc(*this, "rtc"),
-		m_adc_ports(*this, {"AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7"}),
+		m_adc_ports(*this, "AN%u", 0U),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
@@ -80,6 +85,56 @@ public:
 		m_step20_with_old_real3d = false;
 	}
 
+	void add_cpu_66mhz(machine_config &config);
+	void add_cpu_100mhz(machine_config &config);
+	void add_cpu_166mhz(machine_config &config);
+
+	void add_base_devices(machine_config &config);
+	void add_scsi_devices(machine_config &config);
+	void add_crypt_devices(machine_config &config);
+
+	void model3_21_5881(machine_config &config);
+	void model3_20_5881(machine_config &config);
+	void model3_15(machine_config &config);
+	void model3_10(machine_config &config);
+	void model3_20(machine_config &config);
+	void model3_21(machine_config &config);
+	void scud(machine_config &config);
+
+	void init_lemans24();
+	void init_vs298();
+	void init_vs299();
+	void init_swtrilgy();
+	void init_scudplus();
+	void init_model3_20();
+	void init_bass();
+	void init_vs2();
+	void init_daytona2();
+	void init_eca();
+	void init_srally2();
+	void init_harleya();
+	void init_skichamp();
+	void init_spikeofe();
+	void init_scud();
+	void init_harley();
+	void init_swtrilga();
+	void init_vs29815();
+	void init_model3_10();
+	void init_vs215();
+	void init_getbass();
+	void init_scudplusa();
+	void init_dirtdvls();
+	void init_vf3();
+	void init_von2();
+	void init_lostwsga();
+	void init_oceanhun();
+	void init_dayto2pe();
+	void init_spikeout();
+	void init_magtruck();
+	void init_lamachin();
+	void init_model3_15();
+
+private:
 	required_device<ppc_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
 	required_device<cpu_device> m_audiocpu;
@@ -106,6 +161,7 @@ public:
 	int m_sound_irq_enable;
 	emu_timer *m_sound_timer;
 	emu_timer *m_real3d_dma_timer;
+	emu_timer *m_scan_timer;
 	uint8_t m_irq_enable;
 	uint8_t m_irq_state;
 	uint8_t m_scsi_irq_state;
@@ -236,38 +292,7 @@ public:
 	void pci_device_set_reg(uint32_t value);
 	void configure_fast_ram();
 	void interleave_vroms();
-	void init_lemans24();
-	void init_vs298();
-	void init_vs299();
-	void init_swtrilgy();
-	void init_scudplus();
-	void init_model3_20();
-	void init_bass();
-	void init_vs2();
-	void init_daytona2();
-	void init_eca();
-	void init_srally2();
-	void init_harleya();
-	void init_skichamp();
-	void init_spikeofe();
-	void init_scud();
-	void init_harley();
-	void init_swtrilga();
-	void init_vs29815();
-	void init_model3_10();
-	void init_vs215();
-	void init_getbass();
-	void init_scudplusa();
-	void init_dirtdvls();
-	void init_vf3();
-	void init_von2();
-	void init_lostwsga();
-	void init_oceanhun();
-	void init_dayto2pe();
-	void init_spikeout();
-	void init_magtruck();
-	void init_lamachin();
-	void init_model3_15();
+
 	DECLARE_MACHINE_START(model3_10);
 	DECLARE_MACHINE_RESET(model3_10);
 	DECLARE_MACHINE_START(model3_15);
@@ -278,12 +303,13 @@ public:
 	DECLARE_MACHINE_RESET(model3_21);
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
 	TIMER_CALLBACK_MEMBER(real3d_dma_timer_callback);
+	TIMER_CALLBACK_MEMBER(model3_scan_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
 	DECLARE_WRITE8_MEMBER(scsp_irq);
-	LSI53C810_DMA_CB(real3d_dma_callback);
-	LSI53C810_FETCH_CB(scsi_fetch);
-	LSI53C810_IRQ_CB(scsi_irq_callback);
+	void real3d_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
+	uint32_t scsi_fetch(uint32_t dsp);
+	void scsi_irq_callback(int state);
 	void update_irq_state();
 	void set_irq_line(uint8_t bit, int line);
 	void model3_init(int step);
@@ -337,15 +363,12 @@ public:
 
 	uint16_t crypt_read_callback(uint32_t addr);
 
-	void model3_21_5881(machine_config &config);
-	void model3_20_5881(machine_config &config);
-	void model3_15(machine_config &config);
-	void model3_10(machine_config &config);
-	void model3_20(machine_config &config);
-	void model3_21(machine_config &config);
-	void scud(machine_config &config);
 	void model3_5881_mem(address_map &map);
 	void model3_10_mem(address_map &map);
 	void model3_mem(address_map &map);
 	void model3_snd(address_map &map);
+	void scsp1_map(address_map &map);
+	void scsp2_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MODEL3_H

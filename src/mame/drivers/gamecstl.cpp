@@ -83,6 +83,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void gamecstl(machine_config &config);
+
+	void init_gamecstl();
+
+private:
 	required_shared_ptr<uint32_t> m_cga_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -93,14 +98,12 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	void init_gamecstl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void intel82439tx_init();
-	void gamecstl(machine_config &config);
 	void gamecstl_io(address_map &map);
 	void gamecstl_map(address_map &map);
 
@@ -454,8 +457,8 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, gamecstl_state, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, gamecstl_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

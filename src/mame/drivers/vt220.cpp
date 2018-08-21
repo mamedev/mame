@@ -50,13 +50,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG) { }
 
+	void vt220(machine_config &config);
+	void vt220a(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	void vt220(machine_config &config);
-	void vt220a(machine_config &config);
 	void vt220_io(address_map &map);
 	void vt220_mem(address_map &map);
 	void vt220a_io(address_map &map);
@@ -110,7 +112,7 @@ MACHINE_CONFIG_START(vt220_state::vt220)
 	MCFG_DEVICE_ADD("maincpu", I8051, XTAL(11'059'200)) // from schematic for earlier version
 	MCFG_DEVICE_PROGRAM_MAP(vt220_mem)
 	MCFG_DEVICE_IO_MAP(vt220_io)
-	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ???
+	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT1_LINE))
@@ -127,8 +129,7 @@ MACHINE_CONFIG_START(vt220_state::vt220)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt220_state::vt220a)

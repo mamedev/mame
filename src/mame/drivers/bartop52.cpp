@@ -163,6 +163,7 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	RAM(config, m_ram).set_default_size("16K");
 MACHINE_CONFIG_END
 
 ROM_START(barbball)

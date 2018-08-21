@@ -16,6 +16,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void mspuzzle(machine_config &config);
+	void dblpoint(machine_config &config);
+	void gumbo(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
@@ -31,9 +36,6 @@ public:
 	uint32_t screen_update_gumbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void mspuzzle(machine_config &config);
-	void dblpoint(machine_config &config);
-	void gumbo(machine_config &config);
 	void dblpoint_map(address_map &map);
 	void gumbo_map(address_map &map);
 	void mspuzzle_map(address_map &map);

@@ -89,11 +89,15 @@ class magtouch_state : public pcat_base_state
 {
 public:
 	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-			m_isabus(*this, "isa"),
-			m_rombank(*this, "rombank"),
-			m_in0(*this, "IN0"){ }
+		: pcat_base_state(mconfig, type, tag)
+		, m_isabus(*this, "isa")
+		, m_rombank(*this, "rombank")
+		, m_in0(*this, "IN0")
+	{ }
 
+	void magtouch(machine_config &config);
+
+private:
 	required_device<isa8_device> m_isabus;
 	required_memory_bank m_rombank;
 	required_ioport m_in0;
@@ -103,7 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	virtual void machine_start() override;
 	static void magtouch_sb_conf(device_t *device);
-	void magtouch(machine_config &config);
 	void magtouch_io(address_map &map);
 	void magtouch_map(address_map &map);
 };
@@ -209,8 +212,7 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, magtouch_state, dma8237_1_dack_w))
+	m_dma8237_1->out_iow_callback<1>().set(FUNC(magtouch_state::dma8237_1_dack_w));
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")

@@ -40,6 +40,9 @@ public:
 	{
 	}
 
+	void midqslvr(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
@@ -62,7 +65,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void midqslvr(machine_config &config);
 	void midqslvr_io(address_map &map);
 	void midqslvr_map(address_map &map);
 
@@ -427,8 +429,8 @@ MACHINE_CONFIG_START(midqslvr_state::midqslvr)
 	MCFG_PCI_BUS_LEGACY_DEVICE( 0, DEVICE_SELF, midqslvr_state, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(31, DEVICE_SELF, midqslvr_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
 	pcvideo_vga(config);

@@ -168,18 +168,24 @@ uint32_t mips3_disassembler::dasm_cop0(uint32_t pc, uint32_t op, std::ostream &s
 		case 0x1f:  /* COP */
 			switch (op & 0x01ffffff)
 			{
-				case 0x01:  util::stream_format(stream, "tlbr");                                            break;
-				case 0x02:  util::stream_format(stream, "tlbwi");                                           break;
-				case 0x06:  util::stream_format(stream, "tlbwr");                                           break;
-				case 0x08:  util::stream_format(stream, "tlbp");                                            break;
-				case 0x10:  util::stream_format(stream, "rfe"); flags = STEP_OUT;                  break;
-				case 0x18:  util::stream_format(stream, "eret      [invalid]");                                  break;
-				default:    util::stream_format(stream, "cop0      $%07x", op & 0x01ffffff);                    break;
+				case 0x01:  util::stream_format(stream, "tlbr");                                break;
+				case 0x02:  util::stream_format(stream, "tlbwi");                               break;
+				case 0x06:  util::stream_format(stream, "tlbwr");                               break;
+				case 0x08:  util::stream_format(stream, "tlbp");                                break;
+				case 0x10:  util::stream_format(stream, "rfe"); flags = STEP_OUT;               break;
+				case 0x18:  util::stream_format(stream, "eret");                                break;
+				default:    dasm_extra_cop0(pc, op, stream);                                    break;
 			}
 			break;
-		default:    util::stream_format(stream, "dc.l      $%08x [invalid]", op);                              break;
+		default:    util::stream_format(stream, "dc.l      $%08x [invalid]", op);               break;
 	}
 	return flags;
+}
+
+uint32_t mips3_disassembler::dasm_extra_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	util::stream_format(stream, "cop0       $%07x", op & 0x01ffffff);
+	return 0;
 }
 
 uint32_t mips3_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
@@ -258,11 +264,17 @@ uint32_t mips3_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &s
 				case 0x3d:  util::stream_format(stream, "c.nge.%s   %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);   break;
 				case 0x3e:  util::stream_format(stream, "c.le.%s    %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);    break;
 				case 0x3f:  util::stream_format(stream, "c.ngt.%s   %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);   break;
-				default:    util::stream_format(stream, "cop1       $%07x", op & 0x01ffffff);                                   break;
+				default:    dasm_extra_cop1(pc, op, stream); break;
 			}
 			break;
 	}
 	return flags;
+}
+
+uint32_t mips3_disassembler::dasm_extra_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	util::stream_format(stream, "cop1       $%07x", op & 0x01ffffff);
+	return 0;
 }
 
 uint32_t mips3_disassembler::dasm_cop1x(uint32_t pc, uint32_t op, std::ostream &stream)
@@ -413,6 +425,32 @@ uint32_t mips3_disassembler::dasm_extra_regimm(uint32_t pc, uint32_t op, std::os
 uint32_t mips3_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	util::stream_format(stream, "dc.l      $%08x [invalid]", op);
+	return 0;
+}
+
+uint32_t ee_disassembler::dasm_extra_cop0(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	switch (op & 0x01ffffff)
+	{
+		case 0x38: util::stream_format(stream, "ei"); break;
+		case 0x39: util::stream_format(stream, "di"); break;
+		default:   util::stream_format(stream, "cop1       $%07x", op & 0x01ffffff); break;
+	}
+	return 0;
+}
+
+uint32_t ee_disassembler::dasm_extra_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	const int fd   = (op >>  6) & 31;
+	const int fs   = (op >> 11) & 31;
+	const int ft   = (op >> 16) & 31;
+
+	switch (op & 0x3f)
+	{
+		case 0x18: util::stream_format(stream, "adda.s   %s,%s", cpreg[1][fs], cpreg[1][ft]); break;
+		case 0x1c: util::stream_format(stream, "madd.s   %s,%s,%s", cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]); break;
+		default:   util::stream_format(stream, "dc.l     $%08x [invalid]", op); break;
+	}
 	return 0;
 }
 
@@ -578,7 +616,7 @@ uint32_t ee_disassembler::dasm_idt(uint32_t pc, uint32_t op, std::ostream &strea
 			else
 				util::stream_format(stream, "maddu     %s,%s", reg[rs], reg[rt]);
 			break;
-		case 0x04: util::stream_format(stream, "plzcw     ?"); break;
+		case 0x04: util::stream_format(stream, "plzcw     %s,%s", reg[rd], reg[rs]); break;
 		case 0x08: flags = dasm_mmi0(pc, op, stream); break;
 		case 0x09: flags = dasm_mmi2(pc, op, stream); break;
 		case 0x10: util::stream_format(stream, "mfhi1     %s", reg[rd]); break;
@@ -799,9 +837,11 @@ uint32_t ee_disassembler::dasm_extra_base(uint32_t pc, uint32_t op, std::ostream
 uint32_t ee_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	const int rs = (op >> 21) & 31;
+	const int rd = (op >> 11) & 31;
 
 	switch (op & 63)
 	{
+		case 0x28: util::stream_format(stream, "mfsa      %s", reg[rd]);            break;
 		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);            break;
 		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);    break;
 	}

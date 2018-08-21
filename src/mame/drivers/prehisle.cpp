@@ -47,14 +47,14 @@ void prehisle_state::prehisle_map(address_map &map)
 
 WRITE8_MEMBER(prehisle_state::D7759_write_port_0_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
 {
-	m_upd7759->reset_w(data & 0x80);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 void prehisle_state::prehisle_sound_map(address_map &map)

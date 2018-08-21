@@ -57,6 +57,15 @@ public:
 		, m_cass(*this, "cassette")
 		{ }
 
+	void homelab3(machine_config &config);
+	void brailab4(machine_config &config);
+	void homelab(machine_config &config);
+
+	void init_brailab4();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
+
+private:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(cass2_r);
@@ -65,8 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
 	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
-	void init_brailab4();
 	DECLARE_VIDEO_START(homelab2);
 	DECLARE_MACHINE_RESET(homelab3);
 	DECLARE_VIDEO_START(homelab3);
@@ -77,15 +84,12 @@ public:
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void homelab3(machine_config &config);
-	void brailab4(machine_config &config);
-	void homelab(machine_config &config);
 	void brailab4_io(address_map &map);
 	void brailab4_mem(address_map &map);
 	void homelab2_mem(address_map &map);
 	void homelab3_io(address_map &map);
 	void homelab3_mem(address_map &map);
-private:
+
 	const uint8_t *m_p_videoram;
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;

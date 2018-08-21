@@ -29,13 +29,13 @@
 
 /***************************************************************************/
 
-READ8_MEMBER(dcon_state::sdgndmps_sound_comms_r)
+u8 dcon_state::sdgndmps_sound_comms_r(offs_t offset)
 {
 	// Routine at 134C sends no sound commands if lowest bit is 0
 	if (offset == 5) // ($a000a)
 		return 1;
 
-	return m_seibu_sound->main_r(space, offset);
+	return m_seibu_sound->main_r(offset);
 }
 
 void dcon_state::dcon_map(address_map &map)
@@ -284,6 +284,7 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Perhaps 14318180/4? */
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -328,6 +329,7 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

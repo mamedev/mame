@@ -230,6 +230,15 @@ public:
 		m_flashrom(*this, "flash"),
 		m_io_ps7500(*this, "PS7500") { }
 
+	void ssfindo(machine_config &config);
+	void ppcar(machine_config &config);
+	void tetfight(machine_config &config);
+
+	void init_ssfindo();
+	void init_ppcar();
+	void init_tetfight();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	optional_device<i2cmem_device> m_i2cmem;
@@ -278,9 +287,6 @@ public:
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
 
 	void init_common();
-	void init_ssfindo();
-	void init_ppcar();
-	void init_tetfight();
 	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -297,9 +303,7 @@ public:
 	void PS7500_reset();
 	void ssfindo_speedups();
 	void ppcar_speedups();
-	void ssfindo(machine_config &config);
-	void ppcar(machine_config &config);
-	void tetfight(machine_config &config);
+
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
 	void tetfight_map(address_map &map);

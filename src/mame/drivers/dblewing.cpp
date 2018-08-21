@@ -100,6 +100,11 @@ public:
 		m_soundlatch_pending(false)
 	{ }
 
+	void dblewing(machine_config &config);
+
+	void init_dblewing();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
@@ -115,7 +120,6 @@ public:
 
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
-	void init_dblewing();
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -124,12 +128,10 @@ public:
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
 
-	void dblewing(machine_config &config);
 	void dblewing_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);
-private:
 	bool m_soundlatch_pending;
 };
 
@@ -402,14 +404,14 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_DECO_SPRITE_PRIORITY_CB(dblewing_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(*this, dblewing_state, soundlatch_irq_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("soundirq", input_merger_device, in_w<0>))
+	DECO104PROT(config, m_deco104, 0);
+	m_deco104->port_a_cb().set_ioport("INPUTS");
+	m_deco104->port_b_cb().set_ioport("SYSTEM");
+	m_deco104->port_c_cb().set_ioport("DSW");
+	m_deco104->set_interface_scramble_interleave();
+	m_deco104->set_use_magic_read_address_xor(true);
+	m_deco104->soundlatch_irq_cb().set(FUNC(dblewing_state::soundlatch_irq_w));
+	m_deco104->soundlatch_irq_cb().append("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

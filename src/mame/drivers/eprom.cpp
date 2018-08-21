@@ -391,11 +391,11 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_IN0_CB(IOPORT("ADC0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ADC1"))
-	MCFG_ADC0808_IN2_CB(IOPORT("ADC2"))
-	MCFG_ADC0808_IN3_CB(IOPORT("ADC3"))
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	m_adc->in_callback<0>().set_ioport("ADC0");
+	m_adc->in_callback<1>().set_ioport("ADC1");
+	m_adc->in_callback<2>().set_ioport("ADC2");
+	m_adc->in_callback<3>().set_ioport("ADC3");
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -482,11 +482,11 @@ MACHINE_CONFIG_START(eprom_state::guts)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_IN0_CB(IOPORT("ADC0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ADC1"))
-	MCFG_ADC0808_IN2_CB(IOPORT("ADC2"))
-	MCFG_ADC0808_IN3_CB(IOPORT("ADC3"))
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	m_adc->in_callback<0>().set_ioport("ADC0");
+	m_adc->in_callback<1>().set_ioport("ADC1");
+	m_adc->in_callback<2>().set_ioport("ADC2");
+	m_adc->in_callback<3>().set_ioport("ADC3");
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)

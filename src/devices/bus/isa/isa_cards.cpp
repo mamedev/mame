@@ -33,6 +33,7 @@
 #include "side116.h"
 #include "aha1542.h"
 #include "wd1002a_wx1.h"
+#include "wd1007a.h"
 #include "mcd.h"
 #include "lbaenhancer.h"
 
@@ -166,4 +167,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("sb16_lle", ISA16_SB16);
 	device.option_add("mcd", ISA16_MCD);
 	device.option_add("sad8852", ISA16_SAD8852);
+	device.option_add("wd1007a", WD1007A);
 }

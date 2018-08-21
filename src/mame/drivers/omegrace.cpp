@@ -241,18 +241,20 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void omegrace(machine_config &config);
+
+	void init_omegrace();
+
+private:
 	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
-	void init_omegrace();
-	void omegrace(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_port(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 

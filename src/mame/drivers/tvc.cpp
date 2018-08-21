@@ -56,6 +56,9 @@ public:
 		, m_keyboard(*this, "LINE.%u", 0)
 	{ }
 
+	void tvc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<tvc_sound_device> m_sound;
@@ -110,7 +113,7 @@ public:
 	uint8_t       m_cassette_ff;
 	uint8_t       m_centronics_ff;
 	DECLARE_PALETTE_INIT(tvc);
-	void tvc(machine_config &config);
+
 	void tvc_io(address_map &map);
 	void tvc_mem(address_map &map);
 };
@@ -787,9 +790,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, tvc_state, int_ff_set))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

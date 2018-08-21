@@ -1059,12 +1059,12 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_DEVICE_OPCODES_MAP(abc800_m1)
 
 	// peripheral hardware
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, ABC800_X01/2/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, abc800_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, abc800_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, txca_w))
+	Z80CTC(config, m_ctc, ABC800_X01/2/2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(abc800_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(abc800_state::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<2>().append(m_dart, FUNC(z80dart_device::txca_w));
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CTC_TAG, abc800_state, ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, ABC800_X01/2/2)
@@ -1142,9 +1142,7 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 
@@ -1172,9 +1170,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 
@@ -1205,8 +1201,7 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	MCFG_SLOT_DEFAULT_OPTION("abc834")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1238,9 +1233,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	MCFG_SLOT_DEFAULT_OPTION("abc832")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("160K")
-	MCFG_RAM_EXTRA_OPTIONS("544K")
+	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")

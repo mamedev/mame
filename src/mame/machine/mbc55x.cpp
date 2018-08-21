@@ -149,12 +149,12 @@ WRITE8_MEMBER( mbc55x_state::vram_page_w )
 
 READ8_MEMBER(mbc55x_state::mbc55x_disk_r)
 {
-	return m_fdc->read(space, offset>>1);
+	return m_fdc->read(offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
 {
-	m_fdc->write(space, offset>>1, data);
+	m_fdc->write(offset>>1, data);
 }
 
 

@@ -17,11 +17,6 @@
 class pentagon_state : public spectrum_state
 {
 public:
-	enum
-	{
-		TIMER_IRQ_ON,
-		TIMER_IRQ_OFF
-	};
 	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
@@ -30,6 +25,16 @@ public:
 		, m_bank4(*this, "bank4")
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
+
+	void pent1024(machine_config &config);
+	void pentagon(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_IRQ_ON,
+		TIMER_IRQ_OFF
+	};
 
 	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
@@ -42,19 +47,17 @@ public:
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
-	void pent1024(machine_config &config);
-	void pentagon(machine_config &config);
 	void pentagon_io(address_map &map);
 	void pentagon_mem(address_map &map);
 	void pentagon_switch(address_map &map);
-protected:
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
+
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void pentagon_update_memory();
@@ -305,12 +308,12 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pentagon_state::pent1024)
+void pentagon_state::pent1024(machine_config &config)
+{
 	pentagon(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1024K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1024K");
+}
 
 /***************************************************************************
 

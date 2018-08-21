@@ -150,6 +150,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void ibm6580(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ibm6580);
 
 	DECLARE_WRITE16_MEMBER(pic_latch_w);
@@ -183,10 +186,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ibm6580(machine_config &config);
 	void ibm6580_io(address_map &map);
 	void ibm6580_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -887,16 +889,14 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_DEVICE_IO_MAP(ibm6580_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("160K,192K,224K,256K,320K,384K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'000'000)/2, 833, 0, 640, 428, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ibm6580_state, vblank_w))
-	MCFG_DEFAULT_LAYOUT(layout_ibm6580)
+	config.set_default_layout(layout_ibm6580);
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(ibm6580_state, ibm6580)
@@ -912,11 +912,11 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 
-	MCFG_DEVICE_ADD("kbd", DW_KEYBOARD, 0)
-	MCFG_DW_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(*this, ibm6580_state, kb_data_w))
-	MCFG_DW_KEYBOARD_OUT_CLOCK_HANDLER(WRITELINE(*this, ibm6580_state, kb_clock_w))
-	MCFG_DW_KEYBOARD_OUT_STROBE_HANDLER(WRITELINE(*this, ibm6580_state, kb_strobe_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ppi8255", i8255_device, pc4_w))
+	DW_KEYBOARD(config, m_kbd, 0);
+	m_kbd->out_data_handler().set(FUNC(ibm6580_state::kb_data_w));
+	m_kbd->out_clock_handler().set(FUNC(ibm6580_state::kb_clock_w));
+	m_kbd->out_strobe_handler().set(FUNC(ibm6580_state::kb_strobe_w));
+	m_kbd->out_strobe_handler().append(m_ppi8255, FUNC(i8255_device::pc4_w));
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(14'745'600)/3)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, ibm6580_state, hrq_w))

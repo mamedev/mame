@@ -12,7 +12,7 @@ struct ssg_callbacks;
 
 
 #define MCFG_YM2610_IRQ_HANDLER(cb) \
-		devcb = &downcast<ym2610_device &>(*device).set_irq_handler((DEVCB_##cb));
+		downcast<ym2610_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 class ym2610_device : public ay8910_device
 {
@@ -21,6 +21,7 @@ public:
 
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -36,6 +37,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_post_load() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;

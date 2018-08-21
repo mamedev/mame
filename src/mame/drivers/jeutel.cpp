@@ -42,7 +42,7 @@ public:
 	void init_jeutel();
 	void jeutel(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
@@ -54,7 +54,6 @@ protected:
 	void jeutel_cpu3_io(address_map &map);
 	void jeutel_map(address_map &map);
 
-private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
 	uint8_t m_digit;
@@ -210,7 +209,7 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	MCFG_DEVICE_IO_MAP(jeutel_cpu3_io)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_jeutel)
+	config.set_default_layout(layout_jeutel);
 
 	/* Sound */
 	genpin_audio(config);

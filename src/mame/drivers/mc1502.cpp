@@ -309,9 +309,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("608K")                   /* 96 base + 512 on expansion card */
-	MCFG_RAM_EXTRA_OPTIONS("96K")
+	RAM(config, RAM_TAG).set_default_size("608K").set_extra_options("96K"); /* 96 base + 512 on expansion card */
 MACHINE_CONFIG_END
 
 

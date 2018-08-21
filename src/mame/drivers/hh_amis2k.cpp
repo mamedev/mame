@@ -50,7 +50,7 @@ public:
 
 	void wildfire(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -66,7 +66,6 @@ protected:
 	void write_a12(int state);
 	void sound_update();
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_a12_decay_timer;
@@ -326,7 +325,7 @@ MACHINE_CONFIG_START(wildfire_state::wildfire)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD("a12_decay", wildfire_state, reset_q2)
 
-	MCFG_DEFAULT_LAYOUT(layout_wildfire)
+	config.set_default_layout(layout_wildfire);
 
 	/* no video! */
 

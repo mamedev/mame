@@ -220,8 +220,8 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 class sun3_state : public driver_device
 {
 public:
-	sun3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sun3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
@@ -234,8 +234,15 @@ public:
 		m_rom(*this, "user1"),
 		m_idprom(*this, "idprom"),
 		m_ram(*this, RAM_TAG)
-		{ }
+	{ }
 
+	void sun3(machine_config &config);
+	void sun3e(machine_config &config);
+	void sun3_60(machine_config &config);
+	void sun3200(machine_config &config);
+	void sun3_50(machine_config &config);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
@@ -267,18 +274,13 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
-	void sun3(machine_config &config);
-	void sun3e(machine_config &config);
-	void sun3_60(machine_config &config);
-	void sun3200(machine_config &config);
-	void sun3_50(machine_config &config);
 	void sun3_mem(address_map &map);
 	void vmetype0space_map(address_map &map);
 	void vmetype0space_novram_map(address_map &map);
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
-private:
+
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint32_t m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
@@ -979,48 +981,28 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("6M,8M,12M,16M,20M,24M,28M,32M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("6M,8M,12M,16M,20M,24M,28M,32M").set_default_value(0);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun3_state::vmetype0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun3_state::vmetype1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun3_state::vmetype2space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
 	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
 	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
@@ -1069,9 +1051,7 @@ MACHINE_CONFIG_START(sun3_state::sun3200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1600-1, 0, 1100-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")
-	MCFG_RAM_EXTRA_OPTIONS("64M,96M,128M")
+	m_ram->set_default_size("32M").set_extra_options("64M,96M,128M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun3_state::sun3_50)
@@ -1089,43 +1069,24 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("4M").set_default_value(0);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_novram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun3_state::vmetype0space_novram_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun3_state::vmetype1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun3_state::vmetype2space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
 	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))

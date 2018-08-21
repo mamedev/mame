@@ -29,14 +29,6 @@
 class gottlieb_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_LASERDISC_PHILIPS,
-		TIMER_LASERDISC_BIT_OFF,
-		TIMER_LASERDISC_BIT,
-		TIMER_NMI_CLEAR
-	};
-
 	gottlieb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -56,6 +48,38 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void gottlieb_core(machine_config &config);
+	void cobram3(machine_config &config);
+	void screwloo(machine_config &config);
+	void gottlieb2(machine_config &config);
+	void reactor(machine_config &config);
+	void tylz(machine_config &config);
+	void g2laser(machine_config &config);
+	void qbert(machine_config &config);
+	void qbert_knocker(machine_config &config);
+	void gottlieb1(machine_config &config);
+	void gottlieb1_votrax(machine_config &config);
+
+	void init_romtiles();
+	void init_screwloo();
+	void init_vidvince();
+	void init_ramtiles();
+	void init_stooges();
+	void init_qbert();
+	void init_qbertqub();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+
+private:
+	enum
+	{
+		TIMER_LASERDISC_PHILIPS,
+		TIMER_LASERDISC_BIT_OFF,
+		TIMER_LASERDISC_BIT,
+		TIMER_NMI_CLEAR
+	};
+
 	void qbert_knocker(uint8_t knock);
 
 	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
@@ -73,15 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gottlieb_laserdisc_video_control_w);
 	DECLARE_WRITE8_MEMBER(gottlieb_videoram_w);
 	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
-	void init_romtiles();
-	void init_screwloo();
-	void init_vidvince();
-	void init_ramtiles();
-	void init_stooges();
-	void init_qbert();
-	void init_qbertqub();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
 	DECLARE_VIDEO_START(screwloo);
@@ -97,20 +112,9 @@ public:
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
-	void gottlieb_core(machine_config &config);
-	void cobram3(machine_config &config);
-	void screwloo(machine_config &config);
-	void gottlieb2(machine_config &config);
-	void reactor(machine_config &config);
-	void tylz(machine_config &config);
-	void g2laser(machine_config &config);
-	void qbert(machine_config &config);
-	void qbert_knocker(machine_config &config);
-	void gottlieb1(machine_config &config);
-	void gottlieb1_votrax(machine_config &config);
 	void gottlieb_map(address_map &map);
 	void reactor_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -18,37 +18,6 @@
 
 #pragma once
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-// TODO: REMOVE THESE
-#define MCFG_VIA6522_READPA_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_readpa_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_READPB_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_readpb_handler(DEVCB_##_devcb);
-
-// TODO: CONVERT THESE TO WRITE LINE
-#define MCFG_VIA6522_WRITEPA_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_writepa_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_WRITEPB_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_writepb_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_CA2_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_ca2_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_CB1_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_cb1_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_CB2_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_cb2_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<via6522_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -83,43 +52,43 @@ public:
 	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// TODO: REMOVE THESE
-	template <class Object> devcb_base &set_readpa_handler(Object &&cb) { return m_in_a_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_readpb_handler(Object &&cb) { return m_in_b_handler.set_callback(std::forward<Object>(cb)); }
+	auto readpa_handler() { return m_in_a_handler.bind(); }
+	auto readpb_handler() { return m_in_b_handler.bind(); }
 
 	// TODO: CONVERT THESE TO WRITE LINE
-	template <class Object> devcb_base &set_writepa_handler(Object &&cb) { return m_out_a_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_writepb_handler(Object &&cb) { return m_out_b_handler.set_callback(std::forward<Object>(cb)); }
+	auto writepa_handler() { return m_out_a_handler.bind(); }
+	auto writepb_handler() { return m_out_b_handler.bind(); }
 
-	template <class Object> devcb_base &set_ca2_handler(Object &&cb) { return m_ca2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cb1_handler(Object &&cb) { return m_cb1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cb2_handler(Object &&cb) { return m_cb2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto ca2_handler() { return m_ca2_handler.bind(); }
+	auto cb1_handler() { return m_cb1_handler.bind(); }
+	auto cb2_handler() { return m_cb2_handler.bind(); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { write_pa(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { write_pa(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa2 ) { write_pa(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa3 ) { write_pa(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa4 ) { write_pa(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa5 ) { write_pa(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa6 ) { write_pa(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa7 ) { write_pa(7, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { set_pa_line(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { set_pa_line(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa2 ) { set_pa_line(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa3 ) { set_pa_line(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa4 ) { set_pa_line(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa5 ) { set_pa_line(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa6 ) { set_pa_line(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa7 ) { set_pa_line(7, state); }
 	DECLARE_WRITE8_MEMBER( write_pa );
 	DECLARE_WRITE_LINE_MEMBER( write_ca1 );
 	DECLARE_WRITE_LINE_MEMBER( write_ca2 );
 
-	DECLARE_WRITE_LINE_MEMBER( write_pb0 ) { write_pb(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb1 ) { write_pb(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb2 ) { write_pb(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb3 ) { write_pb(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb4 ) { write_pb(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb5 ) { write_pb(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb6 ) { write_pb(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb7 ) { write_pb(7, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb0 ) { set_pb_line(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb1 ) { set_pb_line(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb2 ) { set_pb_line(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb3 ) { set_pb_line(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb4 ) { set_pb_line(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb5 ) { set_pb_line(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb6 ) { set_pb_line(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb7 ) { set_pb_line(7, state); }
 	DECLARE_WRITE8_MEMBER( write_pb );
 	DECLARE_WRITE_LINE_MEMBER( write_cb1 );
 	DECLARE_WRITE_LINE_MEMBER( write_cb2 );
@@ -143,8 +112,8 @@ private:
 	void clear_int(int data);
 	void shift_out();
 	void shift_in();
-	void write_pa(int line, int state);
-	void write_pb(int line, int state);
+	void set_pa_line(int line, int state);
+	void set_pb_line(int line, int state);
 
 	uint8_t input_pa();
 	void output_pa();

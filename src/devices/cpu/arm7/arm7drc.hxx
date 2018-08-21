@@ -471,15 +471,6 @@ void arm7_cpu_device::cfunc_unimplemented()
 void arm7_cpu_device::static_generate_entry_point()
 {
 	drcuml_state *drcuml = m_impstate.drcuml;
-	uml::code_label nodabt;
-	uml::code_label nofiq;
-	uml::code_label noirq;
-	uml::code_label irq32;
-	uml::code_label nopabd;
-	uml::code_label nound;
-	uml::code_label swi32;
-	uml::code_label irqadjust;
-	uml::code_label done;
 
 	drcuml_block &block(drcuml->begin_block(110));
 
@@ -1160,8 +1151,6 @@ void arm7_cpu_device::generate_update_cycles(drcuml_block &block, compiler_state
 	/* check full interrupts if pending */
 	if (compiler.checkints)
 	{
-		uml::code_label skip;
-
 		compiler.checkints = false;
 		UML_CALLH(block, *m_impstate.check_irq);
 	}

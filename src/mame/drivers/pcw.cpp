@@ -1272,8 +1272,7 @@ MACHINE_CONFIG_START(pcw_state::pcw)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, m_ram).set_default_size("256K");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pcw_timer", pcw_state, pcw_timer_interrupt, attotime::from_hz(300))
 MACHINE_CONFIG_END
@@ -1287,7 +1286,7 @@ MACHINE_CONFIG_START(pcw_state::pcw8256)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_pcw )
+	config.set_default_layout(layout_pcw);
 
 MACHINE_CONFIG_END
 
@@ -1300,11 +1299,10 @@ MACHINE_CONFIG_START(pcw_state::pcw8512)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_pcw )
+	config.set_default_layout(layout_pcw);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	m_ram->set_default_size("512K");
 MACHINE_CONFIG_END
 
 /* PCW9512, PCW9512+, PCW10 */
@@ -1314,8 +1312,7 @@ MACHINE_CONFIG_START(pcw_state::pcw9512)
 	MCFG_DEVICE_IO_MAP(pcw9512_io)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	m_ram->set_default_size("512K");
 MACHINE_CONFIG_END
 
 

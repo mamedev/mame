@@ -92,9 +92,6 @@ void namco_c117_device::device_reset()
 	m_offsets[1][0] = 0x0180 * 0x2000; // bank0 = 0x180(RAM) - evidence: wldcourt
 	m_offsets[1][7] = 0x03ff * 0x2000; // bank7 = 0x3ff(PRG7)
 
-	m_cpucache[0]->force_update();
-	m_cpucache[1]->force_update();
-
 	m_subres = m_wdog = 0;
 	m_subres_cb(ASSERT_LINE);
 
@@ -192,10 +189,7 @@ void namco_c117_device::register_w(int whichcpu, offs_t offset, uint8_t data)
 			break;
 		case 14: // FC00 - set initial ROM bank for sub CPU
 			if (whichcpu == 0)
-			{
 				m_offsets[1][7] = 0x600000 | (data * 0x2000);
-				m_cpucache[1]->force_update();
-			}
 			else
 				unknown_reg = true;
 			break;
@@ -215,8 +209,6 @@ void namco_c117_device::bankswitch(int whichcpu, int whichbank, int a0, uint8_t 
 		bank = (bank & 0x1fe000) | ((data & 0x03) * 0x200000);
 	else
 		bank = (bank & 0x600000) | (data * 0x2000);
-
-	m_cpucache[whichcpu]->force_update();
 }
 
 void namco_c117_device::kick_watchdog(int whichcpu)

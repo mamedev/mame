@@ -114,7 +114,6 @@
 
 #include "emu.h"
 #include "includes/micronic.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -364,8 +363,6 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)
 
@@ -377,8 +374,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* ram banks */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("224K")
+	RAM(config, RAM_TAG).set_default_size("224K");
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", micronic_state, nvram_init)  // base ram
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)  // additional ram banks

@@ -2,42 +2,44 @@
 // copyright-holders:Curt Coder
 /****************************************************************************************************
 
-        XOR S-100-12
+XOR S-100-12
 
-        XOR Data Science was apparently a 1982 reincorporation of a Huntington Beach-based
-        company previously known as Delta Products. At least some of the S-100 boards used
-        in XOR's systems were originally developed and documented under the former company
-        name.
+XOR Data Science was apparently a 1982 reincorporation of a Huntington Beach-based
+company previously known as Delta Products. At least some of the S-100 boards used
+in XOR's systems were originally developed and documented under the former company
+name.
 
 *****************************************************************************************************
 
-        All input must be in upper case.
-        Summary of Monitor commands:
+All input must be in upper case.
+Summary of Monitor commands:
 
-        D xxxx yyyy           = dump memory to screen
-        F xxxx yyyy zz        = fill memory from xxxx to yyyy-1 with zz
-        G xxxx                = execute program at xxxx
-        H xxxx yyyy aa bb...  = Search memory for a string of bytes
-        L xxxx                = edit memory (. to exit)
-        M xxxx yyyy zzzz      = Move (copy) memory
-        V xxxx                = Ascii dump of memory to the screen (cr to continue, space to exit)
-        X n                   = Select a bank (0 works, others freeze)
+D xxxx yyyy           = dump memory to screen
+F xxxx yyyy zz        = fill memory from xxxx to yyyy-1 with zz
+G xxxx                = execute program at xxxx
+H xxxx yyyy aa bb...  = Search memory for a string of bytes
+L xxxx                = edit memory (. to exit)
+M xxxx yyyy zzzz      = Move (copy) memory
+R                     = Read cassette (not in all bios versions)
+V xxxx                = Ascii dump of memory to the screen (cr to continue, space to exit)
+W                     = Write cassette (not in all bios versions)
+X n                   = Select a bank (0 works, others freeze)
+^C                    = Boot from floppy
 
-        Note some of the commands are a bit buggy, eg F doesn't fill the last byte
+Note some of the commands are a bit buggy, eg F doesn't fill the last byte
+
+
+TODO:
+- Fix floppy. It needs to WAIT the cpu whenever port 0xFC is read, wait
+  for either DRQ or INTRQ to assert, then release the cpu and then do the
+  actual port read. Our Z80 cannot do that.
+- The only available disks crash MAME when loaded.
+- honor jumper settings
+- CTC signal header
+- serial printer
+- cassette (no information, assumed to be on another card)
 
 *****************************************************************************************************/
-
-/*
-
-    TODO:
-
-    - cannot boot from floppy (at prompt press ^C, wait, it says 'Drive not ready')
-    - honor jumper settings
-    - CTC signal header
-    - serial printer
-    - cassette? (no mention of it in the manuals)
-
-*/
 
 
 #include "emu.h"
@@ -157,16 +159,6 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 	return 0xff;
 }
 
-READ8_MEMBER( xor100_state::fdc_r )
-{
-	return m_fdc->gen_r(offset) ^ 0xff;
-}
-
-WRITE8_MEMBER( xor100_state::fdc_w )
-{
-	m_fdc->gen_w(offset, data ^ 0xff);
-}
-
 READ8_MEMBER( xor100_state::fdc_wait_r )
 {
 	/*
@@ -188,12 +180,11 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 	{
 		if (!m_fdc_irq && !m_fdc_drq)
 		{
-			fatalerror("Z80 WAIT not supported by MAME core\n");
 			m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 		}
 	}
 
-	return !m_fdc_irq << 7;
+	return m_fdc_irq ? 0x7f : 0xff;
 }
 
 WRITE8_MEMBER( xor100_state::fdc_dcont_w )
@@ -276,7 +267,9 @@ void xor100_state::xor100_io(address_map &map)
 	map(0x0a, 0x0a).r(FUNC(xor100_state::prom_disable_r));
 	map(0x0b, 0x0b).portr("DSW0").w(COM5016_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x0c, 0x0f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xf8, 0xfb).rw(FUNC(xor100_state::fdc_r), FUNC(xor100_state::fdc_w));
+	map(0xf8, 0xfb).lrw8("fdc",
+					[this](offs_t offset) { return m_fdc->read(offset) ^ 0xff; },
+					[this](offs_t offset, u8 data) { m_fdc->write(offset, data ^ 0xff); });
 	map(0xfc, 0xfc).rw(FUNC(xor100_state::fdc_wait_r), FUNC(xor100_state::fdc_dcont_w));
 	map(0xfd, 0xfd).w(FUNC(xor100_state::fdc_dsel_w));
 }
@@ -429,10 +422,7 @@ void xor100_state::fdc_intrq_w(bool state)
 	m_ctc->trg0(state);
 
 	if (state)
-	{
-		fatalerror("Z80 WAIT not supported by MAME core\n");
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
-	}
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 void xor100_state::fdc_drq_w(bool state)
@@ -440,21 +430,9 @@ void xor100_state::fdc_drq_w(bool state)
 	m_fdc_drq = state;
 
 	if (state)
-	{
-		fatalerror("Z80 WAIT not supported by MAME core\n");
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
-	}
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
-
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
 
 static void xor100_s100_cards(device_slot_interface &device)
 {
@@ -526,13 +504,12 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(I8251_A_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_A_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_B_TAG, i8251_device, write_rxc))
+	com8116_device &brg(COM8116(config, COM5016_TAG, 5.0688_MHz_XTAL));
+	brg.fr_handler().set(m_uart_a, FUNC(i8251_device::write_txc));
+	brg.fr_handler().append(m_uart_a, FUNC(i8251_device::write_rxc));
+	brg.ft_handler().set(m_uart_b, FUNC(i8251_device::write_txc));
+	brg.ft_handler().append(m_uart_b, FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
@@ -573,9 +550,7 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	MCFG_S100_SLOT_ADD(S100_TAG ":10", xor100_s100_cards, nullptr)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("128K,192K,256K,320K,384K,448K,512K");
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -589,4 +564,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY             FULLNAME        FLAGS
-COMP( 1980, xor100, 0,      0,      xor100,  xor100, xor100_state, empty_init, "XOR Data Science", "XOR S-100-12", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, xor100, 0,      0,      xor100,  xor100, xor100_state, empty_init, "XOR Data Science", "XOR S-100-12", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

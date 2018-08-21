@@ -291,7 +291,6 @@
 #include "screen.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
 
 #include "sf2049.lh"
 
@@ -325,13 +324,58 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
-		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
-		m_io_analog(*this, "AN.%u", 0),
+		m_io_analog(*this, "AN.%u", 0U),
+		m_io_49way_x(*this, "49WAYX_P%u", 1U),
+		m_io_49way_y(*this, "49WAYY_P%u", 1U),
+		m_io_keypad(*this, "KEYPAD"),
+		m_io_gearshift(*this, "GEAR"),
+		m_io_system(*this, "SYSTEM"),
+		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_a2d_shift(0)
 	{ }
+
+	void vegascore(machine_config &config);
+	void vegas(machine_config &config);
+	void vegas250(machine_config &config);
+	void vegas32m(machine_config &config);
+	void vegasban(machine_config &config);
+	void vegasv3(machine_config &config);
+	void denver(machine_config &config);
+
+	void nbanfl(machine_config &config);
+	void sf2049te(machine_config &config);
+	void sf2049se(machine_config &config);
+	void nbashowt(machine_config &config);
+	void gauntdl(machine_config &config);
+	void sf2049(machine_config &config);
+	void gauntleg(machine_config &config);
+	void cartfury(machine_config &config);
+	void tenthdeg(machine_config &config);
+	void nbagold(machine_config &config);
+	void roadburn(machine_config &config);
+	void warfa(machine_config &config);
+
+	void init_gauntleg();
+	void init_cartfury();
+	void init_tenthdeg();
+	void init_nbashowt();
+	void init_nbagold();
+	void init_warfa();
+	void init_roadburn();
+	void init_sf2049te();
+	void init_gauntdl();
+	void init_nbanfl();
+	void init_sf2049();
+	void init_sf2049se();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
+private:
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
 
 	required_device<mips3_device> m_maincpu;
@@ -340,10 +384,15 @@ public:
 	required_device<smc91c94_device> m_ethernet;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
-	optional_device<generic_terminal_device> m_uart0;
 	optional_device<ns16550_device> m_uart1;
 	optional_device<ns16550_device> m_uart2;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport_array<4> m_io_49way_x;
+	optional_ioport_array<4> m_io_49way_y;
+	optional_ioport m_io_keypad;
+	optional_ioport m_io_gearshift;
+	optional_ioport m_io_system;
+	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 
 	int m_a2d_shift;
@@ -366,18 +415,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_cb);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-	void init_gauntleg();
-	void init_cartfury();
-	void init_tenthdeg();
-	void init_nbashowt();
-	void init_nbagold();
-	void init_warfa();
-	void init_roadburn();
-	void init_sf2049te();
-	void init_gauntdl();
-	void init_nbanfl();
-	void init_sf2049();
-	void init_sf2049se();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -411,32 +449,11 @@ public:
 	DECLARE_WRITE8_MEMBER(parallel_w);
 	DECLARE_WRITE8_MEMBER(mpsreset_w);
 	DECLARE_WRITE32_MEMBER(i40_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
 	DECLARE_WRITE32_MEMBER(wheel_board_w);
 
 	std::string sioIRQString(uint8_t data);
-	void vegascore(machine_config &config);
-	void vegas(machine_config &config);
-	void vegas250(machine_config &config);
-	void vegas32m(machine_config &config);
-	void vegasban(machine_config &config);
-	void vegasv3(machine_config &config);
-	void denver(machine_config &config);
 
-	void nbanfl(machine_config &config);
-	void sf2049te(machine_config &config);
-	void sf2049se(machine_config &config);
-	void nbashowt(machine_config &config);
-	void gauntdl(machine_config &config);
-	void sf2049(machine_config &config);
-	void gauntleg(machine_config &config);
-	void cartfury(machine_config &config);
-	void tenthdeg(machine_config &config);
-	void nbagold(machine_config &config);
-	void roadburn(machine_config &config);
-	void warfa(machine_config &config);
 	void vegas_cs2_map(address_map &map);
 	void vegas_cs3_map(address_map &map);
 	void vegas_cs4_map(address_map &map);
@@ -457,6 +474,7 @@ void vegas_state::machine_start()
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
+	m_wheel_driver.resolve();
 	m_lamps.resolve();
 
 	/* register for save states */
@@ -939,7 +957,7 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
 		m_pending_analog_read = currValue;
 	}
 	// Declare calibration finished as soon as a SYSTEM button is hit
-	if (!m_wheel_calibrated && ((~ioport("SYSTEM")->read()) & 0xffff)) {
+	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
 		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
 	}
@@ -1039,28 +1057,28 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 	uint8_t data = 0;
 	switch (index) {
 	case 0:
-		data = translate49[ioport("49WAYX_P1")->read() >> 4];
+		data = translate49[m_io_49way_x[0]->read() >> 4];
 		break;
 	case 1:
-		data = translate49[ioport("49WAYY_P1")->read() >> 4];
+		data = translate49[m_io_49way_y[0]->read() >> 4];
 		break;
 	case 2:
-		data = translate49[ioport("49WAYX_P2")->read() >> 4];
+		data = translate49[m_io_49way_x[1]->read() >> 4];
 		break;
 	case 3:
-		data = translate49[ioport("49WAYY_P2")->read() >> 4];
+		data = translate49[m_io_49way_y[1]->read() >> 4];
 		break;
 	case 4:
-		data = translate49[ioport("49WAYX_P3")->read() >> 4];
+		data = translate49[m_io_49way_x[2]->read() >> 4];
 		break;
 	case 5:
-		data = translate49[ioport("49WAYY_P3")->read() >> 4];
+		data = translate49[m_io_49way_y[2]->read() >> 4];
 		break;
 	case 6:
-		data = translate49[ioport("49WAYX_P4")->read() >> 4];
+		data = translate49[m_io_49way_x[3]->read() >> 4];
 		break;
 	case 7:
-		data = translate49[ioport("49WAYY_P4")->read() >> 4];
+		data = translate49[m_io_49way_y[3]->read() >> 4];
 		break;
 	case 10:
 	case 11:
@@ -1096,7 +1114,7 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 		switch (op)
 		{
 		case 0x0:
-			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(~arg);
 			break;
 
@@ -1124,7 +1142,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
 			break;
 	}
 	if (row_sel <= 3) {
-		uint32_t bits = ioport((const char *)param)->read();
+		uint32_t bits = m_io_keypad->read();
 		bits >>= row_sel * 3;
 		return bits & 0x7;
 	}
@@ -1140,7 +1158,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
 DECLARE_CUSTOM_INPUT_MEMBER(vegas_state::gearshift_r)
 {
 	// Check for gear change and save gear selection
-	uint32_t gear = ioport("GEAR")->read();
+	uint32_t gear = m_io_gearshift->read();
 	for (int i = 0; i < 4; i++)
 	{
 		if (gear & (1 << i))
@@ -1739,9 +1757,9 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_VRC5074_SET_CS(6, vegas_state::vegas_cs6_map)
 	MCFG_VRC5074_SET_CS(7, vegas_state::vegas_cs7_map)
 
-	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x10950646, 0x05, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(WRITELINE(PCI_ID_NILE, vrc5074_device, pci_intr_d))
-	//MCFG_IDE_PCI_SET_PIF(0x8f)
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x10950646, 0x05, 0x0));
+	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
+	//ide.set_pif(0x8f);
 
 	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_2_PCI, 0, m_maincpu, "screen")
 	MCFG_VOODOO_PCI_FBMEM(2)
@@ -1749,9 +1767,9 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
 
-	MCFG_DEVICE_ADD(m_timekeeper, M48T37, 0)
-	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, vegas_state, watchdog_reset))
-	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, vegas_state, watchdog_irq))
+	M48T37(config, m_timekeeper);
+	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
+	m_timekeeper->irq_cb().set(FUNC(vegas_state::watchdog_irq));
 
 	MCFG_SMC91C94_ADD(m_ethernet)
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, vegas_state, ethernet_interrupt))

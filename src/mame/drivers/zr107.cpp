@@ -215,7 +215,14 @@ public:
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_konppc(*this, "konppc") { }
 
+	void zr107(machine_config &config);
+	void jetwave(machine_config &config);
 
+	void init_common();
+	void init_zr107();
+	void init_jetwave();
+
+private:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
@@ -250,26 +257,21 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
 	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
 
-	void init_common();
-	void init_zr107();
-	void init_jetwave();
 	DECLARE_VIDEO_START(zr107);
 	DECLARE_VIDEO_START(jetwave);
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
-	ADC083X_INPUT_CB(adc0838_callback);
+	double adc0838_callback(uint8_t input);
 	K056832_CB_MEMBER(tile_callback);
 
-	void zr107(machine_config &config);
-	void jetwave(machine_config &config);
 	void jetwave_map(address_map &map);
 	void k054539_map(address_map &map);
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
 	void zr107_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -717,7 +719,7 @@ INPUT_PORTS_END
 
 /* ADC0838 Interface */
 
-ADC083X_INPUT_CB(zr107_state::adc0838_callback)
+double zr107_state::adc0838_callback(uint8_t input)
 {
 	switch (input)
 	{
@@ -727,16 +729,11 @@ ADC083X_INPUT_CB(zr107_state::adc0838_callback)
 		return (double)(5 * m_analog2->read()) / 255.0;
 	case ADC083X_CH2:
 		return (double)(5 * m_analog3->read()) / 255.0;
-	case ADC083X_CH3:
-		return 0;
-	case ADC083X_COM:
-		return 0;
-	case ADC083X_AGND:
-		return 0;
 	case ADC083X_VREF:
 		return 5;
+	default:
+		return 0;
 	}
-	return 0;
 }
 
 
@@ -833,8 +830,8 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
+	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
@@ -912,8 +909,8 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
+	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)

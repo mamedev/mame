@@ -177,6 +177,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void radicasi(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -186,7 +189,6 @@ public:
 	DECLARE_READ8_MEMBER(radicasi_rombank_lo_r);
 	DECLARE_WRITE8_MEMBER(radicasi_rombank_lo_w);
 	DECLARE_WRITE8_MEMBER(radicasi_rombank_hi_w);
-
 
 	// DMA
 	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_lo_w);
@@ -235,18 +237,15 @@ public:
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
-	void radicasi(machine_config &config);
-
 	void radicasi_bank_map(address_map &map);
 	void radicasi_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_vram;
@@ -1154,12 +1153,7 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 	MCFG_DEVICE_PROGRAM_MAP(radicasi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)
 
-	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(radicasi_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a05_state::radicasi_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

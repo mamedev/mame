@@ -1468,17 +1468,17 @@ MACHINE_CONFIG_START(nemesis_state::nemesis)
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map) /* fixed */
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 13J
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // 13J
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
+	outlatch.q_out_cb<0>().append(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0) // 11K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch")); // 11K
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1535,17 +1535,17 @@ MACHINE_CONFIG_START(nemesis_state::gx400)
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gx400_sound_map)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1608,16 +1608,16 @@ MACHINE_CONFIG_START(nemesis_state::konamigt)
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin1_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1675,17 +1675,17 @@ MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gx400_sound_map)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1949,10 +1949,10 @@ MACHINE_CONFIG_START(nemesis_state::hcrash)
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)       /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sal_sound_map)
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w)) // or at 0x0c2804 ?
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set_nop(); // ?
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq2_enable_w)); // or at 0x0c2804 ?
+	intlatch.q_out_cb<2>().set_nop(); // ?
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2704,17 +2704,17 @@ MACHINE_CONFIG_START(nemesis_state::bubsys)
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gx400_sound_map)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

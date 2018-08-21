@@ -116,11 +116,6 @@ DONE:
 class notetaker_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_FIFOCLK,
-	};
-
 	notetaker_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
 		m_iop_cpu(*this, "iop_cpu"),
@@ -136,6 +131,17 @@ public:
 		m_floppy(nullptr)
 	{
 	}
+
+	void notetakr(machine_config &config);
+
+	void init_notetakr();
+
+private:
+	enum
+	{
+		TIMER_FIFOCLK,
+	};
+
 // devices
 	required_device<cpu_device> m_iop_cpu;
 	required_device<pic8259_device> m_iop_pic;
@@ -172,7 +178,6 @@ public:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iop_r);
 	DECLARE_WRITE16_MEMBER(iop_w);
-	void init_notetakr();
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -228,12 +233,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void notetakr(machine_config &config);
 	void iop_io(address_map &map);
 	void iop_mem(address_map &map);
 	void ep_io(address_map &map);
 	void ep_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -842,13 +846,15 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	AY31015(config, m_kbduart, 0); // HD6402, == AY-3-1015D
+	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	m_kbduart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
 
-	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	AY31015(config, m_eiauart, 0); // HD6402, == AY-3-1015D
+	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	m_eiauart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
 
 	/* Floppy */
 	MCFG_DEVICE_ADD("wd1791", FD1791, (((24_MHz_XTAL/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board

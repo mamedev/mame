@@ -9,8 +9,6 @@
 
 11/09/2011 - modernised. The portable doesn't seem to have
              scroll registers, and it sets the palette to black.
-             I've added a temporary video output so that you can get
-             an idea of what the screen should look like. [Robbbert]
 
 ****************************************************************************/
 
@@ -50,15 +48,12 @@
 
 #define I8086_TAG       "ic7"
 #define I8284_TAG       "ic30"
-#define I8237_TAG       "ic17"
 #define I8259A_TAG      "ic51"
-#define I8253A5_TAG     "ic20"
 #define TMS4500_TAG     "ic42"
 #define MC6845_TAG      "ic69"
 #define HD63B01V1_TAG   "ic29"
 #define AD7574_TAG      "ic34"
 #define AD1408_TAG      "ic37"
-#define Z80SIO0_TAG     "ic6"
 #define WD2797_TAG      "ic5"
 #define SN76489AN_TAG   "ic13"
 #define CENTRONICS_TAG  "centronics"
@@ -87,24 +82,27 @@ class fp_state : public driver_device
 {
 public:
 	fp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8086_TAG),
-			m_soundcpu(*this, HD63B01V1_TAG),
-			m_dmac(*this, I8237_TAG),
-			m_pic(*this, I8259A_TAG),
-			m_pit(*this, I8253A5_TAG),
-			m_sio(*this, Z80SIO0_TAG),
-			m_fdc(*this, WD2797_TAG),
-			m_crtc(*this, MC6845_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, WD2797_TAG":0"),
-			m_floppy1(*this, WD2797_TAG":1"),
-			m_floppy(nullptr),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_work_ram(*this, "work_ram"),
-			m_video_ram(*this, "video_ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, I8086_TAG)
+		, m_soundcpu(*this, HD63B01V1_TAG)
+		, m_dmac(*this, "ic17")
+		, m_pic(*this, I8259A_TAG)
+		, m_pit(*this, "ic20")
+		, m_sio(*this, "ic6")
+		, m_fdc(*this, WD2797_TAG)
+		, m_crtc(*this, MC6845_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_floppy0(*this, WD2797_TAG":0")
+		, m_floppy1(*this, WD2797_TAG":1")
+		, m_floppy(nullptr)
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_work_ram(*this, "work_ram")
+		, m_video_ram(*this, "video_ram")
 	{ }
 
+	void fp(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<cpu_device> m_maincpu;
@@ -155,7 +153,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	void fp(machine_config &config);
+
 	void fp_io(address_map &map);
 	void fp_mem(address_map &map);
 	void sound_io(address_map &map);
@@ -575,11 +573,6 @@ FLOPPY_FORMATS_MEMBER( fp_state::floppy_formats )
 	FLOPPY_APRIDISK_FORMAT
 FLOPPY_FORMATS_END
 
-static void fp_floppies(device_slot_interface &device)
-{
-	device.option_add("d32w", SONY_OA_D32W);
-}
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( fp )
@@ -598,7 +591,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_apricotp )
+	config.set_default_layout(layout_apricotp);
 
 	MCFG_SCREEN_ADD(SCREEN_LCD_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -631,42 +624,40 @@ MACHINE_CONFIG_START(fp_state::fp)
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
-	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 250000)
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(I8259A_TAG, pic8259_device, ir7_w))
-	MCFG_I8237_IN_IOR_1_CB(READ8(WD2797_TAG, wd_fdc_device_base, data_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(WD2797_TAG, wd_fdc_device_base, data_w))
+	AM9517A(config, m_dmac, 250000);
+	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
+	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
 
-	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8253A5_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_CLK2(2000000)
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(2000000);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(2000000);
+	m_pit->set_clk<2>(2000000);
 
-	MCFG_DEVICE_ADD(Z80SIO0_TAG, Z80SIO, 2500000)
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+	Z80SIO(config, m_sio, 2500000);
+	m_sio->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 2000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir1_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq1_w))
+	WD2797(config, m_fdc, 2000000);
+	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", fp_floppies, "d32w", fp_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", fp_floppies, nullptr,   fp_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, "d32w", SONY_OA_D32W, true,  floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, "d32w", SONY_OA_D32W, false, floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, fp_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fp_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fp_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fp_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(fp_state::write_centronics_select));
+	m_centronics->fault_handler().set(FUNC(fp_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(fp_state::write_centronics_perror));
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,1M");
 MACHINE_CONFIG_END
 
 

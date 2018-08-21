@@ -36,8 +36,6 @@ public:
 
 protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	DECLARE_READ8_MEMBER(leta_r);
 	DECLARE_WRITE8_MEMBER(nvram_recall_w);
 	DECLARE_WRITE8_MEMBER(nvram_store_w);

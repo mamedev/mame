@@ -136,8 +136,14 @@ public:
 			m_attr0(*this, "attr0"),
 			m_vram1(*this, "vram1"),
 			m_attr1(*this, "attr1")
-
 			{ }
+
+	void rblaster(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -153,18 +159,14 @@ public:
 	required_shared_ptr<uint8_t> m_vram1;
 	required_shared_ptr<uint8_t> m_attr1;
 
-	uint8_t m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_READ8_MEMBER(acia_status_hack_r);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
-	void rblaster(machine_config &config);
 	void rblaster_map(address_map &map);
 	void rblaster_sound_map(address_map &map);
 };
@@ -485,9 +487,9 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
-	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("laserdisc", sony_ldp1000_device, write))
-	//MCFG_ACIA6850_RXD_HANDLER(READLINE("laserdisc", sony_ldp1000_device, read))
+	//ACIA6850(config, m_acia, 0);
+	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
+	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 
 	/* sound hardware */
 	/* TODO: mixing */

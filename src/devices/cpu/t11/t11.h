@@ -32,7 +32,7 @@ enum
 	downcast<t11_device &>(*device).set_initial_mode(_mode);
 
 #define MCFG_T11_RESET(_devcb) \
-	devcb = &downcast<t11_device &>(*device).set_out_reset_func(DEVCB_##_devcb);
+	downcast<t11_device &>(*device).set_out_reset_func(DEVCB_##_devcb);
 
 class t11_device :  public cpu_device
 {

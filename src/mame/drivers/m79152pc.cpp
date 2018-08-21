@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/clock.h"
@@ -32,12 +33,15 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
+	void m79152pc(machine_config &config);
+
+private:
 	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void m79152pc(machine_config &config);
-	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+	void io_map(address_map &map);
+	void mcu_map(address_map &map);
+
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attributes;
@@ -49,7 +53,7 @@ private:
 void m79152pc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom();
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);;
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0x8fff).ram().share("videoram");
 	map(0x9000, 0x9fff).ram().share("attributes");
@@ -61,6 +65,11 @@ void m79152pc_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x44, 0x47).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
+
+void m79152pc_state::mcu_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("mcu", 0);
 }
 
 /* Input ports */
@@ -131,6 +140,9 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
+	MCFG_DEVICE_ADD("mcu", I8035, 6'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -142,9 +154,9 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", z80sio_device, rxca_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set(m_uart, FUNC(z80sio_device::txca_w));
+	uart_clock.signal_handler().append(m_uart, FUNC(z80sio_device::rxca_w));
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -168,12 +180,14 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( m79152pc )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "left.bin", 0x0000, 0x4000, CRC(8cd677fc) SHA1(7ad28f3ba984383f24a36639ca27fc1eb5a5d002))
 
-	ROM_REGION( 0x1800, "chargen", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "chargen", ROMREGION_INVERT )
 	ROM_LOAD( "right.bin", 0x0000, 0x1000, CRC(93f83fdc) SHA1(e8121b3d175c46c02828f43ec071a7d9c62e7c26)) // chargen
-	ROM_LOAD( "char.bin",  0x1000, 0x0800, CRC(da3792a5) SHA1(b4a4f0d61d8082b7909a346a5b01494c53cf8d05)) // unknown
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "char.bin",  0x0000, 0x0800, CRC(da3792a5) SHA1(b4a4f0d61d8082b7909a346a5b01494c53cf8d05))
 ROM_END
 
 /* Driver */

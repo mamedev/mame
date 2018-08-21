@@ -44,6 +44,12 @@ public:
 		m_ramdac(*this, "ramdac"),
 		m_palette(*this, "palette") { }
 
+	void mediagx(machine_config &config);
+
+	void init_mediagx();
+	void init_pinball2k();
+
+private:
 	required_shared_ptr<uint32_t> m_main_ram;
 	required_shared_ptr<uint32_t> m_cga_ram;
 	required_shared_ptr<uint32_t> m_bios_ram;
@@ -68,9 +74,9 @@ public:
 	uint8_t m_mediagx_config_regs[256];
 
 	//uint8_t m_controls_data;
-	uint8_t m_parallel_pointer;
-	uint8_t m_parallel_latched;
-	uint32_t m_parport;
+	//uint8_t m_parallel_pointer;
+	//uint8_t m_parallel_latched;
+	//uint32_t m_parport;
 	//int m_control_num;
 	//int m_control_num2;
 	//int m_control_read;
@@ -91,7 +97,7 @@ public:
 	DECLARE_WRITE32_MEMBER(port400_w);
 	DECLARE_READ32_MEMBER(port800_r);
 	DECLARE_WRITE32_MEMBER(port800_w);
-	void init_pinball2k();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -99,8 +105,6 @@ public:
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void init_mediagx();
-	void mediagx(machine_config &config);
 	void mediagx_io(address_map &map);
 	void mediagx_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -611,8 +615,8 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, pinball2k_state, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 

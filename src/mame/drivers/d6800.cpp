@@ -72,6 +72,10 @@ public:
 		, m_io_shift(*this, "SHIFT")
 		{ }
 
+
+	void d6800(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
 	DECLARE_READ8_MEMBER( d6800_keyboard_r );
@@ -82,9 +86,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 
-	void d6800(machine_config &config);
 	void d6800_map(address_map &map);
-private:
+
 	uint8_t m_rtc;
 	bool m_cb2;
 	bool m_cassold;
@@ -407,14 +410,14 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, d6800_state, d6800_keyboard_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, d6800_state, d6800_cassette_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, d6800_state, d6800_keyboard_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, d6800_state, d6800_cassette_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, d6800_state, d6800_screen_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(d6800_state::d6800_keyboard_r));
+	m_pia->readpb_handler().set(FUNC(d6800_state::d6800_cassette_r));
+	m_pia->writepa_handler().set(FUNC(d6800_state::d6800_keyboard_w));
+	m_pia->writepb_handler().set(FUNC(d6800_state::d6800_cassette_w));
+	m_pia->cb2_handler().set(FUNC(d6800_state::d6800_screen_w));
+	m_pia->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

@@ -106,7 +106,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x04: // FLOP
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 		break;
 
 	case 0x05: // VIPS
@@ -149,7 +149,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x04: // FLOP
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 		break;
 
 	case 0x05: // VIPS
@@ -758,13 +758,13 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tiki100_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tiki100_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, tiki100_state, write_centronics_perror))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->ack_handler().set(FUNC(tiki100_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(tiki100_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(tiki100_state::write_centronics_perror));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
@@ -780,8 +780,7 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tiki100")

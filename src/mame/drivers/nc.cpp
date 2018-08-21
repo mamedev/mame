@@ -101,9 +101,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/mc146818.h"   // for NC200 real time clock
 #include "machine/rp5c01.h"     // for NC100 real time clock
-#include "machine/upd765.h"     // for NC200 disk drive interface
 #include "formats/pc_dsk.h"     // for NC200 disk image
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -677,7 +675,7 @@ WRITE8_MEMBER(nc_state::nc_uart_control_w)
 		/* changed uart from off to on */
 		if ((data & (1<<3))==0)
 		{
-			machine().device("uart")->reset();
+			m_uart->reset();
 		}
 	}
 
@@ -1228,13 +1226,12 @@ WRITE8_MEMBER(nc200_state::nc200_uart_control_w)
 
 WRITE8_MEMBER(nc200_state::nc200_memory_card_wait_state_w)
 {
-	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	LOGDEBUG("nc200 memory card wait state: PC: %04x %02x\n", m_maincpu->pc(), data);
 #if 0
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
 #endif
-	fdc->tc_w(data & 0x01);
+	m_fdc->tc_w(data & 0x01);
 }
 
 /* bit 2: backlight: 1=off, 0=on */
@@ -1395,8 +1392,6 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_PALETTE_ADD("palette", NC_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(nc_state, nc)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep.1", BEEP, 0)
@@ -1422,8 +1417,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_GENERIC_UNLOAD(nc_state, nc_pcmcia_card)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	/* dummy timer */
@@ -1500,8 +1494,7 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 MACHINE_CONFIG_END
 
 

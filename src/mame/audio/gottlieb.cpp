@@ -12,13 +12,19 @@
 
 #include "emu.h"
 #include "audio/gottlieb.h"
+
 #include "sound/dac.h"
+#include "machine/input_merger.h"
 #include "sound/volt_reg.h"
 
 
-#define SOUND1_CLOCK        XTAL(3'579'545)
-#define SOUND2_CLOCK        XTAL(4'000'000)
-#define SOUND2_SPEECH_CLOCK XTAL(3'120'000)
+namespace {
+
+constexpr XTAL SOUND1_CLOCK(3'579'545);
+constexpr XTAL SOUND2_CLOCK(4'000'000);
+constexpr XTAL SOUND2_SPEECH_CLOCK(3'120'000);
+
+} // anonymous namespace
 
 
 //**************************************************************************
@@ -167,10 +173,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
-	, m_audiocpu(*this, "audiocpu")
 	, m_riot(*this, "riot")
-	, m_votrax(*this, "votrax")
-	, m_last_speech_clock(0)
 {
 }
 
@@ -189,80 +192,6 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::write )
 
 
 //-------------------------------------------------
-//  snd_interrupt - signal a sound interrupt
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( gottlieb_sound_r1_device::snd_interrupt )
-{
-	m_audiocpu->set_input_line(M6502_IRQ_LINE, state);
-}
-
-
-//-------------------------------------------------
-//  r6532_portb_w - handle writes to the RIOT's
-//  port B
-//-------------------------------------------------
-
-WRITE8_MEMBER( gottlieb_sound_r1_device::r6532_portb_w )
-{
-	// unsure if this is ever used, but the NMI is connected to the RIOT's PB7
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-//-------------------------------------------------
-//  votrax_data_w - write data to the Votrax SC-01
-//  speech chip
-//-------------------------------------------------
-
-WRITE8_MEMBER( gottlieb_sound_r1_device::votrax_data_w )
-{
-	if (m_votrax != nullptr)
-	{
-		m_votrax->inflection_w(space, offset, data >> 6);
-		m_votrax->write(space, offset, ~data & 0x3f);
-	}
-}
-
-
-//-------------------------------------------------
-//  speech_clock_dac_w - modify the clock driving
-//  the Votrax SC-01 speech chip
-//-------------------------------------------------
-
-WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
-{
-	// prevent negative clock values (and possible crash)
-	if (data < 0x65) data = 0x65;
-
-	if (m_votrax != nullptr)
-	{
-		// nominal clock is 0xa0
-		if (data != m_last_speech_clock)
-		{
-			osd_printf_debug("clock = %02X\n", data);
-
-			// totally random guesswork; would like to get real measurements on a board
-			if (m_votrax != nullptr)
-				m_votrax->set_unscaled_clock(600000 + (data - 0xa0) * 10000);
-			m_last_speech_clock = data;
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  votrax_request - map the VOTRAX SC-01 request
-//  line to the NMI pin on the sound chip
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( gottlieb_sound_r1_device::votrax_request )
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-
-//-------------------------------------------------
 //  audio CPU map
 //-------------------------------------------------
 
@@ -273,9 +202,15 @@ void gottlieb_sound_r1_device::gottlieb_sound_r1_map(address_map &map)
 	map(0x0000, 0x007f).mirror(0x0d80).ram();
 	map(0x0200, 0x021f).mirror(0x0de0).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x1000, 0x1000).mirror(0x0fff).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_device::votrax_data_w));
-	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_device::speech_clock_dac_w));
 	map(0x6000, 0x7fff).rom();
+}
+
+void gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_map(address_map &map)
+{
+	// A15 not decoded except in expansion socket
+	gottlieb_sound_r1_device::gottlieb_sound_r1_map(map);
+	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_with_votrax_device::votrax_data_w));
+	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w));
 }
 
 
@@ -313,11 +248,13 @@ MACHINE_CONFIG_START(gottlieb_sound_r1_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
 	MCFG_DEVICE_PROGRAM_MAP(gottlieb_sound_r1_map)
 
+	INPUT_MERGER_ANY_HIGH(config, "nmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+
 	// I/O configuration
-	MCFG_DEVICE_ADD("riot", RIOT6532, SOUND1_CLOCK/4)
-	MCFG_RIOT6532_IN_PB_CB(IOPORT("SB1"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gottlieb_sound_r1_device, r6532_portb_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, gottlieb_sound_r1_device, snd_interrupt))
+	RIOT6532(config, m_riot, SOUND1_CLOCK/4);
+	m_riot->in_pb_callback().set_ioport("SB1");
+	m_riot->out_pb_callback().set("nmi", FUNC(input_merger_device::in_w<0>)).bit(7).invert(); // unsure if this is ever used, but the NMI is connected to the RIOT's PB7
+	m_riot->irq_callback().set_inputline("audiocpu", M6502_IRQ_LINE);
 
 	// sound devices
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25) // unknown DAC
@@ -358,6 +295,8 @@ void gottlieb_sound_r1_device::device_start()
 
 gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1_VOTRAX, tag, owner, clock)
+	, m_votrax(*this, "votrax")
+	, m_last_speech_clock(0)
 {
 }
 
@@ -366,14 +305,15 @@ gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(gottlieb_sound_r1_with_votrax_device::device_add_mconfig)
+void gottlieb_sound_r1_with_votrax_device::device_add_mconfig(machine_config &config)
+{
 	gottlieb_sound_r1_device::device_add_mconfig(config);
 
 	// add the VOTRAX
-	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
-	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(DEVICE_SELF, gottlieb_sound_r1_device, votrax_request))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.5)
-MACHINE_CONFIG_END
+	VOTRAX_SC01(config, m_votrax, 720000);
+	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
+	m_votrax->add_route(ALL_OUTPUTS, *this, 0.5);
+}
 
 
 //-------------------------------------------------
@@ -384,6 +324,60 @@ MACHINE_CONFIG_END
 ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( gottlieb_sound_r1_with_votrax );
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gottlieb_sound_r1_with_votrax_device::device_start()
+{
+	gottlieb_sound_r1_device::device_start();
+	save_item(NAME(m_last_speech_clock));
+}
+
+
+void gottlieb_sound_r1_with_votrax_device::device_post_load()
+{
+	gottlieb_sound_r1_device::device_post_load();
+
+	// totally random guesswork; would like to get real measurements on a board
+	m_votrax->set_unscaled_clock(600000 + (m_last_speech_clock - 0xa0) * 10000);
+}
+
+
+//-------------------------------------------------
+//  votrax_data_w - write data to the Votrax SC-01
+//  speech chip
+//-------------------------------------------------
+
+WRITE8_MEMBER( gottlieb_sound_r1_with_votrax_device::votrax_data_w )
+{
+	m_votrax->inflection_w(space, offset, data >> 6);
+	m_votrax->write(space, offset, ~data & 0x3f);
+}
+
+
+//-------------------------------------------------
+//  speech_clock_dac_w - modify the clock driving
+//  the Votrax SC-01 speech chip
+//-------------------------------------------------
+
+WRITE8_MEMBER( gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w )
+{
+	// prevent negative clock values (and possible crash)
+	if (data < 0x65) data = 0x65;
+
+	// nominal clock is 0xa0
+	if (data != m_last_speech_clock)
+	{
+		logerror("clock = %02X\n", data);
+
+		// totally random guesswork; would like to get real measurements on a board
+		m_votrax->set_unscaled_clock(600000 + (data - 0xa0) * 10000);
+		m_last_speech_clock = data;
+	}
 }
 
 

@@ -54,9 +54,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_ay8910(*this, "ay8910") { }
 
-void init_dynadice();
+	void dynadice(machine_config &config);
 
-void dynadice(machine_config &config);
+	void init_dynadice();
 
 protected:
 	virtual void machine_start() override;

@@ -253,12 +253,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_DEVICE_ADD("maincpu", MC6809, 12.0576_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(poly_mem)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(poly_bank)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&poly_state::poly_bank).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
@@ -285,14 +280,12 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K");
 
 	/* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	//MCFG_MC6854_OUT_TXD_CB(WRITELINE(NETWORK_TAG, poly_network_device, data_w))
-	//MCFG_MC6854_OUT_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
+	MC6854(config, m_adlc);
+	//m_adlc->out_txd_cb().set(NETWORK_TAG, FUNC(poly_network_device::data_w));
+	//m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	//MCFG_POLY_NETWORK_ADD()
 	//MCFG_POLY_NETWORK_CLK_CB(WRITELINE(*this, poly_state, network_clk_w))
@@ -301,11 +294,11 @@ MACHINE_CONFIG_START(poly_state::poly)
 	//MCFG_POLY_NETWORK_SLOT_ADD("netdown", poly_network_devices, nullptr)
 
 	/* timer */
-	MCFG_DEVICE_ADD("ptm", PTM6840, 12.0576_MHz_XTAL / 3)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, poly_state, ptm_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, poly_state, ptm_o3_callback))
-	//MCFG_PTM6840_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
+	PTM6840(config, m_ptm, 12.0576_MHz_XTAL / 3);
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o2_callback().set(FUNC(poly_state::ptm_o2_callback));
+	m_ptm->o3_callback().set(FUNC(poly_state::ptm_o3_callback));
+	//m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* keyboard encoder */
 	//MCFG_DEVICE_ADD("kr2376", KR2376_12, 50000)
@@ -326,31 +319,30 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(poly_state, kbd_put))
 
 	/* video control */
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, poly_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, poly_state, pia0_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pa_w));
+	m_pia[0]->writepb_handler().set(FUNC(poly_state::pia0_pb_w));
+	m_pia[0]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
+	m_pia[0]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
 	/* keyboard PIA */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, poly_state, pia1_b_in))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<4>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<5>))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpb_handler().set(FUNC(poly_state::pia1_b_in));
+	m_pia[1]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
+	m_pia[1]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
 	/* optional rs232 interface */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<6>))
+	ACIA6850(config, m_acia, 0);
+	//m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	CLOCK(config, m_acia_clock, 153600);
+	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_acia_clock->signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "poly_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY1")
+	SOFTWARE_LIST(config, "flop_list").set_original("poly_flop").set_filter("POLY1");
 MACHINE_CONFIG_END
 
 
@@ -358,8 +350,7 @@ MACHINE_CONFIG_START(poly_state::poly2)
 	poly(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY2")

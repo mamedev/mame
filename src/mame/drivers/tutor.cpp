@@ -200,6 +200,10 @@ public:
 	{
 	}
 
+	void pyuutajr(machine_config &config);
+	void tutor(machine_config &config);
+
+private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	optional_device<cassette_image_device> m_cass;
@@ -227,8 +231,6 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	void pyuutajr(machine_config &config);
-	void tutor(machine_config &config);
 	void pyuutajr_mem(address_map &map);
 	void tutor_io(address_map &map);
 	void tutor_memmap(address_map &map);
@@ -746,7 +748,9 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), tutor_memmap, tutor_io)
+	TMS9995(config, m_maincpu, XTAL(10'738'635));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tutor_state::tutor_memmap);
+	m_maincpu->set_addrmap(AS_IO, &tutor_state::tutor_io);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )

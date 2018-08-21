@@ -387,6 +387,15 @@ public:
 	{
 	}
 
+	void viper(machine_config &config);
+
+	void init_viper();
+	void init_vipercf();
+	void init_viperhd();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
+
+private:
 	DECLARE_READ32_MEMBER(epic_r);
 	DECLARE_WRITE32_MEMBER(epic_w);
 	DECLARE_WRITE64_MEMBER(unk2_w);
@@ -417,25 +426,20 @@ public:
 	DECLARE_READ64_MEMBER(unk_serial_r);
 	DECLARE_WRITE64_MEMBER(unk_serial_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
-	void init_viper();
-	void init_vipercf();
-	void init_viperhd();
+
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	WRITE_LINE_MEMBER(voodoo_pciint);
-	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
 
 	//the following two arrays need to stay public til the legacy PCI bus is removed
 	uint32_t m_voodoo3_pci_reg[0x100];
 	uint32_t m_mpc8240_regs[256/4];
 
-	void viper(machine_config &config);
 	void viper_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
 
@@ -2393,7 +2397,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, viper_state, mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, DEVICE_SELF, viper_state, voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
 	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
 	MCFG_VOODOO_FBMEM(8)

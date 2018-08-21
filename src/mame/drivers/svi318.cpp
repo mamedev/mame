@@ -71,6 +71,12 @@ public:
 		m_keyboard_row(0)
 	{}
 
+	void svi328n(machine_config &config);
+	void svi318(machine_config &config);
+	void svi318n(machine_config &config);
+	void svi328(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( ppi_port_a_r );
 	DECLARE_READ8_MEMBER( ppi_port_b_r );
 	DECLARE_WRITE8_MEMBER( ppi_port_c_w );
@@ -91,18 +97,13 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
-	void svi328n(machine_config &config);
-	void svi318(machine_config &config);
-	void svi318n(machine_config &config);
-	void svi328(machine_config &config);
 	void svi3x8_io(address_map &map);
 	void svi3x8_io_bank(address_map &map);
 	void svi3x8_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_io;
@@ -534,14 +535,9 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_DEVICE_PROGRAM_MAP(svi3x8_mem)
 	MCFG_DEVICE_IO_MAP(svi3x8_io)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, m_ram).set_default_size("16K");
 
-	MCFG_DEVICE_ADD("io", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(svi3x8_io_bank)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(9)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
+	ADDRESS_MAP_BANK(config, "io").set_map(&svi3x8_state::svi3x8_io_bank).set_data_width(8).set_addr_width(9).set_stride(0x100);
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, svi3x8_state, ppi_port_a_r))
@@ -598,19 +594,17 @@ MACHINE_CONFIG_START(svi3x8_state::svi318n)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(svi3x8_state::svi328)
+void svi3x8_state::svi328(machine_config &config)
+{
 	svi318(config);
-	MCFG_DEVICE_REMOVE(RAM_TAG)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("64K");
+}
 
-MACHINE_CONFIG_START(svi3x8_state::svi328n)
+void svi3x8_state::svi328n(machine_config &config)
+{
 	svi318n(config);
-	MCFG_DEVICE_REMOVE(RAM_TAG)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("64K");
+}
 
 
 //**************************************************************************

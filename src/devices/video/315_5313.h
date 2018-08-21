@@ -16,19 +16,19 @@
 	downcast<sega315_5313_device &>(*device).set_signal_type(_bool);
 
 #define MCFG_SEGA315_5313_INT_CB(_devcb) \
-	devcb = &downcast<sega315_5313_device &>(*device).set_int_callback(DEVCB_##_devcb);
+	downcast<sega315_5313_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5313_PAUSE_CB(_devcb) \
-	devcb = &downcast<sega315_5313_device &>(*device).set_pause_callback(DEVCB_##_devcb);
+	downcast<sega315_5313_device &>(*device).set_pause_callback(DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5313_SND_IRQ_CALLBACK(_write) \
-	devcb = &downcast<sega315_5313_device &>(*device).set_sndirqline_callback(DEVCB_##_write);
+	downcast<sega315_5313_device &>(*device).set_sndirqline_callback(DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(_write) \
-	devcb = &downcast<sega315_5313_device &>(*device).set_lv6irqline_callback(DEVCB_##_write);
+	downcast<sega315_5313_device &>(*device).set_lv6irqline_callback(DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(_write) \
-	devcb = &downcast<sega315_5313_device &>(*device).set_lv4irqline_callback(DEVCB_##_write);
+	downcast<sega315_5313_device &>(*device).set_lv4irqline_callback(DEVCB_##_write);
 
 #define MCFG_SEGA315_5313_ALT_TIMING(_data) \
 	downcast<sega315_5313_device &>(*device).set_alt_timing(_data);
@@ -51,7 +51,7 @@
 	downcast<sega315_5313_device &>(*device).set_md_32x_scanline_helper(sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, this));
 
 
-class sega315_5313_device : public sega315_5124_device, public device_mixer_interface
+class sega315_5313_device : public sega315_5313_mode4_device, public device_mixer_interface
 {
 public:
 	template <typename T>

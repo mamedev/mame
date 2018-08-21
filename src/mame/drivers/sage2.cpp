@@ -486,8 +486,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_IEEE488_BUS_ADD()
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "sage2")

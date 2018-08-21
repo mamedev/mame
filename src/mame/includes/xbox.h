@@ -23,6 +23,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		debugc_bios(nullptr) { }
 
+	void xbox_base(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(superio_read);
 	DECLARE_WRITE8_MEMBER(superio_write);
 	DECLARE_READ8_MEMBER(superiors232_read);
@@ -72,9 +75,9 @@ public:
 	} debugp[];
 	const debugger_constants *debugc_bios;
 
-	void xbox_base(machine_config &config);
 	void xbox_base_map(address_map &map);
 	void xbox_base_map_io(address_map &map);
+
 private:
 	void dump_string_command(int ref, const std::vector<std::string> &params);
 	void dump_process_command(int ref, const std::vector<std::string> &params);

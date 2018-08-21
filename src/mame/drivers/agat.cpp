@@ -106,6 +106,9 @@ public:
 		, m_upperbank(*this, A7_UPPERBANK_TAG)
 	{ }
 
+	void agat7(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
@@ -160,10 +163,9 @@ public:
 	DECLARE_READ8_MEMBER(controller_strobe_r);
 	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
-	void agat7(machine_config &config);
 	void agat7_map(address_map &map);
 	void inhbank_map(address_map &map);
-private:
+
 	int m_speaker_state;
 	int m_cassette_state;
 
@@ -1086,10 +1088,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 
 	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
 
-	MCFG_RAM_ADD(m_ram)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-//  MCFG_RAM_EXTRA_OPTIONS("64K,128K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("32K").set_default_value(0);//.set_extra_options("64K,128K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1097,11 +1096,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(m_upperbank, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* keyboard controller -- XXX must be replaced */
 	MCFG_DEVICE_ADD(m_ay3600, AY3600, 0)

@@ -79,6 +79,9 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::KEYBOARD; }
 
+	void sm7238(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(sm7238);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -90,11 +93,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sm7238(machine_config &config);
 	void sm7238_io(address_map &map);
 	void sm7238_mem(address_map &map);
 	void videobank_map(address_map &map);
-private:
+
 	void recompute_parameters();
 
 	struct
@@ -367,11 +369,7 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_DEVICE_IO_MAP(sm7238_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("videobank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(videobank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

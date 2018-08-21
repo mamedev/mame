@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "machine/alpha8201.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -22,6 +23,7 @@ public:
 	champbas_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainlatch(*this, "mainlatch"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -81,6 +83,7 @@ protected:
 
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_mainlatch;
 	optional_device<alpha_8201_device> m_alpha_8201;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;

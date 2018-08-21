@@ -10,11 +10,6 @@
 
     Based on a datasheet obtained from www.freetradezone.com
 
-    The SMI does not have DC0 and DC1, only DC0; as a result, it does
-    not respond to the main CPU's DC0/DC1 swap instruction.  This may
-    lead to two devices responding to the same DC0 address and
-    attempting to place their bytes on the data bus simultaneously!
-
     8-bit shift register:
     Feedback in0 = !((out3 ^ out4) ^ (out5 ^ out7))
     Interrupts are at 0xfe
@@ -36,7 +31,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853")
+DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853 SMI")
 
 //-------------------------------------------------
 //  f3853_device - constructor
@@ -44,7 +39,18 @@ DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853")
 
 f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, F3853, tag, owner, clock)
+	, m_int_req_callback(*this)
+	, m_pri_out_callback(*this)
+	, m_priority_line(false)
+	, m_external_interrupt_line(true)
 {
+}
+
+void f3853_device::device_resolve_objects()
+{
+	m_int_req_callback.resolve_safe();
+	m_pri_out_callback.resolve_safe(); // TODO: not implemented
+	m_int_daisy_chain_callback.bind_relative_to(*owner());
 }
 
 //-------------------------------------------------
@@ -60,17 +66,14 @@ void f3853_device::device_start()
 		reg = reg << 1 | (BIT(reg,7) ^ BIT(reg,5) ^ BIT(reg,4) ^ BIT(reg,3) ^ 1);
 	}
 
-	m_interrupt_req_cb.bind_relative_to(*owner());
-
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(f3853_device::timer_callback),this));
 
-	save_item(NAME(m_high) );
-	save_item(NAME(m_low) );
-	save_item(NAME(m_external_enable) );
-	save_item(NAME(m_timer_enable) );
-	save_item(NAME(m_request_flipflop) );
-	save_item(NAME(m_priority_line) );
-	save_item(NAME(m_external_interrupt_line) );
+	save_item(NAME(m_int_vector));
+	save_item(NAME(m_external_enable));
+	save_item(NAME(m_timer_enable));
+	save_item(NAME(m_request_flipflop));
+	save_item(NAME(m_priority_line));
+	save_item(NAME(m_external_interrupt_line));
 }
 
 
@@ -80,13 +83,12 @@ void f3853_device::device_start()
 
 void f3853_device::device_reset()
 {
-	m_high = 0;
-	m_low = 0;
-	m_external_enable = 0;
-	m_timer_enable = 0;
-	m_request_flipflop = 0;
-	m_priority_line = false;
+	m_int_vector = 0;
+	m_external_enable = false;
+	m_timer_enable = false;
+	m_request_flipflop = false;
 	m_external_interrupt_line = true;
+	set_interrupt_request_line();
 
 	m_timer->enable(false);
 }
@@ -94,15 +96,32 @@ void f3853_device::device_reset()
 
 void f3853_device::set_interrupt_request_line()
 {
-	if (m_interrupt_req_cb.isnull())
-		return;
+	m_int_req_callback(m_request_flipflop && !m_priority_line ? ASSERT_LINE : CLEAR_LINE);
+}
 
-	if (m_external_enable && !m_priority_line)
-		m_interrupt_req_cb(external_interrupt_vector(), true);
+
+IRQ_CALLBACK_MEMBER(f3853_device::int_acknowledge)
+{
+	if (m_external_enable && !m_priority_line && m_request_flipflop)
+	{
+		m_request_flipflop = false;
+		set_interrupt_request_line();
+		return external_interrupt_vector();
+	}
 	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
-		m_interrupt_req_cb(timer_interrupt_vector(), true);
+	{
+		m_request_flipflop = false;
+		set_interrupt_request_line();
+		return timer_interrupt_vector();
+	}
+	else if (!m_int_daisy_chain_callback.isnull())
+		return m_int_daisy_chain_callback(device, irqline);
 	else
-		m_interrupt_req_cb(0, false);
+	{
+		// should never happen
+		logerror("%s: Spurious interrupt!\n", machine().describe_context());
+		return 0;
+	}
 }
 
 
@@ -123,19 +142,19 @@ TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 	timer_start(0xfe);
 }
 
-void f3853_device::set_external_interrupt_in_line(int level)
+WRITE_LINE_MEMBER(f3853_device::ext_int_w)
 {
-	if(m_external_interrupt_line && !level && m_external_enable)
+	if(m_external_interrupt_line && !state && m_external_enable)
 	{
 		m_request_flipflop = true;
 	}
-	m_external_interrupt_line = level;
+	m_external_interrupt_line = bool(state);
 	set_interrupt_request_line();
 }
 
-void f3853_device::set_priority_in_line(int level)
+WRITE_LINE_MEMBER(f3853_device::pri_in_w)
 {
-	m_priority_line = level;
+	m_priority_line = bool(state);
 	set_interrupt_request_line();
 }
 
@@ -147,11 +166,11 @@ READ8_MEMBER(f3853_device::read)
 	switch (offset)
 	{
 	case 0:
-		data = m_high;
+		data = m_int_vector >> 8;
 		break;
 
 	case 1:
-		data = m_low;
+		data = m_int_vector & 0xff;
 		break;
 
 	case 2: // Interrupt control; not readable
@@ -168,11 +187,11 @@ WRITE8_MEMBER(f3853_device::write)
 	switch(offset)
 	{
 	case 0:
-		m_high = data;
+		m_int_vector = (data << 8) | (m_int_vector & 0x00ff);
 		break;
 
 	case 1:
-		m_low = data;
+		m_int_vector = data | (m_int_vector & 0xff00);
 		break;
 
 	case 2: //interrupt control

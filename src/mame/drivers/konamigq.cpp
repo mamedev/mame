@@ -98,6 +98,11 @@ public:
 	{
 	}
 
+	void konamigq(machine_config &config);
+
+	void init_konamigq();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<tms57002_device> m_dasp;
@@ -105,7 +110,6 @@ public:
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint8_t> m_pcmram;
 
-	uint8_t *m_p_n_pcmram;
 	uint8_t m_sector_buffer[ 512 ];
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
@@ -117,7 +121,6 @@ public:
 	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	void init_konamigq();
 	DECLARE_MACHINE_START(konamigq);
 	DECLARE_MACHINE_RESET(konamigq);
 	INTERRUPT_GEN_MEMBER(tms_sync);
@@ -125,7 +128,6 @@ public:
 
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void konamigq(machine_config &config);
 	void konamigq_dasp_map(address_map &map);
 	void konamigq_k054539_map(address_map &map);
 	void konamigq_map(address_map &map);
@@ -332,8 +334,7 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_DEVICE_ADD("maincpu", CXD8530BQ, XTAL(67'737'600))
 	MCFG_DEVICE_PROGRAM_MAP(konamigq_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, this ) )
@@ -355,9 +356,9 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 
-	MCFG_DEVICE_ADD("am53cf96", AM53CF96, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_AM53CF96_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	AM53CF96(config, m_am53cf96, 0);
+	m_am53cf96->set_scsi_port("scsi");
+	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175))

@@ -2353,7 +2353,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 
 	if(m_fdc)
 	{
-		track = m_fdc->track_r(space, 0);
+		track = m_fdc->track_r();
 		if(track == 0)
 			tk00 = 1;
 
@@ -2363,7 +2363,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 		last_dir = track > last_track ? 0 : 1; // see WD_FDC
 		last_track = track;
 
-		fdc_status = m_fdc->read_status();
+		fdc_status = m_fdc->status_r();
 
 		if ( (fdc_status & 0x80) == 0) // (see WD_FDC: S_WP = 0x40, S_NRDY = 0x80, S_TR00 = 0x04)
 			fdc_ready = 1;
@@ -2404,7 +2404,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	{
 		data |= m_fdc->drq_r()   ? 0x80 : 0x00;
 		data |= m_fdc->intrq_r() ? 0x40 : 0x00;
-		track = m_fdc->track_r(space, 0);
+		track = m_fdc->track_r();
 
 		// D2: TG43 * LOW ACTIVE * :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
 		// (asserted when writing data to tracks 44 through 79)
@@ -3212,7 +3212,7 @@ void rainbow_state::upd7220_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(rainbow_state::rainbow)
-	MCFG_DEFAULT_LAYOUT(layout_rainbow)
+	config.set_default_layout(layout_rainbow);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8088, 24.0734_MHz_XTAL / 5) // approximately 4.815 MHz
@@ -3286,10 +3286,10 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_WD2010_IN_WF_CB(READLINE(*this, rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
 
 	MCFG_WD2010_IN_DRDY_CB(READLINE(*this, rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
-	MCFG_WD2010_IN_SC_CB(VCC)                                        // SEEK COMPLETE (set to VCC if not serviced)
+	MCFG_WD2010_IN_SC_CB(CONSTANT(1))                                        // SEEK COMPLETE (set to VCC if not serviced)
 
-	MCFG_WD2010_IN_TK000_CB(VCC) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
-	MCFG_WD2010_IN_INDEX_CB(VCC) //    "
+	MCFG_WD2010_IN_TK000_CB(CONSTANT(1)) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
+	MCFG_WD2010_IN_INDEX_CB(CONSTANT(1)) //    "
 
 	MCFG_HARDDISK_ADD("decharddisk1")
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
@@ -3306,9 +3306,9 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-	MCFG_DEVICE_ADD("dbrg", COM8116_003, 24.0734_MHz_XTAL / 4) // 6.01835 MHz (nominally 6 MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, rainbow_state, dbrg_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, rainbow_state, dbrg_ft_w))
+	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
+	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
+	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 24.0734_MHz_XTAL / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))
@@ -3342,10 +3342,10 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("prtbrg", RIPPLE_COUNTER, 24.0734_MHz_XTAL / 6 / 13) // 74LS393 at E17 (both halves)
+	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)
 	// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
-	MCFG_RIPPLE_COUNTER_STAGES(8)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, rainbow_state, bitrate_counter_w))
+	prtbrg.set_stages(8);
+	prtbrg.count_out_cb().set(FUNC(rainbow_state::bitrate_counter_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 

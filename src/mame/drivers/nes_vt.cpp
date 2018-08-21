@@ -101,9 +101,24 @@ public:
 		, m_prgbank3(*this, "prg_bank3")
 		, m_prgrom(*this, "mainrom")
 		, m_csel(*this, "CARTSEL")
-
 		{ }
 
+	void nes_vt(machine_config &config);
+
+	void nes_vt_hum(machine_config &config);
+	void nes_vt_pjoy(machine_config &config);
+	void nes_vt_sp69(machine_config &config);
+
+	void nes_vt_xx(machine_config &config);
+	void nes_vt_hh(machine_config &config);
+	void nes_vt_cy(machine_config &config);
+	void nes_vt_dg(machine_config &config);
+	void nes_vt_bt(machine_config &config);
+	void nes_vt_vg(machine_config &config);
+	void nes_vt_fp(machine_config &config);
+	void nes_vt_fa(machine_config &config);
+
+private:
 	/* APU handling */
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 	DECLARE_READ8_MEMBER(apu_read_mem);
@@ -164,22 +179,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(chr_w);
 
-	void nes_vt(machine_config &config);
-
-	void nes_vt_hum(machine_config &config);
-	void nes_vt_pjoy(machine_config &config);
-	void nes_vt_sp69(machine_config &config);
-
-
-	void nes_vt_xx(machine_config &config);
-	void nes_vt_hh(machine_config &config);
-	void nes_vt_cy(machine_config &config);
-	void nes_vt_dg(machine_config &config);
-	void nes_vt_bt(machine_config &config);
-	void nes_vt_vg(machine_config &config);
-	void nes_vt_fp(machine_config &config);
-	void nes_vt_fa(machine_config &config);
-
 	void nes_vt_hum_map(address_map &map);
 	void nes_vt_pjoy_map(address_map &map);
 	void nes_vt_sp69_map(address_map &map);
@@ -192,7 +191,6 @@ public:
 	void nes_vt_fa_map(address_map &map);
 	void nes_vt_fp_map(address_map &map);
 	void prg_map(address_map &map);
-private:
 
 	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
 	std::unique_ptr<uint8_t[]> m_ntram;
@@ -1369,12 +1367,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	MCFG_PPU_VT03_READ_BG_CB(READ8(*this, nes_vt_state,chr_r))
 	MCFG_PPU_VT03_READ_SP_CB(READ8(*this, nes_vt_state,spr_r))
 
-	MCFG_DEVICE_ADD("prg", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(prg_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", nes_control_port1_devices, "joypad")
 	//MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)

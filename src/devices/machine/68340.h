@@ -17,37 +17,37 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 #define MCFG_MC68340_PA_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pa_in_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pa_in_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_PA_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pa_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pa_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_PB_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pb_in_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pb_in_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_PB_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pb_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pb_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_ADD_CRYSTAL(_crystal) \
 	downcast<m68340_cpu_device &>(*device).set_crystal(_crystal);
 
 #define MCFG_MC68340_TOUT1_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tout1_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tout1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TIN1_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tin1_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tin1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TGATE1_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tgate1_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tgate1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TOUT2_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tout2_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tout2_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TIN2_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tin2_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tin2_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TGATE2_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tgate2_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tgate2_out_callback(DEVCB_##_devcb);
 
 class m68340_cpu_device : public fscpu32_device
 {
@@ -61,6 +61,10 @@ public:
 	template <class Object> devcb_base &set_pa_out_callback(Object &&cb){ return m_pa_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pb_in_callback(Object &&cb){ return m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pb_out_callback(Object &&cb){ return m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
+	auto pa_in_callback() { return m_pa_in_cb.bind(); }
+	auto pa_out_callback() { return m_pa_out_cb.bind(); }
+	auto pb_in_callback() { return m_pb_in_cb.bind(); }
+	auto pb_out_callback() { return m_pb_out_cb.bind(); }
 
 	template <class Object> devcb_base &set_tout1_out_callback(Object &&cb){ return m_timer1->m_tout_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tin1_in_callback(Object &&cb)  { return m_timer1->m_tin_in_cb.set_callback (std::forward<Object>(cb)); }
@@ -68,6 +72,12 @@ public:
 	template <class Object> devcb_base &set_tout2_out_callback(Object &&cb){ return m_timer2->m_tout_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tin2_in_callback(Object &&cb)  { return m_timer2->m_tin_in_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tgate2_in_callback(Object &&cb){ return m_timer2->m_tgate_in_cb.set_callback (std::forward<Object>(cb)); }
+	auto tout1_out_callback() { return m_timer1->m_tout_out_cb.bind(); }
+	auto tin1_in_callback() { return m_timer1->m_tin_in_cb.bind(); }
+	auto tgate1_in_callback() { return m_timer1->m_tgate_in_cb.bind(); }
+	auto tout2_out_callback() { return m_timer2->m_tout_out_cb.bind(); }
+	auto tin2_in_callback() { return m_timer2->m_tin_in_cb.bind(); }
+	auto tgate2_in_callback() { return m_timer2->m_tgate_in_cb.bind(); }
 
 	uint16_t get_cs(offs_t address);
 

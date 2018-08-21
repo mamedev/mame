@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
+#ifndef MAME_INCLUDES_GALASTRM_H
+#define MAME_INCLUDES_GALASTRM_H
+
+#pragma once
+
 #include "machine/eepromser.h"
 
 #include "video/poly.h"
@@ -47,8 +52,8 @@ class galastrm_state : public driver_device
 {
 	friend class galastrm_renderer;
 public:
-	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galastrm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
@@ -57,7 +62,8 @@ public:
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void galastrm(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
@@ -104,3 +110,5 @@ private:
 
 	void galastrm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALASTRM_H

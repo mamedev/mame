@@ -75,6 +75,10 @@ public:
 		m_io_config(*this, "CONFIG"),
 		m_palette(*this, "palette")  { }
 
+	void mz2000(machine_config &config);
+	void mz80b(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<cassette_image_device> m_cass;
@@ -129,12 +133,10 @@ public:
 	DECLARE_READ8_MEMBER(mz2000_pio1_portb_r);
 	DECLARE_READ8_MEMBER(mz2000_pio1_porta_r);
 
-	void mz2000(machine_config &config);
-	void mz80b(machine_config &config);
 	void mz2000_io(address_map &map);
 	void mz2000_map(address_map &map);
 	void mz80b_io(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mb8877_device> m_mb8877a;
@@ -350,7 +352,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 READ8_MEMBER(mz2000_state::fdc_r)
 {
 	if(m_has_fdc)
-		return m_mb8877a->read(space, offset) ^ 0xff;
+		return m_mb8877a->read(offset) ^ 0xff;
 
 	return 0xff;
 }
@@ -358,7 +360,7 @@ READ8_MEMBER(mz2000_state::fdc_r)
 WRITE8_MEMBER(mz2000_state::fdc_w)
 {
 	if(m_has_fdc)
-		m_mb8877a->write(space, offset, data ^ 0xff);
+		m_mb8877a->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER(mz2000_state::floppy_select_w)

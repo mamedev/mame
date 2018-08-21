@@ -96,6 +96,17 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void hp9k370(machine_config &config);
+	void hp9k330(machine_config &config);
+	void hp9k382(machine_config &config);
+	void hp9k310(machine_config &config);
+	void hp9k340(machine_config &config);
+	void hp9k380(machine_config &config);
+	void hp9k320(machine_config &config);
+	void hp9k332(machine_config &config);
+	void hp9k300(machine_config &config);
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<i8042_device> m_iocpu;
 	optional_device<hp_hil_mlc_device> m_mlc;
@@ -147,14 +158,6 @@ public:
 #endif
 	}
 
-	void hp9k370(machine_config &config);
-	void hp9k330(machine_config &config);
-	void hp9k382(machine_config &config);
-	void hp9k310(machine_config &config);
-	void hp9k340(machine_config &config);
-	void hp9k380(machine_config &config);
-	void hp9k320(machine_config &config);
-	void hp9k332(machine_config &config);
 	void hp9k310_map(address_map &map);
 	void hp9k320_map(address_map &map);
 	void hp9k330_map(address_map &map);
@@ -164,11 +167,6 @@ public:
 	void hp9k382_map(address_map &map);
 	void hp9k3xx_common(address_map &map);
 	void iocpu_map(address_map &map);
-
-protected:
-	void hp9k300(machine_config &config);
-
-private:
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_reset);
 
@@ -473,10 +471,10 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
 	MCFG_DEVICE_ADD(m_mlc, HP_HIL_MLC, XTAL(8'000'000))
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_46021a")
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 0.0f, 250000.0f)
-	MCFG_PTM6840_O3_CB(WRITELINE(PTM6840_TAG, ptm6840_device , set_c2))
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_6))
+	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 250000)); // from oscillator module next to the 6840
+	ptm.set_external_clocks(250000.0f, 0.0f, 250000.0f);
+	ptm.o3_callback().set(PTM6840_TAG, FUNC(ptm6840_device::set_c2));
+	ptm.irq_callback().set_inputline("maincpu", M68K_IRQ_6);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)

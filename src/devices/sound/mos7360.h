@@ -37,24 +37,6 @@
 
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_MOS7360_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _irq, _k) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(mos7360_device::PAL_VRETRACERATE) \
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
-	MCFG_SCREEN_SIZE(336, 216) \
-	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos7360_device, screen_update) \
-	MCFG_DEVICE_ADD(_tag, MOS7360, _clock) \
-	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos7360_device *>(device)->set_callbacks(_cpu_tag, DEVCB_##_irq, DEVCB_##_k);
-
-
-
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -93,14 +75,11 @@ public:
 	static constexpr unsigned PAL_LINES = 312;
 
 	// construction/destruction
-	//mos7360_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock);
 	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Irq, class K> void set_callbacks(const char *cpu_tag, Irq &&irq, K &&k) {
-		m_cpu_tag = cpu_tag;
-		m_write_irq.set_callback(std::forward<Irq>(irq));
-		m_read_k.set_callback(std::forward<K>(k));
-	}
+	// callbacks
+	auto write_irq_callback() { return m_write_irq.bind(); }
+	auto read_k_callback() { return m_read_k.bind(); }
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -156,8 +135,6 @@ protected:
 	devcb_write_line   m_write_irq;
 	devcb_read8        m_read_k;
 
-	const char *m_cpu_tag;
-	cpu_device *m_cpu;
 	sound_stream *m_stream;
 
 	uint8_t m_reg[0x20];

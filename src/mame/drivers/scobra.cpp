@@ -52,18 +52,6 @@ public:
 		: scramble_state(mconfig, type, tag),
 			m_soundram(*this, "soundram") { }
 
-	DECLARE_READ8_MEMBER(scobra_soundram_r);
-	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
-
 	void mimonkey(machine_config &config);
 	void stratgyx(machine_config &config);
 	void type1(machine_config &config);
@@ -78,6 +66,21 @@ public:
 	void tazmani3(machine_config &config);
 	void hustlerb(machine_config &config);
 	void rescuefe(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
+
+private:
+	DECLARE_READ8_MEMBER(scobra_soundram_r);
+	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
+
 	void hustler_map(address_map &map);
 	void hustler_sound_io_map(address_map &map);
 	void hustler_sound_map(address_map &map);
@@ -92,7 +95,7 @@ public:
 	void tazmani3_map(address_map &map);
 	void type1_map(address_map &map);
 	void type2_map(address_map &map);
-private:
+
 	optional_shared_ptr<uint8_t> m_soundram;
 };
 
@@ -873,8 +876,8 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_DEVICE_IO_MAP(scobra_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,scramble_sh_7474_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
@@ -887,11 +890,11 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scobra_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
@@ -1053,16 +1056,16 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_DEVICE_IO_MAP(hustler_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,scramble_sh_7474_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scobra_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 

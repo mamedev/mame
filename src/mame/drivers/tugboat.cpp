@@ -37,11 +37,6 @@ always false - counter was reloaded and incremented before interrupt occurs
 class tugboat_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -49,6 +44,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ram(*this, "ram") { }
+
+	void tugboat(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -76,12 +79,10 @@ public:
 	DECLARE_PALETTE_INIT(tugboat);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
-		int addr,int gfx0,int gfx1,int transparency);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int addr, int gfx0, int gfx1, int transparency);
 
-		void tugboat(machine_config &config);
-		void main_map(address_map &map);
-protected:
+	void main_map(address_map &map);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -366,12 +367,12 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_DEVICE_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tugboat_state,input_r))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set(FUNC(tugboat_state::input_r));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tugboat_state, ctrl_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("DSW");
+	pia1.writepb_handler().set(FUNC(tugboat_state::ctrl_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

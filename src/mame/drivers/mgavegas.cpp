@@ -62,7 +62,13 @@ public:
 		m_filter2(*this, "filter2")
 	{ }
 
+	void mgavegas(machine_config &config);
 
+	void init_mgavegas();
+	void init_mgavegas21();
+	void init_mgavegas133();
+
+private:
 	uint8_t m_int;
 
 	//OUT1
@@ -136,16 +142,9 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_a_r);
 	DECLARE_READ8_MEMBER(ay8910_b_r);
 
-	void init_mgavegas();
-	void init_mgavegas21();
-	void init_mgavegas133();
-
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
-
-	void mgavegas(machine_config &config);
 	void mgavegas_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -159,9 +158,6 @@ protected:
 	virtual void machine_reset() override;
 	void update_custom();
 	void update_lamp();
-
-
-private:
 };
 
 
@@ -620,7 +616,7 @@ MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_mgavegas)
+	config.set_default_layout(layout_mgavegas);
 
 MACHINE_CONFIG_END
 

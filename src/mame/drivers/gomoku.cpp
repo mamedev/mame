@@ -128,10 +128,10 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	MCFG_DEVICE_PROGRAM_MAP(gomoku_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 7J
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gomoku_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gomoku_state, bg_dispsw_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // start LED?
+	ls259_device &latch(LS259(config, "latch")); // 7J
+	latch.q_out_cb<1>().set(FUNC(gomoku_state::flipscreen_w));
+	latch.q_out_cb<2>().set(FUNC(gomoku_state::bg_dispsw_w));
+	latch.q_out_cb<7>().set_nop(); // start LED?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

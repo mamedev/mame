@@ -12,7 +12,7 @@
 		MCFG_IRQ_FUNC(irqf)
 
 #define MCFG_IRQ_FUNC(irqf) \
-		devcb = &downcast<mpu401_device *>(device)->set_irqf(DEVCB_##irqf);
+		downcast<mpu401_device *>(device)->set_irqf(DEVCB_##irqf);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

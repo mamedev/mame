@@ -14,35 +14,35 @@
 
 // I/O ports setup
 #define MCFG_UCOM4_READ_A_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_read_a_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_read_a_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_B_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_read_b_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_read_b_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_C_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_read_c_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_read_c_callback(DEVCB_##_devcb);
 #define MCFG_UCOM4_WRITE_C_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_write_c_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_write_c_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_D_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
 #define MCFG_UCOM4_WRITE_D_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_E_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_write_e_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_write_e_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_F_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_write_f_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_write_f_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_G_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_write_g_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_write_g_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_H_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_write_h_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_write_h_callback(DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_I_CB(_devcb) \
-	devcb = &downcast<ucom4_cpu_device &>(*device).set_write_i_callback(DEVCB_##_devcb);
+	downcast<ucom4_cpu_device &>(*device).set_write_i_callback(DEVCB_##_devcb);
 
 enum
 {

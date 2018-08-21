@@ -46,27 +46,23 @@ Notes:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_coin_w)
+WRITE16_MEMBER(drgnmst_state::coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x100);
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
 }
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
+WRITE8_MEMBER(drgnmst_state::snd_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_snd_command = (data & 0xff);
-		m_maincpu->yield();
-	}
+	m_snd_command = data;
+	m_maincpu->yield();
 }
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_snd_flag_w)
+WRITE8_MEMBER(drgnmst_state::snd_flag_w)
 {
 	/* Enables the following 68K write operation to latch through to the PIC */
-	if (ACCESSING_BITS_0_7)
-		m_snd_flag = 1;
+	m_snd_flag = 1;
 }
 
 
@@ -75,14 +71,14 @@ READ8_MEMBER(drgnmst_state::pic16c5x_port0_r)
 	return m_pic16c5x_port0;
 }
 
-READ8_MEMBER(drgnmst_state::drgnmst_snd_command_r)
+READ8_MEMBER(drgnmst_state::snd_command_r)
 {
-	int data = 0;
+	uint8_t data = 0;
 
 	switch (m_oki_control & 0x1f)
 	{
-		case 0x12:  data = (m_oki_2->read(space, 0) & 0x0f); break;
-		case 0x16:  data = (m_oki_1->read(space, 0) & 0x0f); break;
+		case 0x12:  data = (m_oki[1]->read(space, 0) & 0x0f); break;
+		case 0x16:  data = (m_oki[0]->read(space, 0) & 0x0f); break;
 		case 0x0b:
 		case 0x0f:  data = m_snd_command; break;
 		default:    break;
@@ -91,7 +87,7 @@ READ8_MEMBER(drgnmst_state::drgnmst_snd_command_r)
 	return data;
 }
 
-READ8_MEMBER(drgnmst_state::drgnmst_snd_flag_r)
+READ8_MEMBER(drgnmst_state::snd_flag_r)
 {
 	if (m_snd_flag)
 	{
@@ -102,22 +98,22 @@ READ8_MEMBER(drgnmst_state::drgnmst_snd_flag_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(drgnmst_state::drgnmst_pcm_banksel_w)
+WRITE8_MEMBER(drgnmst_state::pcm_banksel_w)
 {
 	/*  This is a 4 bit port.
 	    Each pair of bits is used in part of the OKI PCM ROM bank selectors.
-	    See the Port 2 write handler below (drgnmst_snd_control_w) for details.
+	    See the Port 2 write handler below (snd_control_w) for details.
 	*/
 
 	m_pic16c5x_port0 = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::drgnmst_oki_w)
+WRITE8_MEMBER(drgnmst_state::oki_w)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
+WRITE8_MEMBER(drgnmst_state::snd_control_w)
 {
 	/*  This port controls communications to and from the 68K, both OKI
 	    devices, and part of the OKI PCM ROM bank selection.
@@ -147,32 +143,32 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 
 
 	oki_new_bank = ((m_pic16c5x_port0 & 0xc) >> 2) | ((m_oki_control & 0x80) >> 5);
-	if (oki_new_bank != m_oki0_bank)
+	if (oki_new_bank != m_oki_bank[0])
 	{
-		m_oki0_bank = oki_new_bank;
-		if (m_oki0_bank)
+		m_oki_bank[0] = oki_new_bank;
+		if (m_oki_bank[0])
 			oki_new_bank--;
-		m_oki_1->set_rom_bank(oki_new_bank);
+		m_oki1bank->set_entry(oki_new_bank);
 	}
 
 	oki_new_bank = ((m_pic16c5x_port0 & 0x3) >> 0) | ((m_oki_control & 0x20) >> 3);
-	if (oki_new_bank != m_oki1_bank)
+	if (oki_new_bank != m_oki_bank[1])
 	{
-		m_oki1_bank = oki_new_bank;
-		m_oki_2->set_rom_bank(oki_new_bank);
+		m_oki_bank[1] = oki_new_bank;
+		m_oki[1]->set_rom_bank(oki_new_bank);
 	}
 
 	switch (m_oki_control & 0x1f)
 	{
 		case 0x11:
 //                  logerror("Writing %02x to OKI1", m_oki_command);
-//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki0_bank, m_oki1_bank);
-					m_oki_2->write(space, 0, m_oki_command);
+//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki_bank[0], m_oki_bank[1]);
+					m_oki[1]->write(space, 0, m_oki_command);
 					break;
 		case 0x15:
 //                  logerror("Writing %02x to OKI0", m_oki_command);
-//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki0_bank, m_oki1_bank);
-					m_oki_1->write(space, 0, m_oki_command);
+//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki_bank[0], m_oki_bank[1]);
+					m_oki[0]->write(space, 0, m_oki_command);
 					break;
 		default:    break;
 	}
@@ -188,22 +184,28 @@ void drgnmst_state::drgnmst_main_map(address_map &map)
 	map(0x800018, 0x800019).portr("SYSTEM");
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
-	map(0x800030, 0x800031).w(FUNC(drgnmst_state::drgnmst_coin_w));
+	map(0x800030, 0x800031).w(FUNC(drgnmst_state::coin_w));
 	map(0x800100, 0x80011f).writeonly().share("vidregs");
 	map(0x800120, 0x800121).nopw();
 	map(0x80014a, 0x80014b).nopw();
 	map(0x800154, 0x800155).writeonly().share("vidregs2"); // seems to be priority control
 	map(0x800176, 0x800177).portr("EXTRA");
-	map(0x800180, 0x800181).w(FUNC(drgnmst_state::drgnmst_snd_command_w));
-	map(0x800188, 0x800189).w(FUNC(drgnmst_state::drgnmst_snd_flag_w));
+	map(0x800181, 0x800181).w(FUNC(drgnmst_state::snd_command_w));
+	map(0x800189, 0x800189).w(FUNC(drgnmst_state::snd_flag_w));
 	map(0x8001e0, 0x8001e1).nopw();
-	map(0x900000, 0x903fff).ram().w(FUNC(drgnmst_state::drgnmst_paletteram_w)).share("paletteram");
-	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_state::drgnmst_md_videoram_w)).share("md_videoram");
-	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_state::drgnmst_bg_videoram_w)).share("bg_videoram");
-	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_state::drgnmst_fg_videoram_w)).share("fg_videoram");
+	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_state::md_videoram_w)).share("md_videoram");
+	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_state::bg_videoram_w)).share("bg_videoram");
+	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_state::fg_videoram_w)).share("fg_videoram");
 	map(0x920000, 0x923fff).ram().share("rowscrollram"); // rowscroll ram
 	map(0x930000, 0x9307ff).ram().share("spriteram");   // Sprites
 	map(0xff0000, 0xffffff).ram();
+}
+
+void drgnmst_state::drgnmst_oki1_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("oki1bank");
 }
 
 
@@ -298,7 +300,7 @@ static INPUT_PORTS_START( drgnmst )
 INPUT_PORTS_END
 
 
-static const gfx_layout drgnmst_char8x8_layout =
+static const gfx_layout char8x8_layout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -310,7 +312,7 @@ static const gfx_layout drgnmst_char8x8_layout =
 };
 
 
-static const gfx_layout drgnmst_char16x16_layout =
+static const gfx_layout char16x16_layout =
 {
 	16,16,
 	RGN_FRAC(1,2),
@@ -325,7 +327,7 @@ static const gfx_layout drgnmst_char16x16_layout =
 
 
 
-static const gfx_layout drgnmst_char32x32_layout =
+static const gfx_layout char32x32_layout =
 {
 	32,32,
 	RGN_FRAC(1,2),
@@ -345,33 +347,30 @@ static const gfx_layout drgnmst_char32x32_layout =
 
 
 static GFXDECODE_START( gfx_drgnmst )
-	GFXDECODE_ENTRY( "gfx1", 0, drgnmst_char16x16_layout,   0,      0x200  ) /* sprite tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char8x8_layout,     0x200,  0x200  ) /* fg tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char16x16_layout,   0x0400, 0x200  ) /* md tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char32x32_layout,   0x0600, 0x200  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, char16x16_layout,   0,     0x20 ) /* sprite tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, char8x8_layout,     0x200, 0x20 ) /* fg tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, char16x16_layout,   0x400, 0x20 ) /* md tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, char32x32_layout,   0x600, 0x20 ) /* bg tiles */
 GFXDECODE_END
 
 
 void drgnmst_state::machine_start()
 {
 	save_item(NAME(m_snd_flag));
-	save_item(NAME(m_snd_command));
 	save_item(NAME(m_oki_control));
 	save_item(NAME(m_oki_command));
 	save_item(NAME(m_pic16c5x_port0));
-	save_item(NAME(m_oki1_bank));
-	save_item(NAME(m_oki0_bank));
+	save_item(NAME(m_oki_bank));
 }
 
 void drgnmst_state::machine_reset()
 {
 	m_snd_flag = 0;
-	m_snd_command = 0;
 	m_oki_control = 0;
 	m_oki_command = 0;
 	m_pic16c5x_port0 = 0;
-	m_oki1_bank = 0;
-	m_oki0_bank = 0;
+	m_oki_bank[1] = 0;
+	m_oki_bank[0] = 0;
 }
 
 MACHINE_CONFIG_START(drgnmst_state::drgnmst)
@@ -382,11 +381,11 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 
 	MCFG_DEVICE_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
 	MCFG_PIC16C5x_READ_A_CB(READ8(*this, drgnmst_state, pic16c5x_port0_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, drgnmst_state, drgnmst_pcm_banksel_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, drgnmst_state, drgnmst_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, drgnmst_state, drgnmst_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, drgnmst_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, drgnmst_snd_control_w))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, drgnmst_state, pcm_banksel_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, drgnmst_state, snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, drgnmst_state, oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, snd_control_w))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
 
@@ -395,15 +394,17 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update_drgnmst)
+	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_FORMAT_CLASS(2, drgnmst_state, drgnmst_IIIIRRRRGGGGBBBB)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(0, drgnmst_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
@@ -465,7 +466,6 @@ void drgnmst_state::init_drgnmst()
 {
 	uint8_t *drgnmst_PICROM_HEX = memregion("user1")->base();
 	uint16_t *drgnmst_PICROM = (uint16_t *)memregion("audiocpu")->base();
-	uint8_t *drgnmst_PCM = memregion("oki1")->base();
 	uint16_t  src_pos = 0;
 	uint16_t  dst_pos = 0;
 
@@ -473,17 +473,8 @@ void drgnmst_state::init_drgnmst()
 	/* $00000-1ffff is the same through all banks */
 	/* $20000-3ffff in each bank is actually the switched area */
 
-	for (int32_t offs = 0x1ffff; offs >= 0; offs--)
-	{
-		drgnmst_PCM[0x120000 + offs] = drgnmst_PCM[0xa0000 + offs];
-		drgnmst_PCM[0x100000 + offs] = drgnmst_PCM[0x00000 + offs];
-		drgnmst_PCM[0x0e0000 + offs] = drgnmst_PCM[0x80000 + offs];
-		drgnmst_PCM[0x0c0000 + offs] = drgnmst_PCM[0x00000 + offs];
-		drgnmst_PCM[0x0a0000 + offs] = drgnmst_PCM[0x60000 + offs];
-		drgnmst_PCM[0x080000 + offs] = drgnmst_PCM[0x00000 + offs];
-		drgnmst_PCM[0x060000 + offs] = drgnmst_PCM[0x40000 + offs];
-		drgnmst_PCM[0x040000 + offs] = drgnmst_PCM[0x00000 + offs];
-	}
+	m_oki1bank->configure_entries(0, 8, memregion("oki1")->base() + 0x20000, 0x20000);
+	//m_oki1bank->configure_entries(0, 8, memregion("oki1")->base(), 0x20000); // TODO : Correct?
 
 	/**** Convert the PIC16C55 ASCII HEX dump to pure HEX ****/
 	do

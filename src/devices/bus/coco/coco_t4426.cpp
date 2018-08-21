@@ -149,12 +149,12 @@ namespace
 ***************************************************************************/
 
 MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_t4426_device, pia_A_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(coco_t4426_device::pia_A_w));
 
-	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(SERIAL_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(SERIAL_TAG, rs232_port_device, write_rts))
+	ACIA6850(config, m_uart, 0);
+	m_uart->txd_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->rts_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(SERIAL_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(UART_TAG, acia6850_device, write_rxd))
@@ -225,8 +225,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_T4426, device_cococart_interface, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 //**************************************************************************
 //  LIVE DEVICE

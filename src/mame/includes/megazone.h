@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "sound/flt_rc.h"
 #include "emupal.h"
 
 class megazone_state : public driver_device
@@ -24,8 +25,13 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_daccpu(*this, "daccpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_filter(*this, "filter.0.%u", 0U)
+	{ }
 
+	void megazone(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scrolly;
 	required_shared_ptr<uint8_t> m_scrollx;
@@ -48,6 +54,7 @@ public:
 	required_device<cpu_device> m_daccpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device_array<filter_rc_device, 3> m_filter;
 
 	uint8_t         m_irq_mask;
 	DECLARE_WRITE8_MEMBER(megazone_i8039_irq_w);
@@ -64,7 +71,6 @@ public:
 	DECLARE_PALETTE_INIT(megazone);
 	uint32_t screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void megazone(machine_config &config);
 	void megazone_i8039_io_map(address_map &map);
 	void megazone_i8039_map(address_map &map);
 	void megazone_map(address_map &map);

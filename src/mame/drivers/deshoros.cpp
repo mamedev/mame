@@ -33,7 +33,6 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/beep.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,6 +45,11 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	void destiny(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 
@@ -60,9 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-	void destiny(machine_config &config);
 	void main_map(address_map &map);
 protected:
 	// driver_device overrides
@@ -278,7 +279,6 @@ MACHINE_CONFIG_START(destiny_state::destiny)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DRIVER(destiny_state, screen_update_destiny)
 	MCFG_SCREEN_PALETTE("palette")
 

@@ -625,7 +625,7 @@ READ32_MEMBER( next_state::fdc_control_r )
 	// reason.  The kernel otoh behaves as expected.
 
 	if(fdc) {
-		floppy_image_device *fdev = machine().device<floppy_connector>(":fdc:0")->get_device();
+		floppy_image_device *fdev = floppy0->get_device();
 		if(fdev->exists()) {
 			uint32_t variant = fdev->get_variant();
 			switch(variant) {
@@ -1015,13 +1015,17 @@ MACHINE_CONFIG_START(next_state::next_base)
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
+
 	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL(32'768))
-	MCFG_DEVICE_ADD("scc", SCC8530, XTAL(25'000'000))
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(*this, next_state, scc_irq))
+
+	SCC8530(config, scc, XTAL(25'000'000));
+	scc->intrq_callback().set(FUNC(next_state::scc_irq));
+
 	MCFG_DEVICE_ADD("keyboard", NEXTKBD, 0)
 	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(*this, next_state, keyboard_irq))
 	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(*this, next_state, power_irq))
 	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(*this, next_state, nmi_irq))
+
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)

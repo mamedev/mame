@@ -707,6 +707,23 @@ GFXDECODE_END
  *
  *************************************/
 
+void atarisy1_state::add_adc(machine_config &config)
+{
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	m_adc->eoc_callback().set(m_ajsint, FUNC(input_merger_device::in_w<1>));
+	// IN7 = J102 pin 2
+	// IN6 = J102 pin 3
+	// IN5 = J102 pin 4
+	// IN4 = J102 pin 6
+	// IN3 = J102 pin 8
+	// IN2 = J102 pin 9
+	// IN1 = J102 pin 7
+	// IN0 = J102 pin 5
+
+	INPUT_MERGER_ALL_HIGH(config, m_ajsint);
+	m_ajsint->output_handler().set(FUNC(atarisy1_state::joystick_int));
+}
+
 MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	/* basic machine hardware */
@@ -719,29 +736,15 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_EOC_CB(WRITELINE("ajsint", input_merger_device, in_w<1>))
-	// IN7 = J102 pin 2
-	// IN6 = J102 pin 3
-	// IN5 = J102 pin 4
-	// IN4 = J102 pin 6
-	// IN3 = J102 pin 8
-	// IN2 = J102 pin 9
-	// IN1 = J102 pin 7
-	// IN0 = J102 pin 5
-
-	MCFG_INPUT_MERGER_ALL_HIGH("ajsint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, atarisy1_state, joystick_int))
-
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // J106 pin 4
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // J106 pin 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_left_w))
+	LS259(config, m_outlatch); // 15H (TTL) or 14F (LSI)
+	m_outlatch->q_out_cb<0>().set("ymsnd", FUNC(ym2151_device::reset_w));
+	m_outlatch->q_out_cb<4>().set_output("led0").invert(); // J106 pin 4
+	m_outlatch->q_out_cb<5>().set_output("led1").invert(); // J106 pin 3
+	m_outlatch->q_out_cb<6>().set(FUNC(atarisy1_state::coin_counter_right_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(atarisy1_state::coin_counter_left_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -791,73 +794,76 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, ATARI_CLOCK_14MHz/8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, atarisy1_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, atarisy1_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, atarisy1_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, atarisy1_state, via_pb_w))
+	via6522_device &via(VIA6522(config, "via6522_0", ATARI_CLOCK_14MHz/8));
+	via.readpa_handler().set(FUNC(atarisy1_state::via_pa_r));
+	via.readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
+	via.writepa_handler().set(FUNC(atarisy1_state::via_pa_w));
+	via.writepb_handler().set(FUNC(atarisy1_state::via_pb_w));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarisy1_state::marble)
+void atarisy1_state::marble(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 103, true)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 103, true);
+}
 
-	// No joystick
-	MCFG_DEVICE_REMOVE("adc")
-	MCFG_DEVICE_REMOVE("ajsint")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(atarisy1_state::peterpak)
+void atarisy1_state::peterpak(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 107, true);
 
 	// Digital joystick read through ADC
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
-MACHINE_CONFIG_END
+	m_adc->in_callback<0>().set(FUNC(atarisy1_state::digital_joystick_r<0>));
+	m_adc->in_callback<1>().set(FUNC(atarisy1_state::digital_joystick_r<1>));
+	m_adc->in_callback<2>().set(FUNC(atarisy1_state::digital_joystick_r<2>));
+	m_adc->in_callback<3>().set(FUNC(atarisy1_state::digital_joystick_r<3>));
+}
 
-MACHINE_CONFIG_START(atarisy1_state::indytemp)
+void atarisy1_state::indytemp(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, true)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 105, true);
 
 	// Digital joystick read through ADC
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
-MACHINE_CONFIG_END
+	m_adc->in_callback<0>().set(FUNC(atarisy1_state::digital_joystick_r<0>));
+	m_adc->in_callback<1>().set(FUNC(atarisy1_state::digital_joystick_r<1>));
+	m_adc->in_callback<2>().set(FUNC(atarisy1_state::digital_joystick_r<2>));
+	m_adc->in_callback<3>().set(FUNC(atarisy1_state::digital_joystick_r<3>));
+}
 
-MACHINE_CONFIG_START(atarisy1_state::roadrunn)
+void atarisy1_state::roadrunn(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, true)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 108, true);
 
 	// Hall-effect analog joystick
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN6_CB(IOPORT("IN0"))
-	MCFG_ADC0808_IN7_CB(IOPORT("IN1"))
-MACHINE_CONFIG_END
+	m_adc->in_callback<6>().set_ioport("IN0");
+	m_adc->in_callback<7>().set_ioport("IN1");
+}
 
-MACHINE_CONFIG_START(atarisy1_state::roadb109)
+void atarisy1_state::roadb109(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, true)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 109, true);
 
 	// Road Blasters gas pedal
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN2_CB(IOPORT("IN1"))
-MACHINE_CONFIG_END
+	m_adc->in_callback<2>().set_ioport("IN1");
+}
 
-MACHINE_CONFIG_START(atarisy1_state::roadb110)
+void atarisy1_state::roadb110(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, true)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 110, true);
 
 	// Road Blasters gas pedal
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN2_CB(IOPORT("IN1"))
-MACHINE_CONFIG_END
+	m_adc->in_callback<2>().set_ioport("IN1");
+}
 
 
 

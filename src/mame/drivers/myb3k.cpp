@@ -23,7 +23,7 @@
     - Keyboard is not interfaced through 8255
     - Non standard graphics board
 
-    These and other incompatibilities required many PC software's to be
+    These and other incompatibilities required many PC softwares to be
     recompiled to work on this computer.
 
 ****************************************************************************/
@@ -109,6 +109,14 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
+	void stepone(machine_config &config);
+	void jb3000(machine_config &config);
+	void myb3k(machine_config &config);
+
+	/* Monitor */
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+
+private:
 	/* Interrupt controller */
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
@@ -158,23 +166,15 @@ public:
 	/* Video Controller */
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 
-	/* Monitor */
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
-
 	/* Status bits */
 	DECLARE_READ8_MEMBER(myb3k_io_status_r);
 
-	void stepone(machine_config &config);
-	void jb3000(machine_config &config);
-	void myb3k(machine_config &config);
-
 	void myb3k_io(address_map &map);
 	void myb3k_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	/* Interrupt Controller */
 	void pic_ir5_w(int source, int state);
 	void pic_ir7_w(int source, int state);
@@ -938,9 +938,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
 	/* RAM options */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 256K");
 
 	/* Interrupt controller */
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)

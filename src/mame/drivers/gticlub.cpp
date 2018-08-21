@@ -273,7 +273,17 @@ public:
 	{
 	}
 
+	void thunderh(machine_config &config);
+	void hangplt(machine_config &config);
+	void slrasslt(machine_config &config);
+	void gticlub(machine_config &config);
 
+	void init_hangplt_common();
+	void init_hangplt();
+	void init_hangpltu();
+	void init_gticlub();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -320,10 +330,6 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 
-	void init_hangplt_common();
-	void init_hangplt();
-	void init_hangpltu();
-	void init_gticlub();
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
@@ -331,23 +337,19 @@ public:
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
-	ADC1038_INPUT_CB(adc1038_input_callback);
+	int adc1038_input_callback(int input);
 
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void thunderh(machine_config &config);
-	void hangplt(machine_config &config);
-	void slrasslt(machine_config &config);
-	void gticlub(machine_config &config);
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
-private:
+
 	void gticlub_led_setreg(int offset, uint8_t data);
 
 	uint8_t m_gticlub_led_reg[2];
@@ -823,22 +825,16 @@ INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
 }
 
 
-ADC1038_INPUT_CB(gticlub_state::adc1038_input_callback)
+int gticlub_state::adc1038_input_callback(int input)
 {
-	int value = 0;
 	switch (input)
 	{
-	case 0: value = m_analog0->read(); break;
-	case 1: value = m_analog1->read(); break;
-	case 2: value = m_analog2->read(); break;
-	case 3: value = m_analog3->read(); break;
-	case 4: value = 0x000; break;
-	case 5: value = 0x000; break;
-	case 6: value = 0x000; break;
-	case 7: value = 0x000; break;
+	case 0:  return m_analog0->read();
+	case 1:  return m_analog1->read();
+	case 2:  return m_analog2->read();
+	case 3:  return m_analog3->read();
+	default: return 0;
 	}
-
-	return value;
 }
 
 MACHINE_RESET_MEMBER(gticlub_state,gticlub)
@@ -977,9 +973,9 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
-	MCFG_ADC1038_GTIHACK(1)
+	ADC1038(config, m_adc1038, 0);
+	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
+	m_adc1038->set_gti_club_hack(true);
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
@@ -1032,9 +1028,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gticlub_state::thunderh)
 	gticlub(config);
 
-	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	m_adc1038->set_gti_club_hack(false);
 
 	MCFG_DEVICE_REMOVE("k056230")
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
@@ -1045,9 +1039,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gticlub_state::slrasslt)
 	gticlub(config);
 
-	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	m_adc1038->set_gti_club_hack(false);
 
 	MCFG_DEVICE_REMOVE("k001604_1")
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
@@ -1089,8 +1081,8 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	ADC1038(config, m_adc1038, 0);
+	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")

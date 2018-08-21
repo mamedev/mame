@@ -874,7 +874,7 @@ uint8_t napple2_state::read_floatingbus()
 
 	// calculate vertical scanning state
 	//
-	v_line  = i / kHClocks; // which vertical scanning line
+	v_line  = (i / kHClocks) + 188; // which vertical scanning line
 	v_state = kVLine0State + v_line; // V state bits
 	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
 	{
@@ -1396,22 +1396,18 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&napple2_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* soft switches */
-	MCFG_DEVICE_ADD("softlatch", F9334, 0) // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, napple2_state, txt_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, napple2_state, mix_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, napple2_state, scr_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, napple2_state, res_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, napple2_state, an0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, napple2_state, an1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, napple2_state, an2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, napple2_state, an3_w))
+	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
+	m_softlatch->q_out_cb<0>().set(FUNC(napple2_state::txt_w));
+	m_softlatch->q_out_cb<1>().set(FUNC(napple2_state::mix_w));
+	m_softlatch->q_out_cb<2>().set(FUNC(napple2_state::scr_w));
+	m_softlatch->q_out_cb<3>().set(FUNC(napple2_state::res_w));
+	m_softlatch->q_out_cb<4>().set(FUNC(napple2_state::an0_w));
+	m_softlatch->q_out_cb<5>().set(FUNC(napple2_state::an1_w));
+	m_softlatch->q_out_cb<6>().set(FUNC(napple2_state::an2_w));
+	m_softlatch->q_out_cb<7>().set(FUNC(napple2_state::an3_w));
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(A2_KBDC_TAG, AY3600, 0)
@@ -1455,27 +1451,24 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_CASSETTE_INTERFACE("apple2_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(napple2_state::apple2)
+void napple2_state::apple2(machine_config &config)
+{
 	apple2_common(config);
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,32K,36K,48K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,32K,36K,48K").set_default_value(0);
+}
 
-MACHINE_CONFIG_START(napple2_state::apple2p)
+void napple2_state::apple2p(machine_config &config)
+{
 	apple2_common(config);
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0);
+}
 
-MACHINE_CONFIG_START(napple2_state::space84)
+void napple2_state::space84(machine_config &config)
+{
 	apple2p(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(napple2_state::apple2jp)
 	apple2p(config);
@@ -1705,6 +1698,18 @@ ROM_START(ivelultr)
 	ROM_LOAD( "ultra4.bin", 0x0000, 0x0800, CRC(3dce51ac) SHA1(676b6e775d5159049cae5b6143398ec7b2bf437a) )
 ROM_END
 
+ROM_START(laser2c)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "g1.bin",       0x000000, 0x001000, BAD_DUMP CRC(7ad15cc4) SHA1(88c60ec0b008eccdbece09d18fe905380ddc070f) )
+
+	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "g2.bin",       0x000000, 0x001000, CRC(f1d92f9c) SHA1(a54d55201f04af4c24bf94450d2cd1fa87c2c259) )
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "laser.bin",    0x001000, 0x002000, CRC(8b975094) SHA1(eea53530b4a3777afa00d2979abedf84fac62e08) )
+	ROM_LOAD( "mon.bin",      0x003000, 0x001000, CRC(978c083f) SHA1(14e87cb717780b19db75c313004ba4d6ef20bc26) )
+ROM_END
+
 #if 0
 ROM_START(laba2p) /* II Plus clone with on-board Disk II controller and Videx-compatible 80-column card, supposedly from lab equipment */
 	ROM_REGION(0x1000,"gfx1",0)
@@ -1728,6 +1733,36 @@ ROM_START(laba2p) /* II Plus clone with on-board Disk II controller and Videx-co
 ROM_END
 #endif
 
+ROM_START( basis108 )
+	ROM_REGION(0x4000, "maincpu", 0) // all roms overdumped
+	ROM_LOAD( "d0.d83",   0x1000, 0x0800, CRC(bb4ac440) SHA1(7901203845adab588850ae35f81e4ee2a2248686) )
+	ROM_IGNORE( 0x0800 )
+	ROM_LOAD( "d8.d70",   0x1800, 0x0800, CRC(3e8cdbcd) SHA1(b2a418818e4130859afd6c08b5695328a3edd2c5) )
+	ROM_IGNORE( 0x0800 )
+	ROM_LOAD( "e0.d56",   0x2000, 0x0800, CRC(0575ba28) SHA1(938884eb3ebd0870f99df33ee7a03e93cd625ab4) )
+	ROM_IGNORE( 0x0800 )
+	ROM_LOAD( "e8.d40",   0x2800, 0x0800, CRC(fc7229f6) SHA1(380ffcf0dba008f0bc43a483931e98034b1d0d52) )
+	ROM_IGNORE( 0x0800 )
+	ROM_LOAD( "f0.d39",   0x3000, 0x0800, CRC(bae4b24d) SHA1(b5ffc9b3552b13b2f577a42196addae71289203d) )
+	ROM_IGNORE( 0x0800 )
+	ROM_LOAD( "f8.d25",   0x3800, 0x0800, CRC(f84efac5) SHA1(66b7eadfdb938cda0de01dbeab1b74aa88bd096c) )
+	ROM_IGNORE( 0x0800 )
+
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD( "cg.d29",   0x0000, 0x1000, CRC(120de575) SHA1(e6e4e357b3834a143df9e5834abfb4a9139457d4) )
+
+	ROM_REGION(0x1000, "cg80col", 0)
+	ROM_LOAD( "dispcard_cg.bin",         0x0000, 0x1000, CRC(cf84811c) SHA1(135f4f35607dd74941f0a3cae813227bf8a8a020) )
+
+	ROM_REGION(0x1000, "fw80col", 0)
+	ROM_LOAD( "dispcard_ctrl_17.43.bin", 0x0000, 0x0800, CRC(bf04eda4) SHA1(86047c0ec6b06d647b95304d7f95d3d116f60e4a) )
+
+	ROM_REGION(0x800, "diskii", 0)
+	ROM_LOAD( "fdccard_fdc4_slot6.bin",  0x0000, 0x0800, CRC(2bd452bb) SHA1(10ba81d34117ef713c546d748bf0e1a8c04d1ae3) )
+ROM_END
+
+
+
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                FULLNAME
 COMP( 1977, apple2,   0,      0,      apple2,   apple2,  napple2_state, empty_init, "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )
 COMP( 1979, apple2p,  apple2, 0,      apple2p,  apple2p, napple2_state, empty_init, "Apple Computer",      "Apple ][+", MACHINE_SUPPORTS_SAVE )
@@ -1747,3 +1782,5 @@ COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2p, napple2_state, empty_in
 COMP( 1985, space84,  apple2, 0,      space84,  apple2p, napple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
 COMP( 1985, am64,     apple2, 0,      space84,  apple2p, napple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
 //COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, napple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, laser2c,  apple2, 0,      space84,  apple2p, napple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, napple2_state, empty_init, "Basis",               "Basis 108", MACHINE_SUPPORTS_SAVE )
