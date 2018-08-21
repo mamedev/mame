@@ -4513,6 +4513,78 @@ void pentium3_device::device_reset()
 }
 
 /*****************************************************************************/
+/* AMD Athlon XP
+   Model: Athlon XP 2400+
+   Part number: AXDA2400DKV3C
+   Stepping code: AIUCP
+   Date code: 0240MPMW
+*/
+
+void athlonxp_device::device_start()
+{
+	i386_common_init();
+	register_state_i386_x87_xmm();
+
+	build_x87_opcode_table();
+	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+}
+
+void athlonxp_device::device_reset()
+{
+	zero_state();
+
+	m_sreg[CS].selector = 0xf000;
+	m_sreg[CS].base = 0xffff0000;
+	m_sreg[CS].limit = 0xffff;
+	m_sreg[CS].flags = 0x0093;
+
+	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
+	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
+
+	m_idtr.base = 0;
+	m_idtr.limit = 0x3ff;
+
+	m_a20_mask = ~0;
+
+	m_cr[0] = 0x60000010;
+	m_eflags = 0x00200000;
+	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	m_eip = 0xfff0;
+	m_mxcsr = 0x1f80;
+	m_smm = false;
+	m_smi_latched = false;
+	m_smbase = 0x30000;
+	m_nmi_masked = false;
+	m_nmi_latched = false;
+
+	x87_reset();
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 6, Model 8, Stepping 1
+	REG32(EAX) = 0;
+	REG32(EDX) = (6 << 8) | (8 << 4) | (1);
+
+	m_cpuid_id0 = ('h' << 24) | ('t' << 16) | ('u' << 8) | 'A';   // Auth
+	m_cpuid_id1 = ('i' << 24) | ('t' << 16) | ('n' << 8) | 'e';   // enti
+	m_cpuid_id2 = ('D' << 24) | ('M' << 16) | ('A' << 8) | 'c';   // cAMD
+
+	m_cpuid_max_input_value_eax = 0x01;
+	m_cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	// [ 4:4] Time Stamp Counter
+	// [ D:D] PTE Global Bit
+	m_feature_flags = 0x2383fbff;       // TODO: enable relevant flags here
+
+	CHANGE_PC(m_eip);
+}
+
+/*****************************************************************************/
 /* Intel Pentium 4 */
 
 void pentium4_device::device_start()

@@ -223,7 +223,7 @@ protected:
 	address_space *m_io;
 	uint32_t m_a20_mask;
 
-	int m_cpuid_max_input_value_eax;
+	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
 	uint32_t m_cpu_version;
 	uint32_t m_feature_flags;
@@ -1543,6 +1543,18 @@ protected:
 };
 
 
+class athlonxp_device : public pentium_device
+{
+public:
+	// construction/destruction
+	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+
 class pentium4_device : public pentium_device
 {
 public:
@@ -1565,6 +1577,7 @@ DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
 DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
+DECLARE_DEVICE_TYPE(ATHLONXP,    athlonxp_device)
 DECLARE_DEVICE_TYPE(PENTIUM4,    pentium4_device)
 
 #endif // MAME_CPU_I386_I386_H
