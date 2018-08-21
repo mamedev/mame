@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(st0020_device::get_tile_info)
 
 TILEMAP_MAPPER_MEMBER(st0020_device::scan_16x16)
 {
-	return (row&1) | ((col & 0x3f) << 1) | ((row & ~1) << 6);
+	return (row & 1) | ((col & 0x3f) << 1) | ((row & ~1) << 6);
 }
 
 // Sprite RAM
