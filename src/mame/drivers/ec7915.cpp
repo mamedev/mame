@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 //#include "machine/i8214.h"
-//#include "machine/i8251.h"
+#include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 //#include "screen.h"
@@ -46,8 +46,11 @@ void ec7915_state::io_map(address_map &map)
 {
 	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x08).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x09, 0x09).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x0c, 0x0f).rw("ppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).w("pit", FUNC(pit8253_device::write));
+	//map(0x14, 0x14).w("picu", FUNC(i8214_device::write));
 }
 
 
@@ -65,7 +68,8 @@ void ec7915_state::ec7915(machine_config &config)
 
 	PIT8253(config, "pit", 0); // КР580ВИ53
 
-	//I8251(config, "usart", 2000000); // КР580ВВ51А
+	I8251(config, "usart", 2000000); // КР580ВВ51А
+	// 8251 usage appears to prefer synchronous communications
 
 	// 2x NEC D8255AC-2 on main board + КР580ВВ55А on display board
 	I8255A(config, "ppi1");
@@ -80,7 +84,7 @@ ROM_START( ec7915 ) // 6k ram // amber
 	ROM_LOAD( "50mp_0810_40.bin",        0x0800, 0x0800, CRC(ed7f12d6) SHA1(b6f1da6a74f77cf1d392eee79f5ea168f3626ee5) )
 	ROM_LOAD( "50mp_1010_49.bin",        0x1000, 0x0800, CRC(bfddf0e6) SHA1(dff4be8c0403519530e6c9106ab279a3037e074a) )
 	ROM_LOAD( "50mp_1810_60.bin",        0x1800, 0x0800, CRC(759f2dc7) SHA1(515778ea213b9204f75f920ef1fbff6c14f9cf3c) )
-	ROM_LOAD( "50mp_2c10_30_lower.bin",  0x2000, 0x0800, CRC(1ff59657) SHA1(777ef82e20a0100c0069ee5e7fbac5b3b86e3529) ) // keyboard rom?
+	ROM_LOAD( "50mp_2c10_30_lower.bin",  0x2000, 0x0800, CRC(1ff59657) SHA1(777ef82e20a0100c0069ee5e7fbac5b3b86e3529) BAD_DUMP ) // fails checksum test
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "char.bin",                0x0000, 0x0800, CRC(e75a6bc4) SHA1(04b56d1f5ab7f2145699555df5ac44d078804821) )
