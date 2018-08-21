@@ -85,7 +85,7 @@
 
 TODO:
 - Filter and ramping behavior might not be perfect.
-- sometimes clicking / popping noises. e.g. raycris song #12 in the sound test.
+- sometimes clicking / popping noises
 - memory reads out of range sometimes
 
 */
@@ -272,10 +272,10 @@ void zsg2_device::filter_samples(zchan *ch)
 
 	for (int i = 0; i < 4; i++)
 	{
-		ch->samples[i+1] = raw_samples[i];
-
 		ch->emphasis_filter_state += raw_samples[i]-((ch->emphasis_filter_state+EMPHASIS_ROUNDING)>>EMPHASIS_FILTER_SHIFT);
-		ch->samples[i+1] = ch->emphasis_filter_state >> EMPHASIS_OUTPUT_SHIFT;
+
+		int32_t sample = ch->emphasis_filter_state >> EMPHASIS_OUTPUT_SHIFT;
+		ch->samples[i+1] = std::min<int32_t>(std::max<int32_t>(sample, -32768), 32767);
 	}
 }
 
@@ -285,7 +285,6 @@ void zsg2_device::filter_samples(zchan *ch)
 
 void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// DSP is programmed to expect 24-bit samples! So we're not limiting to 16-bit here
 	for (int i = 0; i < samples; i++)
 	{
 		int32_t mix[4] = {};
@@ -327,6 +326,10 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			// another filter...
 			elem.output_filter_state += (sample - (elem.output_filter_state>>16)) * elem.output_cutoff;
 			sample = elem.output_filter_state >> 16;
+
+			// To prevent DC bias, we need to slowly discharge the filter when the output filter cutoff is 0
+			if(!elem.output_cutoff)
+				elem.output_filter_state >>= 1;
 
 			sample = (sample * elem.vol)>>16;
 
