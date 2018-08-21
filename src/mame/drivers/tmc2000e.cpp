@@ -34,6 +34,7 @@
 #include "emu.h"
 #include "includes/tmc2000e.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -293,9 +294,12 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 	m_maincpu->q_cb().set(FUNC(tmc2000e_state::q_w));
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
 
-	// video/sound hardware
+	// video hardware
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	CDP1864(config, m_cti, 1.75_MHz_XTAL, SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);

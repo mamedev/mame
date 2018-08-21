@@ -222,6 +222,7 @@ Notes:
 #include "emu.h"
 #include "includes/vip.h"
 
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -716,11 +717,12 @@ MACHINE_CONFIG_START(vip_state::vip)
 	m_maincpu->tpb_cb().set(m_exp, FUNC(vip_expansion_slot_device::tpb_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	CDP1861(config, m_vdc, 3.52128_MHz_XTAL / 2, screen);
+	CDP1861(config, m_vdc, 3.52128_MHz_XTAL / 2).set_screen(SCREEN_TAG);
 	m_vdc->int_cb().set(FUNC(vip_state::vdc_int_w));
 	m_vdc->dma_out_cb().set(FUNC(vip_state::vdc_dma_out_w));
 	m_vdc->efx_cb().set(FUNC(vip_state::vdc_ef1_w));
+
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(vip_state::screen_update));
 
 	// sound hardware
