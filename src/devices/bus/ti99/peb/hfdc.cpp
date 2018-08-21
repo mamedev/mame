@@ -1069,7 +1069,6 @@ ROM_END
 
 void myarc_hfdc_device::device_add_mconfig(machine_config& config)
 {
-	device_t *device = nullptr;
 	HDC9234(config, m_hdc9234, 0);
 	m_hdc9234->intrq_cb().set(FUNC(myarc_hfdc_device::intrq_w));
 	m_hdc9234->dmarq_cb().set(FUNC(myarc_hfdc_device::dmarq_w));
@@ -1078,19 +1077,16 @@ void myarc_hfdc_device::device_add_mconfig(machine_config& config)
 	m_hdc9234->dmain_cb().set(FUNC(myarc_hfdc_device::read_buffer));
 	m_hdc9234->dmaout_cb().set(FUNC(myarc_hfdc_device::write_buffer));
 
-	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f3", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	// First two floppy drives shall be connected by default
+	FLOPPY_CONNECTOR(config, "f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f3", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f4", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
 
-	// NB: Hard disks don't go without image (other than floppy drives)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
+	// Hard disks don't go without image (other than floppy drives)
+	MFM_HD_CONNECTOR(config, "h1", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, "h2", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, "h3", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
 	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 

@@ -675,24 +675,21 @@ ROM_START( bwg_fdc )
 	ROM_LOAD("bwg_dsr.u15", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 ROM_END
 
-MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
+void snug_bwg_device::device_add_mconfig(machine_config& config)
+{
 	WD1773(config, m_wd1773, 8_MHz_XTAL);
 	m_wd1773->intrq_wr_callback().set(FUNC(snug_bwg_device::fdc_irq_w));
 	m_wd1773->drq_wr_callback().set(FUNC(snug_bwg_device::fdc_drq_w));
 
 	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
-	MCFG_FLOPPY_DRIVE_ADD("0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
 
 	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 ioport_constructor snug_bwg_device::device_input_ports() const
 {

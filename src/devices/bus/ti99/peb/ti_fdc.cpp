@@ -419,17 +419,15 @@ ROM_START( ti_fdc )
 	ROM_LOAD("fdc_dsr.u27", 0x1000, 0x1000, CRC(2c921087) SHA1(3646c3bcd2dce16b918ee01ea65312f36ae811d2)) /* TI disk DSR ROM second 4K */
 ROM_END
 
-MACHINE_CONFIG_START(ti_fdc_device::device_add_mconfig)
+void ti_fdc_device::device_add_mconfig(machine_config& config)
+{
 	FD1771(config, m_fd1771, 1_MHz_XTAL);
 	m_fd1771->intrq_wr_callback().set(FUNC(ti_fdc_device::fdc_irq_w));
 	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("2", tifdc_floppies, nullptr, ti_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "2", tifdc_floppies, nullptr, ti_fdc_device::floppy_formats).enable_sound(true);
 
 	LS259(config, m_crulatch); // U23
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_fdc_device::dskpgena_w));
@@ -440,7 +438,7 @@ MACHINE_CONFIG_START(ti_fdc_device::device_add_mconfig)
 	m_crulatch->q_out_cb<5>().set(FUNC(ti_fdc_device::dsel_w));
 	m_crulatch->q_out_cb<6>().set(FUNC(ti_fdc_device::dsel_w));
 	m_crulatch->q_out_cb<7>().set(FUNC(ti_fdc_device::sidsel_w));
-MACHINE_CONFIG_END
+}
 
 const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 {

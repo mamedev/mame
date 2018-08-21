@@ -301,12 +301,13 @@ void ti99_multi_cart_conn_device::device_reset(void)
 	m_grom_selected = false;
 }
 
-MACHINE_CONFIG_START(ti99_multi_cart_conn_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cartridge1", TI99_CART, 0)
-	MCFG_DEVICE_ADD("cartridge2", TI99_CART, 0)
-	MCFG_DEVICE_ADD("cartridge3", TI99_CART, 0)
-	MCFG_DEVICE_ADD("cartridge4", TI99_CART, 0)
-MACHINE_CONFIG_END
+void ti99_multi_cart_conn_device::device_add_mconfig(machine_config &config)
+{
+	TI99_CART(config, "cartridge1", 0);
+	TI99_CART(config, "cartridge2", 0);
+	TI99_CART(config, "cartridge3", 0);
+	TI99_CART(config, "cartridge4", 0);
+}
 
 INPUT_CHANGED_MEMBER( ti99_multi_cart_conn_device::switch_changed )
 {

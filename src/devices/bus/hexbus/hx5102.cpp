@@ -667,7 +667,8 @@ INPUT_PORTS_END
 /*
     HX5102 configuration
 */
-MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
+void hx5102_device::device_add_mconfig(machine_config& config)
+{
 	// Hexbus controller
 	IBC(config, m_hexbus_ctrl, 0);
 	m_hexbus_ctrl->hexbus_cb().set(FUNC(hx5102_device::hexbus_out));
@@ -687,13 +688,13 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
 	// Tied to 1: READY
 	// Tied to 0: TC
-	MCFG_I8272A_ADD(FDC_TAG, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hx5102_device, fdc_irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hx5102_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("d0", hx5102_drive, "525dd", hx5102_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("d1", hx5102_drive, nullptr, hx5102_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	I8272A(config, m_floppy_ctrl, 0);
+	m_floppy_ctrl->set_ready_line_connected(false);
+	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
+	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
+
+	FLOPPY_CONNECTOR(config, "d0", hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "d1", hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
 
 	// Monoflops
 	TTL74123(config, m_motormf, 0);
@@ -721,7 +722,7 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	// RAM
 	RAM(config, RAM1_TAG).set_default_size("2048").set_default_value(0);
 	RAM(config, RAM2_TAG).set_default_size("2048").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( hx5102 )
 	ROM_REGION( 0x4000, DSR_TAG, 0 )

@@ -206,11 +206,25 @@ public:
 DECLARE_DEVICE_TYPE(MFMHD_ST251, mfm_hd_st251_device)
 
 
-/* Connector for a MFM hard disk. See also floppy.c */
+/*
+    Connector for a MFM hard disk. Similar concept as in floppy.cpp.
+*/
 class mfm_harddisk_connector : public device_t,
 								public device_slot_interface
 {
 public:
+	template <typename T>
+	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts,
+		const char *dflt, mfmhd_enc_t enc, int spinup, int cache, const mfmhd_format_type format, bool fixed = false)
+		: mfm_harddisk_connector(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+		configure(enc, spinup, cache, format);
+	}
+
 	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mfm_harddisk_connector();
 
