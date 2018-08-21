@@ -164,21 +164,6 @@ public:
 
 } } } // end namespace bus::ti99::internal
 
-#define MCFG_VIDEO992_SCREEN_ADD(_screen_tag) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, bus::ti99::internal::video992_device::TOTAL_HORZ, bus::ti99::internal::video992_device::HORZ_DISPLAY_START-12, bus::ti99::internal::video992_device::HORZ_DISPLAY_START + 256 + 12, \
-			bus::ti99::internal::video992_device::TOTAL_VERT_NTSC, bus::ti99::internal::video992_device::VERT_DISPLAY_START_NTSC - 12, bus::ti99::internal::video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
-
-#define MCFG_VIDEO992_MEM_ACCESS_CB(_devcb) \
-	downcast<bus::ti99::internal::video992_device &>(*device).set_readmem_callback(DEVCB_##_devcb);
-
-#define MCFG_VIDEO992_HOLD_CB(_devcb) \
-	downcast<bus::ti99::internal::video992_device &>(*device).set_hold_callback(DEVCB_##_devcb);
-
-#define MCFG_VIDEO992_INT_CB(_devcb) \
-	downcast<bus::ti99::internal::video992_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
 DECLARE_DEVICE_TYPE_NS(VIDEO99224, bus::ti99::internal, video992_24_device)
 DECLARE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device)
 DECLARE_DEVICE_TYPE_NS(IO99224, bus::ti99::internal, io992_24_device)

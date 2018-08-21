@@ -230,6 +230,16 @@ public:
 
 	mfm_harddisk_device *get_device();
 
+	/*
+	    Configuration parameters:
+	    encoding = Encoding (see comments in mfm_hd.c)
+	    spinupms = Spinup time in milliseconds. Even though this is a property
+	        of the physical device, we need a way to configure it per system;
+	        some systems expect the hard disk to be turned on before the
+	        main system, and expect it to be ready when they try to access it
+	    cache = number of cached MFM tracks
+	    format = MFMHD_GEN_FORMAT (see formats/mfm_hd.h; currently the only value)
+	*/
 	void configure(mfmhd_enc_t encoding, int spinupms, int cache, mfmhd_format_type format);
 
 protected:
@@ -244,23 +254,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MFM_HD_CONNECTOR, mfm_harddisk_connector)
-
-/*
-    Add a harddisk connector.
-    Parameters:
-    _tag = Tag of the connector
-    _slot_intf = Selection of hard drives
-    _def_slot = Default hard drive
-    _enc = Encoding (see comments in mfm_hd.c)
-    _spinupms = Spinup time in milliseconds (some configurations assume that the
-    user has turned on the hard disk before turning on the system. We cannot
-    emulate this, so we allow for shorter times)
-    _cache = number of cached MFM tracks
-*/
-#define MCFG_MFM_HARDDISK_CONN_ADD(_tag, _slot_intf, _def_slot, _enc, _spinupms, _cache, _format)  \
-	MCFG_DEVICE_ADD(_tag, MFM_HD_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<mfm_harddisk_connector *>(device)->configure(_enc, _spinupms, _cache, _format);
-
 
 #endif // MAME_DEVICES_IMAGEDEV_MFMHD_H

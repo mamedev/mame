@@ -176,7 +176,6 @@ Known Issues (MZ, 2010-11-07)
 #include "bus/ti99/ti99defs.h"
 
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "machine/tms9901.h"
 #include "machine/tmc0430.h"
 #include "imagedev/cassette.h"
