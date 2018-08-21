@@ -835,11 +835,14 @@ uint8_t i8255_device::read_pa()
 READ8_MEMBER( i8255_device::acka_r )
 {
 	if (!machine().side_effects_disabled())
-	{
 		pc6_w(0);
+
+	uint8_t data = read_pa();
+
+	if (!machine().side_effects_disabled())
 		pc6_w(1);
-	}
-	return read_pa();
+
+	return data;
 }
 
 
@@ -873,11 +876,14 @@ uint8_t i8255_device::read_pb()
 READ8_MEMBER( i8255_device::ackb_r )
 {
 	if (!machine().side_effects_disabled())
-	{
 		pc2_w(0);
+
+	uint8_t data = read_pb();
+
+	if (!machine().side_effects_disabled())
 		pc2_w(1);
-	}
-	return read_pb();
+
+	return data;
 }
 
 
