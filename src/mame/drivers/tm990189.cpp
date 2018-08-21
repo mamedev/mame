@@ -891,10 +891,11 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
+	tms9918_device &vdp(TMS9918(config, "tms9918", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
 	config.set_default_layout(layout_tm990189v);
 
 	/* sound hardware */

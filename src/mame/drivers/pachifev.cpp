@@ -358,11 +358,12 @@ MACHINE_CONFIG_START(pachifev_state::pachifev)
 	m_maincpu->set_addrmap(AS_IO, &pachifev_state::pachifev_cru);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pachifev_state, vblank_w))
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.screen_vblank().set(FUNC(pachifev_state::vblank_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

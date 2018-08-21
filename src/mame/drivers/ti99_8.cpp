@@ -842,47 +842,31 @@ void ti99_8_state::ti99_8(machine_config& config)
 /*
     TI-99/8 US version (NTSC, 60 Hz)
 */
-void ti99_8_state::ti99_8_60hz(machine_config& config)
+void ti99_8_state::ti99_8_60hz(machine_config &config)
 {
 	ti99_8(config);
 	// Video hardware
-	tms9928a_device& video(TMS9118(config, TI_VDP_TAG, XTAL(10'738'635) / 2));
-	video.out_int_line_callback().set(FUNC(ti99_8_state::video_interrupt));
+	tms9118_device &video(TMS9118(config, TI_VDP_TAG, XTAL(10'738'635)));
 	video.set_vram_size(0x4000);
-	video.set_screen(TI_SCREEN_TAG);
+	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
+	video.set_screen("screen");
 
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
-			tms9928a_device::TOTAL_HORZ, \
-			tms9928a_device::HORZ_DISPLAY_START-12, \
-			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_NTSC, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC - 12, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
-	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 }
 
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
-void ti99_8_state::ti99_8_50hz(machine_config& config)
+void ti99_8_state::ti99_8_50hz(machine_config &config)
 {
 	ti99_8(config);
 	// Video hardware
-	tms9928a_device& video(TMS9129(config, TI_VDP_TAG, XTAL(10'738'635) / 2));
-	video.out_int_line_callback().set(FUNC(ti99_8_state::video_interrupt));
+	tms9129_device &video(TMS9129(config, TI_VDP_TAG, XTAL(10'738'635)));
 	video.set_vram_size(0x4000);
-	video.set_screen(TI_SCREEN_TAG);
+	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
+	video.set_screen("screen");
 
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
-			tms9928a_device::TOTAL_HORZ, \
-			tms9928a_device::HORZ_DISPLAY_START-12, \
-			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_PAL, \
-			tms9928a_device::VERT_DISPLAY_START_PAL - 12, \
-			tms9928a_device::VERT_DISPLAY_START_PAL + 192 + 12 );
-	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 }
 
 /*

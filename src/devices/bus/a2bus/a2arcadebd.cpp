@@ -36,17 +36,16 @@ DEFINE_DEVICE_TYPE(A2BUS_ARCADEBOARD, a2bus_arcboard_device, "a2arcbd", "Third M
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_arcboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, a2bus_arcboard_device, tms_irq_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS_TAG, tms9918a_device, screen_update )
+void a2bus_arcboard_device::device_add_mconfig(machine_config &config)
+{
+	TMS9918A(config, m_tms, XTAL(10'738'635)).set_screen(SCREEN_TAG);
+	m_tms->set_vram_size(0x4000); // 16k of VRAM
+	m_tms->int_callback().set(FUNC(a2bus_arcboard_device::tms_irq_w));
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY_TAG, AY8910, 1022727)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay, 1022727).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

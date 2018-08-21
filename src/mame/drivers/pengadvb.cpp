@@ -234,11 +234,11 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pengadvb_state, pengadvb_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL(10'738'635)/2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9128", tms9128_device, screen_update)
+	tms9128_device &vdp(TMS9128(config, "tms9128", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

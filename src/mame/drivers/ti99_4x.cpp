@@ -940,47 +940,31 @@ void ti99_4x_state::ti99_4(machine_config& config)
 /*
     US version: 60 Hz, NTSC
 */
-void ti99_4x_state::ti99_4_60hz(machine_config& config)
+void ti99_4x_state::ti99_4_60hz(machine_config &config)
 {
 	ti99_4(config);
-	TMS9918(config, m_video, XTAL(10'738'635) / 2);
-	m_video->out_int_line_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
-	m_video->out_gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
+	TMS9918(config, m_video, XTAL(10'738'635));
 	m_video->set_vram_size(0x4000);
+	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
+	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
-			tms9928a_device::TOTAL_HORZ, \
-			tms9928a_device::HORZ_DISPLAY_START-12, \
-			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_NTSC, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC - 12, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
-	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /*
     European version: 50 Hz, PAL
 */
-void ti99_4x_state::ti99_4_50hz(machine_config& config)
+void ti99_4x_state::ti99_4_50hz(machine_config &config)
 {
 	ti99_4(config);
-	TMS9929(config, m_video, XTAL(10'738'635) / 2);
-	m_video->out_int_line_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
-	m_video->out_gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
+	TMS9929(config, m_video, XTAL(10'738'635));
 	m_video->set_vram_size(0x4000);
+	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
+	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
-			tms9928a_device::TOTAL_HORZ, \
-			tms9928a_device::HORZ_DISPLAY_START-12, \
-			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_PAL, \
-			tms9928a_device::VERT_DISPLAY_START_PAL - 12, \
-			tms9928a_device::VERT_DISPLAY_START_PAL + 192 + 12 );
-	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /**********************************************************************
@@ -1015,47 +999,31 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 /*
     US version: 60 Hz, NTSC
 */
-void ti99_4x_state::ti99_4a_60hz(machine_config& config)
+void ti99_4x_state::ti99_4a_60hz(machine_config &config)
 {
 	ti99_4a(config);
-	TMS9918A(config, m_video, XTAL(10'738'635) / 2);
-	m_video->out_int_line_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
-	m_video->out_gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
+	TMS9918A(config, m_video, XTAL(10'738'635));
 	m_video->set_vram_size(0x4000);
+	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
+	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
-			tms9928a_device::TOTAL_HORZ, \
-			tms9928a_device::HORZ_DISPLAY_START-12, \
-			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_NTSC, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC - 12, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
-	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /*
     European version: 50 Hz, PAL
 */
-void ti99_4x_state::ti99_4a_50hz(machine_config& config)
+void ti99_4x_state::ti99_4a_50hz(machine_config &config)
 {
 	ti99_4a(config);
-	TMS9929A(config, m_video, XTAL(10'738'635) / 2);
-	m_video->out_int_line_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
-	m_video->out_gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
+	TMS9929A(config, m_video, XTAL(10'738'635));
 	m_video->set_vram_size(0x4000);
+	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
+	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
-			tms9928a_device::TOTAL_HORZ, \
-			tms9928a_device::HORZ_DISPLAY_START-12, \
-			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_PAL, \
-			tms9928a_device::VERT_DISPLAY_START_PAL - 12, \
-			tms9928a_device::VERT_DISPLAY_START_PAL + 192 + 12 );
-	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /************************************************************************
@@ -1071,26 +1039,18 @@ void ti99_4x_state::ti99_4a_50hz(machine_config& config)
     US version: 60 Hz, NTSC
     There were no European versions.
 */
-void ti99_4x_state::ti99_4qi_60hz(machine_config& config)
+void ti99_4x_state::ti99_4qi_60hz(machine_config &config)
 {
 	ti99_4a(config);
 	m_model = MODEL_4QI;
 
-	TMS9918A(config, m_video, XTAL(10'738'635) / 2);
-	m_video->out_int_line_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
-	m_video->out_gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
+	TMS9918A(config, m_video, XTAL(10'738'635));
 	m_video->set_vram_size(0x4000);
+	m_video->int_callback().set(FUNC(ti99_4x_state::video_interrupt_in));
+	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
-			tms9928a_device::TOTAL_HORZ, \
-			tms9928a_device::HORZ_DISPLAY_START-12, \
-			tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_NTSC, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC - 12, \
-			tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
-	screen.set_screen_update(TI_VDP_TAG, FUNC(tms9928a_device::screen_update));
+	SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 /************************************************************************
