@@ -349,11 +349,7 @@ ROM_END
 void ti_pcode_card_device::device_add_mconfig(machine_config &config)
 {
 	for (unsigned i = 0; m_groms.size() > i; ++i)
-	{
-		TMC0430(config, m_groms[i], 0);
-		m_groms[i]->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-		m_groms[i]->set_region_and_ident(PCODE_GROM_TAG, 0x2000 * i, i);
-	}
+		TMC0430(config, m_groms[i], PCODE_GROM_TAG, 0x2000 * i, i).ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
 
 	LS259(config, m_crulatch); // U12
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_pcode_card_device::pcpage_w));

@@ -808,96 +808,32 @@ void ti99_8_state::ti99_8(machine_config& config)
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);;
 
 	// GROM library
-	tmc0430_device& sgrom0(TMC0430(config, TI998_SYSGROM0_TAG, 0));
-	sgrom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
-	sgrom0.set_region_and_ident(TI998_SYSGROM_REG, 0x0000, 0);
+	using namespace bus::ti99::internal;
+	TMC0430(config, TI998_SYSGROM0_TAG, TI998_SYSGROM_REG, 0x0000, 0).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::system_grom_ready));
+	TMC0430(config, TI998_SYSGROM1_TAG, TI998_SYSGROM_REG, 0x2000, 1).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::system_grom_ready));
+	TMC0430(config, TI998_SYSGROM2_TAG, TI998_SYSGROM_REG, 0x4000, 2).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::system_grom_ready));
 
-	tmc0430_device& sgrom1(TMC0430(config, TI998_SYSGROM1_TAG, 0));
-	sgrom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
-	sgrom1.set_region_and_ident(TI998_SYSGROM_REG, 0x2000, 1);
+	TMC0430(config, TI998_GLIB10_TAG, TI998_GROMLIB1_REG, 0x0000, 0).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
+	TMC0430(config, TI998_GLIB11_TAG, TI998_GROMLIB1_REG, 0x2000, 1).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
+	TMC0430(config, TI998_GLIB12_TAG, TI998_GROMLIB1_REG, 0x4000, 2).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
+	TMC0430(config, TI998_GLIB13_TAG, TI998_GROMLIB1_REG, 0x6000, 3).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
+	TMC0430(config, TI998_GLIB14_TAG, TI998_GROMLIB1_REG, 0x8000, 4).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
+	TMC0430(config, TI998_GLIB15_TAG, TI998_GROMLIB1_REG, 0xa000, 5).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
+	TMC0430(config, TI998_GLIB16_TAG, TI998_GROMLIB1_REG, 0xc000, 6).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
+	TMC0430(config, TI998_GLIB17_TAG, TI998_GROMLIB1_REG, 0xe000, 7).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::ptts_grom_ready));
 
-	tmc0430_device& sgrom2(TMC0430(config, TI998_SYSGROM2_TAG, 0));
-	sgrom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::system_grom_ready));
-	sgrom2.set_region_and_ident(TI998_SYSGROM_REG, 0x4000, 2);
+	TMC0430(config, TI998_GLIB20_TAG, TI998_GROMLIB2_REG, 0x0000, 0).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
+	TMC0430(config, TI998_GLIB21_TAG, TI998_GROMLIB2_REG, 0x2000, 1).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
+	TMC0430(config, TI998_GLIB22_TAG, TI998_GROMLIB2_REG, 0x4000, 2).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
+	TMC0430(config, TI998_GLIB23_TAG, TI998_GROMLIB2_REG, 0x6000, 3).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
+	TMC0430(config, TI998_GLIB24_TAG, TI998_GROMLIB2_REG, 0x8000, 4).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
+	TMC0430(config, TI998_GLIB25_TAG, TI998_GROMLIB2_REG, 0xa000, 5).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
+	TMC0430(config, TI998_GLIB26_TAG, TI998_GROMLIB2_REG, 0xc000, 6).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
+	TMC0430(config, TI998_GLIB27_TAG, TI998_GROMLIB2_REG, 0xe000, 7).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p8_grom_ready));
 
-
-	tmc0430_device& tgrom0(TMC0430(config, TI998_GLIB10_TAG, 0));
-	tgrom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom0.set_region_and_ident(TI998_GROMLIB1_REG, 0x0000, 0);
-
-	tmc0430_device& tgrom1(TMC0430(config, TI998_GLIB11_TAG, 0));
-	tgrom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom1.set_region_and_ident(TI998_GROMLIB1_REG, 0x2000, 1);
-
-	tmc0430_device& tgrom2(TMC0430(config, TI998_GLIB12_TAG, 0));
-	tgrom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom2.set_region_and_ident(TI998_GROMLIB1_REG, 0x4000, 2);
-
-	tmc0430_device& tgrom3(TMC0430(config, TI998_GLIB13_TAG, 0));
-	tgrom3.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom3.set_region_and_ident(TI998_GROMLIB1_REG, 0x6000, 3);
-
-	tmc0430_device& tgrom4(TMC0430(config, TI998_GLIB14_TAG, 0));
-	tgrom4.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom4.set_region_and_ident(TI998_GROMLIB1_REG, 0x8000, 4);
-
-	tmc0430_device& tgrom5(TMC0430(config, TI998_GLIB15_TAG, 0));
-	tgrom5.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom5.set_region_and_ident(TI998_GROMLIB1_REG, 0xa000, 5);
-
-	tmc0430_device& tgrom6(TMC0430(config, TI998_GLIB16_TAG, 0));
-	tgrom6.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom6.set_region_and_ident(TI998_GROMLIB1_REG, 0xc000, 6);
-
-	tmc0430_device& tgrom7(TMC0430(config, TI998_GLIB17_TAG, 0));
-	tgrom7.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::ptts_grom_ready));
-	tgrom7.set_region_and_ident(TI998_GROMLIB1_REG, 0xe000, 7);
-
-
-	tmc0430_device& p8grom0(TMC0430(config, TI998_GLIB20_TAG, 0));
-	p8grom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom0.set_region_and_ident(TI998_GROMLIB2_REG, 0x0000, 0);
-
-	tmc0430_device& p8grom1(TMC0430(config, TI998_GLIB21_TAG, 0));
-	p8grom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom1.set_region_and_ident(TI998_GROMLIB2_REG, 0x2000, 1);
-
-	tmc0430_device& p8grom2(TMC0430(config, TI998_GLIB22_TAG, 0));
-	p8grom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom2.set_region_and_ident(TI998_GROMLIB2_REG, 0x4000, 2);
-
-	tmc0430_device& p8grom3(TMC0430(config, TI998_GLIB23_TAG, 0));
-	p8grom3.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom3.set_region_and_ident(TI998_GROMLIB2_REG, 0x6000, 3);
-
-	tmc0430_device& p8grom4(TMC0430(config, TI998_GLIB24_TAG, 0));
-	p8grom4.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom4.set_region_and_ident(TI998_GROMLIB2_REG, 0x8000, 4);
-
-	tmc0430_device& p8grom5(TMC0430(config, TI998_GLIB25_TAG, 0));
-	p8grom5.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom5.set_region_and_ident(TI998_GROMLIB2_REG, 0xa000, 5);
-
-	tmc0430_device& p8grom6(TMC0430(config, TI998_GLIB26_TAG, 0));
-	p8grom6.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom6.set_region_and_ident(TI998_GROMLIB2_REG, 0xc000, 6);
-
-	tmc0430_device& p8grom7(TMC0430(config, TI998_GLIB27_TAG, 0));
-	p8grom7.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p8_grom_ready));
-	p8grom7.set_region_and_ident(TI998_GROMLIB2_REG, 0xe000, 7);
-
-
-	tmc0430_device& p3grom0(TMC0430(config, TI998_GLIB30_TAG, 0));
-	p3grom0.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p3_grom_ready));
-	p3grom0.set_region_and_ident(TI998_GROMLIB3_REG, 0x0000, 0);
-
-	tmc0430_device& p3grom1(TMC0430(config, TI998_GLIB31_TAG, 0));
-	p3grom1.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p3_grom_ready));
-	p3grom1.set_region_and_ident(TI998_GROMLIB3_REG, 0x2000, 1);
-
-	tmc0430_device& p3grom2(TMC0430(config, TI998_GLIB32_TAG, 0));
-	p3grom2.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::p3_grom_ready));
-	p3grom2.set_region_and_ident(TI998_GROMLIB3_REG, 0x4000, 2);
+	TMC0430(config, TI998_GLIB30_TAG, TI998_GROMLIB3_REG, 0x0000, 0).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p3_grom_ready));
+	TMC0430(config, TI998_GLIB31_TAG, TI998_GROMLIB3_REG, 0x2000, 1).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p3_grom_ready));
+	TMC0430(config, TI998_GLIB32_TAG, TI998_GROMLIB3_REG, 0x4000, 2).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p3_grom_ready));
 
 	// Joystick port
 	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_mouse, "twinjoy");

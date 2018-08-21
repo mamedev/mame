@@ -902,17 +902,9 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	CASSETTE(config, "cassette2", 0);
 
 	// GROM devices
-	tmc0430_device& grom0(TMC0430(config, TI99_GROM0_TAG, 0));
-	grom0.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
-	grom0.set_region_and_ident(TI99_CONSOLEGROM, 0x0000, 0);
-
-	tmc0430_device& grom1(TMC0430(config, TI99_GROM1_TAG, 0));
-	grom1.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
-	grom1.set_region_and_ident(TI99_CONSOLEGROM, 0x2000, 1);
-
-	tmc0430_device& grom2(TMC0430(config, TI99_GROM2_TAG, 0));
-	grom2.ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
-	grom2.set_region_and_ident(TI99_CONSOLEGROM, 0x4000, 2);
+	TMC0430(config, TI99_GROM0_TAG, TI99_CONSOLEGROM, 0x0000, 0).ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	TMC0430(config, TI99_GROM1_TAG, TI99_CONSOLEGROM, 0x2000, 1).ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
+	TMC0430(config, TI99_GROM2_TAG, TI99_CONSOLEGROM, 0x4000, 2).ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
 }
 
 /**********************************************************************
