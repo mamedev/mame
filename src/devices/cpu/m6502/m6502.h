@@ -126,7 +126,7 @@ protected:
 
 	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
-	int icount;
+	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
 	bool irq_taken, sync, cache_disabled, inhibit_interrupts;
 
@@ -269,6 +269,17 @@ protected:
 	O(kil_non);
 
 #undef O
+};
+
+class m6502_mcu_device : public m6502_device {
+protected:
+	m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void internal_update(uint64_t current_time) = 0;
+	void recompute_bcount(uint64_t event_time);
+	static void add_event(uint64_t &event_time, uint64_t new_event);
+
+	virtual void execute_run() override;
 };
 
 enum {
