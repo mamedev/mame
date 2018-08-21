@@ -24,6 +24,13 @@
 
 namespace bus { namespace ti99 { namespace joyport {
 
+enum
+{
+	PLAIN=0,
+	MOUSE,
+	HANDSET
+};
+
 class joyport_device;
 
 /********************************************************************
@@ -49,13 +56,22 @@ protected:
 class joyport_device : public device_t, public device_slot_interface
 {
 public:
+	template <typename U>
+	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: joyport_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	uint8_t   read_port();
 	void    write_port(int data);
 	void    set_interrupt(int state);
 	void    pulse_clock();
 	auto    int_cb() { return m_interrupt.bind(); }
-	void    configure_slot(bool withmouse, bool withhandset);
 
 protected:
 	void device_start() override;
@@ -69,5 +85,9 @@ private:
 } } } // end namespace bus::ti99::joyport
 
 DECLARE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device)
+
+void ti99_joyport_options_plain(device_slot_interface &device);
+void ti99_joyport_options_mouse(device_slot_interface &device);
+void ti99_joyport_options_994(device_slot_interface &device);
 
 #endif // MAME_BUS_TI99_JOYPORT_JOYPORT_H

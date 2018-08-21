@@ -195,6 +195,7 @@ e100.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp
+ec7915.cpp
 einstein.cpp
 electron.cpp
 elekscmp.cpp
@@ -304,6 +305,7 @@ ibm6580.cpp
 ibmpc.cpp
 ibmpcjr.cpp
 icatel.cpp
+icebox.cpp
 ie15.cpp
 if800.cpp
 imds.cpp
@@ -771,6 +773,7 @@ vax11.cpp
 vboy.cpp
 vc4000.cpp
 vcs80.cpp
+vdm7932x.cpp
 vector06.cpp
 vector4.cpp
 vectrex.cpp

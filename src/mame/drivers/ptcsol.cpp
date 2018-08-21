@@ -8,6 +8,10 @@
 
     Info from: http://www.sol20.org/
 
+    The Sol Terminal Computer was the first complete S-100 microcomputer
+    with a built-in keyboard and video output. However, its internal
+    architecture resembles a video display terminal more than anything else.
+
     Note that the SOLOS dump comes from the Solace emu. Confirmed as ok.
 
     The roms DPMON and CONSOL are widely available on the net as ENT files,
@@ -808,5 +812,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME  FLAGS
-COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "SOL-20", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME                    FLAGS
+COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "Sol-20 Terminal Computer", 0 )

@@ -343,8 +343,7 @@ uint8_t hexbus_chained_device::to_line_state(uint8_t data, bool bav, bool hsk)
 
 }   }   // end namespace bus::hexbus
 
-void hexbus_conn(device_slot_interface &device)
+void hexbus_options(device_slot_interface &device)
 {
 	device.option_add("hx5102", HX5102);
 }
-

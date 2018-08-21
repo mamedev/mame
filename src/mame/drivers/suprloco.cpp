@@ -25,18 +25,11 @@ Sega PCB 834-5137
 #include "includes/suprloco.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
-
-READ8_MEMBER(suprloco_state::soundport_r)
-{
-	m_ppi->pc6_w(0); // ACK signal
-	uint8_t data = m_ppi->pa_r(space, 0);
-	m_ppi->pc6_w(1);
-	return data;
-}
 
 void suprloco_state::main_map(address_map &map)
 {
@@ -48,7 +41,7 @@ void suprloco_state::main_map(address_map &map)
 	map(0xd800, 0xd800).portr("P2");
 	map(0xe000, 0xe000).portr("DSW1");
 	map(0xe001, 0xe001).portr("DSW2");
-	map(0xe800, 0xe803).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe800, 0xe803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf000, 0xf6ff).ram().w(FUNC(suprloco_state::videoram_w)).share("videoram");
 	map(0xf700, 0xf7df).ram(); /* unused */
 	map(0xf7e0, 0xf7ff).ram().w(FUNC(suprloco_state::scrollram_w)).share("scrollram");
@@ -67,7 +60,7 @@ void suprloco_state::sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::command_w));
 	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::command_w));
-	map(0xe000, 0xe000).r(FUNC(suprloco_state::soundport_r));
+	map(0xe000, 0xe000).r("ppi", FUNC(i8255_device::acka_r));
 }
 
 
@@ -183,11 +176,11 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(suprloco_state, irq0_line_hold, 4*60)          /* NMIs are caused by the main CPU */
 
-	I8255A(config, m_ppi, 0);
-	m_ppi->out_pb_callback().set(FUNC(suprloco_state::control_w));
-	m_ppi->tri_pb_callback().set_constant(0);
-	m_ppi->out_pc_callback().set_output("lamp0").bit(0).invert(); // set by 8255 bit mode when no credits inserted
-	m_ppi->out_pc_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI).bit(7).invert();
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pb_callback().set(FUNC(suprloco_state::control_w));
+	ppi.tri_pb_callback().set_constant(0);
+	ppi.out_pc_callback().set_output("lamp0").bit(0).invert(); // set by 8255 bit mode when no credits inserted
+	ppi.out_pc_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI).bit(7).invert();
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

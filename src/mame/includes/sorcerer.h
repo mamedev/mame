@@ -104,6 +104,7 @@ private:
 	bool m_wait;
 	bool m_drq_off;
 	bool m_intrq_off;
+	uint8_t m_2c;
 	uint8_t m_fe;
 	uint8_t m_keyboard_line;
 	const uint8_t *m_p_videoram;

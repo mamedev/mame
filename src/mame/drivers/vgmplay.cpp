@@ -291,6 +291,15 @@ private:
 		rom_block(offs_t start, offs_t end, std::unique_ptr<uint8_t[]> &&d) : start_address(start), end_address(end), data(std::move(d)) {}
 	};
 
+	enum class LengthMode : uint8_t
+	{
+		Ignore = 0x00,
+		Cmds = 0x01,
+		MSec = 0x02,
+		ToEnd = 0x03,
+		Bytes = 0x0f,
+	};
+
 	struct stream
 	{
 		// stream control
@@ -306,9 +315,10 @@ private:
 		// start stream
 		uint32_t offset;
 		uint32_t length;
-		uint8_t length_mode;
+		LengthMode length_mode;
 		bool loop;
 		bool reverse;
+		uint32_t position;
 	};
 
 	TIMER_CALLBACK_MEMBER(stream_timer_expired);
@@ -342,8 +352,15 @@ private:
 
 	std::list<rom_block> m_rom_blocks[2][0x40];
 
+	struct data_block
+	{
+		uint32_t start;
+		uint32_t size;
+		data_block(uint32_t _start, uint32_t _size) { start = _start; size = _size; }
+	};
+
 	std::array<std::vector<uint8_t>, 0x40> m_data_streams;
-	std::array<std::vector<uint32_t>, 0x40> m_data_stream_starts;
+	std::array<std::vector<data_block>, 0x40> m_data_stream_blocks;
 
 	uint32_t m_ym2612_stream_offset = 0U;
 
@@ -383,6 +400,8 @@ public:
 	template<int Chip> DECLARE_WRITE8_MEMBER(upd7759_reset_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(upd7759_data_w);
 	template<int Chip> DECLARE_WRITE_LINE_MEMBER(upd7759_drq_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6258_clock_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6258_divider_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(scc_w);
@@ -460,8 +479,10 @@ private:
 	required_device_array<c352_device, 2> m_c352;
 	required_device_array<iremga20_device, 2> m_ga20;
 
+	uint32_t m_okim6258_clock[2];
+	uint8_t m_okim6258_divider[2];
 	uint32_t m_okim6295_clock[2];
-	uint32_t m_okim6295_pin7[2];
+	uint8_t m_okim6295_pin7[2];
 	uint8_t m_scc_reg[2];
 
 	int m_upd7759_md[2];
@@ -602,7 +623,7 @@ void vgmplay_device::blocks_clear()
 		m_rom_blocks[0][i].clear();
 		m_rom_blocks[1][i].clear();
 		m_data_streams[i].clear();
-		m_data_stream_starts[i].clear();
+		m_data_stream_blocks[i].clear();
 	}
 }
 
@@ -616,7 +637,7 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 	if (type < 0x40)
 	{
 		uint32_t start = m_data_streams[type].size();
-		m_data_stream_starts[type].push_back(start);
+		m_data_stream_blocks[type].push_back(data_block(start, size));
 		m_data_streams[type].resize(start + size);
 		for (uint32_t i = 0; i<size; i++)
 			m_data_streams[type][start + i] = m_file->read_byte(m_pc + 7 + i);
@@ -710,7 +731,24 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 
 TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 {
-	// TODO: stream audio to chip
+	stream &s = m_streams[param];
+
+	uint8_t data = m_data_streams[s.bank][s.offset + s.position];
+
+	switch (s.type)
+	{
+	case LED_OKIM6258:
+		m_io->write_byte(A_OKIM6258_0 + s.reg, data);
+		break;
+
+	default:
+		logerror("unsupported stream to chip %02x\n", s.type);
+		break;
+	}
+
+	s.position += s.step_size;
+	if (s.position >= s.length)
+		m_stream_timers[param]->adjust(attotime::never);
 }
 
 void vgmplay_device::execute_run()
@@ -967,12 +1005,18 @@ void vgmplay_device::execute_run()
 				if (id < 0xff)
 				{
 					uint8_t flags = m_file->read_byte(m_pc + 3);
-					m_streams[id].length_mode = flags & 3;
+					m_streams[id].length_mode = LengthMode(flags & 3);
 					m_streams[id].reverse = BIT(flags, 4);
 					m_streams[id].loop = BIT(flags, 7);
 					m_streams[id].offset = m_file->read_dword(m_pc + 2);
 					m_streams[id].length = m_file->read_dword(m_pc + 7);
-					m_stream_timers[id]->adjust(attotime::zero, id, m_streams[id].frequency ? attotime::from_double(m_streams[id].frequency) : attotime::never);
+					m_streams[id].position = 0;
+					logerror("unsupported loop stream start\n");
+					if (m_streams[id].loop)
+						logerror("unsupported loop mode\n");
+					if (m_streams[id].reverse)
+						logerror("unsupported reverse mode\n");
+					m_stream_timers[id]->adjust(attotime::zero, id, m_streams[id].frequency ? attotime::from_hz(m_streams[id].frequency) : attotime::never);
 				}
 				m_pc += 11;
 				break;
@@ -995,14 +1039,19 @@ void vgmplay_device::execute_run()
 				uint8_t id = m_file->read_byte(m_pc + 1);
 				if (id < 0xff && m_streams[id].type < 0xff && m_data_streams[m_streams[id].bank].size() != 0)
 				{
-					uint8_t flags = m_file->read_byte(m_pc + 3);
+					uint8_t block = m_file->read_word(m_pc + 2);
+					uint8_t flags = m_file->read_byte(m_pc + 4);
 					m_streams[id].loop = BIT(flags, 0);
 					m_streams[id].reverse = BIT(flags, 4);
-					/// TODO: get offset & length from????
-					m_streams[id].offset = 0;
-					m_streams[id].length = 0;
-					m_streams[id].length_mode = 0;
-					m_stream_timers[id]->adjust(attotime::zero, id, m_streams[id].frequency ? attotime::from_double(m_streams[id].frequency) : attotime::never);
+					m_streams[id].offset = m_data_stream_blocks[m_streams[id].bank][block].start;
+					m_streams[id].length = m_data_stream_blocks[m_streams[id].bank][block].size;
+					m_streams[id].length_mode = LengthMode::Bytes;
+					m_streams[id].position = 0;
+					if (m_streams[id].loop)
+						logerror("unsupported loop mode\n");
+					if (m_streams[id].reverse)
+						logerror("unsupported reverse mode\n");
+					m_stream_timers[id]->adjust(attotime::zero, id, m_streams[id].frequency ? attotime::from_hz(m_streams[id].frequency) : attotime::never);
 				}
 				m_pc += 5;
 				break;
@@ -1168,7 +1217,6 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_UPD7759);
 				uint8_t offset = m_file->read_byte(m_pc + 1);
-
 				if (offset & 0x80)
 					m_io->write_byte(A_UPD7759_1 + (offset & 0x7f), m_file->read_byte(m_pc + 2));
 				else
@@ -2386,13 +2434,15 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_okim6258[0]->set_unscaled_clock(version >= 0x161 && header_size >= 0x94 ? r32(0x90) & ~0x40000000 : 0);
 		m_okim6258[1]->set_unscaled_clock(version >= 0x161 && header_size >= 0x94 && (r32(0x90) & 0x40000000) ? r32(0x90) & ~0x40000000 : 0);
 
-		uint8_t oki6258_flags = version >= 0x161 && header_size >= 0x95 ? r8(0x94) : 0;
-		m_okim6258[0]->set_divider(oki6258_flags & 3);
-		m_okim6258[0]->set_outbits(BIT(oki6258_flags, 3) ? 12 : 10);
-		m_okim6258[0]->set_type(BIT(oki6258_flags, 2));
-		m_okim6258[1]->set_divider(oki6258_flags & 3);
-		m_okim6258[1]->set_outbits(BIT(oki6258_flags, 3) ? 12 : 10);
-		m_okim6258[1]->set_type(BIT(oki6258_flags, 2));
+		uint8_t okim6258_flags = version >= 0x161 && header_size >= 0x95 ? r8(0x94) : 0;
+		m_okim6258_divider[0] = okim6258_flags & 3;
+		m_okim6258[0]->set_divider(m_okim6258_divider[0]);
+		m_okim6258[0]->set_outbits(BIT(okim6258_flags, 3) ? 12 : 10);
+		m_okim6258[0]->set_type(BIT(okim6258_flags, 2));
+		m_okim6258_divider[1] = okim6258_flags & 3;
+		m_okim6258[1]->set_divider(m_okim6258_divider[1]);
+		m_okim6258[1]->set_outbits(BIT(okim6258_flags, 3) ? 12 : 10);
+		m_okim6258[1]->set_type(BIT(okim6258_flags, 2));
 
 		m_k054539[0]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 		m_k054539[1]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
@@ -2585,8 +2635,28 @@ template<int Chip>
 WRITE8_MEMBER(vgmplay_device::upd7759_bank_w)
 {
 	// TODO: upd7759 update stream
-
 	m_upd7759_bank[Chip] = data * 0x20000;
+}
+
+template<int Chip>
+WRITE8_MEMBER(vgmplay_state::okim6258_clock_w)
+{
+	uint32_t old = m_okim6258_clock[Chip];
+	int shift = ((offset & 3) << 3);
+	m_okim6258_clock[Chip] = (m_okim6258_clock[Chip] & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
+	if (old != m_okim6258_clock[Chip])
+		m_okim6258[Chip]->set_unscaled_clock(m_okim6258_clock[Chip]);
+
+}
+
+template<int Chip>
+WRITE8_MEMBER(vgmplay_state::okim6258_divider_w)
+{
+	if ((data & mem_mask) != (m_okim6258_divider[Chip] & mem_mask))
+	{
+		COMBINE_DATA(&m_okim6258_divider[Chip]);
+		m_okim6258[Chip]->set_divider(m_okim6258_divider[Chip]);
+	}
 }
 
 template<int Chip>
@@ -2777,13 +2847,13 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_OKIM6258_0 + 0x0, vgmplay_device::A_OKIM6258_0 + 0x0).w(m_okim6258[0], FUNC(okim6258_device::ctrl_w));
 	map(vgmplay_device::A_OKIM6258_0 + 0x1, vgmplay_device::A_OKIM6258_0 + 0x1).w(m_okim6258[0], FUNC(okim6258_device::data_w));
 	map(vgmplay_device::A_OKIM6258_0 + 0x2, vgmplay_device::A_OKIM6258_0 + 0x2).nopw(); // TODO: okim6258 pan
-	map(vgmplay_device::A_OKIM6258_0 + 0x8, vgmplay_device::A_OKIM6258_0 + 0xb).nopw(); // TODO: okim6258 clock
-	map(vgmplay_device::A_OKIM6258_0 + 0xc, vgmplay_device::A_OKIM6258_0 + 0xc).nopw(); // TODO: okim6258 divider
+	map(vgmplay_device::A_OKIM6258_0 + 0x8, vgmplay_device::A_OKIM6258_0 + 0xb).w(FUNC(vgmplay_state::okim6258_clock_w<0>));
+	map(vgmplay_device::A_OKIM6258_0 + 0xc, vgmplay_device::A_OKIM6258_0 + 0xc).w(FUNC(vgmplay_state::okim6258_divider_w<0>));
 	map(vgmplay_device::A_OKIM6258_1 + 0x0, vgmplay_device::A_OKIM6258_1 + 0x0).w(m_okim6258[1], FUNC(okim6258_device::ctrl_w));
 	map(vgmplay_device::A_OKIM6258_1 + 0x1, vgmplay_device::A_OKIM6258_1 + 0x1).w(m_okim6258[1], FUNC(okim6258_device::data_w));
 	map(vgmplay_device::A_OKIM6258_1 + 0x2, vgmplay_device::A_OKIM6258_1 + 0x2).nopw(); // TODO: okim6258 pan
-	map(vgmplay_device::A_OKIM6258_1 + 0x8, vgmplay_device::A_OKIM6258_1 + 0xb).nopw(); // TODO: okim6258 clock
-	map(vgmplay_device::A_OKIM6258_1 + 0xc, vgmplay_device::A_OKIM6258_1 + 0xc).nopw(); // TODO: okim6258 divider
+	map(vgmplay_device::A_OKIM6258_1 + 0x8, vgmplay_device::A_OKIM6258_1 + 0xb).w(FUNC(vgmplay_state::okim6258_clock_w<1>));
+	map(vgmplay_device::A_OKIM6258_1 + 0xc, vgmplay_device::A_OKIM6258_1 + 0xc).w(FUNC(vgmplay_state::okim6258_divider_w<1>));
 	map(vgmplay_device::A_OKIM6295_0, vgmplay_device::A_OKIM6295_0).w(m_okim6295[0], FUNC(okim6295_device::write));
 	map(vgmplay_device::A_OKIM6295_0 + 0x8, vgmplay_device::A_OKIM6295_0 + 0xb).w(FUNC(vgmplay_state::okim6295_clock_w<0>));
 	map(vgmplay_device::A_OKIM6295_0 + 0xc, vgmplay_device::A_OKIM6295_0 + 0xc).w(FUNC(vgmplay_state::okim6295_pin7_w<0>));

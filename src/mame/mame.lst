@@ -11796,6 +11796,9 @@ ec1847                          //
 ec65                            //
 ec65k                           //
 
+@source:ec7915.cpp
+ec7915                          //
+
 @source:ecoinf1.cpp
 ec_bar5                         // Bar 5 (older PCB) (Electrocoin)
 ec_barxo                        // Bar X (older PCB) (Electrocoin)
@@ -15350,6 +15353,9 @@ ibm5160                         // 1982 IBM XT 5160
 @source:ibmpcjr.cpp
 ibmpcjr                         // 1984 IBM PC Jr
 ibmpcjx                         // 1985 IBM PC JX
+
+@source:icebox.cpp
+icebox                          // Nutting Icebox
 
 @source:icatel.cpp
 icatel                          //
@@ -36912,7 +36918,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 7951om                          //
 alcat258                        //
 alcat7100                       //
-ec7915                          //
 facit4440                       //
 feap90                          //
 ikt5a                           //
@@ -36921,7 +36926,6 @@ loewe715                        //
 loewed                          //
 t3210                           //
 teleguide                       //
-vdm79322                        //
 
 @source:terracre.cpp
 amatelas                        // (c) 1986
@@ -38045,6 +38049,9 @@ vcs80                           //
 @source:vd.cpp
 break86                         //
 papillon                        //
+
+@source:vdm7932x.cpp
+vdm79322                        //
 
 @source:vector06.cpp
 krista2                         //

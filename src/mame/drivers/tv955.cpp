@@ -106,17 +106,17 @@ MACHINE_CONFIG_START(tv955_state::tv955)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", m6502_device::NMI_LINE))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("hostuart", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	MOS6551(config, m_hostuart, 0);
+	m_hostuart->set_xtal(3.6864_MHz_XTAL);
+	m_hostuart->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("printuart", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	mos6551_device &printuart(MOS6551(config, "printuart", 0));
+	printuart.set_xtal(3.6864_MHz_XTAL / 2);
+	printuart.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("keybuart", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
+	mos6551_device &keybuart(MOS6551(config, "keybuart", 0));
+	keybuart.set_xtal(3.6864_MHz_XTAL / 2);
+	keybuart.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

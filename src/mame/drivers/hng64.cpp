@@ -486,54 +486,34 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 	return m_com_shared[offset];
 }
 
-READ32_MEMBER(hng64_state::hng64_sysregs_r)
+
+READ32_MEMBER(hng64_state::hng64_rtc_r)
 {
-	uint16_t rtc_addr;
-
-#if 0
-	if((offset*4) != 0x1084)
-		printf("HNG64 port read (PC=%08x) 0x%08x\n", m_maincpu->pc(), offset*4);
-#endif
-
-	rtc_addr = offset >> 1;
-
-	if((rtc_addr & 0xff0) == 0x420)
+	if (offset & 1)
 	{
-		if((rtc_addr & 0xf) == 0xd)
-			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10; // bit 4 disables "system log reader"
+		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
+		int rtc_addr = offset >> 1;
+
+		// bit 4 disables "system log reader" (the device is 4-bit? so this bit is not from the device?)
+		if ((rtc_addr & 0xf) == 0xd)
+			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10; 
 
 		return m_rtc->read(space, (rtc_addr) & 0xf);
 	}
-
-	switch(offset*4)
+	else
 	{
-		case 0x001c: return machine().rand(); // hng64 hangs on start-up if zero.
-		//case 0x106c:
-		//case 0x107c:
-		case 0x1084:
-			LOG("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
-			return 0x00000002; //MCU->MIPS latch port
-		//case 0x108c:
-		case 0x1104:
-			LOG("%s: irq level READ %04x\n", machine().describe_context(),m_irq_level);
-			return m_irq_level;
-		case 0x111c:
-			//printf("Read to IRQ ACK?\n");
-			break;
-		case 0x1254: return 0x00000000; //dma status, 0x800
+		// shouldn't happen unless something else is mapped here too
+		LOG("%s: unhandled hng64_rtc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+		return 0xffffffff;
 	}
-
-//  printf("%08x\n",offset*4);
-
-//  return machine().rand()&0xffffffff;
-	return m_sysregs[offset];
 }
 
 /* preliminary dma code, dma is used to copy program code -> ram */
 void hng64_state::do_dma(address_space &space)
 {
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
+	// check if this determines how long the crosshatch is visible for, we might need to put it on a timer.
 
+	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
 	while (m_dma_len >= 0)
 	{
 		uint32_t dat;
@@ -546,27 +526,144 @@ void hng64_state::do_dma(address_space &space)
 	}
 }
 
-/*
-//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
-//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
-//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
+READ32_MEMBER(hng64_state::hng64_dmac_r)
+{
+	// DMAC seems to be mapped as 4 bytes in every 8
+	if ((offset * 4) == 0x54)
+		return 0x00000000; //dma status, 0x800
 
-//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
+	LOG("%s: unhandled hng64_dmac_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(hng64_state::hng64_dmac_w)
+{
+	// DMAC seems to be mapped as 4 bytes in every 8
+	switch (offset * 4)
+	{
+	case 0x04: COMBINE_DATA(&m_dma_start); break;
+	case 0x14: COMBINE_DATA(&m_dma_dst); break;
+	case 0x24: COMBINE_DATA(&m_dma_len);
+		do_dma(space);
+		break;
+
+	// these are touched during startup when setting up the DMA, maybe mode selection?
+	case 0x34: // (0x0075)
+	case 0x44: // (0x0000)
+
+	// written immediately after length, maybe one of these is the actual trigger?, 4c is explicitly set to 0 after all operations are complete
+	case 0x4c: // (0x0101 - trigger) (0x0000 - after DMA)
+	case 0x5c: // (0x0008 - trigger?) after 0x4c
+	default:
+		LOG("%s: unhandled hng64_dmac_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		break;
+	}
+}
+
+WRITE32_MEMBER(hng64_state::hng64_rtc_w)
+{
+	if (offset & 1)
+	{
+		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
+		m_rtc->write(space, (offset >> 1) & 0xf, data);
+	}
+	else
+	{
+		// shouldn't happen unless something else is mapped here too
+		LOG("%s: unhandled hng64_rtc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+	}
+}
+
+WRITE32_MEMBER(hng64_state::hng64_mips_to_iomcu_irq_w)
+{
+	// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
+	LOG("%s: HNG64 writing to SYSTEM Registers %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), data, mem_mask);
+	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
+}
+
+READ32_MEMBER(hng64_state::hng64_irqc_r)
+{
+	if ((offset * 4) == 0x04)
+	{
+		LOG("%s: irq level READ %04x\n", machine().describe_context(), m_irq_level);
+		return m_irq_level;
+	}
+	else
+	{
+		LOG("%s: unhandled hng64_irqc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+	}
+
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(hng64_state::hng64_irqc_w)
+{
+	switch (offset * 4)
+	{
+		//case 0x0c: // global irq mask? (probably not)
+	case 0x1c:
+		// IRQ ack
+		m_irq_pending &= ~(data&mem_mask);
+		set_irq(0x0000);
+		break;
+
+	default:
+		LOG("%s: unhandled hng64_irqc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		break;
+	}
+}
+
+/*
+  These 'sysregs' seem to be multiple sets of the same thing
+  (based on xrally)
+
+  the 0x1084 addresses appear to be related to the IO MCU, but neither sending commands to the MCU, not controlling lines directly
+  0x20 is written to 0x1084 in the MIPS IRQ handlers for the IO MCU (both 0x11 and 0x17 irq levels)
+
+  the 0x1074 address seems to be the same thing but for the network CPU
+  0x20 is written to 0x1074 in the MIPS IRQ handlers that seem to be associated with communication (levels 0x09, 0x0a, 0x0b, 0x0c)
+
+
+  -----
+  the following notes are taken from the old 'fake IO' function, in reality it turned out that these 'commands' were not needed
+  with the real IO MCU hooked up, although we still use the 0x0c one as a hack in order to provide the 'm_no_machine_error_code' value
+  in order to bypass a startup check, in reality it looks like that should be written by the MCU after reading it via serial.
+
+  ---- OUTDATED NOTES ----
+
+  I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
+
+	command table:
+	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
+	0x0c = cut down connections, treats the dualport to be normal RAM
+	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
+	0x20 = asks for MCU machine code (probably not, this is also written in the function after the TLCS870 requests an interrupt on the MIPS)
+
+	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
+  ----
 */
+
+READ32_MEMBER(hng64_state::hng64_sysregs_r)
+{
+	//LOG("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+
+	switch(offset*4)
+	{
+		case 0x001c: return 0x00000000; // 0x00000040 must not be set or games won't boot
+		//case 0x106c:
+		//case 0x107c:
+		case 0x1084:
+			LOG("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
+			return 0x00000002; //MCU->MIPS latch port
+	}
+
+	return m_sysregs[offset];
+}
 
 WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
-
-	if(((offset >> 1) & 0xff0) == 0x420)
-	{
-		m_rtc->write(space, (offset >> 1) & 0xf,data);
-		return;
-	}
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
@@ -579,47 +676,21 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
 			LOG("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
-		//0x110c global irq mask?
-		/* irq ack */
-		case 0x111c: m_irq_pending &= ~m_sysregs[offset]; set_irq(0x0000); break;
-		case 0x1204: m_dma_start = m_sysregs[offset]; break;
-		case 0x1214: m_dma_dst = m_sysregs[offset]; break;
-		case 0x1224:
-			m_dma_len = m_sysregs[offset];
-			do_dma(space);
-			break;
-		case 0x21c4:
-			// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
-			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), offset*4, data, mem_mask);
-			if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
-			break;
-
 		default:
 			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
 }
 
-/**************************************
-* MCU simulation / hacks
-**************************************/
 
-// real IO MCU only has 8 multiplexed 8-bit digital input ports, so some of these fake inputs are probably processed representations of the same thing
+/**************************************
+* MIPS side Dual Port RAM hookup for MCU
+**************************************/
 
 READ8_MEMBER(hng64_state::hng64_dualport_r)
 {
 	LOG("%s: dualport R %04x\n", machine().describe_context(), offset);
 
-	/*
-	I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
-
-	command table:
-	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
-	0x0c = cut down connections, treats the dualport to be normal RAM
-	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
-	0x20 = asks for MCU machine code (probably not, this is also written in the function after the TLCS870 requests an interrupt on the MIPS)
-
-	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
-	*/
+	// hack, this should just be put in ram at 0x600 by the MCU.
 	if (!(m_mcu_en == 0x0c))
 	{
 		switch (offset)
@@ -654,7 +725,8 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 	the MIPS (at least in Fatal Fury) uploads this data to shared RAM prior to the call.
 
 	need to work out what triggers the interrupt, as a write to 0 wouldn't as the Dual Port RAM interrupts
-	are on addresses 0x7fe and 0x7ff
+	are on addresses 0x7fe and 0x7ff (we're using an address near the system regs, based on code analysis
+	it seems correct, see hng64_mips_to_iomcu_irq_w )
 */
 
 WRITE8_MEMBER(hng64_state::hng64_dualport_w)
@@ -761,14 +833,20 @@ void hng64_state::hng_map(address_map &map)
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
-	// Ports
-	map(0x1f700000, 0x1f702fff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	// Misc Peripherals
+	map(0x1f700000, 0x1f7010ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs"); // various things
+
+	map(0x1f701100, 0x1f70111f).rw(FUNC(hng64_state::hng64_irqc_r), FUNC(hng64_state::hng64_irqc_w));
+	map(0x1f701200, 0x1f70127f).rw(FUNC(hng64_state::hng64_dmac_r), FUNC(hng64_state::hng64_dmac_w));
+	// 1f702004 used (rarely writes 01 or a random looking value as part of init sequences)
+	map(0x1f702100, 0x1f70217f).rw(FUNC(hng64_state::hng64_rtc_r), FUNC(hng64_state::hng64_rtc_w));
+	map(0x1f7021c4, 0x1f7021c7).w(FUNC(hng64_state::hng64_mips_to_iomcu_irq_w));
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	map(0x1F800000, 0x1F803fff).ram().share("nvram");
+	map(0x1f800000, 0x1f803fff).ram().share("nvram");
 
 	// Dualport RAM (shared with IO MCU)
-	map(0x1F808000, 0x1F8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
+	map(0x1f808000, 0x1f8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
 
 	// BIOS ROM
 	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");

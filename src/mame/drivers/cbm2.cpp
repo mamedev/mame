@@ -2294,13 +2294,13 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	m_tpi2->in_pc_cb().set(FUNC(p500_state::tpi2_pc_r));
 	m_tpi2->out_pc_cb().set(FUNC(p500_state::tpi2_pc_w));
 
-	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, VIC6567_CLOCK)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MOS6551_RXC_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_etc))
+	MOS6551(config, m_acia, VIC6567_CLOCK);
+	m_acia->set_xtal(XTAL(1'843'200));
+	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
+	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_acia->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia->rxc_handler().set(RS232_TAG, FUNC(rs232_port_device::write_etc));
 
 	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(14'318'181)/14)
 	MCFG_MOS6526_TOD(60)
@@ -2350,11 +2350,11 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	m_user->cnt_callback().set(MOS6526_TAG, FUNC(mos6526_device::cnt_w));
 	m_user->flag_callback().set(MOS6526_TAG, FUNC(mos6526_device::flag_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -2425,10 +2425,10 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 	m_tpi2->in_pc_cb().set(FUNC(p500_state::tpi2_pc_r));
 	m_tpi2->out_pc_cb().set(FUNC(p500_state::tpi2_pc_w));
 
-	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(XTAL(1'843'200));
+	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
+	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(17'734'472)/18)
 	MCFG_MOS6526_TOD(50)
@@ -2477,11 +2477,11 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 	m_user->cnt_callback().set(MOS6526_TAG, FUNC(mos6526_device::cnt_w));
 	m_user->flag_callback().set(MOS6526_TAG, FUNC(mos6526_device::flag_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -2551,10 +2551,10 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	m_tpi2->out_pb_cb().set(FUNC(cbm2_state::tpi2_pb_w));
 	m_tpi2->in_pc_cb().set(FUNC(cbm2_state::tpi2_pc_r));
 
-	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(XTAL(1'843'200));
+	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
+	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(60)
@@ -2602,11 +2602,11 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	m_user->cnt_callback().set(MOS6526_TAG, FUNC(mos6526_device::cnt_w));
 	m_user->flag_callback().set(MOS6526_TAG, FUNC(mos6526_device::flag_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
 	MCFG_QUICKLOAD_ADD("quickload", cbm2_state, cbmb, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 

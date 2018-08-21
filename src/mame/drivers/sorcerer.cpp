@@ -140,9 +140,9 @@ Exidy Sorcerer Video/Disk Unit:
   emulation done but it's all guesswork. The unit contains 2 dipswitch units
   (one has 4 switches and the other has 8), a 8 MHz crystal, 3 proms and a
   FD1793-B01 fdc. Going by the code, it would appear to place the Z-80 into
-  WAIT while reading a sector. However, we don't get that far; it bombs out
-  with Record Not Found. We need suitable disk images.
-  To try it out: GO BF00 at the monitor prompt.
+  WAIT while reading a sector. To try it out: GO BF00 at the monitor prompt.
+  Currently the CP/M sign-on message appears, followed by lockup due to a
+  fdc problem.
 
 ********************************************************************************/
 
@@ -490,6 +490,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 
 	MCFG_DEVICE_ADD("fdc2", FD1793, 8_MHz_XTAL / 8)  // confirmed clock
+	MCFG_WD_FDC_FORCE_READY // should be able to get rid of this when fdc issue is fixed
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, sorcerer_state, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, sorcerer_state, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
