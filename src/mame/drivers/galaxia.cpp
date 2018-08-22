@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_DEVICE_IO_MAP(galaxia_io_map)
 	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, galaxia_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_DEVICE_IO_MAP(galaxia_io_map)
 	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, galaxia_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
