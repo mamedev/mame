@@ -2,7 +2,8 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Intel 8275 Programmable CRT Controller emulation
+    Intel 8275 Programmable CRT Controller
+    Intel 8276 Small Systems CRT Controller
 
 **********************************************************************/
 
@@ -40,7 +41,7 @@ static const int DMA_BURST_SPACING[] = { 0, 7, 15, 23, 31, 39, 47, 55 };
 	((m_param[REG_SCN1] & 0x7f) + 1)
 
 #define VRTC_ROW_COUNT \
-	((m_param[REG_SCN2] >> 5) + 1)
+	((m_param[REG_SCN2] >> 6) + 1)
 
 #define CHARACTER_ROWS_PER_FRAME \
 	((m_param[REG_SCN2] & 0x3f) + 1)
@@ -83,8 +84,9 @@ const int i8275_device::character_attribute[3][16] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-// device type definition
+// device type definitions
 DEFINE_DEVICE_TYPE(I8275, i8275_device, "i8275", "Intel 8275 CRTC")
+DEFINE_DEVICE_TYPE(I8276, i8276_device, "i8276", "Intel 8276 CRTC")
 
 
 
@@ -96,8 +98,8 @@ DEFINE_DEVICE_TYPE(I8275, i8275_device, "i8275", "Intel 8275 CRTC")
 //  i8275_device - constructor
 //-------------------------------------------------
 
-i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, I8275, tag, owner, clock),
+i8275_device::i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_drq(*this),
@@ -126,6 +128,16 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 	m_stored_attr(0)
 {
 	memset(m_param, 0x00, sizeof(m_param));
+}
+
+i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8275_device(mconfig, I8275, tag, owner, clock)
+{
+}
+
+i8276_device::i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8275_device(mconfig, I8276, tag, owner, clock)
+{
 }
 
 

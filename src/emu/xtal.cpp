@@ -140,6 +140,7 @@ const double XTAL::known_xtals[] = {
 	  9'877'680, /* 9.87768_MHz_XTAL       Microterm 420 */
 	  9'987'000, /* 9.987_MHz_XTAL         Crazy Balloon */
 	 10'000'000, /* 10_MHz_XTAL            - */
+	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
 	 10'500'000, /* 10.5_MHz_XTAL          Agat-7 */
@@ -193,6 +194,7 @@ const double XTAL::known_xtals[] = {
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
+	 14'784'000, /* 14.784_MHz_XTAL        Zenith Z-29 */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
 	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */
 	 15'000'000, /* 15_MHz_XTAL            Sinclair QL, Amusco Poker */
@@ -226,6 +228,7 @@ const double XTAL::known_xtals[] = {
 	 17'971'200, /* 17.9712_MHz_XTAL       - */
 	 18'000'000, /* 18_MHz_XTAL            S.A.R, Ikari Warriors 3 */
 	 18'432'000, /* 18.432_MHz_XTAL        Extremely common, used on 100's of PCBs (48000 * 384) */
+	 18'480'000, /* 18.48_MHz_XTAL         Wyse WY-100 video */
 	 18'575'000, /* 18.575_MHz_XTAL        Visual 102, Visual 220 */
 	 18'720'000, /* 18.72_MHz_XTAL         Nokia MikroMikko 1 */
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */

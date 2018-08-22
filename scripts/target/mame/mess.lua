@@ -3582,6 +3582,7 @@ files {
 createMESSProjects(_target, _subtarget, "zenith")
 files {
 	MAME_DIR .. "src/mame/drivers/z100.cpp",
+	MAME_DIR .. "src/mame/drivers/z29.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "zpa")
@@ -3802,6 +3803,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vp415.cpp",
 	MAME_DIR .. "src/mame/drivers/vsmilepro.cpp",
 	MAME_DIR .. "src/mame/drivers/wicat.cpp",
+	MAME_DIR .. "src/mame/drivers/wy100.cpp",
 	MAME_DIR .. "src/mame/drivers/wyse.cpp",
 	MAME_DIR .. "src/mame/drivers/xor100.cpp",
 	MAME_DIR .. "src/mame/includes/xor100.h",
