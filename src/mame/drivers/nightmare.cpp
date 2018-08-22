@@ -218,67 +218,65 @@
 class nightmare_state : public driver_device
 {
 public:
-  enum
-  {
-    TIMER_SET_CPU_MODE
-  };
+	enum
+	{
+		TIMER_SET_CPU_MODE
+	};
 
-  nightmare_state(const machine_config &mconfig, device_type type, const char *tag)
-    : driver_device(mconfig, type, tag)
-    , m_maincpu(*this, "cdp1802")
-    , m_soundcpu(*this,"cdp1802_sound")
-    , m_vdc(*this, "vdc")
-    , m_vdc2(*this, "vdc2")
-    , m_eeprom(*this,"eeprom")
+	nightmare_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "cdp1802")
+		, m_soundcpu(*this,"cdp1802_sound")
+		, m_vdc(*this, "vdc")
+		, m_vdc2(*this, "vdc2")
+		, m_eeprom(*this,"eeprom")
+	{ }
 
-  { }
-
-  DECLARE_READ_LINE_MEMBER( clear_r );
-  DECLARE_READ_LINE_MEMBER( ef1_r );
-  DECLARE_READ_LINE_MEMBER( ef2_r );
-  DECLARE_WRITE_LINE_MEMBER( q_w );
-  DECLARE_WRITE8_MEMBER( ic10_w );
-  DECLARE_WRITE8_MEMBER( unkout_w );
-
-  void nightmare(machine_config &config);
-  void nightmare_map(address_map &map);
-  void nightmare_io_map(address_map &map);
-  void nightmare_sound_map(address_map &map);
-  void nightmare_sound_io_map(address_map &map);
-  uint32_t screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
+	void nightmare(machine_config &config);
 
 protected:
-  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-  virtual void machine_start() override;
-  virtual void machine_reset() override;
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef1_r );
+	DECLARE_READ_LINE_MEMBER( ef2_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_WRITE8_MEMBER( ic10_w );
+	DECLARE_WRITE8_MEMBER( unkout_w );
 
-  required_device<cosmac_device> m_maincpu;
-  required_device<cosmac_device> m_soundcpu;
-  required_device<tms9928a_device> m_vdc;
-  required_device<tms9928a_device> m_vdc2;
-  required_device<sda2006_device> m_eeprom;
-  
-  // cpu state
-  int m_reset;
+	void nightmare_map(address_map &map);
+	void nightmare_io_map(address_map &map);
+	void nightmare_sound_map(address_map &map);
+	void nightmare_sound_io_map(address_map &map);
+	uint32_t screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cosmac_device> m_maincpu;
+	required_device<cosmac_device> m_soundcpu;
+	required_device<tms9928a_device> m_vdc;
+	required_device<tms9928a_device> m_vdc2;
+	required_device<sda2006_device> m_eeprom;
+
+	// cpu state
+	int m_reset;
 };
 
 void nightmare_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-  switch (id)
-  {
-  case TIMER_SET_CPU_MODE:
-
-    m_reset = 1;
-    break;
-  default:
-    assert_always(false, "Unknown id in nightmare_state::device_timer");
-  }
+	switch (id)
+	{
+	case TIMER_SET_CPU_MODE:
+		m_reset = 1;
+		break;
+	default:
+		assert_always(false, "Unknown id in nightmare_state::device_timer");
+	}
 }
 
 void nightmare_state::machine_start()
 {
-  save_item(NAME(m_reset));
+	save_item(NAME(m_reset));
 
 }
 
@@ -286,34 +284,34 @@ void nightmare_state::machine_start()
 
 void nightmare_state::machine_reset()
 {
-  m_reset = 0;
-  timer_set(attotime::from_msec(200), TIMER_SET_CPU_MODE);
+	m_reset = 0;
+	timer_set(attotime::from_msec(200), TIMER_SET_CPU_MODE);
 }
 
 /* CDP1802 Interface */
 
 READ_LINE_MEMBER( nightmare_state::clear_r )
 {
-  return m_reset;
+	return m_reset;
 }
 
 WRITE_LINE_MEMBER( nightmare_state::q_w )
 {
-  m_eeprom->write_clock(state);
+	m_eeprom->write_clock(state);
 }
 
 READ_LINE_MEMBER( nightmare_state::ef1_r )
 {
-  //EEPROM Inv ???
+	//EEPROM Inv ???
 
-  return 0;
+	return 0;
 }
 
 
 READ_LINE_MEMBER( nightmare_state::ef2_r )
 {
-  //EEPROM Dq data read;
-  return m_eeprom->read_data();
+	//EEPROM Dq data read;
+	return m_eeprom->read_data();
 }
 
 
@@ -330,10 +328,10 @@ WRITE8_MEMBER( nightmare_state::ic10_w )
     0 - ?
   */
 
-  m_eeprom->write_data((data&0x80) ?1:0);
-  m_eeprom->write_enable((data&0x40) ?1:0);
+	m_eeprom->write_data((data&0x80) ?1:0);
+	m_eeprom->write_enable((data&0x40) ?1:0);
 }
-  
+
 
 WRITE8_MEMBER( nightmare_state::unkout_w )
 {
@@ -342,24 +340,24 @@ WRITE8_MEMBER( nightmare_state::unkout_w )
 
 void nightmare_state::nightmare_map(address_map &map)
 {
-  map(0x0000, 0x5fff).rom();
-  map(0x8000, 0x83ff).ram();
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x83ff).ram();
 }
 
 void nightmare_state::nightmare_io_map(address_map &map)
 {
-  map(0x0001, 0x0001).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
-  map(0x0002, 0x0002).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
+	map(0x0001, 0x0001).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
+	map(0x0002, 0x0002).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
 
-  map(0x0004, 0x0004).rw(m_vdc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-  map(0x0005, 0x0005).rw(m_vdc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-  map(0x0006, 0x0006).rw(m_vdc2, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-  map(0x0007, 0x0007).rw(m_vdc2, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x0004, 0x0004).rw(m_vdc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x0005, 0x0005).rw(m_vdc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x0006, 0x0006).rw(m_vdc2, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x0007, 0x0007).rw(m_vdc2, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 }
 
 void nightmare_state::nightmare_sound_map(address_map &map)
 {
-  map(0x0000, 0x3fff).rom();
+	map(0x0000, 0x3fff).rom();
 }
 
 void nightmare_state::nightmare_sound_io_map(address_map &map)
@@ -369,115 +367,115 @@ void nightmare_state::nightmare_sound_io_map(address_map &map)
 
 uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-  // combine two buffers (additive?)
-  for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-  {
-    uint32_t *const bitmap1 = &m_vdc2->get_bitmap().pix32(y);
-    uint32_t *const bitmap2 = &m_vdc->get_bitmap().pix32(y);
-    uint32_t *dst = &bitmap.pix32(y);
+	// combine two buffers (additive?)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint32_t *const bitmap1 = &m_vdc2->get_bitmap().pix32(y);
+		uint32_t *const bitmap2 = &m_vdc->get_bitmap().pix32(y);
+		uint32_t *dst = &bitmap.pix32(y);
 
-    for (int x = cliprect.left(); x <= cliprect.right(); x++)
-    {
-      uint32_t p1 = bitmap1[x];
-      uint32_t p2 = bitmap2[x];
-      uint32_t result = 0;
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			uint32_t p1 = bitmap1[x];
+			uint32_t p2 = bitmap2[x];
+			uint32_t result = 0;
 
-      for(int shift=0; shift<32;shift+=8){
-        uint32_t data = ((p2>>shift)&0xff)+((p1>>shift)&0xff);
-        result|=((data>0xff)?0xff:data)<<shift;
-      }
-      dst[x]=result;
-    }
-  }
+			for(int shift=0; shift<32;shift+=8)
+			{
+				uint32_t data = ((p2>>shift)&0xff)+((p1>>shift)&0xff);
+				result|=((data>0xff)?0xff:data)<<shift;
+			}
+			dst[x]=result;
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
 static INPUT_PORTS_START( nightmare )
-  PORT_START("IN0")
-  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
-  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 
-  PORT_START("IN1")
-  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) 
-  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) 
-  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
-  PORT_START("EF")
-  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", cosmac_device, ef3_w) //ic17 - cpu
-  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", cosmac_device, ef4_w)
+	PORT_START("EF")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", cosmac_device, ef3_w) //ic17 - cpu
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", cosmac_device, ef4_w)
 INPUT_PORTS_END
 
 
 void nightmare_state::nightmare(machine_config &config)
 {
-  /* main cpu */
-  CDP1802(config, m_maincpu, MASTER_CLOCK/3);
-  m_maincpu->set_addrmap(AS_PROGRAM, &nightmare_state::nightmare_map);
-  m_maincpu->set_addrmap(AS_IO, &nightmare_state::nightmare_io_map);
-  m_maincpu->wait_cb().set_constant(1);
-  m_maincpu->clear_cb().set(FUNC(nightmare_state::clear_r));
-  m_maincpu->q_cb().set(FUNC(nightmare_state::q_w));
-  m_maincpu->ef1_cb().set(FUNC(nightmare_state::ef1_r));
-  m_maincpu->ef2_cb().set(FUNC(nightmare_state::ef2_r));
-  m_maincpu->tpb_cb().set("ic10", FUNC(cdp1852_device::clock_w));
+	/* main cpu */
+	CDP1802(config, m_maincpu, MASTER_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nightmare_state::nightmare_map);
+	m_maincpu->set_addrmap(AS_IO, &nightmare_state::nightmare_io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(nightmare_state::clear_r));
+	m_maincpu->q_cb().set(FUNC(nightmare_state::q_w));
+	m_maincpu->ef1_cb().set(FUNC(nightmare_state::ef1_r));
+	m_maincpu->ef2_cb().set(FUNC(nightmare_state::ef2_r));
+	m_maincpu->tpb_cb().set("ic10", FUNC(cdp1852_device::clock_w));
 
-  /* sound cpu */
-  CDP1802(config, m_soundcpu, SOUND_CLOCK);
-  m_soundcpu->set_addrmap(AS_PROGRAM, &nightmare_state::nightmare_sound_map);
-  m_soundcpu->set_addrmap(AS_IO, &nightmare_state::nightmare_sound_io_map);
-  m_soundcpu->set_disable(); 
+	/* sound cpu */
+	CDP1802(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &nightmare_state::nightmare_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &nightmare_state::nightmare_sound_io_map);
+	m_soundcpu->set_disable(); 
 
-  /* i/o hardware */
-  cdp1852_device &ic8(CDP1852(config, "ic8")); 
-  ic8.mode_cb().set_constant(0);
-  ic8.di_cb().set_ioport("IN0");
+	/* i/o hardware */
+	cdp1852_device &ic8(CDP1852(config, "ic8")); 
+	ic8.mode_cb().set_constant(0);
+	ic8.di_cb().set_ioport("IN0");
 
-  cdp1852_device &ic9(CDP1852(config, "ic9"));
-  ic9.mode_cb().set_constant(0);
-  ic9.di_cb().set_ioport("IN1");
+	cdp1852_device &ic9(CDP1852(config, "ic9"));
+	ic9.mode_cb().set_constant(0);
+	ic9.di_cb().set_ioport("IN1");
 
-  cdp1852_device &ic10(CDP1852(config, "ic10")); 
-  ic10.mode_cb().set_constant(1);
-  ic10.do_cb().set(FUNC(nightmare_state::ic10_w));
+	cdp1852_device &ic10(CDP1852(config, "ic10")); 
+	ic10.mode_cb().set_constant(1);
+	ic10.do_cb().set(FUNC(nightmare_state::ic10_w));
 
-  SDA2006(config, m_eeprom);
+	SDA2006(config, m_eeprom);
 
-  /* video hardware */
-  TMS9928A( config, m_vdc, MASTER_CLOCK/2 );
-  m_vdc->set_vram_size(0x4000);
+	/* video hardware */
+	TMS9928A( config, m_vdc, MASTER_CLOCK );
+	m_vdc->set_vram_size(0x4000);
 
-  TMS9928A( config, m_vdc2, MASTER_CLOCK/2 );
-  m_vdc2->set_vram_size(0x4000);
-  m_vdc2->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	TMS9928A( config, m_vdc2, MASTER_CLOCK );
+	m_vdc2->set_vram_size(0x4000);
+	m_vdc2->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 
-  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-  screen.set_raw(MASTER_CLOCK/2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-      tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12);
-  screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+		tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12);
+	screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));
 }
 
 
 ROM_START( nightmare )
-  ROM_REGION( 0x6000, "cdp1802", 0 )
-  ROM_LOAD( "nm1-ia1.bin", 0x0000, 0x2000, CRC(5d648f62) SHA1(028a47d4b1b4910d0d4e00f81d4e94a5478834d3) )
-  ROM_LOAD( "nm1-ib1.bin", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
-  ROM_LOAD( "nm1-ic1.bin", 0x4000, 0x2000, CRC(a3117246) SHA1(ca9601401f7ab34200c969e41ffae50bee0aca4d) )
+	ROM_REGION( 0x6000, "cdp1802", 0 )
+	ROM_LOAD( "nm1-ia1.bin", 0x0000, 0x2000, CRC(5d648f62) SHA1(028a47d4b1b4910d0d4e00f81d4e94a5478834d3) )
+	ROM_LOAD( "nm1-ib1.bin", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
+	ROM_LOAD( "nm1-ic1.bin", 0x4000, 0x2000, CRC(a3117246) SHA1(ca9601401f7ab34200c969e41ffae50bee0aca4d) )
 
-  ROM_REGION( 0x10000, "cdp1802_sound", 0 ) 
-  ROM_LOAD( "sound.bin",    0x0000, 0x4000, NO_DUMP )
-
+	ROM_REGION( 0x10000, "cdp1802_sound", 0 ) 
+	ROM_LOAD( "sound.bin",    0x0000, 0x4000, NO_DUMP )
 ROM_END
 
 GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Nightmare", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
