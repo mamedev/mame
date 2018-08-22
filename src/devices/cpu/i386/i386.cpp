@@ -14,6 +14,7 @@
         Intel Pentium Pro
         Intel Pentium II
         Intel Pentium III
+        Amd Athlon XP
         Intel Pentium 4
 */
 
@@ -38,6 +39,7 @@ DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentiu
 DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
 DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
+DEFINE_DEVICE_TYPE(ATHLONXP,    athlonxp_device,    "athlonxp",    "Amd Athlon XP")
 DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Intel Pentium 4")
 
 
@@ -123,6 +125,13 @@ pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag,
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
+}
+
+athlonxp_device::athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pentium_device(mconfig, ATHLONXP, tag, owner, clock)
+{
+	// TODO: put correct value
+	set_vtlb_dynamic_entries(256);
 }
 
 pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
