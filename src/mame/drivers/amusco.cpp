@@ -558,17 +558,17 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	MCFG_DEVICE_ADD("lpt_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, lpt_data_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(*this, amusco_state, lpt_status_r))
+	i8155_device &i8155a(I8155(config, "lpt_interface", 0));
+	i8155a.out_pa_callback().set(FUNC(amusco_state::lpt_data_w));
+	i8155a.in_pb_callback().set(FUNC(amusco_state::lpt_status_r));
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
 	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, rtc_control_w))
-	MCFG_I8155_IN_PORTC_CB(READ8("rtc", msm5832_device, data_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8("rtc", msm5832_device, data_w))
+	i8155_device &i8155b(I8155(config, "rtc_interface", 0));
+	i8155b.out_pa_callback().set(FUNC(amusco_state::rtc_control_w));
+	i8155b.in_pc_callback().set("rtc", FUNC(msm5832_device::data_r));
+	i8155b.out_pc_callback().set("rtc", FUNC(msm5832_device::data_w));
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 

@@ -185,11 +185,11 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 	MCFG_DEVICE_PROGRAM_MAP(paranoia_z80_map)
 	MCFG_DEVICE_IO_MAP(paranoia_z80_io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, 1000000 /*?*/)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, paranoia_state, i8155_a_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, paranoia_state, i8155_b_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, paranoia_state, i8155_c_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, paranoia_state, i8155_timer_out))
+	i8155_device &i8155(I8155(config, "i8155", 1000000 /*?*/));
+	i8155.out_pa_callback().set(FUNC(paranoia_state::i8155_a_w));
+	i8155.out_pb_callback().set(FUNC(paranoia_state::i8155_b_w));
+	i8155.out_pc_callback().set(FUNC(paranoia_state::i8155_c_w));
+	i8155.out_to_callback().set(FUNC(paranoia_state::i8155_timer_out));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
