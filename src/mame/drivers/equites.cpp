@@ -1047,11 +1047,11 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
 
-	MCFG_DEVICE_ADD("audio8155", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, equites_state, equites_8155_porta_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, equites_state, equites_8155_portb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, equites_state, equites_8155_portc_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, equites_state, equites_8155_timer_pulse))
+	i8155_device &i8155(I8155(config, "audio8155", 0));
+	i8155.out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
+	i8155.out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
+	i8155.out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
+	i8155.out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

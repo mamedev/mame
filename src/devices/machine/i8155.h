@@ -35,33 +35,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I8155_IN_PORTA_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_IN_PORTB_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_IN_PORTC_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_PORTA_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_PORTB_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_PORTC_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_TIMEROUT_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_to_callback(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -75,13 +48,6 @@ public:
 	// construction/destruction
 	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_to_callback(Object &&cb) { return m_out_to_cb.set_callback(std::forward<Object>(cb)); }
 	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
 	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
 	auto in_pc_callback()  { return m_in_pc_cb.bind(); }

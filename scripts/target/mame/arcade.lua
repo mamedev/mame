@@ -4826,6 +4826,7 @@ files {
 	MAME_DIR .. "src/mame/includes/vectrex.h",
 	MAME_DIR .. "src/mame/video/vectrex.cpp",
 	MAME_DIR .. "src/mame/machine/vectrex.cpp",
+	MAME_DIR .. "src/mame/drivers/videosaa.cpp",
 	MAME_DIR .. "src/mame/drivers/vlc.cpp",
 	MAME_DIR .. "src/mame/drivers/voyager.cpp",
 	MAME_DIR .. "src/mame/drivers/vp101.cpp",
