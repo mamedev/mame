@@ -23,9 +23,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_AMIGA_KEYBOARD_INTERFACE_ADD(_tag, _def_slot) \
+#define MCFG_AMIGA_KEYBOARD_INTERFACE_ADD(_tag, _opts, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, AMIGA_KEYBOARD_INTERFACE, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(amiga_keyboard_devices, _def_slot, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_opts, _def_slot, false)
 
 #define MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(_devcb) \
 	downcast<amiga_keyboard_bus_device &>(*device).set_kclk_handler(DEVCB_##_devcb);
@@ -99,5 +99,7 @@ DECLARE_DEVICE_TYPE(AMIGA_KEYBOARD_INTERFACE, amiga_keyboard_bus_device)
 
 // supported devices
 void amiga_keyboard_devices(device_slot_interface &device);
+void a500_keyboard_devices(device_slot_interface &device);
+void a600_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_AMIGA_KEYBOARD_H

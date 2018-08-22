@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/amiga.h"
+
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
 #include "cpu/m68000/m68000.h"
@@ -1437,12 +1438,6 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, amiga_state, centronics_select_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", "a500_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
-
 	// software
 	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
 	MCFG_SOFTWARE_LIST_ADD("hardware_list", "amiga_hardware")
@@ -1453,6 +1448,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a1000_mem)
@@ -1465,6 +1466,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1000_state::a1000n)
 	a1000(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1481,6 +1483,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2000_state::a2000)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a2000_mem)
@@ -1506,6 +1514,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2000_state::a2000n)
 	a2000(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1522,6 +1531,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500_state::a500)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", a500_keyboard_devices, "a500_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a500_mem)
@@ -1552,6 +1568,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdtv_state::cdtv)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(cdtv_mem)
@@ -1623,6 +1645,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a3000_state::a3000)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(32'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a3000_mem)
@@ -1653,6 +1681,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500p_state::a500p)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", a500_keyboard_devices, "a500_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a500p_mem)
@@ -1687,6 +1722,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a600_state::a600)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", a600_keyboard_devices, "a600_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_DEVICE_PROGRAM_MAP(a600_mem)
@@ -1729,6 +1771,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a1200_state::a1200)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a1200_us") // FIXME: replace with Amiga 1200 devices when we have mask ROM dump
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a1200_mem)
@@ -1789,6 +1838,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000)
 	amiga_base(config);
+
+	// keyboard
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(a4000_mem)
@@ -1819,6 +1874,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000n)
 	a4000(config);
+
 	MCFG_DEVICE_REMOVE("screen")
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
@@ -1863,6 +1919,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cd32_state::cd32)
 	amiga_base(config);
+
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(cd32_mem)
@@ -1900,11 +1957,11 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("cd32_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cd32")
-	MCFG_DEVICE_REMOVE("kbd")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cd32_state::cd32n)
 	cd32(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_REMOVE("screen")
@@ -1934,6 +1991,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a4000_state::a4000tn)
 	a4000(config);
+
 	MCFG_DEVICE_REMOVE("screen")
 	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")

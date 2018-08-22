@@ -4,7 +4,7 @@
 
     m6502.c
 
-    Mostek 6502, original NMOS variant
+    MOS Technology 6502, original NMOS variant
 
 ***************************************************************************/
 
@@ -589,9 +589,11 @@ void m6502_mcu_device::execute_run()
 
 	while(icount > 0) {
 		while(icount > bcount) {
-			if(inst_state < 0x10000) {
+			if(inst_state < 0xff00) {
 				PPC = NPC;
-				debugger_instruction_hook(NPC);
+				inst_state = IR | inst_state_base;
+				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+					debugger_instruction_hook(NPC);
 			}
 			do_exec_full();
 		}
