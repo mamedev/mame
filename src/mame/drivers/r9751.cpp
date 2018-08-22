@@ -76,6 +76,9 @@
 
 #define ENABLE_TRACE_ALL_DEVICES 1
 
+#define ENABLE_TRACE_SYSTEM 1
+#define SYSTEM_TRACE_LEVEL 5
+
 
 #if ENABLE_TRACE_SMIOC
 #define TRACE_SMIOC_READ(address, data, reg, text) UnifiedTrace((address),(data)," Read", "SMIOC", (reg), (text))
@@ -166,6 +169,9 @@ private:
 	virtual void machine_reset() override;
 	void trace_device(int address, int data, const char* direction);
 
+	void system_trace_init();
+	void trace_system(int table, int offset, int data, const char* direction);
+
 	uint32_t m_device_trace_enable[2];
 	int m_trace_last_address[64];
 	int m_trace_last_data[64];
@@ -176,9 +182,11 @@ private:
 	void device_trace_enable_all();
 	void device_trace_disable(int device);
 
+	void* system_trace_context;
 };
 
 #if ENABLE_TRACE_ALL_DEVICES
+// Device tracing
 static const char * DeviceNames[] = {
 	nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,"??", // 0x00-0x07
 	"??","HDD",nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0x08-0x0F
@@ -203,6 +211,7 @@ static const GenericCommandRecord GenericCommands[] = {
 	{ 0x8000, "various" },  // Read address, 
 	{ 0xC000, "various" },  // Write address, Read length
 };
+
 
 void r9751_state::device_trace_init()
 {
@@ -298,6 +307,132 @@ void r9751_state::device_trace_disable(int device)
 	m_device_trace_enable[device >> 5] &= ~(1 << (device & 0x1F));
 }
 
+
+// System register tracing
+struct SystemRegisterInfo {
+	int VerboseLevel;
+	u32 RegisterAddress;
+	const char * RegisterName;
+	const char * Description;
+};
+
+static const SystemRegisterInfo SystemRegisters[] = {
+	{ 5, 0xff010000, "DB00" },{ 5, 0xff010004, "DB01" },{ 5, 0xff010008, "DB02" },{ 5, 0xff01000c, "DB03" },
+	{ 5, 0xff010010, "DB04" },{ 5, 0xff010014, "DB05" },{ 5, 0xff010018, "DB06" },{ 5, 0xff01001c, "DB07" },
+	{ 5, 0xff010020, "DB08" },{ 5, 0xff010024, "DB09" },{ 5, 0xff010028, "DB10" },{ 5, 0xff01002c, "DB11" },
+	{ 5, 0xff010040, "DBVR" },{ 5, 0xff010044, "DTAR" },{ 5, 0xff010048, "DESR" },{ 5, 0xff01004c, "DVR" },
+	{ 5, 0xff010050, "DRR" },{ 5, 0xff010054, "DDR" },{ 5, 0xff010060, "DMR" },{ 5, 0xff010064, "RCR" },
+	{ 5, 0xff010068, "RESR" },{ 5, 0xff01006c, "RBSR" },{ 5, 0xff010070, "RBDR" },{ 5, 0xff010074, "RBAR" },
+	{ 5, 0xff010078, "RIOB" },{ 5, 0xff01007c, "RPSR" },{ 5, 0xff010080, "PDR" },
+
+	{ 5, 0xff020004, "ARSP" },{ 5, 0xff020008, "MEXC" },{ 5, 0xff02000c, "MADD" },{ 5, 0xff020010, "MDAT" },
+	{ 5, 0xff020014, "ADIA" },{ 5, 0xff020018, "ECCD" },{ 5, 0xff02001c, "VPDS" },{ 5, 0xff020020, "HBRK" },
+	{ 5, 0xff020024, "LBRK" },{ 5, 0xff020028, "REFS" },{ 5, 0xff02002c, "RCNT" },{ 5, 0xff020030, "RTMR" },
+
+	{ 5, 0xff050004, "ROSR" },{ 5, 0xff050008, "BIVR" },{ 5, 0xff05000c, "RDDR" },{ 5, 0xff050104, "AMR" },
+	{ 5, 0xff050108, "MIVR" },{ 5, 0xff050200, "APCR" },{ 5, 0xff050204, "PESR" },{ 5, 0xff050208, "PEAR" },
+	{ 5, 0xff05020c, "PEDR" },{ 5, 0xff050210, "PEST" },{ 5, 0xff050300, "RCID" },
+	{ 2, 0xff050310, "APLT" }, // APLT is accessed heavily in background/timing processes.
+	{ 2, 0xff050320, "WDT" }, // WDT use is particularly noisy
+	{ 5, 0xff050400, "APT" },{ 5, 0xff050404, "AIVR" },{ 5, 0xff050408, "ASSR" },
+	{ 5, 0xff050410, "STRU" },{ 5, 0xff050414, "STRL" },
+	{ 5, 0xff050500, "EV00" },{ 5, 0xff050504, "EV01" },{ 5, 0xff050508, "EV02" },{ 5, 0xff05050c, "EV03" },
+	{ 5, 0xff050510, "EV04" },{ 5, 0xff050514, "EV05" },{ 5, 0xff050518, "EV06" },{ 5, 0xff05051c, "EV07" },
+	{ 5, 0xff050520, "EV08" },{ 5, 0xff050524, "EV09" },{ 5, 0xff050528, "EV10" },{ 5, 0xff05052c, "EV11" },
+	{ 5, 0xff050530, "EV12" },{ 5, 0xff050534, "EV13" },{ 5, 0xff050538, "EV14" },{ 5, 0xff05053c, "EV15" },
+	{ 5, 0xff050540, "EV16" },{ 5, 0xff050544, "EV17" },{ 5, 0xff050548, "EV18" },{ 5, 0xff05054c, "EV19" },
+	{ 5, 0xff050550, "EV20" },{ 5, 0xff050554, "EV21" },{ 5, 0xff050558, "EV22" },{ 5, 0xff05055c, "EV23" },
+	{ 5, 0xff050560, "EV24" },{ 5, 0xff050564, "EV25" },
+	{ 5, 0xff050580, "PISR" },{ 5, 0xff050584, "PIMR" },{ 5, 0xff050600, "CDMR" },{ 5, 0xff050604, "CDER" },
+	{ 5, 0xff050610, "CIV0" },{ 5, 0xff050614, "CIV1" },{ 5, 0xff050618, "CIV2" },{ 5, 0xff05061c, "CIV3" },
+	{ 5, 0xff050620, "CIV4" },{ 5, 0xff050624, "CIV5" },{ 5, 0xff050628, "CIV6" },{ 5, 0xff05062c, "CIV7" },
+	{ 5, 0xff050630, "CCV0" },{ 5, 0xff050634, "CCV1" },{ 5, 0xff050638, "CCV2" },{ 5, 0xff05063c, "CCV3" },
+	{ 5, 0xff050640, "CCV4" },{ 5, 0xff050644, "CCV5" },{ 5, 0xff050648, "CCV6" },{ 5, 0xff05064c, "CCV7" },
+
+	{ 5, 0xff060014, "SCAS" },{ 5, 0xff060018, "SCRG" },{ 5, 0xff060020, "SDER" },{ 5, 0xff060024, "SDCR" },
+	{ 5, 0xff060028, "SESR" },{ 5, 0xff06002c, "SBSR" },{ 5, 0xff060030, "SBDR" },{ 5, 0xff060034, "SBAR" },
+	{ 5, 0xff060038, "SDAR" },{ 5, 0xff06003c, "SINT" },{ 5, 0xff060040, "SDXC" },{ 5, 0xff060044, "SOSR" },
+	{ 5, 0xff060048, "SISR" },{ 5, 0xff06004c, "SIDR" },{ 5, 0xff060050, "SDSD" },
+
+};
+
+
+static const int MaxSystemTables = 256; // FF00xxxx through FFFFxxxx
+static const int MaxSystemRegisters = 0x400; // FF0x0000 through FF0x0FFC
+void r9751_state::system_trace_init()
+{
+	const SystemRegisterInfo*** trace_context;
+
+	// Allocate tables for FF00 through FFFF
+	trace_context = new const SystemRegisterInfo**[MaxSystemTables];
+	memset(trace_context, 0, sizeof(void*)*MaxSystemTables);
+
+	// Iterate over the system register info
+	for (int i = 0; i < (sizeof(SystemRegisters) / sizeof(*SystemRegisters)); i++)
+	{
+		const SystemRegisterInfo* current = SystemRegisters + i;
+
+		int table = (current->RegisterAddress & 0x00FF0000) >> 16;
+		int regindex = (current->RegisterAddress & 0xFFFC) >> 2;
+
+		if (table >= MaxSystemTables || regindex >= MaxSystemRegisters)
+		{
+			logerror("system_trace_init: Register out of range and cannot be traced: 0x%x %s\n", current->RegisterAddress, current->RegisterName);
+			continue;
+		}
+
+		// Lookup the first tier table and create it if it doesn't exist
+		const SystemRegisterInfo** firstTier = trace_context[table];
+		if (firstTier == nullptr)
+		{
+			firstTier = new const SystemRegisterInfo*[MaxSystemRegisters];
+			memset(firstTier, 0, sizeof(void*) * MaxSystemRegisters);
+			trace_context[table] = firstTier;
+		}
+
+		// Set the content in the table
+		firstTier[regindex] = current;
+
+	}
+
+	system_trace_context = trace_context;
+}
+#ifdef ENABLE_TRACE_SYSTEM
+void r9751_state::trace_system(int table, int offset, int data, const char* direction)
+{
+	const SystemRegisterInfo*** trace_context = (const SystemRegisterInfo***)system_trace_context;
+
+	const char* regName = "?";
+	const char* regDescription = "?";
+	int level = 10; // Undefined registers are level 10
+
+	if (table < MaxSystemTables && offset < MaxSystemRegisters)
+	{
+		const SystemRegisterInfo** firstTier = trace_context[table];
+		if (firstTier != nullptr)
+		{
+			const SystemRegisterInfo* current = firstTier[offset];
+			if (current != nullptr)
+			{
+				regName = current->RegisterName;
+				if (current->Description != nullptr) regDescription = current->Description;
+				level = current->VerboseLevel;
+			}
+		}
+	}
+
+	if (level >= SYSTEM_TRACE_LEVEL)
+	{
+		u32 address = 0xFF000000 | (table << 16) | (offset << 2);
+		logerror("%s System Register [%08X] (%s %s) %s %08X (PC=%08X)\n", machine().time().as_string(), address, regName, regDescription, direction, data, m_maincpu->pc());
+	}
+
+}
+#else
+void r9751_state::trace_system(int table, int offset, int data, const char* direction)
+{
+}
+#endif
 
 
 void r9751_state::kbd_put(u8 data)
@@ -420,6 +555,8 @@ void r9751_state::init_r9751()
 	device_trace_enable_all();
 	device_trace_disable(0x07);
 	device_trace_disable(0x09);
+
+	system_trace_init();
 
 	/* Save states */
 	save_item(NAME(reg_ff050004));
@@ -746,11 +883,14 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 ******************************************************************************/
 READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
 {
+	u32 data;
 	switch(offset << 2)
 	{
 		default:
-			return 0;
+			data = 0;
 	}
+	trace_system(1, offset, data, ">>");
+	return data;
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
@@ -758,6 +898,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
 		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0xFF010000, m_maincpu->pc());
+
+	trace_system(1, offset, data, "<<");
 
 	switch(offset << 2)
 	{
@@ -782,22 +924,30 @@ READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 	switch(offset << 2)
 	{
 		case 0x0004:
-			return reg_ff050004;
+			data = reg_ff050004;
+			break;
 		case 0x0300:
-			return 0x1B | (1<<0x14);
+			data = 0x1B | (1<<0x14);
+			break;
 		case 0x0320: /* Some type of counter */
-			return (machine().time() - timer_32khz_last).as_ticks(32768) & 0xFFFF;
+			data = (machine().time() - timer_32khz_last).as_ticks(32768) & 0xFFFF;
+			break;
 		case 0x0584:
-			return 0;
+			data = 0;
+			break;
 		case 0x0610:
-			return 0xabacabac;
+			data = 0xabacabac;
+			break;
 		case 0x0014:
-			return 0x80;
+			data = 0x80;
+			break;
 		default:
 			data = 0;
 			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", m_maincpu->pc(), offset << 2 | 0xFF050000, data, mem_mask);
-			return data;
+			break;
 	}
+	trace_system(5, offset, data, "<<");
+	return data;
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
@@ -805,6 +955,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
 		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0xFF050000, m_maincpu->pc());
+
+	trace_system(5, offset, data, ">>");
 
 	switch(offset << 2)
 	{
@@ -830,12 +982,15 @@ READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 	switch(offset << 2)
 	{
 		case 0x0040:
-			return reg_fff80040;
+			data = reg_fff80040;
+			break;
 		default:
 			data = 0;
 			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", m_maincpu->pc(), offset << 2 | 0xFFF80000, data, mem_mask);
-			return data;
+			break;
 	}
+	trace_system(5, offset, data, "<<");
+	return data;
 }
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
@@ -843,6 +998,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
 		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0xFFF80000, m_maincpu->pc());
+
+	trace_system(5, offset, data, ">>");
 
 	switch(offset << 2)
 	{
