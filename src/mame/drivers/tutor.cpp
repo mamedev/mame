@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Cartridge slot
-	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "tutor_cart", nullptr);
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "tutor_cart", "bin");
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_type("tutor", SOFTWARE_LIST_ORIGINAL_SYSTEM);
