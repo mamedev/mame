@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(mpcb849_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(164'609'300, 2112, 0, 1664, 1299, 0, 1248)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb849_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, irq3))
 
 	RAM(config, "sram").set_default_size("128K").set_default_value(0);
 	RAM(config, "vram").set_default_size("5120K").set_default_value(0); // size is a guess
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(mpcb896_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(164'609'300, 2112, 0, 1664, 1299, 0, 1248)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb896_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, irq3))
 
 	RAM(config, "sram").set_default_size("256K").set_default_value(0);
 	RAM(config, "vram").set_default_size("18M").set_default_value(0);
@@ -717,8 +717,8 @@ WRITE_LINE_MEMBER(edge1_device_base::vblank)
 	if (state)
 	{
 		// TODO: set vblank status
-		m_bus->vblank_w(ASSERT_LINE);
-		m_bus->vblank_w(CLEAR_LINE);
+		m_bus->irq3_w(ASSERT_LINE);
+		m_bus->irq3_w(CLEAR_LINE);
 	}
 	else
 		; // TODO: clear vblank status
