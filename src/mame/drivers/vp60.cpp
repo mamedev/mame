@@ -11,7 +11,7 @@ No significant progress can be made until the 8051 has its internal ROM dumped.
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/er2055.h"
-//#include "video/i8275.h"
+#include "video/i8275.h"
 #include "screen.h"
 
 class vp60_state : public driver_device
@@ -20,25 +20,38 @@ public:
 	vp60_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
 	void vp60(machine_config &config);
 
 private:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	I8275_DRAW_CHARACTER_MEMBER(draw_character);
+	DECLARE_READ8_MEMBER(crtc_r);
+	DECLARE_WRITE8_MEMBER(crtc_w);
 
 	void io_map(address_map &map);
 	void kbd_map(address_map &map);
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<i8275_device> m_crtc;
 	required_region_ptr<u8> m_p_chargen;
 };
 
-u32 vp60_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+I8275_DRAW_CHARACTER_MEMBER(vp60_state::draw_character)
 {
-	return 0;
+}
+
+READ8_MEMBER(vp60_state::crtc_r)
+{
+	return m_crtc->read(space, offset >> 8);
+}
+
+WRITE8_MEMBER(vp60_state::crtc_w)
+{
+	m_crtc->write(space, offset >> 8, data);
 }
 
 void vp60_state::mem_map(address_map &map)
@@ -49,6 +62,7 @@ void vp60_state::mem_map(address_map &map)
 void vp60_state::io_map(address_map &map)
 {
 	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xc000).select(0x100).rw(FUNC(vp60_state::crtc_r), FUNC(vp60_state::crtc_w));
 }
 
 void vp60_state::kbd_map(address_map &map)
@@ -59,18 +73,25 @@ void vp60_state::kbd_map(address_map &map)
 static INPUT_PORTS_START( vp60 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vp60_state::vp60)
-	MCFG_DEVICE_ADD("maincpu", I8051, XTAL(10'920'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void vp60_state::vp60(machine_config &config)
+{
+	I8051(config, m_maincpu, 10.92_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vp60_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &vp60_state::io_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'920'000), 1350, 0, 1056, 320, 0, 300) // dimensions guessed
-	MCFG_SCREEN_UPDATE_DRIVER(vp60_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.92_MHz_XTAL, 1600, 0, 1280, 270, 0, 250);
+	//screen.set_raw(25.92_MHz_XTAL, 1632, 0, 1280, 319, 0, 275);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 
-	MCFG_DEVICE_ADD("kbdcpu", I8035, XTAL(3'579'545)) // 48-300-010 XTAL
-	MCFG_DEVICE_PROGRAM_MAP(kbd_map)
-MACHINE_CONFIG_END
+	I8275(config, m_crtc, 25.92_MHz_XTAL / 16);
+	m_crtc->set_character_width(16);
+	m_crtc->set_display_callback(FUNC(vp60_state::draw_character), this);
+	m_crtc->set_screen("screen");
+
+	i8035_device &kbdcpu(I8035(config, "kbdcpu", 3.579545_MHz_XTAL)); // 48-300-010 XTAL
+	kbdcpu.set_addrmap(AS_PROGRAM, &vp60_state::kbd_map);
+}
 
 
 /**************************************************************************************************************
