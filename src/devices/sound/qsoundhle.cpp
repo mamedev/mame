@@ -523,7 +523,7 @@ void qsound_hle_device::state_normal_update()
 
 	// update ADPCM voices (one every third sample)
 	const int adpcm_voice = m_state_counter % 3;
-	m_adpcm[adpcm_voice].update(*this, m_voice_output[16 + adpcm_voice], m_state_counter / 3);
+	m_voice_output[16 + adpcm_voice] = m_adpcm[adpcm_voice].update(*this, m_voice_output[16 + adpcm_voice], m_state_counter / 3);
 
 	int16_t echo_output = m_echo.apply(echo_input);
 
