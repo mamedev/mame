@@ -94,7 +94,7 @@ void cdp1864_device::device_config_complete()
 	if (!screen().refresh_attoseconds())
 		screen().set_raw(clock(), SCREEN_WIDTH, HBLANK_END, HBLANK_START, TOTAL_SCANLINES, SCANLINE_VBLANK_END, SCANLINE_VBLANK_START);
 
-	if (!screen().have_screen_update())
+	if (!screen().has_screen_update())
 		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(cdp1864_device::screen_update), this));
 }
 

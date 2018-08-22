@@ -75,7 +75,7 @@ void tms9928a_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().have_screen_update())
+	if (!screen().has_screen_update())
 		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(tms9928a_device::screen_update), this));
 
 	if (!screen().refresh_attoseconds())
@@ -128,12 +128,6 @@ tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, d
 tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9928a_device(mconfig, TMS9929A, tag, owner, clock, true, true, true)
 {
-}
-
-void tms9928a_device::device_validity_check(validity_checker &valid) const
-{
-	if (clock() < 6'000'000)
-		osd_printf_error("%d Hz clock is too slow!\n", clock());
 }
 
 device_memory_interface::space_config_vector tms9928a_device::memory_space_config() const
