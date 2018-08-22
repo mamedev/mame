@@ -566,6 +566,7 @@ MACHINES["SATURN"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
 --MACHINES["SECFLASH"] = true
+MACHINES["SDA2006"] = true
 MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SEGA_SCU"] = true
@@ -1758,6 +1759,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cidelsa.cpp",
 	MAME_DIR .. "src/mame/includes/cidelsa.h",
 	MAME_DIR .. "src/mame/video/cidelsa.cpp",
+	MAME_DIR .. "src/mame/drivers/nightmare.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "eolith")

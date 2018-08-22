@@ -2543,6 +2543,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sda2006.h,MACHINES["SDA2006"] = true
+---------------------------------------------------
+
+if (MACHINES["SDA2006"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sda2006.cpp",
+		MAME_DIR .. "src/devices/machine/sda2006.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/smc91c9x.h,MACHINES["SMC91C9X"] = true
 ---------------------------------------------------
 

@@ -30278,6 +30278,9 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 @source:nmkmedal.cpp
 trocana                         // NTC / NMK
 
+@source:nightmare.cpp
+nightmare						// (c) 1982 E.F.O.
+
 @source:nokia_3310.cpp
 noki3210                        //
 noki3310                        //
