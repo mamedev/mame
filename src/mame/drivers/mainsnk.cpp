@@ -479,5 +479,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT180, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
