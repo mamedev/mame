@@ -29,6 +29,167 @@
 
 
 //**************************************************************************
+//  PRIVATE DEVICES
+//**************************************************************************
+
+/*
+The keyboard reset/power-on reset circuit for the Amiga 2000 is built
+around the LM339 at U805 (top left on sheet 3 of the schematic).  To
+simplify things, we assume all components are ideal.
+
+In stead idle state:
+* /KBCLK is high
+* U805 pin 1 is driven low, holding C813 discharged
+* U805 pin 2 is not driven, allowing C814 to remain charged
+* U805 pin 13 is driven low setting thresholds to 2.0V and 1.0V
+* U805 pin 14 is not driven, leaving /KBRST deasserted
+
+When /KBCLK is asserted, C814 is allowed to charge.  A short pulse will
+not give it sufficient time to charge past the 2.0V threshold on pin 5
+and the circuit will remain in idle.
+
+If /KBCLK is asserted for over 112ms:
+* U805 pin 1 is not driven, allowing C813 to charge past 2.0V
+* U805 pin 2 is driven low, discharging C814
+* U805 pin 13 is not driven, raising thresholds to 2.86V and 3.57V
+* U805 pin 14 is driven low, asserting /KBRST
+
+The thresholds changing will cause U805 pin 2 to float, allowing C814 to
+begin charging.  If /KBCLK is asserted for a further 74 milliseconds,
+U805 pin 2 will be driven low keeping C814 discharged until /KBCLK is
+deasserted.
+
+C814 (22µF) will charge via R805 (47kΩ) until it reaches the 3.57V
+threshold, ensuring the minimum length of a reset pulse is 1.294s.
+
+The power-on reset signal is also allowed to discharge C814, but we
+ignore this for simplicity.  Earlier boards use a 1N4148 signal diode,
+while later boards replace it with a PST518B at XU1.
+
+*/
+
+DECLARE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device)
+
+class a2000_kbreset_device : public device_t
+{
+public:
+	a2000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, u32 clock = 0U) :
+		device_t(config, A2000_KBRESET, tag, owner, clock),
+		m_kbrst_cb(*this)
+	{
+	}
+
+	auto kbrst_cb() { return m_kbrst_cb.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER(kbclk_w)
+	{
+		if (bool(state) != bool(m_kbclk))
+		{
+			m_kbclk = state ? 1U : 0U;
+			if (state)
+			{
+				// U805 pin 1 driven low - discharges C813
+				m_c813_level = 0U;
+				m_c813_timer->reset();
+
+				// U805 pin 2 floating - allows C814 to charge
+				if (!m_c814_charging)
+				{
+					m_c814_charging = 1U;
+					m_c814_timer->adjust(attotime::from_msec(1294)); // 0V to 3.57V
+				}
+			}
+			else
+			{
+				// U805 pin 1 floating - allows C813 to charge
+				assert(0U == m_c813_level);
+				m_c813_timer->adjust(attotime::from_msec(112)); // 0V to 2V
+			}
+		}
+	}
+
+protected:
+	virtual void device_resolve_objects() override
+	{
+		m_kbrst_cb.resolve_safe();
+	}
+
+	virtual void device_start() override
+	{
+		// allocate resources
+		m_c813_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2000_kbreset_device::c813_charged), this));
+		m_c814_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2000_kbreset_device::c814_charged), this));
+
+		// start in idle state
+		m_kbclk = 1U;
+		m_kbrst = 1U;
+		m_c813_level = 0U;
+		m_c814_charging = 1U;
+
+		// always better to save state
+		save_item(NAME(m_kbclk));
+		save_item(NAME(m_kbrst));
+		save_item(NAME(m_c813_level));
+		save_item(NAME(m_c814_charging));
+	}
+
+private:
+	TIMER_CALLBACK_MEMBER(c813_charged)
+	{
+		assert(2U > m_c813_level);
+		if (2U > ++m_c813_level)
+			m_c813_timer->adjust(attotime::from_msec(74)); // 2V to 2.86V
+
+		if ((m_kbrst ? 0U : 1U) < m_c813_level)
+		{
+			// U805 pin 2 driven low - discharges C814
+			if (2U > m_c813_level)
+			{
+				assert(m_c814_charging);
+				m_c814_timer->adjust(attotime::from_msec(1294)); // 0V to 3.57V
+			}
+			else
+			{
+				m_c814_charging = 0U;
+				m_c814_timer->reset();
+			}
+			if (m_kbrst)
+				m_kbrst_cb(m_kbrst = 0U);
+		}
+	}
+
+	TIMER_CALLBACK_MEMBER(c814_charged)
+	{
+		// C814 above high threshold - /KBRST deasserted
+		assert(m_c814_charging);
+		assert(!m_kbrst);
+		m_kbrst_cb(m_kbrst = 1U);
+
+		// if C813 is between 2.0V and 2.86V, lowering the threshold will discharge C814
+		assert(2U > m_c813_level);
+		if (0U < m_c813_level)
+		{
+			// threshold is bumped back up
+			m_kbrst_cb(m_kbrst = 0U);
+			m_c814_timer->adjust(attotime::from_msec(1294)); // 0V to 3.57V
+		}
+	}
+
+	devcb_write_line m_kbrst_cb;
+
+	emu_timer *m_c813_timer = nullptr; // C813 = 22µF, R802 = 10kΩ
+	emu_timer *m_c814_timer = nullptr; // C814 = 22µF, R805 = 47kΩ
+
+	u8 m_kbclk = 1U; // /KBCLK input
+	u8 m_kbrst = 1U; // /KBRST output
+	u8 m_c813_level = 0U; // 0 = 0V-2V, 1 = 2V - 2.86V, 2 = 2.86V - 5V
+	u8 m_c814_charging = 1U; // U805 pin 2
+};
+
+DEFINE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device, "a2000kbrst", "Amiga 2000 keyboard reset circuit")
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -58,7 +219,7 @@ protected:
 private:
 	required_device<address_map_bank_device> m_bootrom;
 	required_memory_bank m_wom;
-	std::vector<uint16_t> m_wom_ram;
+	std::vector<u16> m_wom_ram;
 };
 
 class a2000_state : public amiga_state
@@ -261,7 +422,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	static const uint8_t GAYLE_ID = 0xd0;
+	static const u8 GAYLE_ID = 0xd0;
 
 	void a600n(machine_config &config);
 	void a600(machine_config &config);
@@ -286,7 +447,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	static const uint8_t GAYLE_ID = 0xd1;
+	static const u8 GAYLE_ID = 0xd1;
 
 	void a1200(machine_config &config);
 	void a1200n(machine_config &config);
@@ -355,8 +516,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
 
-	void handle_joystick_cia(uint8_t pra, uint8_t dra);
-	uint16_t handle_joystick_potgor(uint16_t potgor);
+	void handle_joystick_cia(u8 pra, u8 dra);
+	u16 handle_joystick_potgor(u16 potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
@@ -368,14 +529,14 @@ public:
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
-	uint16_t m_potgo_value;
+	u16 m_potgo_value;
 
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);
 	void cd32_mem(address_map &map);
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(uint16_t data) override;
+	virtual void potgo_w(u16 data) override;
 
 private:
 	required_device<cdda_device> m_cdda;
@@ -707,7 +868,7 @@ bool cdtv_state::int6_pending()
 
 READ32_MEMBER( a3000_state::scsi_r )
 {
-	uint32_t data = 0xffffffff;
+	u32 data = 0xffffffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -719,7 +880,7 @@ WRITE32_MEMBER( a3000_state::scsi_w )
 
 READ32_MEMBER( a3000_state::motherboard_r )
 {
-	uint32_t data = 0xffffffff;
+	u32 data = 0xffffffff;
 	logerror("motherboard_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -772,7 +933,7 @@ WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
 
 READ32_MEMBER( a4000_state::scsi_r )
 {
-	uint16_t data = 0xffff;
+	u16 data = 0xffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -784,7 +945,7 @@ WRITE32_MEMBER( a4000_state::scsi_w )
 
 READ16_MEMBER( a4000_state::ide_r )
 {
-	uint16_t data = 0xffff;
+	u16 data = 0xffff;
 
 	// ide interrupt register
 	if (offset == 0x1010)
@@ -829,7 +990,7 @@ WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
 
 READ32_MEMBER( a4000_state::motherboard_r )
 {
-	uint32_t data = 0;
+	u32 data = 0;
 
 	if (offset == 0)
 	{
@@ -872,7 +1033,7 @@ WRITE_LINE_MEMBER(cd32_state::akiko_int_w)
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
 
-void cd32_state::potgo_w(uint16_t data)
+void cd32_state::potgo_w(u16 data)
 {
 	int i;
 
@@ -881,30 +1042,30 @@ void cd32_state::potgo_w(uint16_t data)
 
 	for (i = 0; i < 8; i += 2)
 	{
-		uint16_t dir = 0x0200 << i;
+		u16 dir = 0x0200 << i;
 		if (data & dir)
 		{
-			uint16_t d = 0x0100 << i;
+			u16 d = 0x0100 << i;
 			m_potgo_value &= ~d;
 			m_potgo_value |= data & d;
 		}
 	}
 	for (i = 0; i < 2; i++)
 	{
-		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
+		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
 		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
 			m_cd32_shifter[i] = 8;
 	}
 }
 
-void cd32_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
+void cd32_state::handle_joystick_cia(u8 pra, u8 dra)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		uint8_t but = 0x40 << i;
-		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
+		u8 but = 0x40 << i;
+		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
@@ -922,14 +1083,14 @@ void cd32_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
 	}
 }
 
-uint16_t cd32_state::handle_joystick_potgor(uint16_t potgor)
+u16 cd32_state::handle_joystick_potgor(u16 potgor)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		uint16_t p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		uint16_t p9dat = 0x0400 << (i * 4); /* data P9 */
-		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
+		u16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
+		u16 p9dat = 0x0400 << (i * 4); /* data P9 */
+		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
@@ -955,7 +1116,7 @@ CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
 
 CUSTOM_INPUT_MEMBER( cd32_state::cd32_sel_mirror_input )
 {
-	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
+	u8 bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -1450,9 +1611,9 @@ MACHINE_CONFIG_START(a1000_state::a1000)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a1000_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
@@ -1485,9 +1646,11 @@ MACHINE_CONFIG_START(a2000_state::a2000)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a2000_kbreset_device::kbclk_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	A2000_KBRESET(config, "kbrst").kbrst_cb().set(FUNC(a2000_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
@@ -1533,10 +1696,10 @@ MACHINE_CONFIG_START(a500_state::a500)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", a500_keyboard_devices, "a500_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", a500_keyboard_devices, "a500_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
@@ -1570,9 +1733,9 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
@@ -1647,9 +1810,9 @@ MACHINE_CONFIG_START(a3000_state::a3000)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(32'000'000) / 2)
@@ -1683,10 +1846,10 @@ MACHINE_CONFIG_START(a500p_state::a500p)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", a500_keyboard_devices, "a500_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", a500_keyboard_devices, "a500_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
@@ -1724,10 +1887,10 @@ MACHINE_CONFIG_START(a600_state::a600)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", a600_keyboard_devices, "a600_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", a600_keyboard_devices, "a600_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
@@ -1773,10 +1936,10 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a1200_us") // FIXME: replace with Amiga 1200 devices when we have mask ROM dump
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1200_us")); // FIXME: replace with Amiga 1200 devices when we have mask ROM dump
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
@@ -1840,9 +2003,9 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(50'000'000) / 2)

@@ -345,6 +345,13 @@ protected:
 		save_item(NAME(m_reset_active));
 	}
 
+	virtual void device_reset() override
+	{
+		mitsumi_keyboard_base::device_reset();
+
+		m_mcu->cntr_w(1);
+	}
+
 	virtual void ctrl_a_a_changed(bool state) override
 	{
 		m_reset_merger->in_w<1>(state ? 0 : 1);
