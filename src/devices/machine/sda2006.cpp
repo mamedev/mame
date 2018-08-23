@@ -36,7 +36,16 @@ DEFINE_DEVICE_TYPE(SDA2006, sda2006_device, "sda2006", "SDA2006 EEPROM")
 sda2006_device::sda2006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SDA2006, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
-	, m_latch(0),  m_current_address(0), m_eeprom_state(),m_read_stream_pos(0),m_is_end_o_stream(false), m_write_stream_length(0), m_write_stream(0), m_write_state(0), m_clock_state (0)
+	, m_latch(0)
+	, m_current_address(0)
+	, m_eeprom_state()
+	, m_read_stream_pos(0)
+	, m_is_end_o_stream(false)
+	, m_write_stream_length(0)
+	, m_write_stream(0)
+	, m_write_state(0)
+	, m_clock_state(0)
+	, m_region(*this, DEVICE_SELF)
 {
 }
 
@@ -80,7 +89,6 @@ void sda2006_device::device_reset()
 	m_read_stream_pos = 0;
 	m_eeprom_state = EEPROM_WRITE;
 	m_clock_state = 0;
-
 }
 
 //-------------------------------------------------
@@ -90,6 +98,13 @@ void sda2006_device::device_reset()
 
 void sda2006_device::nvram_default()
 {
+	// region always wins
+	if (m_region.found())
+	{
+		memcpy(m_eeprom_data, m_region->base(), EEPROM_CAPACITY);
+		return;
+	}
+
 	for (auto & elem : m_eeprom_data)
 		elem = 0xffff;
 }
