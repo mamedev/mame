@@ -91,7 +91,7 @@ MACHINE_CONFIG_START(v102_state::v102)
 	//MCFG_DEVICE_ADD("vpac", CRT9007, CRTC_CLOCK)
 	//MCFG_CRT9007_CHARACTER_WIDTH(6 or 10)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))

@@ -1206,7 +1206,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	// IN6 = J102 pin 2 (unused)
 	// IN7 = J102 pin 3 (unused)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1233,7 +1233,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu").int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)

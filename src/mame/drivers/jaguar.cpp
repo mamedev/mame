@@ -1944,7 +1944,7 @@ MACHINE_CONFIG_START(jaguar_state::jaguar)
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jaguar_state::jaguarcd)

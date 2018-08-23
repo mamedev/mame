@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_DEVICE_PROGRAM_MAP(funystrp_sound_map)
 	MCFG_DEVICE_IO_MAP(funystrp_sound_io_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1841,7 +1841,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2159,7 +2159,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2278,8 +2278,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
-	m_eeprom->set_default_data(shogwarr_default_eeprom, 128);
+	EEPROM_93C46_16BIT(config, m_eeprom).default_data(shogwarr_default_eeprom, 128);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2346,12 +2345,13 @@ void kaneko16_shogwarr_state::brapboys_oki2_map(address_map &map)
 	map(0x20000, 0x3ffff).bankr("okibank2");
 }
 
-MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
+void kaneko16_shogwarr_state::brapboys(machine_config &config)
+{
 	shogwarr(config);
 	m_oki[1]->set_addrmap(0, &kaneko16_shogwarr_state::brapboys_oki2_map);
 	m_kaneko_hit->set_type(2);
-	m_eeprom->set_default_data(brapboys_default_eeprom, 128);
-MACHINE_CONFIG_END
+	m_eeprom->default_data(brapboys_default_eeprom, 128);
+}
 
 /***************************************************************************
 

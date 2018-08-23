@@ -410,7 +410,7 @@ void policetr_state::policetr(machine_config &config)
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::mem);
 
-	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
+	EEPROM_93C66_16BIT(config, m_eeprom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

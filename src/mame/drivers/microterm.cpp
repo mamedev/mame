@@ -107,7 +107,7 @@ MACHINE_CONFIG_START(microterm_state::mt420)
 
 	MC2661(config, "aci", XTAL(3'686'400)); // SCN2641
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom").do_callback().set("duart", FUNC(scn2681_device::ip6_w));
+	EEPROM_93C46_16BIT(config, "eeprom").do_callback().set("duart", FUNC(scn2681_device::ip6_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(9'877'680), 612, 0, 480, 269, 0, 250)
@@ -136,9 +136,9 @@ MACHINE_CONFIG_START(microterm_state::mt5510)
 	duart.outport_cb().append("eeprom1", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(3);
 	duart.outport_cb().append("eeprom2", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(3);
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom1").do_callback().set("duart", FUNC(scn2681_device::ip6_w));
+	EEPROM_93C46_16BIT(config, "eeprom1").do_callback().set("duart", FUNC(scn2681_device::ip6_w));
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom2").do_callback().set("duart", FUNC(scn2681_device::ip5_w));
+	EEPROM_93C46_16BIT(config, "eeprom2").do_callback().set("duart", FUNC(scn2681_device::ip5_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(45'830'400) / 2, 1120, 0, 960, 341, 0, 300) // wild guess at resolution

@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_NVRAM_ADD_0FILL("nvram0")
 	MCFG_NVRAM_ADD_0FILL("nvram1")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

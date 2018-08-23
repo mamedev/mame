@@ -2606,7 +2606,7 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gdfs_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	ADC0809(config, m_adc, 1000000); // unknown clock
 	m_adc->in_callback<0>().set_ioport("GUNX1");

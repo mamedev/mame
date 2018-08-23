@@ -214,6 +214,10 @@ public:
 	template <class Object> devcb_base &set_allpot_r_callback(Object &&cb) { return m_allpot_r_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_serin_r_callback(Object &&cb) { return m_serin_r_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_serout_w_callback(Object &&cb) { return m_serout_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto pot_r() { return m_pot_r_cb[N].bind(); }
+	auto allpot_r() { return m_allpot_r_cb.bind(); }
+	auto serin_r() { return m_serin_r_cb.bind(); }
+	auto serout_w() { return m_serout_w_cb.bind(); }
 
 	template <typename Object> void set_keyboard_callback(Object &&cb) { m_keyboard_r = std::forward<Object>(cb); }
 	template <typename Object> void set_interrupt_callback(Object &&cb) { m_irq_f = std::forward<Object>(cb); }

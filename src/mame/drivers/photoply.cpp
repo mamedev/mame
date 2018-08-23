@@ -327,9 +327,9 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
-	MCFG_EEPROM_ERASE_ALL_TIME(attotime::from_usec(10))
+	EEPROM_93C46_16BIT(config, "eeprom")
+		.write_time(attotime::from_usec(1))
+		.erase_all_time(attotime::from_usec(10));
 MACHINE_CONFIG_END
 
 

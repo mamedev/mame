@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 
 	ADDRESS_MAP_BANK(config, "bank4000").set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -267,7 +267,7 @@ void xtide_device::device_add_mconfig(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 	m_ata->irq_handler().set(FUNC(xtide_device::ide_interrupt));
 
-	EEPROM_PARALLEL_2864(config, m_eeprom);
+	EEPROM_2864(config, m_eeprom);
 }
 
 //-------------------------------------------------

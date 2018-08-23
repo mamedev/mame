@@ -3636,7 +3636,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 	audiocpu.p0_in_cb().set_ioport("EEPROM");
 	audiocpu.p0_out_cb().set_ioport("EEPROM");
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4149,7 +4149,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
+	EEPROM_93C66_8BIT(config, "eeprom");
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
 	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);

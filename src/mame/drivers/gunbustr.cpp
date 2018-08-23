@@ -235,7 +235,7 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_DEVICE_PROGRAM_MAP(gunbustr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_0_callback().set_ioport("EXTRA");

@@ -670,9 +670,10 @@ void iteagle_eeprom_device::eeprom_map(address_map &map)
 	map(0x0000, 0x000F).rw(FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
 }
 
-MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+void iteagle_eeprom_device::device_add_mconfig(machine_config &config)
+{
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock)
@@ -714,7 +715,7 @@ void iteagle_eeprom_device::device_start()
 	}
 	m_iteagle_default_eeprom[0x3f] = checkSum;
 
-	m_eeprom->set_default_data(m_iteagle_default_eeprom.data(), 0x80);
+	m_eeprom->default_data(m_iteagle_default_eeprom.data(), 0x80);
 
 	pci_device::device_start();
 	skip_map_regs(1);

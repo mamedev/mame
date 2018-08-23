@@ -350,8 +350,8 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigq_state, konamigq)
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(konamigq_def_eeprom, 128)
+
+	EEPROM_93C46_16BIT(config, "eeprom").default_data(konamigq_def_eeprom, 128);
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)

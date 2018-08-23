@@ -199,8 +199,7 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(klax_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

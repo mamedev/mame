@@ -73,8 +73,7 @@ MACHINE_CONFIG_START(tti_state::tti)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("mfp", mc68901_device, write_rx))
 
-	MCFG_DEVICE_ADD("novram", EEPROM_SERIAL_X24C44_16BIT)
-	MCFG_EEPROM_SERIAL_DO_CALLBACK(WRITELINE("mfp", mc68901_device, i0_w))
+	EEPROM_X24C44_16BIT(config, "novram").do_callback().set("mfp", FUNC(mc68901_device::i0_w));
 
 	ls259_device &bitlatch(LS259(config, "bitlatch")); // U17
 	bitlatch.q_out_cb<0>().set("novram", FUNC(eeprom_serial_x24c44_device::di_write));

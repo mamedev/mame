@@ -704,7 +704,8 @@ MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
+	ATARI_SOUND_COMM(config, "soundcomm", "cpu")
+		.int_callback().set(FUNC(atari_jsa_base_device::main_int_write_line));
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
@@ -834,7 +835,8 @@ MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
+	ATARI_SOUND_COMM(config, "soundcomm", "cpu")
+		.int_callback().set(FUNC(atari_jsa_base_device::main_int_write_line));
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
@@ -916,7 +918,8 @@ MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
+	ATARI_SOUND_COMM(config, "soundcomm", "cpu")
+		.int_callback().set(FUNC(atari_jsa_base_device::main_int_write_line));
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))

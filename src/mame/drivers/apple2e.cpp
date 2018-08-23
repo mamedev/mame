@@ -3994,8 +3994,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* DS1315 for no-slot clock */
-	MCFG_DS1315_ADD("nsc")
-	MCFG_DS1315_BACKING_HANDLER(READ8(*this, apple2e_state, nsc_backing_r))
+	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0);

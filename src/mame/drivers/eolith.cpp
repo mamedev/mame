@@ -551,9 +551,9 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))
+	EEPROM_93C66_8BIT(config, "eeprom")
+		.erase_time(attotime::from_usec(250))
+		.write_time(attotime::from_usec(250));
 
 //  for testing sound sync
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")

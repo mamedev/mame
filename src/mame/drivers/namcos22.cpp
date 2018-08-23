@@ -3789,7 +3789,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_DEVICE_PROGRAM_MAP( iomcu_s22_program)
 	MCFG_DEVICE_IO_MAP( iomcu_s22_io)
 
-	MCFG_EEPROM_2864_ADD("eeprom")
+	EEPROM_2864(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3857,7 +3857,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_EEPROM_2864_ADD("eeprom")
+	EEPROM_2864(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

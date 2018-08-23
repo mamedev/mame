@@ -23,7 +23,7 @@
 
 TILE_GET_INFO_MEMBER(cyberbal_base_state::get_alpha_tile_info)
 {
-	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
+	uint16_t data = m_alpha->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(cyberbal_base_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
 {
-	uint16_t data = m_alpha2_tilemap->basemem_read(tile_index);
+	uint16_t data = m_alpha2->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
 
 TILE_GET_INFO_MEMBER(cyberbal_base_state::get_playfield_tile_info)
 {
-	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
+	uint16_t data = m_playfield->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(cyberbal_base_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
 {
-	uint16_t data = m_playfield2_tilemap->basemem_read(tile_index);
+	uint16_t data = m_playfield2->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -115,8 +115,8 @@ void cyberbal_base_state::video_start()
 void cyberbal_state::video_start()
 {
 	palette_device *rpalette = subdevice<palette_device>("rpalette");
-	m_playfield2_tilemap->set_palette(*rpalette);
-	m_alpha2_tilemap->set_palette(*rpalette);
+	m_playfield2->set_palette(*rpalette);
+	m_alpha2->set_palette(*rpalette);
 
 	cyberbal_base_state::video_start();
 
@@ -205,13 +205,13 @@ void cyberbal_base_state::scanline_update_one(screen_device &screen, int scanlin
 
 void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 {
-	scanline_update_one(*m_lscreen, scanline, 0, *m_playfield_tilemap, *m_alpha_tilemap);
-	scanline_update_one(*m_rscreen, scanline, 1, *m_playfield2_tilemap, *m_alpha2_tilemap);
+	scanline_update_one(*m_lscreen, scanline, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_rscreen, scanline, 1, *m_playfield2, *m_alpha2);
 }
 
 void cyberbal2p_state::scanline_update(screen_device &screen, int scanline)
 {
-	scanline_update_one(*m_screen, scanline, 0, *m_playfield_tilemap, *m_alpha_tilemap);
+	scanline_update_one(*m_screen, scanline, 0, *m_playfield, *m_alpha);
 }
 
 
@@ -254,15 +254,15 @@ uint32_t cyberbal_base_state::update_one_screen(screen_device &screen, bitmap_in
 
 uint32_t cyberbal_state::screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield_tilemap, *m_alpha_tilemap);
+	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield, *m_alpha);
 }
 
 uint32_t cyberbal_state::screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return update_one_screen(screen, bitmap, cliprect, *m_mob2, *m_playfield2_tilemap, *m_alpha2_tilemap);
+	return update_one_screen(screen, bitmap, cliprect, *m_mob2, *m_playfield2, *m_alpha2);
 }
 
 uint32_t cyberbal2p_state::screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield_tilemap, *m_alpha_tilemap);
+	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield, *m_alpha);
 }

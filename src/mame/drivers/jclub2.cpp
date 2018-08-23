@@ -1142,7 +1142,7 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_S29290_16BIT)
+	EEPROM_S29290_16BIT(config, "eeprom");
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1176,7 +1176,7 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT) // 93C46 ( 8 bits)
+	EEPROM_93C46_8BIT(config, "eeprom");
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1211,7 +1211,7 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
