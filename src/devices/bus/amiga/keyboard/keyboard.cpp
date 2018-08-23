@@ -20,6 +20,9 @@
 
 DEFINE_DEVICE_TYPE(AMIGA_KEYBOARD_INTERFACE, amiga_keyboard_bus_device, "amiga_kbd", "Amiga Keyboard Interface")
 
+template class device_finder<device_amiga_keyboard_interface, false>;
+template class device_finder<device_amiga_keyboard_interface, true>;
+
 
 //**************************************************************************
 //  SLOT DEVICE
@@ -108,6 +111,13 @@ device_amiga_keyboard_interface::~device_amiga_keyboard_interface()
 
 void amiga_keyboard_devices(device_slot_interface &device)
 {
+	device.option_add("a1000_us", A1000_KBD_US);
+	device.option_add("a1000_de", A1000_KBD_DE);
+	device.option_add("a1000_fr", A1000_KBD_FR);
+	device.option_add("a1000_it", A1000_KBD_IT);
+	device.option_add("a1000_se", A1000_KBD_SE);
+	device.option_add("a1000_dk", A1000_KBD_DK);
+	device.option_add("a1000_gb", A1000_KBD_GB);
 	device.option_add("a1200_us", A1200_KBD); // FIXME: sort this out properly when we get mask ROM dumps
 	device.option_add("a2000_g80_us", A2000_KBD_G80_US);
 	device.option_add("a2000_g80_de", A2000_KBD_G80_DE);

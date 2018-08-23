@@ -4,37 +4,48 @@
 
     mitsumi.cpp
 
-	Fifteen rows by six columns, plus seven dedicated meta key inputs.
+    Fifteen rows by six columns, plus seven dedicated meta key inputs.
 
-	Newer external keyboards and the Amiga 500 keyboard have an external
-	watchdog circuit built from a 74LS123.  Older external keyboards and
-	the Amiga 600 keyboard lack this.  If CNTR is tied low, the program
-	expects the watchdog to be present.
+    Newer external keyboards and the Amiga 500 keyboard have an external
+    watchdog circuit built around a 74LS123.  Older external keyboards
+    and the Amiga 600 keyboard lack this.  If CNTR is tied low, the
+    program expects the watchdog to be present.
 
-	Note that the Ctrl-Amiga-Amiga detection circuit is not present in
-	external "big box" keyboards.  It's implemented in the base class
-	here for convenience.  In the Amiga 600, it's possible for the MCU
-	to read or drive the input to the reset pulse generator via PA7
-	(assuming R624 has a low enough resistance), but this isn't used.
+    Note that the Ctrl-Amiga-Amiga detection circuit is not present in
+    external "big box" keyboards.  It's implemented in the base class
+    here for convenience.  In the Amiga 600, it's possible for the MCU
+    to read or drive the input to the reset pulse generator via PA7
+    (assuming R624 has a low enough resistance), but this isn't used by
+    the program.
 
-	The Amiga 500 and Amiga 600 keyboards generate a reset pulse on a
-	dedicated line using an NE555 timer.  These systems won't generate a
-	system reset in response to the KCLK line being held low for an
-	extended period.  No reset warning is generated before the reset
-	pulse on these systems.
+    The Amiga 500 and Amiga 600 keyboards generate a reset pulse on a
+    dedicated line using an NE555 timer.  These systems won't generate a
+    system reset in response to the KCLK line being held low for an
+    extended period.  No reset warning is generated before the reset
+    pulse on these systems.
 
-	The NE555 used of generating the reset pulse on Amiga 600 keyboards
-	also provides power-on reset, and its output is combined with a
-	power good signal on Rev 2C and later machines.
+    The Amiga 500 keyboard MCU is in the keyboard assembly.  The MCU
+    reset signal is generated using logic in the keyboard assembly.  The
+    main system reset signal is not used.
 
-	Newer external keyboards have a 74HC00 in addition to the 74LS123.
-	The exact purpose of this chip is unknown.
+    The NE555 used to generate the reset pulse on Amiga 600 keyboards
+    also provides power-on reset, and its output is combined with a
+    power good signal on Rev 2C and later machines.  The Amiga 600
+    keyboard MCU is on the system board and is reset by the main system
+    reset signal.
 
-	We need better photos of the Hi-Tek version of the Amiga 2000
-	keyboard to identify the chips (40-pin MCU, two 14-pin DIPs, one
-	8-pin DIP).
+    The Amiga 1000 keyboard uses an NE556 to generate a power-on reset
+    sigal for the MCU.  There is no watchdog circuit.  The CNTR pin is
+    unconnected, relying on the internal pull-up.
 
-	Known Amiga 500 keyboard part numbers:
+    Newer external keyboards have a 74HC00 in addition to the 74LS123.
+    The exact purpose of this chip is unknown.
+
+    We need better photos of the Hi-Tek version of the Amiga 2000
+    keyboard to identify the chips (40-pin MCU, two 14-pin DIPs, one
+    8-pin DIP).
+
+    Known Amiga 500 keyboard part numbers:
     * 312502-01 U.S./Canada
     * 312502-02 Germany/Austria
     * 312502-03 France/Belgium
@@ -46,18 +57,18 @@
     * 312502-09 Norway
     * 312502-12 UK
 
-	Known Amiga 1000 keyboard part numbers:
-	* 327063-01 U.S./Canada
-	* 327063-02 UK
-	* 327063-03 Germany
-	* 327063-04 France
-	* 327063-05 Italy
+    Known Amiga 1000 keyboard part numbers:
+    * 327063-01 U.S./Canada
+    * 327063-02 UK
+    * 327063-03 Germany
+    * 327063-04 France
+    * 327063-05 Italy
 
-	Known Amiga 2000 keyboard part numbers:
-	* 312716-02 U.S./Canada
+    Known Amiga 2000 keyboard part numbers:
+    * 312716-02 U.S./Canada
 
-	Known Amiga CDTV keyboard part numbers:
-	* 364351-01 U.S./Canada
+    Known Amiga CDTV keyboard part numbers:
+    * 364351-01 U.S./Canada
 
 ***************************************************************************/
 
@@ -72,6 +83,11 @@
 
 
 namespace {
+
+ROM_START(keyboard_old)
+	ROM_REGION(0x0800, "mcu", 0)
+	ROM_LOAD("6500-1", 0x0000, 0x0800, CRC(4a3fc332) SHA1(83b21d0c8b93fc9b9b3b287fde4ec8f3badac5a2) BAD_DUMP) // using newer program until we get a dump
+ROM_END
 
 ROM_START(keyboard_new)
 	ROM_REGION(0x0800, "mcu", 0)
@@ -106,16 +122,16 @@ public:
 
 	CUSTOM_INPUT_MEMBER(reset_r)
 	{
-		return m_reset;
+		return m_ctrl_a_a;
 	}
 
-	DECLARE_INPUT_CHANGED_MEMBER(check_reset)
+	DECLARE_INPUT_CHANGED_MEMBER(check_ctrl_a_a)
 	{
 		u8 const state((m_meta->read() & 0x4cU) ? 0x00 : 0x01);
-		if (state != m_reset)
+		if (state != m_ctrl_a_a)
 		{
-			m_reset = state;
-			reset_changed(bool(state));
+			m_ctrl_a_a = state;
+			ctrl_a_a_changed(bool(state));
 		}
 	}
 
@@ -150,10 +166,10 @@ protected:
 	{
 		save_item(NAME(m_row_drive));
 		save_item(NAME(m_kdat_in));
-		save_item(NAME(m_reset));
+		save_item(NAME(m_ctrl_a_a));
 	}
 
-	virtual void reset_changed(bool state)
+	virtual void ctrl_a_a_changed(bool state)
 	{
 	}
 
@@ -165,7 +181,7 @@ private:
 
 	u16 m_row_drive = 0xffffU;
 	u8  m_kdat_in = 0x01;
-	u8  m_reset = 0x00;
+	u8  m_ctrl_a_a = 0x00;
 };
 
 
@@ -235,7 +251,7 @@ private:
 
 	emu_timer *m_wd_timeout = nullptr;
 	emu_timer *m_wd_pulse = nullptr;
-	
+
 	u8 m_pd7 = 0x01U;
 };
 
@@ -261,12 +277,17 @@ protected:
 		mitsumi_watchdog_keyboard_base::device_start();
 
 		m_reset_pulse = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a500_keyboard_base::reset_pulse), this));
+
+		m_reset_active = 0U;
+
+		save_item(NAME(m_reset_active));
 	}
 
-	virtual void reset_changed(bool state) override
+	virtual void ctrl_a_a_changed(bool state) override
 	{
-		if (state)
+		if (state && !m_reset_active)
 		{
+			m_reset_active = 1U;
 			m_host->krst_w(0);
 			m_reset_merger->in_w<0>(1);
 			m_reset_pulse->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(47), CAP_U(10)));
@@ -281,6 +302,7 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(reset_pulse)
 	{
+		m_reset_active = 0U;
 		m_host->krst_w(1);
 		m_reset_merger->in_w<0>(0);
 	}
@@ -288,6 +310,7 @@ private:
 	required_device<input_merger_device> m_reset_merger;
 
 	emu_timer *m_reset_pulse = nullptr;
+	u8 m_reset_active = 0U;
 };
 
 
@@ -315,12 +338,14 @@ protected:
 
 		m_reset_pulse = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a600_keyboard_base::reset_pulse), this));
 
-		m_reset_trigger = 0x00U;
+		m_reset_trigger = 0U;
+		m_reset_active = 0U;
 
 		save_item(NAME(m_reset_trigger));
+		save_item(NAME(m_reset_active));
 	}
 
-	virtual void reset_changed(bool state) override
+	virtual void ctrl_a_a_changed(bool state) override
 	{
 		m_reset_merger->in_w<1>(state ? 0 : 1);
 	}
@@ -330,9 +355,10 @@ private:
 	{
 		if (bool(state) != bool(m_reset_trigger))
 		{
-			m_reset_trigger = state ? 0x01U : 0x00U;
-			if (state)
+			m_reset_trigger = state ? 1U : 0U;
+			if (state & !m_reset_active)
 			{
+				m_reset_active = 1U;
 				m_host->krst_w(0);
 				m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				m_reset_pulse->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(47), CAP_U(10)));
@@ -342,6 +368,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(reset_pulse)
 	{
+		m_reset_active = 0U;
 		m_host->krst_w(1);
 		m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
@@ -350,7 +377,19 @@ private:
 
 	emu_timer *m_reset_pulse = nullptr;
 
-	u8 m_reset_trigger = 0x00U;
+	u8 m_reset_trigger = 0U, m_reset_active = 0U;
+};
+
+
+class a1000_keyboard_base : public mitsumi_keyboard_base
+{
+protected:
+	using mitsumi_keyboard_base::mitsumi_keyboard_base;
+
+	virtual tiny_rom_entry const *device_rom_region() const override
+	{
+		return ROM_NAME(keyboard_old);
+	}
 };
 
 
@@ -372,15 +411,85 @@ INPUT_PORTS_END
 INPUT_PORTS_START(mitsumi_meta)
 	PORT_START("META")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)        PORT_CHAR(UCHAR_MAMEKEY(LWIN))       PORT_NAME("Left Amiga")   PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_reset, nullptr)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)        PORT_CHAR(UCHAR_MAMEKEY(LWIN))       PORT_NAME("Left Amiga")   PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, nullptr)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)        PORT_CHAR(UCHAR_MAMEKEY(LALT))       PORT_NAME("Left Alt")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)      PORT_CHAR(UCHAR_SHIFT_1)             PORT_NAME("Left Shift")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)    PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))   PORT_NAME("Ctrl")         PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_reset, nullptr)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)        PORT_CHAR(UCHAR_MAMEKEY(RWIN))       PORT_NAME("Right Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_reset, nullptr)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)    PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))   PORT_NAME("Ctrl")         PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, nullptr)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)        PORT_CHAR(UCHAR_MAMEKEY(RWIN))       PORT_NAME("Right Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, check_ctrl_a_a, nullptr)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)        PORT_CHAR(UCHAR_SHIFT_2)             PORT_NAME("Right Alt")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))     PORT_NAME("Right Shift")
 INPUT_PORTS_END
- 
+
+
+INPUT_PORTS_START(a1000_us)
+	PORT_INCLUDE(fullsize_cols)
+	PORT_INCLUDE(mitsumi_meta)
+	bus::amiga::keyboard::construct_ioport_matrix_us(owner, portlist, errorbuf);
+	bus::amiga::keyboard::construct_ioport_a1000_keypad(owner, portlist, errorbuf);
+INPUT_PORTS_END
+
+INPUT_PORTS_START(a1000_de)
+	PORT_INCLUDE(fullsize_cols)
+	PORT_INCLUDE(mitsumi_meta)
+	bus::amiga::keyboard::construct_ioport_matrix_de(owner, portlist, errorbuf);
+	bus::amiga::keyboard::construct_ioport_a1000_keypad(owner, portlist, errorbuf);
+INPUT_PORTS_END
+
+INPUT_PORTS_START(a1000_fr)
+	PORT_INCLUDE(fullsize_cols)
+	PORT_INCLUDE(mitsumi_meta)
+	bus::amiga::keyboard::construct_ioport_matrix_fr(owner, portlist, errorbuf);
+	bus::amiga::keyboard::construct_ioport_a1000_keypad(owner, portlist, errorbuf);
+INPUT_PORTS_END
+
+INPUT_PORTS_START(a1000_it)
+	PORT_INCLUDE(fullsize_cols)
+	PORT_INCLUDE(mitsumi_meta)
+	bus::amiga::keyboard::construct_ioport_matrix_it(owner, portlist, errorbuf);
+	bus::amiga::keyboard::construct_ioport_a1000_keypad(owner, portlist, errorbuf);
+INPUT_PORTS_END
+
+INPUT_PORTS_START(a1000_se)
+	PORT_INCLUDE(fullsize_cols)
+	PORT_INCLUDE(mitsumi_meta)
+	bus::amiga::keyboard::construct_ioport_matrix_se(owner, portlist, errorbuf);
+	bus::amiga::keyboard::construct_ioport_a1000_keypad(owner, portlist, errorbuf);
+
+	// Commodore shipped A1000 U.S./Canada layout with stickers on key caps for Sweden/Finland
+	PORT_MODIFY("ROW0")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("ROW12")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("ROW13")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('\\') PORT_CHAR('|')
+INPUT_PORTS_END
+
+INPUT_PORTS_START(a1000_dk)
+	PORT_INCLUDE(fullsize_cols)
+	PORT_INCLUDE(mitsumi_meta)
+	bus::amiga::keyboard::construct_ioport_matrix_dk(owner, portlist, errorbuf);
+	bus::amiga::keyboard::construct_ioport_a1000_keypad(owner, portlist, errorbuf);
+
+	// Commodore shipped A1000 U.S./Canada layout with stickers on key caps for Denmark
+	PORT_MODIFY("ROW0")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("ROW12")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("ROW13")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('\\') PORT_CHAR('|')
+INPUT_PORTS_END
+
+INPUT_PORTS_START(a1000_gb)
+	PORT_INCLUDE(fullsize_cols)
+	PORT_INCLUDE(mitsumi_meta)
+	bus::amiga::keyboard::construct_ioport_matrix_gb(owner, portlist, errorbuf);
+	bus::amiga::keyboard::construct_ioport_a1000_keypad(owner, portlist, errorbuf);
+INPUT_PORTS_END
+
 
 INPUT_PORTS_START(fullsize_us)
 	PORT_INCLUDE(fullsize_cols)
@@ -441,7 +550,7 @@ INPUT_PORTS_START(fullsize_gb)
 	PORT_INCLUDE(mitsumi_meta)
 	bus::amiga::keyboard::construct_ioport_matrix_gb(owner, portlist, errorbuf);
 INPUT_PORTS_END
- 
+
 
 INPUT_PORTS_START(compact_us)
 	PORT_INCLUDE(compact_cols)
@@ -736,6 +845,84 @@ protected:
 };
 
 
+class a1000_keyboard_us : public a1000_keyboard_base
+{
+public:
+	a1000_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: a1000_keyboard_base(mconfig, A1000_KBD_US, tag, owner, clock)
+	{ }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_us); }
+};
+
+class a1000_keyboard_de : public a1000_keyboard_base
+{
+public:
+	a1000_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: a1000_keyboard_base(mconfig, A1000_KBD_DE, tag, owner, clock)
+	{ }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_de); }
+};
+
+class a1000_keyboard_fr : public a1000_keyboard_base
+{
+public:
+	a1000_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: a1000_keyboard_base(mconfig, A1000_KBD_FR, tag, owner, clock)
+	{ }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_fr); }
+};
+
+class a1000_keyboard_it : public a1000_keyboard_base
+{
+public:
+	a1000_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: a1000_keyboard_base(mconfig, A1000_KBD_IT, tag, owner, clock)
+	{ }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_it); }
+};
+
+class a1000_keyboard_se : public a1000_keyboard_base
+{
+public:
+	a1000_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: a1000_keyboard_base(mconfig, A1000_KBD_SE, tag, owner, clock)
+	{ }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_se); }
+};
+
+class a1000_keyboard_dk : public a1000_keyboard_base
+{
+public:
+	a1000_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: a1000_keyboard_base(mconfig, A1000_KBD_DK, tag, owner, clock)
+	{ }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_dk); }
+};
+
+class a1000_keyboard_gb : public a1000_keyboard_base
+{
+public:
+	a1000_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: a1000_keyboard_base(mconfig, A1000_KBD_GB, tag, owner, clock)
+	{ }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_gb); }
+};
+
+
 class a2000_keyboard_us : public mitsumi_watchdog_keyboard_base
 {
 public:
@@ -874,6 +1061,14 @@ DEFINE_DEVICE_TYPE_PRIVATE(A600_KBD_DK, device_amiga_keyboard_interface, a600_ke
 DEFINE_DEVICE_TYPE_PRIVATE(A600_KBD_CH, device_amiga_keyboard_interface, a600_keyboard_ch, "a600kbd_ch", "Amiga 600 Keyboard (Switzerland)")
 DEFINE_DEVICE_TYPE_PRIVATE(A600_KBD_NO, device_amiga_keyboard_interface, a600_keyboard_no, "a600kbd_no", "Amiga 600 Keyboard (Norway)")
 DEFINE_DEVICE_TYPE_PRIVATE(A600_KBD_GB, device_amiga_keyboard_interface, a600_keyboard_gb, "a600kbd_gb", "Amiga 600 Keyboard (UK)")
+
+DEFINE_DEVICE_TYPE_PRIVATE(A1000_KBD_US, device_amiga_keyboard_interface, a1000_keyboard_us, "a1000kbd_us", "Amiga 1000 Keyboard (U.S./Canada)")
+DEFINE_DEVICE_TYPE_PRIVATE(A1000_KBD_DE, device_amiga_keyboard_interface, a1000_keyboard_de, "a1000kbd_de", "Amiga 1000 Keyboard (Germany/Austria)")
+DEFINE_DEVICE_TYPE_PRIVATE(A1000_KBD_FR, device_amiga_keyboard_interface, a1000_keyboard_fr, "a1000kbd_fr", "Amiga 1000 Keyboard (France/Belgium)")
+DEFINE_DEVICE_TYPE_PRIVATE(A1000_KBD_IT, device_amiga_keyboard_interface, a1000_keyboard_it, "a1000kbd_it", "Amiga 1000 Keyboard (Italy)")
+DEFINE_DEVICE_TYPE_PRIVATE(A1000_KBD_SE, device_amiga_keyboard_interface, a1000_keyboard_se, "a1000kbd_se", "Amiga 1000 Keyboard (Sweden/Finland)")
+DEFINE_DEVICE_TYPE_PRIVATE(A1000_KBD_DK, device_amiga_keyboard_interface, a1000_keyboard_dk, "a1000kbd_dk", "Amiga 1000 Keyboard (Denmark)")
+DEFINE_DEVICE_TYPE_PRIVATE(A1000_KBD_GB, device_amiga_keyboard_interface, a1000_keyboard_gb, "a1000kbd_gb", "Amiga 1000 Keyboard (UK)")
 
 DEFINE_DEVICE_TYPE_PRIVATE(A2000_KBD_US, device_amiga_keyboard_interface, a2000_keyboard_us, "a2000kbd_us", "Amiga 2000/3000/4000 Keyboard (U.S./Canada)")
 DEFINE_DEVICE_TYPE_PRIVATE(A2000_KBD_DE, device_amiga_keyboard_interface, a2000_keyboard_de, "a2000kbd_de", "Amiga 2000/3000/4000 Keyboard (Germany/Austria)")

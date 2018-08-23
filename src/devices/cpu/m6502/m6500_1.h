@@ -11,6 +11,28 @@
     * Four eight-bit open drain I/O ports
     * Sixteen-bit programmable counter/latch
 
+                            _____   _____
+                   Vrr   1 |*    \_/     | 40  /NMI
+                   PD7   2 |             | 38  /RES
+                   PD6   3 |             | 38  PA0
+                   PD5   4 |             | 37  PA1
+                   PD4   5 |             | 36  PA2
+                   PD3   6 |             | 35  PA3
+                   PD2   7 |             | 34  PA4
+                   PD1   8 |             | 33  PA5
+                   PD0   9 |             | 32  PA6
+                  XTLI  10 |   6500/1    | 31  PA7
+                  XTLO  11 |             | 30  Vcc
+                   Vss  12 |             | 29  PB0
+                   PC7  13 |             | 28  PB1
+                   PC6  14 |             | 27  PB2
+                   PC5  15 |             | 26  PB3
+                   PC4  16 |             | 25  PB4
+                   PC3  17 |             | 24  PB5
+                   PC2  18 |             | 23  PB6
+                   PC1  19 |             | 22  PB7
+                   PC0  20 |_____________| 21  CNTR
+
 ***************************************************************************/
 #ifndef MAME_CPU_M6502_M6500_1_H
 #define MAME_CPU_M6502_M6500_1_H
@@ -59,8 +81,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-    virtual u64 execute_clocks_to_cycles(u64 clocks) const override;
-    virtual u64 execute_cycles_to_clocks(u64 cycles) const override;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override;
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override;
 
 	virtual void state_import(device_state_entry const &entry) override;
 	virtual void state_export(device_state_entry const &entry) override;
@@ -84,6 +106,7 @@ protected:
 	u64 update_counter(u64 current_time);
 	bool should_count() const;
 	bool pulse_generator_mode() const;
+	bool event_counter_mode() const;
 	TIMER_CALLBACK_MEMBER(set_cntr_in);
 	void toggle_cntr();
 

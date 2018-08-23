@@ -7,7 +7,7 @@
     Mitsumi keyboards with MOS MCU and 15-row matrix:
     * A500 keyboard (watchdog, crystal, reset line)
     * A600 keyboard (no keypad, no watchdog, crystal, reset line)
-    * A2000/A3000 keyboard (watchdog, ceramic resonator)
+    * A2000/A3000/A4000/CDTV keyboard (watchdog, ceramic resonator)
 
 ***************************************************************************/
 #ifndef MAME_BUS_AMIGA_KEYBOARD_MITSUMI_H
@@ -29,6 +29,14 @@ DECLARE_DEVICE_TYPE(A500_KBD_DK, device_amiga_keyboard_interface)
 DECLARE_DEVICE_TYPE(A500_KBD_CH, device_amiga_keyboard_interface)
 DECLARE_DEVICE_TYPE(A500_KBD_NO, device_amiga_keyboard_interface)
 DECLARE_DEVICE_TYPE(A500_KBD_GB, device_amiga_keyboard_interface)
+
+DECLARE_DEVICE_TYPE(A1000_KBD_US, device_amiga_keyboard_interface)
+DECLARE_DEVICE_TYPE(A1000_KBD_DE, device_amiga_keyboard_interface)
+DECLARE_DEVICE_TYPE(A1000_KBD_FR, device_amiga_keyboard_interface)
+DECLARE_DEVICE_TYPE(A1000_KBD_IT, device_amiga_keyboard_interface)
+DECLARE_DEVICE_TYPE(A1000_KBD_SE, device_amiga_keyboard_interface)
+DECLARE_DEVICE_TYPE(A1000_KBD_DK, device_amiga_keyboard_interface)
+DECLARE_DEVICE_TYPE(A1000_KBD_GB, device_amiga_keyboard_interface)
 
 DECLARE_DEVICE_TYPE(A600_KBD_US, device_amiga_keyboard_interface)
 DECLARE_DEVICE_TYPE(A600_KBD_DE, device_amiga_keyboard_interface)

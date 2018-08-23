@@ -1450,7 +1450,7 @@ MACHINE_CONFIG_START(a1000_state::a1000)
 	amiga_base(config);
 
 	// keyboard
-	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a2000_us")
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", amiga_keyboard_devices, "a1000_us")
 	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
 	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
 

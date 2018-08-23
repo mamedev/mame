@@ -41,8 +41,22 @@
     * 2 - event counter: counter is incremented on rising CNTR edge
     * 3 - pulse width measurement: like mode 0 gated by CNTR (low)
 
+    According to the manual, the maximum rate that edges can be detected
+    on the CNTR pin in event counter mode is half the phase 2 clock
+    rate.  This suggests that an internal flag is set when a rasing edge
+    is detected on CNTR and reset when the counter is synchronously
+    decremented.  This is not emulated - for simplicity the counter is
+    asynchronously decremented on detecting a rising edge on CNTR.
+
+    The CNTR pin has an active low driver and internal passive pull-up.
+    The pull-up can be disabled as a mask option.
+
     Applying +10V to the /RES pin activates test mode, redirecting
     memory fetches to port C.
+
+    The 6570 and 6571 are compatible with the 6500/1.  Differences
+    appear to include the addition of an onboard power-on reset.  It
+    is unknown what other differences these devices have.
 
 ***************************************************************************/
 
@@ -436,11 +450,31 @@ bool m6500_1_device::pulse_generator_mode() const
 	return (m_cr & (CR_CMC0 | CR_CMC1)) == 0x01U;
 }
 
+bool m6500_1_device::event_counter_mode() const
+{
+	return (m_cr & (CR_CMC0 | CR_CMC1)) == 0x02U;
+}
+
 TIMER_CALLBACK_MEMBER(m6500_1_device::set_cntr_in)
 {
-	internal_update();
-	m_cntr_in = param ? 1U : 0U;
-	internal_update();
+	if (bool(m_cntr_in) != bool(param))
+	{
+		internal_update();
+		m_cntr_in = param ? 1U : 0U;
+		if (param && event_counter_mode())
+		{
+			if (m_counter)
+			{
+				--m_counter;
+			}
+			else
+			{
+				m_cr |= CR_CTRO;
+				m_counter = m_latch;
+			}
+		}
+		internal_update();
+	}
 }
 
 void m6500_1_device::toggle_cntr()
