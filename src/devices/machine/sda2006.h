@@ -9,18 +9,18 @@
 
 // sda2006_device
 
-class sda2006_device :   public device_t,
-							public device_nvram_interface
+class sda2006_device : public device_t,
+	public device_nvram_interface
 {
 public:
 	// construction/destruction
 	sda2006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// I/O operations
-	DECLARE_READ_LINE_MEMBER( read_data );
-	DECLARE_WRITE_LINE_MEMBER( write_data );
-	DECLARE_WRITE_LINE_MEMBER( write_clock );
-	DECLARE_WRITE_LINE_MEMBER( write_enable );
+	DECLARE_READ_LINE_MEMBER(read_data);
+	DECLARE_WRITE_LINE_MEMBER(write_data);
+	DECLARE_WRITE_LINE_MEMBER(write_clock);
+	DECLARE_WRITE_LINE_MEMBER(write_enable);
 
 protected:
 	// device-level overrides
@@ -38,19 +38,18 @@ private:
 		EEPROM_WRITE
 	};
 
-	 uint8_t m_latch;
-	 uint8_t m_current_address;
-	 uint32_t m_eeprom_state;
-	 uint8_t m_read_stream_pos;
-	 bool m_is_end_o_stream;
-	 uint8_t m_write_stream_length;
- 	 uint32_t m_write_stream;
-	 uint8_t m_write_state;
-	 uint8_t m_clock_state;
-	
-	 
-	 
-	 uint16_t m_eeprom_data[0x20];
+	uint8_t m_latch;
+	uint8_t m_current_address;
+	uint32_t m_eeprom_state;
+	uint8_t m_read_stream_pos;
+	bool m_is_end_o_stream;
+	uint8_t m_write_stream_length;
+	uint32_t m_write_stream;
+	uint8_t m_write_state;
+	uint8_t m_clock_state;
+
+	optional_memory_region m_region;
+	uint16_t m_eeprom_data[0x20];
 };
 
 

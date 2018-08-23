@@ -170,7 +170,7 @@
 
   
   Sound Board:
-  
+  (also used on some Pinball machines)
 
   IC9, EFO 90503 (seems a remarked TMS5220, speech synthesizer IC).
 
@@ -201,7 +201,7 @@
   - Verify video mixing (Press F2 to enter service mode, then press 1 + 2 to continue
     to settings screen. There's diagnostic color pattern at the top of screen)
   - Add sound hardware (ROM is missing)
-
+  - Quitting MAME while in service mode settings screen will invalidate settings
 
 ******************************************************************************/
 
@@ -476,6 +476,9 @@ ROM_START( nightmare )
 
 	ROM_REGION( 0x10000, "cdp1802_sound", 0 ) 
 	ROM_LOAD( "sound.bin",    0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x40, "eeprom", 0 ) 
+	ROM_LOAD( "eeprom", 0x00, 0x40, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
 ROM_END
 
-GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Nightmare", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Nightmare (Spain)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
