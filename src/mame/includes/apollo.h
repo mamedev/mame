@@ -36,6 +36,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "diserial.h"
+#include "screen.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
