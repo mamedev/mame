@@ -4585,10 +4585,8 @@ void athlonxp_device::device_reset()
 	m_cpuid_max_input_value_eax = 0x01;
 	m_cpu_version = REG32(EDX);
 
-	// [ 0:0] FPU on chip
-	// [ 4:4] Time Stamp Counter
-	// [ D:D] PTE Global Bit
-	m_feature_flags = 0x2383fbff;       // TODO: enable relevant flags here
+	// see FEATURE_FLAGS enum for bit names
+	m_feature_flags = 0x0383fbff;
 
 	CHANGE_PC(m_eip);
 }
