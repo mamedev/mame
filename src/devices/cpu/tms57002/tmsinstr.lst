@@ -232,7 +232,7 @@ lmld 1  32 1 n
 lpc  2a 31 1 n
 	lpc %c
 	if(sti & S_HOST)
-	break;
+	return;
 	c = %c;
 	host[0] = c >> 24;
 	host[1] = c >> 16;
@@ -338,7 +338,7 @@ raov 2a 38 1 n
 rde  1  39 1 n
 	rde %c
 	if(sti & (S_READ|S_WRITE))
-	break;
+	return;
 	xoa = %c;
 	xm_init();
 	sti |= S_READ;
@@ -525,7 +525,7 @@ sub  1  0d 1 y
 wre  1  38 1 n
 	wre %d,%c
 	if(sti & (S_READ|S_WRITE))
-	break;
+	return;
 	xwr = %d24;
 	xoa = %c;
 	xm_init();

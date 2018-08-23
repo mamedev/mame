@@ -203,6 +203,10 @@ private:
 	short get_hashnode(unsigned char adr, uint32_t st1, short pnode);
 	int decode_get_pc();
 	uint32_t get_cmem(uint8_t addr);
+
+#define CINTRPDECL
+#include "../../emu/cpu/tms57002/tms57002.hxx"
+#undef CINTRPDECL
 };
 
 enum {

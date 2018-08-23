@@ -2345,11 +2345,13 @@ if (CPUS["TMS57002"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57002.cpp",
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57002.h",
+		MAME_DIR .. "src/devices/cpu/tms57002/tmsops.cpp",
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57kdec.cpp",
 	}
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tms57kdec.cpp", GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tms57002.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsops.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" },
 	}
 	custombuildtask {
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx",   { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) $(<) $(@)" } }

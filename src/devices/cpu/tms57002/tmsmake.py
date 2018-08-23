@@ -268,13 +268,17 @@ class Instruction:
             for v in  VARIANT_CANONICAL_ORDER:
                 if v in flags_fixed:
                     vals.append("%s=%d" % (v, flags_fixed[v]))
-            out = ["case %d: // %s %s" % (no, self._name, " ".join(vals))]
+            out = ["void tms57002_device::ex_%d(const icd *i) // %s %s" % (no, self._name, " ".join(vals))]
+            out.append("{")
+            out.append("\tuint32_t c; (void)c;")
+            out.append("\tuint32_t d; (void)d;")
+            out.append("\tint64_t r; (void)r;")
             for line in self.PreprocessRunString():
                 exp = self.ExpandCintrp(line, flags_fixed)
                 # ensure we're not outputing a = a;
                 if not CheckSelfAssign(exp):
                     out.append(exp)
-            out.append("  break;")
+            out.append("}")
             out.append("")
             EmitWithPrefix(f, out, prefix)
             return no + 1
@@ -404,6 +408,21 @@ def EmitCintrp(f, ins_list):
     for i in ins_list:
         no = i.EmitCintrp(f, "", no)
     print("#endif", file=f)
+    return no
+    
+def EmitCintrpDecl(f, ins_list, no):
+    ins_list.sort(key=lambda x : (x._cat, x._id))
+    print("#ifdef CINTRPDECL", file=f)
+    for i in range(4, no):
+        print("void ex_%d(const icd *i);" % i, file=f)
+    print("#endif", file=f)
+    
+def EmitCintrpSwitch(f, ins_list, no):
+    ins_list.sort(key=lambda x : (x._cat, x._id))
+    print("#ifdef CINTRPSWITCH", file=f)
+    for i in range(4, no):
+        print("case %d: ex_%d(i); break;" % (i, i), file=f)
+    print("#endif", file=f)
 
 
 def CheckSelfAssign(line):
@@ -424,4 +443,6 @@ except Exception:
 
 EmitDasm(f, ins_list)
 EmitCdec(f, ins_list)
-EmitCintrp(f, ins_list)
+no = EmitCintrp(f, ins_list)
+EmitCintrpDecl(f, ins_list, no)
+EmitCintrpSwitch(f, ins_list, no)

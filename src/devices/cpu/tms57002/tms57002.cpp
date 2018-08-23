@@ -16,7 +16,6 @@
 
 DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
-// Can't use a DEVICE_ADDRESS_MAP, not yet anyway
 void tms57002_device::internal_pgm(address_map &map)
 {
 	map(0x00, 0xff).ram();
@@ -800,8 +799,6 @@ void tms57002_device::execute_run()
 		macc_write = macc;
 
 		for(;;) {
-			uint32_t c, d;
-			int64_t r;
 			const icd *i = cache.inst + ipc;
 
 			ipc = i->next;
@@ -821,9 +818,9 @@ void tms57002_device::execute_run()
 				++ca, ++id;
 				goto inst;
 
-#define CINTRP
+#define CINTRPSWITCH
 #include "cpu/tms57002/tms57002.hxx"
-#undef CINTRP
+#undef CINTRPSWITCH
 
 			default:
 				fatalerror("Unhandled opcode in tms57002_execute\n");
