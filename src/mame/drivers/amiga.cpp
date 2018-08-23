@@ -66,6 +66,14 @@ The power-on reset signal is also allowed to discharge C814, but we
 ignore this for simplicity.  Earlier boards use a 1N4148 signal diode,
 while later boards replace it with a PST518B at XU1.
 
+The equivalent circuit in the Amiga 1000 works similarly, but has
+different components:
+* 10µF/22kΩ (C104/R62) for timing /KBCLK pulse
+* 10µF/100kΩ (C105/R63) for minimum /KBRESET pulse duration
+* Thresholds of 2.499/2.501V and 2.474V/2.526V
+* BAS32L diode for power-on reset
+* This gives delays of 152ms, 176µs, and 704ms
+
 */
 
 DECLARE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device)
@@ -80,6 +88,14 @@ public:
 	}
 
 	auto kbrst_cb() { return m_kbrst_cb.bind(); }
+
+	a2000_kbreset_device &set_delays(attotime detect, attotime stray, attotime output)
+	{
+		m_detect_time = detect;
+		m_stray_time = stray;
+		m_output_time = output;
+		return *this;
+	}
 
 	DECLARE_WRITE_LINE_MEMBER(kbclk_w)
 	{
@@ -96,14 +112,14 @@ public:
 				if (!m_c814_charging)
 				{
 					m_c814_charging = 1U;
-					m_c814_timer->adjust(attotime::from_msec(1294)); // 0V to 3.57V
+					m_c814_timer->adjust(m_output_time); // 0V to 3.57V
 				}
 			}
 			else
 			{
 				// U805 pin 1 floating - allows C813 to charge
 				assert(0U == m_c813_level);
-				m_c813_timer->adjust(attotime::from_msec(112)); // 0V to 2V
+				m_c813_timer->adjust(m_detect_time); // 0V to 2V
 			}
 		}
 	}
@@ -138,7 +154,7 @@ private:
 	{
 		assert(2U > m_c813_level);
 		if (2U > ++m_c813_level)
-			m_c813_timer->adjust(attotime::from_msec(74)); // 2V to 2.86V
+			m_c813_timer->adjust(m_stray_time); // 2V to 2.86V
 
 		if ((m_kbrst ? 0U : 1U) < m_c813_level)
 		{
@@ -146,7 +162,7 @@ private:
 			if (2U > m_c813_level)
 			{
 				assert(m_c814_charging);
-				m_c814_timer->adjust(attotime::from_msec(1294)); // 0V to 3.57V
+				m_c814_timer->adjust(m_output_time); // 0V to 3.57V
 			}
 			else
 			{
@@ -171,9 +187,13 @@ private:
 		{
 			// threshold is bumped back up
 			m_kbrst_cb(m_kbrst = 0U);
-			m_c814_timer->adjust(attotime::from_msec(1294)); // 0V to 3.57V
+			m_c814_timer->adjust(m_output_time); // 0V to 3.57V
 		}
 	}
+
+	attotime m_detect_time = attotime::from_msec(112);
+	attotime m_stray_time = attotime::from_msec(74);
+	attotime m_output_time = attotime::from_msec(1294);
 
 	devcb_write_line m_kbrst_cb;
 
@@ -186,7 +206,7 @@ private:
 	u8 m_c814_charging = 1U; // U805 pin 2
 };
 
-DEFINE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device, "a2000kbrst", "Amiga 2000 keyboard reset circuit")
+DEFINE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device, "a2000kbrst", "Amiga 1000/2000 keyboard reset circuit")
 
 
 //**************************************************************************
@@ -1613,7 +1633,11 @@ MACHINE_CONFIG_START(a1000_state::a1000)
 	// keyboard
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1000_us"));
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a2000_kbreset_device::kbclk_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	A2000_KBRESET(config, "kbrst")
+			.set_delays(attotime::from_msec(152), attotime::from_usec(176), attotime::from_msec(704))
+			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
@@ -1650,7 +1674,9 @@ MACHINE_CONFIG_START(a2000_state::a2000)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kclk_handler().append("kbrst", FUNC(a2000_kbreset_device::kbclk_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
-	A2000_KBRESET(config, "kbrst").kbrst_cb().set(FUNC(a2000_state::kbreset_w));
+	A2000_KBRESET(config, "kbrst")
+			.set_delays(attotime::from_msec(112), attotime::from_msec(74), attotime::from_msec(1294))
+			.kbrst_cb().set(FUNC(a2000_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
