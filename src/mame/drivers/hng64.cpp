@@ -1471,7 +1471,7 @@ void hng64_state::init_ss64()
 	m_samsho64_3d_hack = 1;
 }
 
-void hng64_state::init_hng64_race()
+void hng64_state::init_hng64_drive()
 {
 	m_no_machine_error_code = 0x02;
 	init_hng64();
@@ -1479,7 +1479,7 @@ void hng64_state::init_hng64_race()
 
 void hng64_state::init_roadedge()
 {
-	init_hng64_race();
+	init_hng64_drive();
 	m_roadedge_3d_hack = 1;
 }
 
@@ -1821,7 +1821,7 @@ void hng64_state::machine_reset()
 
 WRITE8_MEMBER(hng64_state::ioport1_w)
 {
-	LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
+	//LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
 
 	/* Port bits
 	
@@ -1842,18 +1842,126 @@ WRITE8_MEMBER(hng64_state::ioport1_w)
 // it does write 0xff here before each set of reading, but before setting a new output address?
 WRITE8_MEMBER(hng64_state::ioport3_w)
 {
-	int addr = (m_port1&0xe0)>>5;
 
-	LOG("%s: ioport3_w %02x (to address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), data, addr, m_port1 & 0x1f);
+	if (m_port1 & 0x08) // 0x08 in port1 enables write? otherwise it writes 0xff to port 7 all the time, when port 7 is also lamps
+	{
+		int addr = (m_port1 & 0xe0) >> 5;
+		m_lamps->lamps_w(space, addr, data);
+	}
 }
+
 
 READ8_MEMBER(hng64_state::ioport3_r)
 {
 	int addr = (m_port1&0xe0)>>5;
 
 	//LOG("%s: ioport3_r (from address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), addr, m_port1 & 0x1f);
-	return m_intest[addr]->read();
+	return m_in[addr]->read();
 }
+
+DEFINE_DEVICE_TYPE(HNG64_LAMPS, hng64_lamps_device, "hng64_lamps", "HNG64 Lamps")
+
+hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, HNG64_LAMPS, tag, owner, clock)
+	, m_lamps_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+{
+}
+
+void hng64_lamps_device::device_start()
+{
+	for (auto &cb : m_lamps_out_cb)
+		cb.resolve_safe();
+}
+
+WRITE8_MEMBER(hng64_state::hng64_drive_lamps7_w)
+{
+	/* 
+	   0x80 - BGM Select #2 (Active High)
+	   0x40 - BGM Select #1 (Active High)
+	   0x20
+	   0x10
+	   0x08
+	   0x04
+	   0x02
+	   0x01
+	*/
+}
+
+WRITE8_MEMBER(hng64_state::hng64_drive_lamps6_w)
+{
+	/* 
+	   0x80 - BGM Select #4 (Active High)
+	   0x40 - BGM Select #3 (Active High)
+	   0x20 - Winning Lamp (0x00 = ON, 0x10 = Blink 1, 0x20 = Blink 2, 0x30 = OFF)
+	   0x10 -  ^^
+	   0x08 - Breaking Lamp (Active Low?)
+	   0x04 - Start Lamp (Active High)
+	   0x02
+	   0x01 - Coin Counter #1
+	*/
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+}
+
+WRITE8_MEMBER(hng64_state::hng64_drive_lamps5_w)
+{
+	// force feedback steering position
+}
+
+WRITE8_MEMBER(hng64_state::hng64_shoot_lamps7_w)
+{
+	/* 
+	   0x80 
+	   0x40 - Gun #3
+	   0x20 - Gun #2
+	   0x10 - Gun #1
+	   0x08
+	   0x04
+	   0x02
+	   0x01
+	*/
+}
+
+/*
+	Beast Busters 2 outputs (all written to offset 0x1c in dualport ram):
+	0x00000001 start #1
+	0x00000002 start #2
+	0x00000004 start #3
+	0x00001000 gun #1
+	0x00002000 gun #2
+	0x00004000 gun #3
+*/
+
+WRITE8_MEMBER(hng64_state::hng64_shoot_lamps6_w)
+{
+	// Start Lamp #1 / #2 don't get written to the output port, is this a TLCS870 bug or are they not connected to the 'lamp' outputs, they do get written to the DP ram, see above notes
+	/* 
+	   0x80 
+	   0x40
+	   0x20
+	   0x10
+	   0x08
+	   0x04 - Start Lamp #3
+	   0x02
+	   0x01
+	*/
+}
+
+WRITE8_MEMBER(hng64_state::hng64_fight_lamps6_w)
+{
+	/* 
+	   0x80 
+	   0x40
+	   0x20
+	   0x10
+	   0x08
+	   0x04 
+	   0x02 - Coin Counter #2
+	   0x01 - Coin Counter #1
+	*/
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+}
+
 
 /***********************************************
 
@@ -1943,14 +2051,14 @@ WRITE8_MEMBER(hng64_state::ioport4_w)
 
 ***********************************************/
 
-READ8_MEMBER(hng64_state::anport0_r) { return ioport("AN0")->read(); }
-READ8_MEMBER(hng64_state::anport1_r) { return ioport("AN1")->read(); }
-READ8_MEMBER(hng64_state::anport2_r) { return ioport("AN2")->read(); }
-READ8_MEMBER(hng64_state::anport3_r) { return ioport("AN3")->read(); }
-READ8_MEMBER(hng64_state::anport4_r) { return ioport("AN4")->read(); }
-READ8_MEMBER(hng64_state::anport5_r) { return ioport("AN5")->read(); }
-READ8_MEMBER(hng64_state::anport6_r) { return ioport("AN6")->read(); }
-READ8_MEMBER(hng64_state::anport7_r) { return ioport("AN7")->read(); }
+READ8_MEMBER(hng64_state::anport0_r) { return m_an_in[0]->read(); }
+READ8_MEMBER(hng64_state::anport1_r) { return m_an_in[1]->read(); }
+READ8_MEMBER(hng64_state::anport2_r) { return m_an_in[2]->read(); }
+READ8_MEMBER(hng64_state::anport3_r) { return m_an_in[3]->read(); }
+READ8_MEMBER(hng64_state::anport4_r) { return m_an_in[4]->read(); }
+READ8_MEMBER(hng64_state::anport5_r) { return m_an_in[5]->read(); }
+READ8_MEMBER(hng64_state::anport6_r) { return m_an_in[6]->read(); }
+READ8_MEMBER(hng64_state::anport7_r) { return m_an_in[7]->read(); }
 
 /***********************************************
 
@@ -2035,7 +2143,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	iomcu.p0_out_cb().set(FUNC(hng64_state::ioport0_w)); // writes to shared ram
 	iomcu.p1_out_cb().set(FUNC(hng64_state::ioport1_w));  // configuration / clocking for input port (port 3) accesses
 	//iomcu.p2_out_cb().set(FUNC(hng64_state::ioport2_w)); // the IO MCU uses EXTINT0 which shares one of the pins on this port, but the port is not used for IO
-	iomcu.p3_out_cb().set(FUNC(hng64_state::ioport3_w)); // writes to input ports? maybe lamps, coin counters etc.?
+	iomcu.p3_out_cb().set(FUNC(hng64_state::ioport3_w)); // writes to ports for lamps, coin counters, force feedback etc.
 	iomcu.p4_out_cb().set(FUNC(hng64_state::ioport4_w)); // unknown, lower 2 IO bits accessed along with serial accesses
 	//iomcu.p5_out_cb().set(FUNC(hng64_state::ioport5_w));  // simply seems to be unused, neither used for an IO port, nor any of the other features
 	//iomcu.p6_out_cb().set(FUNC(hng64_state::ioport6_w)); // the IO MCU code uses the ADC which shares pins with port 6, meaning port 6 isn't used as an IO port
@@ -2055,7 +2163,44 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 
 	MCFG_DEVICE_ADD("dt71321_dpram", IDT71321, 0)
 	//MCFG_MB8421_INTL_AN0R(INPUTLINE("xxx", 0)) // I don't think the IRQs are connected
+MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(hng64_state::hng64_default)
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps0_out_cb().set(FUNC(hng64_state::hng64_default_lamps0_w));
+	lamps.lamps1_out_cb().set(FUNC(hng64_state::hng64_default_lamps1_w));
+	lamps.lamps2_out_cb().set(FUNC(hng64_state::hng64_default_lamps2_w));
+	lamps.lamps3_out_cb().set(FUNC(hng64_state::hng64_default_lamps3_w));
+	lamps.lamps4_out_cb().set(FUNC(hng64_state::hng64_default_lamps4_w));
+	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_default_lamps5_w));
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_default_lamps6_w));
+	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_default_lamps7_w));
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(hng64_state::hng64_drive)
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_drive_lamps5_w)); // force feedback steering
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_drive_lamps6_w)); // lamps + coin counter
+	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_drive_lamps7_w)); // lamps
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(hng64_state::hng64_shoot)
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some misisng?!)
+	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(hng64_state::hng64_fight)
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_fight_lamps6_w)); // coin counters
 MACHINE_CONFIG_END
 
 
@@ -2509,13 +2654,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,     hng64, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,     hng64_default, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64, hng64, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64, hng64, hng64_drive,    hng64_state, init_hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64, hng64, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64, hng64, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64, hng64, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64, hng64, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64, hng64_drive, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64, hng64_drive, hng64_drive,    hng64_state, init_hng64_drive,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64, hng64_shoot, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
+GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */

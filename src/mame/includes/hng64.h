@@ -126,6 +126,31 @@ private:
 };
 
 
+// TODO, this could become the IO board device emulation
+class hng64_lamps_device : public device_t
+{
+public:
+	hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto lamps0_out_cb() { return m_lamps_out_cb[0].bind(); }
+	auto lamps1_out_cb() { return m_lamps_out_cb[1].bind(); }
+	auto lamps2_out_cb() { return m_lamps_out_cb[2].bind(); }
+	auto lamps3_out_cb() { return m_lamps_out_cb[3].bind(); }
+	auto lamps4_out_cb() { return m_lamps_out_cb[4].bind(); }
+	auto lamps5_out_cb() { return m_lamps_out_cb[5].bind(); }
+	auto lamps6_out_cb() { return m_lamps_out_cb[6].bind(); }
+	auto lamps7_out_cb() { return m_lamps_out_cb[7].bind(); }
+
+	DECLARE_WRITE8_MEMBER(lamps_w) { m_lamps_out_cb[offset](data); }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	devcb_write8  m_lamps_out_cb[8];
+};
+
+
 class hng64_state : public driver_device
 {
 public:
@@ -136,6 +161,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_iomcu(*this, "iomcu"),
+		m_lamps(*this, "lamps"),
 		m_dt71321_dpram(*this, "dt71321_dpram"),
 		m_dsp(*this, "l7a1045"),
 		m_comm(*this, "network"),
@@ -155,15 +181,20 @@ public:
 		m_fbram2(*this, "fbram2"),
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_intest(*this, "IN%u", 0U),
+		m_in(*this, "IN%u", 0U),
+		m_an_in(*this, "AN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0)
 	{}
 
 	void hng64(machine_config &config);
+	void hng64_default(machine_config &config);
+	void hng64_drive(machine_config &config);
+	void hng64_shoot(machine_config &config);
+	void hng64_fight(machine_config &config);
 
 	void init_roadedge();
-	void init_hng64_race();
+	void init_hng64_drive();
 	void init_hng64();
 	void init_hng64_shoot();
 	void init_ss64();
@@ -189,6 +220,7 @@ private:
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
 	required_device<tmp87ph40an_device> m_iomcu;
+	required_device<hng64_lamps_device> m_lamps;
 	required_device<idt71321_device> m_dt71321_dpram;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<cpu_device> m_comm;
@@ -215,7 +247,27 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	optional_ioport_array<8> m_intest;
+	required_ioport_array<8> m_in;
+	required_ioport_array<8> m_an_in;
+
+
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps0_w) { logerror("lamps0 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps1_w) { logerror("lamps1 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps2_w) { logerror("lamps2 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps3_w) { logerror("lamps3 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps4_w) { logerror("lamps4 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps5_w) { logerror("lamps5 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps6_w) { logerror("lamps6 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps7_w) { logerror("lamps7 %02x\n", data); }
+
+	DECLARE_WRITE8_MEMBER(hng64_drive_lamps7_w);
+	DECLARE_WRITE8_MEMBER(hng64_drive_lamps6_w);
+	DECLARE_WRITE8_MEMBER(hng64_drive_lamps5_w);
+
+	DECLARE_WRITE8_MEMBER(hng64_shoot_lamps7_w);
+	DECLARE_WRITE8_MEMBER(hng64_shoot_lamps6_w);
+
+	DECLARE_WRITE8_MEMBER(hng64_fight_lamps6_w);
 
 	int m_samsho64_3d_hack;
 	int m_roadedge_3d_hack;
