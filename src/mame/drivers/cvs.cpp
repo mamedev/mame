@@ -1564,6 +1564,8 @@ READ8_MEMBER(cvs_state::huncholy_prot_r)
 void cvs_state::init_huncholy()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(FUNC(cvs_state::huncholy_prot_r),this));
+
+	save_item(NAME(m_protection_counter));
 }
 
 
@@ -1587,6 +1589,8 @@ void cvs_state::init_superbik()
 {
 	m_protection_counter = 0;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(FUNC(cvs_state::superbik_prot_r),this));
+
+	save_item(NAME(m_protection_counter));
 }
 
 
