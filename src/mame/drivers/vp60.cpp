@@ -62,7 +62,7 @@ void vp60_state::mem_map(address_map &map)
 void vp60_state::io_map(address_map &map)
 {
 	map(0x8000, 0x87ff).ram();
-	map(0xc000, 0xc000).select(0x100).rw(FUNC(vp60_state::crtc_r), FUNC(vp60_state::crtc_w));
+	map(0xc000, 0xc000).select(0x100).mirror(0xff).rw(FUNC(vp60_state::crtc_r), FUNC(vp60_state::crtc_w));
 }
 
 void vp60_state::kbd_map(address_map &map)
@@ -108,6 +108,17 @@ ROM_START( vp60 )
 	ROM_LOAD( "p8051.ub1",  0x0000, 0x1000, NO_DUMP ) // internal ROM not dumped
 	ROM_LOAD( "pgm.uc1",    0x2000, 0x1000, CRC(714ca569) SHA1(405424369fd5458e02c845c104b2cb386bd857d2) )
 	ROM_CONTINUE(           0x1000, 0x1000 )
+	// Stubs filling in for missing code
+	ROM_FILL( 0x0000, 1, 0x02 )
+	ROM_FILL( 0x0001, 1, 0x10 )
+	ROM_FILL( 0x0002, 1, 0x09 )
+	ROM_FILL( 0x005d, 1, 0x02 )
+	ROM_FILL( 0x005e, 1, 0x27 )
+	ROM_FILL( 0x005f, 1, 0x2e )
+	ROM_FILL( 0x0100, 1, 0x22 )
+	ROM_FILL( 0x0500, 1, 0x22 )
+	ROM_FILL( 0x0600, 1, 0x22 )
+	ROM_FILL( 0x0800, 1, 0x22 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "font.uc4",   0x0000, 0x1000, CRC(3c4d39c0) SHA1(9503c0d5a76e8073c94c86be57bcb312641f6cc4) )
