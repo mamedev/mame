@@ -41,8 +41,7 @@
 
 // ======================> i8155_device
 
-class i8155_device :    public device_t,
-						public device_memory_interface
+class i8155_device : public device_t
 {
 public:
 	// construction/destruction
@@ -74,8 +73,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual space_config_vector memory_space_config() const override;
-
 private:
 	devcb_read8        m_in_pa_cb;
 	devcb_read8        m_in_pb_cb;
@@ -96,6 +93,9 @@ private:
 	uint8_t m_command;          // command register
 	uint8_t m_status;           // status register
 	uint8_t m_output[3];        // output latches
+
+	// RAM
+	std::unique_ptr<uint8_t[]> m_ram;
 
 	// counter
 	uint16_t m_count_length;    // count length register (assigned)
@@ -118,8 +118,6 @@ private:
 	inline void write_port(int port, uint8_t data);
 
 	void register_w(int offset, uint8_t data);
-
-	void i8155(address_map &map);
 };
 
 

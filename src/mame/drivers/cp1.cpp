@@ -244,7 +244,7 @@ void cp1_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 {
-	uint8_t *dest = (uint8_t*)m_i8155->space().get_read_ptr(0);
+	address_space &space = machine().dummy_space();
 	char line[0x10];
 	int addr = 0;
 	while (image.fgets(line, 10) && addr < 0x100)
@@ -252,8 +252,8 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 		int op = 0, arg = 0;
 		if (sscanf(line, "%d.%d", &op, &arg) == 2)
 		{
-			dest[addr++] = op;
-			dest[addr++] = arg;
+			m_i8155->memory_w(space, addr++, op);
+			m_i8155->memory_w(space, addr++, arg);
 		}
 		else
 		{
