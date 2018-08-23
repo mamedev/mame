@@ -111,7 +111,7 @@ public:
 	netdev_pcap(const char *name, class device_network_interface *ifdev, int rate);
 	~netdev_pcap();
 
-	virtual int send_dev(uint8_t *buf, int len) override;
+	virtual int send(uint8_t *buf, int len) override;
 	virtual void set_mac(const char *mac) override;
 protected:
 	virtual int recv_dev(uint8_t **buf) override;
@@ -198,7 +198,7 @@ void netdev_pcap::set_mac(const char *mac)
 	}
 }
 
-int netdev_pcap::send_dev(uint8_t *buf, int len)
+int netdev_pcap::send(uint8_t *buf, int len)
 {
 	int ret;
 	if(!m_p) {

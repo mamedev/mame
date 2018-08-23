@@ -22,9 +22,10 @@ public:
 	};
 	osd_netdev(class device_network_interface *ifdev, int rate);
 	virtual ~osd_netdev();
+	void start();
 	void stop();
 
-	int send(uint8_t *buf, int len);
+	virtual int send(uint8_t *buf, int len);
 	virtual void set_mac(const char *mac);
 	virtual void set_promisc(bool promisc);
 
@@ -32,7 +33,6 @@ public:
 	bool get_promisc();
 
 protected:
-	virtual int send_dev(uint8_t *buf, int len);
 	virtual int recv_dev(uint8_t **buf);
 
 private:
@@ -40,7 +40,6 @@ private:
 
 	class device_network_interface *m_dev;
 	emu_timer *m_timer;
-	bool m_stop;
 };
 
 class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);

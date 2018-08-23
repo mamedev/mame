@@ -56,7 +56,7 @@ public:
 	netdev_tap(const char *name, class device_network_interface *ifdev, int rate);
 	~netdev_tap();
 
-	int send_dev(uint8_t *buf, int len) override;
+	int send(uint8_t *buf, int len) override;
 	void set_mac(const char *mac);
 protected:
 	int recv_dev(uint8_t **buf) override;
@@ -142,14 +142,14 @@ void netdev_tap::set_mac(const char *mac)
 static u32 finalise_frame(u8 buf[], u32 length)
 {
 	/*
-	* On Windows, the taptun driver receives frames which are shorter
-	* than the Ethernet minimum. Partly this is because it can't see
-	* the frame check sequence bytes, but mainly it's because NDIS
-	* expects the lower level device to add the required padding.
-	* We do the equivalent padding here (i.e. pad with zeroes to the
-	* minimum Ethernet length minus FCS), so that devices which check
-	* for this will not reject these packets.
-	*/
+	 * On Windows, the taptun driver receives frames which are shorter
+	 * than the Ethernet minimum. Partly this is because it can't see
+	 * the frame check sequence bytes, but mainly it's because NDIS
+	 * expects the lower level device to add the required padding.
+	 * We do the equivalent padding here (i.e. pad with zeroes to the
+	 * minimum Ethernet length minus FCS), so that devices which check
+	 * for this will not reject these packets.
+	 */
 	if (length < ETHERNET_MIN_FRAME - 4)
 	{
 		std::fill_n(&buf[length], ETHERNET_MIN_FRAME - length - 4, 0);
@@ -168,7 +168,7 @@ static u32 finalise_frame(u8 buf[], u32 length)
 	return length;
 }
 
-int netdev_tap::send_dev(uint8_t *buf, int len)
+int netdev_tap::send(uint8_t *buf, int len)
 {
 	OVERLAPPED overlapped = {};
 
@@ -309,7 +309,7 @@ static std::vector<std::wstring> get_tap_adapters()
 	return result;
 }
 #else
-int netdev_tap::send_dev(uint8_t *buf, int len)
+int netdev_tap::send(uint8_t *buf, int len)
 {
 	if(m_fd == -1) return 0;
 	len = write(m_fd, buf, len);
