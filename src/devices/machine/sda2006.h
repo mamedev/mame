@@ -48,7 +48,7 @@ private:
 	uint8_t m_write_state;
 	uint8_t m_clock_state;
 
-	optional_memory_region      m_region;
+	optional_memory_region m_region;
 	uint16_t m_eeprom_data[0x20];
 };
 
