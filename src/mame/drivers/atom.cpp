@@ -738,9 +738,9 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, atom_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, atom_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8271_TAG, I8271 , 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, atom_state, atom_8271_interrupt_callback))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, atom_state, motor_w))
+	I8271(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
+	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
