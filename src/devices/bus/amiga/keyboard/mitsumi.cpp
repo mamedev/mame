@@ -84,6 +84,10 @@
 
 namespace {
 
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
+
 ROM_START(keyboard_old)
 	ROM_REGION(0x0800, "mcu", 0)
 	ROM_LOAD("6500-1", 0x0000, 0x0800, CRC(4a3fc332) SHA1(83b21d0c8b93fc9b9b3b287fde4ec8f3badac5a2) BAD_DUMP) // using newer program until we get a dump
@@ -94,6 +98,10 @@ ROM_START(keyboard_new)
 	ROM_LOAD("6570-036", 0x0000, 0x0800, CRC(4a3fc332) SHA1(83b21d0c8b93fc9b9b3b287fde4ec8f3badac5a2))
 ROM_END
 
+
+//**************************************************************************
+//  KEYBOARD BASE CLASSES
+//**************************************************************************
 
 class mitsumi_keyboard_base : public device_t, public device_amiga_keyboard_interface
 {
@@ -400,6 +408,10 @@ protected:
 };
 
 
+//**************************************************************************
+//  COMMON PORT DEFINITIONS
+//**************************************************************************
+
 INPUT_PORTS_START(fullsize_cols)
 	PORT_START("COLS")
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, cols_r, nullptr)
@@ -427,6 +439,10 @@ INPUT_PORTS_START(mitsumi_meta)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))     PORT_NAME("Right Shift")
 INPUT_PORTS_END
 
+
+//**************************************************************************
+//  A1000 KEYBOARD PORT DEFINITIONS
+//**************************************************************************
 
 INPUT_PORTS_START(a1000_us)
 	PORT_INCLUDE(fullsize_cols)
@@ -498,6 +514,10 @@ INPUT_PORTS_START(a1000_gb)
 INPUT_PORTS_END
 
 
+//**************************************************************************
+//  FULL SIZE KEYBOARD PORT DEFINITIONS
+//**************************************************************************
+
 INPUT_PORTS_START(fullsize_us)
 	PORT_INCLUDE(fullsize_cols)
 	PORT_INCLUDE(mitsumi_meta)
@@ -558,6 +578,10 @@ INPUT_PORTS_START(fullsize_gb)
 	bus::amiga::keyboard::construct_ioport_matrix_gb(owner, portlist, errorbuf);
 INPUT_PORTS_END
 
+
+//**************************************************************************
+//  COMPACT KEYBOARD PORT DEFINITIONS
+//**************************************************************************
 
 INPUT_PORTS_START(compact_us)
 	PORT_INCLUDE(compact_cols)
@@ -629,6 +653,10 @@ INPUT_PORTS_START(compact_gb)
 	bus::amiga::keyboard::construct_ioport_remove_keypad(owner, portlist, errorbuf);
 INPUT_PORTS_END
 
+
+//**************************************************************************
+//  A500 KEYBOARD CLASSES
+//**************************************************************************
 
 class a500_keyboard_us : public a500_keyboard_base
 {
@@ -741,6 +769,10 @@ protected:
 };
 
 
+//**************************************************************************
+//  A600 KEYBOARD CLASSES
+//**************************************************************************
+
 class a600_keyboard_us : public a600_keyboard_base
 {
 public:
@@ -852,6 +884,10 @@ protected:
 };
 
 
+//**************************************************************************
+//  A1000 KEYBOARD CLASSES
+//**************************************************************************
+
 class a1000_keyboard_us : public a1000_keyboard_base
 {
 public:
@@ -929,6 +965,10 @@ protected:
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(a1000_gb); }
 };
 
+
+//**************************************************************************
+//  A2000/A3000/A4000/CDTV KEYBOARD CLASSES
+//**************************************************************************
 
 class a2000_keyboard_us : public mitsumi_watchdog_keyboard_base
 {
