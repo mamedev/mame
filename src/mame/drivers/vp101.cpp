@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(vp10x_state::vp101)
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 	m_ata->dmarq_handler().set(FUNC(vp10x_state::dmarq_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vp10x_state::vp50)
@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(vp10x_state::vp50)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START(jnero)

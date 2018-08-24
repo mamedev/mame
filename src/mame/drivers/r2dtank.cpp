@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_DEVICE_ADD("audiocpu", M6802,3000000)         /* ?? */
 	MCFG_DEVICE_PROGRAM_MAP(r2dtank_audio_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

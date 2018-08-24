@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(re900_state::re900)
 	//vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware   */
 	SPEAKER(config, "mono").front_center();

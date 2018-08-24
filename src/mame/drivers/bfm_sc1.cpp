@@ -1088,7 +1088,7 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	config.set_default_layout(layout_sc1_vfd);
 
 	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)

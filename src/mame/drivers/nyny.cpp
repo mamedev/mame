@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_DEVICE_ADD("audio2", M6802, AUDIO_CPU_2_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(nyny_audio_2_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

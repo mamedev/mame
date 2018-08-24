@@ -1304,7 +1304,7 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)

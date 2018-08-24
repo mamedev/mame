@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(pda600_state::pda600)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	MCFG_DEVICE_ADD("rtc", HD64610, XTAL(32'768))
 MACHINE_CONFIG_END

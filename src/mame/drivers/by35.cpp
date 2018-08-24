@@ -1097,7 +1097,7 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_DEVICE_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_DEVICE_PROGRAM_MAP(by35_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
 	config.set_default_layout(layout_by35);

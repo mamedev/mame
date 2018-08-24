@@ -4203,7 +4203,7 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
+//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);    // no battery
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4256,7 +4256,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4330,7 +4330,7 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::hnoridur_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4398,7 +4398,7 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::hjingi_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4466,7 +4466,7 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4532,7 +4532,7 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_mainlatch); // IC15
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::mjdialq2_blit_dest1_w));
@@ -4600,8 +4600,6 @@ MACHINE_CONFIG_START(dynax_state::yarunara)
 
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(yarunara_banked_map)
-
-	MCFG_NVRAM_REPLACE_0FILL("nvram")
 
 	MCFG_DEVICE_REMOVE("outlatch") // ???
 
@@ -4689,7 +4687,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4873,7 +4871,7 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_mainlatch); // 10C on Ougon no Hai
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)).invert();
@@ -4947,7 +4945,7 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::mjdialq2_blit_dest1_w));

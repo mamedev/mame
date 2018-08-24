@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	MCFG_DEVICE_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

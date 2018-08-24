@@ -335,7 +335,7 @@ MACHINE_CONFIG_START(risc2500_state::risc2500)
 
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("128K, 256K, 512K, 1M, 2M");
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -1471,7 +1471,7 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	MCFG_DEVICE_IO_MAP(lucky74_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// Each 82C255 behaves like 2x 8255 (in mode 0). Since MAME doesn't support it yet, I replaced
 	// both 82C255 with 4x 8255...

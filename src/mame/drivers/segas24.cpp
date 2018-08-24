@@ -1925,10 +1925,11 @@ void segas24_state::mahmajn(machine_config &config)
 	io.out_pd_callback().set(FUNC(segas24_state::mahmajn_mux_w));
 }
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy)
+void segas24_state::system24_floppy(machine_config &config)
+{
 	system24(config);
-	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "floppy_nvram", nvram_device::DEFAULT_NONE);
+}
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
 	system24_floppy(config);

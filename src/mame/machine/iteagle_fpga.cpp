@@ -52,8 +52,8 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 }
 
 MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
-	MCFG_NVRAM_ADD_1FILL("eagle1_bram")
+	NVRAM(config, "eagle2_rtc", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "eagle1_bram", nvram_device::DEFAULT_ALL_1);
 
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
@@ -787,9 +787,10 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 // Attached Peripheral Controller
 //************************************
 
-MACHINE_CONFIG_START(iteagle_periph_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_0FILL("eagle1_rtc")
-MACHINE_CONFIG_END
+void iteagle_periph_device::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, "eagle1_rtc", nvram_device::DEFAULT_ALL_0);
+}
 
 DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITEagle Peripheral Controller")
 

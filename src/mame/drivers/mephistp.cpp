@@ -166,7 +166,7 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_DEVICE_PROGRAM_MAP(mephisto_map)
 	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	//MCFG_DEVICE_ADD("muart", I8256, XTAL(18'000'000)/3)
 	//MCFG_I8256_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

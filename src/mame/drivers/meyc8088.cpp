@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 	i8155_2.out_pc_callback().set(FUNC(meyc8088_state::common_w));
 	i8155_2.out_to_callback().set("dac", FUNC(dac_bit_interface::write));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD("heartbeat", meyc8088_state, heartbeat_callback)
 

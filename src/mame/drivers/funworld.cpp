@@ -3071,7 +3071,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_DEVICE_ADD("maincpu", M65SC02, CPU_CLOCK)    /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	pia6821_device &pia0(PIA6821(config, "pia0", 0));
 	pia0.readpa_handler().set_ioport("IN0");

@@ -1927,7 +1927,7 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, fidel6502_state, eas_ppi_portb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidel6502_state, eas_ppi_portc_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_eas);

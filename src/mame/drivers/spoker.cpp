@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 	MCFG_DEVICE_IO_MAP(spoker_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)  // Control 0x8b --> A:out; B:input; C:input.
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spoker_state, nmi_and_coins_w))

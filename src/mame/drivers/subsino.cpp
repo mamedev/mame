@@ -2897,7 +2897,7 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("INB"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("INA"))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */

@@ -3349,7 +3349,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 //----------------------------------------------------------------------------------------

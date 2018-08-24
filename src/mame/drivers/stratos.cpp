@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(stratos_state::stratos)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", stratos_state, irq_timer, attotime::from_hz(1000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( stratos )

@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -1492,7 +1492,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
@@ -1750,7 +1750,7 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 
 	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5114 + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)

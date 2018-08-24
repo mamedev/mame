@@ -1094,7 +1094,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

@@ -4321,7 +4321,7 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(goldnpkr_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::goldnpkr_mux_port_r));

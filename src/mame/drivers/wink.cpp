@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_DEVICE_IO_MAP(wink_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

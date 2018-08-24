@@ -2290,8 +2290,8 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_vid_state, e2ram_init)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
 	config.set_default_layout(layout_sc2_vid);
 
 	MCFG_BFM_ADDER2_ADD("adder2")
@@ -3767,8 +3767,8 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_awp_state, e2ram_init)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_awp_state::e2ram_init));
 
 	/* video hardware */
 	config.set_default_layout(layout_sc2_vfd);
@@ -3824,8 +3824,8 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_dmd_state, e2ram_init)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_dmd_state::e2ram_init));
 
 	/* video hardware */
 	config.set_default_layout(layout_sc2_dmd);

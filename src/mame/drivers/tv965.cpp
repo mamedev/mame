@@ -75,7 +75,7 @@ MACHINE_CONFIG_START(tv965_state::tv965)
 	MCFG_DEVICE_DATA_MAP(mem_map)
 	MCFG_DEVICE_PROGRAM_MAP(program_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // CXK5864BP-10L + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5864BP-10L + battery
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(26.9892_MHz_XTAL, 1020, 0, 800, 441, 0, 416)

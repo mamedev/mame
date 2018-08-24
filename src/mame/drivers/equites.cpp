@@ -1200,7 +1200,7 @@ MACHINE_CONFIG_START(gekisou_state::gekisou)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
 
 	// gekisou has battery-backed RAM to store settings
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 

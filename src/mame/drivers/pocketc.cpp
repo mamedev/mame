@@ -727,8 +727,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(pocketc_state::pocketc)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_NVRAM_ADD_0FILL("cpu_nvram")
-	MCFG_NVRAM_ADD_0FILL("ram_nvram")
+	NVRAM(config, "cpu_nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "ram_nvram", nvram_device::DEFAULT_ALL_0);
 
 	/*
 	   aim: show sharp with keyboard

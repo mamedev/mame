@@ -1241,10 +1241,11 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mitchell_state::pangnv)
+void mitchell_state::pangnv(machine_config &config)
+{
 	pang(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 
 static const gfx_layout blcharlayout =

@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(cesclassic_state::cesclassic)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("l_lcd", LCD)

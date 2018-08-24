@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 MACHINE_CONFIG_END
 
 

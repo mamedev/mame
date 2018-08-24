@@ -1216,12 +1216,12 @@ MACHINE_CONFIG_START(segaorun_state::outrundx)
 	MCFG_DEVICE_ADD("sprites", SEGA_OUTRUN_SPRITES, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segaorun_state::outrun)
+void segaorun_state::outrun(machine_config &config)
+{
 	outrundx(config);
 
-	// basic machine hardware
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(segaorun_state::outrun_fd1094)
 	outrun(config);
@@ -1254,7 +1254,7 @@ MACHINE_CONFIG_START(segaorun_state::shangon)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, segaorun_state, unknown_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segaorun_state, video_control_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")

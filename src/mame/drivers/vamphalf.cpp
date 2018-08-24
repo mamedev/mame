@@ -1275,7 +1275,7 @@ MACHINE_CONFIG_START(vamphalf_nvram_state::finalgdr)
 	MCFG_DEVICE_IO_MAP(finalgdr_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
@@ -1287,7 +1287,7 @@ MACHINE_CONFIG_START(vamphalf_nvram_state::mrkickera)
 	MCFG_DEVICE_IO_MAP(mrkickera_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END

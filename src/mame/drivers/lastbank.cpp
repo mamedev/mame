@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_audio_map)

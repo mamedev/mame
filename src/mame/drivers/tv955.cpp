@@ -91,7 +91,7 @@ MACHINE_CONFIG_START(tv955_state::tv955)
 
 	MCFG_DEVICE_ADD("keyboard", I8049, 5.7143_MHz_XTAL)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + 3.2V battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + 3.2V battery
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(19.3396_MHz_XTAL, 846, 0, 720, 381, 0, 364)

@@ -1325,7 +1325,7 @@ MACHINE_CONFIG_START(coinmstr_state::jpcoin)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(jpcoin_map)
 	MCFG_DEVICE_IO_MAP(jpcoin_io_map)
-//  MCFG_NVRAM_ADD_0FILL("attr_ram3")
+//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /*

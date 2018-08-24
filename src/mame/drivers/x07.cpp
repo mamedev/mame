@@ -1509,8 +1509,8 @@ MACHINE_CONFIG_START(x07_state::x07)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink_timer", x07_state, blink_timer, attotime::from_msec(300))
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", x07_state, nvram_init)   // t6834 RAM
-	MCFG_NVRAM_ADD_0FILL("nvram2") // RAM banks
+	NVRAM(config, "nvram1").set_custom_handler(FUNC(x07_state::nvram_init));   // t6834 RAM
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM banks
 
 	/* internal ram */
 	// 8KB  no expansion

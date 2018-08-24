@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 	MCFG_DEVICE_PROGRAM_MAP(jp_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_latch[0]);
 	m_latch[0]->q_out_cb<1>().set(FUNC(jp_state::disp_data_w)).invert();

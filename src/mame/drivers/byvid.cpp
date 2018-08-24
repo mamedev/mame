@@ -765,7 +765,7 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia_u7, 0);
 	m_pia_u7->readpa_handler().set(FUNC(by133_state::u7_a_r));

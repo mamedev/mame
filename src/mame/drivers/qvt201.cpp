@@ -116,7 +116,7 @@ MACHINE_CONFIG_START(qvt201_state::qvt201)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip4_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // TC5516APL-2 or uPD446C-2 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL-2 or uPD446C-2 + battery
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250)

@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_DEVICE_ADD(M6809_TAG, MC6809, 10.738635_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02 (or DS1220Y)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
 	// devices
 	PIA6821(config, m_pia_u4, 0);

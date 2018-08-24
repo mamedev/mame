@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 	MCFG_INS8250_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("ns16450_0", ins8250_uart_device, rx_w) )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(magtouch_state::dma8237_1_dack_w));
 

@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::montec)
 	MCFG_DEVICE_PROGRAM_MAP( montec_mem )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)

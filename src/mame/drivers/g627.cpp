@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(g627_state::g627)
 	i8156.out_pc_callback().set(FUNC(g627_state::portc_w));
 	i8156.out_to_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);

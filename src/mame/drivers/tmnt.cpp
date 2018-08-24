@@ -1943,7 +1943,7 @@ MACHINE_CONFIG_START(tmnt_state::cuebrick)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,cuebrick)
 

@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, epos_state, i8255_porta_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, epos_state, i8255_portc_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 

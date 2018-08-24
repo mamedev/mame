@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(miniboy7_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	pia6821_device &pia(PIA6821(config, "pia0", 0));
 	pia.readpa_handler().set_ioport("INPUT1");

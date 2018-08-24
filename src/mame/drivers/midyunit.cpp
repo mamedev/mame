@@ -1112,7 +1112,7 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -1155,7 +1155,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_core)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 256)

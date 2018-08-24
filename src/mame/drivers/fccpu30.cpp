@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(cpu30_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD("vme", 1, fccpu30_vme_cards, nullptr)

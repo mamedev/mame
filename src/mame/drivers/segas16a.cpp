@@ -1983,7 +1983,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	MCFG_I8243_ADD("n7751_8243", CONSTANT(0), WRITE8(*this, segas16a_state,n7751_rom_offset_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

@@ -1287,7 +1287,7 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("backupram")
+	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MB3773_ADD("watchdog") // IC95

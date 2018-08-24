@@ -4370,7 +4370,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -9827,7 +9827,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ultrchmp)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ultrchmp_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)
 MACHINE_CONFIG_END

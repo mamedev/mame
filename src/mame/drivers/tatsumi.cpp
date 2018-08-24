@@ -883,7 +883,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apache3_state, irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
 	m58990_device &adc(M58990(config, "adc", 1000000)); // unknown clock

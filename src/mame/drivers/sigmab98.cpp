@@ -2849,7 +2849,7 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sigmab98)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
@@ -2933,7 +2933,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 
 	MCFG_MACHINE_RESET_OVERRIDE(lufykzku_state, lufykzku)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   // battery backed RAM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	// No EEPROM
 
 	MCFG_DEVICE_ADD("watchdog_mb3773", MB3773, 0)
@@ -3004,7 +3004,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   // battery backed RAM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )

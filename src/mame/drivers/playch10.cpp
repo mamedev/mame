@@ -698,10 +698,11 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(playch10_state::playchnv)
+void playch10_state::playchnv(machine_config &config)
+{
 	playch10(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(playch10_state::playch10_hboard)
 	playch10(config);

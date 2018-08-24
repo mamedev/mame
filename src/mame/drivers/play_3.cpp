@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	m_maincpu->q_cb().set("4013a", FUNC(ttl7474_device::clear_w));
 	m_maincpu->tpb_cb().set(FUNC(play_3_state::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_play_3);

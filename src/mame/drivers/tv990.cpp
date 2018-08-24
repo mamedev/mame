@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
 	m_kbdc->input_buffer_full_callback().set_inputline("maincpu", M68K_IRQ_2);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000); //whats the freq?

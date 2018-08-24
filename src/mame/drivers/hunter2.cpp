@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, hunter2_state,cts_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, hunter2_state,rxd_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
 	ADDRESS_MAP_BANK(config, "bank2").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);

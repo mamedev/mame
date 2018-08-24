@@ -2576,7 +2576,7 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_DEVICE_PROGRAM_MAP(sys903_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calomega_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));

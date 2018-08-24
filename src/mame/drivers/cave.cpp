@@ -2550,7 +2550,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::pacslot)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
@@ -2804,7 +2804,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::tekkencw)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
@@ -2858,7 +2858,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::tjumpman)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)

@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	mainlatch.q_out_cb<5>().set_nop(); // SA
 	mainlatch.q_out_cb<7>().set(FUNC(hyperspt_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

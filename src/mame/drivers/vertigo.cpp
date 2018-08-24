@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	/* motor controller */
 	MCFG_DEVICE_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

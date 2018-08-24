@@ -1674,8 +1674,8 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("backup1")
-	MCFG_NVRAM_ADD_0FILL("backup2")
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "backup2", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MB3773_ADD("watchdog")

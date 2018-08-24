@@ -162,7 +162,7 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	// PORT C read = unknown
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(kingpin_sound_map)

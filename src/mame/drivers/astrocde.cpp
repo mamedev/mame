@@ -1202,7 +1202,7 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
 	/* basic machine hardware */
 	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&astrocde_state::bank4000_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1436,7 +1436,7 @@ MACHINE_CONFIG_START(astrocde_state::robby)
 	MCFG_DEVICE_PROGRAM_MAP(robby_map)
 	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + battery
 
 	cd4099_device &outlatch(CD4099(config, "outlatch")); // on game board at U1
 	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));

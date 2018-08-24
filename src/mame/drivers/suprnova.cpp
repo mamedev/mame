@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(skns_state::skns)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int15_timer", skns_state, interrupt_callback, attotime::from_msec(2))
 	MCFG_TIMER_PARAM(15)

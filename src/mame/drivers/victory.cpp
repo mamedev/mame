@@ -218,7 +218,7 @@ MACHINE_CONFIG_START(victory_state::victory)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// PIO interrupts are disconnected
 	MCFG_DEVICE_ADD("pio1", Z80PIO, VICTORY_MAIN_CPU_CLOCK) // at K8

@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(s11c_state::s11c)
 	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
 	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// generic sound board is not used in System 11C, except for Star Trax
 

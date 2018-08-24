@@ -102,7 +102,7 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_HD63450_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
-	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
+	NVRAM(config, "zpram", nvram_device::DEFAULT_ALL_0); // MK48Z02
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("mfp", FUNC(mc68901_device::write_rx));

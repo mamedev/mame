@@ -1781,10 +1781,10 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// standard sram
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	// 256kb memory card
-	MCFG_NVRAM_ADD_0FILL("memcard")
+	NVRAM(config, "memcard", nvram_device::DEFAULT_ALL_0);
 
 	// real-time clock
 	MCFG_DEVICE_ADD("u61", MSM6242, XTAL(32'768))

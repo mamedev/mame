@@ -878,7 +878,7 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
 	MCFG_DEVICE_PROGRAM_MAP(supercon_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_novag_supercon);
@@ -898,7 +898,7 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	HLCD0538(config, m_hlcd0538, 0);
@@ -933,7 +933,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	rs232.rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
 	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
 

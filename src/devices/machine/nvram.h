@@ -13,44 +13,6 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NVRAM_ADD_0FILL(_tag) \
-	MCFG_DEVICE_ADD(_tag, NVRAM, nvram_device::DEFAULT_ALL_0);
-#define MCFG_NVRAM_ADD_1FILL(_tag) \
-	MCFG_DEVICE_ADD(_tag, NVRAM, nvram_device::DEFAULT_ALL_1);
-#define MCFG_NVRAM_ADD_RANDOM_FILL(_tag) \
-	MCFG_DEVICE_ADD(_tag, NVRAM, nvram_device::DEFAULT_RANDOM);
-#define MCFG_NVRAM_ADD_NO_FILL(_tag) \
-	MCFG_DEVICE_ADD(_tag, NVRAM, nvram_device::DEFAULT_NONE);
-#define MCFG_NVRAM_ADD_CUSTOM_DRIVER(_tag, _class, _method) \
-	MCFG_DEVICE_ADD(_tag, NVRAM) \
-	downcast<nvram_device &>(*device).set_custom_handler(nvram_device::init_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
-#define MCFG_NVRAM_REPLACE_0FILL(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, NVRAM, 0) \
-	downcast<nvram_device &>(*device).set_default_value(nvram_device::DEFAULT_ALL_0);
-#define MCFG_NVRAM_REPLACE_1FILL(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, NVRAM, 0) \
-	downcast<nvram_device &>(*device).set_default_value(nvram_device::DEFAULT_ALL_1);
-#define MCFG_NVRAM_REPLACE_RANDOM_FILL(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, NVRAM, 0) \
-	downcast<nvram_device &>(*device).set_default_value(*nvram_device::DEFAULT_RANDOM);
-#define MCFG_NVRAM_REPLACE_CUSTOM_DRIVER(_tag, _class, _method) \
-	MCFG_DEVICE_REPLACE(_tag, NVRAM, 0) \
-	downcast<nvram_device &>(*device).set_custom_handler(nvram_device::init_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> nvram_device
-
 class nvram_device :    public device_t,
 						public device_nvram_interface
 {
@@ -117,9 +79,6 @@ protected:
 	size_t                      m_length;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(NVRAM, nvram_device)
-
 
 #endif // MAME_DEVICES_MACHINE_NVRAM_H

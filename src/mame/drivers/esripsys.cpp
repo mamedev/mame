@@ -685,7 +685,7 @@ MACHINE_CONFIG_START(esripsys_state::esripsys)
 	MCFG_DEVICE_ADD("sound_cpu", MC6809E, XTAL(8'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

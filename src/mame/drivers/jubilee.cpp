@@ -678,7 +678,7 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 	m_maincpu->set_addrmap(AS_IO, &jubilee_state::jubileep_cru_map);
 	m_maincpu->set_vblank_int("screen", FUNC(jubilee_state::jubileep_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("videoworkram")
+	NVRAM(config, "videoworkram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

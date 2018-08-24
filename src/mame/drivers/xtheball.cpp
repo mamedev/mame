@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	hc259_device &latch1(HC259(config, "latch1"));
 	latch1.q_out_cb<7>().set("ticket", FUNC(ticket_dispenser_device::motor_w));

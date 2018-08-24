@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(ti89_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

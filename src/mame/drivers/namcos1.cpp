@@ -1056,7 +1056,7 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MCFG_QUANTUM_TIME(attotime::from_hz(38400))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("dsw_sel", LS157, 0) // LS257 'A3'
 

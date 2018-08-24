@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(sat_console_state::nvram_init));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

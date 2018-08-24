@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 MACHINE_CONFIG_END

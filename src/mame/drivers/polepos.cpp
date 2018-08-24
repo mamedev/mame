@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
 
@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
 

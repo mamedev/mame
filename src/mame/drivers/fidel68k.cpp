@@ -636,7 +636,7 @@ MACHINE_CONFIG_START(fidel68k_state::eag_base)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(4.9152_MHz_XTAL/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(4.9152_MHz_XTAL/0x2000))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_eag_68k);

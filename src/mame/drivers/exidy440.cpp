@@ -1002,7 +1002,7 @@ MACHINE_CONFIG_START(exidy440_state::exidy440)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(exidy440_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	exidy440_video(config);

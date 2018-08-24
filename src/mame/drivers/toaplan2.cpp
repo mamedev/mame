@@ -3794,7 +3794,7 @@ MACHINE_CONFIG_START(toaplan2_state::pwrkick)
 
 	UPD4992(config, m_rtc);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(PWRKICK_HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
@@ -3829,7 +3829,7 @@ MACHINE_CONFIG_START(toaplan2_state::othldrby)
 
 	UPD4992(config, m_rtc);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

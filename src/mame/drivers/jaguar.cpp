@@ -1853,7 +1853,7 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
 	MCFG_DEVICE_PROGRAM_MAP(dsp_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

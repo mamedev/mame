@@ -1363,7 +1363,7 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	MCFG_DEVICE_PROGRAM_MAP(brvteam_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);
@@ -1381,7 +1381,7 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	MCFG_DEVICE_PROGRAM_MAP(canasta_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);
@@ -1402,7 +1402,7 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	MCFG_DEVICE_PROGRAM_MAP(lapbylap_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);
@@ -1426,7 +1426,7 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_DEVICE_PROGRAM_MAP(inder_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);

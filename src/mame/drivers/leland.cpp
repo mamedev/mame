@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(leland_state::leland)
 	MCFG_DEVICE_IO_MAP(slave_map_io)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
-	MCFG_NVRAM_ADD_0FILL("battery")
+	NVRAM(config, "battery", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	leland_video(config);
@@ -1063,7 +1063,7 @@ MACHINE_CONFIG_START(ataxx_state::ataxx)
 
 	EEPROM_93C56_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_NVRAM_ADD_0FILL("battery")
+	NVRAM(config, "battery", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	ataxx_video(config);

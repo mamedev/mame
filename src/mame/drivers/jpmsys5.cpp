@@ -609,7 +609,7 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_S16LF01_ADD("vfd",0)//for debug ports
 
@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_S16LF01_ADD("vfd",0)
 
 	SPEAKER(config, "mono").front_center();
@@ -888,7 +888,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_S16LF01_ADD("vfd",0)
 
 	SPEAKER(config, "mono").front_center();
