@@ -756,9 +756,7 @@ void avr8_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC",     m_shifted_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[AVR8_REGIDX_SREG]).callimport().callexport().formatstr("%8s").noshow();
 	state_add(AVR8_SREG,       "STATUS",    m_r[AVR8_REGIDX_SREG]).mask(0xff);
-	state_add(AVR8_PC,         "PC",        m_shifted_pc).mask(m_addr_mask);
-	state_add(AVR8_SPH,        "SPH",       m_r[AVR8_REGIDX_SPH]).mask(0xff);
-	state_add(AVR8_SPL,        "SPL",       m_r[AVR8_REGIDX_SPL]).mask(0xff);
+	state_add(AVR8_PC,         "SP",        m_stack_level).mask(0x7);
 	state_add(AVR8_R0,         "R0",        m_r[ 0]).mask(0xff);
 	state_add(AVR8_R1,         "R1",        m_r[ 1]).mask(0xff);
 	state_add(AVR8_R2,         "R2",        m_r[ 2]).mask(0xff);

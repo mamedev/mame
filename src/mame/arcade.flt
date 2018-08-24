@@ -267,6 +267,7 @@ cultures.cpp
 cupidon.cpp
 cv1k.cpp
 cvs.cpp
+cwheel.cpp
 cyberbal.cpp
 cybertnk.cpp
 cybstorm.cpp

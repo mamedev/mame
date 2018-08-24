@@ -131,6 +131,7 @@ CPUS["HMCS40"] = true
 --CPUS["MELPS4"] = true
 --CPUS["HPHYBRID"] = true
 --CPUS["SM510"] = true
+CPUS["ST62XX"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -4560,6 +4561,7 @@ files {
 	MAME_DIR .. "src/mame/machine/inder_vid.cpp",
 	MAME_DIR .. "src/mame/machine/inder_vid.h",
 	MAME_DIR .. "src/mame/drivers/corona.cpp",
+	MAME_DIR .. "src/mame/drivers/cwheel.cpp",
 	MAME_DIR .. "src/mame/drivers/crystal.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.h",
