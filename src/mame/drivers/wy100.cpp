@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
+#include "machine/mc2661.h"
 #include "video/i8275.h"
 #include "screen.h"
 
@@ -23,15 +24,25 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "bankdev")
 		, m_crtc(*this, "crtc%u", 1U)
+		, m_pci(*this, "pci")
 		, m_chargen(*this, "chargen")
 	{
 	}
 
 	void wy100(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	I8275_DRAW_CHARACTER_MEMBER(draw_character);
+
 	DECLARE_WRITE8_MEMBER(crtc_w);
+	DECLARE_READ8_MEMBER(pci_r);
+	DECLARE_WRITE8_MEMBER(pci_w);
+	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
 	DECLARE_WRITE8_MEMBER(p2_w);
+	DECLARE_READ_LINE_MEMBER(t1_r);
 
 	void prg_map(address_map &map);
 	void io_map(address_map &map);
@@ -40,9 +51,23 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device_array<i8276_device, 2> m_crtc;
+	required_device<mc2661_device> m_pci;
 
 	required_region_ptr<u8> m_chargen;
+
+	bool m_rxrdy;
 };
+
+void wy100_state::machine_start()
+{
+	m_rxrdy = false;
+
+	save_item(NAME(m_rxrdy));
+}
+
+I8275_DRAW_CHARACTER_MEMBER(wy100_state::draw_character)
+{
+}
 
 WRITE8_MEMBER(wy100_state::crtc_w)
 {
@@ -50,9 +75,29 @@ WRITE8_MEMBER(wy100_state::crtc_w)
 	m_crtc[1]->write(space, offset >> 8, data);
 }
 
+READ8_MEMBER(wy100_state::pci_r)
+{
+	return m_pci->read(space, offset >> 8);
+}
+
+WRITE8_MEMBER(wy100_state::pci_w)
+{
+	m_pci->write(space, offset >> 8, data);
+}
+
+WRITE_LINE_MEMBER(wy100_state::rxrdy_w)
+{
+	m_rxrdy = state;
+}
+
 WRITE8_MEMBER(wy100_state::p2_w)
 {
-	m_bankdev->set_bank(data & 0x1f);
+	m_bankdev->set_bank(data & 0x7f);
+}
+
+READ_LINE_MEMBER(wy100_state::t1_r)
+{
+	return m_rxrdy;
 }
 
 void wy100_state::prg_map(address_map &map)
@@ -67,8 +112,10 @@ void wy100_state::io_map(address_map &map)
 
 void wy100_state::bank_map(address_map &map)
 {
-	map(0x0000, 0x01ff).w(FUNC(wy100_state::crtc_w));
-	map(0x0c00, 0x1fff).ram();
+	map(0x0000, 0x0000).mirror(0x10ff).select(0x100).w(FUNC(wy100_state::crtc_w));
+	map(0x4000, 0x4000).mirror(0xff).nopw();
+	map(0x4c00, 0x5fff).ram();
+	map(0x6000, 0x63ff).rw(FUNC(wy100_state::pci_r), FUNC(wy100_state::pci_w));
 }
 
 
@@ -86,17 +133,24 @@ void wy100_state::wy100(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(0, &wy100_state::bank_map);
 	m_bankdev->set_data_width(8);
-	m_bankdev->set_addr_width(13);
+	m_bankdev->set_addr_width(15);
 	m_bankdev->set_stride(0x100);
 
-	//SCN2651(config, "pci", 10.1376_MHz_XTAL / 2); // INS2651N
+	MC2661(config, m_pci, 10.1376_MHz_XTAL / 2); // INS2651N
+	m_pci->rxrdy_handler().set(FUNC(wy100_state::rxrdy_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(18.48_MHz_XTAL, 1000, 0, 800, 308, 0, 286);
 	screen.set_screen_update("crtc1", FUNC(i8276_device::screen_update));
 
-	I8276(config, m_crtc[0], 18.48_MHz_XTAL / 10).set_character_width(10);
-	I8276(config, m_crtc[1], 18.48_MHz_XTAL / 10).set_character_width(10);
+	for (auto &crtc : m_crtc)
+	{
+		I8276(config, crtc, 18.48_MHz_XTAL / 10);
+		crtc->set_screen("screen");
+		crtc->set_character_width(10);
+	}
+	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character), this);
+	//m_crtc[0]->vrtc_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 }
 
 
