@@ -503,11 +503,11 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_DEVICE_ADD(m_pio_1, Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(m_sio_0, Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, nanos_state, z80daisy_interrupt))
+	Z80SIO(config, m_sio_0, XTAL(4'000'000));
+	m_sio_0->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
 
-	MCFG_DEVICE_ADD(m_sio_1, Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, nanos_state, z80daisy_interrupt))
+	Z80SIO(config, m_sio_1, XTAL(4'000'000));
+	m_sio_1->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
 
 	MCFG_DEVICE_ADD(m_pio, Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, nanos_state, port_a_r))

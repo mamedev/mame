@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(22'118'400)/18)
 //  MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart8274", z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart8274", i8274_new_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc286_tmr2_w))
 
@@ -477,15 +477,15 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
 #else
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(16'000'000)/4)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
+	I8274_NEW(config, m_uart8274, XTAL(16'000'000)/4);
+	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 //  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic_0", pic8259_device, ir6_w))
+	m_uart8274->out_int_callback().set("pic_0", FUNC(pic8259_device::ir6_w));
 #endif
 
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
@@ -494,9 +494,9 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsa_w))
 #else
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", i8274_new_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", i8274_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", i8274_new_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsa_w))
 #endif
 
 	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
@@ -505,9 +505,9 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsb_w))
 #else
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", i8274_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", i8274_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", i8274_new_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsb_w))
 #endif
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 

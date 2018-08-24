@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(c900_state::c900)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c900)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("cio", Z8036, 6'000'000)
+	Z8036(config, "cio", 6'000'000);
 
 	MCFG_DEVICE_ADD("scc", SCC8030, 6'000'000) // 5'850'000 is the ideal figure
 	/* Port B */

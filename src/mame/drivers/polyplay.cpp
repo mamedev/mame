@@ -329,8 +329,8 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zrepp)
 	MCFG_DEVICE_IO_MAP(polyplay_io_zrepp)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, POLYPLAY_MAIN_CLOCK / 4) /* UB8560D */
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
+	Z80SIO(config, m_z80sio, POLYPLAY_MAIN_CLOCK / 4); /* UB8560D */
+	m_z80sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 MACHINE_CONFIG_END
 
 
