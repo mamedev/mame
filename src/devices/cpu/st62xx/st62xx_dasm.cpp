@@ -17,6 +17,37 @@ uint32_t st62xx_disassembler::opcode_alignment() const
 	return 1;
 }
 
+std::string st62xx_disassembler::reg_name(const uint8_t reg)
+{
+	static const char* REG_NAMES[256] =
+	{
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+
+		"X",     "Y",     "V",     "W",      nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+
+		"DRA",   "DRB",   "DRC",   "DRD",    "DDRA",  "DDRB",  "DDRC",  "DDRD",   "IOR",   "DWR",   "PRPR",  "DRBR",   "ORA",   "ORB",   "ORC",   "ORD",
+		"ADR",   "ADCR",  "PSC",   "TCR",    "TSCR",  nullptr, "UARTDR","UARTCR", "DWDR",  nullptr, "IPR",   nullptr,  "SIDR",  "SDSR",  nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, "ARMC",  "ARSC0", "ARSC1",  nullptr, "ARRC",  "ARCP",  "ARLR",   nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+	};
+
+	if (REG_NAMES[reg])
+		return std::string(REG_NAMES[reg]);
+	else
+		return util::string_format("$%02Xh", reg);
+}
+
 offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	offs_t base_pc = pc;
@@ -141,22 +172,14 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			break;
 		case 0x0d:
 		{
-			const uint8_t nn = opcodes.r8(pc);
-			pc++;
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			if (rr == 0 && nn == 0x80)
-				util::stream_format(stream, "CLR  X");
-			else if (rr == 0 && nn == 0x81)
-				util::stream_format(stream, "CLR  Y");
-			else if (rr == 0 && nn == 0x82)
-				util::stream_format(stream, "CLR  V");
-			else if (rr == 0 && nn == 0x83)
-				util::stream_format(stream, "CLR  W");
-			else if (rr == 0)
-				util::stream_format(stream, "CLR  $%Xh", nn);
+			const uint8_t nn = opcodes.r8(pc);
+			pc++;
+			if (nn == 0)
+				util::stream_format(stream, "CLR  %s", reg_name(rr));
 			else
-				util::stream_format(stream, "LDI  $%Xh,%Xh", rr, nn);
+				util::stream_format(stream, "LDI  %s,%Xh", reg_name(rr), nn);
 			break;
 		}
 		case 0x1d:
@@ -206,9 +229,9 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			break;
 		case 0x17:
 		{
-			const uint8_t rr = opcodes.r8(pc);
+			const uint8_t nn = opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "LDI  A,%Xh", rr);
+			util::stream_format(stream, "LDI  A,%Xh", nn);
 			break;
 		}
 		case 0x27:
@@ -267,7 +290,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "LD   A,%Xh", rr);
+			util::stream_format(stream, "LD   A,%s", reg_name(rr));
 			break;
 		}
 		case 0x2f:
@@ -277,7 +300,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "CP   A,%Xh", rr); // rr
+			util::stream_format(stream, "CP   A,%s", reg_name(rr)); // rr
 			break;
 		}
 		case 0x4f:
@@ -290,7 +313,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			if (rr == 0xff)
 				util::stream_format(stream, "SLA  A");
 			else
-				util::stream_format(stream, "ADD  A,%Xh", rr);
+				util::stream_format(stream, "ADD  A,%s", reg_name(rr));
 			break;
 		}
 		case 0x6f:
@@ -300,18 +323,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			if (rr == 0xff)
-				util::stream_format(stream, "INC  A"); // rr
-			else if (rr == 0x80)
-				util::stream_format(stream, "INC  X"); // rr
-			else if (rr == 0x81)
-				util::stream_format(stream, "INC  Y"); // rr
-			else if (rr == 0x82)
-				util::stream_format(stream, "INC  V"); // rr
-			else if (rr == 0x83)
-				util::stream_format(stream, "INC  W"); // rr
-			else
-				util::stream_format(stream, "INC  %Xh", rr); // rr
+			util::stream_format(stream, "INC  %s", reg_name(rr)); // rr
 			break;
 		}
 		case 0x8f:
@@ -321,7 +333,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "LD   %Xh,A", rr); // rr
+			util::stream_format(stream, "LD   %s,A", reg_name(rr)); // rr
 			break;
 		}
 		case 0xaf:
@@ -331,18 +343,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			if (rr == 0xff)
-				util::stream_format(stream, "AND  A,A"); // rr
-			else if (rr == 0x80)
-				util::stream_format(stream, "AND  A,X"); // rr
-			else if (rr == 0x81)
-				util::stream_format(stream, "AND  A,Y"); // rr
-			else if (rr == 0x82)
-				util::stream_format(stream, "AND  A,V"); // rr
-			else if (rr == 0x83)
-				util::stream_format(stream, "AND  A,W"); // rr
-			else
-				util::stream_format(stream, "AND  A,%Xh", rr); // rr
+			util::stream_format(stream, "AND  A,%s", reg_name(rr)); // rr
 			break;
 		}
 		case 0xcf:
@@ -355,7 +356,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			if (rr == 0xff)
 				util::stream_format(stream, "CLR  A", rr);
 			else
-				util::stream_format(stream, "SUB  A,%Xh", rr);
+				util::stream_format(stream, "SUB  A,%s", reg_name(rr));
 			break;
 		}
 		case 0xef:
@@ -365,18 +366,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		{
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			if (rr == 0xff)
-				util::stream_format(stream, "DEC  A"); // rr
-			else if (rr == 0x80)
-				util::stream_format(stream, "DEC  X"); // rr
-			else if (rr == 0x81)
-				util::stream_format(stream, "DEC  Y"); // rr
-			else if (rr == 0x82)
-				util::stream_format(stream, "DEC  V"); // rr
-			else if (rr == 0x83)
-				util::stream_format(stream, "DEC  W"); // rr
-			else
-				util::stream_format(stream, "DEC  %Xh", rr); // rr
+			util::stream_format(stream, "DEC  %s", reg_name(rr)); // rr
 			break;
 		}
 		default:

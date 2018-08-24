@@ -19,6 +19,9 @@ public:
 
 	virtual uint32_t opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+protected:
+	std::string reg_name(const uint8_t reg);
 };
 
 #endif // MAME_CPU_ST62XX_DASM_H

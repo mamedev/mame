@@ -65,7 +65,12 @@ void st6228_device::device_start()
 	state_add(STATE_FLAGS,     "FLAGS",    m_flags[0]).mask(0x3f);
 	state_add(STATE_PC,        "PC",       m_pc).mask(0xfff);
 	state_add(STATE_SP,        "SP",       m_stack_index).mask(0x7);
-	state_add(STATE_STACK,     "STACK",    m_stack[0]).callimport().callexport().formatstr("%04X");
+	state_add(STATE_STACK0,    "STACK0",   m_stack[0]).formatstr("%03X");
+	state_add(STATE_STACK1,    "STACK1",   m_stack[1]).formatstr("%03X");
+	state_add(STATE_STACK2,    "STACK2",   m_stack[2]).formatstr("%03X");
+	state_add(STATE_STACK3,    "STACK3",   m_stack[3]).formatstr("%03X");
+	state_add(STATE_STACK4,    "STACK4",   m_stack[4]).formatstr("%03X");
+	state_add(STATE_STACK5,    "STACK5",   m_stack[5]).formatstr("%03X");
 	state_add(STATE_A,         "A",        m_regs[REG_A]);
 	state_add(STATE_X,         "X",        m_regs[REG_X]);
 	state_add(STATE_Y,         "Y",        m_regs[REG_Y]);
@@ -105,6 +110,11 @@ void st6228_device::device_reset()
 	m_rambank->set_entry(0);
 	m_program_rombank->set_entry(0);
 	m_data_rombank->set_entry(0);
+
+	m_regs[REG_TIMER_COUNT] = 0xff;
+	m_regs[REG_TIMER_PRESCALE] = 0x7f;
+	m_regs[REG_WATCHDOG] = 0xfe;
+	m_regs[REG_AD_CONTROL] = 0x40;
 }
 
 device_memory_interface::space_config_vector st6228_device::memory_space_config() const
@@ -128,9 +138,6 @@ void st6228_device::state_string_export(const device_state_entry &entry, std::st
 				(m_flags[0] & FLAG_C) ? 'C' : '.',
 				(m_flags[0] & FLAG_Z) ? 'Z' : '.');
 			break;
-		case STATE_STACK:
-			str = string_format("%04X", m_stack[m_stack_index]);
-			break;
 	}
 }
 
@@ -143,6 +150,13 @@ WRITE8_MEMBER(st6228_device::regs_w)
 {
 	offset += 0x80;
 
+	if (offset > REG_W && offset < REG_PORTA_DATA)
+	{
+		// Data RAM
+		m_regs[offset] = data;
+		return;
+	}
+
 	switch (offset)
 	{
 		case REG_X:
@@ -152,6 +166,23 @@ WRITE8_MEMBER(st6228_device::regs_w)
 		case REG_A:
 			m_regs[offset] = data;
 			break;
+
+		case REG_DATA_ROM_WINDOW:
+			m_data_rombank->set_entry(data & 0x7f);
+			break;
+
+		case REG_ROM_BANK_SELECT:
+			m_program_rombank->set_entry(data & 3);
+			break;
+
+		case REG_RAM_BANK_SELECT:
+			m_rambank->set_entry(data & 1);
+			break;
+
+		case REG_WATCHDOG:
+			// Do nothing for now
+			break;
+
 		default:
 			logerror("%s: Unknown register write: %02x = %02x\n", machine().describe_context(), offset, data);
 			break;
@@ -162,6 +193,12 @@ READ8_MEMBER(st6228_device::regs_r)
 {
 	uint8_t ret = 0;
 	offset += 0x80;
+
+	if (offset > REG_W && offset < REG_PORTA_DATA)
+	{
+		// Data RAM
+		return m_regs[offset];
+	}
 
 	switch (offset)
 	{
@@ -395,7 +432,7 @@ void st6228_device::execute_run()
 			case 0x0d:	// LDI rr,nn
 			{
 				const uint8_t rr = m_program->read_byte(m_pc);
-				const uint8_t nn = m_program->read_byte(m_pc);
+				const uint8_t nn = m_program->read_byte(m_pc + 1);
 				m_data->write_byte(rr, nn);
 
 				if (nn)
