@@ -487,19 +487,18 @@ static void isa_com(device_slot_interface &device)
 
 void pcipc_state::superio_config(device_t *device)
 {
-	devcb_base *devcb = nullptr;
-	(void)devcb;
-	MCFG_FDC37C93X_SYSOPT(1)
-	MCFG_FDC37C93X_GP20_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_FDC37C93X_GP25_GATEA20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
-	MCFG_FDC37C93X_IRQ1_CB(WRITELINE(":pci:07.0", i82371sb_isa_device, pc_irq1_w))
-	MCFG_FDC37C93X_IRQ8_CB(WRITELINE(":pci:07.0", i82371sb_isa_device, pc_irq8n_w))
-	MCFG_FDC37C93X_TXD1_CB(WRITELINE(":serport0", rs232_port_device, write_txd))
-	MCFG_FDC37C93X_NDTR1_CB(WRITELINE(":serport0", rs232_port_device, write_dtr))
-	MCFG_FDC37C93X_NRTS1_CB(WRITELINE(":serport0", rs232_port_device, write_rts))
-	MCFG_FDC37C93X_TXD2_CB(WRITELINE(":serport1", rs232_port_device, write_txd))
-	MCFG_FDC37C93X_NDTR2_CB(WRITELINE(":serport1", rs232_port_device, write_dtr))
-	MCFG_FDC37C93X_NRTS2_CB(WRITELINE(":serport1", rs232_port_device, write_rts))
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 MACHINE_CONFIG_START(pcipc_state::pcipc)

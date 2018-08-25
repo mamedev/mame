@@ -30,22 +30,22 @@ class fdc37c93x_device : public device_t, public device_isa16_card_interface
 public:
 	fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~fdc37c93x_device() {}
-	static void static_set_sysopt_pin(device_t &device, int value) { dynamic_cast<fdc37c93x_device &>(device).sysopt_pin = value; }
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	template <class Object> devcb_base &set_gp20_reset_callback(Object &&cb) { return m_gp20_reset_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gp25_gatea20_callback(Object &&cb) { return m_gp25_gatea20_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq1_callback(Object &&cb) { return m_irq1_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq8_callback(Object &&cb) { return m_irq8_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq9_callback(Object &&cb) { return m_irq9_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_txd1_callback(Object &&cb) { return m_txd1_callback.set_callback(std::forward<Object>(cb));	}
-	template <class Object> devcb_base &set_ndtr1_callback(Object &&cb) {return m_ndtr1_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nrts1_callback(Object &&cb) {return m_nrts1_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_txd2_callback(Object &&cb) { return m_txd2_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ndtr2_callback(Object &&cb) { return m_ndtr2_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nrts2_callback(Object &&cb) { return m_nrts2_callback.set_callback(std::forward<Object>(cb)); }
+	void set_sysopt_pin(int value) { sysopt_pin = value; }
+	auto gp20_reset() { return m_gp20_reset_callback.bind(); }
+	auto gp25_gatea20() { return m_gp25_gatea20_callback.bind(); }
+	auto irq1() { return m_irq1_callback.bind(); }
+	auto irq8() { return m_irq8_callback.bind(); }
+	auto irq9() { return m_irq9_callback.bind(); }
+	auto txd1() { return m_txd1_callback.bind(); }
+	auto ndtr1() { return m_ndtr1_callback.bind(); }
+	auto nrts1() { return m_nrts1_callback.bind(); }
+	auto txd2() { return m_txd2_callback.bind(); }
+	auto ndtr2() { return m_ndtr2_callback.bind(); }
+	auto nrts2() { return m_nrts2_callback.bind(); }
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
@@ -204,44 +204,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device);
-
-#define MCFG_FDC37C93X_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, FDC37C93X, 0)
-
-#define MCFG_FDC37C93X_SYSOPT(_pinvalue) \
-	fdc37c93x_device::static_set_sysopt_pin(*device, _pinvalue);
-
-#define MCFG_FDC37C93X_GP20_RESET_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_gp20_reset_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_GP25_GATEA20_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_gp25_gatea20_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_IRQ1_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_irq1_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_IRQ8_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_irq8_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_IRQ9_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_irq9_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_TXD1_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_txd1_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_NDTR1_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_ndtr1_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_NRTS1_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_nrts1_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_TXD2_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_txd2_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_NDTR2_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_ndtr2_callback(DEVCB_##_devcb);
-
-#define MCFG_FDC37C93X_NRTS2_CB(_devcb) \
-	downcast<fdc37c93x_device &>(*device).set_nrts2_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_FDC37C93X_H
