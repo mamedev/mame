@@ -5701,7 +5701,7 @@ GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22_state, init_alpi
 GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)"          , MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // various problems
 GAME( 1995, cybrcycc, 0,         cybrcycc,  cybrcycc,  namcos22_state, init_cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)"          , MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2, World)"                   , MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)"                   , MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
 GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)"           , MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
 GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)"           , MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)"            , MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
