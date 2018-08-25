@@ -91,7 +91,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( jade )
 	ROM_REGION( 0x800, "roms", 0 )
-	ROM_LOAD( "jgz80.rom",   0x0000, 0x0800, CRC(90c4a1ef) SHA1(8a93a11051cc27f3edca24f0f4297ebe0099964e) )
+	ROM_LOAD( "jade.rom", 0x0000, 0x0800, CRC(90c4a1ef) SHA1(8a93a11051cc27f3edca24f0f4297ebe0099964e) )
 ROM_END
 
 /* Driver */
