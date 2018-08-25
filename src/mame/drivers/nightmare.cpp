@@ -3,7 +3,7 @@
 
 /******************************************************************************
 
-  Nightmare / Clean Octopus.
+  Night Mare / Clean Octopus.
 
   E.F.O. S.A. Video IV System.
   Barcelona, Spain.
@@ -16,8 +16,9 @@
   The game was designed by EFO/Playmatic in 1982, then dissappeared and remained
   lost till now.
 
-  The name of the game for the local market was "Nightmare", but for the interna-
-  tional market they changed the name to "Clean Octopus".
+  The name of the game for the local market was "Night Mare" (misspelled in
+  some cases as "Nigth Mare"), but for the international market they changed the
+  name to "Clean Octopus".
 
 
 --------------------------------------------------------------------------------
@@ -454,16 +455,16 @@ void nightmare_state::nightmare(machine_config &config)
 	SDA2006(config, m_eeprom);
 
 	/* video hardware */
-	TMS9928A( config, m_vdc, MASTER_CLOCK );
+	EFO90501( config, m_vdc, MASTER_CLOCK );
+	m_vdc->set_screen("screen");
 	m_vdc->set_vram_size(0x4000);
 
-	TMS9928A( config, m_vdc2, MASTER_CLOCK );
+	EFO90501( config, m_vdc2, MASTER_CLOCK );
+	m_vdc2->set_screen("screen");
 	m_vdc2->set_vram_size(0x4000);
 	m_vdc2->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK/2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-		tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12);
 	screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));
 }
 
@@ -481,4 +482,4 @@ ROM_START( nightmare )
 	ROM_LOAD( "eeprom", 0x00, 0x40, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
 ROM_END
 
-GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Nightmare (Spain)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

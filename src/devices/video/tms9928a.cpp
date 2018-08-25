@@ -35,6 +35,7 @@ DEFINE_DEVICE_TYPE(TMS9128,  tms9128_device,  "tms9128",  "TMS9128 VDP")
 DEFINE_DEVICE_TYPE(TMS9929,  tms9929_device,  "tms9929",  "TMS9929 VDP")
 DEFINE_DEVICE_TYPE(TMS9929A, tms9929a_device, "tms9929a", "TMS9929A VDP")
 DEFINE_DEVICE_TYPE(TMS9129,  tms9129_device,  "tms9129",  "TMS9129 VDP")
+DEFINE_DEVICE_TYPE(EFO90501, efo90501_device, "efo90501", "EFO90501 VDP")
 
 // ======= Debugging =========
 
@@ -127,6 +128,11 @@ tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, d
 
 tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9928a_device(mconfig, TMS9929A, tag, owner, clock, true, true, true)
+{
+}
+
+efo90501_device::efo90501_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms9928a_device(mconfig, EFO90501, tag, owner, clock, true, true, true)
 {
 }
 

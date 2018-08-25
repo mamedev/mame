@@ -46,6 +46,7 @@ DECLARE_DEVICE_TYPE(TMS9128,  tms9128_device)
 DECLARE_DEVICE_TYPE(TMS9929,  tms9929_device)
 DECLARE_DEVICE_TYPE(TMS9929A, tms9929a_device)
 DECLARE_DEVICE_TYPE(TMS9129,  tms9129_device)
+DECLARE_DEVICE_TYPE(EFO90501, efo90501_device)
 
 
 class tms9928a_device : public device_t,
@@ -203,6 +204,13 @@ class tms9129_device : public tms9928a_device
 {
 public:
 	tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class efo90501_device : public tms9928a_device
+{
+public:
+	efo90501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
