@@ -60,7 +60,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
 |         MCM2018  GAL.U94                                  |
 |         MCM2018  GAL.U63                         SS002.U7 |
 |          +-----+ GAL.U66                                  |
-|          |DE146|         MC86000P12F-16MHZ       SS001.U8 |
+|          |DE146|         MC68000P12F-16MHZ       SS001.U8 |
 |  SW2 SW1 +-----+                                          |
 +-----------------------------------------------------------+
 
@@ -68,7 +68,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
     U9 & U10 are 28pin 27C512
     U36 & U38 are 42pin 8/16Meg mask
 
-    CPU: MC86000P12F 16 MHZ
+    CPU: MC68000P12F 16 MHZ
   Sound: Z80B, YM2203C, Y3014B, OKI M6295
     OSC: 28.0000MHz, 16.0000MHz
     DSW: 8 position dipswitch x 2

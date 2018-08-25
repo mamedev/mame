@@ -1179,7 +1179,7 @@ ROM_START( ctribeua )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
-ROM_START( ctribeu1 ) // only main program code differs from ctribe1 set
+ROM_START( ctribeu1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-1.ic26", 0x00001, 0x20000, CRC(d108f36f) SHA1(af53fa441b9ddfc639abb573864a9b351633c6b7) )
 	ROM_LOAD16_BYTE( "28a15-1.ic25", 0x00000, 0x20000, CRC(3f5693a3) SHA1(2d4516506ad1d68ac45242fe149bba1b4b53eb45) )
@@ -1391,7 +1391,7 @@ ROM_START( wwfwfestu1 )
 	ROM_LOAD16_BYTE( "31a14-0.ic18", 0x00000, 0x40000, CRC(30824d0b) SHA1(54281c76f380225516877648645a619d8417816e) ) /* label had a blue stripe down the side */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
-	ROM_LOAD( "31a11-0.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) ) /* labeled as 31A11-0 but same data 31A11-2 */
+	ROM_LOAD( "31a11-0.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) ) /* == 31a11-2.ic42 */
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
