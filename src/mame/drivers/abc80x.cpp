@@ -1221,7 +1221,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	abc806_video(config);
 
 	// peripheral hardware
-	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
+	E0516(config, E0516_TAG, ABC806_X02);
 
 	MCFG_DEVICE_MODIFY(Z80DART_TAG)
 	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, abc806_state, keydtr_w))
