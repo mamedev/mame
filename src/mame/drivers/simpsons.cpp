@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&simpsons_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 	ADDRESS_MAP_BANK(config, "bank2000").set_map(&simpsons_state::bank2000_map).set_options(ENDIANNESS_BIG, 8, 14, 0x2000);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

@@ -182,6 +182,7 @@ public:
 	void map(address_map &map);
 
 	void screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *pixel_data);
+	void set_contrast(const u8 data) { m_contrast = data; }
 
 protected:
 	virtual void device_start() override;
@@ -191,9 +192,17 @@ protected:
 
 private:
 	// helper functions
-	u8 get_component(rgb_t *arr, int index);
-	void set_component(rgb_t *arr, int index, u8 data);
-	u32 get_rgb(u8 data, u8 mask) const { return m_palette_ram[data & mask]; }
+	u8 get_component(rgb_t *const arr, const int index);
+	void set_component(rgb_t *const arr, const int index, const u8 data);
+	u32 get_rgb(const u8 data, const u8 mask)
+	{
+		rgb_t rgb = m_palette_ram[data & mask];
+
+		if (m_contrast != 0xff)
+			rgb.scale8(m_contrast + 1);
+
+		return rgb;
+	}
 
 	DECLARE_READ8_MEMBER(address_lo_r);
 	DECLARE_WRITE8_MEMBER(address_lo_w);
@@ -239,6 +248,7 @@ private:
 	rgb_t m_palette_ram[BT459_PIXEL_COLORS];
 
 	u64 m_blink_start;
+	u8 m_contrast;
 };
 
 DECLARE_DEVICE_TYPE(BT459, bt459_device)

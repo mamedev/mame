@@ -369,8 +369,8 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
-	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO, 2500000)
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
+	Z80SIO(config, m_sio, 2500000);
+	m_sio->out_int_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
 	MCFG_Z80CTC_INTR_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, f1_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

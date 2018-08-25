@@ -131,6 +131,7 @@ CPUS["HMCS40"] = true
 --CPUS["MELPS4"] = true
 --CPUS["HPHYBRID"] = true
 --CPUS["SM510"] = true
+CPUS["ST62XX"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -213,6 +214,7 @@ SOUNDS["ES5506"] = true
 SOUNDS["BSMT2000"] = true
 SOUNDS["GAELCO_CG1V"] = true
 SOUNDS["GAELCO_GAE1"] = true
+--SOUNDS["HUC6230"] = true
 SOUNDS["C6280"] = true
 SOUNDS["SP0250"] = true
 SOUNDS["SPU"] = true
@@ -566,6 +568,7 @@ MACHINES["SATURN"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
 --MACHINES["SECFLASH"] = true
+MACHINES["SDA2006"] = true
 MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SEGA_SCU"] = true
@@ -1042,6 +1045,8 @@ files {
 	MAME_DIR .. "src/mame/video/atarisy2.cpp",
 	MAME_DIR .. "src/mame/drivers/atarisy4.cpp",
 	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
+	MAME_DIR .. "src/mame/machine/nl_gtrak10.cpp",
+	MAME_DIR .. "src/mame/machine/nl_gtrak10.h",
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
 	MAME_DIR .. "src/mame/drivers/atetris.cpp",
@@ -1758,6 +1763,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cidelsa.cpp",
 	MAME_DIR .. "src/mame/includes/cidelsa.h",
 	MAME_DIR .. "src/mame/video/cidelsa.cpp",
+	MAME_DIR .. "src/mame/drivers/nightmare.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "eolith")
@@ -3060,12 +3066,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/marineb.cpp",
 	MAME_DIR .. "src/mame/includes/marineb.h",
 	MAME_DIR .. "src/mame/video/marineb.cpp",
+	MAME_DIR .. "src/mame/video/orca40c.cpp",
+	MAME_DIR .. "src/mame/video/orca40c.h",
 	MAME_DIR .. "src/mame/drivers/vastar.cpp",
 	MAME_DIR .. "src/mame/includes/vastar.h",
 	MAME_DIR .. "src/mame/video/vastar.cpp",
 	MAME_DIR .. "src/mame/drivers/zodiack.cpp",
 	MAME_DIR .. "src/mame/includes/zodiack.h",
-	MAME_DIR .. "src/mame/video/zodiack.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "pacific")
@@ -4554,6 +4561,7 @@ files {
 	MAME_DIR .. "src/mame/machine/inder_vid.cpp",
 	MAME_DIR .. "src/mame/machine/inder_vid.h",
 	MAME_DIR .. "src/mame/drivers/corona.cpp",
+	MAME_DIR .. "src/mame/drivers/cwheel.cpp",
 	MAME_DIR .. "src/mame/drivers/crystal.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.h",
@@ -4823,6 +4831,7 @@ files {
 	MAME_DIR .. "src/mame/includes/vectrex.h",
 	MAME_DIR .. "src/mame/video/vectrex.cpp",
 	MAME_DIR .. "src/mame/machine/vectrex.cpp",
+	MAME_DIR .. "src/mame/drivers/videosaa.cpp",
 	MAME_DIR .. "src/mame/drivers/vlc.cpp",
 	MAME_DIR .. "src/mame/drivers/voyager.cpp",
 	MAME_DIR .. "src/mame/drivers/vp101.cpp",

@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)

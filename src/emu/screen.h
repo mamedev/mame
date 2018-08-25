@@ -182,7 +182,7 @@ public:
 	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
 	int orientation() const { assert(configured()); return m_orientation; }
-	std::pair<unsigned, unsigned> physical_aspect() const { assert(configured()); return m_phys_aspect; }
+	std::pair<unsigned, unsigned> physical_aspect() const;
 	int width() const { return m_width; }
 	int height() const { return m_height; }
 	const rectangle &visible_area() const { return m_visarea; }
@@ -195,7 +195,7 @@ public:
 	float yoffset() const { return m_yoffset; }
 	float xscale() const { return m_xscale; }
 	float yscale() const { return m_yscale; }
-	bool have_screen_update() const { return !m_screen_update_ind16.isnull() && !m_screen_update_rgb32.isnull(); }
+	bool has_screen_update() const { return !m_screen_update_ind16.isnull() || !m_screen_update_rgb32.isnull(); }
 
 	// inline configuration helpers
 	void set_type(screen_type_enum type) { assert(!configured()); m_type = type; }

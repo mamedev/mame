@@ -4569,7 +4569,7 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2gs_state, ay3600_repeat, attotime::from_hz(15))
 #endif
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD(A2GS_VIDEO_TAG, APPLE2_VIDEO, A2GS_14M)
 

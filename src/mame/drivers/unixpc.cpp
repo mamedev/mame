@@ -385,10 +385,10 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, unixpc_state, wd2797_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 19.6608_MHz_XTAL / 8)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
+	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("kbc", ACIA6850, 0)
 

@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	ADDRESS_MAP_BANK(config, "block8").set_map(&cdc721_state::block8_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "blockc").set_map(&cdc721_state::blockc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // MCM51L01C45 (256x4) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MCM51L01C45 (256x4) + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

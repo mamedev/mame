@@ -1110,10 +1110,10 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 	MCFG_DEVICE_PROGRAM_MAP(common_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	// various games require fast timing to save settings, probably because our Hyperstone core timings are incorrect
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
+	EEPROM_93C46_16BIT(config, "eeprom")
+		.erase_time(attotime::from_usec(1))
+		.write_time(attotime::from_usec(1));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1275,7 +1275,7 @@ MACHINE_CONFIG_START(vamphalf_nvram_state::finalgdr)
 	MCFG_DEVICE_IO_MAP(finalgdr_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
@@ -1287,7 +1287,7 @@ MACHINE_CONFIG_START(vamphalf_nvram_state::mrkickera)
 	MCFG_DEVICE_IO_MAP(mrkickera_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
@@ -1300,7 +1300,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_DEVICE_IO_MAP(aoh_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -303,7 +303,7 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 	MCFG_DEVICE_PROGRAM_MAP(mjkjidai_map)
 	MCFG_DEVICE_IO_MAP(mjkjidai_io_map)
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("KEYBOARD"))

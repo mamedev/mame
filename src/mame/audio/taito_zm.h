@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, hap
+// copyright-holders:Olivier Galibert, hap, superctr, cam900
 /***************************************************************************
 
     Taito Zoom ZSG-2 sound board
@@ -14,7 +14,7 @@
 #include "cpu/tms57002/tms57002.h"
 #include "sound/zsg2.h"
 
-#define USE_DSP               // Uncomment when DSP emulation is working
+#define USE_DSP               // comment out this to disable DSP emulation
 
 class taito_zoom_device : public device_t, public device_mixer_interface
 

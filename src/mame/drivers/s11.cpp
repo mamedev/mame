@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(s11_state::s11)
 	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
 	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))

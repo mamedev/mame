@@ -114,6 +114,7 @@
     <ClCompile Include="..\devices\net_lib.cpp" />
     <ClCompile Include="..\devices\nld_2102A.cpp" />
     <ClCompile Include="..\devices\nld_2716.cpp" />
+    <ClCompile Include="..\devices\nld_tms4800.cpp" />
     <ClCompile Include="..\devices\nld_4020.cpp" />
     <ClCompile Include="..\devices\nld_4066.cpp" />
     <ClCompile Include="..\devices\nld_4316.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="..\devices\nld_9316.cpp" />
     <ClCompile Include="..\devices\nld_9322.cpp" />
     <ClCompile Include="..\devices\nld_am2847.cpp" />
+    <ClCompile Include="..\devices\nld_dm9314.cpp" />
     <ClCompile Include="..\devices\nld_dm9334.cpp" />
     <ClCompile Include="..\devices\nld_legacy.cpp" />
     <ClCompile Include="..\devices\nld_log.cpp" />
@@ -195,6 +197,7 @@
     <ClInclude Include="..\devices\net_lib.h" />
     <ClInclude Include="..\devices\nld_2102A.h" />
     <ClInclude Include="..\devices\nld_2716.h" />
+    <ClInclude Include="..\devices\nld_tms4800.h" />
     <ClInclude Include="..\devices\nld_4020.h" />
     <ClInclude Include="..\devices\nld_4066.h" />
     <ClInclude Include="..\devices\nld_4316.h" />
@@ -230,6 +233,7 @@
     <ClInclude Include="..\devices\nld_9322.h" />
     <ClInclude Include="..\devices\nld_am2847.h" />
     <ClInclude Include="..\devices\nld_devinc.h" />
+    <ClInclude Include="..\devices\nld_dm9314.h" />
     <ClInclude Include="..\devices\nld_dm9334.h" />
     <ClInclude Include="..\devices\nld_legacy.h" />
     <ClInclude Include="..\devices\nld_log.h" />

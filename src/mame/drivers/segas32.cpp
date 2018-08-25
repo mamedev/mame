@@ -2227,7 +2227,7 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
 	io_chip.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2550,7 +2550,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
 	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_1_w));
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)

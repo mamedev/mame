@@ -354,7 +354,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	m_mainlatch->q_out_cb<6>().set(FUNC(tomcat_state::ack_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(tomcat_state::txbuff_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

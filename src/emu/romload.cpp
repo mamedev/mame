@@ -1257,13 +1257,13 @@ void rom_load_manager::normalize_flags_for_device(const char *rgntag, u8 &width,
 			int buswidth;
 
 			/* set the endianness */
-			if (spaceconfig->m_endianness == ENDIANNESS_LITTLE)
+			if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 				endian = ENDIANNESS_LITTLE;
 			else
 				endian = ENDIANNESS_BIG;
 
 			/* set the width */
-			buswidth = spaceconfig->m_data_width;
+			buswidth = spaceconfig->data_width();
 			if (buswidth <= 8)
 				width = 1;
 			else if (buswidth <= 16)

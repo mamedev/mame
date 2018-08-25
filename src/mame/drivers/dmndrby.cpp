@@ -542,7 +542,7 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	MCFG_DEVICE_PROGRAM_MAP(dderby_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

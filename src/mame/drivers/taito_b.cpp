@@ -2193,7 +2193,7 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
@@ -2257,7 +2257,7 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
@@ -2379,7 +2379,7 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");

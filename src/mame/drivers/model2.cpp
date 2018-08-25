@@ -2496,7 +2496,7 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2o_state,model2o)
 
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
 	ioboard.set_default_bios_tag("epr14869c");
@@ -2653,8 +2653,8 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2a_state,model2a)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pa_callback().set(FUNC(model2a_state::eeprom_w));
@@ -2778,8 +2778,8 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_MACHINE_START_OVERRIDE(model2b_state,model2b)
 	MCFG_MACHINE_RESET_OVERRIDE(model2b_state,model2b)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pa_callback().set(FUNC(model2b_state::eeprom_w));
@@ -2901,8 +2901,8 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_MACHINE_START_OVERRIDE(model2c_state,model2c)
 	MCFG_MACHINE_RESET_OVERRIDE(model2c_state,model2c)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pa_callback().set(FUNC(model2c_state::eeprom_w));

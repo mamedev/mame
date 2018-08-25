@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(_88games_state::_88games)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

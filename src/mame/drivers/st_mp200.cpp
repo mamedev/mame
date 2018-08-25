@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_DEVICE_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
 	MCFG_DEVICE_PROGRAM_MAP(st_mp200_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_st_mp200);

@@ -2123,6 +2123,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pcf8583.h,MACHINES["PCF8583"] = true
+---------------------------------------------------
+
+if (MACHINES["PCF8583"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pcf8583.cpp",
+		MAME_DIR .. "src/devices/machine/pcf8583.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pcf8593.h,MACHINES["PCF8593"] = true
 ---------------------------------------------------
 
@@ -2526,6 +2538,18 @@ if (MACHINES["SERFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/serflash.cpp",
 		MAME_DIR .. "src/devices/machine/serflash.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sda2006.h,MACHINES["SDA2006"] = true
+---------------------------------------------------
+
+if (MACHINES["SDA2006"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sda2006.cpp",
+		MAME_DIR .. "src/devices/machine/sda2006.h",
 	}
 end
 

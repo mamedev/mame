@@ -2002,7 +2002,7 @@ MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 
-	MCFG_NVRAM_ADD_0FILL("saveram")
+	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 

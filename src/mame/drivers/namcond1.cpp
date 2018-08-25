@@ -399,8 +399,8 @@ MACHINE_CONFIG_START(namcond1_state::abcheck)
 	MCFG_DEVICE_PROGRAM_MAP(abcheck_map)
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("zpr1")
-	MCFG_NVRAM_ADD_0FILL("zpr2")
+	NVRAM(config, "zpr1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "zpr2", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )

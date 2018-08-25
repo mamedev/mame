@@ -957,7 +957,7 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
 	mainlatch.q_out_cb<0>().set(FUNC(ppking_state::spritebuffer_w));
@@ -1019,7 +1019,7 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
-	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // NEC uPD449 CMOS SRAM
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
 	mainlatch.q_out_cb<0>().set(FUNC(gladiatr_state::spritebuffer_w));

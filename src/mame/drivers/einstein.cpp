@@ -616,11 +616,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
-	MCFG_TMS9928A_SET_SCREEN("screen")
-	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9129_device, screen_update)
+	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000); // 16k RAM, provided by IC i040 and i041
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

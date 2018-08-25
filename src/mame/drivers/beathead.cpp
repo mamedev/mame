@@ -342,8 +342,7 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	MCFG_DEVICE_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

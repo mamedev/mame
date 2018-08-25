@@ -917,7 +917,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	m_mainlatch->q_out_cb<6>().set_nop(); // CN3.4
 	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -993,7 +993,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	mainlatch.q_out_cb<6>().set_nop();
 	mainlatch.q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

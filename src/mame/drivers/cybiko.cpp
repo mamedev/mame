@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	AT45DB041(config, m_flash1, 0);
 	m_flash1->so_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");

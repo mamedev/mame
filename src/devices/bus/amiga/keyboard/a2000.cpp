@@ -74,11 +74,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_US, bus::amiga::keyboard, a2000_kbd_us_device, "a2000kbd_us", "Amiga 2000 Keyboard (U.S./Canada)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_DE, bus::amiga::keyboard, a2000_kbd_de_device, "a2000kbd_de", "Amiga 2000 Keyboard (Germany/Austria)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_SE, bus::amiga::keyboard, a2000_kbd_se_device, "a2000kbd_se", "Amiga 2000 Keyboard (Sweden/Finland)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_DK, bus::amiga::keyboard, a2000_kbd_dk_device, "a2000kbd_dk", "Amiga 2000 Keyboard (Denmark)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_GB, bus::amiga::keyboard, a2000_kbd_gb_device, "a2000kbd_gb", "Amiga 2000 Keyboard (UK)")
+DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_US, bus::amiga::keyboard, a2000_kbd_g80_us_device, "a2000kbd_g80_us", "Amiga 2000 Keyboard (Cherry - U.S./Canada)")
+DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_DE, bus::amiga::keyboard, a2000_kbd_g80_de_device, "a2000kbd_g80_de", "Amiga 2000 Keyboard (Cherry - Germany/Austria)")
+DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_SE, bus::amiga::keyboard, a2000_kbd_g80_se_device, "a2000kbd_g80_se", "Amiga 2000 Keyboard (Cherry - Sweden/Finland)")
+DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_DK, bus::amiga::keyboard, a2000_kbd_g80_dk_device, "a2000kbd_g80_dk", "Amiga 2000 Keyboard (Cherry - Denmark)")
+DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_GB, bus::amiga::keyboard, a2000_kbd_g80_gb_device, "a2000kbd_g80_gb", "Amiga 2000 Keyboard (Cherry - UK)")
 
 
 
@@ -489,9 +489,9 @@ ROM_END
 //  LIVE DEVICE
 //**************************************************************************
 
-// ======================> a2000_kbd_device
+// ======================> a2000_kbd_g80_device
 
-a2000_kbd_device::a2000_kbd_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+a2000_kbd_g80_device::a2000_kbd_g80_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0U)
@@ -503,7 +503,7 @@ a2000_kbd_device::a2000_kbd_device(machine_config const &mconfig, device_type ty
 {
 }
 
-WRITE_LINE_MEMBER(a2000_kbd_device::kdat_w)
+WRITE_LINE_MEMBER(a2000_kbd_g80_device::kdat_w)
 {
 	if (bool(state) != m_host_kdat)
 	{
@@ -514,7 +514,7 @@ WRITE_LINE_MEMBER(a2000_kbd_device::kdat_w)
 	}
 }
 
-READ8_MEMBER(a2000_kbd_device::mcu_bus_r)
+READ8_MEMBER(a2000_kbd_g80_device::mcu_bus_r)
 {
 	// when jumpered for external ROM, offset latched by U2 is 0x60 + (row << 1)
 	uint8_t result(0U);
@@ -527,12 +527,12 @@ READ8_MEMBER(a2000_kbd_device::mcu_bus_r)
 	return result;
 }
 
-WRITE8_MEMBER(a2000_kbd_device::mcu_p1_w)
+WRITE8_MEMBER(a2000_kbd_g80_device::mcu_p1_w)
 {
 	m_row_drive = (m_row_drive & 0x1f00U) | uint16_t(data);
 }
 
-WRITE8_MEMBER(a2000_kbd_device::mcu_p2_w)
+WRITE8_MEMBER(a2000_kbd_g80_device::mcu_p2_w)
 {
 	m_row_drive = (m_row_drive & 0x00ffU) | (uint16_t(data & 0x1fU) << 8);
 
@@ -555,24 +555,24 @@ WRITE8_MEMBER(a2000_kbd_device::mcu_p2_w)
 	}
 }
 
-tiny_rom_entry const *a2000_kbd_device::device_rom_region() const
+tiny_rom_entry const *a2000_kbd_g80_device::device_rom_region() const
 {
 	return ROM_NAME(a2000kbd);
 }
 
-void a2000_kbd_device::device_add_mconfig(machine_config &config)
+void a2000_kbd_g80_device::device_add_mconfig(machine_config &config)
 {
 	auto &mcu(I8039(config, "u1", 6_MHz_XTAL));
-	mcu.set_addrmap(AS_PROGRAM, &a2000_kbd_device::program_map);
-	mcu.set_addrmap(AS_IO, &a2000_kbd_device::ext_map);
-	mcu.p1_out_cb().set(FUNC(a2000_kbd_device::mcu_p1_w));
-	mcu.p2_out_cb().set(FUNC(a2000_kbd_device::mcu_p2_w));
-	mcu.bus_in_cb().set(FUNC(a2000_kbd_device::mcu_bus_r));
+	mcu.set_addrmap(AS_PROGRAM, &a2000_kbd_g80_device::program_map);
+	mcu.set_addrmap(AS_IO, &a2000_kbd_g80_device::ext_map);
+	mcu.p1_out_cb().set(FUNC(a2000_kbd_g80_device::mcu_p1_w));
+	mcu.p2_out_cb().set(FUNC(a2000_kbd_g80_device::mcu_p2_w));
+	mcu.bus_in_cb().set(FUNC(a2000_kbd_g80_device::mcu_bus_r));
 	mcu.t0_in_cb().set_constant(1);
 	mcu.t1_in_cb().set([this] () { return m_mcu_kclk ? 1 : 0; });
 }
 
-void a2000_kbd_device::device_start()
+void a2000_kbd_g80_device::device_start()
 {
 	save_item(NAME(m_row_drive));
 	save_item(NAME(m_host_kdat));
@@ -585,83 +585,83 @@ void a2000_kbd_device::device_start()
 	m_mcu_kclk = true;
 }
 
-void a2000_kbd_device::device_reset()
+void a2000_kbd_g80_device::device_reset()
 {
 }
 
-void a2000_kbd_device::program_map(address_map &map)
+void a2000_kbd_g80_device::program_map(address_map &map)
 {
 	map.global_mask(0x07ff);
 	map(0x0000, 0x07ff).rom().region("mcu", 0);
 }
 
-void a2000_kbd_device::ext_map(address_map &map)
+void a2000_kbd_g80_device::ext_map(address_map &map)
 {
 	map.global_mask(0x00ff);
-	map(0x0000, 0x00ff).r(FUNC(a2000_kbd_device::mcu_bus_r));
+	map(0x0000, 0x00ff).r(FUNC(a2000_kbd_g80_device::mcu_bus_r));
 }
 
 
-// ======================> a2000_kbd_us_device
+// ======================> a2000_kbd_g80_us_device
 
-a2000_kbd_us_device::a2000_kbd_us_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_device(mconfig, A2000_KBD_US, tag, owner, clock)
+a2000_kbd_g80_us_device::a2000_kbd_g80_us_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_US, tag, owner, clock)
 {
 }
 
-ioport_constructor a2000_kbd_us_device::device_input_ports() const
+ioport_constructor a2000_kbd_g80_us_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(a2000_us_keyboard);
 }
 
 
-// ======================> a2000_kbd_de_device
+// ======================> a2000_kbd_g80_de_device
 
-a2000_kbd_de_device::a2000_kbd_de_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_device(mconfig, A2000_KBD_DE, tag, owner, clock)
+a2000_kbd_g80_de_device::a2000_kbd_g80_de_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DE, tag, owner, clock)
 {
 }
 
-ioport_constructor a2000_kbd_de_device::device_input_ports() const
+ioport_constructor a2000_kbd_g80_de_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(a2000_de_keyboard);
 }
 
 
-// ======================> a2000_kbd_se_device
+// ======================> a2000_kbd_g80_se_device
 
-a2000_kbd_se_device::a2000_kbd_se_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_device(mconfig, A2000_KBD_SE, tag, owner, clock)
+a2000_kbd_g80_se_device::a2000_kbd_g80_se_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_SE, tag, owner, clock)
 {
 }
 
-ioport_constructor a2000_kbd_se_device::device_input_ports() const
+ioport_constructor a2000_kbd_g80_se_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(a2000_se_keyboard);
 }
 
 
-// ======================> a2000_kbd_dk_device
+// ======================> a2000_kbd_g80_dk_device
 
-a2000_kbd_dk_device::a2000_kbd_dk_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_device(mconfig, A2000_KBD_DK, tag, owner, clock)
+a2000_kbd_g80_dk_device::a2000_kbd_g80_dk_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DK, tag, owner, clock)
 {
 }
 
-ioport_constructor a2000_kbd_dk_device::device_input_ports() const
+ioport_constructor a2000_kbd_g80_dk_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(a2000_dk_keyboard);
 }
 
 
-// ======================> a2000_kbd_gb_device
+// ======================> a2000_kbd_g80_gb_device
 
-a2000_kbd_gb_device::a2000_kbd_gb_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_device(mconfig, A2000_KBD_GB, tag, owner, clock)
+a2000_kbd_g80_gb_device::a2000_kbd_g80_gb_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_GB, tag, owner, clock)
 {
 }
 
-ioport_constructor a2000_kbd_gb_device::device_input_ports() const
+ioport_constructor a2000_kbd_g80_gb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(a2000_gb_keyboard);
 }

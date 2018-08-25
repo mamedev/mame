@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(cpu30_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD("vme", 1, fccpu30_vme_cards, nullptr)
@@ -747,10 +747,10 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 //  m_pit2->timer_irq_callback().set("fga002", FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
-	MCFG_FGA002_ADD("fga002", 0)
-	MCFG_FGA002_OUT_INT_CB(WRITELINE(*this, cpu30_state, fga_irq_callback))
-	MCFG_FGA002_OUT_LIACK4_CB(READ8("duscc",  duscc_device, iack))
-	MCFG_FGA002_OUT_LIACK5_CB(READ8("duscc2",  duscc_device, iack))
+	fga002_device &fga002(FGA002(config, m_fga002, 0));
+	fga002.out_int().set(FUNC(cpu30_state::fga_irq_callback));
+	fga002.liack4().set("duscc",  FUNC(duscc_device::iack));
+	fga002.liack5().set("duscc2", FUNC(duscc_device::iack));
 
 	// RTC
 	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL(32'768)) // Fake crystal value, the 72423 uses it own internal crystal

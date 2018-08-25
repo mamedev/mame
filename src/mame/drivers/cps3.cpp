@@ -2545,7 +2545,7 @@ MACHINE_CONFIG_START(cps3_state::cps3)
          42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
 */
 
-	MCFG_NVRAM_ADD_0FILL("eeprom")
+	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 	MCFG_PALETTE_ADD("palette", 0x10000) // actually 0x20000 ...
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)

@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmosys)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C46_16BIT(config, "eeprom", eeprom_serial_streaming::ENABLE);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

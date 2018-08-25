@@ -16,7 +16,6 @@
 
 DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
-// Can't use a DEVICE_ADDRESS_MAP, not yet anyway
 void tms57002_device::internal_pgm(address_map &map)
 {
 	map(0x00, 0xff).ram();
@@ -530,7 +529,7 @@ int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::check_macc_overflow_0()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -543,7 +542,7 @@ int64_t tms57002_device::check_macc_overflow_0()
 
 int64_t tms57002_device::check_macc_overflow_1()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -556,7 +555,7 @@ int64_t tms57002_device::check_macc_overflow_1()
 
 int64_t tms57002_device::check_macc_overflow_2()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -569,12 +568,12 @@ int64_t tms57002_device::check_macc_overflow_2()
 
 int64_t tms57002_device::check_macc_overflow_3()
 {
-	return macc;
+	return macc_read;
 }
 
 int64_t tms57002_device::check_macc_overflow_0s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -591,7 +590,7 @@ int64_t tms57002_device::check_macc_overflow_0s()
 
 int64_t tms57002_device::check_macc_overflow_1s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -608,7 +607,7 @@ int64_t tms57002_device::check_macc_overflow_1s()
 
 int64_t tms57002_device::check_macc_overflow_2s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -625,7 +624,7 @@ int64_t tms57002_device::check_macc_overflow_2s()
 
 int64_t tms57002_device::check_macc_overflow_3s()
 {
-	return macc;
+	return macc_read;
 }
 
 uint32_t tms57002_device::get_cmem(uint8_t addr)
@@ -800,8 +799,6 @@ void tms57002_device::execute_run()
 		macc_write = macc;
 
 		for(;;) {
-			uint32_t c, d;
-			int64_t r;
 			const icd *i = cache.inst + ipc;
 
 			ipc = i->next;
@@ -821,9 +818,9 @@ void tms57002_device::execute_run()
 				++ca, ++id;
 				goto inst;
 
-#define CINTRP
+#define CINTRPSWITCH
 #include "cpu/tms57002/tms57002.hxx"
-#undef CINTRP
+#undef CINTRPSWITCH
 
 			default:
 				fatalerror("Unhandled opcode in tms57002_execute\n");

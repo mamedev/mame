@@ -2942,8 +2942,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	MCFG_DEVICE_PROGRAM_MAP(naomi_map)
 	MCFG_DEVICE_IO_MAP(naomi_port)
 
-	MCFG_DEVICE_ADD("main_eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	EEPROM_93C46_16BIT(config, "main_eeprom").default_value(0);
 
 	// high probable this MCU uses one of "fast Z80" cores, like ASCII R800, Kawasaki KC80 or similar, where clocks per instructions is much different from regular Z80.
 	// was made few attempts to measure CPU core clock using different methods (in term of "regular Z80" clock and cycles):
@@ -2953,12 +2952,12 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
 	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
-	MCFG_DEVICE_ADD("mie_eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	MCFG_X76F100_ADD("naomibd_eeprom")
 	MCFG_M3COMM_ADD("comm_board")
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /*
@@ -3093,7 +3092,7 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atomiswave_state::aw1c)

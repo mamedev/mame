@@ -2888,10 +2888,11 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_MSM58321_DEFAULT_24H(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(towns_state::towns)
+void towns_state::towns(machine_config &config)
+{
 	towns_base(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(towns16_state::townsux)
 	towns_base(config);
@@ -2904,7 +2905,7 @@ MACHINE_CONFIG_START(towns16_state::townsux)
 
 	m_ram->set_default_size("2M").set_extra_options("10M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram16")
+	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townssj)
@@ -2952,7 +2953,7 @@ MACHINE_CONFIG_START(marty_state::marty)
 
 	m_ram->set_default_size("6M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram16")
+	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /* ROM definitions */

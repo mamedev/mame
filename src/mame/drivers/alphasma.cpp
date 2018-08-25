@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(asma2k_state::asma2k)

@@ -433,9 +433,10 @@ const tiny_rom_entry *ti99_gkracker_device::device_rom_region() const
 	return ROM_NAME( gkracker_rom );
 }
 
-MACHINE_CONFIG_START(ti99_gkracker_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cartridge", TI99_CART, 0)
-MACHINE_CONFIG_END
+void ti99_gkracker_device::device_add_mconfig(machine_config &config)
+{
+	TI99_CART(config, "cartridge", 0);
+}
 
 INPUT_PORTS_START(gkracker)
 	PORT_START( GKSWITCH1_TAG )

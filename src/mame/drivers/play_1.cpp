@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(play_1_state::play_1)
 	m_maincpu->ef3_cb().set(FUNC(play_1_state::ef3_r));
 	m_maincpu->ef4_cb().set(FUNC(play_1_state::ef4_r));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_play_1);

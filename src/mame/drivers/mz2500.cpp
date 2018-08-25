@@ -1819,7 +1819,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2500_state, mz2500_pio1_porta_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
+	Z80SIO(config, "z80sio", 6000000);
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, 32.768_kHz_XTAL)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))

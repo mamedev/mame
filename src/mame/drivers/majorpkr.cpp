@@ -1013,7 +1013,7 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	ADDRESS_MAP_BANK(config, "palette_bank").set_map(&majorpkr_state::palettebanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
 	ADDRESS_MAP_BANK(config, "vram_bank").set_map(&majorpkr_state::vrambanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -786,8 +786,7 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	EEPROM_93C56_8BIT(config, "eeprom").default_value(0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32) /* If using alpha */

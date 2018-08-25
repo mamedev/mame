@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 2000000));
 	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "cdp1861.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -51,12 +53,23 @@ cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, screen_device &screen)
-	: cdp1861_device(mconfig, tag, owner, clock)
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1861_device::device_config_complete()
 {
-	set_screen(screen, DEVICE_SELF);
-	screen.set_screen_update(screen_update_rgb32_delegate(FUNC(cdp1861_device::screen_update), this));
-	screen.set_raw(clock, SCREEN_WIDTH, HBLANK_END, HBLANK_START, TOTAL_SCANLINES, SCANLINE_VBLANK_END, SCANLINE_VBLANK_START);
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(clock(), SCREEN_WIDTH, HBLANK_END, HBLANK_START, TOTAL_SCANLINES, SCANLINE_VBLANK_END, SCANLINE_VBLANK_START);
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(cdp1861_device::screen_update), this));
 }
 
 

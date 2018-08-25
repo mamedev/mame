@@ -2627,7 +2627,7 @@ MACHINE_CONFIG_START(nbmj9195_state::janbari)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(patimono_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2639,7 +2639,7 @@ MACHINE_CONFIG_START(nbmj9195_state::mmehyou)
 	MCFG_DEVICE_PROGRAM_MAP(koinomp_map)
 	MCFG_DEVICE_IO_MAP(mmehyou_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2651,7 +2651,7 @@ MACHINE_CONFIG_START(nbmj9195_state::ultramhm)
 	MCFG_DEVICE_PROGRAM_MAP(koinomp_map)
 	MCFG_DEVICE_IO_MAP(koinomp_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2698,7 +2698,7 @@ MACHINE_CONFIG_START(nbmj9195_state::pachiten)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(pachiten_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2716,7 +2716,7 @@ MACHINE_CONFIG_START(nbmj9195_state::sailorwr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(sailorwr_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -2763,7 +2763,7 @@ MACHINE_CONFIG_START(nbmj9195_state::yosimotm)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(yosimotm_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 

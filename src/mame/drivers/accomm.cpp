@@ -850,7 +850,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("1M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

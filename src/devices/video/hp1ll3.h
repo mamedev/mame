@@ -105,6 +105,7 @@ private:
 	unsigned m_vram_size;
 	uint16_t m_ram_addr_mask;
 	uint16_t m_rw_win_x, m_rw_win_y;
+	uint8_t m_rw_win_off;
 
 	bool m_busy;
 

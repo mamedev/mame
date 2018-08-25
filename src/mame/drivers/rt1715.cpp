@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE("a29", z80sio_device, txca_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("a29", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("a29", Z80SIO, 9.832_MHz_XTAL / 4)
+	Z80SIO(config, "a29", 9.832_MHz_XTAL / 4);
 
 	/* floppy */
 	MCFG_DEVICE_ADD("a71", Z80PIO, 9.832_MHz_XTAL / 4)

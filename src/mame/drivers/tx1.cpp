@@ -178,7 +178,7 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_DEVICE_PROGRAM_MAP(tx1_math)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,tx1)
@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_triphsxs);
 
@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)

@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("P1X")

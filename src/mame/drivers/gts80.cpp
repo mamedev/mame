@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(gts80_state::gts80)
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
 	MCFG_DEVICE_PROGRAM_MAP(gts80_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
 	config.set_default_layout(layout_gts80);

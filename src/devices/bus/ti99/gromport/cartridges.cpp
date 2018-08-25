@@ -399,30 +399,14 @@ void ti99_cartridge_device::device_config_complete()
 /*
     5 GROMs that may be contained in a cartridge
 */
-MACHINE_CONFIG_START(ti99_cartridge_device::device_add_mconfig)
-
-	tmc0430_device& grom3(TMC0430(config, GROM3_TAG, 0));
-	grom3.ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
-	grom3.set_region_and_ident(CARTGROM_TAG, 0x0000, 3);
-
-	tmc0430_device& grom4(TMC0430(config, GROM4_TAG, 0));
-	grom4.ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
-	grom4.set_region_and_ident(CARTGROM_TAG, 0x2000, 4);
-
-	tmc0430_device& grom5(TMC0430(config, GROM5_TAG, 0));
-	grom5.ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
-	grom5.set_region_and_ident(CARTGROM_TAG, 0x4000, 5);
-
-	tmc0430_device& grom6(TMC0430(config, GROM6_TAG, 0));
-	grom6.ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
-	grom6.set_region_and_ident(CARTGROM_TAG, 0x6000, 6);
-
-	tmc0430_device& grom7(TMC0430(config, GROM7_TAG, 0));
-	grom7.ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
-	grom7.set_region_and_ident(CARTGROM_TAG, 0x8000, 7);
-
-MACHINE_CONFIG_END
-
+void ti99_cartridge_device::device_add_mconfig(machine_config& config)
+{
+	TMC0430(config, GROM3_TAG, CARTGROM_TAG, 0x0000, 3).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM4_TAG, CARTGROM_TAG, 0x2000, 4).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM5_TAG, CARTGROM_TAG, 0x4000, 5).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM6_TAG, CARTGROM_TAG, 0x6000, 6).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM7_TAG, CARTGROM_TAG, 0x8000, 7).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+}
 
 /*
     Memory area for one cartridge. For most cartridges we only need 8 KiB for

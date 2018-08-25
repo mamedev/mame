@@ -1418,7 +1418,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* dummy timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))

@@ -1196,15 +1196,15 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
-	MCFG_NVRAM_ADD_1FILL("fm1208s")
+	NVRAM(config, "fm1208s", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MB3773_ADD("mb3773")
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
 	TAITO_ZOOM(config, m_zoom);
 	m_zoom->add_route(0, "lspeaker", 1.0);
@@ -1220,15 +1220,15 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
-	MCFG_NVRAM_ADD_1FILL("fm1208s")
+	NVRAM(config, "fm1208s", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MB3773_ADD("mb3773")
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
 	TAITO_ZOOM(config, m_zoom);
 	m_zoom->add_route(0, "lspeaker", 1.0);
@@ -2196,7 +2196,7 @@ MACHINE_CONFIG_START(zn_state::nbajamex)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nbajamex_map)
 
-	MCFG_NVRAM_ADD_1FILL("71256")
+	NVRAM(config, "71256", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, nbajamex)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)

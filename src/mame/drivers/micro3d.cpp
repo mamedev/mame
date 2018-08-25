@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	//mfp.out_tao_cb().append("mfp", FUNC(mc68901_device::tc_w));
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
 	MCFG_PALETTE_ADD("palette", 4096)

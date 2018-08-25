@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(europc_pc_state::europc)
 	MCFG_SLOT_FIXED(true)
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);;
 
 	/* internal ram */
 	// Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well

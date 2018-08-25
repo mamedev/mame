@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "includes/elf.h"
 #include "elf2.lh"
+#include "screen.h"
 
 #define RUN \
 	BIT(m_special->read(), 0)
@@ -251,11 +252,11 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	/* video hardware */
 	config.set_default_layout(layout_elf2);
 
-
-	CDP1861(config, m_vdc, XTAL(3'579'545)/2, SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(SCREEN_TAG);
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu,  COSMAC_INPUT_LINE_DMAOUT);
 	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	/* devices */
 	MCFG_DEVICE_ADD(MM74C923_TAG, MM74C923, 0)

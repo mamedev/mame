@@ -3726,7 +3726,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK_10MHz)
 	MCFG_SEGA_315_5195_CPU("maincpu")
@@ -3929,7 +3929,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_DEVICE_IO_MAP(lockonph_sound_iomap)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)

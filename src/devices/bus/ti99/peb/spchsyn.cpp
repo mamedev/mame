@@ -25,7 +25,6 @@
 #include "spchsyn.h"
 
 #include "machine/spchrom.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #define LOG_WARN        (1U<<1)    // Warnings

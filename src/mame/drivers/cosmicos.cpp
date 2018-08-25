@@ -36,6 +36,7 @@
 #include "emu.h"
 #include "includes/cosmicos.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 #include "cosmicos.lh"
@@ -527,13 +528,15 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
 
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	CDP1864(config, m_cti, 1.75_MHz_XTAL, SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set(FUNC(cosmicos_state::dmaout_w));

@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_DEVICE_PROGRAM_MAP(groundfx_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 5);

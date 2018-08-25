@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	m_dma8237_1->out_iow_callback<0>().set("ad1848", FUNC(ad1848_device::dack_w));
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(pcat_dyn_state::dma8237_1_dack_w));
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", pcat_dyn_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(pcat_dyn_state::nvram_init));
 
 	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))

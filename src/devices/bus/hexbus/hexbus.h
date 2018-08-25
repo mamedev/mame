@@ -108,6 +108,16 @@ protected:
 class hexbus_device : public device_t, public device_slot_interface
 {
 public:
+	template <typename U>
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: hexbus_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Used to establish the reverse link (inbound)
@@ -116,7 +126,6 @@ public:
 	// Read and write operations on the bus
 	uint8_t read(int dir);
 	void write(int dir, uint8_t data);
-	void configure_slot();
 
 protected:
 	void device_start() override;
@@ -132,5 +141,7 @@ private:
 }   }   // end namespace bus::hexbus
 
 DECLARE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device)
+
+void hexbus_options(device_slot_interface &device);
 
 #endif // MAME_BUS_HEXBUS_HEXBUS_H

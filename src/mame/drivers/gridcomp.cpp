@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib", tms9914_device, ren_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(4'032'000))
+	I8274_NEW(config, m_uart8274, XTAL(4'032'000));
 
 	MCFG_DEVICE_ADD("modem", I8255, 0)
 

@@ -66,7 +66,7 @@ u32 zms8085_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			u8 code = m_mainram[(ch + pos) & 0xfff];
 			u8 data = m_p_chargen[(code & 0x7f) * 16 + y % 10];
 			for (int bit = 7; bit >= 0; bit--)
-				bitmap.pix(y, x++) = BIT(data, bit) ? rgb_t::black() : rgb_t::green();
+				bitmap.pix(y, x++) = BIT(data, bit) ? rgb_t::black() : rgb_t::white();
 			bitmap.pix(y, x++) = rgb_t::black();
 			bitmap.pix(y, x++) = rgb_t::black();
 			bitmap.pix(y, x++) = rgb_t::black();

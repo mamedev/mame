@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // 10B
 	outlatch.q_out_cb<0>().set(FUNC(cloak_state::coin_counter_r_w));

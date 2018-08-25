@@ -24,14 +24,14 @@
 	   +00c : xxxxxxxx xxxxxxxx : End address
 	   +00e : xxxxxxxx -------- : DSP ch 2 (Left) output gain
 	        : -------- xxxxxxxx : Loop address (high)
-	   +010 : xxxxxxxx xxxxxxxx : Filter time constant (latch)
-	   +012 : -------- -------- :   Unknown register (usually cleared)
-	   +014 : xxxxxxxx xxxxxxxx : Volume (latch)
-	   +016 : --x----- -------- : Key on status flag (only read)
-	   +018 : xxxxxxxx xxxxxxxx : Filter time constant (Ramping target)
+	   +010 : xxxxxxxx xxxxxxxx : Initial filter time constant
+	   +012 : xxxxxxxx xxxxxxxx : Current filter time constant
+	   +014 : xxxxxxxx xxxxxxxx : Initial volume
+	   +016 : xxxxxxxx xxxxxxxx : Current volume
+	   +018 : xxxxxxxx xxxxxxxx : Target filter time constant
 	   +01a : xxxxxxxx -------- : DSP ch 1 (chorus) output gain
 	        : -------- xxxxxxxx : Filter ramping speed
-	   +01c : xxxxxxxx xxxxxxxx : Volume (target)
+	   +01c : xxxxxxxx xxxxxxxx : Target volume
 	   +01e : xxxxxxxx -------- : DSP ch 0 (reverb) output gain
 	        : -------- xxxxxxxx : Filter ramping speed
 	600-604 : Key on flags (each bit corresponds to a channel)
@@ -85,7 +85,7 @@
 
 TODO:
 - Filter and ramping behavior might not be perfect.
-- sometimes clicking
+- sometimes clicking / popping noises
 - memory reads out of range sometimes
 
 */
@@ -97,8 +97,16 @@ TODO:
 #include <fstream>
 #include <cmath>
 
-#define EMPHASIS_CUTOFF_BASE 0x800
-#define EMPHASIS_OUTPUT_SHIFT 15
+#define EMPHASIS_INITIAL_BIAS 0
+// Adjusts the cutoff constant of the filter by right-shifting the filter state.
+// The current value gives a -6dB cutoff frequency at about 81.5 Hz, assuming
+// sample playback at 32.552 kHz.
+#define EMPHASIS_FILTER_SHIFT (16-10)
+#define EMPHASIS_ROUNDING 0x20
+// Adjusts the output amplitude by right-shifting the filtered output. Should be
+// kept relative to the filter shift. A too low value will cause clipping, while
+// too high will cause quantization noise.
+#define EMPHASIS_OUTPUT_SHIFT 1
 
 // device type definition
 DEFINE_DEVICE_TYPE(ZSG2, zsg2_device, "zsg2", "ZOOM ZSG-2")
@@ -138,13 +146,12 @@ void zsg2_device::device_start()
 	save_item(NAME(m_read_address));
 
 	// Generate the output gain table. Assuming -1dB per step for now.
-	for (int i = 0, history=0; i < 32; i++)
+	for (int i = 1; i < 32; i++)
 	{
 		double val = pow(10, -(31 - i) / 20.) * 65535.;
-		gain_tab[i] = val;
-		gain_tab_frac[i] = val-history;
-		history = val;
+		m_gain_tab[i] = val;
 	}
+	m_gain_tab[0] = 0;
 
 	for (int ch = 0; ch < 48; ch++)
 	{
@@ -175,7 +182,7 @@ void zsg2_device::device_start()
 
 		save_item(NAME(m_chan[ch].samples), ch);
 	}
-	
+
 	save_item(NAME(m_sample_count));
 }
 
@@ -204,11 +211,11 @@ void zsg2_device::device_reset()
 	FILE* f;
 
 	f = fopen("zoom_samples.bin","wb");
-	fwrite(m_mem_copy,1,m_mem_blocks*4,f);
+	fwrite(m_mem_copy.get(),1,m_mem_blocks*4,f);
 	fclose(f);
 
 	f = fopen("zoom_samples.raw","wb");
-	fwrite(m_full_samples,2,m_mem_blocks*4,f);
+	fwrite(m_full_samples.get(),2,m_mem_blocks*4,f);
 	fclose(f);
 #endif
 }
@@ -265,12 +272,10 @@ void zsg2_device::filter_samples(zchan *ch)
 
 	for (int i = 0; i < 4; i++)
 	{
-		ch->samples[i+1] = raw_samples[i];
+		ch->emphasis_filter_state += raw_samples[i]-((ch->emphasis_filter_state+EMPHASIS_ROUNDING)>>EMPHASIS_FILTER_SHIFT);
 
-		// not sure if the filter works exactly this way, however I am pleased
-		// with the output for now.
-		ch->emphasis_filter_state += (raw_samples[i]-(ch->emphasis_filter_state>>16)) * EMPHASIS_CUTOFF_BASE;
-		ch->samples[i+1] = (ch->emphasis_filter_state) >> EMPHASIS_OUTPUT_SHIFT;
+		int32_t sample = ch->emphasis_filter_state >> EMPHASIS_OUTPUT_SHIFT;
+		ch->samples[i+1] = std::min<int32_t>(std::max<int32_t>(sample, -32768), 32767);
 	}
 }
 
@@ -280,25 +285,19 @@ void zsg2_device::filter_samples(zchan *ch)
 
 void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// DSP is programmed to expect 24-bit samples! So we're not limiting to 16-bit here
 	for (int i = 0; i < samples; i++)
 	{
 		int32_t mix[4] = {};
 
-		int ch = 0;
-
 		// loop over all channels
 		for (auto & elem : m_chan)
-		//auto & elem = m_chan[0];
 		{
-			ch++;
-			if (!(elem.status & STATUS_ACTIVE))
+			if(~elem.status & STATUS_ACTIVE)
 				continue;
 
 			elem.step_ptr += elem.step;
-			if (elem.step_ptr & 0x10000)
+			if (elem.step_ptr & 0xffff0000)
 			{
-				elem.step_ptr &= 0xffff;
 				if (++elem.cur_pos >= elem.end_pos)
 				{
 					// loop sample
@@ -306,25 +305,33 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					if ((elem.cur_pos + 1) >= elem.end_pos)
 					{
 						// end of sample
+						elem.vol = 0; //this should help the channel allocation just a bit
 						elem.status &= ~STATUS_ACTIVE;
 						continue;
 					}
+
+					if(elem.cur_pos == elem.start_pos)
+						elem.emphasis_filter_state = EMPHASIS_INITIAL_BIAS;
 				}
+				elem.step_ptr &= 0xffff;
 				filter_samples(&elem);
 			}
 
 			uint8_t sample_pos = elem.step_ptr >> 14 & 3;
-			int32_t sample; // = elem.samples[sample_pos];
+			int32_t sample = elem.samples[sample_pos];
 
 			// linear interpolation (hardware certainly does something similar)
-			sample = elem.samples[sample_pos];
 			sample += ((uint16_t)(elem.step_ptr<<2&0xffff) * (int16_t)(elem.samples[sample_pos+1] - sample))>>16;
-
-			sample = (sample * elem.vol) >> 16;
 
 			// another filter...
 			elem.output_filter_state += (sample - (elem.output_filter_state>>16)) * elem.output_cutoff;
 			sample = elem.output_filter_state >> 16;
+
+			// To prevent DC bias, we need to slowly discharge the filter when the output filter cutoff is 0
+			if(!elem.output_cutoff)
+				elem.output_filter_state >>= 1;
+
+			sample = (sample * elem.vol)>>16;
 
 			for(int output=0; output<4; output++)
 			{
@@ -334,7 +341,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				if (elem.output_gain[output] & 0x80) // perhaps ?
 					output_sample = -output_sample;
 
-				mix[output] += (output_sample * gain_tab[output_gain&0x1f]) >> 13;
+				mix[output] += (output_sample * m_gain_tab[output_gain&0x1f]) >> 16;
 			}
 
 			// Apply ramping every other update
@@ -346,10 +353,8 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			}
 		}
 
-		ch = 0;
-
 		for(int output=0; output<4; output++)
-			outputs[output][i] = mix[output];
+			outputs[output][i] = std::min<int32_t>(std::max<int32_t>(mix[output], -32768), 32767);
 
 	}
 	m_sample_count++;
@@ -379,7 +384,9 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 			break;
 
 		case 0x3:
-			// unknown, always 0x0400
+			// unknown, always 0x0400. is this a flag?
+			m_chan[ch].status &= 0x8000;
+			m_chan[ch].status |= data & 0x7fff;
 			break;
 
 		case 0x4:
@@ -412,7 +419,8 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 			break;
 
 		case 0x9:
-			// no function? always 0
+			// writes 0 at key on
+			m_chan[ch].output_cutoff = data;
 			break;
 
 		case 0xa:
@@ -421,8 +429,8 @@ void zsg2_device::chan_w(int ch, int reg, uint16_t data)
 			break;
 
 		case 0xb:
-			// always writes 0
-			// this register is read-only
+			// writes 0 at key on
+			m_chan[ch].vol = data;
 			break;
 
 		case 0xc:
@@ -460,8 +468,16 @@ uint16_t zsg2_device::chan_r(int ch, int reg)
 {
 	switch (reg)
 	{
-		case 0xb: // Only later games (taitogn) read this register...
+		case 0x3:
+			// no games read from this.
 			return m_chan[ch].status;
+		case 0x9:
+			// pretty certain, though no games actually read from this.
+			return m_chan[ch].output_cutoff;
+		case 0xb: // Only later games (taitogn) read this register...
+			// GNet games use some of the flags to decide which channels to kill when
+			// all the channels are busy. (take raycris song #23 as an example)
+			return m_chan[ch].vol;
 		default:
 			break;
 	}
@@ -479,14 +495,12 @@ int16_t zsg2_device::get_ramp(uint8_t val)
 {
 	int16_t frac = val<<12; // sign extend
 	frac = ((frac>>12) ^ 8) << (val >> 4);
-	
 	return (frac >> 4);
 }
 
 inline uint16_t zsg2_device::ramp(uint16_t current, uint16_t target, int16_t delta)
 {
 	int32_t rampval = current + delta;
-	
 	if(delta < 0 && rampval < target)
 		rampval = target;
 	else if(delta >= 0 && rampval > target)
@@ -511,12 +525,13 @@ void zsg2_device::control_w(int reg, uint16_t data)
 				{
 					int ch = base | i;
 					m_chan[ch].status |= STATUS_ACTIVE;
-					m_chan[ch].cur_pos = m_chan[ch].start_pos;
-					m_chan[ch].step_ptr = 0;
-					m_chan[ch].emphasis_filter_state = 0;
-					m_chan[ch].vol = m_chan[ch].vol_initial;
+					m_chan[ch].cur_pos = m_chan[ch].start_pos - 1;
+					m_chan[ch].step_ptr = 0x10000;
+					// Ignoring the "initial volume" for now because it causes lots of clicking
+					m_chan[ch].vol = 0; // m_chan[ch].vol_initial;
+					m_chan[ch].vol_delta = 0x0400; // register 06 ?
 					m_chan[ch].output_cutoff = m_chan[ch].output_cutoff_initial;
-					filter_samples(&m_chan[ch]);
+					m_chan[ch].output_filter_state = 0;
 				}
 			}
 			break;
@@ -531,6 +546,7 @@ void zsg2_device::control_w(int reg, uint16_t data)
 				if (data & (1 << i))
 				{
 					int ch = base | i;
+					m_chan[ch].vol = 0;
 					m_chan[ch].status &= ~STATUS_ACTIVE;
 				}
 			}
@@ -558,6 +574,8 @@ void zsg2_device::control_w(int reg, uint16_t data)
 			break;
 
 		default:
+			if(reg < 0x20)
+				m_reg[reg] = data;
 			logerror("ZSG2 control   %02X = %04X\n", reg, data & 0xffff);
 			break;
 	}
@@ -580,6 +598,8 @@ uint16_t zsg2_device::control_r(int reg)
 			return read_memory(m_read_address) >> 16;
 
 		default:
+			if(reg < 0x20)
+				return m_reg[reg];
 			break;
 	}
 

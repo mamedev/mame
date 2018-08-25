@@ -982,13 +982,13 @@ WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
 	else if ((offs & 0x7fffff) == 0x7FFFF4)
 	{
 		m_5838crypt->data_w(space, offset, data, mem_mask);
-	} 
+	}
 }
 
 void stv_state::init_decathlt()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000000, 0x37fffff, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address, write data
-	
+
 	// really needs installing over the whole range, with fallbacks to read rom if device is disabled or isn't accessed on given address
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27ffff8, 0x27ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); // read decompressed data
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fffff8, 0x2fffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
@@ -998,9 +998,9 @@ void stv_state::init_decathlt()
 	m_protbank->configure_entry(1, memregion("cart")->base() + 0x0800000);
 	m_protbank->configure_entry(2, memregion("cart")->base() + 0x1000000);
 	//m_protbank->configure_entry(3, memregion("cart")->base() + 0x1800000);
-	
+
 	m_protbank->set_entry(0);
-	
+
 	m_newprotection_element = false;
 
 	init_stv();
@@ -1160,7 +1160,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) /* Actually AK93C45F */
+	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

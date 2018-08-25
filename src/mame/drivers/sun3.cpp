@@ -983,7 +983,7 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("6M,8M,12M,16M,20M,24M,28M,32M").set_default_value(0);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// MMU Type 0 device space
 	ADDRESS_MAP_BANK(config, "type0").set_map(&sun3_state::vmetype0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 

@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	MCFG_DEVICE_PROGRAM_MAP(joctronic_sound_map)
 	MCFG_DEVICE_IO_MAP(joctronic_sound_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
 	LS259(config, m_mainlatch); // IC4 - exact type unknown
 	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::display_select_w)); MCFG_DEVCB_MASK(0x07)
@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	MCFG_DEVICE_PROGRAM_MAP(slalom03_sound_map)
 	MCFG_DEVICE_IO_MAP(slalom03_sound_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
 	LS259(config, m_mainlatch); // IC6 - exact type unknown
 	//m_mainlatch->q_out_cb<0>().set(FUNC(joctronic_state::cont_w));

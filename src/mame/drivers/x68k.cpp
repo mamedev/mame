@@ -1704,7 +1704,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 MACHINE_CONFIG_END

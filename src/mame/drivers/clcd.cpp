@@ -729,7 +729,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 
 	RAM(config, "ram").set_default_size("128K").set_extra_options("32K,64K").set_default_value(0);
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", clcd_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(clcd_state::nvram_init));
 MACHINE_CONFIG_END
 
 

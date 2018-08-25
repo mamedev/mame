@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_V3021_ADD("rtc")
 
@@ -4992,6 +4992,6 @@ GAME( 2008, kovshxas,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_ty
 //乱世拳皇/Luànshì quánhuáng
 GAME( 200?, kovlsqh,      kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Quanhuang (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Quanhuang 2 (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-//乱世街霸/Luànshì jiē bà
+//乱世街霸/Luànshì jiē b�
 GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */

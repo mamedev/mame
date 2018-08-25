@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	MCFG_DEVICE_ADD("maincpu", M68010, 10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP (hk68v10_mem)
 
-	MCFG_DEVICE_ADD("cio", Z8536, SCC_CLOCK)
+	Z8536(config, "cio", SCC_CLOCK);
 
 	/* Terminal Port config */
 	MCFG_DEVICE_ADD("scc", SCC8530N, SCC_CLOCK)

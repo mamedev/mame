@@ -173,7 +173,6 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "cpu/tms9900/tms9995.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "bus/centronics/ctronics.h"
@@ -752,32 +751,30 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tutor_state::tutor_memmap);
 	m_maincpu->set_addrmap(AS_IO, &tutor_state::tutor_io);
 
-	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	// video hardware
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound */
-	SPEAKER(config, "mono").front_center();
+	// Sound
+	SPEAKER(config, "sound_out").front_center();
+	SN76489A(config, "sn76489a", 3579545).add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
-	MCFG_DEVICE_ADD("sn76489a", SN76489A, 3579545)   /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tutor_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer").busy_handler().set(FUNC(tutor_state::write_centronics_busy));
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	// Cassette
+	SPEAKER(config, "cass_out").front_center();
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
-	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "tutor_cart")
+	// Cartridge slot
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "tutor_cart", "bin");
 
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
+	// software lists
+	SOFTWARE_LIST(config, "cart_list").set_type("tutor", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tutor_state::pyuutajr)

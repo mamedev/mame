@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(at_state::at386)
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on-board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: deteremine ISA bus clock
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(at_vrom_fix_state::megapcpla)
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock

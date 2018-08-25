@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
 	MCFG_DEVICE_ADDRESS_MAP(0, segacd_pcm_map)
 
-	MCFG_NVRAM_ADD_0FILL("backupram")
+	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
 MACHINE_CONFIG_END

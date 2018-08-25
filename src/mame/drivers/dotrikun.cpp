@@ -232,7 +232,7 @@ ROM_END
 
 ROM_START( dotrikun2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "14479.mpr",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
+	ROM_LOAD( "epr-13141.ic2",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
 ROM_END
 
 ROM_START( dotriman )

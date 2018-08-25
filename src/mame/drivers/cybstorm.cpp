@@ -227,8 +227,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

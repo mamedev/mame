@@ -773,8 +773,8 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 
 	// User interface devices
 	GENEVE_KEYBOARD(config, m_keyboard, 0).int_cb().set(FUNC(geneve_state::keyboard_interrupt));
-	TI99_JOYPORT(config, m_joyport, 0).configure_slot(false, false);
-	TI99_COLORBUS(config, m_colorbus, 0).configure_slot();
+	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
+	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
 
 	// PFM expansion
 	AT29C040(config, GENEVE_PFM512_TAG);

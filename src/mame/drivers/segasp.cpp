@@ -304,8 +304,8 @@ MACHINE_CONFIG_START(segasp_state::segasp)
 	MCFG_DEVICE_PROGRAM_MAP(segasp_map)
 	MCFG_DEVICE_IO_MAP(onchip_port)
 
-	MCFG_DEVICE_ADD("main_eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_DEVICE_ADD("sp_eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "main_eeprom");
+	EEPROM_93C46_16BIT(config, "sp_eeprom");
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
 	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present

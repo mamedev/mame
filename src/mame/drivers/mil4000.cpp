@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 	// irq 2/4/5 point to the same place, others invalid
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

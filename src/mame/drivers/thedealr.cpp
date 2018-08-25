@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_DEVICE_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
 	MCFG_DEVICE_PROGRAM_MAP(thedealr_sub)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

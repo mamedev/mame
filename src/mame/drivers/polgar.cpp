@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 	MCFG_DEVICE_PROGRAM_MAP(polgar_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	hc259_device &outlatch(HC259(config, "outlatch"));
 	outlatch.q_out_cb<0>().set_output("led100");
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	hc259_device &outlatch(HC259(config, "outlatch"));
 	outlatch.q_out_cb<0>().set_output("led100");

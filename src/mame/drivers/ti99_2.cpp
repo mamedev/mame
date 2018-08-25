@@ -145,17 +145,13 @@
 
     ROM dumps
     ---------
-    Hard to believe, but we have access to two people with one 24K and
-    one 32K version, and we were able to dumps the ROMs correctly.
+    Although these machines are extremely rare, we were lucky to get in
+    contact with users of both console variants and got dumps from
+    their machines.
 
     The ROMs contain a stripped-down version of TI BASIC, but without
     the specific graphics subprograms. Programs written on the 99/2 should
     run on the 99/4A, but the opposite is not true.
-
-    TODO
-    ----
-    * Fix cassette
-    * Add Hexbus
 
     Original implementation: Raphael Nabet; December 1999, 2000
 
@@ -173,6 +169,7 @@
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
+#include "bus/hexbus/hexbus.h"
 
 #define TI992_SCREEN_TAG      "screen"
 #define TI992_ROM          "rom_region"
@@ -474,12 +471,12 @@ void ti99_2_state::ti99_2(machine_config& config)
 	RAM(config, TI992_RAM_TAG).set_default_size("4096").set_default_value(0);
 
 	// Cassette drives
-	// There is no route from the cassette to some audio output, so we don't hear it.
-	// Cassette drives
+	// There is no route from the cassette to some audio input,
+	// so we don't hear it.
 	CASSETTE(config, "cassette", 0);
 
 	// Hexbus
-	HEXBUS(config, TI_HEXBUS_TAG, 0).configure_slot();
+	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
 }
 
 /*

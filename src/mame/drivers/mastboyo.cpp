@@ -136,7 +136,7 @@ void mastboyo_state::mastboyo_portmap(address_map &map)
 static INPUT_PORTS_START( mastboyo )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	MCFG_DEVICE_IO_MAP(mastboyo_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f)  // not sure, INT0 pin was measured at 256.244Hz
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -240,7 +240,7 @@ MACHINE_CONFIG_END
 
   Also has a totally different device for questions: mastboy_27256.ic11,
   which is mapped at 0x78000 (all 0xff in the other set)
-  
+
   Due to device addressing and the extra questions device, this dump was
   set as parent.
 
@@ -276,7 +276,7 @@ ROM_END
 /*
   This set has the 78000-80000 range filled with 0xFF's.
   There are more questions banks inside this range in
-  the parent set.  
+  the parent set.
 
 */
 ROM_START( mastboyoa )

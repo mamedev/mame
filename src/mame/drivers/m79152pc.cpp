@@ -161,21 +161,21 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	//MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	//MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	//MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	Z80SIO(config, m_uart, XTAL(4'000'000));
+	//m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_uart->out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	//m_uart->out_txdb_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	//m_uart->out_dtrb_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	//m_uart->out_rtsb_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", z80sio_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsa_w))
 	//MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	//MCFG_RS232_RXD_HANDLER(WRITELINE("uart", z80sio_device, rxb_w))
-	//MCFG_RS232_CTS_HANDLER(WRITELINE("uart", z80sio_device, ctsb_w))
+	//MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxb_w))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

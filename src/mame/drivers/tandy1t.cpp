@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.80)
 
-	MCFG_NVRAM_ADD_0FILL("nvram");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("isa_fdc", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true) // FIXME: determine ISA bus clock
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_35)

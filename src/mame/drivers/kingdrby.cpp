@@ -976,7 +976,7 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)

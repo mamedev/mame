@@ -73,7 +73,7 @@ MACHINE_CONFIG_START(qvt6800_state::qvt102)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'669'800) / 18)
 	MCFG_DEVICE_PROGRAM_MAP(qvt102_mem_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 2x TC5514-APL + 3V battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x TC5514-APL + 3V battery
 
 	//MCFG_DEVICE_ADD("crtc", MC6845, XTAL(16'669'800) / 9)
 
@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(qvt6800_state::qvt190)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'669'800) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(qvt190_mem_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // V61C16P55L + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // V61C16P55L + battery
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 

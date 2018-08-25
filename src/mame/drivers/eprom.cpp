@@ -397,8 +397,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	m_adc->in_callback<2>().set_ioport("ADC2");
 	m_adc->in_callback<3>().set_ioport("ADC3");
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -440,8 +439,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -488,8 +486,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	m_adc->in_callback<2>().set_ioport("ADC2");
 	m_adc->in_callback<3>().set_ioport("ADC3");
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

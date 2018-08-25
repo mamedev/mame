@@ -7,6 +7,7 @@
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
 #include "video/cdp1861.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -38,10 +39,11 @@ uint32_t osc1000b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void tmc1800_state::tmc1800_video(machine_config &config)
 {
-	CDP1861(config, m_vdc, XTAL(1'750'000), SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	CDP1861(config, m_vdc, XTAL(1'750'000)).set_screen(SCREEN_TAG);
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
 	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 }
 
 MACHINE_CONFIG_START(osc1000b_state::osc1000b_video)
@@ -54,8 +56,9 @@ MACHINE_CONFIG_END
 
 void tmc2000_state::tmc2000_video(machine_config &config)
 {
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 	SPEAKER(config, "mono").front_center();
-	CDP1864(config, m_cti, XTAL(1'750'000), SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
@@ -69,8 +72,9 @@ void tmc2000_state::tmc2000_video(machine_config &config)
 
 void nano_state::nano_video(machine_config &config)
 {
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 	SPEAKER(config, "mono").front_center();
-	CDP1864(config, m_cti, XTAL(1'750'000), SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);

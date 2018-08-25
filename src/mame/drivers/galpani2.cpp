@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

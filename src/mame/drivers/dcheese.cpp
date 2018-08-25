@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(dcheese_state::dcheese)
 	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 

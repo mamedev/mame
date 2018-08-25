@@ -523,7 +523,7 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("time_tick_timer", monzagp_state, time_tick_timer, attotime::from_hz(4))
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 MACHINE_CONFIG_END
 
 ROM_START( monzagp )

@@ -22,6 +22,105 @@
     - interrupt generation
     - realistic timing?
     - &c.
+
+    This table summarizes the GPU commands.
+    "Code" is the hex code of command.
+    "Impl" shows whether the command is implemented in this driver or not.
+    "Parameter" reports the I/O data exchanged by the command. Each line
+    is a 16-bit word which is read from/written to the GPU by a pair of
+    8-bit accesses to data register (MSB first).
+    "I" is an input parameter (sent before command code)
+    "D" is an input data word (sent after command code)
+    "O" is an output data word.
+
+    | *Cmd*     | *Code* | *Impl.* | *Parameter*         | *Description*                     |
+    |-----------+--------+---------+---------------------+-----------------------------------|
+    | NOP       |     00 | Y       | -                   | No operation. Used to close       |
+    |           |        |         |                     | RDMEM/WRMEM/RDWIN/WRWIN commands. |
+    | CONF      |     02 | Y       | D@0: H. timing 0    | Configure GPU                     |
+    |           |        |         | D@1: H. timing 1    |                                   |
+    |           |        |         | D@2: H. timing 2    |                                   |
+    |           |        |         | D@3: H. timing 3    |                                   |
+    |           |        |         | D@4: V. timing 0    |                                   |
+    |           |        |         | D@5: V. timing 1    |                                   |
+    |           |        |         | D@6: V. timing 2    |                                   |
+    |           |        |         | D@7: V. timing 3    |                                   |
+    |           |        |         | D@8: Words per line |                                   |
+    |           |        |         | D@9: Lines          |                                   |
+    |           |        |         | D@10: Option bits   |                                   |
+    | DISVID    |     03 | Y       | -                   | Disable video                     |
+    | ENVID     |     04 | Y       | -                   | Enable video                      |
+    | ?         |     06 | Y       | -                   | Unknown                           |
+    |           |        |         |                     | My guess is interrupt enable      |
+    |           |        |         |                     | 05 is probably int. disable       |
+    |           |        |         |                     | It's only used by diagb ROM       |
+    | WRMEM     |     07 | Y       | I@0: RAM address    | Write video RAM. Keep writing     |
+    |           |        |         | D@0: RAM word       | words with auto-incremented addr  |
+    |           |        |         | ...                 | until terminated by NOP.          |
+    | RDMEM     |     08 | Y       | I@0: RAM address    | Read video RAM. Read words until  |
+    |           |        |         | O@0: RAM word       | terminated by NOP.                |
+    |           |        |         | ...                 |                                   |
+    | WRSAD     |     09 | Y       | I@0: Start address  | Set screen start address          |
+    | WRORG     |     0a | Y       | I@0: Start address  | Set raster start address          |
+    | WRDAD     |     0b | Y       | I@0: Start address  | Set data start address            |
+    | WRRR      |     0c | Y       | I@0: RR             | Set replacement rule              |
+    | MOVEP     |     0d | Y       | I@0: X              | Set pen position                  |
+    |           |        |         | I@1: Y              |                                   |
+    | IMOVEP    |     0e | Y       | I@0: delta X        | Set pen position (incremental)    |
+    |           |        |         | I@1: delta Y        |                                   |
+    | DRAWP     |     0f | Y       | I@0: X              | Draw a line and move pen          |
+    |           |        |         | I@1: Y              |                                   |
+    | IDRAWP    |     10 | N       | I@0: delta X        | Draw a line (incremental)         |
+    |           |        |         | I@1: delta Y        |                                   |
+    | RDP       |     11 | Y       | O@0: pen X pos      | Read current pen position         |
+    |           |        |         | O@1: pen Y pos      |                                   |
+    | WRUDL     |     12 | Y       | I@0: UDL            | Set user-defined line pattern     |
+    | WRWINSIZ  |     13 | Y       | I@0: Window width   | Set window size                   |
+    |           |        |         | I@1: Window height  |                                   |
+    | WRWINORG  |     14 | Y       | I@0: Origin X       | Set window origin (UL corner)     |
+    |           |        |         | I@1: Origin Y       |                                   |
+    | COPY      |     15 | Y       | I@0: Dest. origin X | Copy a window. Parameter sets     |
+    |           |        |         | I@1: Dest. origin Y | the UL corner of the dest. win.   |
+    | FILL      |     16 | Y       | I@0: Pattern no.    | Fill a window                     |
+    | FRAME     |     17 | N       | -                   | Draw a frame (rectangle)          |
+    | SCROLUP   |     18 | Y       | I@0: Fill pattern   | Scroll a window upwards           |
+    |           |        |         | I@1: Scroll amount  |                                   |
+    | SCROLDN   |     19 | Y       | I@0: Fill pattern   | Scroll a window downwards         |
+    |           |        |         | I@1: Scroll amount  |                                   |
+    | SCROLLF   |     1a | N       | I@0: Fill pattern   | Scroll a window to the left       |
+    |           |        |         | I@1: Scroll amount  |                                   |
+    | SCROLLF   |     1b | N       | I@0: Fill pattern   | Scroll a window to the right      |
+    |           |        |         | I@1: Scroll amount  |                                   |
+    | RDWIN     |     1c | Y       | I@0: bit offset     | Read a window. Terminated by NOP. |
+    |           |        |         | O@0: data word      |                                   |
+    |           |        |         | ...                 |                                   |
+    | WRWIN     |     1d | Y       | I@0: bit offset     | Write a window. Terminated by NOP.|
+    |           |        |         | D@0: data word      |                                   |
+    |           |        |         | ...                 |                                   |
+    | RDWINPARM |     1e | Y       | O@0: Win. origin X  | Read current window parameters    |
+    |           |        |         | O@1: Win. origin Y  |                                   |
+    |           |        |         | O@2: Window width   |                                   |
+    |           |        |         | O@3: Window height  |                                   |
+    | CR        |     1f | N       | -                   | Carriage return: move pen to      |
+    |           |        |         |                     | start of line                     |
+    | CRLF      |     20 | Y       | -                   | CRLF: move pen to start of next   |
+    |           |        |         |                     | text row                          |
+    | LABEL     |     24 | Y       | I@0: character code | Write a character and move pen    |
+    | ENSP      |     26 | Y       | I@0: sprite pattern | Enable sprite                     |
+    | DISSP     |     27 | Y       | -                   | Disable sprite                    |
+    | MOVESP    |     28 | Y       | I@0: Sprite X pos   | Move sprite                       |
+    |           |        |         | I@1: Sprite Y pos   |                                   |
+    | IMOVESP   |     29 | N       | I@0: Sprite delta X | Move sprite (incremental)         |
+    |           |        |         | I@1: Sprite delta Y |                                   |
+    | RDSP      |     2a | Y       | O@0: Sprite X pos   | Read sprite position              |
+    |           |        |         | O@1: Sprite Y pos   |                                   |
+    | DRAWPX    |     2b | Y       | I@0: X              | Write a pixel                     |
+    |           |        |         | I@1: Y              |                                   |
+    | WRFAD     |     2c | Y       | I@0: Font address   | Set address of font data          |
+    | ENCURS    |     2d | Y       | I@0: cursor pattern | Enable cursor                     |
+    |           |        |         | I@1: cursor offset  |                                   |
+    | DISCURS   |     2e | Y       | -                   | Disable cursor                    |
+    | ID        |     3f | Y       | O@0: ID             | Read hw ID                        |
 */
 
 #include "emu.h"
@@ -794,13 +893,17 @@ READ8_MEMBER( hp1ll3_device::read )
 					}
 					else
 					{
-						unsigned w = std::min(WS, unsigned(width));
+						unsigned discarded_bits = 0;
+						// Insert "m_rw_win_off" dummy bits in the first word of each line
+						if (m_rw_win_x ==  m_window.org_x)
+							discarded_bits = m_rw_win_off;
+						unsigned w = std::min(WS - discarded_bits, unsigned(width));
 
-						m_io_word = rd_video(addr) << bit;
+						m_io_word = (rd_video(addr) << bit) >> discarded_bits;
 						if ((bit + w) > WS)
-							m_io_word |= rd_video(addr + 1) >> (WS - bit);
+							m_io_word |= rd_video(addr + 1) >> (WS - bit + discarded_bits);
 
-						m_io_word &= ~0 << (WS - w);
+						m_io_word &= ~0 << (WS - w - discarded_bits);
 						m_rw_win_x += w;
 						if (m_rw_win_x >= (m_window.width + m_window.org_x))
 						{
@@ -920,20 +1023,24 @@ WRITE8_MEMBER( hp1ll3_device::write )
 						m_command = NOP;
 					else
 					{
-						unsigned w = std::min(WS, unsigned(width));
+						unsigned discarded_bits = 0;
+						// Remove "m_rw_win_off" bits from the first word of each line
+						if (m_rw_win_x ==  m_window.org_x)
+							discarded_bits = m_rw_win_off;
+						unsigned w = std::min(WS - discarded_bits, unsigned(width));
 
 						glob_mask >>= bit;
 						if ((bit + w) < WS)
 							glob_mask &= ~0 << (WS - (bit + w));
 
-						rmw_rop(addr, m_io_word >> bit, glob_mask, rop_masks);
-						DBG_LOG(3, 0, ("WRWIN (%u,%u) %d %04x %04x\n", m_rw_win_x, m_rw_win_y, width, m_io_word >> bit, glob_mask));
+						rmw_rop(addr, (m_io_word << discarded_bits) >> bit, glob_mask, rop_masks);
+						DBG_LOG(3, 0, ("WRWIN (%u,%u) %d %04x %04x->%04x\n", m_rw_win_x, m_rw_win_y, width, (m_io_word << discarded_bits) >> bit, glob_mask, rd_video(addr)));
 						if ((bit + w) > WS)
 						{
-							unsigned pad = WS - bit;
+							unsigned pad = WS - bit + discarded_bits;
 							glob_mask = ~0 << (2 * WS - bit - w);
 							rmw_rop(addr + 1, uint16_t(m_io_word << pad), glob_mask, rop_masks);
-							DBG_LOG(3, 0, ("WRWIN %u %04x %04x\n", pad, m_io_word << pad, glob_mask));
+							DBG_LOG(3, 0, ("WRWIN %u %04x %04x->%04x\n", pad, m_io_word << pad, glob_mask, rd_video(addr + 1)));
 						}
 						m_rw_win_x += w;
 						if (m_rw_win_x >= (m_window.width + m_window.org_x))
@@ -1081,9 +1188,9 @@ void hp1ll3_device::command(int command)
 	case RDWIN:
 		DBG_LOG(2,"HPGPU",("command: %s [%d, 0x%x] offset=%u size(%d,%d)\n",
 						   command == RDWIN ? "RDWIN":"WRWIN", command, command, m_input[0], m_window.width, m_window.height));
-		// m_input[0] is offset (to be implemented)
 		m_rw_win_x = m_window.org_x;
 		m_rw_win_y = m_window.org_y;
+		m_rw_win_off = m_input[0] % WS;
 		disable_cursor();
 		disable_sprite();
 		break;

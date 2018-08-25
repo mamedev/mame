@@ -107,11 +107,10 @@ protected:
 	virtual void sprite_count_overflow(int line, int sprite_index);
 	virtual void draw_scanline(int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line);
-	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line);
+	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line);
 	virtual uint16_t name_table_row_mode4(int row);
 	virtual uint16_t sprite_attributes_addr_mode4(uint16_t base);
 	virtual uint8_t sprite_tile_mask_mode4(uint8_t tile_number);
-	virtual int select_sprite_tile_mode4(int sprite_index, int sprite_line);
 	void process_line_timer();
 	void draw_scanline_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_mode4(int *line_buffer, int *priority_selected, int line);
@@ -124,42 +123,42 @@ protected:
 
 	void vdp_postload();
 
-	uint8_t            m_reg[16];                  /* All the registers */
-	uint8_t            m_status;                   /* Status register */
-	uint8_t            m_pending_status;           /* Pending status flags */
-	uint8_t            m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
-	uint8_t            m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
-	uint8_t            m_addrmode;                 /* Type of VDP action */
-	uint16_t           m_addr;                     /* Contents of internal VDP address register */
-	const uint8_t      m_cram_size;                /* CRAM size */
-	uint8_t            m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
-	bool               m_cram_dirty;               /* Have there been any changes to the CRAM area */
-	bool               m_hint_occurred;
-	bool               m_pending_hint;
-	bool               m_pending_control_write;
-	int                m_pending_sprcol_x;
-	uint8_t            m_buffer;
-	uint8_t            m_control_write_data_latch;
+	uint8_t          m_reg[16];                  /* All the registers */
+	uint8_t          m_status;                   /* Status register */
+	uint8_t          m_pending_status;           /* Pending status flags */
+	uint8_t          m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
+	uint8_t          m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
+	uint8_t          m_addrmode;                 /* Type of VDP action */
+	uint16_t         m_addr;                     /* Contents of internal VDP address register */
+	const uint8_t    m_cram_size;                /* CRAM size */
+	uint8_t          m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
+	bool             m_cram_dirty;               /* Have there been any changes to the CRAM area */
+	bool             m_hint_occurred;
+	bool             m_pending_hint;
+	bool             m_pending_control_write;
+	int              m_pending_sprcol_x;
+	uint8_t          m_buffer;
+	uint8_t          m_control_write_data_latch;
 	bool             m_sega315_5124_compatibility_mode;    /* when true, GG VDP behaves as SMS VDP */
 	int              m_irq_state;                /* The status of the IRQ line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	int              m_draw_time;
-	uint8_t            m_line_counter;
-	uint8_t            m_hcounter;
-	uint8_t            m_CRAM[SEGA315_5377_CRAM_SIZE];  /* CRAM */
-	const uint8_t      *m_frame_timing;
-	const uint8_t      *m_line_timing;
+	uint8_t          m_line_counter;
+	uint8_t          m_hcounter;
+	uint8_t          m_CRAM[SEGA315_5377_CRAM_SIZE];  /* CRAM */
+	const uint8_t    *m_frame_timing;
+	const uint8_t    *m_line_timing;
 	bitmap_rgb32     m_tmpbitmap;
 	bitmap_ind8      m_y1_bitmap;
-	const uint8_t      m_palette_offset;
-	const uint8_t      m_reg_num_mask;
+	const uint8_t    m_palette_offset;
+	const uint8_t    m_reg_num_mask;
 	bool             m_display_disabled;
-	uint16_t           m_sprite_base;
-	uint16_t           m_sprite_pattern_line[8];
+	uint16_t         m_sprite_base;
+	uint16_t         m_sprite_pattern_line[8];
 	int              m_sprite_tile_selected[8];
 	int              m_sprite_x[8];
-	uint8_t            m_sprite_flags[8];
+	uint8_t          m_sprite_flags[8];
 	int              m_sprite_count;
 	int              m_sprite_height;
 	int              m_sprite_zoom_scale;
@@ -223,7 +222,7 @@ protected:
 
 	virtual void update_palette() override;
 	virtual void cram_write(uint8_t data) override;
-	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line ) override;
+	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line) override;
 
 private:
 	DECLARE_PALETTE_INIT( sega315_5377 );
@@ -246,7 +245,7 @@ protected:
 	virtual void sprite_count_overflow(int line, int sprite_index) override;
 	virtual void select_display_mode() override;
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
-	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line) override;
+	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line) override;
 };
 
 

@@ -67,7 +67,6 @@
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "speaker.h"
@@ -837,11 +836,10 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	TMS9901(config, m_tms9901_usr, 2000000);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
@@ -870,10 +868,9 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
 	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	TMS9902(config, m_tms9902, 2000000);
-	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+	TMS9902(config, m_tms9902, 2000000).xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
-	MCFG_DEVICE_ADD("rs232", TM990_189_RS232, 0, m_tms9902)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	// Need to delay the timer, or it will spoil the initial LOAD
 	// TODO: Fix this, probably inside CPU
@@ -891,19 +888,19 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
+	tms9918_device &vdp(TMS9918(config, "tms9918", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
 	config.set_default_layout(layout_tm990189v);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);   /* one two-level buzzer */
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	TMS9901(config, m_tms9901_usr, 2000000);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
@@ -932,10 +929,9 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
 	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	TMS9902(config, m_tms9902, 2000000);
-	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+	TMS9902(config, m_tms9902, 2000000).xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
+	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
-	MCFG_DEVICE_ADD("rs232", TM990_189_RS232, 0, m_tms9902)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END

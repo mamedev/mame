@@ -1514,7 +1514,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// centronics printer
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
@@ -1555,7 +1555,7 @@ MACHINE_CONFIG_START(px4p_state::px4p)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(px4p_io)
 
-	MCFG_NVRAM_ADD_0FILL("rdnvram")
+	NVRAM(config, "rdnvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(px4p_state, px4p)

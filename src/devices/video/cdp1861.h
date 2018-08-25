@@ -26,8 +26,6 @@
 
 #pragma once
 
-#include "screen.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -65,7 +63,6 @@ public:
 
 	// construction/destruction
 	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, screen_device &screen);
 
 	auto int_cb() { return m_write_int.bind(); }
 	auto dma_out_cb() { return m_write_dma_out.bind(); }
@@ -81,6 +78,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 	ide.irq_handler().set(FUNC(csplayh5_state::ide_irq));
 #endif
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified

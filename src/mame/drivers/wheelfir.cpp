@@ -761,7 +761,7 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 

@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, hnayayoi_state, nmi_clock_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(hnayayoi_state::coin_counter_w));

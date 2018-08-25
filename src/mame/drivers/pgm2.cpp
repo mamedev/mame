@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_PALETTE_ADD("bg_palette", 0x2000/4) // bg
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -1192,7 +1192,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("ctc", z80ctc_device, trg2))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
@@ -1282,7 +1282,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("ctc", z80ctc_device, trg2))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 

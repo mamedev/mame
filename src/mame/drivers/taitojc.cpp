@@ -1095,7 +1095,7 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");

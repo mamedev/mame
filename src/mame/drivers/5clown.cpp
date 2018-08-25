@@ -1033,7 +1033,7 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
 	MCFG_DEVICE_PROGRAM_MAP(fcaudio_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	pia6821_device &pia0(PIA6821(config, "pia0", 0));
 	pia0.readpa_handler().set(FUNC(_5clown_state::mux_port_r));

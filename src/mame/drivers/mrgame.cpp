@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 	MCFG_DEVICE_PROGRAM_MAP(audio2_map)
 	MCFG_DEVICE_IO_MAP(audio2_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5564 (x2) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5564 (x2) + battery
 
 	LS259(config, m_selectlatch); // 5B
 	m_selectlatch->q_out_cb<0>().set(FUNC(mrgame_state::video_a11_w));

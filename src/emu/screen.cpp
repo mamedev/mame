@@ -656,19 +656,32 @@ void screen_device::device_config_complete()
 {
 	// combine orientation with machine orientation
 	m_orientation = orientation_add(m_orientation, mconfig().gamedrv().flags & machine_flags::MASK_ORIENTATION);
+}
+
+
+//-------------------------------------------------
+//  physical_aspect - determine the physical
+//  aspect ratio to be used for rendering
+//-------------------------------------------------
+
+std::pair<unsigned, unsigned> screen_device::physical_aspect() const
+{
+	assert(configured());
+
+	std::pair<unsigned, unsigned> phys_aspect = m_phys_aspect;
 
 	// physical aspect ratio unconfigured
-	if (!m_phys_aspect.first || !m_phys_aspect.second)
+	if (!phys_aspect.first || !phys_aspect.second)
 	{
 		switch (m_type)
 		{
 		case SCREEN_TYPE_RASTER:
 		case SCREEN_TYPE_VECTOR:
-			m_phys_aspect = std::make_pair(4, 3); // assume standard CRT
+			phys_aspect = std::make_pair(4, 3); // assume standard CRT
 			break;
 		case SCREEN_TYPE_LCD:
 		case SCREEN_TYPE_SVG:
-			m_phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
+			phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
 			break;
 		case SCREEN_TYPE_INVALID:
 		default:
@@ -677,16 +690,17 @@ void screen_device::device_config_complete()
 	}
 
 	// square pixels?
-	if ((~0U == m_phys_aspect.first) && (~0U == m_phys_aspect.second))
+	if ((~0U == phys_aspect.first) && (~0U == phys_aspect.second))
 	{
-		m_phys_aspect.first = visible_area().width();
-		m_phys_aspect.second = visible_area().height();
+		phys_aspect.first = visible_area().width();
+		phys_aspect.second = visible_area().height();
 	}
 
 	// always keep this in reduced form
-	util::reduce_fraction(m_phys_aspect.first, m_phys_aspect.second);
-}
+	util::reduce_fraction(phys_aspect.first, phys_aspect.second);
 
+	return phys_aspect;
+}
 
 
 //-------------------------------------------------

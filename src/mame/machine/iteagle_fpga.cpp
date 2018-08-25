@@ -52,8 +52,8 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 }
 
 MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
-	MCFG_NVRAM_ADD_1FILL("eagle1_bram")
+	NVRAM(config, "eagle2_rtc", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "eagle1_bram", nvram_device::DEFAULT_ALL_1);
 
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
@@ -670,9 +670,10 @@ void iteagle_eeprom_device::eeprom_map(address_map &map)
 	map(0x0000, 0x000F).rw(FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
 }
 
-MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+void iteagle_eeprom_device::device_add_mconfig(machine_config &config)
+{
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock)
@@ -714,7 +715,7 @@ void iteagle_eeprom_device::device_start()
 	}
 	m_iteagle_default_eeprom[0x3f] = checkSum;
 
-	m_eeprom->set_default_data(m_iteagle_default_eeprom.data(), 0x80);
+	m_eeprom->default_data(m_iteagle_default_eeprom.data(), 0x80);
 
 	pci_device::device_start();
 	skip_map_regs(1);
@@ -786,9 +787,10 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 // Attached Peripheral Controller
 //************************************
 
-MACHINE_CONFIG_START(iteagle_periph_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_0FILL("eagle1_rtc")
-MACHINE_CONFIG_END
+void iteagle_periph_device::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, "eagle1_rtc", nvram_device::DEFAULT_ALL_0);
+}
 
 DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITEagle Peripheral Controller")
 

@@ -47,6 +47,10 @@ public:
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
+	// ADPCM operations
+	DECLARE_READ8_MEMBER( adpcm_update_0 );
+	DECLARE_READ8_MEMBER( adpcm_update_1 );
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -87,6 +91,21 @@ private:
 		uint8_t ctrl;
 	}m_micro_prg;
 
+	struct{
+		uint8_t rate;
+		uint32_t status;
+		int interrupt;
+		uint8_t playing[2];
+		uint8_t control[2];
+		uint32_t start[2];
+		uint32_t end[2];
+		uint32_t imm[2];
+		uint32_t input[2];
+		int nibble[2];
+		uint32_t pos[2];
+		uint32_t addr[2];
+	}m_adpcm;
+
 	const address_space_config      m_program_space_config;
 	const address_space_config      m_data_space_config;
 	required_shared_ptr<uint16_t>   m_microprg_ram;
@@ -103,6 +122,9 @@ private:
 	uint32_t read_dword(offs_t address);
 	void write_dword(offs_t address, uint32_t data);
 	void write_microprg_data(offs_t address, uint16_t data);
+
+	uint8_t adpcm_update(int chan);
+	void interrupt_update();
 
 	void kram_map(address_map &map);
 	void microprg_map(address_map &map);

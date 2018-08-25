@@ -834,7 +834,7 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	MCFG_DEVICE_PROGRAM_MAP(jingbell_map)
 	MCFG_DEVICE_IO_MAP(jingbell_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, igs009_state, nmi_and_coins_w))

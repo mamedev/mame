@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(pntnpuzl_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	VIA6522(config, m_via, 12_MHz_XTAL / 10);
 	m_via->readpa_handler().set_ioport("IN2");

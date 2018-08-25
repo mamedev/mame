@@ -5501,7 +5501,7 @@ void model3_state::add_base_devices(machine_config &config)
 	M68000(config, m_audiocpu, 12000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &model3_state::model3_snd);
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 	NVRAM(config, "backup", nvram_device::DEFAULT_ALL_1);
 	RTC72421(config, m_rtc, XTAL(32'768)); // internal oscillator
 

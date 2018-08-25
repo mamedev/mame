@@ -4,7 +4,7 @@
 
     m6502.c
 
-    Mostek 6502, original NMOS variant
+    MOS Technology 6502, original NMOS variant
 
 ***************************************************************************/
 
@@ -107,6 +107,7 @@ void m6502_device::init()
 	inst_state_base = 0;
 	sync = false;
 	inhibit_interrupts = false;
+	count_before_instruction_step = 0;
 }
 
 void m6502_device::device_reset()
@@ -552,6 +553,68 @@ uint8_t m6502_device::mi_default_nd::read_sync(uint16_t adr)
 uint8_t m6502_device::mi_default_nd::read_arg(uint16_t adr)
 {
 	return program->read_byte(adr);
+}
+
+m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m6502_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
+void m6502_mcu_device::recompute_bcount(uint64_t event_time)
+{
+	if(!event_time || event_time >= total_cycles() + icount) {
+		bcount = 0;
+		return;
+	}
+	bcount = total_cycles() + icount - event_time;
+}
+
+void m6502_mcu_device::execute_run()
+{
+	internal_update(total_cycles());
+
+	icount -= count_before_instruction_step;
+	if(icount < 0) {
+		count_before_instruction_step = -icount;
+		icount = 0;
+	} else
+		count_before_instruction_step = 0;
+
+	while(bcount && icount <= bcount)
+		internal_update(total_cycles() + icount - bcount);
+
+	if(icount > 0 && inst_substate)
+		do_exec_partial();
+
+	while(icount > 0) {
+		while(icount > bcount) {
+			if(inst_state < 0xff00) {
+				PPC = NPC;
+				inst_state = IR | inst_state_base;
+				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+					debugger_instruction_hook(NPC);
+			}
+			do_exec_full();
+		}
+		if(icount > 0)
+			while(bcount && icount <= bcount)
+				internal_update(total_cycles() + icount - bcount);
+		if(icount > 0 && inst_substate)
+			do_exec_partial();
+	}
+	if(icount < 0) {
+		count_before_instruction_step = -icount;
+		icount = 0;
+	}
+}
+
+void m6502_mcu_device::add_event(uint64_t &event_time, uint64_t new_event)
+{
+	if(!new_event)
+		return;
+	if(!event_time || event_time > new_event)
+		event_time = new_event;
 }
 
 

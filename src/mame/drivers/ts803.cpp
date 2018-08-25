@@ -450,9 +450,9 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	dart_clock.signal_handler().set("dart", FUNC(z80dart_device::txca_w));
 	dart_clock.signal_handler().append("dart", FUNC(z80dart_device::rxca_w));
 
-	MCFG_DEVICE_ADD("sti", Z80STI, 16_MHz_XTAL / 4)
-	MCFG_Z80STI_OUT_TBO_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))
-	MCFG_Z80STI_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sti_device& sti(Z80STI(config, "sti", 16_MHz_XTAL / 4));
+	sti.out_tbo_cb().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	sti.out_int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

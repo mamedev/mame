@@ -1281,7 +1281,7 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_DEVICE_PROGRAM_MAP(mpu4_6809_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")               /* confirm */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
 	mpu4_common(config);
 

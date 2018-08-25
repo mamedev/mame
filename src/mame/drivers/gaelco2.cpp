@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_DEVICE_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
+	EEPROM_93C66_16BIT(config, "eeprom");
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
@@ -1560,7 +1560,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
+	EEPROM_93C66_16BIT(config, "eeprom");
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
@@ -1603,7 +1603,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
+	EEPROM_93C66_16BIT(config, "eeprom");
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));

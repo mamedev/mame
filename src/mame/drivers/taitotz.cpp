@@ -2601,7 +2601,7 @@ MACHINE_CONFIG_START(taitotz_state::taitotz)
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
 	ata.irq_handler().set(FUNC(taitotz_state::ide_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

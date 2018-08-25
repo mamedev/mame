@@ -194,6 +194,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -660,7 +661,8 @@ MACHINE_CONFIG_START(studio2_state::studio2)
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 
 	/* video hardware */
-	CDP1861(config, m_vdc, 1760000, SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	CDP1861(config, m_vdc, 1760000).set_screen(m_screen);
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
 	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
@@ -685,11 +687,13 @@ MACHINE_CONFIG_START(visicom_state::visicom)
 	m_maincpu->dma_wr_cb().set(FUNC(visicom_state::dma_w));
 
 	/* video hardware */
-	CDP1861(config, m_vdc, XTAL(3'579'545)/2, SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(visicom_state::screen_update));
+
+	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(m_screen);
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
 	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
-	m_screen->set_screen_update(FUNC(visicom_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -718,7 +722,8 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	CDP1864(config, m_cti, 1.75_MHz_XTAL, SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(m_screen);
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);

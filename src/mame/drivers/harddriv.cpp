@@ -1489,7 +1489,8 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_DEVICE_ADD("200e", M48T02, 0)
-	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
+
+	EEPROM_2816(config, "210e"); // MK48Z02
 
 	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, harddriv_state, harddriv_duart_irq_handler))
@@ -1651,8 +1652,8 @@ MACHINE_CONFIG_START(harddriv_state::dsk)
 	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(*this, harddriv_state,hddsk_update_pif))
 	MCFG_DEVICE_PROGRAM_MAP(dsk_dsp32_map)
 
-	MCFG_EEPROM_2816_ADD("dsk_10c") // MK48Z02
-	MCFG_EEPROM_2816_ADD("dsk_30c") // MK48Z02
+	EEPROM_2816(config, "dsk_10c"); // MK48Z02
+	EEPROM_2816(config, "dsk_30c"); // MK48Z02
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)

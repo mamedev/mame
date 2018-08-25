@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, hap
+// copyright-holders:Olivier Galibert, hap, superctr, cam900
 /***************************************************************************
 
     Taito Zoom ZSG-2 sound board
@@ -18,16 +18,13 @@ Texas Instruments TMS57002DPHA DSP (QFP80)
 * 1.5625MHz pin 75 and 2 [25/16] (BCKI) (BCKO)
 
 Newer games have a Panasonic MN1020819DA,
-and a Zoom Corp. ZFX-2 DSP instead of the TMS57002.
-
+and a Zoom Corp. ZFX-2 DSP instead of the TMS57002 (Functionally identical).
 
 TODO:
-- Raycrisis song 9 gets cut off due to clipping. Possible DSP emulation bug,
-  or just have to change the volumes. in the sound test, it will start to cut
-  at about 55%. and the timbre doesn't sound right anyway.
-
-- check DSP behavior
-- Implement the ramping control registers in zsg2.cpp
+- ZSG-2 sound chip emulation might not be perfect, see zsg2.cpp
+- check DSP behavior. The DSP is programmed to expect 16-bit samples, but
+  the range of the sample values seem really low. Normally the TMS57002 is
+  supposed to left-shift 16-bit samples, but is this the case here?
 
 ***************************************************************************/
 
@@ -219,11 +216,11 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 #ifdef USE_DSP
 	m_zsg2->add_route(0, *m_tms57002, 0.5, 0); // reverb effect
 	m_zsg2->add_route(1, *m_tms57002, 0.5, 1); // chorus effect
-	m_zsg2->add_route(2, *m_tms57002, 0.5, 2); // left direct
-	m_zsg2->add_route(3, *m_tms57002, 0.5, 3); // right direct
+	m_zsg2->add_route(2, *m_tms57002, 1.0, 2); // left direct
+	m_zsg2->add_route(3, *m_tms57002, 1.0, 3); // right direct
 #else
-	m_zsg2->add_route(2, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_zsg2->add_route(3, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_zsg2->add_route(2, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_zsg2->add_route(3, *this, 0.5, AUTO_ALLOC_INPUT, 1);
 #endif
 
 MACHINE_CONFIG_END

@@ -22,6 +22,9 @@ public:
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
+	auto irq_handler_cb() { return m_irq_handler.bind(); }
+	auto drq_handler_cb() { return m_drq_handler.bind(); }
+
 	virtual void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(tcounter_lo_r);
