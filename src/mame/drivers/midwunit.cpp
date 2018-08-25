@@ -691,17 +691,17 @@ PROTO  9FA5 3/20/95  MORTAL KOMBAT III  U132  2M.1
 PROTO  056F 3/20/95  MORTAL KOMBAT III  U131  2M.2
 PROTO  775D 3/20/95  MORTAL KOMBAT III  U130  2M.3
 
-PROTO  DE07 3/20/95  MORTAL KOMBAT III  U129  4M.0   <these labeles were missing, except for one hand written label.  Following format of U133 - U130>
+PROTO  DE07 3/20/95  MORTAL KOMBAT III  U129  4M.0   <these labels were missing, except for one hand written label.  Following format of U133 - U130>
 PROTO  EEE2 3/20/95  MORTAL KOMBAT III  U128  4M.1
 PROTO  D3C6 3/20/95  MORTAL KOMBAT III  U127  4M.2
 PROTO  0F4D 3/20/95  MORTAL KOMBAT III  U126  4M.3
 
-PROTO  985D 3/20/95  MORTAL KOMBAT III  U125  6M.0  <these labeles were missing, except for one hand written label.  Following format of U133 - U130>
+PROTO  985D 3/20/95  MORTAL KOMBAT III  U125  6M.0  <these labels were missing, except for one hand written label.  Following format of U133 - U130>
 PROTO  F576 3/20/95  MORTAL KOMBAT III  U124  6M.1
 PROTO  7C81 3/20/95  MORTAL KOMBAT III  U123  6M.2
 PROTO  49FE 3/20/95  MORTAL KOMBAT III  U122  6M.3
 
-0435 3/29/95  MORTAL KOMBAT III  U121  8M.0  <these labeles were missing, except for one hand written label>
+0435 3/29/95  MORTAL KOMBAT III  U121  8M.0  <these labels were missing, except for one hand written label>
 E667 3/29/95  MORTAL KOMBAT III  U120  8M.1
 0493 3/29/95  MORTAL KOMBAT III  U119  8M.2
 B037 3/29/95  MORTAL KOMBAT III  U118  8M.3
