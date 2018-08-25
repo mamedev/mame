@@ -30,8 +30,12 @@ public:
 
 	void z29(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	u8 dummy_psen_r();
+	void p3_w(u8 data);
+	DECLARE_READ8_MEMBER(bs_24k_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_WRITE8_MEMBER(latch_12k_w);
 
@@ -45,11 +49,32 @@ private:
 	required_shared_ptr<u8> m_charmem;
 	required_shared_ptr<u8> m_attrmem;
 	required_region_ptr<u8> m_chargen;
+
+	bool m_t0;
 };
 
-u8 z29_state::dummy_psen_r()
+void z29_state::machine_start()
 {
-	return 0x24;
+	save_item(NAME(m_t0));
+}
+
+void z29_state::p3_w(u8 data)
+{
+	m_t0 = BIT(data, 4);
+}
+
+READ8_MEMBER(z29_state::bs_24k_r)
+{
+	if (!machine().side_effects_disabled())
+	{
+		u8 chardata = m_charmem[offset];
+		u8 attrdata = m_attrmem[offset] & 0xf;
+
+		m_crtc[0]->dack_w(space, 0, chardata & 0x7f);
+		m_crtc[1]->dack_w(space, 0, (chardata & 0x60) | (BIT(chardata, 7) ? 0x10 : 0) | attrdata);
+	}
+
+	return m_t0 ? 0x24 : 0x20;
 }
 
 WRITE8_MEMBER(z29_state::crtc_w)
@@ -67,7 +92,7 @@ WRITE8_MEMBER(z29_state::latch_12k_w)
 void z29_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("maincpu", 0);
-	map(0x2000, 0xffff).r(FUNC(z29_state::dummy_psen_r));
+	map(0x6000, 0x67ff).mirror(0x800).r(FUNC(z29_state::bs_24k_r));
 }
 
 void z29_state::ext_map(address_map &map)
@@ -90,6 +115,7 @@ void z29_state::z29(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &z29_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &z29_state::ext_map);
 	m_maincpu->port_in_cb<1>().set_constant(0xfd); // hack around keyboard not working
+	m_maincpu->port_out_cb<3>().set(FUNC(z29_state::p3_w));
 
 	X2210(config, m_nvram);
 
