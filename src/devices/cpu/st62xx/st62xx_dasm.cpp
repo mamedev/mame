@@ -39,7 +39,7 @@ std::string st62xx_disassembler::reg_name(const uint8_t reg)
 		"DRA",   "DRB",   "DRC",   "DRD",    "DDRA",  "DDRB",  "DDRC",  "DDRD",   "IOR",   "DWR",   "PRPR",  "DRBR",   "ORA",   "ORB",   "ORC",   "ORD",
 		"ADR",   "ADCR",  "PSC",   "TCR",    "TSCR",  nullptr, "UARTDR","UARTCR", "DWDR",  nullptr, "IPR",   nullptr,  "SIDR",  "SDSR",  nullptr, nullptr,
 		nullptr, nullptr, nullptr, nullptr,  nullptr, "ARMC",  "ARSC0", "ARSC1",  nullptr, "ARRC",  "ARCP",  "ARLR",   nullptr, nullptr, nullptr, nullptr,
-		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, "A",
 	};
 
 	if (REG_NAMES[reg])
@@ -99,7 +99,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			pc++;
 			const int8_t ee = (int8_t)opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "JRR  %d,%Xh,$%Xh", b, rr, ee);
+			util::stream_format(stream, "JRR  %d,%s,$%Xh", b, reg_name(rr), ee);
 			break;
 		}
 		case 0x13: case 0x33: case 0x53: case 0x73: case 0x93: case 0xb3: case 0xd3: case 0xf3:
@@ -109,7 +109,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			pc++;
 			const int8_t ee = (int8_t)opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "JRS  %d,%Xh,$%Xh", b, rr, ee);
+			util::stream_format(stream, "JRS  %d,%s,$%Xh", b, reg_name(rr), ee);
 			break;
 		}
 		case 0x0b: case 0x2b: case 0x4b: case 0x6b: case 0x8b: case 0xab: case 0xcb: case 0xeb:
@@ -117,7 +117,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			const uint8_t b = (op >> 5) & 7;
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "RES  %d,%Xh", b, rr);
+			util::stream_format(stream, "RES  %d,%s", b, reg_name(rr));
 			break;
 		}
 		case 0x1b: case 0x3b: case 0x5b: case 0x7b: case 0x9b: case 0xbb: case 0xdb: case 0xfb:
@@ -125,7 +125,7 @@ offs_t st62xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			const uint8_t b = (op >> 5) & 7;
 			const uint8_t rr = opcodes.r8(pc);
 			pc++;
-			util::stream_format(stream, "SET  %d,%Xh", b, rr);
+			util::stream_format(stream, "SET  %d,%s", b, reg_name(rr));
 			break;
 		}
 		case 0x04: case 0x14: case 0x24: case 0x34: case 0x44: case 0x54: case 0x64: case 0x74:

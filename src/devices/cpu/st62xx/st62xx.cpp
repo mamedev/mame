@@ -17,19 +17,6 @@
 
 DEFINE_DEVICE_TYPE(ST6228,   st6228_device,   "st6228",   "STmicro ST6228")
 
-void st6228_device::st6228_program_map(address_map &map)
-{
-	map(0x000, 0x7ff).bankr("program_rombank");
-	map(0x800, 0xfff).rom().region(tag(), 0x800);
-}
-
-void st6228_device::st6228_data_map(address_map &map)
-{
-	map(0x00, 0x3f).bankrw("rambank");
-	map(0x40, 0x7f).bankr("data_rombank");
-	map(0x80, 0xff).rw(FUNC(st6228_device::regs_r), FUNC(st6228_device::regs_w));
-}
-
 st6228_device::st6228_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ST6228, tag, owner, clock)
 	, m_pc(0)
@@ -37,18 +24,36 @@ st6228_device::st6228_device(const machine_config &mconfig, const char *tag, dev
 	, m_prev_mode(MODE_NORMAL)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(st6228_device::st6228_program_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(st6228_device::st6228_data_map), this))
+	, m_porta_out{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_portb_out{{*this}, {*this}, {*this}}
+	, m_portc_out{{*this}, {*this}, {*this}, {*this}}
+	, m_portd_out{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_program(nullptr)
 	, m_data(nullptr)
-	, m_rambank(*this, "^rambank")
-	, m_program_rombank(*this, "^program_rombank")
-	, m_data_rombank(*this, "^data_rombank")
+	// FIXME: memory banks do not currently work with internal maps.
+	//, m_rambank(*this, "^rambank")
+	//, m_program_rombank(*this, "^program_rombank")
+	//, m_data_rombank(*this, "^data_rombank")
 	, m_rom(*this, this->tag())
 {
 }
 
-void st6228_device::unimplemented_opcode(uint8_t op)
+void st6228_device::st6228_program_map(address_map &map)
 {
-	fatalerror("ST62xx: unknown opcode (%02x) at %04x\n", op, m_pc);
+	// FIXME: memory banks do not currently work with internal maps.
+	//map(0x000, 0x7ff).bankr(m_program_rombank);
+	map(0x000, 0x7ff).r(FUNC(st6228_device::program_rombank_r));
+	map(0x800, 0xfff).rom().region(tag(), 0x800);
+}
+
+void st6228_device::st6228_data_map(address_map &map)
+{
+	// FIXME: memory banks do not currently work with internal maps.
+	//map(0x00, 0x3f).bankrw(m_rambank);
+	//map(0x40, 0x7f).bankr(m_data_rombank);
+	map(0x00, 0x3f).rw(FUNC(st6228_device::rambank_r), FUNC(st6228_device::rambank_w));
+	map(0x40, 0x7f).r(FUNC(st6228_device::data_rombank_r));
+	map(0x80, 0xff).rw(FUNC(st6228_device::regs_r), FUNC(st6228_device::regs_w));
 }
 
 void st6228_device::device_start()
@@ -86,13 +91,34 @@ void st6228_device::device_start()
 	save_item(NAME(m_stack));
 	save_item(NAME(m_stack_index));
 	save_item(NAME(m_icount));
+	save_item(NAME(m_port_dir));
+	save_item(NAME(m_port_option));
+	save_item(NAME(m_port_data));
+	save_item(NAME(m_port_pullup));
+	save_item(NAME(m_port_analog));
+	save_item(NAME(m_port_input));
+	save_item(NAME(m_port_irq_enable));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	m_rambank->configure_entries(0, 2, m_ram, 0x40);
-	m_program_rombank->configure_entries(0, 2, m_rom, 0x800);
-	m_data_rombank->configure_entries(0, 128, m_rom, 0x40);
+	// FIXME: memory banks do not currently work with internal maps.
+	//m_rambank->configure_entries(0, 2, m_ram, 0x40);
+	//m_program_rombank->configure_entries(0, 4, m_rom, 0x800);
+	//m_data_rombank->configure_entries(0, 128, m_rom, 0x40);
+
+	// TODO: magic numbers
+	for (uint8_t bit = 0; bit < 6; bit++)
+		m_porta_out[bit].resolve_safe();
+
+	for (uint8_t bit = 0; bit < 3; bit++)
+		m_portb_out[bit].resolve_safe();
+
+	for (uint8_t bit = 0; bit < 4; bit++)
+		m_portc_out[bit].resolve_safe();
+
+	for (uint8_t bit = 0; bit < 7; bit++)
+		m_portd_out[bit].resolve_safe();
 }
 
 void st6228_device::device_reset()
@@ -102,14 +128,23 @@ void st6228_device::device_reset()
 	std::fill(std::begin(m_stack), std::end(m_stack), 0);
 	std::fill(std::begin(m_flags), std::end(m_flags), 0);
 
+	std::fill(std::begin(m_port_dir), std::end(m_port_dir), 0);
+	std::fill(std::begin(m_port_option), std::end(m_port_option), 0);
+	std::fill(std::begin(m_port_data), std::end(m_port_data), 0);
+	std::fill(std::begin(m_port_pullup), std::end(m_port_pullup), 0);
+	std::fill(std::begin(m_port_analog), std::end(m_port_analog), 0);
+	std::fill(std::begin(m_port_input), std::end(m_port_input), 0);
+	std::fill(std::begin(m_port_irq_enable), std::end(m_port_irq_enable), 0);
+
 	m_pc = m_program->read_word(VEC_RESET);
 	m_stack_index = 0;
 	m_mode = MODE_NMI;
 	m_prev_mode = MODE_NORMAL;
 
-	m_rambank->set_entry(0);
-	m_program_rombank->set_entry(0);
-	m_data_rombank->set_entry(0);
+	// FIXME: memory banks do not currently work with internal maps.
+	//m_rambank->set_entry(0);
+	//m_program_rombank->set_entry(0);
+	//m_data_rombank->set_entry(0);
 
 	m_regs[REG_TIMER_COUNT] = 0xff;
 	m_regs[REG_TIMER_PRESCALE] = 0x7f;
@@ -146,6 +181,113 @@ std::unique_ptr<util::disasm_interface> st6228_device::create_disassembler()
 	return std::make_unique<st62xx_disassembler>();
 }
 
+// TODO: interrupts
+WRITE_LINE_MEMBER(st6228_device::porta0_w) { m_port_input[PORT_A] &= ~(1 << 0); m_port_input[PORT_A] |= (state << 0); }
+WRITE_LINE_MEMBER(st6228_device::porta1_w) { m_port_input[PORT_A] &= ~(1 << 1); m_port_input[PORT_A] |= (state << 1); }
+WRITE_LINE_MEMBER(st6228_device::porta2_w) { m_port_input[PORT_A] &= ~(1 << 2); m_port_input[PORT_A] |= (state << 2); }
+WRITE_LINE_MEMBER(st6228_device::porta3_w) { m_port_input[PORT_A] &= ~(1 << 3); m_port_input[PORT_A] |= (state << 3); }
+WRITE_LINE_MEMBER(st6228_device::porta4_w) { m_port_input[PORT_A] &= ~(1 << 4); m_port_input[PORT_A] |= (state << 4); }
+WRITE_LINE_MEMBER(st6228_device::porta5_w) { m_port_input[PORT_A] &= ~(1 << 5); m_port_input[PORT_A] |= (state << 5); }
+
+WRITE_LINE_MEMBER(st6228_device::portb4_w) { m_port_input[PORT_B] &= ~(1 << 4); m_port_input[PORT_B] |= (state << 4); }
+WRITE_LINE_MEMBER(st6228_device::portb5_w) { m_port_input[PORT_B] &= ~(1 << 5); m_port_input[PORT_B] |= (state << 5); }
+WRITE_LINE_MEMBER(st6228_device::portb6_w) { m_port_input[PORT_B] &= ~(1 << 6); m_port_input[PORT_B] |= (state << 6); }
+
+WRITE_LINE_MEMBER(st6228_device::portc4_w) { m_port_input[PORT_C] &= ~(1 << 4); m_port_input[PORT_C] |= (state << 4); }
+WRITE_LINE_MEMBER(st6228_device::portc5_w) { m_port_input[PORT_C] &= ~(1 << 5); m_port_input[PORT_C] |= (state << 5); }
+WRITE_LINE_MEMBER(st6228_device::portc6_w) { m_port_input[PORT_C] &= ~(1 << 6); m_port_input[PORT_C] |= (state << 6); }
+WRITE_LINE_MEMBER(st6228_device::portc7_w) { m_port_input[PORT_C] &= ~(1 << 7); m_port_input[PORT_C] |= (state << 7); }
+
+WRITE_LINE_MEMBER(st6228_device::portd1_w) { m_port_input[PORT_D] &= ~(1 << 1); m_port_input[PORT_D] |= (state << 1); }
+WRITE_LINE_MEMBER(st6228_device::portd2_w) { m_port_input[PORT_D] &= ~(1 << 2); m_port_input[PORT_D] |= (state << 2); }
+WRITE_LINE_MEMBER(st6228_device::portd3_w) { m_port_input[PORT_D] &= ~(1 << 3); m_port_input[PORT_D] |= (state << 3); }
+WRITE_LINE_MEMBER(st6228_device::portd4_w) { m_port_input[PORT_D] &= ~(1 << 4); m_port_input[PORT_D] |= (state << 4); }
+WRITE_LINE_MEMBER(st6228_device::portd5_w) { m_port_input[PORT_D] &= ~(1 << 5); m_port_input[PORT_D] |= (state << 5); }
+WRITE_LINE_MEMBER(st6228_device::portd6_w) { m_port_input[PORT_D] &= ~(1 << 6); m_port_input[PORT_D] |= (state << 6); }
+WRITE_LINE_MEMBER(st6228_device::portd7_w) { m_port_input[PORT_D] &= ~(1 << 7); m_port_input[PORT_D] |= (state << 7); }
+
+void st6228_device::set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state)
+{
+	switch (index)
+	{
+		case PORT_A:
+			if (bit < 6)
+				m_porta_out[bit](state);
+			break;
+		case PORT_B:
+			if (bit >= 4 && bit <= 6)
+				m_portb_out[bit - 4](state);
+			break;
+		case PORT_C:
+			if (bit >= 4)
+				m_portc_out[bit - 4](state);
+			break;
+		case PORT_D:
+			if (bit >= 1)
+				m_portd_out[bit - 1](state);
+			break;
+	}
+}
+
+void st6228_device::update_port_mode(uint8_t index, uint8_t changed)
+{
+	const uint8_t dir = m_port_dir[index];
+	const uint8_t option = m_port_option[index];
+	for (uint8_t bit = 0; bit < 8; bit++)
+	{
+		const uint8_t mask = (1 << bit);
+		if (BIT(changed, bit) && !BIT(dir, bit))
+		{
+			if (BIT(m_port_data[index], bit))
+			{
+				m_port_irq_enable[index] &= ~mask;
+				m_port_pullup[index] &= ~mask;
+
+				if (BIT(option, bit))
+					m_port_analog[index] |= mask;
+				else
+					m_port_analog[index] &= ~mask;
+			}
+			else
+			{
+				m_port_pullup[index] |= mask;
+				m_port_analog[index] &= ~mask;
+
+				if (BIT(option, bit))
+					m_port_irq_enable[index] |= mask;
+				else
+					m_port_irq_enable[index] &= ~mask;
+			}
+		}
+		else if (BIT(dir, bit))
+		{
+			m_port_pullup[index] &= ~mask;
+			m_port_analog[index] &= ~mask;
+			m_port_irq_enable[index] &= ~mask;
+		}
+	}
+}
+
+READ8_MEMBER(st6228_device::program_rombank_r)
+{
+	return m_rom->base()[(m_regs[REG_ROM_BANK_SELECT] & 3) * 0x800 + offset];
+}
+
+READ8_MEMBER(st6228_device::data_rombank_r)
+{
+	return m_rom->base()[(m_regs[REG_DATA_ROM_WINDOW] & 0x7f) * 0x40 + offset];
+}
+
+WRITE8_MEMBER(st6228_device::rambank_w)
+{
+	m_ram[(m_regs[REG_RAM_BANK_SELECT] & 1) * 0x40 + offset] = data;
+}
+
+READ8_MEMBER(st6228_device::rambank_r)
+{
+	return m_ram[(m_regs[REG_RAM_BANK_SELECT] & 1) * 0x40 + offset];
+}
+
 WRITE8_MEMBER(st6228_device::regs_w)
 {
 	offset += 0x80;
@@ -156,6 +298,8 @@ WRITE8_MEMBER(st6228_device::regs_w)
 		m_regs[offset] = data;
 		return;
 	}
+
+	static char PORT_NAMES[4] = { 'A', 'B', 'C', 'D' };
 
 	switch (offset)
 	{
@@ -168,16 +312,84 @@ WRITE8_MEMBER(st6228_device::regs_w)
 			break;
 
 		case REG_DATA_ROM_WINDOW:
-			m_data_rombank->set_entry(data & 0x7f);
+			m_regs[offset] = data;
+			//m_data_rombank->set_entry(data & 0x7f);
 			break;
 
 		case REG_ROM_BANK_SELECT:
-			m_program_rombank->set_entry(data & 3);
+			m_regs[offset] = data;
+			//m_program_rombank->set_entry(data & 3);
 			break;
 
 		case REG_RAM_BANK_SELECT:
-			m_rambank->set_entry(data & 1);
+			m_regs[offset] = data;
+			//m_rambank->set_entry(data & 1);
 			break;
+
+		case REG_PORTA_DATA:
+		case REG_PORTB_DATA:
+		case REG_PORTC_DATA:
+		case REG_PORTD_DATA:
+		{
+			const uint8_t index = offset - REG_PORTA_DATA;
+			logerror("%s: Port %c data = %02x\n", machine().describe_context(), PORT_NAMES[index], data);
+			const uint8_t old_data = m_port_data[index];
+			const uint8_t changed = old_data ^ data;
+
+			m_port_data[index] = data;
+			update_port_mode(index, changed);
+
+			if (changed & m_port_dir[index])
+			{
+				for (uint8_t bit = 0; bit < 8; bit++)
+				{
+					if (BIT(changed, bit))
+						set_port_output_bit(index, bit, BIT(data, bit));
+				}
+			}
+			break;
+		}
+
+		case REG_PORTA_DIR:
+		case REG_PORTB_DIR:
+		case REG_PORTC_DIR:
+		case REG_PORTD_DIR:
+		{
+			const uint8_t index = offset - REG_PORTA_DIR;
+			logerror("%s: Port %c dir = %02x\n", machine().describe_context(), PORT_NAMES[index], data);
+			const uint8_t old_dir = m_port_dir[index];
+			const uint8_t changed = old_dir ^ data;
+
+			m_port_dir[index] = data;
+			update_port_mode(index, changed);
+
+			if (changed)
+			{
+				for (uint8_t bit = 0; bit < 8; bit++)
+				{
+					if (BIT(changed, bit))
+					{
+						set_port_output_bit(index, bit, BIT(m_port_data[index], bit));
+					}
+				}
+			}
+			break;
+		}
+
+		case REG_PORTA_OPTION:
+		case REG_PORTB_OPTION:
+		case REG_PORTC_OPTION:
+		case REG_PORTD_OPTION:
+		{
+			const uint8_t index = offset - REG_PORTA_OPTION;
+			logerror("%s: Port %c option = %02x\n", machine().describe_context(), PORT_NAMES[index], data);
+
+			const uint8_t changed = m_port_option[index] ^ data;
+			m_port_option[index] = data;
+
+			update_port_mode(index, changed);
+			break;
+		}
 
 		case REG_WATCHDOG:
 			// Do nothing for now
@@ -200,6 +412,8 @@ READ8_MEMBER(st6228_device::regs_r)
 		return m_regs[offset];
 	}
 
+	static char PORT_NAMES[4] = { 'A', 'B', 'C', 'D' };
+
 	switch (offset)
 	{
 		case REG_X:
@@ -209,6 +423,41 @@ READ8_MEMBER(st6228_device::regs_r)
 		case REG_A:
 			ret = m_regs[offset];
 			break;
+
+		case REG_PORTA_DATA:
+		case REG_PORTB_DATA:
+		case REG_PORTC_DATA:
+		case REG_PORTD_DATA:
+		{
+			const uint8_t index = offset - REG_PORTA_DATA;
+			ret = (m_port_data[index] & m_port_dir[index]) |
+				  (m_port_input[index] & ~m_port_dir[index]) |
+				  (m_port_pullup[index] & ~m_port_dir[index]);
+			logerror("%s: Port %c data read (%02x)\n", machine().describe_context(), PORT_NAMES[index], ret);
+			break;
+		}
+
+		case REG_PORTA_DIR:
+		case REG_PORTB_DIR:
+		case REG_PORTC_DIR:
+		case REG_PORTD_DIR:
+		{
+			const uint8_t index = offset - REG_PORTA_DIR;
+			ret = m_port_dir[index];
+			logerror("%s: Port %c direction read (%02x)\n", machine().describe_context(), PORT_NAMES[index], ret);
+			break;
+		}
+
+		case REG_PORTA_OPTION:
+		case REG_PORTB_OPTION:
+		case REG_PORTC_OPTION:
+		case REG_PORTD_OPTION:
+		{
+			const uint8_t index = offset - REG_PORTA_OPTION;
+			ret = m_port_option[index];
+			logerror("%s: Port %c option read (%02x)\n", machine().describe_context(), PORT_NAMES[index], ret);
+			break;
+		}
 
 		default:
 			logerror("%s: Unknown register read: %02x\n", machine().describe_context(), offset);
@@ -241,6 +490,11 @@ void st6228_device::tick_timers(int cycles)
 {
 }
 
+void st6228_device::unimplemented_opcode(uint8_t op)
+{
+	fatalerror("ST62xx: unknown opcode (%02x) at %04x\n", op, m_pc);
+}
+
 void st6228_device::execute_run()
 {
 	while (m_icount > 0)
@@ -248,7 +502,6 @@ void st6228_device::execute_run()
 		debugger_instruction_hook(m_pc);
 
 		uint8_t op = m_program->read_byte(m_pc);
-		m_pc++;
 
 		int cycles = 4;
 
@@ -267,8 +520,8 @@ void st6228_device::execute_run()
 			case 0x01: case 0x11: case 0x21: case 0x31: case 0x41: case 0x51: case 0x61: case 0x71:
 			case 0x81: case 0x91: case 0xa1: case 0xb1: case 0xc1: case 0xd1: case 0xe1: case 0xf1: // CALL abc
 			{
-				const uint8_t ab = m_program->read_byte(m_pc);
-				m_pc++;
+				const uint8_t ab = m_program->read_byte(m_pc+1);
+				m_pc += 2;
 				const uint16_t abc = ((op & 0xf0) >> 4) | (ab << 4);
 				if (m_stack_index < 6) // FIXME: magic numbers
 				{
@@ -281,16 +534,15 @@ void st6228_device::execute_run()
 					//                     values will be lost. In this case, returns will return to the PC
 					//                     values stacked first."
 				}
-				m_pc = abc;
+				m_pc = abc-1;
 				break;
 			}
 			case 0x09: case 0x19: case 0x29: case 0x39: case 0x49: case 0x59: case 0x69: case 0x79:
 			case 0x89: case 0x99: case 0xa9: case 0xb9: case 0xc9: case 0xd9: case 0xe9: case 0xf9:	// JP abc
 			{
-				const uint8_t ab = m_program->read_byte(m_pc);
-				m_pc++;
+				const uint8_t ab = m_program->read_byte(m_pc+1);
 				const uint16_t abc = ((op & 0xf0) >> 4) | (ab << 4);
-				m_pc = abc;
+				m_pc = abc-1;
 				break;
 			}
 			case 0x02: case 0x12: case 0x22: case 0x32: case 0x42: case 0x52: case 0x62: case 0x72:
@@ -330,7 +582,7 @@ void st6228_device::execute_run()
 			case 0x0b: case 0x2b: case 0x4b: case 0x6b: case 0x8b: case 0xab: case 0xcb: case 0xeb:	// RES b,rr
 			{
 				const uint8_t b = (op >> 5) & 7;
-				const uint8_t rr = m_program->read_byte(m_pc);
+				const uint8_t rr = m_program->read_byte(m_pc+1);
 				const uint8_t nn = m_data->read_byte(rr);
 				m_data->write_byte(rr, nn & ~(1 << b));
 				m_pc++;
@@ -339,7 +591,7 @@ void st6228_device::execute_run()
 			case 0x1b: case 0x3b: case 0x5b: case 0x7b: case 0x9b: case 0xbb: case 0xdb: case 0xfb:	// SET b,rr
 			{
 				const uint8_t b = (op >> 5) & 7;
-				const uint8_t rr = m_program->read_byte(m_pc);
+				const uint8_t rr = m_program->read_byte(m_pc+1);
 				const uint8_t nn = m_data->read_byte(rr);
 				m_data->write_byte(rr, nn | (1 << b));
 				m_pc++;
@@ -431,8 +683,8 @@ void st6228_device::execute_run()
 				break;
 			case 0x0d:	// LDI rr,nn
 			{
-				const uint8_t rr = m_program->read_byte(m_pc);
-				const uint8_t nn = m_program->read_byte(m_pc + 1);
+				const uint8_t rr = m_program->read_byte(m_pc+1);
+				const uint8_t nn = m_program->read_byte(m_pc+2);
 				m_data->write_byte(rr, nn);
 
 				if (nn)
@@ -475,7 +727,7 @@ void st6228_device::execute_run()
 				if (m_stack_index > 0)
 				{
 					m_stack_index--;
-					m_pc = m_stack[m_stack_index];
+					m_pc = m_stack[m_stack_index] - 1;
 					m_mode = m_prev_mode;
 					m_prev_mode = MODE_NORMAL;
 				}
@@ -538,7 +790,7 @@ void st6228_device::execute_run()
 				if (m_stack_index > 0)
 				{
 					m_stack_index--;
-					m_pc = m_stack[m_stack_index];
+					m_pc = m_stack[m_stack_index] - 1;
 				}
 				else
 				{
@@ -574,7 +826,7 @@ void st6228_device::execute_run()
 				break;
 			case 0x17:	// LDI A,rr
 			{
-				m_regs[REG_A] = m_program->read_byte(m_pc);
+				m_regs[REG_A] = m_program->read_byte(m_pc+1);
 
 				if (m_regs[REG_A])
 					m_flags[m_mode] &= ~FLAG_Z;
@@ -604,7 +856,7 @@ void st6228_device::execute_run()
 			}
 			case 0x37: // CPI A,nn
 			{
-				const uint8_t nn = m_program->read_byte(m_pc);
+				const uint8_t nn = m_program->read_byte(m_pc+1);
 
 				if (m_regs[REG_A] < nn)
 				{
@@ -645,7 +897,7 @@ void st6228_device::execute_run()
 			}
 			case 0x57: // ADDI A,nn
 			{
-				const uint8_t nn = m_program->read_byte(m_pc);
+				const uint8_t nn = m_program->read_byte(m_pc+1);
 				const uint16_t sum = m_regs[REG_A] + nn;
 
 				if (sum > 0xff)
@@ -694,7 +946,7 @@ void st6228_device::execute_run()
 				break;
 			case 0xb7: // ANDI A,nn
 			{
-				m_regs[REG_A] &= m_program->read_byte(m_pc);
+				m_regs[REG_A] &= m_program->read_byte(m_pc+1);
 
 				if (m_regs[REG_A])
 					m_flags[m_mode] &= ~FLAG_Z;
@@ -725,7 +977,7 @@ void st6228_device::execute_run()
 			}
 			case 0xd7: // SUBI A,nn
 			{
-				const uint8_t nn = m_program->read_byte(m_pc);
+				const uint8_t nn = m_program->read_byte(m_pc+1);
 
 				if (m_regs[REG_A] < nn)
 				{
@@ -765,7 +1017,7 @@ void st6228_device::execute_run()
 				break;
 			case 0x1f: // LD A,rr
 			{
-				m_regs[REG_A] = m_data->read_byte(m_program->read_byte(m_pc));
+				m_regs[REG_A] = m_data->read_byte(m_program->read_byte(m_pc+1));
 
 				if (m_regs[REG_V])
 					m_flags[m_mode] &= ~FLAG_Z;
@@ -795,7 +1047,7 @@ void st6228_device::execute_run()
 			}
 			case 0x3f: // CP A,rr
 			{
-				const uint8_t nn = m_data->read_byte(m_program->read_byte(m_pc));
+				const uint8_t nn = m_data->read_byte(m_program->read_byte(m_pc+1));
 
 				if (m_regs[REG_A] < nn)
 				{
@@ -836,7 +1088,7 @@ void st6228_device::execute_run()
 			}
 			case 0x5f: // ADD A,rr
 			{
-				const uint8_t nn = m_data->read_byte(m_program->read_byte(m_pc));
+				const uint8_t nn = m_data->read_byte(m_program->read_byte(m_pc+1));
 				const uint16_t sum = m_regs[REG_A] + nn;
 
 				if (sum > 0xff)
@@ -867,10 +1119,13 @@ void st6228_device::execute_run()
 					m_flags[m_mode] |= FLAG_Z;
 				break;
 			}
-			case 0x7f: // INC A
+			case 0x7f: // INC rr
 			{
-				m_regs[REG_A]++;
-				if (m_regs[REG_A])
+				const uint8_t rr = m_program->read_byte(m_pc+1);
+				const uint8_t nn = m_data->read_byte(rr) + 1;
+				m_data->write_byte(rr, nn);
+
+				if (nn)
 					m_flags[m_mode] &= ~FLAG_Z;
 				else
 					m_flags[m_mode] |= FLAG_Z;
@@ -887,7 +1142,7 @@ void st6228_device::execute_run()
 				break;
 			case 0x9f: // LD rr,A
 			{
-				m_regs[REG_A] = m_data->read_byte(m_program->read_byte(m_pc));
+				m_regs[REG_A] = m_data->read_byte(m_program->read_byte(m_pc+1));
 
 				if (m_regs[REG_A])
 					m_flags[m_mode] &= ~FLAG_Z;
@@ -907,7 +1162,7 @@ void st6228_device::execute_run()
 				break;
 			case 0xbf: // AND A,rr
 			{
-				m_regs[REG_A] &= m_data->read_byte(m_program->read_byte(m_pc));
+				m_regs[REG_A] &= m_data->read_byte(m_program->read_byte(m_pc+1));
 
 				if (m_regs[REG_A])
 					m_flags[m_mode] &= ~FLAG_Z;
@@ -938,7 +1193,7 @@ void st6228_device::execute_run()
 			}
 			case 0xdf: // SUB A,rr
 			{
-				const uint8_t nn = m_data->read_byte(m_program->read_byte(m_pc));
+				const uint8_t nn = m_data->read_byte(m_program->read_byte(m_pc+1));
 
 				if (m_regs[REG_A] < nn)
 				{
@@ -970,7 +1225,7 @@ void st6228_device::execute_run()
 			}
 			case 0xff: // DEC rr
 			{
-				const uint8_t rr = m_program->read_byte(m_pc);
+				const uint8_t rr = m_program->read_byte(m_pc+1);
 				const uint8_t value = m_data->read_byte(rr) - 1;
 				m_data->write_byte(rr, value);
 
@@ -984,6 +1239,8 @@ void st6228_device::execute_run()
 			default:
 				logerror("%s: Unsupported opcode: %02x\n", op);
 		}
+
+		m_pc++;
 
 		tick_timers(cycles);
 

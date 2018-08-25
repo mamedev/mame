@@ -33,6 +33,51 @@ class st6228_device : public cpu_device
 public:
 	st6228_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <unsigned Bit> auto port_a()
+	{
+		static_assert(Bit < 6, "ST6228 port A bit must be in the range 0..5\n");
+		return m_porta_out[Bit].bind();
+	}
+	template <unsigned Bit> auto port_b()
+	{
+		static_assert(Bit >= 4 && Bit <= 6, "ST6228 port B bit must be in the range 4..6\n");
+		return m_portb_out[Bit - 4].bind();
+	}
+	template <unsigned Bit> auto port_c()
+	{
+		static_assert(Bit >= 4 && Bit <= 7, "ST6228 port C bit must be in the range 4..7\n");
+		return m_portc_out[Bit - 4].bind();
+	}
+	template <unsigned Bit> auto port_d()
+	{
+		static_assert(Bit >= 1 && Bit <= 7, "ST6228 port D bit must be in the range 1..7\n");
+		return m_portd_out[Bit - 1].bind();
+	}
+
+	DECLARE_WRITE_LINE_MEMBER(porta0_w);
+	DECLARE_WRITE_LINE_MEMBER(porta1_w);
+	DECLARE_WRITE_LINE_MEMBER(porta2_w);
+	DECLARE_WRITE_LINE_MEMBER(porta3_w);
+	DECLARE_WRITE_LINE_MEMBER(porta4_w);
+	DECLARE_WRITE_LINE_MEMBER(porta5_w);
+
+	DECLARE_WRITE_LINE_MEMBER(portb4_w);
+	DECLARE_WRITE_LINE_MEMBER(portb5_w);
+	DECLARE_WRITE_LINE_MEMBER(portb6_w);
+
+	DECLARE_WRITE_LINE_MEMBER(portc4_w);
+	DECLARE_WRITE_LINE_MEMBER(portc5_w);
+	DECLARE_WRITE_LINE_MEMBER(portc6_w);
+	DECLARE_WRITE_LINE_MEMBER(portc7_w);
+
+	DECLARE_WRITE_LINE_MEMBER(portd1_w);
+	DECLARE_WRITE_LINE_MEMBER(portd2_w);
+	DECLARE_WRITE_LINE_MEMBER(portd3_w);
+	DECLARE_WRITE_LINE_MEMBER(portd4_w);
+	DECLARE_WRITE_LINE_MEMBER(portd5_w);
+	DECLARE_WRITE_LINE_MEMBER(portd6_w);
+	DECLARE_WRITE_LINE_MEMBER(portd7_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -60,6 +105,13 @@ protected:
 
 	void unimplemented_opcode(uint8_t op);
 	void tick_timers(int cycles);
+	void update_port_mode(uint8_t index, uint8_t changed);
+	void set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state);
+
+	DECLARE_READ8_MEMBER(program_rombank_r);
+	DECLARE_READ8_MEMBER(data_rombank_r);
+	DECLARE_WRITE8_MEMBER(rambank_w);
+	DECLARE_READ8_MEMBER(rambank_r);
 
 	DECLARE_WRITE8_MEMBER(regs_w);
 	DECLARE_READ8_MEMBER(regs_r);
@@ -150,6 +202,14 @@ protected:
 		FLAG_Z	= 0x02
 	};
 
+	enum
+	{
+		PORT_A = 0,
+		PORT_B,
+		PORT_C,
+		PORT_D
+	};
+
 	// CPU registers
 	uint8_t m_regs[0x100];
 	uint8_t m_ram[64*2];
@@ -167,12 +227,26 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 
+	devcb_write_line m_porta_out[6];
+	devcb_write_line m_portb_out[3];
+	devcb_write_line m_portc_out[4];
+	devcb_write_line m_portd_out[7];
+
+	uint8_t m_port_dir[4];
+	uint8_t m_port_option[4];
+	uint8_t m_port_data[4];
+	uint8_t m_port_pullup[4];
+	uint8_t m_port_analog[4];
+	uint8_t m_port_input[4];
+	uint8_t m_port_irq_enable[4];
+
 	address_space *m_program;
 	address_space *m_data;
 
-	required_memory_bank m_rambank;
-	required_memory_bank m_program_rombank;
-	required_memory_bank m_data_rombank;
+	// FIXME: memory banks do not currently work with internal maps.
+	//required_memory_bank m_rambank;
+	//required_memory_bank m_program_rombank;
+	//required_memory_bank m_data_rombank;
 	required_memory_region m_rom;
 };
 
