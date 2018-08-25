@@ -945,6 +945,66 @@ memory_bank *memory_manager::allocate(address_space &space, offs_t addrstart, of
 }
 
 //**************************************************************************
+//  ADDRESS SPACE CONFIG
+//**************************************************************************
+
+//-------------------------------------------------
+//  address_space_config - constructors
+//-------------------------------------------------
+
+address_space_config::address_space_config()
+	: m_name("unknown"),
+		m_endianness(ENDIANNESS_NATIVE),
+		m_data_width(0),
+		m_addr_width(0),
+		m_addr_shift(0),
+		m_logaddr_width(0),
+		m_page_shift(0),
+		m_is_octal(false),
+		m_internal_map(address_map_constructor()),
+		m_default_map(address_map_constructor())
+{
+}
+
+/*!
+ @param name
+ @param endian CPU endianness
+ @param datawidth CPU parallelism bits
+ @param addrwidth address bits
+ @param addrshift
+ @param internal
+ @param defmap
+ */
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
+	: m_name(name),
+		m_endianness(endian),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
+		m_logaddr_width(addrwidth),
+		m_page_shift(0),
+		m_is_octal(false),
+		m_internal_map(internal),
+		m_default_map(defmap)
+{
+}
+
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
+	: m_name(name),
+		m_endianness(endian),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
+		m_logaddr_width(logwidth),
+		m_page_shift(pageshift),
+		m_is_octal(false),
+		m_internal_map(internal),
+		m_default_map(defmap)
+{
+}
+
+
+//**************************************************************************
 //  ADDRESS SPACE
 //**************************************************************************
 
@@ -955,14 +1015,14 @@ memory_bank *memory_manager::allocate(address_space &space, offs_t addrstart, of
 address_space::address_space(memory_manager &manager, device_memory_interface &memory, int spacenum)
 	: m_config(*memory.space_config(spacenum)),
 		m_device(memory.device()),
-		m_addrmask(make_bitmask<offs_t>(m_config.m_addr_width)),
-		m_logaddrmask(make_bitmask<offs_t>(m_config.m_logaddr_width)),
+		m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
+		m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
 		m_unmap(0),
 		m_spacenum(spacenum),
 		m_log_unmap(true),
 		m_name(memory.space_config(spacenum)->name()),
-		m_addrchars((m_config.m_addr_width + 3) / 4),
-		m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
+		m_addrchars((m_config.addr_width() + 3) / 4),
+		m_logaddrchars((m_config.logaddr_width() + 3) / 4),
 		m_notifier_id(0),
 		m_in_notification(0),
 		m_manager(manager)
@@ -1010,8 +1070,8 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 
 	// Check the validity of the addresses given their intrinsic width
 	// We assume that busses with non-zero address shift have a data width matching the shift (reality says yes)
-	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
-	offs_t lowbits_mask = width && !m_config.m_addr_shift ? (width >> 3) - 1 : default_lowbits_mask;
+	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
+	offs_t lowbits_mask = width && !m_config.addr_shift() ? (width >> 3) - 1 : default_lowbits_mask;
 
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrstart & ~lowbits_mask);
@@ -1117,7 +1177,7 @@ void address_space::check_optimize_mirror(const char *function, offs_t addrstart
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mirror %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mirror %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmirror, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -1167,7 +1227,7 @@ void address_space::check_address(const char *function, offs_t addrstart, offs_t
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)

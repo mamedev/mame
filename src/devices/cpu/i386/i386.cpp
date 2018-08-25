@@ -52,14 +52,11 @@ i386_device::i386_device(const machine_config &mconfig, const char *tag, device_
 i386_device::i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
-	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
-	m_program_config.m_logaddr_width = 32;
-	m_program_config.m_page_shift = 12;
-
 	// 32 unified
 	set_vtlb_dynamic_entries(32);
 }

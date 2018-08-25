@@ -1134,6 +1134,8 @@ private:
 // describes an address space and provides basic functions to map addresses to bytes
 class address_space_config
 {
+	friend class address_map;
+
 public:
 	// construction/destruction
 	address_space_config();
@@ -1146,6 +1148,9 @@ public:
 	int data_width() const { return m_data_width; }
 	int addr_width() const { return m_addr_width; }
 	int addr_shift() const { return m_addr_shift; }
+	int logaddr_width() const { return m_logaddr_width; }
+	int page_shift() const { return m_page_shift; }
+	bool is_octal() const { return m_is_octal; }
 
 	// Actual alignment of the bus addresses
 	int alignment() const { int bytes = m_data_width / 8; return m_addr_shift < 0 ? bytes >> -m_addr_shift : bytes << m_addr_shift; }
@@ -1158,7 +1163,7 @@ public:
 	inline offs_t addr2byte_end(offs_t address) const { return (m_addr_shift < 0) ? ((address << -m_addr_shift) | ((1 << -m_addr_shift) - 1)) : (address >> m_addr_shift); }
 	inline offs_t byte2addr_end(offs_t address) const { return (m_addr_shift > 0) ? ((address << m_addr_shift) | ((1 << m_addr_shift) - 1)) : (address >> -m_addr_shift); }
 
-	// state
+	// state (TODO: privatize)
 	const char *        m_name;
 	endianness_t        m_endianness;
 	u8                  m_data_width;
@@ -1233,11 +1238,12 @@ public:
 
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
+	int logaddr_width() const { return m_config.logaddr_width(); }
 	int alignment() const { return m_config.alignment(); }
 	endianness_t endianness() const { return m_config.endianness(); }
 	int addr_shift() const { return m_config.addr_shift(); }
 	u64 unmap() const { return m_unmap; }
-	bool is_octal() const { return m_config.m_is_octal; }
+	bool is_octal() const { return m_config.is_octal(); }
 
 	offs_t addrmask() const { return m_addrmask; }
 	u8 addrchars() const { return m_addrchars; }
