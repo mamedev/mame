@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+//#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/x2212.h"
@@ -85,7 +86,7 @@ INPUT_PORTS_END
 
 void z29_state::z29(machine_config &config)
 {
-	I8031(config, m_maincpu, 14.784_MHz_XTAL / 2);
+	I8031(config, m_maincpu, 14.784_MHz_XTAL / 2); // Intel P8031AH
 	m_maincpu->set_addrmap(AS_PROGRAM, &z29_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &z29_state::ext_map);
 	m_maincpu->port_in_cb<1>().set_constant(0xfd); // hack around keyboard not working
@@ -106,9 +107,9 @@ void z29_state::z29(machine_config &config)
 }
 
 
-ROM_START(z29)
+ROM_START(z29) // All EPROMs on 85-2835-1 terminal board are HN482732AG-30
 	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD("u440.bin", 0x0000, 0x1000, CRC(169b9517) SHA1(c18b6a193655a64808e9ae8765d3e54d13e6669e))
+	ROM_LOAD("u440.bin", 0x0000, 0x1000, CRC(169b9517) SHA1(c18b6a193655a64808e9ae8765d3e54d13e6669e)) // occupies pins 9-32 of 40-pin expansion socket
 	ROM_LOAD("u407.bin", 0x1000, 0x1000, CRC(b5aae8e6) SHA1(692e521a85d7e07647c66a660faa2041d1bfd785))
 
 	ROM_REGION(0x1000, "chargen", 0)
