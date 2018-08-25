@@ -1447,15 +1447,22 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 		LOGCMD("%s Ch:%c : Null command\n", FUNCNAME, 'A' + m_index);
 		break;
 	case WR0_SEND_ABORT:
-		LOGCMD("%s Ch:%c : Send abort command\n", FUNCNAME, 'A' + m_index);
 		// TODO: what actually happens if you try this in a mode other than SDLC?
-		// FIXME: how does this interact with interrupts?
-		// For now assume it behaves like automatically sending CRC and generates a transmit interrupt when a new frame can be sent.
-		tx_setup(0xff, 8, 0, true, true);
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-		m_rr1 &= ~RR1_ALL_SENT;
-		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-			set_ready(false);
+		if ((m_wr4 & (WR4_STOP_BITS_MASK | WR4_SYNC_MODE_MASK)) != (WR4_STOP_BITS_SYNC | WR4_SYNC_MODE_SDLC))
+		{
+			LOGCMD("%s Ch:%c : Send abort command (not in SDLC mode, ignored)\n", FUNCNAME, 'A' + m_index);
+		}
+		else
+		{
+			LOGCMD("%s Ch:%c : Send abort command\n", FUNCNAME, 'A' + m_index);
+			// FIXME: how does this interact with interrupts?
+			// For now assume it behaves like automatically sending CRC and generates a transmit interrupt when a new frame can be sent.
+			tx_setup(0xff, 8, 0, true, true);
+			m_rr0 |= RR0_TX_BUFFER_EMPTY;
+			m_rr1 &= ~RR1_ALL_SENT;
+			if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+				set_ready(false);
+		}
 		break;
 	case WR0_RESET_EXT_STATUS:
 		reset_ext_status();
