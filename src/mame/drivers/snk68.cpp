@@ -889,8 +889,8 @@ ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title 
 	ROM_LOAD16_BYTE( "ik_2.c10", 0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) /* Rotary Joystick - hand written label  */
 	ROM_LOAD16_BYTE( "ik_3.c9",  0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) /* Rotary Joystick - hand written label  */
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Sound CPU */
-	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
 	ROM_LOAD( "ik3-7.16l",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
@@ -909,7 +909,7 @@ ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title 
 	// 340000-3fffff empty
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
-	ROM_LOAD( "ik_6.18e",  0x000000, 0x20000, CRC(df0d860f) SHA1(dff59a8eaadf83e79da6a15f4be4998721902f5b) ) /* hand written label  */
+	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 
 	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
 	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
