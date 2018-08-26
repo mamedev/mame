@@ -74,6 +74,10 @@ different components:
 * BAS32L diode for power-on reset
 * This gives delays of 152ms, 176µs, and 704ms
 
+The equivalent circuit in the Amiga CDTV has the same thresholds as the
+Amiga 2000, but uses 1kΩ resistors for timing.  This gives delays of
+11.2ms, 7.43ms, and 27.5ms.
+
 */
 
 DECLARE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device)
@@ -206,7 +210,7 @@ private:
 	u8 m_c814_charging = 1U; // U805 pin 2
 };
 
-DEFINE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device, "a2000kbrst", "Amiga 1000/2000 keyboard reset circuit")
+DEFINE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device, "a2000kbrst", "Amiga 1000/2000/CDTV keyboard reset circuit")
 
 
 //**************************************************************************
@@ -1762,6 +1766,9 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	A2000_KBRESET(config, "kbrst")
+			.set_delays(attotime::from_usec(11238), attotime::from_usec(7432), attotime::from_usec(27539))
+			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
