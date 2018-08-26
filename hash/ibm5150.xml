@@ -2957,7 +2957,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="Rev. I0123" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="easy-pc demonstrator for printed circuit boards and schematics (rev i0123).img" size="368640" crc="ab548445" sha1="1bb4cc9d514eb2caa537a8445e5b84a9409631c7" status="baddump" offset="0" />
+				<rom name="easy-pc demonstrator for printed circuit boards and schematics (rev i0123).img" size="368640" crc="ab548445" sha1="1bb4cc9d514eb2caa537a8445e5b84a9409631c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3109,7 +3109,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="mitt forsta ordbehandlingsprogram (swe).img" size="368640" crc="d23a7598" sha1="2f103de9468e47999883dca4c0eee967f90bf3ce" status="baddump" offset="0" />
+				<rom name="mitt forsta ordbehandlingsprogram (swe).img" size="368640" crc="d23a7598" sha1="2f103de9468e47999883dca4c0eee967f90bf3ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
