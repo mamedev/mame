@@ -130,14 +130,9 @@ device_t::~device_t()
 memory_region *device_t::memregion(std::string _tag) const
 {
 	// build a fully-qualified name and look it up
-	if (_tag != "")
-	{
-		auto search = machine().memory().regions().find(subtag(_tag).c_str());
-		if (search != machine().memory().regions().end())
-			return search->second.get();
-		else
-			return nullptr;
-	}
+	auto search = machine().memory().regions().find(subtag(_tag).c_str());
+	if (search != machine().memory().regions().end())
+		return search->second.get();
 	else
 		return nullptr;
 }
@@ -151,14 +146,9 @@ memory_region *device_t::memregion(std::string _tag) const
 memory_share *device_t::memshare(std::string _tag) const
 {
 	// build a fully-qualified name and look it up
-	if (_tag != "")
-	{
-		auto search = machine().memory().shares().find(subtag(_tag).c_str());
-		if (search != machine().memory().shares().end())
-			return search->second.get();
-		else
-			return nullptr;
-	}
+	auto search = machine().memory().shares().find(subtag(_tag).c_str());
+	if (search != machine().memory().shares().end())
+		return search->second.get();
 	else
 		return nullptr;
 }
@@ -171,14 +161,9 @@ memory_share *device_t::memshare(std::string _tag) const
 
 memory_bank *device_t::membank(std::string _tag) const
 {
-	if (_tag != "")
-	{
-		auto search = machine().memory().banks().find(subtag(_tag).c_str());
-		if (search != machine().memory().banks().end())
-			return search->second.get();
-		else
-			return nullptr;
-	}
+	auto search = machine().memory().banks().find(subtag(_tag).c_str());
+	if (search != machine().memory().banks().end())
+		return search->second.get();
 	else
 		return nullptr;
 }
