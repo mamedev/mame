@@ -84,6 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cmmb_charram_w);
 	DECLARE_READ8_MEMBER(cmmb_input_r);
 	DECLARE_WRITE8_MEMBER(cmmb_output_w);
+	DECLARE_READ8_MEMBER(flash_r);
+	DECLARE_WRITE8_MEMBER(flash_w);
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -140,6 +142,16 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 	/* dirty char */
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 	m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
+}
+
+READ8_MEMBER(cmmb_state::flash_r)
+{
+	return m_flash->read(space, offset + 0x2000);
+}
+
+WRITE8_MEMBER(cmmb_state::flash_w)
+{
+	m_flash->write(space, offset + 0x2000, data);
 }
 
 READ8_MEMBER(cmmb_state::cmmb_input_r)
@@ -221,7 +233,7 @@ void cmmb_state::bnk2000_map(address_map &map)
 	map(0x0680, 0x0680).nopw();
 	map(0x6000, 0x7fff).rom().region("maincpu", 0x18000);
 
-	map(0x8000, 0xffff).rw("at29c020", FUNC(at29c020_device::read), FUNC(at29c020_device::write));
+	map(0x8000, 0xffff).rw(FUNC(cmmb_state::flash_r), FUNC(cmmb_state::flash_w));
 }
 
 static INPUT_PORTS_START( cmmb )
@@ -359,7 +371,7 @@ static INPUT_PORTS_START( cmmb )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // if this is lit up, coins will auto-insert each frame until they hit 99 (?!)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_SERVICE2 )   // if this is lit up, coins will auto-insert each frame until they hit 99 (?!)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
