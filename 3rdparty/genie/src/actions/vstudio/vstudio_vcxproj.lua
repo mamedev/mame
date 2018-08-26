@@ -61,6 +61,9 @@
 		else
 			_p(2, '<Keyword>Win32Proj</Keyword>')
 		end
+		if _ACTION:sub(3) == "2017" and os.isdir(path.join(os.getenv("VSINSTALLDIR"), "VC/Tools/MSVC/14.14.26428")) then
+			_p(2,'<VCToolsVersion>14.14.26428</VCToolsVersion>')
+		end
 
 		_p(1,'</PropertyGroup>')
 	end
