@@ -309,16 +309,16 @@ private:
 
 READ8_MEMBER(nmg5_state::pixmap_r)
 {
-	int sy = offset >> 8;
-	int sx = (offset & 0xff) << 1;
+	int const sy = offset >> 8;
+	int const sx = (offset & 0xff) << 1;
 
 	return ((m_pixmap->pix16(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix16(sy & 0xff, sx |  1) & 0xf);
 }
 
 WRITE8_MEMBER(nmg5_state::pixmap_w)
 {
-	int sy = offset >> 8;
-	int sx = (offset & 0xff) << 1;
+	int const sy = offset >> 8;
+	int const sx = (offset & 0xff) << 1;
 
 	m_pixmap->pix16(sy & 0xff, sx & ~1) = 0x300 + ((data & 0xf0) >> 4);
 	m_pixmap->pix16(sy & 0xff, sx |  1) = 0x300 + (data & 0x0f);
@@ -863,10 +863,9 @@ void nmg5_state::video_start()
 	m_tilemap[1]->set_transparent_pen(0);
 
 	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);
-	for (int y = 0; y < 256; y++)
-		for (int x = 0; x < 512; x++)
-			m_pixmap->pix16(y,x) = 0x300;
 
+	const rectangle pixmap_rect(0,511,0,255);
+	m_pixmap->fill(0x300, pixmap_rect);
 
 	save_item(NAME(*m_pixmap));
 }
@@ -874,8 +873,8 @@ void nmg5_state::video_start()
 
 uint32_t nmg5_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int xoff = -12;
-	int yoff = -9;
+	int const xoff = -12;
+	int const yoff = -9;
 	m_tilemap[0]->set_scrolly(0, m_scroll_ram[3] + 9);
 	m_tilemap[0]->set_scrollx(0, m_scroll_ram[2] + 3);
 	m_tilemap[1]->set_scrolly(0, m_scroll_ram[1] + 9);
