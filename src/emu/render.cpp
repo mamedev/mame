@@ -622,10 +622,8 @@ void render_container::set_overlay(bitmap_argb32 *bitmap)
 	m_overlaybitmap = bitmap;
 	if (m_overlaybitmap != nullptr)
 	{
-		printf("Allocating overlay\n");
 		m_overlaytexture = m_manager.texture_alloc(render_container::overlay_scale);
 		m_overlaytexture->set_bitmap(*bitmap, bitmap->cliprect(), TEXFORMAT_ARGB32);
-		printf("Done allocating overlay\n");
 	}
 }
 
