@@ -559,10 +559,9 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	uint16_t tex_width(prim->texture.width);
 	uint16_t tex_height(prim->texture.height);
 
-	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
-		tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
-
-	bgfx::TextureHandle texture = bgfx::createTexture2D(tex_width, tex_height, false, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+	bgfx::TextureHandle texture = m_textures->create_or_update_mame_texture(prim->flags & PRIMFLAG_TEXFORMAT_MASK
+		, tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base, prim->texture.seqid
+		, texture_flags, prim->texture.unique_id, prim->texture.old_id);
 
 	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
 
@@ -570,8 +569,6 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	bgfx::setVertexBuffer(0,buffer);
 	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
 	effects[blend]->submit(m_ortho_view->get_index());
-
-	bgfx::destroy(texture);
 }
 
 #define MAX_TEMP_COORDS 100

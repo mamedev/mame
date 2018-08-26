@@ -764,9 +764,9 @@ void screen_device::device_start()
 
 	// allocate raw textures
 	m_texture[0] = machine().render().texture_alloc();
-	m_texture[0]->set_osd_data(u64((m_unique_id << 1) | 0));
+	m_texture[0]->set_id(u64(m_unique_id) << 57);
 	m_texture[1] = machine().render().texture_alloc();
-	m_texture[1]->set_osd_data(u64((m_unique_id << 1) | 1));
+	m_texture[1]->set_id((u64(m_unique_id) << 57) | 1);
 
 	// configure the default cliparea
 	render_container::user_settings settings;
