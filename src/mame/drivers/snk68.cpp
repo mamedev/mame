@@ -889,7 +889,7 @@ ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title 
 	ROM_LOAD16_BYTE( "ik_2.c10", 0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) /* Rotary Joystick - hand written label  */
 	ROM_LOAD16_BYTE( "ik_3.c9",  0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) /* Rotary Joystick - hand written label  */
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
@@ -914,6 +914,12 @@ ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title 
 	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
 	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
 	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
+		
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "a_pal20l10a.ic1", 0x0000, 0x00cc, CRC(1cadf26d) SHA1(348a9e4727df0a15247c7b9c5cd5ee935edd9752) )
+	ROM_LOAD( "b_pal20l10a.ic3", 0x0200, 0x00cc, CRC(c3d9e729) SHA1(f05f03eecf12b4d0793124ecd3195307be04046b) )
+	ROM_LOAD( "c_pal16l8a.ic2",  0x0400, 0x0104, CRC(e258b8d6) SHA1(9d000aa9a09b402208a5c2d98789cc62e23a2eb2) )
 ROM_END
 
 ROM_START( ikari3u )
