@@ -830,7 +830,7 @@ void kongambl_state::init_kingtut()
 }
 
 GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state, init_kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, moneybnk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
