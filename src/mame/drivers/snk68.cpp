@@ -889,7 +889,7 @@ ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title 
 	ROM_LOAD16_BYTE( "ik_2.c10", 0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) /* Rotary Joystick - hand written label  */
 	ROM_LOAD16_BYTE( "ik_3.c9",  0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) /* Rotary Joystick - hand written label  */
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x20000, "soundcpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
