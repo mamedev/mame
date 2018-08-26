@@ -1120,7 +1120,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="firemanr">
 		<description>Fireman Rescue</description>
 		<year>2013</year>
@@ -1132,7 +1132,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="foad">
 		<description>Flight of a Dragon</description>
 		<year>2017</year>
@@ -1169,7 +1169,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pipes">
 		<description>Pipes</description>
 		<year>2012</year>
@@ -1181,7 +1181,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="stmforce">
 		<description>Stormforce</description>
 		<year>2016</year>
@@ -1194,7 +1194,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="airhockey">
 		<description>Air Hockey</description>
 		<year>2013</year>

@@ -2312,9 +2312,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		After the intro the game asks for a disk in drive A. It doesn't work with any of the disks here.
-		Works when installed to HDD.
+	<!--
+	    After the intro the game asks for a disk in drive A. It doesn't work with any of the disks here.
+	    Works when installed to HDD.
 	-->
 	<software name="5jikanm" supported="partial">
 		<description>5 Jikanme no Venus</description>
@@ -3291,7 +3291,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Runs too fast and has graphical glitches on 386 and faster CPUs. This is probably accurate to real hardware. --> 
+	<!-- Runs too fast and has graphical glitches on 386 and faster CPUs. This is probably accurate to real hardware. -->
 	<software name="aircomb">
 		<description>Air Combat - Yuugeki Ou II</description>
 		<year>1989</year>
@@ -3650,11 +3650,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		Works only on 286-based machines (e.g. PC-9801UX). Doesn't seem to happen on real hardware.
-		Also, this game modifies its own disk (the NAME.DEF and FLAG* files), so the image of Disk A has been rebuilt with files from three
-		separate dumps to be as close as possible to an unmodified copy. 
-		It should still be considered a bad dump, though. 
+	<!--
+	    Works only on 286-based machines (e.g. PC-9801UX). Doesn't seem to happen on real hardware.
+	    Also, this game modifies its own disk (the NAME.DEF and FLAG* files), so the image of Disk A has been rebuilt with files from three
+	    separate dumps to be as close as possible to an unmodified copy.
+	    It should still be considered a bad dump, though.
 	-->
 	<software name="akikoprm" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
@@ -4118,11 +4118,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		Seems to have some kind of trouble with changing disks. Starting the game from the opening sequence (オープニングから始める) doesn't work
-		because it doesn't recognize Data Disk A afterwards, but starting from the beginning of the game itself (最初から始める) works.
-		
-		Needs further testing in order to confirm if later disk changes also fail.
+	<!--
+	    Seems to have some kind of trouble with changing disks. Starting the game from the opening sequence (オープニングから始める) doesn't work
+	    because it doesn't recognize Data Disk A afterwards, but starting from the beginning of the game itself (最初から始める) works.
+
+	    Needs further testing in order to confirm if later disk changes also fail.
 	-->
 	<software name="alvaleak" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
@@ -4162,9 +4162,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		Runs without sound on a PC-9801-86 sound card, works fine with the PC-9801-26K.
-		Sound has been confirmed to work on a real PC-9821Nw150 (PC-9801-118 compatible audio), so it's probably an emulation bug.
+	<!--
+	    Runs without sound on a PC-9801-86 sound card, works fine with the PC-9801-26K.
+	    Sound has been confirmed to work on a real PC-9821Nw150 (PC-9801-118 compatible audio), so it's probably an emulation bug.
 	-->
 	<software name="amaranth">
 		<description>Amaranth - Phantasie RPG</description>
@@ -4430,9 +4430,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 
-		The system disk is supposed to come without OS files, and the user is expected to run the setup process (SETUP.EXE) to copy them from 
-		an existing bootable disk. All currently available images of the system disk are modified, so we'll mark it as a bad dump in case a "clean" one appears.
+	<!--
+	    The system disk is supposed to come without OS files, and the user is expected to run the setup process (SETUP.EXE) to copy them from
+	    an existing bootable disk. All currently available images of the system disk are modified, so we'll mark it as a bad dump in case a "clean" one appears.
 	-->
 	<software name="angelarm">
 		<!-- Origin: Neo Kobe Collection -->

@@ -2,12 +2,12 @@
 // copyright-holders:cam900
 /*
     Hudson HuC6230 SoundBox
-	HuC6280 PSG with ADPCM
+    HuC6280 PSG with ADPCM
 
-	TODO:
-	- Volume is linear?
-	- Make it actually working
-	- Implement CDDA Volume
+    TODO:
+    - Volume is linear?
+    - Make it actually working
+    - Implement CDDA Volume
 */
 
 #include "emu.h"
@@ -52,7 +52,7 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (!channel->m_interpolate)
 				sample = channel->m_curr_sample;
 			else
-				sample = ((channel->m_prev_sample * (frq - channel->m_pos)) + 
+				sample = ((channel->m_prev_sample * (frq - channel->m_pos)) +
 					(channel->m_curr_sample * channel->m_pos)) >> m_adpcm_freq;
 
 			outputs[0][i] = clamp(outputs[0][i] + ((sample * channel->m_lvol) >> 2), -32768, 32767);

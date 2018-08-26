@@ -9324,7 +9324,7 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megaline)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 

@@ -57,7 +57,7 @@ private:
 	uint8_t m_tms_ctrl;
 	bool m_use_flash;
 	std::unique_ptr<uint8_t[]> m_snd_shared_ram;
-	
+
 	void update_status_pin(int state);
 };
 

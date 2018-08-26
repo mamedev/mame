@@ -11,9 +11,9 @@ Notes:
 - Schematics show a palette/work RAM bank selector, but this doesn't seem
   to be used?
 
-- Devastators: has player-trench collision detection issues, player isn't 
+- Devastators: has player-trench collision detection issues, player isn't
   supposed to go through them.
-  
+
 - Devastators: shadows don't work. Bit 7 of the sprite attribute is always 0,
   could there be a global enable flag in the 051960?
   This is particularly evident in level 2 where plane shadows cover other sprites.
@@ -23,8 +23,8 @@ Notes:
 
 - Devastators: sprite zooming for the planes in level 2 is particularly bad.
 
-- Devastators: title screen white backdrop is always supposed to flicker, 
-  it currently do that only from second/fourth attract cycles (supposed to always 
+- Devastators: title screen white backdrop is always supposed to flicker,
+  it currently do that only from second/fourth attract cycles (supposed to always
   flicker from PCB video);
 
 ***************************************************************************/
@@ -432,10 +432,10 @@ MACHINE_CONFIG_START(mainevt_state::mainevt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//	MCFG_SCREEN_SIZE(64*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(64*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 14*8, (64-14)*8, 256, 16, 240) // assume 59.17 like Devastators
 	MCFG_SCREEN_UPDATE_DRIVER(mainevt_state, screen_update_mainevt)
 	MCFG_SCREEN_PALETTE("palette")
@@ -481,10 +481,10 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//	MCFG_SCREEN_SIZE(64*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(64*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 13*8, (64-13)*8, 256, 16, 240) // measured 59.17
 	MCFG_SCREEN_UPDATE_DRIVER(mainevt_state, screen_update_dv)
 	MCFG_SCREEN_PALETTE("palette")

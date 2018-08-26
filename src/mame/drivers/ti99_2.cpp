@@ -417,12 +417,12 @@ void ti99_2_state::ti99_224(machine_config& config)
 
 	using namespace bus::ti99::internal;
 	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
+	screen.set_raw(XTAL(10'738'635) / 2,
 			video992_device::TOTAL_HORZ,
 			video992_device::HORZ_DISPLAY_START-12,
-			video992_device::HORZ_DISPLAY_START + 256 + 12, \
-			video992_device::TOTAL_VERT_NTSC, \
-			video992_device::VERT_DISPLAY_START_NTSC - 12, \
+			video992_device::HORZ_DISPLAY_START + 256 + 12,
+			video992_device::TOTAL_VERT_NTSC,
+			video992_device::VERT_DISPLAY_START_NTSC - 12,
 			video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
 	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
 
@@ -441,12 +441,12 @@ void ti99_2_state::ti99_232(machine_config& config)
 
 	using namespace bus::ti99::internal;
 	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(10'738'635) / 2, \
+	screen.set_raw(XTAL(10'738'635) / 2,
 			video992_device::TOTAL_HORZ,
 			video992_device::HORZ_DISPLAY_START-12,
-			video992_device::HORZ_DISPLAY_START + 256 + 12, \
-			video992_device::TOTAL_VERT_NTSC, \
-			video992_device::VERT_DISPLAY_START_NTSC - 12, \
+			video992_device::HORZ_DISPLAY_START + 256 + 12,
+			video992_device::TOTAL_VERT_NTSC,
+			video992_device::VERT_DISPLAY_START_NTSC - 12,
 			video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
 	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
 

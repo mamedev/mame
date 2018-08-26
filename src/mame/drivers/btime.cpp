@@ -2019,7 +2019,7 @@ void btime_state::init_tisland()
 	   unmapped area that causes the game to fail in several circumstances.On the Cassette
 	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
 	   wrong going on in the encryption scheme.
-	   
+
 	   There are other locations with similar problems. These ROMs have NOT yet been
 	   confirmed on multiple PCBs, so this could still be a bad dump.
 	   */

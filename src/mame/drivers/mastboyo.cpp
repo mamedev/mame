@@ -168,7 +168,7 @@ static INPUT_PORTS_START( mastboyo )
 	PORT_DIPNAME( 0x80, 0x80, "Test Inicial" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) <--- Why to mask and hide the test mode???
+//  PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) <--- Why to mask and hide the test mode???
 INPUT_PORTS_END
 
 

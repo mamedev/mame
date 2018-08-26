@@ -115,7 +115,7 @@ void taito_zoom_device::update_status_pin(int state)
 {
 	printf("inside callback set status to %d\n",state);
 	m_soundcpu->set_input_line(1, state);
-	machine().scheduler().synchronize();	// the fix to all problems
+	machine().scheduler().synchronize();    // the fix to all problems
 }
 
 void taito_zoom_device::taitozoom_mn_map(address_map &map)

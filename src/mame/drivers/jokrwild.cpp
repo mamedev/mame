@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(jokrwild_map)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	pia6821_device &pia0(PIA6821(config, "pia0", 0));
 	pia0.readpa_handler().set_ioport("IN0");

@@ -784,13 +784,13 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	pia.writepb_handler().set(FUNC(maygay1b_state::m1_pia_portb_w));
 
 	hc259_device &mainlatch(HC259(config, "mainlatch")); // U29
-	mainlatch.q_out_cb<0>().set(FUNC(maygay1b_state::ramen_w));		// m_RAMEN
-	mainlatch.q_out_cb<1>().set(FUNC(maygay1b_state::alarmen_w));	// AlarmEn
-	mainlatch.q_out_cb<2>().set(FUNC(maygay1b_state::nmien_w));		// Enable
-	mainlatch.q_out_cb<3>().set(FUNC(maygay1b_state::rts_w));		// RTS
-	mainlatch.q_out_cb<4>().set(FUNC(maygay1b_state::psurelay_w));	// PSURelay
-	mainlatch.q_out_cb<5>().set(FUNC(maygay1b_state::wdog_w));		// WDog
-	mainlatch.q_out_cb<6>().set(FUNC(maygay1b_state::srsel_w));		// Srsel
+	mainlatch.q_out_cb<0>().set(FUNC(maygay1b_state::ramen_w));     // m_RAMEN
+	mainlatch.q_out_cb<1>().set(FUNC(maygay1b_state::alarmen_w));   // AlarmEn
+	mainlatch.q_out_cb<2>().set(FUNC(maygay1b_state::nmien_w));     // Enable
+	mainlatch.q_out_cb<3>().set(FUNC(maygay1b_state::rts_w));       // RTS
+	mainlatch.q_out_cb<4>().set(FUNC(maygay1b_state::psurelay_w));  // PSURelay
+	mainlatch.q_out_cb<5>().set(FUNC(maygay1b_state::wdog_w));      // WDog
+	mainlatch.q_out_cb<6>().set(FUNC(maygay1b_state::srsel_w));     // Srsel
 
 	MCFG_S16LF01_ADD("vfd",0)
 	SPEAKER(config, "lspeaker").front_left();

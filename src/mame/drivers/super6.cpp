@@ -402,10 +402,10 @@ WRITE_LINE_MEMBER( super6_state::fdc_drq_w )
 // no evidence of daisy chain in use - removed for now
 //static const z80_daisy_config super6_daisy_chain[] =
 //{
-//	{ Z80CTC_TAG },
-//	{ Z80DART_TAG },
-//	{ Z80PIO_TAG },
-//	{ nullptr }
+//  { Z80CTC_TAG },
+//  { Z80DART_TAG },
+//  { Z80PIO_TAG },
+//  { nullptr }
 //};
 
 

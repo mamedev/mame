@@ -4203,7 +4203,7 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);    // no battery
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);    // no battery
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 

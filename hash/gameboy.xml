@@ -25073,7 +25073,7 @@
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-009"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="TG-002" /> 
+			<feature name="pcb" value="TG-002" />
 			<!-- TG-002 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">

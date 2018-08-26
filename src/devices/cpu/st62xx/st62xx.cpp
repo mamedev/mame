@@ -4,10 +4,10 @@
 
     STmicro ST6-series microcontroller emulation skeleton
 
-	To Do:
-		- Cycle counts
-		- STOP, WAIT opcodes
-		- Peripherals
+    To Do:
+        - Cycle counts
+        - STOP, WAIT opcodes
+        - Peripherals
 
 **********************************************************************/
 
@@ -510,7 +510,7 @@ void st6228_device::execute_run()
 			case 0x00: case 0x10: case 0x20: case 0x30: case 0x40: case 0x50: case 0x60: case 0x70:
 			case 0x80:            case 0xa0: case 0xb0: case 0xc0: case 0xd0: case 0xe0: case 0xf0:
 			case 0x08: case 0x18: case 0x28: case 0x38: case 0x48: case 0x58: case 0x68: case 0x78:
-			case 0x88:            case 0xa8: case 0xb8: case 0xc8: case 0xd8: case 0xe8: case 0xf8:	// JRNZ e
+			case 0x88:            case 0xa8: case 0xb8: case 0xc8: case 0xd8: case 0xe8: case 0xf8: // JRNZ e
 			{
 				const int8_t e = ((int8_t)op) >> 3;
 				if (!(m_flags[m_mode] & FLAG_Z))
@@ -538,7 +538,7 @@ void st6228_device::execute_run()
 				break;
 			}
 			case 0x09: case 0x19: case 0x29: case 0x39: case 0x49: case 0x59: case 0x69: case 0x79:
-			case 0x89: case 0x99: case 0xa9: case 0xb9: case 0xc9: case 0xd9: case 0xe9: case 0xf9:	// JP abc
+			case 0x89: case 0x99: case 0xa9: case 0xb9: case 0xc9: case 0xd9: case 0xe9: case 0xf9: // JP abc
 			{
 				const uint8_t ab = m_program->read_byte(m_pc+1);
 				const uint16_t abc = ((op & 0xf0) >> 4) | (ab << 4);
@@ -548,14 +548,14 @@ void st6228_device::execute_run()
 			case 0x02: case 0x12: case 0x22: case 0x32: case 0x42: case 0x52: case 0x62: case 0x72:
 			case 0x82: case 0x92: case 0xa2: case 0xb2: case 0xc2: case 0xd2: case 0xe2: case 0xf2:
 			case 0x0a: case 0x1a: case 0x2a: case 0x3a: case 0x4a: case 0x5a: case 0x6a: case 0x7a:
-			case 0x8a: case 0x9a: case 0xaa: case 0xba: case 0xca: case 0xda: case 0xea: case 0xfa:	// JRNC abc
+			case 0x8a: case 0x9a: case 0xaa: case 0xba: case 0xca: case 0xda: case 0xea: case 0xfa: // JRNC abc
 			{
 				const int8_t e = ((int8_t)op) >> 3;
 				if (!(m_flags[m_mode] & FLAG_C))
 					m_pc += e;
 				break;
 			}
-			case 0x03: case 0x23: case 0x43: case 0x63: case 0x83: case 0xa3: case 0xc3: case 0xe3:	// JRR b,rr,ee
+			case 0x03: case 0x23: case 0x43: case 0x63: case 0x83: case 0xa3: case 0xc3: case 0xe3: // JRR b,rr,ee
 			{
 				const uint8_t b = (op >> 5) & 7;
 				const uint8_t rr = m_program->read_byte(m_pc+1);
@@ -567,7 +567,7 @@ void st6228_device::execute_run()
 					m_pc += ee;
 				break;
 			}
-			case 0x13: case 0x33: case 0x53: case 0x73: case 0x93: case 0xb3: case 0xd3: case 0xf3:	// JRS b,rr,ee
+			case 0x13: case 0x33: case 0x53: case 0x73: case 0x93: case 0xb3: case 0xd3: case 0xf3: // JRS b,rr,ee
 			{
 				const uint8_t b = (op >> 5) & 7;
 				const uint8_t rr = m_program->read_byte(m_pc+1);
@@ -579,7 +579,7 @@ void st6228_device::execute_run()
 					m_pc += 2;
 				break;
 			}
-			case 0x0b: case 0x2b: case 0x4b: case 0x6b: case 0x8b: case 0xab: case 0xcb: case 0xeb:	// RES b,rr
+			case 0x0b: case 0x2b: case 0x4b: case 0x6b: case 0x8b: case 0xab: case 0xcb: case 0xeb: // RES b,rr
 			{
 				const uint8_t b = (op >> 5) & 7;
 				const uint8_t rr = m_program->read_byte(m_pc+1);
@@ -588,7 +588,7 @@ void st6228_device::execute_run()
 				m_pc++;
 				break;
 			}
-			case 0x1b: case 0x3b: case 0x5b: case 0x7b: case 0x9b: case 0xbb: case 0xdb: case 0xfb:	// SET b,rr
+			case 0x1b: case 0x3b: case 0x5b: case 0x7b: case 0x9b: case 0xbb: case 0xdb: case 0xfb: // SET b,rr
 			{
 				const uint8_t b = (op >> 5) & 7;
 				const uint8_t rr = m_program->read_byte(m_pc+1);
@@ -600,7 +600,7 @@ void st6228_device::execute_run()
 			case 0x04: case 0x14: case 0x24: case 0x34: case 0x44: case 0x54: case 0x64: case 0x74:
 			case 0x84: case 0x94: case 0xa4: case 0xb4: case 0xc4: case 0xd4: case 0xe4: case 0xf4:
 			case 0x0c: case 0x1c: case 0x2c: case 0x3c: case 0x4c: case 0x5c: case 0x6c: case 0x7c:
-			case 0x8c: case 0x9c: case 0xac: case 0xbc: case 0xcc: case 0xdc: case 0xec: case 0xfc:	// JRZ e
+			case 0x8c: case 0x9c: case 0xac: case 0xbc: case 0xcc: case 0xdc: case 0xec: case 0xfc: // JRZ e
 			{
 				const int8_t e = ((int8_t)op) >> 3;
 				if (m_flags[m_mode] & FLAG_Z)
@@ -610,7 +610,7 @@ void st6228_device::execute_run()
 			case 0x06: case 0x16: case 0x26: case 0x36: case 0x46: case 0x56: case 0x66: case 0x76:
 			case 0x86: case 0x96: case 0xa6: case 0xb6: case 0xc6: case 0xd6: case 0xe6: case 0xf6:
 			case 0x0e: case 0x1e: case 0x2e: case 0x3e: case 0x4e: case 0x5e: case 0x6e: case 0x7e:
-			case 0x8e: case 0x9e: case 0xae: case 0xbe: case 0xce: case 0xde: case 0xee: case 0xfe:	// JRC e
+			case 0x8e: case 0x9e: case 0xae: case 0xbe: case 0xce: case 0xde: case 0xee: case 0xfe: // JRC e
 			{
 				const int8_t e = ((int8_t)op) >> 3;
 				if (m_flags[m_mode] & FLAG_C)
@@ -681,7 +681,7 @@ void st6228_device::execute_run()
 				else
 					m_flags[m_mode] |= FLAG_Z;
 				break;
-			case 0x0d:	// LDI rr,nn
+			case 0x0d:  // LDI rr,nn
 			{
 				const uint8_t rr = m_program->read_byte(m_pc+1);
 				const uint8_t nn = m_program->read_byte(m_pc+2);
@@ -824,7 +824,7 @@ void st6228_device::execute_run()
 				else
 					m_flags[m_mode] |= FLAG_Z;
 				break;
-			case 0x17:	// LDI A,rr
+			case 0x17:  // LDI A,rr
 			{
 				m_regs[REG_A] = m_program->read_byte(m_pc+1);
 

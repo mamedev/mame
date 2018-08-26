@@ -19,15 +19,15 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 
 /* Hardware calls these '3d buffers'
 
-	They're only read during the startup check, never written
+    They're only read during the startup check, never written
 
-	They're definitely mirrored in the startup test, according to ElSemi
+    They're definitely mirrored in the startup test, according to ElSemi
 
-	The games run in interlace mode, so buffer resolution can be half the effective screen height
+    The games run in interlace mode, so buffer resolution can be half the effective screen height
 
-	30100000-3011ffff is framebuffer A0 (512x256 8-bit?) (pal data?)
-	30120000-3013ffff is framebuffer A1 (512x256 8-bit?) (pal data?)
-	30140000-3015ffff is ZBuffer A  (512x256 8-bit?)
+    30100000-3011ffff is framebuffer A0 (512x256 8-bit?) (pal data?)
+    30120000-3013ffff is framebuffer A1 (512x256 8-bit?) (pal data?)
+    30140000-3015ffff is ZBuffer A  (512x256 8-bit?)
 */
 
 READ32_MEMBER(hng64_state::hng64_fbram1_r)
@@ -93,16 +93,16 @@ WRITE32_MEMBER(hng64_state::dl_control_w)
 	/* m_activeDisplayList is not currently connected to anything, it seems unlikely there are different banks.
 	   games typically write up to 8 lots of 0x200 data, writing bit 0 between them
 
-		bit 0 (0x01)  process DMA from 3d FIFO to framebuffer?
-		bit 1 (0x02)  written before first set of dl data each frame on some games, but not on SS?
+	    bit 0 (0x01)  process DMA from 3d FIFO to framebuffer?
+	    bit 1 (0x02)  written before first set of dl data each frame on some games, but not on SS?
 	    bit 2 (0x04)  reset buffer count (startup only)
 	*/
 
 	/*
 	if (data & 0x01)
-		m_activeDisplayList = 0;
+	    m_activeDisplayList = 0;
 	else if (data & 0x02)
-		m_activeDisplayList = 1;
+	    m_activeDisplayList = 1;
 	*/
 
 	/*
@@ -110,7 +110,7 @@ WRITE32_MEMBER(hng64_state::dl_control_w)
 
 	if(data & 2) // swap buffers
 	{
-		clear3d();
+	    clear3d();
 	}
 	*/
 }
@@ -118,7 +118,7 @@ WRITE32_MEMBER(hng64_state::dl_control_w)
 READ32_MEMBER(hng64_state::dl_vreg_r)
 {
 	/* tested with possible masked bits 0xf003 (often masking 0xf000 or 0x0003)
-	
+
 	  various wait loops on bit 0x02 (bit 1) after sending 3d commands
 	  tests failing on other bits can cause display list writes to be skipped
 
@@ -927,7 +927,7 @@ void hng64_state::hng64_command3d(const uint16_t* packet)
 
 	switch (packet[0])
 	{
-	case 0x0000:	// NOP?
+	case 0x0000:    // NOP?
 		 /* Appears to be a NOP (or 'end of list for this frame, ignore everything after' doesn't stop stray 3d objects in game for xrally/roadedge
 		    although does stop a partial hng64 logo being displayed assuming that's meant to be kept onscreen by some other means without valid data) */
 		break;
@@ -1029,11 +1029,11 @@ void hng64_state::clear3d()
  *
  *        | Bits      | Use
  *        |           |
- * -------+ 7654-3210-+---------------- 
+ * -------+ 7654-3210-+----------------
  *      0 | ---- --xy | x = Reads in Fatal Fury WA, if on then there isn't a 3d refresh (busy flag?).  y = set at POST/service modes, almost likely fb disable
  *      1 | ---- ---- |
  *      2 | ccc- b--- | c = framebuffer color base, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One (or not?)  b = don't clear buffer
- *      3 | ---- ---- | 
+ *      3 | ---- ---- |
 */
 
 READ8_MEMBER(hng64_state::hng64_fbcontrol_r)
@@ -1046,12 +1046,12 @@ WRITE8_MEMBER(hng64_state::hng64_fbcontrol_w)
 {
 
 	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
-       ':maincpu' (8001EDE0): hng64_fbcontrol_w (002) 10 (disable frame buffer clear)
-       ':maincpu' (8001FE4C): hng64_fbcontrol_w (002) 38 (normal)
+	   ':maincpu' (8001EDE0): hng64_fbcontrol_w (002) 10 (disable frame buffer clear)
+	   ':maincpu' (8001FE4C): hng64_fbcontrol_w (002) 38 (normal)
 
 	   during the Hyper Neogeo 64 logo it has a value of
 	   ':maincpu' (8005AA44): hng64_fbcontrol_w (002) 18
-	   
+
 	   sams64 does
 	   ':maincpu' (800C13C4): hng64_fbcontrol_r (002)     (ANDs with 0x07, ORs with 0x18)
 	   ':maincpu' (800C13D0): hng64_fbcontrol_w (002) 18
@@ -1090,7 +1090,7 @@ WRITE8_MEMBER(hng64_state::hng64_fbunkbyte_w)
 	}
 	else
 	{
-		logerror("%s: hng64_unkbyte_w (%03x - unexpected) %02x \n", machine().describe_context(), offset, data);	
+		logerror("%s: hng64_unkbyte_w (%03x - unexpected) %02x \n", machine().describe_context(), offset, data);
 	}
 }
 

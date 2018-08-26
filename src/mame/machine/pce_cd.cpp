@@ -242,7 +242,7 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
  MACHINE_CONFIG_START(pce_cd_device::device_add_mconfig)
- 	NVRAM(config, "bram").set_custom_handler(FUNC(pce_cd_device::nvram_init));
+	NVRAM(config, "bram").set_custom_handler(FUNC(pce_cd_device::nvram_init));
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("pce_cdrom")

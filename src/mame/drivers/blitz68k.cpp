@@ -1816,7 +1816,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 
 	// MC68HC705C8P (MCU2)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1846,7 +1846,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 
 	// MC68HC705C8P (MCU)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1875,7 +1875,7 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 
 	// MC68HC705C8P (MCU)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1906,7 +1906,7 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 
 	// MC68HC705C8P (MCU2)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1935,7 +1935,7 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 
 	// MC68HC705C8P (MCU)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1969,7 +1969,7 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 
 	// MC68HC705C8P (MCU3)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

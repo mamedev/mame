@@ -38,18 +38,18 @@ private:
 
 	// DSP ROM sample map
 	enum {
-		DATA_PAN_TAB		= 0x110,
-		DATA_ADPCM_TAB		= 0x9dc,
-		DATA_FILTER_TAB		= 0xd53,	// dual filter mode, 5 tables * 95 taps each
-		DATA_FILTER_TAB2	= 0xf2e,	// overlapping data (95+15+95)
+		DATA_PAN_TAB        = 0x110,
+		DATA_ADPCM_TAB      = 0x9dc,
+		DATA_FILTER_TAB     = 0xd53,    // dual filter mode, 5 tables * 95 taps each
+		DATA_FILTER_TAB2    = 0xf2e,    // overlapping data (95+15+95)
 
 		STATE_BOOT          = 0x000,
-		STATE_INIT1			= 0x288,
-		STATE_INIT2			= 0x61a,
-		STATE_REFRESH1		= 0x039,
-		STATE_REFRESH2		= 0x04f,
-		STATE_NORMAL1		= 0x314,
-		STATE_NORMAL2 		= 0x6b2
+		STATE_INIT1         = 0x288,
+		STATE_INIT2         = 0x61a,
+		STATE_REFRESH1      = 0x039,
+		STATE_REFRESH2      = 0x04f,
+		STATE_NORMAL1       = 0x314,
+		STATE_NORMAL2       = 0x6b2
 	};
 
 	const uint16_t PAN_TABLE_DRY = 0;
@@ -87,7 +87,7 @@ private:
 
 	// Q1 Filter
 	struct qsound_fir {
-		int m_tap_count = 0;	// usually 95
+		int m_tap_count = 0;    // usually 95
 		int m_delay_pos = 0;
 		uint16_t m_table_pos = 0;
 		int16_t m_taps[95] = { 0 };

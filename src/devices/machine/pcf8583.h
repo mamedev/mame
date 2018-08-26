@@ -6,15 +6,15 @@
 
 **********************************************************************
 
-	The PCF8583 comes in three package configurations:
+    The PCF8583 comes in three package configurations:
 
-		PCF8583P  - 8-pin dual-inline package (DIP8)
-		PCF8583T  - 8-pin small-outline package (SO8)
-		PCF8583BS - 20-pin thin quad-flat package (HVQFN20)
+        PCF8583P  - 8-pin dual-inline package (DIP8)
+        PCF8583T  - 8-pin small-outline package (SO8)
+        PCF8583BS - 20-pin thin quad-flat package (HVQFN20)
 
 **********************************************************************
 
-	DIP8 pinning:			____  ____
+    DIP8 pinning:           ____  ____
                            |    \/    |
                   OSCI   1 |          | 8   Vdd
                   OSCI   2 |          | 7   /INT
@@ -24,7 +24,7 @@
 
 **********************************************************************
 
-	SO8 pinning: 			_____  _____
+    SO8 pinning:            _____  _____
                            | |   \/     |
                   OSCI   1 | |          | 8   Vdd
                   OSCI   2 | |          | 7   /INT
@@ -34,10 +34,10 @@
 
 **********************************************************************
 
-	HVQFN20 pinning:
-					      NC NC NC NC NC
-	                      20 19 18 17 16
-	                    __________________
+    HVQFN20 pinning:
+                          NC NC NC NC NC
+                          20 19 18 17 16
+                        __________________
                        |                  |
                        |    __________    |
                        |   |          |   |
@@ -95,45 +95,45 @@ protected:
 private:
 	enum
 	{
-		REG_CONTROL				= 0x00,
-		REG_HUNDREDTHS			= 0x01,
-		REG_SECONDS				= 0x02,
-		REG_MINUTES				= 0x03,
-		REG_HOURS				= 0x04,
-		REG_YEAR_DATE			= 0x05,
-		REG_MONTH_DAY			= 0x06,
-		REG_TIMER				= 0x07,
-		REG_ALARM_CONTROL		= 0x08,
-		REG_ALARM_HUNDREDTHS	= 0x09,
-		REG_ALARM_SECONDS		= 0x0a,
-		REG_ALARM_MINUTES		= 0x0b,
-		REG_ALARM_HOURS			= 0x0c,
-		REG_ALARM_DATE			= 0x0d,
-		REG_ALARM_MONTH			= 0x0e,
-		REG_ALARM_TIMER			= 0x0f
+		REG_CONTROL             = 0x00,
+		REG_HUNDREDTHS          = 0x01,
+		REG_SECONDS             = 0x02,
+		REG_MINUTES             = 0x03,
+		REG_HOURS               = 0x04,
+		REG_YEAR_DATE           = 0x05,
+		REG_MONTH_DAY           = 0x06,
+		REG_TIMER               = 0x07,
+		REG_ALARM_CONTROL       = 0x08,
+		REG_ALARM_HUNDREDTHS    = 0x09,
+		REG_ALARM_SECONDS       = 0x0a,
+		REG_ALARM_MINUTES       = 0x0b,
+		REG_ALARM_HOURS         = 0x0c,
+		REG_ALARM_DATE          = 0x0d,
+		REG_ALARM_MONTH         = 0x0e,
+		REG_ALARM_TIMER         = 0x0f
 	};
 
 	enum
 	{
-		CONTROL_STOP_BIT	= 0x80
+		CONTROL_STOP_BIT    = 0x80
 	};
 
 	static const device_timer_id TIMER_TICK = 0;
 
 	// get/set date
-	uint8_t get_date_year()				{ return (m_data[REG_YEAR_DATE] >> 6) & 3; }
-	void set_date_year(uint8_t year)	{ m_data[REG_YEAR_DATE] = (m_data[REG_YEAR_DATE] & 0x3f) | ((year % 4) << 6); }
-	uint8_t get_date_month()			{ return bcd_to_integer(m_data[6] & 0x1f); }
-	void set_date_month(uint8_t month)	{ m_data[REG_MONTH_DAY] = (m_data[REG_MONTH_DAY] & 0xe0) | (convert_to_bcd(month) & 0x1f); }
-	uint8_t get_date_day()				{ return bcd_to_integer(m_data[REG_YEAR_DATE] & 0x3f); }
-	void set_date_day(uint8_t day)		{ m_data[REG_YEAR_DATE] = (m_data[REG_YEAR_DATE] & 0xc0) | (convert_to_bcd(day) & 0x3f); }
+	uint8_t get_date_year()             { return (m_data[REG_YEAR_DATE] >> 6) & 3; }
+	void set_date_year(uint8_t year)    { m_data[REG_YEAR_DATE] = (m_data[REG_YEAR_DATE] & 0x3f) | ((year % 4) << 6); }
+	uint8_t get_date_month()            { return bcd_to_integer(m_data[6] & 0x1f); }
+	void set_date_month(uint8_t month)  { m_data[REG_MONTH_DAY] = (m_data[REG_MONTH_DAY] & 0xe0) | (convert_to_bcd(month) & 0x1f); }
+	uint8_t get_date_day()              { return bcd_to_integer(m_data[REG_YEAR_DATE] & 0x3f); }
+	void set_date_day(uint8_t day)      { m_data[REG_YEAR_DATE] = (m_data[REG_YEAR_DATE] & 0xc0) | (convert_to_bcd(day) & 0x3f); }
 
 	// get/set time
-	uint8_t get_time_hour()				{ return bcd_to_integer(m_data[REG_HOURS]); }
-	void set_time_hour(uint8_t hour)	{ m_data[REG_HOURS] = convert_to_bcd(hour); }
-	uint8_t get_time_minute()			{ return bcd_to_integer(m_data[REG_MINUTES]); }
+	uint8_t get_time_hour()             { return bcd_to_integer(m_data[REG_HOURS]); }
+	void set_time_hour(uint8_t hour)    { m_data[REG_HOURS] = convert_to_bcd(hour); }
+	uint8_t get_time_minute()           { return bcd_to_integer(m_data[REG_MINUTES]); }
 	void set_time_minute(uint8_t minute){ m_data[REG_MINUTES] = convert_to_bcd(minute); }
-	uint8_t get_time_second()			{ return bcd_to_integer(m_data[REG_SECONDS]); }
+	uint8_t get_time_second()           { return bcd_to_integer(m_data[REG_SECONDS]); }
 	void set_time_second(uint8_t second){ m_data[REG_SECONDS] = convert_to_bcd(second); }
 
 	void write_register(uint8_t offset, uint8_t data);
@@ -144,18 +144,18 @@ private:
 
 	// internal state
 	uint8_t     m_data[256];
-	int			m_scl;
-	int			m_sda;
-	int			m_inp;
-	bool		m_transfer_active;
+	int         m_scl;
+	int         m_sda;
+	int         m_inp;
+	bool        m_transfer_active;
 	int         m_bit_index;
-	bool		m_irq;
+	bool        m_irq;
 	uint8_t     m_data_recv_index;
 	uint8_t     m_data_recv;
 	uint8_t     m_mode;
 	uint8_t     m_pos;
-	uint8_t		m_write_address;
-	uint8_t		m_read_address;
+	uint8_t     m_write_address;
+	uint8_t     m_read_address;
 	emu_timer * m_timer;
 	enum        { RTC_MODE_NONE, RTC_MODE_SEND, RTC_MODE_RECV };
 

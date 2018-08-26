@@ -515,7 +515,7 @@ void zodiack_state::zodiack(machine_config &config)
 
 	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb", 0));
 	videopcb.set_palette("videopcb:palette");
-	
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 

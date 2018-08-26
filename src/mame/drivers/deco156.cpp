@@ -10,7 +10,7 @@
 
     How to get the version and region:
     Heavy Smash: Exit test mode
-	World Cup Volleyball 95: Boot the game holding down player 2 button 1
+    World Cup Volleyball 95: Boot the game holding down player 2 button 1
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 */

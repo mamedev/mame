@@ -1972,9 +1972,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::ffantasybl)
 	dec0(config);
 
-//	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
-//	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
-//	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+//  H6280(config, m_subcpu, XTAL(21'477'272) / 16);
+//  m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
+//  m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
 

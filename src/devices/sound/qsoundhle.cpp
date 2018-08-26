@@ -237,7 +237,7 @@ void qsound_hle_device::init_register_map()
 		m_register_map[(i << 3) + 4] = (uint16_t*)&m_voice[i].m_loop_len;
 		m_register_map[(i << 3) + 5] = (uint16_t*)&m_voice[i].m_end_addr;
 		m_register_map[(i << 3) + 6] = (uint16_t*)&m_voice[i].m_volume;
-		m_register_map[(i << 3) + 7] = nullptr;	// unused
+		m_register_map[(i << 3) + 7] = nullptr; // unused
 		m_register_map[i + 0x80] = (uint16_t*)&m_voice_pan[i];
 		m_register_map[i + 0xba] = (uint16_t*)&m_voice[i].m_echo;
 	}
@@ -277,7 +277,7 @@ int16_t qsound_hle_device::read_sample(uint16_t bank, uint16_t address)
 	bank &= 0x7FFF;
 	const uint32_t rom_addr = (bank << 16) | (address << 0);
 	const uint8_t sample_data = read_byte(rom_addr);
-	return (int16_t)(sample_data << 8);	// bit0-7 is tied to ground
+	return (int16_t)(sample_data << 8); // bit0-7 is tied to ground
 }
 
 /********************************************************************/

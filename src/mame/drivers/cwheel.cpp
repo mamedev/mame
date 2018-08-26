@@ -2,18 +2,18 @@
 // copyright-holders:Ryan Holtz
 /******************************************************************************
 
-	Gamebar Catherine Wheel skeleton driver
+    Gamebar Catherine Wheel skeleton driver
 
-	Notable parts:
-		- ST62T28C6: 8-bit microcontroller from STmicro, ST6 series
-		- 3x MM5450N LED drivers
-		- 8MHz crystal oscillator
-		- 60x red LEDs in a circle
-		- 5x 7-segment 1-digit LEDs
-		- ULN2003A darlington transistor array
+    Notable parts:
+        - ST62T28C6: 8-bit microcontroller from STmicro, ST6 series
+        - 3x MM5450N LED drivers
+        - 8MHz crystal oscillator
+        - 60x red LEDs in a circle
+        - 5x 7-segment 1-digit LEDs
+        - ULN2003A darlington transistor array
 
-	TODO:
-		- Everything
+    TODO:
+        - Everything
 
 *******************************************************************************/
 

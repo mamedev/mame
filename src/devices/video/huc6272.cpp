@@ -6,7 +6,7 @@
 
     TODO:
     - Use NSCSI instead of legacy one!
-	- ADPCM Transfer is correct?
+    - ADPCM Transfer is correct?
 
 ***************************************************************************/
 

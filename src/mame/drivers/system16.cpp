@@ -3125,7 +3125,7 @@ ROM_START( dduxbl )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "dduxb01.bin", 0x0000, 0x8000, CRC(0dbef0d7) SHA1(8b9afb2fcb946cec467b1e691c267194b503f841) )
-		
+
 	/* stuff below isn't used but loaded because it was on the board .. */
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "dduxb_5_82s129.b1",  0x0000, 0x0100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) )

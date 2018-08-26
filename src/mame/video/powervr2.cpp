@@ -2783,7 +2783,7 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 			}
 		}
 	} else {
-            render_tri_sorted<&powervr2_device::sample_nontextured>(bitmap, ti, v+i0, v+i1, v+i2);
+			render_tri_sorted<&powervr2_device::sample_nontextured>(bitmap, ti, v+i0, v+i1, v+i2);
 	}
 }
 

@@ -551,15 +551,15 @@ void goupil_base_state::base(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, goupil_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	i8279_device &i8279_kb1(I8279(config, "i8279_kb1", CPU_CLOCK));
-	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));	// scan SL lines
-	i8279_kb1.in_rl_callback().set(FUNC(goupil_g1_state::kbd1_r));				// kbd RL lines
+	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));   // scan SL lines
+	i8279_kb1.in_rl_callback().set(FUNC(goupil_g1_state::kbd1_r));              // kbd RL lines
 	i8279_kb1.in_shift_callback().set(FUNC(goupil_g1_state::shift_kb1_r));
 	i8279_kb1.in_ctrl_callback().set(FUNC(goupil_g1_state::ctrl_kb1_r));
 	i8279_kb1.out_irq_callback().set(m_via_keyb, FUNC(via6522_device::write_ca1));
 
 	i8279_device &i8279_kb2(I8279(config, "i8279_kb2", CPU_CLOCK));
-	i8279_kb2.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd2_w));	// scan SL lines
-	i8279_kb2.in_rl_callback().set(FUNC(goupil_g1_state::kbd2_r));				// kbd RL lines
+	i8279_kb2.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd2_w));   // scan SL lines
+	i8279_kb2.in_rl_callback().set(FUNC(goupil_g1_state::kbd2_r));              // kbd RL lines
 	i8279_kb2.in_shift_callback().set_constant(1);
 	i8279_kb2.in_ctrl_callback().set_constant(1);
 }

@@ -626,12 +626,12 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 
 	/* 74LS123 */
 	TTL74123(config, m_ic48_1, 0);
-	m_ic48_1->set_connection_type(TTL74123_GROUNDED);	/* the hook up type */
-	m_ic48_1->set_resistor_value(RES_K(22));			/* resistor connected to RCext */
-	m_ic48_1->set_capacitor_value(CAP_U(0.01));			/* capacitor connected to Cext and RCext */
-	m_ic48_1->set_a_pin_value(1);						/* A pin - driven by the CRTC */
-	m_ic48_1->set_b_pin_value(1);						/* B pin - pulled high */
-	m_ic48_1->set_clear_pin_value(1);					/* Clear pin - pulled high */
+	m_ic48_1->set_connection_type(TTL74123_GROUNDED);   /* the hook up type */
+	m_ic48_1->set_resistor_value(RES_K(22));            /* resistor connected to RCext */
+	m_ic48_1->set_capacitor_value(CAP_U(0.01));         /* capacitor connected to Cext and RCext */
+	m_ic48_1->set_a_pin_value(1);                       /* A pin - driven by the CRTC */
+	m_ic48_1->set_b_pin_value(1);                       /* B pin - pulled high */
+	m_ic48_1->set_clear_pin_value(1);                   /* Clear pin - pulled high */
 	m_ic48_1->out_cb().set(FUNC(nyny_state::ic48_1_74123_output_changed));
 
 	PIA6821(config, m_pia1, 0);

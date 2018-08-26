@@ -2284,7 +2284,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 	m_file_data.resize(quickload_size);
 
-	if (!quickload_size || 
+	if (!quickload_size ||
 		image.fread(&m_file_data[0], quickload_size) != quickload_size)
 	{
 		m_file_data.clear();
@@ -2322,7 +2322,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 				str.avail_out = decomp.size() - str.total_out;
 				err = inflate(&str, Z_SYNC_FLUSH);
 			} while(err == Z_OK);
-			
+
 			if(err != Z_STREAM_END)
 			{
 				logerror("broken gzip file\n");
@@ -2536,14 +2536,14 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 		m_ga20[0]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe4 ? r32(0xe0) & ~0x40000000 : 0);
 		m_ga20[1]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe4 && (r32(0xe0) & 0x40000000) ? r32(0xe0) & ~0x40000000 : 0);
-		
+
 		for (device_t &child : subdevices())
 			if (child.clock() != 0)
 				logerror("%s %d\n", child.tag(), child.clock());
 
 		//for (auto &stream : machine().sound().streams())
-		//	if (stream->sample_rate() != 0)
-		//		logerror("%s %d\n", stream->device().tag(), stream->sample_rate());
+		//  if (stream->sample_rate() != 0)
+		//      logerror("%s %d\n", stream->device().tag(), stream->sample_rate());
 
 		machine().schedule_soft_reset();
 

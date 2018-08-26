@@ -349,14 +349,14 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, mario_state, memory_write_byte))
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2L (7E80H)
-	mainlatch.q_out_cb<0>().set(FUNC(mario_state::gfx_bank_w));			// ~T ROM
-	mainlatch.q_out_cb<1>().set_nop();									// 2 PSL
-	mainlatch.q_out_cb<2>().set(FUNC(mario_state::flip_w));				// FLIP
-	mainlatch.q_out_cb<3>().set(FUNC(mario_state::palette_bank_w));		// CREF 0
-	mainlatch.q_out_cb<4>().set(FUNC(mario_state::nmi_mask_w));			// NMI EI
-	mainlatch.q_out_cb<5>().set("z80dma", FUNC(z80dma_device::rdy_w));	// DMA SET
-	mainlatch.q_out_cb<6>().set(FUNC(mario_state::coin_counter_1_w));	// COUNTER 2 (misnumbered on schematic)
-	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_2_w));	// COUNTER 1 (misnumbered on schematic)
+	mainlatch.q_out_cb<0>().set(FUNC(mario_state::gfx_bank_w));         // ~T ROM
+	mainlatch.q_out_cb<1>().set_nop();                                  // 2 PSL
+	mainlatch.q_out_cb<2>().set(FUNC(mario_state::flip_w));             // FLIP
+	mainlatch.q_out_cb<3>().set(FUNC(mario_state::palette_bank_w));     // CREF 0
+	mainlatch.q_out_cb<4>().set(FUNC(mario_state::nmi_mask_w));         // NMI EI
+	mainlatch.q_out_cb<5>().set("z80dma", FUNC(z80dma_device::rdy_w));  // DMA SET
+	mainlatch.q_out_cb<6>().set(FUNC(mario_state::coin_counter_1_w));   // COUNTER 2 (misnumbered on schematic)
+	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_2_w));   // COUNTER 1 (misnumbered on schematic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

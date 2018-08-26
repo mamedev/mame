@@ -1597,7 +1597,7 @@ void cvs_state::init_superbik()
 READ8_MEMBER(cvs_state::hero_prot_r)
 {
 	u8 *ROM = memregion("maincpu")->base() + 0x73f0;
-	
+
 	switch (offset + 0x73f0)
 	{
 		case 0x73f0: // pc: 7d, ab9
@@ -1608,7 +1608,7 @@ READ8_MEMBER(cvs_state::hero_prot_r)
 
 		case 0x73f2: // pc: 86, needs to match read from 0x73f0
 			return 0xff & 0x7e; // 0x04 at this address in ROM
-			
+
 		case 0x73f9: // pc: A9f, not sure what this is suppose to do?
 			return 0x00; // 0x1e at this address in ROM
 

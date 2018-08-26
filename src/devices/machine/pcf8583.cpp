@@ -4,12 +4,12 @@
 
     Philips PCF8583 Clock and Calendar with 240 x 8-bit RAM
 
-	TODO:
-		- Alarm mode
-		- Event-counter mode
-		- Clock select
-		- Clock output
-		- Interrupts
+    TODO:
+        - Alarm mode
+        - Event-counter mode
+        - Clock select
+        - Clock output
+        - Interrupts
 
 *********************************************************************/
 

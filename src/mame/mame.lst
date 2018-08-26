@@ -1160,7 +1160,7 @@ ambushj                         // (c) 1983 Nippon Amuse license
 ambushv                         // (c) 1983 Volt Electronics license
 dkong3abl                       // bootleg
 mariobl                         // bootleg
-mariobla						// bootleg
+mariobla                        // bootleg
 
 @source:amerihok.cpp
 amerihok                        //
@@ -10824,7 +10824,7 @@ superbik                        // (c) 1983 Century
 wallst                          // (c) 1982 Century
 
 @source:cwheel.cpp
-cwheel							// (c) 19?? Gamebar
+cwheel                          // (c) 19?? Gamebar
 
 @source:cxgz80.cpp
 ch2001                          //
@@ -30285,7 +30285,7 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 trocana                         // NTC / NMK
 
 @source:nightmare.cpp
-nightmare						// (c) 1982 E.F.O.
+nightmare                       // (c) 1982 E.F.O.
 
 @source:nokia_3310.cpp
 noki3210                        //

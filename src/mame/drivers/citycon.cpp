@@ -304,7 +304,7 @@ ROM_START( citycona )
 	ROM_LOAD( "citycon_82s123n.r4",  0x0100, 0x0020, CRC(29221e13) SHA1(232fd02811f157197c7ce44716dc495ed49a80cc) )
 	ROM_LOAD( "citycon_82s129.l6",   0x0200, 0x0100, CRC(91a7b6e3) SHA1(6135b264a69978d17aa8636d24eb1eba41d16c89) )
 
-        // Same PROM content on J10 and L6 sockets
+		// Same PROM content on J10 and L6 sockets
 	//ROM_LOAD( "citycon_82s129.j10", 0x0300, 0x0100, CRC(91a7b6e3) SHA1(6135b264a69978d17aa8636d24eb1eba41d16c89) )
 
 	ROM_REGION( 0x0600, "plds", 0 )

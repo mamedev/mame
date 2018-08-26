@@ -715,9 +715,9 @@ MACHINE_CONFIG_START(bang_state::bang)
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
-	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));	/* EEPROM data */
-	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));	/* EEPROM serial clock */
-	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));	/* EEPROM chip select */
+	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));   /* EEPROM data */
+	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));  /* EEPROM serial clock */
+	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));   /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -1565,9 +1565,9 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
-	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));	/* EEPROM data */
-	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));	/* EEPROM serial clock */
-	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));	/* EEPROM chip select */
+	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));   /* EEPROM data */
+	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));  /* EEPROM serial clock */
+	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));   /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -1608,9 +1608,9 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
-	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));	/* EEPROM data */
-	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));	/* EEPROM serial clock */
-	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));	/* EEPROM chip select */
+	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));   /* EEPROM data */
+	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));  /* EEPROM serial clock */
+	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));   /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -1855,8 +1855,8 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	LS259(config, m_mainlatch); // IC6
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
-	m_mainlatch->q_out_cb<5>().set(FUNC(wrally2_state::wrally2_adc_clk));	/* ADCs clock-in line */
-	m_mainlatch->q_out_cb<6>().set(FUNC(wrally2_state::wrally2_adc_cs));	/* ADCs chip select line */
+	m_mainlatch->q_out_cb<5>().set(FUNC(wrally2_state::wrally2_adc_clk));   /* ADCs clock-in line */
+	m_mainlatch->q_out_cb<6>().set(FUNC(wrally2_state::wrally2_adc_cs));    /* ADCs chip select line */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(micropin_state::pentacup2)
 	MCFG_DEVICE_IO_MAP(pentacup2_io)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);

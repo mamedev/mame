@@ -637,7 +637,7 @@ uint32_t tms57002_device::get_cmem(uint8_t addr)
 		cmem[addr] = update[update_counter_tail];
 		update_counter_tail = (update_counter_tail + 1) & 0x0f;
 		update_empty();
-		
+
 		if(update_counter_head == update_counter_tail)
 			sti &= ~S_UPDATE;
 
@@ -794,7 +794,7 @@ void tms57002_device::execute_run()
 			else
 				xm_step_write();
 		}
-		
+
 		macc_read = macc_write;
 		macc_write = macc;
 

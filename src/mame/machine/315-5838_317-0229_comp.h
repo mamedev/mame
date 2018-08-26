@@ -9,8 +9,8 @@
 
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
-class sega_315_5838_comp_device :  public device_t, 
-	                               public device_rom_interface
+class sega_315_5838_comp_device :  public device_t,
+								   public device_rom_interface
 {
 public:
 	// construction/destruction
@@ -30,7 +30,7 @@ public:
 		HACK_MODE_NO_KEY,
 		HACK_MODE_DOA
 	};
-	
+
 	void set_hack_mode(int mode) { m_hackmode = mode; }
 
 protected:

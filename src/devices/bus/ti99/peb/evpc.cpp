@@ -490,12 +490,12 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(21'477'272), \
-		v99x8_device::HTOTAL, \
-		0, \
-		v99x8_device::HVISIBLE - 1, \
-		v99x8_device::VTOTAL_NTSC * 2, \
-		v99x8_device::VERTICAL_ADJUST * 2, \
+	screen.set_raw(XTAL(21'477'272),
+		v99x8_device::HTOTAL,
+		0,
+		v99x8_device::HVISIBLE - 1,
+		v99x8_device::VTOTAL_NTSC * 2,
+		v99x8_device::VERTICAL_ADJUST * 2,
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
 	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
 

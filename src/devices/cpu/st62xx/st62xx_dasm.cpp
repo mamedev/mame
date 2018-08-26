@@ -4,8 +4,8 @@
 
     STmicro ST6-series microcontroller disassembler
 
-	To Do:
-		- Named registers/bits
+    To Do:
+        - Named registers/bits
 
 **********************************************************************/
 

@@ -240,7 +240,7 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	        0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
 	        0x00000040 - ?  priority?
 	        0x00000080 - Alpha blending enable
-			0x40000000 - Additive/Subtractable blend? (dragngun)
+	        0x40000000 - Additive/Subtractable blend? (dragngun)
 	    Word 7 :
 
 

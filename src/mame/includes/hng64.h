@@ -342,7 +342,7 @@ private:
 
 	DECLARE_READ8_MEMBER(hng64_fbcontrol_r);
 	DECLARE_WRITE8_MEMBER(hng64_fbcontrol_w);
-	
+
 	DECLARE_WRITE16_MEMBER(hng64_fbunkpair_w);
 	DECLARE_WRITE16_MEMBER(hng64_fbscroll_w);
 

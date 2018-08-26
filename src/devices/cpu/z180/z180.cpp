@@ -364,7 +364,7 @@ bool z180_device::get_tend1()
 
 #define Z180_CNTR_RESET         0x07
 #define Z180_CNTR_RMASK         0xff
-#define Z180_CNTR_WMASK         0x4f		/* Original: 0x7f - Modified: 0x4f - Inhibits setting up TI & RI flags due to the lack of CSIO implementation */
+#define Z180_CNTR_WMASK         0x4f        /* Original: 0x7f - Modified: 0x4f - Inhibits setting up TI & RI flags due to the lack of CSIO implementation */
 
 /* 0b CSI/O transmit/receive register */
 #define Z180_TRDR_RESET         0x00
@@ -2390,7 +2390,7 @@ void z180_device::handle_io_timers(int cycles)
 void z180_device::execute_run()
 {
 	int curcycles;
-	
+
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
 	/* to just check here */
@@ -2441,7 +2441,7 @@ again:
 				if (!m_HALT)
 				{
 					m_R++;
-					IO_FRC++;	/* Added FRC counting, not implemented yet */
+					IO_FRC++;   /* Added FRC counting, not implemented yet */
 					m_extra_cycles = 0;
 					curcycles = exec_op(ROP());
 					curcycles += m_extra_cycles;
@@ -2500,7 +2500,7 @@ again:
 			if (!m_HALT)
 			{
 				m_R++;
-				IO_FRC++;	/* Added FRC counting, not implemented yet */
+				IO_FRC++;   /* Added FRC counting, not implemented yet */
 				m_extra_cycles = 0;
 				curcycles = exec_op(ROP());
 				curcycles += m_extra_cycles;

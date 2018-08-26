@@ -141,10 +141,10 @@ private:
 	uint32_t xm_adr;
 
 	uint8_t host[4], hidx, allow_update;
-	
+
 	uint32_t update[16];
 	uint8_t update_counter_head, update_counter_tail;
-	
+
 	cd cache;
 
 	devcb_write_line m_dready_callback;

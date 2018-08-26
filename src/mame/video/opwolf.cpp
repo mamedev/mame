@@ -52,7 +52,7 @@ uint32_t opwolf_state::screen_update_opwolf(screen_device &screen, bitmap_ind16 
 	screen.priority().fill(0, cliprect);
 
 	// Sprite/tilemap priority is hardwired by the PAL16L8 at location 19
-	
+
 	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 

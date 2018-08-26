@@ -341,7 +341,7 @@ private:
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen
 	int                 m_orientation;              // orientation flags combined with system flags
-	std::pair<unsigned, unsigned> m_phys_aspect;	// physical aspect ratio
+	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
 	bool                m_oldstyle_vblank_supplied; // MCFG_SCREEN_VBLANK_TIME macro used
 	attoseconds_t       m_refresh;                  // default refresh period
 	attoseconds_t       m_vblank;                   // duration of a VBLANK

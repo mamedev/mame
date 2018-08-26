@@ -1009,9 +1009,9 @@ void ql_state::opd(machine_config &config)
 
 void ql_state::megaopd(machine_config &config)
 {
-	ql(config);
+    ql(config);
     // internal ram
-	m_ram->set_default_size("256K");
+    m_ram->set_default_size("256K");
 }
 */
 
