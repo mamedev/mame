@@ -6,7 +6,7 @@
   video hardware emulation
 
  -- this seems to be the same as the tumblepop bootleg based hardware
-    in tumbleb.c
+    in tumbleb.cpp
 
 
 */
@@ -15,10 +15,19 @@
 #include "includes/crospang.h"
 
 
-WRITE16_MEMBER(crospang_state::bestri_tilebank_w)
+WRITE16_MEMBER(crospang_state::bestri_tilebank_select_w)
 {
-	m_bestri_tilebank = (data>>10) & 0xf;
-	//printf("bestri %04x\n", data);
+	logerror("bestri_tilebank_select_w %04x\n", data & mem_mask);
+
+	m_bestri_tilebankselect = (data >> 8) & 3;
+}
+
+
+WRITE16_MEMBER(crospang_state::bestri_tilebank_data_w)
+{
+	logerror("bestri_tilebank_data_w %04x\n", data & mem_mask);
+
+	m_bestri_tilebank[m_bestri_tilebankselect] = data >> 8;
 
 	m_fg_layer->mark_all_dirty();
 	m_bg_layer->mark_all_dirty();
@@ -95,19 +104,23 @@ WRITE16_MEMBER(crospang_state::crospang_bg_videoram_w)
 TILE_GET_INFO_MEMBER(crospang_state::get_bg_tile_info)
 {
 	int data  = m_bg_videoram[tile_index];
-	int tile  = data & 0xfff;
+	int tile  = data & 0x03ff;
+	int tilebank = (data & 0x0c00) >> 10;
+	tile = tile + (m_bestri_tilebank[tilebank] << 10);
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile + m_bestri_tilebank * 0x1000, color + 0x20, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
 {
 	int data  = m_fg_videoram[tile_index];
-	int tile  = data & 0xfff;
+	int tile  = data & 0x03ff;
+	int tilebank = (data & 0x0c00) >> 10;
+	tile = tile + (m_bestri_tilebank[tilebank] << 10);
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile + m_bestri_tilebank * 0x1000, color + 0x10, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 0x10, 0);
 }
 
 
