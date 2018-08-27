@@ -33094,6 +33094,7 @@ ron2                            // (c) 1981 Sanritsu
 roul                            // (c) 1990
 
 @source:route16.cpp
+jongpute                        // 1981 Alpha Denshi Co.
 route16                         // (c) 1981 Tehkan/Sun + Centuri license
 route16a                        // (c) 1981 Tehkan/Sun + Centuri license
 route16bl                       // bootleg
@@ -33107,7 +33108,7 @@ speakresb                       // bootleg
 stratvox                        // [1980 Sun Electronics] Taito
 stratvoxa                       // [1980 Sun Electronics] Taito
 stratvoxb                       // bootleg
-ttmahjng                        // Taito
+ttmahjng                        // 1981 Alpha Denshi Co. / Taito
 
 @source:rowamet.cpp
 heavymtl                        //
