@@ -133,25 +133,25 @@ WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
 
 
 
-/*************************************
+/***************************************************
  *
- *  T.T Mahjong's multiplixed ports
+ *  Jongputer and T.T Mahjong's multiplixed ports
  *
- *************************************/
+ ***************************************************/
 
 
 
-WRITE8_MEMBER(route16_state::ttmahjng_input_port_matrix_w)
+WRITE8_MEMBER(route16_state::jongpute_input_port_matrix_w)
 {
-	m_ttmahjng_port_select = data;
+	m_jongpute_port_select = data;
 }
 
 
-READ8_MEMBER(route16_state::ttmahjng_p1_matrix_r)
+READ8_MEMBER(route16_state::jongpute_p1_matrix_r)
 {
 	uint8_t ret = 0;
 
-	switch (m_ttmahjng_port_select)
+	switch (m_jongpute_port_select)
 	{
 	case 1:  ret = ioport("KEY0")->read(); break;
 	case 2:  ret = ioport("KEY1")->read(); break;
@@ -163,11 +163,11 @@ READ8_MEMBER(route16_state::ttmahjng_p1_matrix_r)
 	return ret;
 }
 
-READ8_MEMBER(route16_state::ttmahjng_p2_matrix_r)
+READ8_MEMBER(route16_state::jongpute_p2_matrix_r)
 {
 	uint8_t ret = 0;
 
-	switch (m_ttmahjng_port_select)
+	switch (m_jongpute_port_select)
 	{
 	case 1:  ret = ioport("KEY4")->read(); break;
 	case 2:  ret = ioport("KEY5")->read(); break;
@@ -264,13 +264,13 @@ void route16_state::speakres_cpu1_map(address_map &map)
 }
 
 
-void route16_state::ttmahjng_cpu1_map(address_map &map)
+void route16_state::jongpute_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
 	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).r(FUNC(route16_state::ttmahjng_p2_matrix_r)).w(FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).rw(FUNC(route16_state::ttmahjng_p1_matrix_r), FUNC(route16_state::ttmahjng_input_port_matrix_w));
+	map(0x5000, 0x5000).r(FUNC(route16_state::jongpute_p2_matrix_r)).w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).rw(FUNC(route16_state::jongpute_p1_matrix_r), FUNC(route16_state::jongpute_input_port_matrix_w));
 	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0x8000, 0xbfff).ram().share("videoram1");
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( spacecho )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( ttmahjng )
+static INPUT_PORTS_START( jongpute )
 	PORT_START("DSW")       /* IN0 */
 	PORT_DIPNAME( 0x0c, 0x08, "Timer Descrement Speed" )
 	PORT_DIPSETTING(    0x00, "Very Fast" )
@@ -582,9 +582,9 @@ MACHINE_START_MEMBER(route16_state, speakres)
 	save_item(NAME(m_speakres_vrx));
 }
 
-MACHINE_START_MEMBER(route16_state, ttmahjng)
+MACHINE_START_MEMBER(route16_state, jongpute)
 {
-	save_item(NAME(m_ttmahjng_port_select));
+	save_item(NAME(m_jongpute_port_select));
 }
 
 void route16_state::init_route16()
@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(route16_state::stratvox)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_ttmahjng)
+	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_jongpute)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("ay8910")
@@ -690,17 +690,17 @@ MACHINE_CONFIG_START(route16_state::spacecho)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(route16_state::ttmahjng)
+MACHINE_CONFIG_START(route16_state::jongpute)
 	route16(config);
 	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(ttmahjng_cpu1_map)
+	MCFG_DEVICE_PROGRAM_MAP(jongpute_cpu1_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_MACHINE_START_OVERRIDE(route16_state, ttmahjng)
+	MCFG_MACHINE_START_OVERRIDE(route16_state, jongpute)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_ttmahjng)
+	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_jongpute)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
@@ -1049,8 +1049,8 @@ ROM_START( jongpute )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	/* not dumped, but ttmahjng roms seem to be compatible completely */
-	ROM_LOAD( "ju03",         0x0000, 0x0100, CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
-	ROM_LOAD( "ju09",         0x0100, 0x0100, CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
+	ROM_LOAD( "ju03",         0x0000, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
+	ROM_LOAD( "ju09",         0x0100, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
 ROM_END
 
 
@@ -1107,5 +1107,5 @@ GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,  
 GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, empty_init,    ROT0,   "Taito",            "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, jongpute, 0,        ttmahjng, ttmahjng, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.", "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )  // sampling voice is not emulated
+GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )  // sampling voice is not emulated
+GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
