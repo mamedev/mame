@@ -333,12 +333,10 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
 
 WRITE8_MEMBER(opwolf_state::counters_w)
 {
-	//logerror("counters_w data=%2x\n",data );
-
 	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);
 }
 
 /******************************************************
@@ -1157,7 +1155,7 @@ void opwolf_state::init_opwolf()
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
-	opwolf_cchip_init();
+	//opwolf_cchip_init(); // start old simulation, including periodic timer
 
 	// World & US version have different gun offsets, presumably slightly different gun hardware
 	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
