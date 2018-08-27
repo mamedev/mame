@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_PIT8253_CLK0(2457500)  // DART channel A
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, octopus_state,serial_clock_w))  // being able to write both Rx and Tx clocks at one time would be nice
 	MCFG_PIT8253_CLK1(2457500)  // DART channel B
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("serial",z80sio_device,rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_serial,z80sio_device,rxtxcb_w))
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, octopus_state,spk_freq_w))
 
@@ -977,12 +977,12 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("serial", Z80SIO, 16_MHz_XTAL / 4) // clock rate not mentioned in tech manual
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic_master",pic8259_device, ir1_w))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("serial_a",rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("serial_b",rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("serial_a",rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("serial_b",rs232_port_device, write_rts))
+	Z80SIO(config, m_serial, 16_MHz_XTAL / 4); // clock rate not mentioned in tech manual
+	m_serial->out_int_callback().set("pic_master", FUNC(pic8259_device::ir1_w));
+	m_serial->out_txda_callback().set("serial_a", FUNC(rs232_port_device::write_txd));
+	m_serial->out_txdb_callback().set("serial_b", FUNC(rs232_port_device::write_txd));
+	m_serial->out_rtsa_callback().set("serial_a", FUNC(rs232_port_device::write_rts));
+	m_serial->out_rtsb_callback().set("serial_b", FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &serial_a(RS232_PORT(config, "serial_a", default_rs232_devices, nullptr));
 	serial_a.rxd_handler().set(m_serial, FUNC(z80sio_device::rxa_w));

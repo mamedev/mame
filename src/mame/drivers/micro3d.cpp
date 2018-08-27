@@ -318,8 +318,8 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
 	MCFG_DEVICE_DATA_MAP(drmath_data)
 
-	MCFG_DEVICE_ADD("scc", SCC8530N, 32_MHz_XTAL / 2 / 2)
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("monitor_drmath", rs232_port_device, write_txd))
+	scc8530_device& scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr));
 	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));

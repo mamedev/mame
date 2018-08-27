@@ -274,26 +274,26 @@ MACHINE_CONFIG_START(ts816_state::ts816)
 	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts816_state, kbd_put))
 
-	//MCFG_DEVICE_ADD("sio0", Z80SIO, XTAL(16'000'000) / 4)
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio3", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio4", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio5", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio6", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio7", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio8", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio9", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//z80sio_device& sio0(Z80SIO(config, "sio0", XTAL(16'000'000) / 4));
+	//sio0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(16'000'000) / 4));
+	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio2(Z80SIO(config, "sio2", XTAL(16'000'000) / 4));
+	sio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio3(Z80SIO(config, "sio3", XTAL(16'000'000) / 4));
+	sio3.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio4(Z80SIO(config, "sio4", XTAL(16'000'000) / 4));
+	sio4.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio5(Z80SIO(config, "sio5", XTAL(16'000'000) / 4));
+	sio5.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio6(Z80SIO(config, "sio6", XTAL(16'000'000) / 4));
+	sio6.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio7(Z80SIO(config, "sio7", XTAL(16'000'000) / 4));
+	sio7.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio8(Z80SIO(config, "sio8", XTAL(16'000'000) / 4));
+	sio8.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio9(Z80SIO(config, "sio9", XTAL(16'000'000) / 4));
+	sio9.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

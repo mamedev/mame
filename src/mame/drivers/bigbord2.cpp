@@ -573,18 +573,18 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, bigbord2_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, bigbord2_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, MAIN_CLOCK)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_SYNCA_CB(WRITELINE("ctc1", z80ctc_device, trg2))
-	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(*this, bigbord2_state, sio_wrdya_w))
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(*this, bigbord2_state, sio_wrdyb_w))
+	Z80SIO(config, m_sio, MAIN_CLOCK);
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio->out_synca_callback().set("ctc1", FUNC(z80ctc_device::trg2));
+	m_sio->out_wrdya_callback().set(FUNC(bigbord2_state::sio_wrdya_w));
+	m_sio->out_wrdyb_callback().set(FUNC(bigbord2_state::sio_wrdyb_w));
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, MAIN_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("ctc2", Z80CTC, MAIN_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))    // to SIO Ch B
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(m_sio, z80sio_device, rxtxcb_w))    // to SIO Ch B
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bigbord2_state, ctc_z1_w))  // to SIO Ch A
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc2", z80ctc_device, trg3))
 

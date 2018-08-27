@@ -647,11 +647,11 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 19.6608_MHz_XTAL / 4)
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 19.6608_MHz_XTAL / 4)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
+	SCC8530N(config, SCC1_TAG, 19.6608_MHz_XTAL / 4);
+	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 19.6608_MHz_XTAL / 4));
+	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
@@ -700,11 +700,11 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 39.3216_MHz_XTAL / 8)
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 39.3216_MHz_XTAL / 8)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
+	SCC8530N(config, SCC1_TAG, 39.3216_MHz_XTAL / 8);
+	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 39.3216_MHz_XTAL / 8));
+	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))

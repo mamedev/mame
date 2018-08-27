@@ -93,8 +93,8 @@ MACHINE_CONFIG_START(v102_state::v102)
 
 	EEPROM_2804(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", XTAL(18'575'000) / 5)); // divider not verified
+	mpsc.out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))

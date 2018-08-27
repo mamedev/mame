@@ -105,12 +105,12 @@ MACHINE_CONFIG_START(c900_state::c900)
 
 	Z8036(config, "cio", 6'000'000);
 
-	MCFG_DEVICE_ADD("scc", SCC8030, 6'000'000) // 5'850'000 is the ideal figure
+	scc8030_device& scc(SCC8030(config, "scc", 6'000'000)); // 5'850'000 is the ideal figure
 	/* Port B */
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, c900_state, scc_int))
+	scc.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	scc.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	scc.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	//scc.out_int_callback().set("rs232", FUNC(c900_state::scc_int));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8030_device, rxb_w))

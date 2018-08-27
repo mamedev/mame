@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("scc", SCC8530, 7000000)
+	SCC8530(config, m_scc, 7000000);
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_6)

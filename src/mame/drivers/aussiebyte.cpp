@@ -559,18 +559,18 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->out_pa_callback().set(FUNC(aussiebyte_state::port20_w));
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO, 16_MHz_XTAL / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(*this, aussiebyte_state, sio1_rdya_w))
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(*this, aussiebyte_state, sio1_rdyb_w))
+	z80sio_device& sio1(Z80SIO(config, "sio1", 16_MHz_XTAL / 4));
+	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio1.out_wrdya_callback().set(FUNC(aussiebyte_state::sio1_rdya_w));
+	sio1.out_wrdyb_callback().set(FUNC(aussiebyte_state::sio1_rdyb_w));
 
-	MCFG_DEVICE_ADD("sio2", Z80SIO, 16_MHz_XTAL / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(*this, aussiebyte_state, sio2_rdya_w))
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(*this, aussiebyte_state, sio2_rdyb_w))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	z80sio_device& sio2(Z80SIO(config, "sio2", 16_MHz_XTAL / 4));
+	sio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio2.out_wrdya_callback().set(FUNC(aussiebyte_state::sio2_rdya_w));
+	sio2.out_wrdyb_callback().set(FUNC(aussiebyte_state::sio2_rdyb_w));
+	sio2.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio2.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio2.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80sio_device, rxa_w))

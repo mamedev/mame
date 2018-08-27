@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(isa16_sad8852_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP( sad8852_mem )
 	MCFG_DEVICE_IO_MAP(sad8852_io)
 
-	MCFG_DEVICE_ADD("terminal", I8274_NEW, XTAL(12'000'000) / 3) // Needs verification
+	I8274_NEW(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
 MACHINE_CONFIG_END
 
 isa16_sad8852_device::isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

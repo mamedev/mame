@@ -120,8 +120,8 @@ MACHINE_CONFIG_START(v550_state::v550)
 	MCFG_DEVICE_ADD("usart", I8251, 34.846_MHz_XTAL / 16) // NEC D8251AC
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 34.846_MHz_XTAL / 16) // NEC D7201C
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 34.846_MHz_XTAL / 16)); // NEC D7201C
+	mpsc.out_int_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

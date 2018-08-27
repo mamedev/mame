@@ -2305,7 +2305,7 @@ MACHINE_CONFIG_START(megaste_state::megaste)
 	MCFG_DEVICE_MODIFY(M68000_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(megaste_map)
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
-	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
+	SCC8530(config, Z8530_TAG, Y2/4);
 
 	/* internal ram */
 	m_ram->set_default_size("4M") // Mega STe 4

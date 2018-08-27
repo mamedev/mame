@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
-//  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
+//  m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
 	m_uart8274->out_int_callback().set("pic_0", FUNC(pic8259_device::ir6_w));
 #endif
 

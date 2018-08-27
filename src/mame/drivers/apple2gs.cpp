@@ -4665,20 +4665,20 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	ADDRESS_MAP_BANK(config, A2GS_B04000_TAG).set_map(&apple2gs_state::rb4000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
 
 	/* serial */
-	MCFG_DEVICE_ADD(SCC_TAG, SCC85C30, A2GS_14M/2)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, apple2gs_state, scc_irq_w))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SCC85C30(config, m_scc, A2GS_14M/2);
+	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
+	m_scc->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, z80scc_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, z80scc_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, z80scc_device, ctsb_w))
 
 	/* slot devices */
 	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)

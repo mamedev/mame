@@ -448,18 +448,18 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	// Baud Gen 0, Baud Gen 1, Baud Gen 2,
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
+	sio.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(4'000'000)));
+	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("pio0", Z80PIO, 1229000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -505,18 +505,18 @@ MACHINE_CONFIG_START(p8k_state::p8k_16)
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
+	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
+	sio.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	sio.out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
+	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(4'000'000)));
+	sio1.out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));
 
 	MCFG_DEVICE_ADD("pio0", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))

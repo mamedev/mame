@@ -63,13 +63,13 @@ MACHINE_CONFIG_START(pm68k_state::pm68k)
 	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
 	MCFG_DEVICE_PROGRAM_MAP(pm68k_mem)
 
-	MCFG_DEVICE_ADD("mpsc", I8274_NEW, 0)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
+	i8274_new_device& mpsc(I8274_NEW(config, "mpsc", 0));
+	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	mpsc.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 
 	am9513_device &stc(AM9513(config, "stc", 4000000));
 	stc.out4_cb().set("mpsc", FUNC(i8274_new_device::rxca_w));

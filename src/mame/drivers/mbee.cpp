@@ -847,7 +847,7 @@ MACHINE_CONFIG_START(mbee_state::mbeett)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
 	MCFG_DEVICE_REMOVE("quickload")
 	MCFG_DEVICE_REMOVE("quickload2")
-	MCFG_DEVICE_ADD("scc", SCC8530, 4000000) // clock unknown
+	SCC8530(config, "scc", 4000000); // clock unknown
 MACHINE_CONFIG_END
 
 /* Unused roms:

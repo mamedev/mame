@@ -231,12 +231,11 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	uart_clock.signal_handler().set("asp_sio", FUNC(z80sio_device::txca_w));
 	uart_clock.signal_handler().append("asp_sio", FUNC(z80sio_device::rxca_w));
 
-	MCFG_DEVICE_ADD("asp_sio", Z80SIO, 4800)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sio_device& sio(Z80SIO(config, "asp_sio", 4800));
 	// SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("asp_sio", z80sio_device, rxa_w))
