@@ -441,7 +441,9 @@ protected:
 
 class upd765a_device : public upd765_family_device {
 public:
-	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, bool ready, bool select) : upd765a_device(mconfig, tag, owner, 0U) {
+	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, bool ready, bool select)
+		: upd765a_device(mconfig, tag, owner, 0U)
+	{
 		set_ready_line_connected(ready);
 		set_select_lines_connected(select);
 	}
@@ -507,6 +509,13 @@ public:
 
 class upd72065_device : public upd765_family_device {
 public:
+	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready, bool select)
+		: upd72065_device(mconfig, tag, owner, clock)
+	{
+		set_ready_line_connected(ready);
+		set_select_lines_connected(select);
+	}
+
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;

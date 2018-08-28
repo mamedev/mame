@@ -98,8 +98,7 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	//mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::rc_w));
 	//mfp.out_tdo_cb().set("mfp", FUNC(mc68901_device::tc_w));
 
-	MCFG_DEVICE_ADD("dmac", HD63450, 40_MHz_XTAL / 4) // MC68450R10 (or HD68450Y-10)
-	MCFG_HD63450_CPU("maincpu")
+	HD63450(config, "dmac", 40_MHz_XTAL / 4, "maincpu"); // MC68450R10 (or HD68450Y-10)
 
 	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 	NVRAM(config, "zpram", nvram_device::DEFAULT_ALL_0); // MK48Z02

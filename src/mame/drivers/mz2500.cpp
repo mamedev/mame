@@ -1821,8 +1821,8 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	Z80SIO(config, "z80sio", 6000000);
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, 32.768_kHz_XTAL)
-	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))
+	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->alarm().set(FUNC(mz2500_state::mz2500_rtc_alarm_irq));
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
