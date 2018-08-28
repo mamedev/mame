@@ -1044,8 +1044,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	v1050_video(config);
 
 	// devices
-	MCFG_DEVICE_ADD(UPB8214_TAG, I8214, 16_MHz_XTAL/4)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, v1050_state, pic_int_w))
+	I8214(config, m_pic, 16_MHz_XTAL/4);
+	m_pic->int_wr_callback().set(FUNC(v1050_state::pic_int_w));
 
 	MCFG_DEVICE_ADD(MSM58321RS_TAG, MSM58321, 32.768_kHz_XTAL)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_0_w))

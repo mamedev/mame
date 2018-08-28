@@ -312,8 +312,8 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_I8085A_INTE(WRITELINE("i8214", i8214_device, inte_w))
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms6102_state, ms6102_int_ack)
 
-	MCFG_DEVICE_ADD("i8214", I8214, XTAL(18'432'000) / 9)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, ms6102_state, irq_w))
+	I8214(config, m_pic, XTAL(18'432'000) / 9);
+	m_pic->int_wr_callback().set(FUNC(ms6102_state::irq_w));
 
 	MCFG_DEVICE_ADD("earom", KR1601RR1, 0)
 

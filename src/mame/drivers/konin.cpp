@@ -140,13 +140,13 @@ MACHINE_CONFIG_START(konin_state::konin)
 	MCFG_I8085A_INTE(WRITELINE("picu", i8214_device, inte_w))
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
-	MCFG_DEVICE_ADD("intlatch", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(CONSTANT(0))
-	MCFG_I8212_DI_CALLBACK(READ8("picu", i8214_device, vector_r))
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
+	i8212_device &intlatch(I8212(config, "intlatch", 0));
+	intlatch.md_rd_callback().set_constant(0);
+	intlatch.di_rd_callback().set(m_picu, FUNC(i8214_device::vector_r));
+	intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE);
 
-	MCFG_DEVICE_ADD("picu", I8214, XTAL(4'000'000))
-	MCFG_I8214_INT_CALLBACK(WRITELINE("intlatch", i8212_device, stb_w))
+	I8214(config, m_picu, XTAL(4'000'000));
+	m_picu->int_wr_callback().set("intlatch", FUNC(i8212_device::stb_w));
 
 	pit8253_device &mainpit(PIT8253(config, "mainpit", 0));
 	// wild guess at UART clock and source

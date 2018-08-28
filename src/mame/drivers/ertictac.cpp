@@ -229,9 +229,8 @@ MACHINE_CONFIG_START(ertictac_state::ertictac)
 	MCFG_DEVICE_PROGRAM_MAP(ertictac_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
-	MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
+	I2CMEM(config, "i2cmem", 0).set_page_size(NVRAM_PAGE_SIZE).set_data_size(NVRAM_SIZE);
+
 //  AAKART(config, m_kart, XTAL(24'000'000)/3); // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)

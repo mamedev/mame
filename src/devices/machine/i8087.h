@@ -8,15 +8,6 @@
 #include "softfloat/softfloat.h"
 #endif
 
-#define MCFG_I8087_DATA_WIDTH(_data_width) \
-	downcast<i8087_device &>(*device).set_data_width(_data_width);
-
-#define MCFG_I8087_INT_HANDLER(_devcb) \
-	downcast<i8087_device &>(*device).set_int(DEVCB_##_devcb);
-
-#define MCFG_I8087_BUSY_HANDLER(_devcb) \
-	downcast<i8087_device &>(*device).set_busy(DEVCB_##_devcb);
-
 DECLARE_DEVICE_TYPE(I8087, i8087_device)
 
 class i8087_device : public device_t,
@@ -25,8 +16,8 @@ class i8087_device : public device_t,
 public:
 	i8087_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	void set_data_width(u8 data_width) { m_data_width = data_width; }
-	template <class Object> devcb_base &set_int(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_busy(Object &&cb) { return m_busy_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_int_handler.bind(); }
+	auto busy() { return m_busy_handler.bind(); }
 
 	DECLARE_WRITE32_MEMBER(insn_w); // the real 8087 sniffs the bus watching for esc, can't do that here so provide a poke spot
 	DECLARE_WRITE32_MEMBER(addr_w);

@@ -376,8 +376,8 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_MACHINE_START_OVERRIDE(gridcomp_state, gridcomp)
 	MCFG_MACHINE_RESET_OVERRIDE(gridcomp_state, gridcomp)
 
-	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL(15'000'000)/3)
-	MCFG_I80130_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+	I80130(config, m_osp, XTAL(15'000'000)/3);
+	m_osp->irq().set_inputline("maincpu", 0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
@@ -394,10 +394,10 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_DEVICE_ADD("keyboard", GRID_KEYBOARD, 0)
 	MCFG_GRID_KEYBOARD_CB(PUT(gridcomp_state, kbd_put))
 
-	MCFG_DEVICE_ADD("i7220", I7220, XTAL(4'000'000))
-	MCFG_I7220_DATA_SIZE(3) // 3 1-Mbit MBM's
-	MCFG_I7220_IRQ_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
-	MCFG_I7220_DRQ_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
+	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
+	i7220.set_data_size(3); // 3 1-Mbit MBM's
+	i7220.irq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
+	i7220.drq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 
 	MCFG_DEVICE_ADD("hpib", TMS9914, XTAL(4'000'000))
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(I80130_TAG, i80130_device, ir5_w))

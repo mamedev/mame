@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 //  MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D)    // or another variant with ID 0xEC 0x75 ?
 //  MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
 
-//  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, nullptr)
+//  I2CMEM(config, "i2cmem", 0, 0xA0, 0, 0x100, nullptr);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -658,16 +658,14 @@ MACHINE_CONFIG_START(ghosteo_state::bballoon)
 	ghosteo(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bballoon_map)
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(256)
+	I2CMEM(config, "i2cmem", 0).set_data_size(256);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ghosteo_state::touryuu)
 	ghosteo(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(touryuu_map)
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(1024)
+	I2CMEM(config, "i2cmem", 0).set_data_size(1024);
 MACHINE_CONFIG_END
 
 
