@@ -405,9 +405,7 @@ void opwolf_state::opwolf_map(address_map &map)
 void opwolf_state::opwolfb_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0008, 0x0f0009).portr("IN0");
-	map(0x0f000a, 0x0f000b).portr("IN1");
-	map(0x0ff000, 0x0fffff).rw(FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
+	map(0x0f0000, 0x0f0fff).mirror(0xf000).rw(FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x380000, 0x380001).portr("DSWA");
@@ -468,9 +466,9 @@ void opwolf_state::opwolf_sound_z80_map(address_map &map)
 void opwolf_state::opwolfb_sub_z80_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8800, 0x8800).portr("IN0");  /* read at PC=$637: poked to $c004, irrelevant mirror? */
+	map(0x8800, 0x8800).portr("IN1");  /* read at PC=$637: poked to $c004 */
 	map(0x9000, 0x9000).nopw();            /* unknown write, 0 then 1 each interrupt */
-	map(0x9800, 0x9800).portr("IN0");  /* read at PC=$631: poked to $c005, needed for coins */
+	map(0x9800, 0x9800).portr("IN0");  /* read at PC=$631: poked to $c005 */
 	map(0xa000, 0xa000).nopw();    /* IRQ acknowledge (unimplemented) */
 	map(0xc000, 0xc7ff).ram().share("cchip_ram");
 }
