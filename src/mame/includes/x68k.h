@@ -78,7 +78,7 @@ public:
 	void x68000_base(machine_config &config);
 	void x68000(machine_config &config);
 
-	void driver_init() override;
+	virtual void driver_init() override;
 
 protected:
 	enum
@@ -249,7 +249,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg1_tile);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_16);
-	DECLARE_VIDEO_START(x68000);
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(x68000);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(led_callback);
@@ -350,7 +350,7 @@ public:
 	void x68kxvi(machine_config &config);
 	void x68ksupr(machine_config &config);
 
-	void driver_init() override;
+	virtual void driver_init() override;
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
@@ -371,7 +371,7 @@ public:
 
 	void x68030(machine_config &config);
 
-	void driver_init() override;
+	virtual void driver_init() override;
 
 protected:
 	void x68030_map(address_map &map);

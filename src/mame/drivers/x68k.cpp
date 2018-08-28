@@ -1116,8 +1116,6 @@ void x68k_state::x68k_base_map(address_map &map)
 	map(0xc00000, 0xdfffff).rw(m_crtc, FUNC(x68k_crtc_device::gvram_r), FUNC(x68k_crtc_device::gvram_w));
 	map(0xe00000, 0xe7ffff).rw(m_crtc, FUNC(x68k_crtc_device::tvram_r), FUNC(x68k_crtc_device::tvram_w));
 	map(0xe80000, 0xe81fff).rw(m_crtc, FUNC(x68k_crtc_device::crtc_r), FUNC(x68k_crtc_device::crtc_w));
-	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("gfxpalette");
-	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe82400, 0xe83fff).rw(FUNC(x68k_state::vid_r), FUNC(x68k_state::vid_w));
 	map(0xe84000, 0xe85fff).rw(m_hd63450, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0xe86000, 0xe87fff).rw(FUNC(x68k_state::areaset_r), FUNC(x68k_state::areaset_w));
@@ -1145,6 +1143,8 @@ void x68k_state::x68k_base_map(address_map &map)
 void x68k_state::x68k_map(address_map &map)
 {
 	x68k_base_map(map);
+	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("gfxpalette");
+	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
 	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
 	map(0xe96000, 0xe9601f).rw("x68k_hdc", FUNC(x68k_hdc_image_device::hdc_r), FUNC(x68k_hdc_image_device::hdc_w));
@@ -1156,6 +1156,8 @@ void x68k_state::x68k_map(address_map &map)
 void x68ksupr_state::x68kxvi_map(address_map &map)
 {
 	x68k_base_map(map);
+	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("gfxpalette");
+	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
 	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
 	map(0xea0000, 0xea1fff).rw(FUNC(x68ksupr_state::exp_r), FUNC(x68ksupr_state::exp_w));  // external SCSI ROM and controller
@@ -1167,6 +1169,8 @@ void x68030_state::x68030_map(address_map &map)
 {
 	map.global_mask(0x00ffffff);  // Still only has 24-bit address space
 	x68k_base_map(map);
+	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("gfxpalette");
+	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("pcgpalette");
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(FUNC(x68030_state::adpcm_w)).umask32(0x00ff00ff);
 
@@ -1589,8 +1593,6 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 
 	PALETTE(config, m_gfxpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
 	PALETTE(config, m_pcgpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
-
-	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000)
 
 	config.set_default_layout(layout_x68000);
 
