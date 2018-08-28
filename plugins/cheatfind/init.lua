@@ -713,6 +713,9 @@ function cheatfind.startplugin()
 					if getmetatable(dev.space).__name:match("device_t") then
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
+					elseif getmetatable(dev.space).__name:match("memory_share") then
+						cheat.share = { share = dev.tag }
+						cheat.script.run = "share:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 					else
 						cheat.space = { cpu = { tag = dev.tag, type = dev.sname } }
 						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"

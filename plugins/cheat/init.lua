@@ -37,6 +37,10 @@
 --     "varname": "tag",
 --     ...
 --   },
+--   "share": {
+--     "varname": "tag",
+--     ...
+--   },
 --   "script": {
 --     "on|off|run|change": "script",
 --      ...
@@ -479,6 +483,16 @@ function cheat.startplugin()
 					return
 				end
 				cheat.cheat_env[name] = emu.item(ram.items["0/m_pointer"])
+			end
+		end
+		if cheat.share then
+			for name, tag in pairs(cheat.share) do
+				local share = manager:machine():memory().shares[tag]
+				if not share then
+					cheat_error(cheat, "missing share " .. share)
+					return
+				end
+				cheat.cheat_env[name] = share
 			end
 		end
 		local param = cheat.parameter
