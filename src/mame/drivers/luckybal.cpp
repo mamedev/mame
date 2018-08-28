@@ -81,35 +81,35 @@
   Edge Connector:
 
 
-           Solder side |  | Components
-  ---------------------|--|-----------------
-                 +5VCC |01| GND
-                 +5VCC |02| -5VCC
-             Jugador 2 |03| Jugador 1
-             Jugador 4 |04| Jugador 3
-             Jugador 6 |06| Jugador 5
-                       |07|
-                       |08| Izquierda
-               Derecha |09| Abajo
-               Entrada |10| Salida
-               Apuesta |11| Arriba
-                       |12|
-                       |13|
-                       |14|
-                       |15|
-                       |16|
-                       |17|
-                       |18| +5VCC
-     Contador Entradas |19|
-                       |20| Contador Salidas
-          Habilitacion |21|
-                       |22| Programacion
-                       |23|
-                 Verde |24| Sincronismo
-                  Azul |25| Rojo
-                +12VCC |26| Parlante
-                 +5VCC |27| GND
-                 +5VCC |28| GND
+       Solder side |  | Components
+  -----------------|--|-----------------
+             +5Vcc |01| GND
+             +5Vcc |02| -5Vcc
+          Player 2 |03| Player 1
+          Player 4 |04| Player 3
+          Player 6 |06| Player 5
+                   |07|
+                   |08| Left
+             Right |09| Down
+        Credits IN |10| Credits OUT
+               Bet |11| Up
+                   |12|
+                   |13|
+                   |14|
+                   |15|
+                   |16|
+                   |17|
+                   |18| +5VCC
+        Counter IN |19|
+                   |20| Counter OUT
+      Operator Key |21|
+                   |22| Programming
+                   |23|
+             Green |24| Sync
+              Blue |25| Red
+            +12Vcc |26| Speaker
+             +5Vcc |27| GND
+             +5Vcc |28| GND
 
 
   DIP Switches:
@@ -146,16 +146,16 @@
   Program ROM
   Data Lines Scrambling.
 
-  BUS     ROM
+  BUS    ROM
 
-  D0  ->  D1
-  D1  ->  D0
-  D2  ->  D3
-  D3  ->  D2
-  D4  ->  D5
-  D5  ->  D4
-  D6  ->  D7
-  D7  ->  D6
+  D0 ---> D1
+  D1 ---> D0
+  D2 ---> D3
+  D3 ---> D2
+  D4 ---> D5
+  D5 ---> D4
+  D6 ---> D7
+  D7 ---> D6
 
 
 *********************************************************************
