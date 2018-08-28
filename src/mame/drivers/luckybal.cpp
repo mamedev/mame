@@ -421,8 +421,9 @@ WRITE8_MEMBER(luckybal_state::output_port_a_w)
 	if (m_trdr & 0x80)
 	{
 		m_trdr = m_trdr & 0x7f;
-		if (m_trdr > 36) m_trdr = m_led_on; /* Prevents unexpected data */
+		if (m_trdr > 36) m_trdr = m_led_on;  // Prevents unexpected data.
 	}
+
 	m_lamps[m_led_on] = 0;
 	m_lamps[m_trdr] = 1;
 	m_led_on = m_trdr;
@@ -440,24 +441,22 @@ WRITE8_MEMBER(luckybal_state::output_port_b_w)
 
 READ8_MEMBER(luckybal_state::input_port_c_r)
 {
-	uint8_t mux_player, sel_line, bit5, bit6=0xff, bit7, ret;
-	sel_line=m_ppi->read_pb() & 0x7f;
+	uint8_t mux_player, sel_line, bit5, bit6, bit7, ret;
+	sel_line = m_ppi->read_pb() & 0x7f;
 	mux_player = m_latch[0]->output_state();
-	bit5 = (((m_aux->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xdf;	
 
-	switch(mux_player)
-	{
-		case 0xfe:bit6 = (((m_keymx[0]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;	
-		case 0xfd:bit6 = (((m_keymx[1]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xfb:bit6 = (((m_keymx[2]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xf7:bit6 = (((m_keymx[3]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xef:bit6 = (((m_keymx[4]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xdf:bit6 = (((m_keymx[5]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-	}
+	bit5 = BIT(m_aux->read(), sel_line & 0x07) ? 0xff : 0xdf;                   // Operator & Page.
 
-	bit7 = (((m_dsw->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0x7f;
+	bit6 = 0xff;
+    for (int i = 0; 6 > i; ++i)
+    {
+        if (!BIT(mux_player, i) && !BIT(m_keymx[i]->read(), sel_line & 0x07))   // Player buttons.
+            bit6 &= 0xbf;
+    }
 
-	if ((sel_line & 0x07) == 6)  m_lamps[37] = (bit5 == 0xff) ? 0 : 1;	/* Operator lamp */
+	bit7 = BIT(m_dsw->read(), sel_line & 0x07) ? 0xff : 0x7f;                   // Dip Switch.
+
+	if ((sel_line & 0x07) == 6)  m_lamps[37] = (bit5 == 0xff) ? 0 : 1;	        // Operator lamp.
 	ret = bit7 & bit6 & bit5;
 
 	return ret;
@@ -465,7 +464,9 @@ READ8_MEMBER(luckybal_state::input_port_c_r)
 
 WRITE8_MEMBER(luckybal_state::output_port_c_w)
 {
-//	logerror("%s: Write to PPI port C: %02X\n", machine().describe_context(), data);
+/*	Writes 0xF0/0xF1 constantly at the begining... like a watchdog.
+    After a while, just stop (when roulette LEDs are transmitted).
+*/
 }
 
 
@@ -546,28 +547,28 @@ static INPUT_PORTS_START( luckybal )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)  PORT_NAME("Test Mode / Books / Page")   // Need the Oper Key active to work.
 	
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Setting Access" )
+	PORT_DIPNAME( 0x01, 0x01, "Setting Access" )        PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Jackpot Enable" )
+	PORT_DIPNAME( 0x02, 0x02, "Jackpot Enable" )        PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Partial Books Clear" )
+	PORT_DIPNAME( 0x04, 0x04, "Partial Books Clear" )   PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Jackpot Mode" )
+	PORT_DIPNAME( 0x08, 0x08, "Jackpot Mode" )          PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Coinage / Bet Mode" )
+	PORT_DIPNAME( 0x10, 0x10, "Coinage / Bet Mode" )    PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown - 0x20" )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown - 0x20" )        PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown - 0x40" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown - 0x40" )        PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Full Books Clear" )
+	PORT_DIPNAME( 0x80, 0x80, "Full Books Clear" )      PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
