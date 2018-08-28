@@ -13,13 +13,11 @@
 #include "emu.h"
 #include "huc6230.h"
 
-static const int clamp(int val, int min, int max) { return std::min(max,std::max(min,val)); }
+constexpr int clamp(int val, int min, int max) { return std::min(max, std::max(min, val)); }
 
 
 void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	/* Clear buffer */
-
 	int frq = (1 << m_adpcm_freq);
 	for (int i = 0; i < samples; i++)
 	{

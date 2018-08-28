@@ -29,8 +29,6 @@
 
 PALETTE_INIT_MEMBER(dcheese_state, dcheese)
 {
-	/* really 65536 colors, but they don't use the later ones so we can stay */
-	/* within MAME's limits */
 	for (int i = 0; i < 65536; i++)
 	{
 		int data = m_palrom[i];
