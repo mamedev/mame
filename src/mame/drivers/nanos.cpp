@@ -497,11 +497,11 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
 
-	MCFG_DEVICE_ADD(m_pio_0, Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio_0, XTAL(4'000'000));
+	m_pio_0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(m_pio_1, Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio_1, XTAL(4'000'000));
+	m_pio_1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80SIO(config, m_sio_0, XTAL(4'000'000));
 	m_sio_0->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
@@ -509,10 +509,10 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	Z80SIO(config, m_sio_1, XTAL(4'000'000));
 	m_sio_1->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
 
-	MCFG_DEVICE_ADD(m_pio, Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, nanos_state, port_a_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, nanos_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, nanos_state, port_b_w))
+	Z80PIO(config, m_pio, XTAL(4'000'000));
+	m_pio->in_pa_callback().set(FUNC(nanos_state::port_a_r));
+	m_pio->in_pb_callback().set(FUNC(nanos_state::port_b_r));
+	m_pio->out_pb_callback().set(FUNC(nanos_state::port_b_w));
 
 	/* UPD765 */
 	MCFG_UPD765A_ADD(m_fdc, false, true)

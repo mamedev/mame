@@ -317,8 +317,8 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	Z80SIO(config, "a29", 9.832_MHz_XTAL / 4);
 
 	/* floppy */
-	MCFG_DEVICE_ADD("a71", Z80PIO, 9.832_MHz_XTAL / 4)
-	MCFG_DEVICE_ADD("a72", Z80PIO, 9.832_MHz_XTAL / 4)
+	Z80PIO(config, "a71", 9.832_MHz_XTAL / 4);
+	Z80PIO(config, "a72", 9.832_MHz_XTAL / 4);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);

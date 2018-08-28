@@ -203,23 +203,23 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("zve_pio", Z80PIO, XTAL(2'457'600))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mc8030_state, zve_port_a_r))
-	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8030_state, zve_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8030_state, zve_port_b_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8030_state, zve_port_b_w))
+	z80pio_device& zve_pio(Z80PIO(config, "zve_pio", XTAL(2'457'600)));
+	zve_pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	zve_pio.in_pa_callback().set(FUNC(mc8030_state::zve_port_a_r));
+	//zve_pio.out_pa_callback().set(FUNC(mc8030_state::zve_port_a_w));
+	zve_pio.in_pb_callback().set(FUNC(mc8030_state::zve_port_b_r));
+	//zve_pio.out_pb_callback().set(FUNC(mc8030_state::zve_port_b_w));
 
 	MCFG_DEVICE_ADD("zve_ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// ZC0, ZC1, ZC2 for user
 
-	MCFG_DEVICE_ADD("asp_pio", Z80PIO, XTAL(2'457'600))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mc8030_state, asp_port_a_r))
-	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8030_state, asp_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8030_state, asp_port_b_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8030_state, asp_port_b_w))
+	z80pio_device& asp_pio(Z80PIO(config, "asp_pio", XTAL(2'457'600)));
+	asp_pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	asp_pio.in_pa_callback().set(FUNC(mc8030_state::asp_port_a_r));
+	//asp_pio.out_pa_callback().set(FUNC(mc8030_state::asp_port_a_w));
+	asp_pio.in_pb_callback().set(FUNC(mc8030_state::asp_port_b_r));
+	//asp_pio.out_pb_callback().set(FUNC(mc8030_state::asp_port_b_w));
 
 	MCFG_DEVICE_ADD("asp_ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

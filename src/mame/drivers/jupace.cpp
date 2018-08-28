@@ -797,11 +797,11 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, ace_state, sby_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ace_state, ald_w))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(6'500'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ace_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ace_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	Z80PIO(config, m_z80pio, XTAL(6'500'000)/2);
+	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80pio->in_pa_callback().set(FUNC(ace_state::pio_pa_r));
+	m_z80pio->out_pa_callback().set(FUNC(ace_state::pio_pa_w));
+	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

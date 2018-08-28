@@ -456,11 +456,11 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_DEVICE_MODIFY("pit8253")
 	MCFG_PIT8253_CLK0(XTAL(17'734'470)/16)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(17'734'470)/5)
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, mz_state, mz800_z80pio_irq))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz_state, mz800_z80pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz_state, mz800_z80pio_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(17'734'470)/5));
+	pio.out_int_callback().set(FUNC(mz_state::mz800_z80pio_irq));
+	pio.in_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_r));
+	pio.out_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_w));
+	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 

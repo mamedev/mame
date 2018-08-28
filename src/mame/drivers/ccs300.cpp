@@ -143,8 +143,8 @@ MACHINE_CONFIG_START(ccs300_state::ccs300)
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(4'000'000)));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

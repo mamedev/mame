@@ -247,14 +247,14 @@ MACHINE_CONFIG_START(babbage_state::babbage)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, babbage_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, babbage_state, ctc_z2_w))
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MAIN_CLOCK)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, babbage_state, pio1_b_w))
+	Z80PIO(config, m_pio_1, MAIN_CLOCK);
+	m_pio_1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio_1->out_pb_callback().set(FUNC(babbage_state::pio1_b_w));
 
-	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, MAIN_CLOCK)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, babbage_state, pio2_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, babbage_state, pio2_b_w))
+	Z80PIO(config, m_pio_2, MAIN_CLOCK);
+	m_pio_2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio_2->in_pa_callback().set(FUNC(babbage_state::pio2_a_r));
+	m_pio_2->out_pb_callback().set(FUNC(babbage_state::pio2_b_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", babbage_state, keyboard_callback, attotime::from_hz(30))
 MACHINE_CONFIG_END

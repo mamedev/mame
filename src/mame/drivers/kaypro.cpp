@@ -246,14 +246,14 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	brg.ft_handler().append("sio", FUNC(z80sio_device::txca_w));
 	brg.fr_handler().set("sio", FUNC(z80sio_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD("z80pio_g", Z80PIO, 20_MHz_XTAL / 8)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	Z80PIO(config, m_pio_g, 20_MHz_XTAL / 8);
+	m_pio_g->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio_g->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
-	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 20_MHz_XTAL / 8)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, kaypro_state, pio_system_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kaypro_state, kayproii_pio_system_w))
+	Z80PIO(config, m_pio_s, 20_MHz_XTAL / 8);
+	m_pio_s->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio_s->in_pa_callback().set(FUNC(kaypro_state::pio_system_r));
+	m_pio_s->out_pa_callback().set(FUNC(kaypro_state::kayproii_pio_system_w));
 
 	z80sio_device& sio(Z80SIO(config, "sio", 20_MHz_XTAL / 8));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -275,11 +275,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kaypro_state::kayproiv)
 	kayproii(config);
-	MCFG_DEVICE_REMOVE("z80pio_s")
-	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 2500000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, kaypro_state, pio_system_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kaypro_state, kayproiv_pio_system_w))
+	m_pio_s->set_clock(2500000);
+	m_pio_s->out_pa_callback().set(FUNC(kaypro_state::kayproiv_pio_system_w));
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)

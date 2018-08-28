@@ -173,19 +173,19 @@ MACHINE_CONFIG_START(brandt8641_state::brandt8641)
 	// Z80APIO U9
 	// Z80APIO U14
 	// Z80PIO U7 - unknown which is which
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio1, XTAL(4'000'000));
+	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, brandt8641_state, port08_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, brandt8641_state, port08_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, brandt8641_state, port09_w))
+	Z80PIO(config, m_pio2, XTAL(4'000'000));
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pa_callback().set(FUNC(brandt8641_state::port08_r));
+	m_pio2->out_pa_callback().set(FUNC(brandt8641_state::port08_w));
+	m_pio2->out_pb_callback().set(FUNC(brandt8641_state::port09_w));
 
-	MCFG_DEVICE_ADD("pio3", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio3, XTAL(4'000'000));
+	m_pio3->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000)) // Z80CTC U8
+	Z80CTC(config, "ctc", XTAL(4'000'000)); // Z80CTC U8
 MACHINE_CONFIG_END
 
 /* ROM definition */

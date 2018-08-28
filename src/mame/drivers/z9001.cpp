@@ -235,12 +235,12 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(z9001_state, kbd_put))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(9'830'400) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, z9001_state, port88_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(9'830'400) / 4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(z9001_state::port88_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(9'830'400) / 4)   // keyboard PIO
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(9'830'400) / 4)); // keyboard PIO
+	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(9'830'400) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

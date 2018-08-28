@@ -61,12 +61,12 @@ MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 
 	// Sony CXK5864BSP-10L  (8KB ram)
 	// Sharp LH0081A Z80A-PIO-0 - For communicating between the MSX and the TMP
-	MCFG_DEVICE_ADD("bm012_pio", Z80PIO, XTAL(3'579'545))  // ?????
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("tmpz84c015af", tmpz84c015_device, pa_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8("tmpz84c015af", tmpz84c015_device, pa_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("tmpz84c015af", tmpz84c015_device, pb_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8("tmpz84c015af", tmpz84c015_device, pb_r))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE("tmpz84c015af", tmpz84c015_device, strobe_b))
+	Z80PIO(config, m_bm012_pio, XTAL(3'579'545));  // ?????
+	m_bm012_pio->out_pa_callback().set("tmpz84c015af", FUNC(tmpz84c015_device::pa_w));
+	m_bm012_pio->in_pa_callback().set("tmpz84c015af", FUNC(tmpz84c015_device::pa_r));
+	m_bm012_pio->out_pb_callback().set("tmpz84c015af", FUNC(tmpz84c015_device::pb_w));
+	m_bm012_pio->in_pb_callback().set("tmpz84c015af", FUNC(tmpz84c015_device::pb_r));
+	m_bm012_pio->out_brdy_callback().set("tmpz84c015af", FUNC(tmpz84c015_device::strobe_b));
 
 	// MIDI ports
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")

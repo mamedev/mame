@@ -603,8 +603,8 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg2))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(15'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(15'000'000) / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 

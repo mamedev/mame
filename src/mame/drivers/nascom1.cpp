@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_CASSETTE_ADD("cassette")
 
 	// pio
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(16'000'000)/8)
+	Z80PIO(config, "z80pio", XTAL(16'000'000)/8);
 
 	// internal extra ram
 	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");

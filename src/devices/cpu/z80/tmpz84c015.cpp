@@ -208,14 +208,14 @@ MACHINE_CONFIG_START(tmpz84c015_device::device_add_mconfig)
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<2>))
 	MCFG_Z80CTC_ZC3_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<3>))
 
-	MCFG_DEVICE_ADD("tmpz84c015_pio", Z80PIO, DERIVED_CLOCK(1,1) )
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio, DERIVED_CLOCK(1,1));
+	m_pio->out_int_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ0);
 
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, tmpz84c015_device, in_pa_cb_trampoline_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, tmpz84c015_device, out_pa_cb_trampoline_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, tmpz84c015_device, out_ardy_cb_trampoline_w))
+	m_pio->in_pa_callback().set(FUNC(tmpz84c015_device::in_pa_cb_trampoline_r));
+	m_pio->out_pa_callback().set(FUNC(tmpz84c015_device::out_pa_cb_trampoline_w));
+	m_pio->out_ardy_callback().set(FUNC(tmpz84c015_device::out_ardy_cb_trampoline_w));
 
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, tmpz84c015_device, in_pb_cb_trampoline_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, tmpz84c015_device, out_pb_cb_trampoline_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, tmpz84c015_device, out_brdy_cb_trampoline_w))
+	m_pio->in_pb_callback().set(FUNC(tmpz84c015_device::in_pb_cb_trampoline_r));
+	m_pio->out_pb_callback().set(FUNC(tmpz84c015_device::out_pb_cb_trampoline_w));
+	m_pio->out_brdy_callback().set(FUNC(tmpz84c015_device::out_brdy_cb_trampoline_w));
 MACHINE_CONFIG_END

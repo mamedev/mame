@@ -155,13 +155,13 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	sio1_clock.signal_handler().append(m_sio[0], FUNC(z80sio_device::txca_w));
 
 	/* peripheral hardware */
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000)/4)
-	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(16'000'000)/4)
-	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) /4)
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) /4)
-	MCFG_DEVICE_ADD("ctc3", Z80CTC, XTAL(16'000'000) /4)
+	Z80PIO(config, m_pio[0], XTAL(16'000'000)/4);
+	//m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	Z80PIO(config, m_pio[1], XTAL(16'000'000)/4);
+	//m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	Z80CTC(config, m_ctc[0], XTAL(16'000'000) /4);
+	Z80CTC(config, m_ctc[1], XTAL(16'000'000) /4);
+	Z80CTC(config, m_ctc[2], XTAL(16'000'000) /4);
 	Z80SIO(config, m_sio[0], XTAL(16'000'000) /4);
 	m_sio[0]->out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_sio[0]->out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -176,8 +176,9 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("pio1s", Z80PIO, XTAL(16'000'000)/4)
-	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("subcpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, "pio1s", XTAL(16'000'000)/4);
+	//z80pio_device& pio1s(Z80PIO(config, "pio1s", XTAL(16'000'000)/4));
+	//pio1s->out_int_callback().set_inputline("subcpu", INPUT_LINE_IRQ0);
 
 	clock_device &sio1s_clock(CLOCK(config, "sio1s_clock", 614400));
 	sio1s_clock.signal_handler().set("sio1s", FUNC(z80sio_device::rxtxcb_w));
@@ -261,13 +262,13 @@ MACHINE_CONFIG_START(onyx_state::c5000)
 	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_sio[0] ,z80sio_device, txca_w))
 
 	/* peripheral hardware */
-	//MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000)/4)
-	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(16'000'000)/4)
-	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) /4)
-	//MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) /4)
-	//MCFG_DEVICE_ADD("ctc3", Z80CTC, XTAL(16'000'000) /4)
+	//Z80PIO(config, m_pio[0], XTAL(16'000'000)/4);
+	//m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//Z80PIO(config, m_pio[1], XTAL(16'000'000)/4);
+	//m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//Z80CTC(config, m_ctc[0], XTAL(16'000'000) /4);
+	//Z80CTC(config, m_ctc[1], XTAL(16'000'000) /4);
+	//Z80CTC(config, m_ctc[2], XTAL(16'000'000) /4);
 
 	Z80SIO(config, m_sio[0], XTAL(16'000'000) /4);
 	m_sio[0]->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));

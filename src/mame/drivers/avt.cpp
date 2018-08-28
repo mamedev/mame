@@ -1000,14 +1000,14 @@ MACHINE_CONFIG_START(avt_state::avt)
 	// ZC1 not connected
 	// TRG2 to TP18; ZC2 to TP9; TRG3 to VSYNC; TRG0 to cpu_clock/4
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, CPU_CLOCK) // U23
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("IN0"))
+	Z80PIO(config, m_pio0, CPU_CLOCK); // U23
+	m_pio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio0->in_pb_callback().set_ioport("IN0");
 	// PORT A appears to be lamp drivers
 	// PORT B d0-d5 = muxed inputs; d6 = SW2 pushbutton; d7 = ?
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, CPU_CLOCK) // U22
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio1, CPU_CLOCK); // U22
+	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// PORT A d0-d7 = TP13,TP12,TP11,TP10,TP8,TP7,TP5,TP3
 	// PORT B d0-d7 = "Player2", DCOM, CCOM, BCOM, ACOM, LOCKOUT/TP6, TP4, 50/60HZ (held high, jumper on JP13 grounds it)
 	// DCOM,CCOM,BCOM,ACOM appear to be muxes

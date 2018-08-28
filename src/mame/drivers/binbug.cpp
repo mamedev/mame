@@ -568,12 +568,12 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, dg680_state, porta_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000) / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio.in_pa_callback().set(FUNC(dg680_state::porta_r));
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, dg680_state, portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, dg680_state, portb_w))
+	pio.in_pb_callback().set(FUNC(dg680_state::portb_r));
+	pio.out_pb_callback().set(FUNC(dg680_state::portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc0", dg680_state, time_tick, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc3", dg680_state, uart_tick, attotime::from_hz(4800))

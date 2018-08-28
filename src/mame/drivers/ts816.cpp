@@ -295,11 +295,11 @@ MACHINE_CONFIG_START(ts816_state::ts816)
 	z80sio_device& sio9(Z80SIO(config, "sio9", XTAL(16'000'000) / 4));
 	sio9.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_Z80PIO_IN_PA_CB(READ8(*this, ts816_state, porta_r))
-	//MCFG_Z80PIO_IN_PB_CB(READ8(*this, ts816_state, portb_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, ts816_state, portb_w))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(16'000'000) / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//pio.in_pa_callback().set(FUNC(ts816_state::porta_r));
+	//pio.in_pb_callback().set(FUNC(ts816_state::portb_r));
+	//pio.out_pb_callback().set(FUNC(ts816_state::portb_w));
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

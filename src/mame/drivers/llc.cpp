@@ -223,14 +223,14 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	config.set_default_layout(layout_llc1);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, llc_state, llc1_port1_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, llc_state, llc1_port1_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, llc_state, llc1_port1_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
+	pio1.in_pa_callback().set(FUNC(llc_state::llc1_port1_a_r));
+	pio1.out_pa_callback().set(FUNC(llc_state::llc1_port1_a_w));
+	pio1.out_pb_callback().set(FUNC(llc_state::llc1_port1_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, llc_state, llc1_port2_a_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, llc_state, llc1_port2_b_r))
+	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
+	pio2.in_pa_callback().set(FUNC(llc_state::llc1_port2_a_r));
+	pio2.in_pb_callback().set(FUNC(llc_state::llc1_port2_b_r));
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 	// timer 0 irq does digit display, and timer 3 irq does scan of the
@@ -270,13 +270,13 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, llc_state, llc2_port1_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, llc_state, llc2_port1_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
+	pio1.in_pa_callback().set(K7659_KEYBOARD_TAG, FUNC(k7659_keyboard_device::read));
+	pio1.in_pb_callback().set(FUNC(llc_state::llc2_port1_b_r));
+	pio1.out_pb_callback().set(FUNC(llc_state::llc2_port1_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, llc_state, llc2_port2_a_r))
+	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
+	pio2.in_pa_callback().set(FUNC(llc_state::llc2_port2_a_r));
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 

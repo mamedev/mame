@@ -185,11 +185,11 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 
 	MCFG_DEVICE_ADD("dart2", Z80DART, 4'000'000) // RS232 ports
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, 4'000'000)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, dmax8000_state, port0c_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, dmax8000_state, port0d_w))
+	z80pio_device& pio1(Z80PIO(config, "pio1", 4'000'000));
+	pio1.out_pa_callback().set(FUNC(dmax8000_state::port0c_w));
+	pio1.out_pb_callback().set(FUNC(dmax8000_state::port0d_w));
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, 4'000'000)
+	Z80PIO(config, "pio2", 4'000'000);
 
 	MCFG_DEVICE_ADD("fdc", FD1793, 2'000'000) // no idea
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

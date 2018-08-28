@@ -101,7 +101,7 @@ MACHINE_CONFIG_START(mccpm_state::mccpm)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
+	Z80PIO(config, "pio", XTAL(4'000'000));
 MACHINE_CONFIG_END
 
 /* ROM definition */

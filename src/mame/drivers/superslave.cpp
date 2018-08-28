@@ -372,8 +372,8 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	am9519_device &am9519(AM9519(config, AM9519_TAG, 0));
 	am9519.out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(8'000'000)/2));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(Z80DART_0_TAG, Z80DART, XTAL(8'000'000)/2)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))

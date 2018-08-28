@@ -284,14 +284,14 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	MCFG_K7659_KEYBOARD_ADD()
 	MCFG_CASSETTE_ADD("cassette")
 
-	MCFG_DEVICE_ADD("pio_u", Z80PIO, XTAL(10'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio_u, XTAL(10'000'000)/4);
+	m_pio_u->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio_s", Z80PIO, XTAL(10'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pcm_state, pcm_85_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, pcm_state, pcm_85_w))
+	Z80PIO(config, m_pio_s, XTAL(10'000'000)/4);
+	m_pio_s->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio_s->in_pa_callback().set(K7659_KEYBOARD_TAG, FUNC(k7659_keyboard_device::read));
+	m_pio_s->in_pb_callback().set(FUNC(pcm_state::pcm_85_r));
+	m_pio_s->out_pb_callback().set(FUNC(pcm_state::pcm_85_w));
 
 	Z80SIO(config, "sio", XTAL(10'000'000) /4);
 

@@ -209,8 +209,8 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 	//MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(16'000'000)/4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 MACHINE_CONFIG_END
 
 

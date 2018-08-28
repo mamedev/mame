@@ -97,15 +97,15 @@ MACHINE_CONFIG_START(haze_state::haze)
 	MCFG_DEVICE_ADD("ctc3", Z80CTC, 1'000'000 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, 1'000'000 )
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("TEST"))
+	z80pio_device& pio1(Z80PIO(config, "pio1", 1'000'000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.in_pa_callback().set_ioport("TEST");
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, 1'000'000 )
+	Z80PIO(config, "pio2", 1'000'000);
 
-	MCFG_DEVICE_ADD("pio3", Z80PIO, 1'000'000 )
+	Z80PIO(config, "pio3", 1'000'000);
 
-	MCFG_DEVICE_ADD("pio4", Z80PIO, 1'000'000 )
+	Z80PIO(config, "pio4", 1'000'000);
 MACHINE_CONFIG_END
 
 ROM_START( hg_frd )

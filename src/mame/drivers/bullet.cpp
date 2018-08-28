@@ -1141,10 +1141,10 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, bullet_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, bullet_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 16_MHz_XTAL / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, bullet_state, pio_pb_r))
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 16_MHz_XTAL / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.in_pb_callback().set(FUNC(bullet_state::pio_pb_r));
 
 	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
@@ -1220,12 +1220,12 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, bullet_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, bullet_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 16_MHz_XTAL / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8("scsi_ctrl_in", input_buffer_device, bus_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, bulletf_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, bulletf_state, cstrb_w))
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 16_MHz_XTAL / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio.in_pa_callback().set("scsi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	pio.out_pa_callback().set(FUNC(bulletf_state::pio_pa_w));
+	pio.out_ardy_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.out_brdy_callback().set(FUNC(bulletf_state::cstrb_w));
 
 	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(Z80DART_TAG, z80dart_device, rib_w))

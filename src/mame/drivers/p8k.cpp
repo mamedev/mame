@@ -461,15 +461,15 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(4'000'000)));
 	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, 1229000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio0(Z80PIO(config, "pio0", 1229000));
+	pio0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, 1229000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio1(Z80PIO(config, "pio1", 1229000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, 1229000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("DSW"))
+	Z80PIO(config, m_pio2, 1229000);
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pa_callback().set_ioport("DSW");
 
 	MCFG_I8272A_ADD("i8272", true)
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
@@ -518,14 +518,14 @@ MACHINE_CONFIG_START(p8k_state::p8k_16)
 	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(4'000'000)));
 	sio1.out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
+	z80pio_device& pio0(Z80PIO(config, "pio0", XTAL(4'000'000)));
+	pio0.out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
+	z80pio_device& pio1(Z80PIO(config, "pio1", XTAL(4'000'000)));
+	pio1.out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, p8k_state, p8k_16_daisy_interrupt))
+	Z80PIO(config, m_pio2, XTAL(4'000'000));
+	m_pio2->out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

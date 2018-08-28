@@ -560,9 +560,9 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_DEVICE_PROGRAM_MAP(senjyo_sound_map)
 	MCFG_DEVICE_IO_MAP(senjyo_sound_io_map)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 2000000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, senjyo_state, pio_pa_r))
+	Z80PIO(config, m_pio, 2000000);
+	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(senjyo_state::pio_pa_r));
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 2000000 /* same as "sub" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))

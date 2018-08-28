@@ -654,12 +654,12 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 12_MHz_XTAL / 6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, mbee_state, pio_ardy))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mbee_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mbee_state, pio_port_b_w))
+	Z80PIO(config, m_pio, 12_MHz_XTAL / 6);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_ardy_callback().set(FUNC(mbee_state::pio_ardy));
+	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
+	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -711,12 +711,12 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3375000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, mbee_state, pio_ardy))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mbee_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mbee_state, pio_port_b_w))
+	Z80PIO(config, m_pio, 3375000);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_ardy_callback().set(FUNC(mbee_state::pio_ardy));
+	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
+	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("z80pio", z80pio_device, strobe_a))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

@@ -351,15 +351,15 @@ MACHINE_CONFIG_START(lc80_state::lc80)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, lc80_state, pio1_pb_w))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio2_pb_r))
+	Z80PIO(config, m_pio2, 900000);
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
@@ -388,15 +388,15 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, lc80_state, pio1_pb_w))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio2_pb_r))
+	Z80PIO(config, m_pio2, 900000);
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

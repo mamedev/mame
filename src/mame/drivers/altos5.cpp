@@ -430,15 +430,15 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, altos5_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, altos5_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, altos5_state, port08_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, altos5_state, port08_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, altos5_state, port09_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, altos5_state, port09_w))
+	Z80PIO(config, m_pio0, 8_MHz_XTAL / 2);
+	m_pio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio0->in_pa_callback().set(FUNC(altos5_state::port08_r));
+	m_pio0->out_pa_callback().set(FUNC(altos5_state::port08_w));
+	m_pio0->in_pb_callback().set(FUNC(altos5_state::port09_r));
+	m_pio0->out_pb_callback().set(FUNC(altos5_state::port09_w));
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio1(Z80PIO(config, "pio1", 8_MHz_XTAL / 2));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("dart", Z80DART, 8_MHz_XTAL / 2)
 	// Channel A - console #3

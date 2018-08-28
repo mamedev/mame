@@ -148,8 +148,8 @@ MACHINE_CONFIG_START(mes_state::mes)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
 	Z80SIO(config, "sio", 0);
 
 	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)

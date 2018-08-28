@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 
 	// devices
 	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(Z80PIO_TAG, z80pio_device, pa_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(m_pio, z80pio_device, pa_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
@@ -756,18 +756,18 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, trs80m2_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, trs80m2_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
@@ -821,7 +821,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 
 	// devices
 	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(Z80PIO_TAG, z80pio_device, pa_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(m_pio, z80pio_device, pa_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
@@ -844,12 +844,12 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, trs80m2_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, trs80m2_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -858,7 +858,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))

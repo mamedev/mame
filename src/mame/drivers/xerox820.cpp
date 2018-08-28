@@ -611,14 +611,14 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, 20_MHz_XTAL / 8)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, xerox820_state, kbpio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, xerox820_state, kbpio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, xerox820_state, kbpio_pb_r))
+	Z80PIO(config, m_kbpio, 20_MHz_XTAL / 8);
+	m_kbpio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_kbpio->in_pa_callback().set(FUNC(xerox820_state::kbpio_pa_r));
+	m_kbpio->out_pa_callback().set(FUNC(xerox820_state::kbpio_pa_w));
+	m_kbpio->in_pb_callback().set(FUNC(xerox820_state::kbpio_pb_r));
 
-	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, 20_MHz_XTAL / 8)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 20_MHz_XTAL / 8));
+	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 20_MHz_XTAL / 8)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
-	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
+	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(m_kbpio, z80pio_device, strobe_b))
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
@@ -692,22 +692,22 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, 16_MHz_XTAL / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, xerox820_state, kbpio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, xerox820_state, kbpio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, xerox820_state, kbpio_pb_r))
+	Z80PIO(config, m_kbpio, 16_MHz_XTAL / 4);
+	m_kbpio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_kbpio->in_pa_callback().set(FUNC(xerox820_state::kbpio_pa_r));
+	m_kbpio->out_pa_callback().set(FUNC(xerox820_state::kbpio_pa_w));
+	m_kbpio->in_pb_callback().set(FUNC(xerox820_state::kbpio_pb_r));
 
-	MCFG_DEVICE_ADD(Z80PIO_GP_TAG, Z80PIO, 16_MHz_XTAL / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 16_MHz_XTAL / 4));
+	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80PIO_RD_TAG, Z80PIO, 20_MHz_XTAL / 8)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8("sasi_data_in", input_buffer_device, bus_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("sasi_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, xerox820ii_state, rdpio_pardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8("sasi_ctrl_in", input_buffer_device, bus_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, xerox820ii_state, rdpio_pb_w))
+	z80pio_device& pio_rd(Z80PIO(config, Z80PIO_RD_TAG, 20_MHz_XTAL / 8));
+	pio_rd.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio_rd.in_pa_callback().set("sasi_data_in", FUNC(input_buffer_device::bus_r));
+	pio_rd.out_pa_callback().set("sasi_data_out", FUNC(output_latch_device::bus_w));
+	pio_rd.out_ardy_callback().set(FUNC(xerox820ii_state::rdpio_pardy_w));
+	pio_rd.in_pb_callback().set("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	pio_rd.out_pb_callback().set(FUNC(xerox820ii_state::rdpio_pb_w));
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -742,7 +742,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
-	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
+	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(m_kbpio, z80pio_device, strobe_b))
 
 	// SASI bus
 	SCSI_PORT(config, m_sasibus, 0);

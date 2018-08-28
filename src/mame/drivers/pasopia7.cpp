@@ -945,10 +945,10 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, pasopia7_state, mux_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pasopia7_state, keyb_r))
+	Z80PIO(config, m_pio, XTAL(4'000'000));
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set(FUNC(pasopia7_state::mux_w));
+	m_pio->in_pb_callback().set(FUNC(pasopia7_state::keyb_r));
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, pasopia7_state, unk_r))

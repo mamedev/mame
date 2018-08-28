@@ -713,10 +713,10 @@ MACHINE_CONFIG_START(super80_state::super80)
 	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, super80_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, super80_state,pio_port_b_r))
+	Z80PIO(config, m_pio, MASTER_CLOCK/6);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set(FUNC(super80_state::pio_port_a_w));
+	m_pio->in_pb_callback().set(FUNC(super80_state::pio_port_b_r));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(48.8)
@@ -800,10 +800,10 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80r)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, super80_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, super80_state,pio_port_b_r))
+	Z80PIO(config, m_pio, MASTER_CLOCK/6);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set(FUNC(super80_state::pio_port_a_w));
+	m_pio->in_pb_callback().set(FUNC(super80_state::pio_port_b_r));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

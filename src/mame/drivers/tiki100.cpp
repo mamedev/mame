@@ -733,12 +733,12 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8("cent_data_in", input_buffer_device, bus_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, tiki100_state, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, tiki100_state, pio_pb_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 4);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pb_callback().set(FUNC(tiki100_state::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(tiki100_state::pio_pb_w));
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

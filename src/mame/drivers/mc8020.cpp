@@ -316,10 +316,10 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(2'457'600))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8020_state, port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8020_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8020_state, port_b_w))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(2'457'600)));
+	pio.out_pa_callback().set(FUNC(mc8020_state::port_a_w));
+	pio.in_pb_callback().set(FUNC(mc8020_state::port_b_r));
+	pio.out_pb_callback().set(FUNC(mc8020_state::port_b_w));
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(2'457'600) / 64) // guess
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))

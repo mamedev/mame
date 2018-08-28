@@ -1878,7 +1878,7 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 	mcr_91490_snt(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("ipu", Z80, 7372800/2)
+	MCFG_DEVICE_ADD(m_ipu, Z80, 7372800/2)
 	MCFG_Z80_DAISY_CHAIN(mcr_ipu_daisy_chain)
 	MCFG_DEVICE_PROGRAM_MAP(ipu_91695_map)
 	MCFG_DEVICE_IO_MAP(ipu_91695_portmap)
@@ -1888,11 +1888,11 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 	MCFG_DEVICE_ADD("ipu_ctc", Z80CTC, 7372800/2 /* same as "ipu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("ipu_pio0", Z80PIO, 7372800/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_ipu_pio0, 7372800/2);
+	m_ipu_pio0->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_ipu_pio1, 7372800/2);
+	m_ipu_pio1->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("ipu_sio", Z80SIO0, 7372800/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))

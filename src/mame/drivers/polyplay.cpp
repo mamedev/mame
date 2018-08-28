@@ -292,12 +292,12 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, polyplay_state, ctc_zc1_w))
 	//MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, polyplay_state, ctc_zc2_w))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, POLYPLAY_MAIN_CLOCK / 4) /* UB855D */
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, polyplay_state, pio_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, polyplay_state, pio_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, polyplay_state, pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, polyplay_state, pio_portb_w))
+	Z80PIO(config, m_z80pio, POLYPLAY_MAIN_CLOCK / 4); /* UB855D */
+	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80pio->in_pa_callback().set(FUNC(polyplay_state::pio_porta_r));
+	m_z80pio->out_pa_callback().set(FUNC(polyplay_state::pio_porta_w));
+	m_z80pio->in_pb_callback().set(FUNC(polyplay_state::pio_portb_r));
+	m_z80pio->out_pb_callback().set(FUNC(polyplay_state::pio_portb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

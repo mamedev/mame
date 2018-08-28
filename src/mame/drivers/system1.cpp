@@ -2219,10 +2219,11 @@ MACHINE_CONFIG_START(system1_state::sys1pio)
 	MCFG_DEVICE_IO_MAP(system1_pio_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("pio", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, system1_state, soundport_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, system1_state, videomode_w))
+
+	Z80PIO(config, m_pio, MASTER_CLOCK);
+	m_pio->out_pa_callback().set(FUNC(system1_state::soundport_w));
+	m_pio->out_ardy_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	m_pio->out_pb_callback().set(FUNC(system1_state::videomode_w));
 MACHINE_CONFIG_END
 
 #define ENCRYPTED_SYS1PPI_MAPS \

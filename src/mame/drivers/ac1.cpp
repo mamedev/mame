@@ -135,11 +135,11 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	MCFG_DEVICE_PROGRAM_MAP(ac1_mem)
 	MCFG_DEVICE_IO_MAP(ac1_io)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ac1_state, ac1_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ac1_state, ac1_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, ac1_state, ac1_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, ac1_state, ac1_port_b_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000)/4));
+	pio.in_pa_callback().set(FUNC(ac1_state::ac1_port_a_r));
+	pio.out_pa_callback().set(FUNC(ac1_state::ac1_port_a_w));
+	pio.in_pb_callback().set(FUNC(ac1_state::ac1_port_b_r));
+	pio.out_pb_callback().set(FUNC(ac1_state::ac1_port_b_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

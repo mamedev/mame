@@ -1760,10 +1760,10 @@ MACHINE_CONFIG_START(fidelz80_state::vsc)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fidelz80_state, vsc_ppi_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vsc_ppi_portc_w))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3.9_MHz_XTAL)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, fidelz80_state, vsc_pio_porta_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, fidelz80_state, vsc_pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, fidelz80_state, vsc_pio_portb_w))
+	Z80PIO(config, m_z80pio, 3.9_MHz_XTAL);
+	m_z80pio->in_pa_callback().set(FUNC(fidelz80_state::vsc_pio_porta_r));
+	m_z80pio->in_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_r));
+	m_z80pio->out_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_vsc);

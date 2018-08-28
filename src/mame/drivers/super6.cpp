@@ -466,8 +466,8 @@ MACHINE_CONFIG_START(super6_state::super6)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super6_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super6_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(m_pio, Z80PIO, 24_MHz_XTAL / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio, 24_MHz_XTAL / 4);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(m_fdc, WD2793, 24_MHz_XTAL / 12)
 	MCFG_WD_FDC_FORCE_READY

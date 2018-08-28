@@ -779,19 +779,19 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 	ADDRESS_MAP_BANK(config, "mb_sub_ram").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 	ADDRESS_MAP_BANK(config, "mb_sub_pal").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map).set_options(ENDIANNESS_LITTLE, 8, 8+6, 0x100);
 
-	MCFG_DEVICE_ADD("z80pio_ic48", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic48_pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic48_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pb_w))
+	Z80PIO(config, m_ic48_pio, 4000000/2);
+//  m_ic48_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ic48_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_r));
+	m_ic48_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_w));
+	m_ic48_pio->in_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_r));
+	m_ic48_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_w));
 
-	MCFG_DEVICE_ADD("z80pio_ic49", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic49_pio_pa_r)) // NOT USED
-//  MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pa_w)) // NOT USED
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic49_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pb_w))
+	Z80PIO(config, m_ic49_pio, 4000000/2);
+//  m_ic49_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//  m_ic49_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_r)); // NOT USED
+//  m_ic49_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_w)); // NOT USED
+	m_ic49_pio->in_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_r));
+	m_ic49_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

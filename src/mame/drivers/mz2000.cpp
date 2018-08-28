@@ -889,10 +889,10 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2000_state, mz2000_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2000_state, mz2000_portc_w))
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2000_state, mz2000_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2000_state, mz2000_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2000_state, mz2000_pio1_portb_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio_1", MASTER_CLOCK));
+	pio.in_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_r));
+	pio.out_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_w));
+	pio.in_pb_callback().set(FUNC(mz2000_state::mz2000_pio1_portb_r));
 
 	/* TODO: clocks aren't known */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)

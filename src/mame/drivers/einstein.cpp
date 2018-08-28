@@ -588,13 +588,13 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	driver. So we update at 50Hz and hope this is good enough. */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, keyboard_timer_callback, attotime::from_hz(50))
 
-	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, einstein_state, int_w<0>))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, einstein_state, ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8("user", einstein_userport_device, read))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("user", einstein_userport_device, write))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE("user", einstein_userport_device, brdy_w))
+	z80pio_device& pio(Z80PIO(config, IC_I063, XTAL_X002 / 2));
+	pio.out_int_callback().set(FUNC(einstein_state::int_w<0>));
+	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.out_ardy_callback().set(FUNC(einstein_state::ardy_w));
+	pio.in_pb_callback().set("user", FUNC(einstein_userport_device::read));
+	pio.out_pb_callback().set("user", FUNC(einstein_userport_device::write));
+	pio.out_brdy_callback().set("user", FUNC(einstein_userport_device::brdy_w));
 
 	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
 	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, einstein_state, int_w<1>))
