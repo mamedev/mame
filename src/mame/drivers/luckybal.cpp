@@ -191,71 +191,60 @@
   3x 4099 (8-Bit Addressable Latch).
   3x 4512 (8-Channel Data Selector).
 
-      PPI 8255
-  .------v------.
-  |         PA0 |------> DAC (D7)
-  |         PA1 |------> DAC (D6)
-  |         PA2 |------> DAC (D5)
-  |         PA3 |------> DAC (D4)
-  |         PA4 |------> DAC (D3)
-  |         PA5 |------> DAC (D2)
-  |         PA6 |------> DAC (D1)
-  |         PA7 |------> DAC (D0)
-  |             |
-  |         PB0 |------> I/O 4099 (A0) & 4512 (A)
-  |         PB1 |------> I/O 4099 (A1) & 4512 (B)
-  |         PB2 |------> I/O 4099 (A2) & 4512 (C)
-  |         PB3 |------> I/O 4099 (WD 4099 #0, Players)
-  |         PB4 |------> I/O 4099 (WD 4099 #1, Counters)
-  |         PB5 |------> I/O 4099 (WD 4099 #2, unknown)
-  |         PB6 |------> I/O 4099 (D)
-  |         PB7 |------> PB7
-  |             |
-  |         PC0 |------> EEPROM (DI)
-  |         PC1 |------> EEPROM (CS)
-  |         PC2 |------> EEPROM (SK)
-  |         PC3 |------\ tied together
-  |         PC4 |------/ to PC3.
-  |         PC5 |------> I/O 4512 #0 (SO, inputs #0)
-  |         PC6 |------> I/O 4512 #1 (SO, inputs #1)
-  |         PC7 |------> I/O 4512 #2 (SO, DIP switches)
-  '-------------'
 
-      4099 #1
-   .-----v-----.
-   |        Q0 |-------> JUG. 1
-   |        Q1 |-------> JUG. 2
-   |        Q2 |-------> JUG. 3
-   |        Q3 |-------> JUG. 4
-   |        Q4 |-------> JUG. 5
-   |        Q5 |-------> JUG. 6
-   |        Q6 |-------> JUG. 7
-   |        Q7 |-------> JUG. 8
-   '-----------'
+                  PPI 8255
+                .-----v-----.
+  DAC (D7) <----| PA0   PB0 |----> I/O 4099 (A0) & 4512 (A)
+  DAC (D6) <----| PA1   PB1 |----> I/O 4099 (A1) & 4512 (B)
+  DAC (D5) <----| PA2   PB2 |----> I/O 4099 (A2) & 4512 (C)
+  DAC (D4) <----| PA3   PB3 |----> I/O 4099 (WD 4099 #0, Players)
+  DAC (D3) <----| PA4   PB4 |----> I/O 4099 (WD 4099 #1, Counters)
+  DAC (D2) <----| PA5   PB5 |----> I/O 4099 (WD 4099 #2, unknown)
+  DAC (D1) <----| PA6   PB6 |----> I/O 4099 (D)
+  DAC (D0) <----| PA7   PB7 |----> PB7
+                |           |
+                |       PC0 |----> EEPROM (DI)
+                |       PC1 |----> EEPROM (CS)
+                |       PC2 |----> EEPROM (SK)
+                |       PC3 |----\ tied together
+                |       PC4 |----/ to PC3.
+                |       PC5 |----> I/O 4512 #0 (SO, inputs #0)
+                |       PC6 |----> I/O 4512 #1 (SO, inputs #1)
+                |       PC7 |----> I/O 4512 #2 (SO, DIP switches)
+                '-----------'
 
-      4099 #2
-   .-----v-----.
-   |        Q0 |-------> AUX OUT1
-   |        Q1 |-------> AUX OUT2 (through ULN2004)
-   |        Q2 |-------> AUX OUT3 (through ULN2004)
-   |        Q3 |-------> AUX OUT4 (through ULN2004)
-   |        Q4 |-------> CONT.AUX1 (through ULN2004)
-   |        Q5 |-------> CONT.ENT (through ULN2004)
-   |        Q6 |-------> CONT.AUX2 (through ULN2004)
-   |        Q7 |-------> CONT.SAL (through ULN2004)
-   '-----------'
 
-      4099 #3
-   .-----v-----.
-   |        Q0 |-------> n.c.?
-   |        Q1 |-------> n.c.?
-   |        Q2 |-------> n.c.?
-   |        Q3 |-------> n.c.?
-   |        Q4 |-------> TOUCH (through 1N60)
-   |        Q5 |-------> n.c.?
-   |        Q6 |-------> n.c.?
-   |        Q7 |-------> n.c.?
-   '-----------'
+  Inputs...
+
+    4512 #0                     4512 #1                           4512 #2
+  .----v----.                 .----v----.                       .----v----.                      
+  |      D0 |----> AUX IN     |      D0 |----> CREDITS IN       |      D0 |----> DSW #1
+  |      D1 |----> N/C        |      D1 |----> PLAYER UP        |      D1 |----> DSW #2
+  |      D2 |----> N/C        |      D2 |----> PLAYER BET       |      D2 |----> DSW #3
+  |      D3 |----> N/C        |      D3 |----> CREDITS OUT      |      D3 |----> DSW #4
+  |      D4 |----> TOUCH      |      D4 |----> PLAYER RIGHT     |      D4 |----> DSW #5
+  |      D5 |----> N/C        |      D5 |----> PLAYER DOWN      |      D5 |----> DSW #6
+  |      D6 |----> CREDIT     |      D6 |----> COIN (???)       |      D6 |----> DSW #7
+  |      D7 |----> PAGE       |      D7 |----> PLAYER LEFT      |      D7 |----> DSW #8
+  '---------'                 '---------'                       '---------'
+
+
+  Outputs...
+
+    4099 #0                     4099 #1                                   4099 #2
+  .----v----.                 .----v----.                               .----v----.                      
+  |      Q0 |----> PL. 1      |      Q0 |----> AUX OUT1                 |      Q0 |----> N/C
+  |      Q1 |----> PL. 2      |      Q1 |----> AUX OUT2  (ULN2004)      |      Q1 |----> N/C
+  |      Q2 |----> PL. 3      |      Q2 |----> AUX OUT3  (ULN2004)      |      Q2 |----> N/C
+  |      Q3 |----> PL. 4      |      Q3 |----> AUX OUT4  (ULN2004)      |      Q3 |----> N/C
+  |      Q4 |----> PL. 5      |      Q4 |----> COUNTER AUX1 (ULN2004)   |      Q4 |----> TOUCH (through 1N60)
+  |      Q5 |----> PL. 6      |      Q5 |----> COUNTER IN   (ULN2004)   |      Q5 |----> N/C
+  |      Q6 |----> PL. 7      |      Q6 |----> COUNTER AUX2 (ULN2004)   |      Q6 |----> N/C
+  |      Q7 |----> PL. 8      |      Q7 |----> COUNTER OUT  (ULN2004)   |      Q7 |----> N/C
+  '---------'                 '---------'                               '---------'
+
+
+  TOUCH = For iButton inplementation. Not present in the current PCBs.
 
 
 *********************************************************************
