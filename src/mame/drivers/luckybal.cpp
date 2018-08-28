@@ -305,6 +305,7 @@ public:
 		, m_aux(*this, "AUX")
 		, m_dsw(*this, "DSW")
 		, m_latch(*this, "latch%u", 1)
+		, m_keymx(*this, "IN%u", 0)
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -334,6 +335,7 @@ private:
 	required_ioport m_aux;
 	required_ioport m_dsw;
 	required_device_array<cd4099_device, 3> m_latch;
+	required_ioport_array<6> m_keymx;
 
 	void main_io(address_map &map);
 	void main_map(address_map &map);
@@ -350,10 +352,10 @@ private:
 void luckybal_state::main_map(address_map &map)
 {
 	map(0x0000, 0x57ff).rom();
-	map(0x6000, 0x7fff).bankr("bank1");	// BANKED ROM
-	map(0x8000, 0x9fff).bankr("bank1");	// BANKED ROM
-	map(0xa000, 0xbfff).bankr("bank1");	// BANKED ROM
-	map(0xc000, 0xdfff).bankr("bank1");	// BANKED ROM
+	map(0x6000, 0x7fff).bankr("bank1");	 // Banked ROM.
+	map(0x8000, 0x9fff).bankr("bank1");	 // Banked ROM.
+	map(0xa000, 0xbfff).bankr("bank1");	 // Banked ROM.
+	map(0xc000, 0xdfff).bankr("bank1");	 // Banked ROM.
 	map(0xe000, 0xffff).ram().share("nvram");  // 6264 SRAM
 }
 
@@ -361,41 +363,14 @@ void luckybal_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x0a).nopr(); /* Z180 Internal registers */
-	map(0x00, 0x0a).nopw(); /* Z180 Internal registers */
-	map(0x0b, 0x0b).w(FUNC(luckybal_state::z180_trdr_w));
-	map(0x0c, 0x3f).nopr(); /* Z180 Internal registers */
-	map(0x0c, 0x3f).nopw(); /* Z180 Internal registers */
+	map(0x00, 0x0a).nopr().nopw();;  // Z180 Internal registers.
+	map(0x0b, 0x0b).nopr().w(FUNC(luckybal_state::z180_trdr_w));
+	map(0x0c, 0x3f).nopr().nopw();;  // Z180 Internal registers.
 
 	map(0x90, 0x90).w(FUNC(luckybal_state::port90_bitswap_w));
 	map(0xc0, 0xc3).rw(FUNC(luckybal_state::ppi_bitswap_r), FUNC(luckybal_state::ppi_bitswap_w));
 	map(0xe0, 0xe3).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
-/*
-[:maincpu] ':maincpu' (00006): unmapped io memory write to 0010 = 00 & FF
-[:maincpu] ':maincpu' (00009): unmapped io memory read from 0018 & FF
-[:maincpu] ':maincpu' (002C9): unmapped io memory write to 003F = 00 & FF
-[:maincpu] ':maincpu' (002CE): unmapped io memory write to 0033 = A0 & FF
-[:maincpu] ':maincpu' (002D2): unmapped io memory write to 0034 = 00 & FF
-[:maincpu] ':maincpu' (049C3): unmapped io memory write to 0032 = 00 & FF
-[:maincpu] ':maincpu' (0498F): unmapped io memory write to 000C = 1B & FF
-[:maincpu] ':maincpu' (04993): unmapped io memory write to 000D = 00 & FF
-[:maincpu] ':maincpu' (04998): unmapped io memory write to 000E = 1B & FF
-[:maincpu] ':maincpu' (0499C): unmapped io memory write to 000F = 00 & FF
-[:maincpu] ':maincpu' (049A1): unmapped io memory write to 0014 = 00 & FF
-[:maincpu] ':maincpu' (049A6): unmapped io memory write to 0015 = 18 & FF
-[:maincpu] ':maincpu' (049AA): unmapped io memory write to 0016 = 00 & FF
-[:maincpu] ':maincpu' (049AF): unmapped io memory write to 0017 = 18 & FF
-[:maincpu] ':maincpu' (049B2): unmapped io memory read from 0010 & FF
-[:maincpu] ':maincpu' (049B9): unmapped io memory write to 0010 = 04 & FF
-[:maincpu] ':maincpu' (04A65): unmapped io memory write to 000A = 04 & FF
-[:maincpu] ':maincpu' (049C7): unmapped io memory write to 0002 = 00 & FF
-[:maincpu] ':maincpu' (049D1): unmapped io memory write to 0000 = 64 & FF
-[:maincpu] ':maincpu' (002F2): unmapped io memory write to 00C3 = 44 & FF
-[:maincpu] ':maincpu' (002F4): unmapped io memory write to 00C3 = 44 & FF
-[:maincpu] ':maincpu' (002F8): unmapped io memory write to 00C0 = 5A & FF
-[:maincpu] ':maincpu' (002FA): unmapped io memory read from 00C0 & FF
-*/
 /*
 ;*********** PPI 8255 *******
 PORTCN    EQU  C0H    ;80H C
@@ -429,7 +404,6 @@ WRITE8_MEMBER(luckybal_state::port90_bitswap_w)
 {
 	data = bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1);
 	membank("bank1")->set_entry(data & 0x3f);
-	//logerror("%s: Write to port 90: %02X\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(luckybal_state::ppi_bitswap_r)
@@ -454,7 +428,6 @@ WRITE8_MEMBER(luckybal_state::output_port_a_w)
 	m_led_on = m_trdr;
 		
 	m_dac->write(data);
-	//logerror("%s: Write to PPI port A: %02X\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(luckybal_state::output_port_b_w)
@@ -470,25 +443,29 @@ READ8_MEMBER(luckybal_state::input_port_c_r)
 	uint8_t mux_player, sel_line, bit5, bit6=0xff, bit7, ret;
 	sel_line=m_ppi->read_pb() & 0x7f;
 	mux_player = m_latch[0]->output_state();
-	bit5 = (((m_aux->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xdf;	
+	bit5 = (((m_aux->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xdf;	
+
 	switch(mux_player)
 	{
-		case 0xfe:bit6 = (((ioport("IN1")->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;	
-		case 0xfd:bit6 = (((ioport("IN2")->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xfb:bit6 = (((ioport("IN3")->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xf7:bit6 = (((ioport("IN4")->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xef:bit6 = (((ioport("IN5")->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
-		case 0xdf:bit6 = (((ioport("IN6")->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
+		case 0xfe:bit6 = (((m_keymx[0]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;	
+		case 0xfd:bit6 = (((m_keymx[1]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
+		case 0xfb:bit6 = (((m_keymx[2]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
+		case 0xf7:bit6 = (((m_keymx[3]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
+		case 0xef:bit6 = (((m_keymx[4]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
+		case 0xdf:bit6 = (((m_keymx[5]->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0xbf; break;
 	}
-	bit7 = (((m_dsw->read() | (~(int)(pow(2, sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0x7f;
+
+	bit7 = (((m_dsw->read() | (~(0x01<<(sel_line & 0x07)))) & 0xff ) == 0xff) ? 0xff : 0x7f;
+
 	if ((sel_line & 0x07) == 6)  m_lamps[37] = (bit5 == 0xff) ? 0 : 1;	/* Operator lamp */
 	ret = bit7 & bit6 & bit5;
+
 	return ret;
 }
 
 WRITE8_MEMBER(luckybal_state::output_port_c_w)
 {
-	logerror("%s: Write to PPI port C: %02X\n", machine().describe_context(), data);
+//	logerror("%s: Write to PPI port C: %02X\n", machine().describe_context(), data);
 }
 
 
@@ -498,65 +475,65 @@ WRITE8_MEMBER(luckybal_state::output_port_c_w)
 
 static INPUT_PORTS_START( luckybal )
 
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_1)        PORT_NAME("Player 1 - Credits IN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)  PORT_CODE(KEYCODE_W)        PORT_NAME("Player 1 - Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )                        PORT_CODE(KEYCODE_Q)        PORT_NAME("Player 1 - Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_Z)        PORT_NAME("Player 1 - Credits OUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)  PORT_CODE(KEYCODE_D)        PORT_NAME("Player 1 - Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)  PORT_CODE(KEYCODE_S)	    PORT_NAME("Player 1 - Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // 'Player 1 - Coins' in the schematics. Maybe for another game.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)  PORT_CODE(KEYCODE_A)        PORT_NAME("Player 1 - Left")
+
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Player 1 - Credits IN")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Player 1 - Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Player 1 - Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("Player 1 - Credits OUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Player 1 - Right")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Player 1 - Down")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("Player 1 - Coin")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Player 1 - Left")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_2)        PORT_NAME("Player 2 - Credits IN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)  PORT_CODE(KEYCODE_T)        PORT_NAME("Player 2 - Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )                        PORT_CODE(KEYCODE_R)        PORT_NAME("Player 2 - Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_X)        PORT_NAME("Player 2 - Credits OUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)  PORT_CODE(KEYCODE_H)        PORT_NAME("Player 2 - Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)  PORT_CODE(KEYCODE_G)	    PORT_NAME("Player 2 - Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // 'Player 2 - Coins' in the schematics. Maybe for another game.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)  PORT_CODE(KEYCODE_F)        PORT_NAME("Player 2 - Left")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Player 2 - Credits IN")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Player 2 - Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Player 2 - Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Player 2 - Credits OUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Player 2 - Right")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("Player 2 - Down")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("Player 2 - Coin")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("Player 2 - Left")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_3)        PORT_NAME("Player 3 - Credits IN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(3)  PORT_CODE(KEYCODE_S)        PORT_NAME("Player 3 - Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )                        PORT_CODE(KEYCODE_U)        PORT_NAME("Player 3 - Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_C)        PORT_NAME("Player 3 - Credits OUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)  PORT_CODE(KEYCODE_L)        PORT_NAME("Player 3 - Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(3)  PORT_CODE(KEYCODE_K)	    PORT_NAME("Player 3 - Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // 'Player 3 - Coins' in the schematics. Maybe for another game.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(3)  PORT_CODE(KEYCODE_J)        PORT_NAME("Player 3 - Left")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Player 3 - Credits IN")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Player 3 - Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("Player 3 - Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Player 3 - Credits OUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("Player 3 - Right")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Player 3 - Down")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O) PORT_NAME("Player 3 - Coin")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("Player 3 - Left")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_4)        PORT_NAME("Player 4 - Credits IN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(4)  PORT_CODE(KEYCODE_PGUP)     PORT_NAME("Player 4 - Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )                        PORT_CODE(KEYCODE_LALT)     PORT_NAME("Player 4 - Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_V)        PORT_NAME("Player 4 - Credits OUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)  PORT_CODE(KEYCODE_7)        PORT_NAME("Player 4 - Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(4)  PORT_CODE(KEYCODE_PGDN)	    PORT_NAME("Player 4 - Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // 'Player 4 - Coins' in the schematics. Maybe for another game.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(4)  PORT_CODE(KEYCODE_8)        PORT_NAME("Player 4 - Left")
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) 	PORT_NAME("Player 4 - Credits IN")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGUP)	PORT_NAME("Player 4 - Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)	PORT_NAME("Player 4 - Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)		PORT_NAME("Player 4 - Credits OUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7)		PORT_NAME("Player 4 - Right")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGDN)	PORT_NAME("Player 4 - Down")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Player 4 - Coin")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8)		PORT_NAME("Player 4 - Left")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_5)        PORT_NAME("Player 5 - Credits IN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(5)  PORT_CODE(KEYCODE_DOWN)     PORT_NAME("Player 5 - Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )                        PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Player 5 - Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_B)        PORT_NAME("Player 5 - Credits OUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(5)  PORT_CODE(KEYCODE_LEFT)     PORT_NAME("Player 5 - Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(5)  PORT_CODE(KEYCODE_UP)	    PORT_NAME("Player 5 - Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // 'Player 5 - Coins' in the schematics. Maybe for another game.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(5)  PORT_CODE(KEYCODE_RIGHT)    PORT_NAME("Player 5 - Left")
 
 	PORT_START("IN5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5)        PORT_NAME("Player 5 - Credits IN")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)     PORT_NAME("Player 5 - Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Player 5 - Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)        PORT_NAME("Player 5 - Credits OUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)     PORT_NAME("Player 5 - Right")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)	   PORT_NAME("Player 5 - Down")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)     PORT_NAME("Player 5 - Coin")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)    PORT_NAME("Player 5 - Left")
-
-	PORT_START("IN6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6)     PORT_NAME("Player 6 - Credits IN")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Player 6 - Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Player 6 - Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)  	PORT_NAME("Player 6 - Credits OUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Player 6 - Right")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Player 6 - Down")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Player 6 - Coin")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Player 6 - Left")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_6)        PORT_NAME("Player 6 - Credits IN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(6)  PORT_CODE(KEYCODE_2_PAD)    PORT_NAME("Player 6 - Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )                        PORT_CODE(KEYCODE_7_PAD)    PORT_NAME("Player 6 - Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )                        PORT_CODE(KEYCODE_N)        PORT_NAME("Player 6 - Credits OUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(6)  PORT_CODE(KEYCODE_4_PAD)    PORT_NAME("Player 6 - Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(6)  PORT_CODE(KEYCODE_8_PAD)	PORT_NAME("Player 6 - Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // 'Player 6 - Coins' in the schematics. Maybe for another game.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(6)  PORT_CODE(KEYCODE_6_PAD)    PORT_NAME("Player 6 - Left")
 	
 	PORT_START("AUX")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -565,8 +542,8 @@ static INPUT_PORTS_START( luckybal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0) 		PORT_NAME("Credit") 	PORT_TOGGLE 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) 		PORT_NAME("Page")  
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0)  PORT_NAME("Operator Key")  PORT_TOGGLE  // Allow to credit in/out for all players.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)  PORT_NAME("Test Mode / Books / Page")   // Need the Oper Key active to work.
 	
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Setting Access" )
@@ -584,10 +561,10 @@ static INPUT_PORTS_START( luckybal )
 	PORT_DIPNAME( 0x10, 0x10, "Coinage / Bet Mode" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW_20" )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown - 0x20" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW_40" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown - 0x40" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Full Books Clear" )
@@ -620,8 +597,7 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	MCFG_DEVICE_ADD("latch3", CD4099, 0)
 
-	/* New: nvram added */
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+	/* nvram */
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
 	/* video hardware */
@@ -631,7 +607,7 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // DAC 08
+	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -701,12 +677,15 @@ void luckybal_state::init_luckybala()
 	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
+
 	for (int i = start; i < size; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 6, 7, 4, 5, 2, 3, 0, 1);
 	}
 	
-	/* HACK SECTION */
+	/* The following patches are to avoid hardware verifications through
+       the unemulated synchronic serial comm of the z180...
+    */
 	rom[0x571] = 0x68; 	//31
 	rom[0x572] = 0xE8;	//4C
 	rom[0x573] = 0x18;	//42
@@ -716,7 +695,6 @@ void luckybal_state::init_luckybala()
 	rom[0x1D65] = 0x0E;	//0C
 	rom[0x4499] = 0x00;	//FF	<------- Checksum.
 	rom[0x4AB6] = 0xAF;	//B9
-	/* END */
 	
 	membank("bank1")->configure_entries(0, 0x40, &rom[0x10000], 0x2000);
 }
@@ -726,12 +704,15 @@ void luckybal_state::init_luckybalc()
 	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
+
 	for (int i = start; i < size; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 6, 7, 4, 5, 2, 3, 0, 1);
 	}
 	
-	/* HACK SECTION */
+	/* The following patches are to avoid hardware verifications through
+       the unemulated synchronic serial comm of the z180...
+    */
 	rom[0x571] = 0x68; 	//31
 	rom[0x572] = 0xE8;	//4C
 	rom[0x573] = 0x18;	//42
@@ -741,7 +722,6 @@ void luckybal_state::init_luckybalc()
 	rom[0x1D45] = 0x0E;	//0C
 	rom[0x44A9] = 0x00;	//FF	<------- Checksum.
 	rom[0x4AC6] = 0xAF;	//B9
-	/* END */
 
 	membank("bank1")->configure_entries(0, 0x40, &rom[0x10000], 0x2000);
 }
