@@ -3550,7 +3550,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 	MCFG_DEVICE_PROGRAM_MAP(pipibibi_bootleg_68k_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(toaplan2_state, pipibibsbl_irq_ack)
 
-	Z80(config, m_audiocpu, 12_MHz_XTAL / 6); // GoldStar Z8400B; clock source and divider unknown
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
