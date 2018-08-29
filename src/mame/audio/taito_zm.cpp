@@ -113,7 +113,7 @@ WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
 
 void taito_zoom_device::update_status_pin(int state)
 {
-	printf("inside callback set status to %d\n",state);
+	logerror("inside callback set status to %d\n", state);
 	m_soundcpu->set_input_line(1, state);
 	machine().scheduler().synchronize();    // the fix to all problems
 }
