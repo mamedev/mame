@@ -238,7 +238,7 @@ void h6280_device::device_add_mconfig(machine_config &config)
 
 void h6280_device::device_start()
 {
-	m_port_in_cb.resolve_safe(0xff);
+	m_port_in_cb.resolve();
 	m_port_out_cb.resolve_safe();
 
 	// register our state for the debugger
@@ -2589,16 +2589,15 @@ READ8_MEMBER( h6280_device::port_r )
 {
 	if (!m_port_in_cb.isnull())
 		return m_port_in_cb();
-
-	return m_io_buffer;
+	else
+		return m_io_buffer;
 }
 
 WRITE8_MEMBER( h6280_device::port_w )
 {
 	m_io_buffer = data;
 
-	if (!m_port_out_cb.isnull())
-		m_port_out_cb(data);
+	m_port_out_cb(data);
 }
 
 READ8_MEMBER( h6280_device::io_buffer_r )
