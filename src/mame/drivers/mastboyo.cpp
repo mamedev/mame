@@ -162,7 +162,7 @@ static INPUT_PORTS_START( mastboyo )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0x40, 0x40, "Attract Music" )  // From manual... 'Con Reclamo' 
+	PORT_DIPNAME( 0x40, 0x40, "Attract Music" )  // From manual... 'Con Reclamo'
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )      // From manual... 'Test Inicial'

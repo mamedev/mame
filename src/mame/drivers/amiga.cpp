@@ -74,22 +74,26 @@ different components:
 * BAS32L diode for power-on reset
 * This gives delays of 152ms, 176µs, and 704ms
 
+The equivalent circuit in the Amiga CDTV has the same thresholds as the
+Amiga 2000, but uses 1kΩ resistors for timing.  This gives delays of
+11.2ms, 7.43ms, and 27.5ms.
+
 */
 
-DECLARE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device)
+DECLARE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device)
 
-class a2000_kbreset_device : public device_t
+class a1000_kbreset_device : public device_t
 {
 public:
-	a2000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, u32 clock = 0U) :
-		device_t(config, A2000_KBRESET, tag, owner, clock),
+	a1000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, u32 clock = 0U) :
+		device_t(config, A1000_KBRESET, tag, owner, clock),
 		m_kbrst_cb(*this)
 	{
 	}
 
 	auto kbrst_cb() { return m_kbrst_cb.bind(); }
 
-	a2000_kbreset_device &set_delays(attotime detect, attotime stray, attotime output)
+	a1000_kbreset_device &set_delays(attotime detect, attotime stray, attotime output)
 	{
 		m_detect_time = detect;
 		m_stray_time = stray;
@@ -133,8 +137,8 @@ protected:
 	virtual void device_start() override
 	{
 		// allocate resources
-		m_c813_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2000_kbreset_device::c813_charged), this));
-		m_c814_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2000_kbreset_device::c814_charged), this));
+		m_c813_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a1000_kbreset_device::c813_charged), this));
+		m_c814_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a1000_kbreset_device::c814_charged), this));
 
 		// start in idle state
 		m_kbclk = 1U;
@@ -206,7 +210,7 @@ private:
 	u8 m_c814_charging = 1U; // U805 pin 2
 };
 
-DEFINE_DEVICE_TYPE(A2000_KBRESET, a2000_kbreset_device, "a2000kbrst", "Amiga 1000/2000 keyboard reset circuit")
+DEFINE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device, "a1000kbrst", "Amiga 1000/2000/CDTV keyboard reset circuit")
 
 
 //**************************************************************************
@@ -1633,9 +1637,9 @@ MACHINE_CONFIG_START(a1000_state::a1000)
 	// keyboard
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1000_us"));
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
-	kbd.kclk_handler().append("kbrst", FUNC(a2000_kbreset_device::kbclk_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
-	A2000_KBRESET(config, "kbrst")
+	A1000_KBRESET(config, "kbrst")
 			.set_delays(attotime::from_msec(152), attotime::from_usec(176), attotime::from_msec(704))
 			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
 
@@ -1672,9 +1676,9 @@ MACHINE_CONFIG_START(a2000_state::a2000)
 	// keyboard
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
-	kbd.kclk_handler().append("kbrst", FUNC(a2000_kbreset_device::kbclk_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
-	A2000_KBRESET(config, "kbrst")
+	A1000_KBRESET(config, "kbrst")
 			.set_delays(attotime::from_msec(112), attotime::from_msec(74), attotime::from_msec(1294))
 			.kbrst_cb().set(FUNC(a2000_state::kbreset_w));
 
@@ -1761,7 +1765,11 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	// keyboard
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kclk_handler().append("kbrst", FUNC(a1000_kbreset_device::kbclk_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
+	A1000_KBRESET(config, "kbrst")
+			.set_delays(attotime::from_usec(11238), attotime::from_usec(7432), attotime::from_usec(27539))
+			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
 
 	// main cpu
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
