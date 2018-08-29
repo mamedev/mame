@@ -1894,10 +1894,10 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 	Z80PIO(config, m_ipu_pio1, 7372800/2);
 	m_ipu_pio1->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ipu_sio", Z80SIO0, 7372800/2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, mcr_nflfoot_state, sio_txda_w))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(*this, mcr_nflfoot_state, sio_txdb_w))
+	Z80SIO0(config, m_ipu_sio, 7372800/2);
+	m_ipu_sio->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
+	m_ipu_sio->out_txda_callback().set(FUNC(mcr_nflfoot_state::sio_txda_w));
+	m_ipu_sio->out_txdb_callback().set(FUNC(mcr_nflfoot_state::sio_txdb_w));
 MACHINE_CONFIG_END
 
 

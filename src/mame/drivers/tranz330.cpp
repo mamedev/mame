@@ -162,11 +162,11 @@ void tranz330_state::tranz330(machine_config &config)
 	m_pio->in_pb_callback().set(FUNC(tranz330_state::pio_b_r));
 
 	Z80DART(config, m_dart, XTAL(7'159'090)/2); //*
-	m_dart->set_out_syncb_callback(DEVCB_WRITELINE(*this, tranz330_state, syncb_w));
-	m_dart->set_out_txdb_callback(DEVCB_WRITELINE(m_rs232, rs232_port_device, write_txd)); //?
-	m_dart->set_out_dtrb_callback(DEVCB_WRITELINE(m_rs232, rs232_port_device, write_dtr)); //?
-	m_dart->set_out_rtsb_callback(DEVCB_WRITELINE(m_rs232, rs232_port_device, write_rts)); //?
-	m_dart->set_out_int_callback(DEVCB_WRITELINE("irq", input_merger_device, in_w<1>));
+	m_dart->out_syncb_callback().set(FUNC(tranz330_state::syncb_w));
+	m_dart->out_txdb_callback().set(m_rs232, FUNC(rs232_port_device::write_txd)); //?
+	m_dart->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr)); //?
+	m_dart->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts)); //?
+	m_dart->out_int_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
 	Z80CTC(config, m_ctc, XTAL(7'159'090)/2); //*
 	m_ctc->set_zc_callback<2>(DEVCB_WRITELINE(*this, tranz330_state, sound_w));

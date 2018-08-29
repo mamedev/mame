@@ -458,13 +458,13 @@ MACHINE_CONFIG_START(super6_state::super6)
 	clock_device &ctc_tick(CLOCK(config, "ctc_tick", 24_MHz_XTAL / 16));
 	ctc_tick.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));   // J6 pin 1-14 (1.5MHz)
 
-	MCFG_DEVICE_ADD(m_dma, Z80DMA, 24_MHz_XTAL / 6)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(m_dma, z80dma_device, bai_w))
-	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(m_ctc, z80ctc_device, trg2))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, super6_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, super6_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super6_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super6_state, io_write_byte))
+	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
+	m_dma->out_busreq_callback().set(m_dma, FUNC(z80dma_device::bai_w));
+	m_dma->out_int_callback().set(m_ctc, FUNC(z80ctc_device::trg2));
+	m_dma->in_mreq_callback().set(FUNC(super6_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(super6_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(super6_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(super6_state::io_write_byte));
 
 	Z80PIO(config, m_pio, 24_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -479,14 +479,14 @@ MACHINE_CONFIG_START(super6_state::super6)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD(m_dart, Z80DART, 24_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_dart, 24_MHz_XTAL / 4);
+	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_dart->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))

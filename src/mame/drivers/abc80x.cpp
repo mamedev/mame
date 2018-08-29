@@ -1076,21 +1076,21 @@ MACHINE_CONFIG_START(abc800_state::common)
 	m_sio->out_rtsb_callback().set(FUNC(abc800_state::sio_rtsb_w));
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_dart, ABC800_X01/2/2);
+	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
+	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CASSETTE_TAG, abc800_state, cassette_input_tick, attotime::from_hz(44100))
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_dart, z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_dart, z80dart_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxa_w))
@@ -1098,9 +1098,9 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
 
 	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, nullptr)
-	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
-	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
-	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
+	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
+	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
+	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(m_dart, z80dart_device, dcdb_w))
 
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, nullptr)
 
@@ -1190,9 +1190,8 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	abc802_video(config);
 
 	// peripheral hardware
-	MCFG_DEVICE_MODIFY(Z80DART_TAG)
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, abc802_state, lrs_w))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(*this, abc802_state, mux80_40_w))
+	m_dart->out_dtrb_callback().set(FUNC(abc802_state::lrs_w));
+	m_dart->out_rtsb_callback().set(FUNC(abc802_state::mux80_40_w));
 
 	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
 	MCFG_SLOT_DEFAULT_OPTION("abc55")
@@ -1223,8 +1222,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	// peripheral hardware
 	E0516(config, E0516_TAG, ABC806_X02);
 
-	MCFG_DEVICE_MODIFY(Z80DART_TAG)
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, abc806_state, keydtr_w))
+	m_dart->out_dtrb_callback().set(FUNC(abc806_state::keydtr_w));
 
 	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
 	MCFG_SLOT_DEFAULT_OPTION("abc77")

@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
-	MCFG_DEVICE_ADD("sio", Z80SIO2, 4000000)
+	Z80SIO2(config, "sio", 4000000);
 
 	MCFG_DEVICE_ADD("crtc", HD6845, XTAL(64'000'000)/64) // clock unknown
 	MCFG_MC6845_CHAR_WIDTH(32) // ??

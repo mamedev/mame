@@ -421,14 +421,14 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, 8_MHz_XTAL / 2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, altos5_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80DMA(config, m_dma, 8_MHz_XTAL / 2);
+	m_dma->out_busreq_callback().set(FUNC(altos5_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// BAO, not used
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, altos5_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, altos5_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, altos5_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, altos5_state, io_write_byte))
+	m_dma->in_mreq_callback().set(FUNC(altos5_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(altos5_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(altos5_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(altos5_state::io_write_byte));
 
 	Z80PIO(config, m_pio0, 8_MHz_XTAL / 2);
 	m_pio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -440,10 +440,10 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	z80pio_device& pio1(Z80PIO(config, "pio1", 8_MHz_XTAL / 2));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart", Z80DART, 8_MHz_XTAL / 2)
+	z80dart_device& dart(Z80DART(config, "dart", 8_MHz_XTAL / 2));
 	// Channel A - console #3
 	// Channel B - printer
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80sio_device& sio(Z80SIO(config, "sio", 8_MHz_XTAL / 2));
 	// Channel A - console #2
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 
 	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, altos5_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)

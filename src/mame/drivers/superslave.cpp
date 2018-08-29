@@ -375,41 +375,41 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(8'000'000)/2));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80DART_0_TAG, Z80DART, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80dart_device& dart0(Z80DART(config, Z80DART_0_TAG, XTAL(8'000'000)/2));
+	dart0.out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	dart0.out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
+	dart0.out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	dart0.out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	dart0.out_dtrb_callback().set(m_rs232b, FUNC(rs232_port_device::write_dtr));
+	dart0.out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
+	dart0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD(m_rs232a, RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, ctsa_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(m_rs232b, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, ctsb_w))
 
-	MCFG_DEVICE_ADD(Z80DART_1_TAG, Z80DART, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80dart_device& dart1(Z80DART(config, Z80DART_1_TAG, XTAL(8'000'000)/2));
+	dart1.out_txda_callback().set(m_rs232c, FUNC(rs232_port_device::write_txd));
+	dart1.out_dtra_callback().set(m_rs232c, FUNC(rs232_port_device::write_dtr));
+	dart1.out_rtsa_callback().set(m_rs232c, FUNC(rs232_port_device::write_rts));
+	dart1.out_txdb_callback().set(m_rs232d, FUNC(rs232_port_device::write_txd));
+	dart1.out_dtrb_callback().set(m_rs232d, FUNC(rs232_port_device::write_dtr));
+	dart1.out_rtsb_callback().set(m_rs232d, FUNC(rs232_port_device::write_rts));
+	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(m_rs232c, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, ctsa_w))
 
-	MCFG_DEVICE_ADD(RS232_D_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(m_rs232d, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, ctsb_w))

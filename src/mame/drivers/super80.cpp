@@ -860,14 +860,14 @@ MACHINE_CONFIG_START(super80_state::super80r)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(super80r_io)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, MASTER_CLOCK/6)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, super80_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80DMA(config, m_dma, MASTER_CLOCK/6);
+	m_dma->out_busreq_callback().set(FUNC(super80_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//ba0 - not connected
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, super80_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, super80_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super80_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super80_state, io_write_byte))
+	m_dma->in_mreq_callback().set(FUNC(super80_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(super80_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(super80_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(super80_state::io_write_byte));
 
 	MCFG_DEVICE_ADD("fdc", WD2793, 2_MHz_XTAL)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))

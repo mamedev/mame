@@ -369,8 +369,8 @@ MACHINE_CONFIG_START(mtx_state::rs128)
 	MCFG_Z80_DAISY_CHAIN(rs128_daisy_chain)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_z80dart, XTAL(4'000'000));
+	m_z80dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* internal ram */
 	m_ram->set_default_size("128K").set_extra_options("192K,320K,448K,512K");
