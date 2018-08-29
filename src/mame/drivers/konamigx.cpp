@@ -785,8 +785,10 @@ READ32_MEMBER(konamigx_state::type3_sync_r)
 /*
     Run and Gun 2, Rushing Heroes, Winning Spike, and Vs. Net Soccer contain a XILINX FPGA that serves as security.
 
-    RnG2's version is stamped "K002204", while Rushing Heroes' is "K0000035891".  Vs Net's is unknown at this time.
-    Winning Spike's is "0000032652".
+    RnG2's version is stamped "K002204"
+    Rushing Heroes' is "K0000035891"
+    Vs Net Soccer is "003462"
+    Winning Spike's is "0000032652"
 
     RnG2's is used to generate the sprite list just like the ESC, among other tasks.  (RnG2 sends many commands per frame to the protection).
 
