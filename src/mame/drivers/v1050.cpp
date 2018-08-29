@@ -1075,9 +1075,9 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_DISP_TAG, i8255_device, pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, m6502_ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0/*16_MHz_XTAL/8,*/)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(V1050_KEYBOARD_TAG, v1050_keyboard_device, si_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v1050_state, kb_rxrdy_w))
+	I8251(config, m_uart_kb, 0/*16_MHz_XTAL/8,*/);
+	m_uart_kb->txd_handler().set(V1050_KEYBOARD_TAG, FUNC(v1050_keyboard_device::si_w));
+	m_uart_kb->rxrdy_handler().set(FUNC(v1050_state::kb_rxrdy_w));
 
 	MCFG_DEVICE_ADD(CLOCK_KB_TAG, CLOCK, 16_MHz_XTAL/4/13/8)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_keyboard_clock))
@@ -1086,12 +1086,12 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
 	MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_KB_TAG, i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD(I8251A_SIO_TAG, I8251, 0/*16_MHz_XTAL/8,*/)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v1050_state, sio_rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, v1050_state, sio_txrdy_w))
+	I8251(config, m_uart_sio, 0/*16_MHz_XTAL/8,*/);
+	m_uart_sio->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart_sio->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart_sio->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart_sio->rxrdy_handler().set(FUNC(v1050_state::sio_rxrdy_w));
+	m_uart_sio->txrdy_handler().set(FUNC(v1050_state::sio_txrdy_w));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))

@@ -15,31 +15,6 @@
 
 #include "diserial.h"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I8251_TXD_HANDLER(_devcb) \
-	downcast<i8251_device &>(*device).set_txd_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_DTR_HANDLER(_devcb) \
-	downcast<i8251_device &>(*device).set_dtr_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_RTS_HANDLER(_devcb) \
-	downcast<i8251_device &>(*device).set_rts_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_RXRDY_HANDLER(_devcb) \
-	downcast<i8251_device &>(*device).set_rxrdy_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_TXRDY_HANDLER(_devcb) \
-	downcast<i8251_device &>(*device).set_txrdy_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_TXEMPTY_HANDLER(_devcb) \
-	downcast<i8251_device &>(*device).set_txempty_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_SYNDET_HANDLER(_devcb) \
-	downcast<i8251_device &>(*device).set_syndet_handler(DEVCB_##_devcb);
-
 class i8251_device :  public device_t,
 	public device_serial_interface
 {

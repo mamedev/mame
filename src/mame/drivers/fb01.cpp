@@ -203,10 +203,10 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16
 	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_state,fb01_pixel_update)
 
-	MCFG_DEVICE_ADD("upd71051", I8251, XTAL(4'000'000))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, fb01_state, upd71051_rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, fb01_state, upd71051_txrdy_w))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	I8251(config, m_upd71051, XTAL(4'000'000));
+	m_upd71051->rxrdy_handler().set(FUNC(fb01_state::upd71051_rxrdy_w));
+	m_upd71051->txrdy_handler().set(FUNC(fb01_state::upd71051_txrdy_w));
+	m_upd71051->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, fb01_state, write_usart_clock))

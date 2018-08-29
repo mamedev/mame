@@ -560,9 +560,9 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 
 	MCFG_MACHINE_RESET_OVERRIDE(excali64_state, excali64)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, "uart", 0);
+	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(16_MHz_XTAL / 16) /* Timer 0: tone gen for speaker */

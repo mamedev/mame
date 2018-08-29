@@ -647,10 +647,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_TIMER_DRIVER_ADD("strobe", einstein_state, strobe_callback)
 
 	// uart
-	MCFG_DEVICE_ADD(IC_I060, I8251, XTAL_X002 / 4)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	i8251_device &ic_i060(I8251(config, IC_I060, XTAL_X002 / 4));
+	ic_i060.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	ic_i060.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	ic_i060.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	// rs232 port
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)

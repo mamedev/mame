@@ -445,29 +445,29 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_PIT8253_CLK2(XTAL(16'000'000)/2/13)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, sage2_state, br2_w))
 
-	MCFG_DEVICE_ADD(I8251_0_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(M68000_TAG, M68K_IRQ_5))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir2_w))
+	I8251(config, m_usart0, 0);
+	m_usart0->txd_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart0->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart0->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_usart0->rxrdy_handler().set_inputline(M68000_TAG, M68K_IRQ_5);
+	m_usart0->txrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir2_w));
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_0_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_0_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_0_TAG, i8251_device, write_cts))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart0, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_usart0, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_usart0, i8251_device, write_cts))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(I8251_1_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir1_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir3_w))
+	I8251(config, m_usart1, 0);
+	m_usart1->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart1->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart1->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_usart1->rxrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir1_w));
+	m_usart1->txrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_1_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_1_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart1, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_usart1, i8251_device, write_dsr))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, sage2_state, fdc_irq))

@@ -824,12 +824,12 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, tandy2k_state, ppi_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tandy2k_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tandy2k_state, rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tandy2k_state, txrdy_w))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->rxrdy_handler().set(FUNC(tandy2k_state::rxrdy_w));
+	m_uart->txrdy_handler().set(FUNC(tandy2k_state::txrdy_w));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))

@@ -178,10 +178,10 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 	MCFG_DEVICE_PROGRAM_MAP(isbc8010_mem)
 	MCFG_DEVICE_IO_MAP(isbc8010_io)
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
 	MCFG_DEVICE_ADD(I8255A_2_TAG, I8255A, 0)

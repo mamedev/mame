@@ -500,23 +500,23 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	k1135a.ft_handler().set(m_i8251_1, FUNC(i8251_device::write_txc));
 	k1135a.ft_handler().append(m_i8251_1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD(INS8251_0_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0xf>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0x3>))
+	I8251(config, m_i8251_0, 0);
+	m_i8251_0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251_0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_i8251_0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_i8251_0->rxrdy_handler().set(FUNC(cgc7900_state::irq<0xf>));
+	m_i8251_0->txrdy_handler().set(FUNC(cgc7900_state::irq<0x3>));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(INS8251_1_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs449", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs449", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs449", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0x8>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, cgc7900_state, irq<0x1>))
+	I8251(config, m_i8251_1, 0);
+	m_i8251_1->txd_handler().set("rs449", FUNC(rs232_port_device::write_txd));
+	m_i8251_1->dtr_handler().set("rs449", FUNC(rs232_port_device::write_dtr));
+	m_i8251_1->rts_handler().set("rs449", FUNC(rs232_port_device::write_rts));
+	m_i8251_1->rxrdy_handler().set(FUNC(cgc7900_state::irq<0x8>));
+	m_i8251_1->txrdy_handler().set(FUNC(cgc7900_state::irq<0x1>));
 
 	MCFG_DEVICE_ADD("rs449", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_rxd))

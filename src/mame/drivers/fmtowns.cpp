@@ -2861,13 +2861,14 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, towns_state, towns_rxrdy_irq))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, towns_state, towns_txrdy_irq))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, towns_state, towns_syndet_irq))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232c", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232c", rs232_port_device, write_rts))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232c", rs232_port_device, write_txd))
+	I8251(config, m_i8251, 0);
+	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
+	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_txrdy_irq));
+	m_i8251->syndet_handler().set(FUNC(towns_state::towns_syndet_irq));
+	m_i8251->dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
+	m_i8251->rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
+	m_i8251->txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251",i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251",i8251_device, write_dsr))

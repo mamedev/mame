@@ -392,13 +392,13 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* uarts */
-	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txrdy_int))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txempty_int))
+	i8251_device &u15(I8251(config, "i8251a_u15", 0));
+	u15.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	u15.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	u15.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	u15.rxrdy_handler().set(FUNC(tsispch_state::i8251_rxrdy_int));
+	u15.txrdy_handler().set(FUNC(tsispch_state::i8251_txrdy_int));
+	u15.txempty_handler().set(FUNC(tsispch_state::i8251_txempty_int));
 
 	clock_device &clock(CLOCK(config, "baudclock", 153600));
 	clock.signal_handler().set("i8251a_u15", FUNC(i8251_device::write_txc));

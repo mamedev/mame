@@ -687,11 +687,11 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("printer", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, vt240_state, duartout_w))
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, vt240_state, tx_w))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, vt240_state, lben_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vt240_state, irq9_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vt240_state, irq7_w))
+	I8251(config, m_i8251, 0);
+	m_i8251->txd_handler().set(FUNC(vt240_state::tx_w));
+	m_i8251->dtr_handler().set(FUNC(vt240_state::lben_w));
+	m_i8251->rxrdy_handler().set(FUNC(vt240_state::irq9_w));
+	m_i8251->txrdy_handler().set(FUNC(vt240_state::irq7_w));
 
 	MCFG_DEVICE_ADD("lk201", LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
@@ -718,9 +718,8 @@ MACHINE_CONFIG_START(vt240_state::mc7105)
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
 	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
 
-	MCFG_DEVICE_MODIFY("i8251")
-	MCFG_I8251_TXD_HANDLER(NOOP)
-	//MCFG_I8251_TXD_HANDLER(WRITELINE("ms7004", ms7004_device, rx_w))
+	m_i8251->txd_handler().set_nop();
+	//m_i8251->txd_handler().set("ms7004", FUNC(ms7004_device::rx_w));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_REMOVE("keyboard_clock")

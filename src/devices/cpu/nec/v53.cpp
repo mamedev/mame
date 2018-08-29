@@ -504,8 +504,8 @@ WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
 }
 
 
-MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
-
+void v53_base_device::device_add_mconfig(machine_config &config)
+{
 	PIT8254(config, m_v53tcu, 0); // functionality identical to uPD71054
 	m_v53tcu->set_clk<0>(16000000); // manual implicitly claims that these runs at same speed as the CPU
 	m_v53tcu->set_clk<1>(16000000);
@@ -537,16 +537,15 @@ MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
 	m_v53icu->in_sp_callback().set_constant(1);
 	m_v53icu->read_slave_ack_callback().set(FUNC(v53_base_device::get_pic_ack));
 
-	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, v53_base_device, scu_txd_trampoline_cb))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, v53_base_device, scu_dtr_trampoline_cb))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, v53_base_device, scu_rts_trampoline_cb))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_rxrdy_trampoline_cb))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_txrdy_trampoline_cb))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, v53_base_device, scu_txempty_trampoline_cb))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, v53_base_device, scu_syndet_trampoline_cb))
-
-MACHINE_CONFIG_END
+	V53_SCU(config, m_v53scu, 0);
+	m_v53scu->txd_handler().set(FUNC(v53_base_device::scu_txd_trampoline_cb));
+	m_v53scu->dtr_handler().set(FUNC(v53_base_device::scu_dtr_trampoline_cb));
+	m_v53scu->rts_handler().set(FUNC(v53_base_device::scu_rts_trampoline_cb));
+	m_v53scu->rxrdy_handler().set(FUNC(v53_base_device::scu_rxrdy_trampoline_cb));
+	m_v53scu->txrdy_handler().set(FUNC(v53_base_device::scu_txrdy_trampoline_cb));
+	m_v53scu->txempty_handler().set(FUNC(v53_base_device::scu_txempty_trampoline_cb));
+	m_v53scu->syndet_handler().set(FUNC(v53_base_device::scu_syndet_trampoline_cb));
+}
 
 
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
