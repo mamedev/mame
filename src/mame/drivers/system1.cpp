@@ -5522,7 +5522,7 @@ GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, i
 GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "hack (Vision Electronics)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nob,        0,        nobm,              nob,       system1_state, init_nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, init_nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 
