@@ -262,14 +262,14 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, bus_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portc_w))
 
-	MCFG_DEVICE_ADD("upd8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, m_upd8251, 0);
+	m_upd8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_upd8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_upd8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	/* XXX RxD data are accessible via PPI port C, bit 7 */
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, mc1502_state, mc1502_i8251_syndet))
+	m_upd8251->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir7_w)); /* default handler does nothing */
+	m_upd8251->txrdy_handler().set("pic8259", FUNC(pic8259_device::ir7_w));
+	m_upd8251->syndet_handler().set(FUNC(mc1502_state::mc1502_i8251_syndet));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251", i8251_device, write_rxd))

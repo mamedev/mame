@@ -1013,11 +1013,11 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
-	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//  MCFG_I8251_TXEMPTY_HANDLER(WRITELINE("pic",pic8259_device,ir4_w))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("keyboard", rs232_port_device, write_txd))
+	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
+//  m_viduart->txempty_handler().set("pic", FUNC(pic8259_device::ir4_w));
+	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "ngen")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("videouart", i8251_device, write_rxd))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_viduart, i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen_state,timer_clk_out))
@@ -1124,11 +1124,11 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
-	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//  MCFG_I8251_TXEMPTY_HANDLER(WRITELINE("pic",pic8259_device,ir4_w))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("keyboard", rs232_port_device, write_txd))
+	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
+//  m_viduart->txempty_handler().set("pic", FUNC(pic8259_device::ir4_w));
+	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "ngen")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("videouart", i8251_device, write_rxd))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_viduart, i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen386_state,timer_clk_out))

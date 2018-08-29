@@ -775,12 +775,12 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	i8155_io.out_pc_callback().set(FUNC(vixen_state::io_i8155_pc_w));
 	i8155_io.out_to_callback().set(FUNC(vixen_state::io_i8155_to_w));
 
-	MCFG_DEVICE_ADD(P8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vixen_state, rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vixen_state, txrdy_w))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_usart->rxrdy_handler().set(FUNC(vixen_state::rxrdy_w));
+	m_usart->txrdy_handler().set(FUNC(vixen_state::txrdy_w));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_rxd))

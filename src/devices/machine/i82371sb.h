@@ -24,18 +24,12 @@
 #include "machine/am9517a.h"
 
 
-#define MCFG_I82371SB_SMI_CB(_devcb) \
-	downcast<i82371sb_isa_device &>(*device).set_smi_callback(DEVCB_##_devcb);
-
-#define MCFG_I82371SB_BOOT_STATE_HOOK(_devcb) \
-	downcast<i82371sb_isa_device &>(*device).set_boot_state_hook(DEVCB_##_devcb);
-
 class i82371sb_isa_device : public pci_device {
 public:
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_smi_callback(Object &&cb) { return m_smi_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_boot_state_hook(Object &&cb) { return m_boot_state_hook.set_callback(std::forward<Object>(cb)); }
+	auto smi() { return m_smi_callback.bind(); }
+	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(pc_pirqa_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_pirqb_w);
@@ -207,22 +201,13 @@ private:
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
 
-#define MCFG_I82371SB_IDE_IRQ_PRI_CB(_devcb) \
-	downcast<i82371sb_ide_device &>(*device).set_irq_pri_callback(DEVCB_##_devcb);
-
-#define MCFG_I82371SB_IDE_IRQ_SEC_CB(_devcb) \
-	downcast<i82371sb_ide_device &>(*device).set_irq_sec_callback(DEVCB_##_devcb);
-
-#define MCFG_I82371SB_IDE_INTERRUPTS(_tag, _dev, _irq_pri, _irq_sec) \
-	MCFG_I82371SB_IDE_IRQ_PRI_CB(WRITELINE(_tag, _dev, _irq_pri)) \
-	MCFG_I82371SB_IDE_IRQ_SEC_CB(WRITELINE(_tag, _dev, _irq_sec))
 
 class i82371sb_ide_device : public pci_device {
 public:
 	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_pri_callback(Object &&cb) { return m_irq_pri_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq_sec_callback(Object &&cb) { return m_irq_sec_callback.set_callback(std::forward<Object>(cb)); }
+	auto irq_pri() { return m_irq_pri_callback.bind(); }
+	auto irq_sec() { return m_irq_sec_callback.bind(); }
 
 protected:
 	virtual void device_start() override;

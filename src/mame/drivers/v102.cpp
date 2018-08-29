@@ -96,8 +96,8 @@ MACHINE_CONFIG_START(v102_state::v102)
 	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", XTAL(18'575'000) / 5)); // divider not verified
 	mpsc.out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	i8251_device &usart(I8251(config, "usart", XTAL(18'575'000) / 5)); // divider not verified
+	usart.rxrdy_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))

@@ -447,12 +447,12 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* i8251 */
-	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'000'000) / 9)
+	I8251(config, "usart", XTAL(18'000'000) / 9);
 	/*
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
+	usart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	usart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	usart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	usart.rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))

@@ -415,8 +415,7 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
 	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x100)
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

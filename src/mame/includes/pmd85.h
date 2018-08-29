@@ -53,7 +53,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void pmd85(machine_config &config);
+	void pmd85(machine_config &config, bool with_uart = true);
 	void pmd851(machine_config &config);
 	void pmd853(machine_config &config);
 	void pmd852a(machine_config &config);

@@ -1143,11 +1143,11 @@ MACHINE_CONFIG_START(twinkle_state::twinklex)
 	MCFG_X76F041_ADD( "security" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(twinkle_state::twinklei)
+void twinkle_state::twinklei(machine_config &config)
+{
 	twinkle(config);
-	MCFG_I2CMEM_ADD( "security" )
-	MCFG_I2CMEM_DATA_SIZE( 0x100 )
-MACHINE_CONFIG_END
+	I2CMEM(config, "security", 0).set_data_size(0x100);
+}
 
 static INPUT_PORTS_START( twinkle )
 

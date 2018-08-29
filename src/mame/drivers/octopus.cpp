@@ -947,10 +947,10 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	m_rtc->irq_callback().set(m_pic2, FUNC(pic8259_device::ir2_w));
 
 	// Keyboard UART
-	MCFG_DEVICE_ADD("keyboard", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_slave",pic8259_device, ir4_w))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, octopus_state,spk_w))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, octopus_state,beep_w))
+	I8251(config, m_kb_uart, 0);
+	m_kb_uart->rxrdy_handler().set("pic_slave", FUNC(pic8259_device::ir4_w));
+	m_kb_uart->dtr_handler().set(FUNC(octopus_state::spk_w));
+	m_kb_uart->rts_handler().set(FUNC(octopus_state::beep_w));
 	MCFG_DEVICE_ADD("keyboard_port", RS232_PORT, keyboard, "octopus")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("keyboard", i8251_device, write_rxd))
 	MCFG_DEVICE_ADD("keyboard_clock_rx", CLOCK, 9600 * 64)

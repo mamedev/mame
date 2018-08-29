@@ -168,12 +168,12 @@ MACHINE_CONFIG_START(mice_state::mice)
 	MCFG_DEVICE_PROGRAM_MAP(mice_mem)
 	MCFG_DEVICE_IO_MAP(mice_io)
 
-	MCFG_DEVICE_ADD("uart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
+	i8251_device &uart(I8251(config, "uart", 6.144_MHz_XTAL / 2));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.txrdy_handler().set_inputline("maincpu", I8085_RST65_LINE);
+	uart.rxrdy_handler().set_inputline("maincpu", I8085_RST75_LINE);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))

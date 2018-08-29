@@ -400,8 +400,8 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("usart", I8251, 10_MHz_XTAL / 4) // same as CPU clock
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	i8251_device &usart(I8251(config, "usart", 10_MHz_XTAL / 4)); // same as CPU clock
+	usart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))

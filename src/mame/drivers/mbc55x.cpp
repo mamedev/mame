@@ -266,8 +266,8 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	/* Devices */
-	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir3_w))
+	I8251(config, m_kb_uart, 0);
+	m_kb_uart->rxrdy_handler().set(PIC8259_TAG, FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIT_C0_CLOCK)

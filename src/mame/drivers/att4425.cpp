@@ -286,10 +286,10 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_DEVICE_ADD("line_clock", CLOCK, 9600*64)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_line_clock))
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, m_i8251, 0);
+	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_i8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))

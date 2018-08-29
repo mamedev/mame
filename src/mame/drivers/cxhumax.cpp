@@ -1061,8 +1061,7 @@ MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 
 
 	MCFG_INTEL_28F320J3D_ADD("flash")
-	MCFG_I2CMEM_ADD("eeprom")
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
+	I2CMEM(config, "eeprom", 0).set_data_size(0x2000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

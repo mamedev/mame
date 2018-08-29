@@ -344,17 +344,17 @@ MACHINE_CONFIG_START(isbc_state::isbc86)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir6_w))
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart8251->rxrdy_handler().set("pic_0", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8251, i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8251, i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart8251, i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
 MACHINE_CONFIG_END
 
@@ -377,12 +377,12 @@ MACHINE_CONFIG_START(isbc_state::rpc86)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir6_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir7_w))
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart8251->rxrdy_handler().set("pic_0", FUNC(pic8259_device::ir6_w));
+	m_uart8251->txrdy_handler().set("pic_0", FUNC(pic8259_device::ir7_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")

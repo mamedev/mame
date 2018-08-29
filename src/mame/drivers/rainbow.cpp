@@ -3333,11 +3333,11 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_DEVICE_MODIFY("printer")
 	MCFG_SLOT_DEFAULT_OPTION("printer")
 
-	MCFG_DEVICE_ADD("kbdser", I8251, 24.0734_MHz_XTAL / 5 / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, rainbow_state, kbd_tx))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, rainbow_state, irq_hi_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_rxready_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_txready_w))
+	I8251(config, m_kbd8251, 24.0734_MHz_XTAL / 5 / 2);
+	m_kbd8251->txd_handler().set(FUNC(rainbow_state::kbd_tx));
+	m_kbd8251->dtr_handler().set(FUNC(rainbow_state::irq_hi_w));
+	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_state::kbd_rxready_w));
+	m_kbd8251->txrdy_handler().set(FUNC(rainbow_state::kbd_txready_w));
 
 	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))

@@ -1406,7 +1406,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, m_uart, 0);
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, nc_state, write_uart_clock))
@@ -1441,9 +1441,8 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc100_state, write_nc100_centronics_ack))
 
 	/* uart */
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, nc100_state, nc100_rxrdy_callback))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc100_state, nc100_txrdy_callback))
+	m_uart->rxrdy_handler().set(FUNC(nc100_state::nc100_rxrdy_callback));
+	m_uart->txrdy_handler().set(FUNC(nc100_state::nc100_txrdy_callback));
 
 	/* rtc */
 	MCFG_DEVICE_ADD("rtc", TC8521, 32.768_kHz_XTAL)
@@ -1482,9 +1481,8 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc200_state, write_nc200_centronics_ack))
 
 	/* uart */
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, nc200_state, nc200_rxrdy_callback))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc200_state, nc200_txrdy_callback))
+	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
+	m_uart->txrdy_handler().set(FUNC(nc200_state::nc200_txrdy_callback));
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, nc200_state, nc200_fdc_interrupt))

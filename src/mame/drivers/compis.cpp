@@ -761,11 +761,11 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(DEVICE_SELF, compis_state, tmr1_w))
 
 	// devices
-	MCFG_DEVICE_ADD(I80130_TAG, I80130, 15.36_MHz_XTAL/2)
-	MCFG_I80130_IRQ_CALLBACK(WRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
-	MCFG_I80130_SYSTICK_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir3_w))
-	MCFG_I80130_DELAY_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir7_w))
-	MCFG_I80130_BAUD_CALLBACK(WRITELINE(*this, compis_state, tmr2_w))
+	I80130(config, m_osp, 15.36_MHz_XTAL/2);
+	m_osp->irq().set(I80186_TAG, FUNC(i80186_cpu_device::int0_w));
+	m_osp->systick().set(I80130_TAG, FUNC(i80130_device::ir3_w));
+	m_osp->delay().set(I80130_TAG, FUNC(i80130_device::ir7_w));
+	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(15.36_MHz_XTAL/8)
@@ -779,10 +779,10 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, compis_state, ppi_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, compis_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(COMPIS_KEYBOARD_TAG, compis_keyboard_device, si_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(I80130_TAG, i80130_device, ir2_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(COMPIS_KEYBOARD_TAG, FUNC(compis_keyboard_device::si_w));
+	m_uart->rxrdy_handler().set(I80130_TAG, FUNC(i80130_device::ir2_w));
+	m_uart->txrdy_handler().set(I80186_TAG, FUNC(i80186_cpu_device::int1_w));
 
 	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
 	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))

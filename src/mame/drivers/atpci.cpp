@@ -54,10 +54,9 @@ void at586_state::tx_config(device_t *device)
 
 void at586_state::sb_config(device_t *device)
 {
-	devcb_base *devcb = nullptr;
-	(void)devcb;
-	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(":", at586_state, boot_state_w))
-	MCFG_I82371SB_SMI_CB(INPUTLINE(":maincpu", INPUT_LINE_SMI))
+	i82371sb_device &sb = *downcast<i82371sb_device *>(device);
+	sb.boot_state_hook().set(":", FUNC(at586_state::boot_state_w));
+	sb.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 }
 
 

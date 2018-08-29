@@ -821,14 +821,14 @@ MACHINE_CONFIG_START(m20_state::m20)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 
-	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir4_w))
+	I8251(config, m_kbdi8251, 0);
+	m_kbdi8251->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
+	m_kbdi8251->rxrdy_handler().set("i8259", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("i8251_2", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir3_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("i8259", pic8259_device, ir5_w))
+	I8251(config, m_ttyi8251, 0);
+	m_ttyi8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_ttyi8251->rxrdy_handler().set("i8259", FUNC(pic8259_device::ir3_w));
+	m_ttyi8251->txrdy_handler().set("i8259", FUNC(pic8259_device::ir5_w));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1230782)

@@ -493,8 +493,8 @@ MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	m_pit->set_clk<1>(4_MHz_XTAL / 2);
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
-	MCFG_DEVICE_ADD("usart", I8251, 0) // U8
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	I8251(config, m_usart, 0); // U8
+	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))

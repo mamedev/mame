@@ -418,7 +418,9 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, othello_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 
-	MCFG_I8243_ADD(m_i8243, CONSTANT(0), WRITE8(*this, othello_state, n7751_rom_control_w))
+	I8243(config, m_i8243);
+	m_i8243->read_handler().set_constant(0);
+	m_i8243->write_handler().set(FUNC(othello_state::n7751_rom_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

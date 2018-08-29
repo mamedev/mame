@@ -508,11 +508,14 @@ MACHINE_CONFIG_START(pcipc_state::pcipc)
 
 	MCFG_DEVICE_ADD(      ":pci",      PCI_ROOT, 0)
 	MCFG_DEVICE_ADD(      ":pci:00.0", I82439HX, 0, "maincpu", 256*1024*1024)
-	MCFG_DEVICE_ADD(      ":pci:07.0", I82371SB_ISA, 0)
-	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(*this, pcipc_state, boot_state_phoenix_ver40_rev6_w))
-	MCFG_I82371SB_SMI_CB(INPUTLINE(":maincpu", INPUT_LINE_SMI))
-	MCFG_DEVICE_ADD(      ":pci:07.1", I82371SB_IDE, 0)
-	MCFG_I82371SB_IDE_INTERRUPTS(":pci:07.0", i82371sb_isa_device, pc_irq14_w, pc_irq15_w)
+
+	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
+	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_phoenix_ver40_rev6_w));
+	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
+
+	i82371sb_ide_device &ide(I82371SB_IDE(config, ":pci:07.1", 0));
+	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
+	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq15_w));
 //  MCFG_DEVICE_ADD(      ":pci:12.0", MGA2064W, 0)
 
 	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true)
@@ -542,8 +545,9 @@ MACHINE_CONFIG_START(pcipc_state::pcipctx)
 
 	MCFG_DEVICE_ADD(      ":pci",      PCI_ROOT, 0)
 	MCFG_DEVICE_ADD(      ":pci:00.0", I82439TX, 0, ":maincpu", 256*1024*1024)
-	MCFG_DEVICE_ADD(      ":pci:07.0", I82371SB_ISA, 0)
-	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(*this, pcipc_state, boot_state_award_w))
+
+	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
+	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  MCFG_DEVICE_ADD(      ":pci:07.1", IDE_PCI, 0, 0x80867010, 0x03, 0x00000000)
 	MCFG_DEVICE_ADD(      ":pci:12.0", MGA2064W, 0)
 MACHINE_CONFIG_END

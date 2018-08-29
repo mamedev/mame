@@ -233,17 +233,17 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("i8251line", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	I8251(config, m_rs232, 0);
+	m_rs232->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_rs232->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
+	m_rs232->txrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD("i8251lan", I8251, 0)
+	I8251(config, m_lan, 0);
 
 	MCFG_DEVICE_ADD("wd1793", FD1793, 20_MHz_XTAL / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259", pic8259_device, ir7_w))
