@@ -302,7 +302,7 @@ public:
 
 	void init_luckybal();
 	void init_luckybala();
-	void init_luckybalc();
+	void init_luckybald();
 
 private:
 	DECLARE_WRITE8_MEMBER(z180_trdr_w);
@@ -689,7 +689,7 @@ void luckybal_state::init_luckybala()
 	membank("bank1")->configure_entries(0, 0x40, &rom[0x10000], 0x2000);
 }
 
-void luckybal_state::init_luckybalc()
+void luckybal_state::init_luckybald()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -726,5 +726,5 @@ GAMEL( 1999, luckybal,  0,        luckybal, luckybal, luckybal_state, init_lucky
 GAMEL( 1996, luckybala, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
 GAMEL( 1996, luckybalb, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 626)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
 GAMEL( 1996, luckybalc, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 623)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
-GAMEL( 1996, luckybald, luckybal, luckybal, luckybal, luckybal_state, init_luckybalc, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
+GAMEL( 1996, luckybald, luckybal, luckybal, luckybal, luckybal_state, init_luckybald, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
 GAMEL( 1996, luckybale, luckybal, luckybal, luckybal, luckybal_state, init_luckybal,  ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.01)"      , MACHINE_SUPPORTS_SAVE, layout_luckybal)
