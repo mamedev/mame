@@ -439,7 +439,7 @@ class avt_state : public driver_device
 public:
 	avt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this,"maincpu")
+		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_pio0(*this, "pio0")
 		, m_pio1(*this, "pio1")
@@ -470,7 +470,7 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;
@@ -963,10 +963,10 @@ WRITE_LINE_MEMBER( avt_state::avtbingo_w )
 
 MACHINE_CONFIG_START(avt_state::avt)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(avt_map)
-	MCFG_DEVICE_IO_MAP(avt_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK); /* guess */
+	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &avt_state::avt_map);
+	m_maincpu->set_addrmap(AS_IO, &avt_state::avt_portmap);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

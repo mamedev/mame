@@ -358,11 +358,11 @@ void mpf1_state::machine_reset()
 MACHINE_CONFIG_START(mpf1_state::mpf1)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
-	MCFG_DEVICE_PROGRAM_MAP(mpf1_map)
-	MCFG_DEVICE_OPCODES_MAP(mpf1_step)
-	MCFG_DEVICE_IO_MAP(mpf1_io_map)
-	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
+	Z80(config, m_maincpu, XTAL(3'579'545)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mpf1_state::mpf1_step);
+	m_maincpu->set_addrmap(AS_IO, &mpf1_state::mpf1_io_map);
+	m_maincpu->set_daisy_config(mpf1_daisy_chain);
 
 	/* devices */
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(3'579'545)/2));
@@ -392,11 +392,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
-	MCFG_DEVICE_PROGRAM_MAP(mpf1b_map)
-	MCFG_DEVICE_OPCODES_MAP(mpf1_step)
-	MCFG_DEVICE_IO_MAP(mpf1b_io_map)
-	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
+	Z80(config, m_maincpu, XTAL(3'579'545)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1b_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mpf1_state::mpf1_step);
+	m_maincpu->set_addrmap(AS_IO, &mpf1_state::mpf1b_io_map);
+	m_maincpu->set_daisy_config(mpf1_daisy_chain);
 
 	/* devices */
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(3'579'545)/2));
@@ -429,11 +429,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(mpf1p_map)
-	MCFG_DEVICE_OPCODES_MAP(mpf1_step)
-	MCFG_DEVICE_IO_MAP(mpf1p_io_map)
-	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1p_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mpf1_state::mpf1_step);
+	m_maincpu->set_addrmap(AS_IO, &mpf1_state::mpf1p_io_map);
+	m_maincpu->set_daisy_config(mpf1_daisy_chain);
 
 	/* video hardware */
 	config.set_default_layout(layout_mpf1p);

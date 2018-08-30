@@ -116,7 +116,6 @@
 #include "emu.h"
 #include "includes/astrocde.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
@@ -1513,10 +1512,10 @@ MACHINE_CONFIG_START(tenpindx_state::tenpindx)
 	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
 	MCFG_DEVICE_IO_MAP(port_map_16col_pattern_tenpindx)
 
-	MCFG_DEVICE_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
-	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(sub_io_map)
+	Z80(config, m_subcpu, ASTROCADE_CLOCK/4); /* real clock unknown */
+	m_subcpu->set_daisy_config(tenpin_daisy_chain);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tenpindx_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &tenpindx_state::sub_io_map);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, ASTROCADE_CLOCK/4 /* same as "sub" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))

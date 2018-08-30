@@ -191,10 +191,10 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 
 
 MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(zsu_map)
-	MCFG_DEVICE_IO_MAP(zsu_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	z80_device& soundcpu(Z80(config, "soundcpu", 4000000));
+	soundcpu.set_addrmap(AS_PROGRAM, &efo_zsu_device::zsu_map);
+	soundcpu.set_addrmap(AS_IO, &efo_zsu_device::zsu_io);
+	soundcpu.set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, 4000000)
 	MCFG_Z80CTC_INTR_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))

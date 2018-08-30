@@ -129,7 +129,6 @@ playing the automaton. Bits 0-2 of PORTB control the organ.
 #include "emu.h"
 #include "includes/polyplay.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 
 #include "screen.h"
@@ -279,11 +278,11 @@ GFXDECODE_END
 /* the machine driver */
 MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80CPU_TAG, Z80, POLYPLAY_MAIN_CLOCK / 4) /* UB880D */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_zre)
-	MCFG_DEVICE_PROGRAM_MAP(polyplay_mem_zre)
-	MCFG_DEVICE_IO_MAP(polyplay_io_zre)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(polyplay_state, nmi_handler, 100) /* A302 - zero cross detection from AC (50Hz) */
+	Z80(config, m_maincpu, POLYPLAY_MAIN_CLOCK / 4); /* UB880D */
+	m_maincpu->set_daisy_config(daisy_chain_zre);
+	m_maincpu->set_addrmap(AS_PROGRAM, &polyplay_state::polyplay_mem_zre);
+	m_maincpu->set_addrmap(AS_IO, &polyplay_state::polyplay_io_zre);
+	m_maincpu->set_periodic_int(FUNC(polyplay_state::nmi_handler), attotime::from_hz(100)); /* A302 - zero cross detection from AC (50Hz) */
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, POLYPLAY_MAIN_CLOCK / 4) /* UB857D */
@@ -319,19 +318,19 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(polyplay_state::polyplay_zrepp)
+void polyplay_state::polyplay_zrepp(machine_config &config)
+{
 	polyplay_zre(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY(Z80CPU_TAG) /* UB880D */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_zrepp)
-	MCFG_DEVICE_PROGRAM_MAP(polyplay_mem_zrepp)
-	MCFG_DEVICE_IO_MAP(polyplay_io_zrepp)
+	m_maincpu->set_daisy_config(daisy_chain_zrepp);
+	m_maincpu->set_addrmap(AS_PROGRAM, &polyplay_state::polyplay_mem_zrepp);
+	m_maincpu->set_addrmap(AS_IO, &polyplay_state::polyplay_io_zrepp);
 
 	/* devices */
 	Z80SIO(config, m_z80sio, POLYPLAY_MAIN_CLOCK / 4); /* UB8560D */
 	m_z80sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-MACHINE_CONFIG_END
+}
 
 
 /* ROM loading and mapping */

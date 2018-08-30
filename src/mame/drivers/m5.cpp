@@ -277,7 +277,6 @@ Few other notes:
 #include "emu.h"
 #include "includes/m5.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
@@ -1407,10 +1406,10 @@ void brno_state::machine_reset()
 
 MACHINE_CONFIG_START(m5_state::m5)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 14.318181_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(m5_mem)
-	MCFG_DEVICE_IO_MAP(m5_io)
-	MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m5_state::m5_mem);
+	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
+	m_maincpu->set_daisy_config(m5_daisy_chain);
 
 	MCFG_DEVICE_ADD(Z80_FD5_TAG, Z80, 14.318181_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
@@ -1503,10 +1502,8 @@ MACHINE_CONFIG_START(brno_state::brno)
 	m5(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(m5_mem_brno)
-	MCFG_DEVICE_IO_MAP(brno_io)
-//  MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
+	m_maincpu->set_addrmap(AS_PROGRAM, &brno_state::m5_mem_brno);
+	m_maincpu->set_addrmap(AS_IO, &brno_state::brno_io);
 
 
 	//remove devices used for fd5 floppy

@@ -565,13 +565,13 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bigbord2_state, clock_w))
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, bigbord2_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, bigbord2_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, bigbord2_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, bigbord2_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, bigbord2_state, io_write_byte))
+	Z80DMA(config, m_dma, MAIN_CLOCK);
+	m_dma->out_busreq_callback().set(FUNC(bigbord2_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set(FUNC(bigbord2_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(bigbord2_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(bigbord2_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(bigbord2_state::io_write_byte));
 
 	Z80SIO(config, m_sio, MAIN_CLOCK);
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

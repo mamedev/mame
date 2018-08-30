@@ -286,10 +286,10 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 MACHINE_CONFIG_START(mtx_state::mtx512)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mtx_mem)
-	MCFG_DEVICE_IO_MAP(mtx_io)
-	MCFG_Z80_DAISY_CHAIN(mtx_daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtx_state::mtx_mem);
+	m_maincpu->set_addrmap(AS_IO, &mtx_state::mtx_io);
+	m_maincpu->set_daisy_config(mtx_daisy_chain);
 
 	MCFG_MACHINE_START_OVERRIDE(mtx_state,mtx512)
 	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
@@ -360,13 +360,13 @@ void mtx_state::mtx500(machine_config &config)
     MACHINE_CONFIG_START( rs128 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(mtx_state::rs128)
+void mtx_state::rs128(machine_config &config)
+{
 	mtx512(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_IO_MAP(rs128_io)
-	MCFG_Z80_DAISY_CHAIN(rs128_daisy_chain)
+	m_maincpu->set_addrmap(AS_IO, &mtx_state::rs128_io);
+	m_maincpu->set_daisy_config(rs128_daisy_chain);
 
 	/* devices */
 	Z80DART(config, m_z80dart, XTAL(4'000'000));
@@ -374,7 +374,7 @@ MACHINE_CONFIG_START(mtx_state::rs128)
 
 	/* internal ram */
 	m_ram->set_default_size("128K").set_extra_options("192K,320K,448K,512K");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
     ROMS

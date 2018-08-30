@@ -19,9 +19,9 @@ DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "Toshiba TMPZ84C
 
 void tmpz84c015_device::tmpz84c015_internal_io_map(address_map &map)
 {
-	map(0x10, 0x13).mirror(0xff00).rw("tmpz84c015_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x18, 0x1b).mirror(0xff00).rw("tmpz84c015_sio", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x1c, 0x1f).mirror(0xff00).rw("tmpz84c015_pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x10, 0x13).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x18, 0x1b).mirror(0xff00).rw(m_sio, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x1c, 0x1f).mirror(0xff00).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xf4, 0xf4).mirror(0xff00).w(FUNC(tmpz84c015_device::irq_priority_w));
 }
 
@@ -180,25 +180,25 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 MACHINE_CONFIG_START(tmpz84c015_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("tmpz84c015_sio", Z80SIO0, DERIVED_CLOCK(1,1))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
+	Z80SIO0(config, m_sio, DERIVED_CLOCK(1,1));
+	m_sio->out_int_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ0);
 
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, tmpz84c015_device, out_txda_cb_trampoline_w))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(*this, tmpz84c015_device, out_dtra_cb_trampoline_w))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(*this, tmpz84c015_device, out_rtsa_cb_trampoline_w))
-	MCFG_Z80DART_OUT_WRDYA_CB(WRITELINE(*this, tmpz84c015_device, out_wrdya_cb_trampoline_w))
-	MCFG_Z80DART_OUT_SYNCA_CB(WRITELINE(*this, tmpz84c015_device, out_synca_cb_trampoline_w))
+	m_sio->out_txda_callback().set(FUNC(tmpz84c015_device::out_txda_cb_trampoline_w));
+	m_sio->out_dtra_callback().set(FUNC(tmpz84c015_device::out_dtra_cb_trampoline_w));
+	m_sio->out_rtsa_callback().set(FUNC(tmpz84c015_device::out_rtsa_cb_trampoline_w));
+	m_sio->out_wrdya_callback().set(FUNC(tmpz84c015_device::out_wrdya_cb_trampoline_w));
+	m_sio->out_synca_callback().set(FUNC(tmpz84c015_device::out_synca_cb_trampoline_w));
 
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(*this, tmpz84c015_device, out_txdb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, tmpz84c015_device, out_dtrb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(*this, tmpz84c015_device, out_rtsb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_WRDYB_CB(WRITELINE(*this, tmpz84c015_device, out_wrdyb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_SYNCB_CB(WRITELINE(*this, tmpz84c015_device, out_syncb_cb_trampoline_w))
+	m_sio->out_txdb_callback().set(FUNC(tmpz84c015_device::out_txdb_cb_trampoline_w));
+	m_sio->out_dtrb_callback().set(FUNC(tmpz84c015_device::out_dtrb_cb_trampoline_w));
+	m_sio->out_rtsb_callback().set(FUNC(tmpz84c015_device::out_rtsb_cb_trampoline_w));
+	m_sio->out_wrdyb_callback().set(FUNC(tmpz84c015_device::out_wrdyb_cb_trampoline_w));
+	m_sio->out_syncb_callback().set(FUNC(tmpz84c015_device::out_syncb_cb_trampoline_w));
 
-	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(*this, tmpz84c015_device, out_rxdrqa_cb_trampoline_w))
-	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(*this, tmpz84c015_device, out_txdrqa_cb_trampoline_w))
-	MCFG_Z80DART_OUT_RXDRQB_CB(WRITELINE(*this, tmpz84c015_device, out_rxdrqb_cb_trampoline_w))
-	MCFG_Z80DART_OUT_TXDRQB_CB(WRITELINE(*this, tmpz84c015_device, out_txdrqb_cb_trampoline_w))
+	m_sio->out_rxdrqa_callback().set(FUNC(tmpz84c015_device::out_rxdrqa_cb_trampoline_w));
+	m_sio->out_txdrqa_callback().set(FUNC(tmpz84c015_device::out_txdrqa_cb_trampoline_w));
+	m_sio->out_rxdrqb_callback().set(FUNC(tmpz84c015_device::out_rxdrqb_cb_trampoline_w));
+	m_sio->out_txdrqb_callback().set(FUNC(tmpz84c015_device::out_txdrqb_cb_trampoline_w));
 
 	MCFG_DEVICE_ADD("tmpz84c015_ctc", Z80CTC, DERIVED_CLOCK(1,1) )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))

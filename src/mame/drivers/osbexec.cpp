@@ -54,7 +54,7 @@ public:
 	void init_osbexec();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mb8877_device>  m_mb8877;
 	required_device<ram_device> m_messram;
@@ -528,10 +528,10 @@ static const z80_daisy_config osbexec_daisy_config[] =
 
 
 MACHINE_CONFIG_START(osbexec_state::osbexec)
-	MCFG_DEVICE_ADD(m_maincpu, Z80, MAIN_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(osbexec_mem)
-	MCFG_DEVICE_IO_MAP(osbexec_io)
-	MCFG_Z80_DAISY_CHAIN(osbexec_daisy_config)
+	Z80(config, m_maincpu, MAIN_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &osbexec_state::osbexec_mem);
+	m_maincpu->set_addrmap(AS_IO, &osbexec_state::osbexec_io);
+	m_maincpu->set_daisy_config(osbexec_daisy_config);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());

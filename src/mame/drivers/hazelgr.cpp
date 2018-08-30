@@ -28,7 +28,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 };
 
 
@@ -74,10 +74,10 @@ static const z80_daisy_config daisy_chain[] =
 // All frequencies are guesswork, in an effort to get something to happen
 MACHINE_CONFIG_START(haze_state::haze)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,2000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 2000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &haze_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &haze_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1'000'000));
 	ctc_clock.signal_handler().set("ctc1", FUNC(z80ctc_device::trg3));

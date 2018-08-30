@@ -50,7 +50,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<cpu_device> m_audiocpu;
+	required_device<z80_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
 	required_region_ptr<uint8_t> m_audiocpu_rom;
 	required_memory_bank m_sounddata_bank;

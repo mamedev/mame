@@ -54,7 +54,7 @@ public:
 private:
 	uint8_t m_port08;
 	uint8_t m_port09;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
 	required_device<z80pio_device> m_pio3;
@@ -160,10 +160,10 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 MACHINE_CONFIG_START(brandt8641_state::brandt8641)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) // U4 ,4MHz crystal on board
-	MCFG_DEVICE_PROGRAM_MAP(brandt8641_mem)
-	MCFG_DEVICE_IO_MAP(brandt8641_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // U4 ,4MHz crystal on board
+	m_maincpu->set_addrmap(AS_PROGRAM, &brandt8641_state::brandt8641_mem);
+	m_maincpu->set_addrmap(AS_IO, &brandt8641_state::brandt8641_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

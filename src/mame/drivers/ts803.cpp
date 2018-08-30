@@ -98,7 +98,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -422,10 +422,10 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(ts803_state::ts803)
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ts803_mem)
-	MCFG_DEVICE_IO_MAP(ts803_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ts803_state::ts803_mem);
+	m_maincpu->set_addrmap(AS_IO, &ts803_state::ts803_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -454,9 +454,9 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	sti.out_tbo_cb().set("dart", FUNC(z80dart_device::rxtxcb_w));
 	sti.out_int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	z80dart_device& dart(Z80DART(config, "dart", 16_MHz_XTAL / 4));
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))

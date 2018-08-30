@@ -240,10 +240,10 @@ static const z80_daisy_config att4425_daisy_chain[] =
 
 MACHINE_CONFIG_START(att4425_state::att4425)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(32'000'000)/8) // XXX
-	MCFG_DEVICE_PROGRAM_MAP(att4425_mem)
-	MCFG_DEVICE_IO_MAP(att4425_io)
-	MCFG_Z80_DAISY_CHAIN(att4425_daisy_chain)
+	Z80(config, m_maincpu, XTAL(32'000'000)/8); // XXX
+	m_maincpu->set_addrmap(AS_PROGRAM, &att4425_state::att4425_mem);
+	m_maincpu->set_addrmap(AS_IO, &att4425_state::att4425_io);
+	m_maincpu->set_daisy_config(att4425_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

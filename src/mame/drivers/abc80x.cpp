@@ -1054,9 +1054,9 @@ QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
 
 MACHINE_CONFIG_START(abc800_state::common)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
-	MCFG_DEVICE_OPCODES_MAP(abc800_m1)
+	Z80(config, m_maincpu, ABC800_X01/2/2);
+	m_maincpu->set_daisy_config(abc800_daisy_chain);
+	m_maincpu->set_addrmap(AS_OPCODES, &abc800_state::abc800_m1);
 
 	// peripheral hardware
 	Z80CTC(config, m_ctc, ABC800_X01/2/2);
@@ -1126,9 +1126,8 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	common(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(abc800c_mem)
-	MCFG_DEVICE_IO_MAP(abc800c_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc800c_state::abc800c_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc800c_state::abc800c_io);
 
 	// video hardware
 	abc800c_video(config);
@@ -1154,9 +1153,8 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	common(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(abc800m_mem)
-	MCFG_DEVICE_IO_MAP(abc800m_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc800m_state::abc800m_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc800m_state::abc800m_io);
 
 	// video hardware
 	abc800m_video(config);
@@ -1182,9 +1180,8 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	common(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(abc802_mem)
-	MCFG_DEVICE_IO_MAP(abc802_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc802_state::abc802_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc802_state::abc802_io);
 
 	// video hardware
 	abc802_video(config);
@@ -1212,9 +1209,8 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	common(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(abc806_mem)
-	MCFG_DEVICE_IO_MAP(abc806_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc806_state::abc806_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc806_state::abc806_io);
 
 	// video hardware
 	abc806_video(config);

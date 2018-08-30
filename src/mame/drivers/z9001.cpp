@@ -74,7 +74,7 @@ private:
 	bool m_cassbit;
 	virtual void machine_reset() override;
 	//virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_colorram;
@@ -208,10 +208,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(z9001_state::z9001)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(z9001_mem)
-	MCFG_DEVICE_IO_MAP(z9001_io)
-	MCFG_Z80_DAISY_CHAIN(z9001_daisy_chain)
+	Z80(config, m_maincpu, XTAL(9'830'400) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z9001_state::z9001_mem);
+	m_maincpu->set_addrmap(AS_IO, &z9001_state::z9001_io);
+	m_maincpu->set_daisy_config(z9001_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -202,10 +202,10 @@ GFXDECODE_END
 /* Machine driver */
 MACHINE_CONFIG_START(llc_state::llc1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'000'000))
-	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(llc1_mem)
-	MCFG_DEVICE_IO_MAP(llc1_io)
+	Z80(config, m_maincpu, XTAL(3'000'000));
+	m_maincpu->set_daisy_config(llc1_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &llc_state::llc1_mem);
+	m_maincpu->set_addrmap(AS_IO, &llc_state::llc1_io);
 
 	MCFG_MACHINE_START_OVERRIDE(llc_state, llc1 )
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc1 )
@@ -246,10 +246,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(llc_state::llc2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'000'000))
-	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(llc2_mem)
-	MCFG_DEVICE_IO_MAP(llc2_io)
+	Z80(config, m_maincpu, XTAL(3'000'000));
+	m_maincpu->set_daisy_config(llc2_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &llc_state::llc2_mem);
+	m_maincpu->set_addrmap(AS_IO, &llc_state::llc2_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc2 )
 

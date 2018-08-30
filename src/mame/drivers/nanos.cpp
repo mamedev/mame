@@ -78,7 +78,7 @@ private:
 	uint8_t m_key_pressed;
 	uint8_t row_number(uint8_t code);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<z80pio_device> m_pio_0;
 	required_device<z80pio_device> m_pio_1;
@@ -467,10 +467,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nanos_state::nanos)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(nanos_daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &nanos_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &nanos_state::io_map);
+	m_maincpu->set_daisy_config(nanos_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

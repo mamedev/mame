@@ -617,10 +617,10 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 
 MACHINE_CONFIG_START(kdt6_state::psi98)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(psi98_mem)
-	MCFG_DEVICE_IO_MAP(psi98_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_cpu, XTAL(16'000'000) / 4);
+	m_cpu->set_addrmap(AS_PROGRAM, &kdt6_state::psi98_mem);
+	m_cpu->set_addrmap(AS_IO, &kdt6_state::psi98_io);
+	m_cpu->set_daisy_config(daisy_chain_intf);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

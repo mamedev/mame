@@ -445,10 +445,10 @@ void super6_state::machine_reset()
 
 MACHINE_CONFIG_START(super6_state::super6)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, Z80, 24_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(super6_mem)
-	MCFG_DEVICE_IO_MAP(super6_io)
-	//MCFG_Z80_DAISY_CHAIN(super6_daisy_chain)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &super6_state::super6_mem);
+	m_maincpu->set_addrmap(AS_IO, &super6_state::super6_io);
+	//m_maincpu->set_daisy_config(super6_daisy_chain);
 
 	// devices
 	MCFG_DEVICE_ADD(m_ctc, Z80CTC, 24_MHz_XTAL / 4)

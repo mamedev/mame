@@ -69,7 +69,7 @@ private:
 	uint8_t convert(offs_t offset, bool state);
 	void setup_banks(uint8_t source);
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80dma_device> m_dma;
 	required_device<fd1797_device> m_fdc;
@@ -410,10 +410,10 @@ void altos5_state::init_altos5()
 
 MACHINE_CONFIG_START(altos5_state::altos5)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &altos5_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &altos5_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 8_MHz_XTAL / 4)); // 2MHz
 	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));

@@ -1081,10 +1081,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mcr3_state::mcrmono)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(mcrmono_map)
-	MCFG_DEVICE_IO_MAP(mcrmono_portmap)
-	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::mcrmono_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
+	m_maincpu->set_daisy_config(mcr_daisy_chain);
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
@@ -1163,9 +1164,8 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spyhunt_map)
-	MCFG_DEVICE_IO_MAP(spyhunt_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::spyhunt_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::spyhunt_portmap);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

@@ -59,7 +59,7 @@ private:
 
 	int m_led1_val;
 	int m_led2_val;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
 
@@ -286,11 +286,10 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 MACHINE_CONFIG_START(rt1715_state::rt1715)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 9.832_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(rt1715_mem)
-	MCFG_DEVICE_IO_MAP(rt1715_io)
-	MCFG_Z80_DAISY_CHAIN(rt1715_daisy_chain)
-
+	Z80(config, m_maincpu, 9.832_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715_mem);
+	m_maincpu->set_addrmap(AS_IO, &rt1715_state::rt1715_io);
+	m_maincpu->set_daisy_config(rt1715_daisy_chain);
 
 	/* keyboard */
 	MCFG_DEVICE_ADD("keyboard", Z80, 683000)

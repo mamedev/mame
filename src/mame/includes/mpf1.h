@@ -49,7 +49,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;

@@ -130,7 +130,7 @@ private:
 	void draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
 	void draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
@@ -923,11 +923,10 @@ static void pasopia7_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pasopia7_mem)
-	MCFG_DEVICE_IO_MAP(pasopia7_io)
-	MCFG_Z80_DAISY_CHAIN(p7_daisy)
-
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pasopia7_state::pasopia7_mem);
+	m_maincpu->set_addrmap(AS_IO, &pasopia7_state::pasopia7_io);
+	m_maincpu->set_daisy_config(p7_daisy);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();

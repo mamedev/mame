@@ -32,7 +32,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -68,10 +68,10 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(qvt103_state::qvt103)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(29'376'000) / 9) // divider guessed
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(29'376'000) / 9); // divider guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &qvt103_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &qvt103_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(29'376'000) / 9)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

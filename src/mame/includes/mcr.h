@@ -206,7 +206,7 @@ private:
 	int m_ipu_sio_txdb;
 	emu_timer *m_ipu_watchdog_timer;
 
-	required_device<cpu_device> m_ipu;
+	required_device<z80_device> m_ipu;
 	required_device<z80dart_device> m_ipu_sio;
 	required_device<z80ctc_device> m_ipu_ctc;
 	required_device<z80pio_device> m_ipu_pio0;

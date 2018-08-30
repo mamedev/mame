@@ -119,7 +119,7 @@ private:
 
 	void einstein_scan_keyboard();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80daisy_generic_device> m_keyboard_daisy;
 	required_device<z80daisy_generic_device> m_adc_daisy;
 	required_device<z80daisy_generic_device> m_fire_daisy;
@@ -579,10 +579,10 @@ static void einstein_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(einstein_state::einstein)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(IC_I001, Z80, XTAL_X002 / 2)
-	MCFG_DEVICE_PROGRAM_MAP(einstein_mem)
-	MCFG_DEVICE_IO_MAP(einstein_io)
-	MCFG_Z80_DAISY_CHAIN(einstein_daisy_chain)
+	Z80(config, m_maincpu, XTAL_X002 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &einstein_state::einstein_mem);
+	m_maincpu->set_addrmap(AS_IO, &einstein_state::einstein_io);
+	m_maincpu->set_daisy_config(einstein_daisy_chain);
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
@@ -608,12 +608,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg2));
 
 	/* Einstein daisy chain support for non-Z80 devices */
-	MCFG_Z80DAISY_GENERIC_ADD("keyboard_daisy", 0xf7)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<2>))
-	MCFG_Z80DAISY_GENERIC_ADD("adc_daisy", 0xfb)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<3>))
-	MCFG_Z80DAISY_GENERIC_ADD("fire_daisy", 0xfd)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
+	Z80DAISY_GENERIC(config, m_keyboard_daisy, 0xf7);
+	m_keyboard_daisy->int_handler().set(FUNC(einstein_state::int_w<2>));
+	Z80DAISY_GENERIC(config, m_adc_daisy, 0xfb);
+	m_adc_daisy->int_handler().set(FUNC(einstein_state::int_w<3>));
+	Z80DAISY_GENERIC(config, m_fire_daisy, 0xfd);
+	m_fire_daisy->int_handler().set(FUNC(einstein_state::int_w<4>));
 
 	/* video hardware */
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	adc0844_device &adc(ADC0844(config, "adc", 0));
-	adc.intr_callback().set("adc_daisy", FUNC(z80daisy_generic_device::int_w));
+	adc.intr_callback().set(m_adc_daisy, FUNC(z80daisy_generic_device::int_w));
 	adc.ch1_callback().set_ioport("analogue_1_x");
 	adc.ch2_callback().set_ioport("analogue_1_y");
 	adc.ch3_callback().set_ioport("analogue_2_x");

@@ -516,10 +516,10 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
-	MCFG_DEVICE_ADD("gfxcpu", Z80, XTAL(16'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(k7070_cpu_mem)
-	MCFG_DEVICE_IO_MAP(k7070_cpu_io)
-	MCFG_Z80_DAISY_CHAIN(k7070_daisy_chain)
+	Z80(config, m_gfxcpu, XTAL(16'000'000)/4);
+	m_gfxcpu->set_addrmap(AS_PROGRAM, &a7150_state::k7070_cpu_mem);
+	m_gfxcpu->set_addrmap(AS_IO, &a7150_state::k7070_cpu_io);
+	m_gfxcpu->set_daisy_config(k7070_daisy_chain);
 
 	ADDRESS_MAP_BANK(config, m_video_bankdev, 0);
 	m_video_bankdev->set_map(&a7150_state::k7070_cpu_banked);

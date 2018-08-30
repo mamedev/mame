@@ -223,7 +223,7 @@ private:
 	required_device_array<v9938_device, 2> m_v9938;
 	optional_device<microtouch_device> m_microtouch;
 	optional_device<ns16550_device> m_uart;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_memory_bank_array<3> m_banks;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_extra;
@@ -1101,10 +1101,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 }
 
 MACHINE_CONFIG_START(meritm_state::crt250)
-	MCFG_DEVICE_ADD(m_maincpu, Z80, SYSTEM_CLK/6)
-	MCFG_DEVICE_PROGRAM_MAP(crt250_map)
-	MCFG_DEVICE_IO_MAP(crt250_io_map)
-	MCFG_Z80_DAISY_CHAIN(meritm_daisy_chain)
+	Z80(config, m_maincpu, SYSTEM_CLK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::crt250_map);
+	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_io_map);
+	m_maincpu->set_daisy_config(meritm_daisy_chain);
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, crt250_port_b_w))   // used LMP x DRIVE
@@ -1150,15 +1150,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::crt250_questions)
 	crt250(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(crt250_questions_map)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::crt250_questions_map);
+
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_questions)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::crt250_crt252_crt258)
 	crt250_questions(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(crt250_crt258_io_map)
+
+	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_crt258_io_map);
+
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_crt252_crt258)
 
 	MCFG_DEVICE_ADD(m_uart, NS16550, UART_CLK)
@@ -1169,9 +1171,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::crt260)
 	crt250(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(map)
-	MCFG_DEVICE_IO_MAP(io_map)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::map);
+	m_maincpu->set_addrmap(AS_IO, &meritm_state::io_map);
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)

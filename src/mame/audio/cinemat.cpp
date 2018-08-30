@@ -1395,10 +1395,10 @@ static const z80_daisy_config daisy_chain[] =
 MACHINE_CONFIG_START(demon_state::demon_sound)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(demon_sound_map)
-	MCFG_DEVICE_IO_MAP(demon_sound_ports)
+	z80_device& audiocpu(Z80(config, "audiocpu", 3579545));
+	audiocpu.set_daisy_config(daisy_chain);
+	audiocpu.set_addrmap(AS_PROGRAM, &demon_state::demon_sound_map);
+	audiocpu.set_addrmap(AS_IO, &demon_state::demon_sound_ports);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 3579545 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

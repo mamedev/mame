@@ -707,10 +707,11 @@ static const char *const relay_sample_names[] =
 
 MACHINE_CONFIG_START(super80_state::super80)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(super80_map)
-	MCFG_DEVICE_IO_MAP(super80_io)
-	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &super80_state::super80_map);
+	m_maincpu->set_addrmap(AS_IO, &super80_state::super80_io);
+	m_maincpu->set_daisy_config(super80_daisy_chain);
+
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80)
 
 	Z80PIO(config, m_pio, MASTER_CLOCK/6);
@@ -794,10 +795,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(super80_state::super80v)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(super80v_map)
-	MCFG_DEVICE_IO_MAP(super80v_io)
-	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &super80_state::super80v_map);
+	m_maincpu->set_addrmap(AS_IO, &super80_state::super80v_io);
+	m_maincpu->set_daisy_config(super80_daisy_chain);
+
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80r)
 
 	Z80PIO(config, m_pio, MASTER_CLOCK/6);

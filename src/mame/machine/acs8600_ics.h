@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "cpu/z80/z80.h"
 
 class acs8600_ics_device : public device_t
 {
@@ -33,7 +34,7 @@ protected:
 	void ics_mem(address_map &map);
 
 private:
-	required_device<cpu_device> m_icscpu;
+	required_device<z80_device> m_icscpu;
 	devcb_write_line m_out_irq1_func;
 	devcb_write_line m_out_irq2_func;
 	required_device<device_memory_interface> m_host_space_device;

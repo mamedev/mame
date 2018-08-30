@@ -65,7 +65,7 @@ private:
 	uint8_t m_prev_key;
 	bool m_step;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio_1;
 	required_device<z80pio_device> m_pio_2;
 	required_device<z80ctc_device> m_ctc;
@@ -232,10 +232,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 MACHINE_CONFIG_START(babbage_state::babbage)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
-	MCFG_DEVICE_PROGRAM_MAP(babbage_map)
-	MCFG_DEVICE_IO_MAP(babbage_io)
-	MCFG_Z80_DAISY_CHAIN(babbage_daisy_chain)
+
+	Z80(config, m_maincpu, MAIN_CLOCK); //2.5MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &babbage_state::babbage_map);
+	m_maincpu->set_addrmap(AS_IO, &babbage_state::babbage_io);
+	m_maincpu->set_daisy_config(babbage_daisy_chain);
 
 	/* video hardware */
 	config.set_default_layout(layout_babbage);

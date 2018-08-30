@@ -54,7 +54,7 @@ private:
 	DECLARE_MACHINE_RESET(dsb46);
 	void dsb46_io(address_map &map);
 	void dsb46_mem(address_map &map);
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 };
 
 void dsb46_state::dsb46_mem(address_map &map)
@@ -110,10 +110,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(dsb46_state::dsb46)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
-	MCFG_DEVICE_PROGRAM_MAP(dsb46_mem)
-	MCFG_DEVICE_IO_MAP(dsb46_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dsb46_state::dsb46_mem);
+	m_maincpu->set_addrmap(AS_IO, &dsb46_state::dsb46_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dsb46_state, dsb46)
 

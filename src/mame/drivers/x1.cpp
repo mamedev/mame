@@ -2201,10 +2201,10 @@ static void x1_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
-	MCFG_DEVICE_IO_MAP(x1_io)
-	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1_mem);
+	m_maincpu->set_addrmap(AS_IO, &x1_state::x1_io);
+	m_maincpu->set_daisy_config(x1_daisy);
 
 	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
@@ -2286,9 +2286,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x1_state::x1turbo)
 	x1(config);
-	MCFG_DEVICE_MODIFY("x1_cpu")
-	MCFG_DEVICE_PROGRAM_MAP(x1turbo_mem)
-	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1turbo_mem);
+	m_maincpu->set_daisy_config(x1turbo_daisy);
+
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
 	MCFG_DEVICE_MODIFY("iobank")

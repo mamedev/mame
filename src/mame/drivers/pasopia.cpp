@@ -72,7 +72,7 @@ private:
 	emu_timer *m_pio_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_region_ptr<u8> m_p_vram;
 	required_device<i8255_device> m_ppi0;
@@ -288,10 +288,11 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 
 MACHINE_CONFIG_START(pasopia_state::pasopia)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(pasopia_map)
-	MCFG_DEVICE_IO_MAP(pasopia_io)
-	MCFG_Z80_DAISY_CHAIN(pasopia_daisy)
+
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pasopia_state::pasopia_map);
+	m_maincpu->set_addrmap(AS_IO, &pasopia_state::pasopia_io);
+	m_maincpu->set_daisy_config(pasopia_daisy);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -497,10 +497,10 @@ void aussiebyte_state::machine_reset()
 
 MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(aussiebyte_map)
-	MCFG_DEVICE_IO_MAP(aussiebyte_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aussiebyte_state::aussiebyte_map);
+	m_maincpu->set_addrmap(AS_IO, &aussiebyte_state::aussiebyte_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

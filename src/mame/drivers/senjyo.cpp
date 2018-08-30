@@ -555,10 +555,10 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 
-	MCFG_DEVICE_ADD("sub", Z80, 2000000)   /* 2 MHz? */
-	MCFG_Z80_DAISY_CHAIN(senjyo_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_sound_map)
-	MCFG_DEVICE_IO_MAP(senjyo_sound_io_map)
+	z80_device& sub(Z80(config, "sub", 2000000));   /* 2 MHz? */
+	sub.set_daisy_config(senjyo_daisy_chain);
+	sub.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_sound_map);
+	sub.set_addrmap(AS_IO, &senjyo_state::senjyo_sound_io_map);
 
 	Z80PIO(config, m_pio, 2000000);
 	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);

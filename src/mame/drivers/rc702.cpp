@@ -89,7 +89,7 @@ private:
 	bool m_eop;
 	bool m_dack1;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
@@ -329,10 +329,10 @@ static void floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(rc702_state::rc702)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(rc702_mem)
-	MCFG_DEVICE_IO_MAP(rc702_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::rc702_mem);
+	m_maincpu->set_addrmap(AS_IO, &rc702_state::rc702_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	CLOCK(config, "ctc_clock", 614000).signal_handler().set(FUNC(rc702_state::clock_w));
 

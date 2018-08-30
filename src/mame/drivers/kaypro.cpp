@@ -197,10 +197,10 @@ static void kaypro_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(kaypro_state::kayproii)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(kaypro_map)
-	MCFG_DEVICE_IO_MAP(kayproii_io)
-	MCFG_Z80_DAISY_CHAIN(kayproii_daisy_chain)
+	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaypro_state::kaypro_map);
+	m_maincpu->set_addrmap(AS_IO, &kaypro_state::kayproii_io);
+	m_maincpu->set_daisy_config(kayproii_daisy_chain);
 
 	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
@@ -286,10 +286,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(kaypro_map)
-	MCFG_DEVICE_IO_MAP(kaypro484_io)
-	MCFG_Z80_DAISY_CHAIN(kaypro484_daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kaypro_state::kaypro_map);
+	m_maincpu->set_addrmap(AS_IO, &kaypro_state::kaypro484_io);
+	m_maincpu->set_daisy_config(kaypro484_daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 

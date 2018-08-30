@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "machine/acs8600_ics.h"
-#include "cpu/z80/z80.h"
 #include "machine/z80sio.h"
 #include "machine/am9513.h"
 #include "bus/rs232/rs232.h"
@@ -97,10 +96,10 @@ static const z80_daisy_config ics_daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_icscpu, Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(ics_mem)
-	MCFG_DEVICE_IO_MAP(ics_io)
-	MCFG_Z80_DAISY_CHAIN(ics_daisy_chain)
+	Z80(config, m_icscpu, 4_MHz_XTAL);
+	m_icscpu->set_addrmap(AS_PROGRAM, &acs8600_ics_device::ics_mem);
+	m_icscpu->set_addrmap(AS_IO, &acs8600_ics_device::ics_io);
+	m_icscpu->set_daisy_config(ics_daisy_chain);
 
 	am9513_device &stc1(AM9513(config, "stc1", 1.8432_MHz_XTAL));
 	stc1.out1_cb().set("sio1", FUNC(z80sio_device::rxca_w));

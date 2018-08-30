@@ -468,14 +468,14 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 #if 0
-	MCFG_DEVICE_ADD("uart8274", I8274, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
+	I8274(config, m_uart8274, XTAL(16'000'000)/4);
+	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
 #else
 	I8274_NEW(config, m_uart8274, XTAL(16'000'000)/4);
 	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));

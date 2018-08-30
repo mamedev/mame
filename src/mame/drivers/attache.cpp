@@ -196,7 +196,7 @@ protected:
 	void attache_io(address_map &map);
 	void attache_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_memory_region m_rom;
 	required_device<ram_device> m_ram;
 	required_memory_region m_char_rom;
@@ -1122,10 +1122,10 @@ void attache816_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(attache_state::attache)
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(attache_map)
-	MCFG_DEVICE_IO_MAP(attache_io)
-	MCFG_Z80_DAISY_CHAIN(attache_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &attache_state::attache_map);
+	m_maincpu->set_addrmap(AS_IO, &attache_state::attache_io);
+	m_maincpu->set_daisy_config(attache_daisy_chain);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1200,10 +1200,10 @@ MACHINE_CONFIG_START(attache_state::attache)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(attache816_state::attache816)
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(attache_map)
-	MCFG_DEVICE_IO_MAP(attache816_io)
-	MCFG_Z80_DAISY_CHAIN(attache_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &attache816_state::attache_map);
+	m_maincpu->set_addrmap(AS_IO, &attache816_state::attache_io);
+	m_maincpu->set_daisy_config(attache_daisy_chain);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

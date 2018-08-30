@@ -215,10 +215,10 @@ void vcs80_state::machine_start()
 
 MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(5'000'000)/2) /* U880D */
-	MCFG_DEVICE_PROGRAM_MAP(vcs80_mem)
-	MCFG_DEVICE_IO_MAP(vcs80_io)
-	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
+	Z80(config, m_maincpu, XTAL(5'000'000)/2); /* U880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcs80_state::vcs80_mem);
+	m_maincpu->set_addrmap(AS_IO, &vcs80_state::vcs80_io);
+	m_maincpu->set_daisy_config(vcs80_daisy_chain);
 
 	/* keyboard timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))

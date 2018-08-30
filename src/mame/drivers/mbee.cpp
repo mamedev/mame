@@ -647,10 +647,10 @@ static void mbee_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(mbee_state::mbee)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL / 6)         /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mbee_mem)
-	MCFG_DEVICE_IO_MAP(mbee_io)
-	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
+	Z80(config, m_maincpu, 12_MHz_XTAL / 6);         /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee_io);
+	m_maincpu->set_daisy_config(mbee_daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
@@ -704,10 +704,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeeic)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mbeeic_mem)
-	MCFG_DEVICE_IO_MAP(mbeeic_io)
-	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
+	Z80(config, m_maincpu, XTAL_13_5MHz / 4);         /* 3.37500 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeeic_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeeic_io);
+	m_maincpu->set_daisy_config(mbee_daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 

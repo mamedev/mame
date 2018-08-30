@@ -44,7 +44,7 @@ public:
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 };
 
 void ccs300_state::ccs300_mem(address_map &map)
@@ -116,10 +116,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(ccs300_state::ccs300)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ccs300_mem)
-	MCFG_DEVICE_IO_MAP(ccs300_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccs300_state::ccs300_mem);
+	m_maincpu->set_addrmap(AS_IO, &ccs300_state::ccs300_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ccs300_state, ccs300)
 

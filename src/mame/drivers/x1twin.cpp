@@ -412,10 +412,10 @@ static void x1_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
-	MCFG_DEVICE_IO_MAP(x1_io)
-	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+	Z80(config, m_maincpu, X1_MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1twin_state::x1_mem);
+	m_maincpu->set_addrmap(AS_IO, &x1twin_state::x1_io);
+	m_maincpu->set_daisy_config(x1_daisy);
 
 	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 

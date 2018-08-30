@@ -603,18 +603,18 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, 16_MHz_XTAL / 4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, excali64_state, busreq_w))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, excali64_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, excali64_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, excali64_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, excali64_state, io_write_byte))
+	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
+	m_dma->out_busreq_callback().set(FUNC(excali64_state::busreq_w));
+	m_dma->in_mreq_callback().set(FUNC(excali64_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(excali64_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(excali64_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(excali64_state::io_write_byte));
 
 	TTL74123(config, m_u12, 0);
 	m_u12->set_connection_type(TTL74123_GROUNDED);  /* Hook up type (no idea what this means) */
