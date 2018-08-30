@@ -624,7 +624,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	screen.set_screen_update(FUNC(pmd85_state::screen_update_pmd85));
 	screen.set_palette("palette");
 
-	PALETTE(config, m_palette, 2);
+	PALETTE(config, m_palette, 3);
 	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
 
 	/* sound hardware */
