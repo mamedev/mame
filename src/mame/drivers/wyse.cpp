@@ -13,6 +13,8 @@ WY-50: SAB8031P, SCN2672A (CRTC), SCN2661B (UART), 2x MSM2128-15RS, SY2158A, 80-
 
 WY-60: SC67336P, P8051AN-40196, SCN2661B, 7219-0629, 4.9152, 11.000, 39.710, 26.580, Beeper
 
+WY-75: i8051-based?
+
 WY-85: 5x HM6116P-3, AM9265EPC, SCN2681A, SCN2672B, SCN8032H, 48.5568, 11.000, 3.6854, Beeper
 
 WY-150: Philips P80C32SBPN, Toshiba 211009-02, Winbond ??, unknown crystal
@@ -92,6 +94,13 @@ ROM_START( wy60 )
 	ROM_LOAD( "wy-60_4k.u6",       0x0000, 0x10000, CRC(6daf2824) SHA1(23cd039ec7ae71b0742e8eebf75be8cd5992e3fd) )
 ROM_END
 
+ROM_START( wy75 ) // 8051, green, 101-key detached keyboard, nvram
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wy75_4001r.bin", 0x000000, 0x002000, CRC(d1e660e0) SHA1(81960e7780b86b9fe338b20d7bd50f7e991020a4) )
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "wy75_4101a.bin", 0x000000, 0x001000, CRC(96d377db) SHA1(9e059cf067d84267f4e1d92b0509f137fb2ceb19) )
+ROM_END
+
 ROM_START( wy85 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "250151-04_reva.5e", 0x0000, 0x4000, CRC(8fcb9f43) SHA1(6c7e1d27fa6014870c29ab2b8b856ae412bfc411) )
@@ -119,6 +128,7 @@ ROM_END
 
 COMP( 1984, wy50,  0,    0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-50",  MACHINE_IS_SKELETON )
 COMP( 1986, wy60,  wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-60",  MACHINE_IS_SKELETON )
+COMP( 1983, wy75,  wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-75",  MACHINE_IS_SKELETON )
 COMP( 1985, wy85,  wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-85",  MACHINE_IS_SKELETON )
 COMP( 1987, wy120, wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-120", MACHINE_IS_SKELETON )
 COMP( 1988, wy150, wy50, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-150", MACHINE_IS_SKELETON )
