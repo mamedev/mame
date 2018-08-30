@@ -153,9 +153,10 @@ private:
 	DECLARE_WRITE8_MEMBER(batrider_clear_nmi_w);
 	DECLARE_READ16_MEMBER(bbakraid_eeprom_r);
 	DECLARE_WRITE16_MEMBER(bbakraid_eeprom_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_tx_linescroll_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_tx_gfxram16_w);
+	DECLARE_WRITE16_MEMBER(tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(tx_linescroll_w);
+	DECLARE_WRITE16_MEMBER(tx_gfxram16_w);
+	DECLARE_WRITE16_MEMBER(batrider_tx_gfxram16_w);
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_pal_text_dma_w);
 	DECLARE_WRITE8_MEMBER(batrider_objectbank_w);
@@ -182,7 +183,7 @@ private:
 	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	IRQ_CALLBACK_MEMBER(fixeightbl_irq_ack);
 	IRQ_CALLBACK_MEMBER(pipibibsbl_irq_ack);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
