@@ -364,6 +364,8 @@ private:
 	uint32_t m_okim6295_nmk112_enable[2];
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
+
+	int m_nes_apu_channel_hack[2];
 };
 
 DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
@@ -535,6 +537,9 @@ void vgmplay_device::device_reset()
 		s.frequency = 0;
 		s.timer->enable(false);
 	}
+
+	m_nes_apu_channel_hack[0] = 0;
+	m_nes_apu_channel_hack[1] = 0;
 }
 
 void vgmplay_device::pulse_act_led(act_led led)
@@ -1366,8 +1371,8 @@ void vgmplay_device::execute_run()
 
 				if ((offset & 0xf0) == 0 && data == 0)
 				{
-					osd_printf_error("HACK: enable 32x channels\n");
-					data |= 6;
+					osd_printf_error("bad rip detected, enabling sega32x channels\n");
+					data |= 5;
 				}
 
 				m_io16->write_word(A_32X_PWM + ((offset & 0xf0) >> 3), ((offset & 0xf) << 8) | data);
@@ -1391,6 +1396,36 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_NESAPU);
 				uint8_t offset = m_file->read_byte(m_pc + 1);
+
+				int chip = offset & 0x80 ? 1 : 0;
+				if (m_nes_apu_channel_hack[chip] >= 0)
+				{
+					if ((offset & 0x7f) == 0x15)
+					{
+						if ((m_file->read_byte(m_pc + 2) & 0x1f) != 0)
+							m_nes_apu_channel_hack[chip] = -1;
+					}
+					else
+					{
+						m_nes_apu_channel_hack[chip]++;
+						if (m_nes_apu_channel_hack[chip] == 32)
+						{
+							osd_printf_error("bad rip detected, enabling nesapu.%d channels\n", chip);
+							if (chip)
+								m_io->write_byte(A_NESAPU_1 + 0x15, 0x0f);
+							else
+								m_io->write_byte(A_NESAPU_0 + 0x15, 0x0f);
+
+							m_nes_apu_channel_hack[chip] = -2;
+						}
+					}
+				}
+				else if ((offset & 0x7f) == 0x15 && m_nes_apu_channel_hack[chip] == -2 && (m_file->read_byte(m_pc + 2) & 0x1f) != 0)
+				{
+					osd_printf_error("bad rip false positive, late enabling nesapu.%d channels\n", chip);
+					m_nes_apu_channel_hack[chip] = -1;
+				}
+
 				if (offset & 0x80)
 					m_io->write_byte(A_NESAPU_1 + (offset & 0x7f), m_file->read_byte(m_pc + 2));
 				else
@@ -2670,7 +2705,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		// HACK: Some VGMs contain 48,000 instead of 18,432,000
 		if (version >= 0x161 && header_size >= 0xa4 && (r32(0xa0) & ~0x40000000) == 48000)
 		{
-			osd_printf_error("HACK: incorrect k054539 clock\n");
+			osd_printf_error("bad rip detected, correcting k054539 clock\n");
 			m_k054539[0]->set_clock_scale(384);
 			m_k054539[1]->set_clock_scale(384);
 		}
@@ -2697,7 +2732,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		// HACK: VGMs contain 4,000,000 instead of 60,000,000
 		if (version >= 0x161 && header_size >= 0xb8 && r32(0xb4) == 4000000)
 		{
-			osd_printf_error("HACK: incorrect qsound clock\n");
+			osd_printf_error("bad rip detected, correcting qsound clock\n");
 			m_qsound->set_clock_scale(15);
 		}
 
