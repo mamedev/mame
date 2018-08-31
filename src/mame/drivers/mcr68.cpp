@@ -1495,6 +1495,9 @@ void mcr68_state::init_xenophob()
 
 	/* install control port handler */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),this));
+
+	/* 6840 is mapped to the lower 8 bits */
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 
