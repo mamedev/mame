@@ -1075,23 +1075,23 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_sp69_w)
 
 READ8_MEMBER(nes_vt_state::psg1_4014_r)
 {
-	//return m_apu->read(space, 0x14);
+	//return m_apu->read(0x14);
 	return 0x00;
 }
 
 READ8_MEMBER(nes_vt_state::psg1_4015_r)
 {
-	return m_apu->read(space, 0x15);
+	return m_apu->read(0x15);
 }
 
 WRITE8_MEMBER(nes_vt_state::psg1_4015_w)
 {
-	m_apu->write(space, 0x15, data);
+	m_apu->write(0x15, data);
 }
 
 WRITE8_MEMBER(nes_vt_state::psg1_4017_w)
 {
-	m_apu->write(space, 0x17, data);
+	m_apu->write(0x17, data);
 }
 
 WRITE8_MEMBER(nes_vt_state::nes_vh_sprite_dma_w)

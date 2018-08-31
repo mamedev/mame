@@ -55,10 +55,11 @@ public:
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_mem_read_callback(Object &&cb) { return m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
 
+	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -91,8 +92,6 @@ private:
 	s8 apu_noise(apu_t::noise_t *chan);
 	s8 apu_dpcm(apu_t::dpcm_t *chan);
 	inline void apu_regwrite(int address, u8 value);
-	inline u8 apu_read(int address);
-	inline void apu_write(int address, u8 value);
 };
 
 DECLARE_DEVICE_TYPE(NES_APU, nesapu_device)
