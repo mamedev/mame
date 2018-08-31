@@ -158,10 +158,19 @@ WRITE_LINE_MEMBER(dio16_98543_device::vblank_w)
 	for (auto &tc: m_topcat)
 		tc->vblank_w(state);
 }
+
 uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int startx[TOPCAT_COUNT], starty[TOPCAT_COUNT];
 	int endx[TOPCAT_COUNT], endy[TOPCAT_COUNT];
+
+	bool changed = false;
+
+	for (auto& tc: m_topcat)
+		changed |= tc->has_changed();
+
+	if (!changed)
+		return UPDATE_HAS_NOT_CHANGED;
 
 	for (int i = 0; i < TOPCAT_COUNT; i++)
 		m_topcat[i]->get_cursor_pos(startx[i], starty[i], endx[i], endy[i]);

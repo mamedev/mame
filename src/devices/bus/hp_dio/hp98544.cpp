@@ -134,17 +134,26 @@ WRITE_LINE_MEMBER(dio16_98544_device::vblank_w)
 uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int startx, starty, endx, endy;
-	m_topcat->get_cursor_pos(startx, starty, endx, endy);
+
+
+	if (!m_topcat->has_changed())
+		return UPDATE_HAS_NOT_CHANGED;
 
 	for (int y = 0; y < m_v_pix; y++) {
 		uint32_t *scanline = &bitmap.pix32(y);
-		for (int x = 0; x < 1024; x++) {
+		for (int x = 0; x < m_h_pix; x++) {
 			uint8_t tmp = m_vram[y * m_h_pix + x];
-			if (y >= starty && y <= endy && x >= startx && x <= endx)
-				tmp |= 0xff;
 			*scanline++ = tmp ? rgb_t(255,255,255) : rgb_t(0, 0, 0);
 		}
 	}
+
+	m_topcat->get_cursor_pos(startx, starty, endx, endy);
+
+	for(int y = starty; y <= endy; y++) {
+		uint32_t *scanline = &bitmap.pix32(y);
+		memset(scanline + startx, 0xff, (endx - startx) << 2);
+	}
+
 	return 0;
 }
 
