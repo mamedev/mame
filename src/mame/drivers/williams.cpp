@@ -1606,7 +1606,7 @@ MACHINE_CONFIG_START(spdball_state::spdball)
 	/* pia */
 	PIA6821(config, m_pia[3], 0);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
-	m_pia[3]->readpa_handler().set_ioport("IN4");
+	m_pia[3]->readpb_handler().set_ioport("IN4");
 MACHINE_CONFIG_END
 
 
