@@ -27,7 +27,8 @@ private:
 	static constexpr int NEREID_BLUE_DATA=0x5b;
 	static constexpr int NEREID_INDEX=0x5c;
 	static constexpr int NEREID_PLANE_MASK=0x5d;
-	static constexpr int NEREID_STROBE=0x78;
+	static constexpr int NEREID_WRITE_STROBE=0x78;
+	static constexpr int NEREID_READ_STROBE=0x7c;
 
 	rgb_t m_palette[256];
 
