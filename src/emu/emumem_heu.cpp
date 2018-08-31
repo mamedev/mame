@@ -55,8 +55,8 @@ template<int Width, int AddrShift, int Endian> void handler_entry_read_units<Wid
 	for(const auto &e : entries)
 		m_subunit_infos[m_subunits++] = subunit_info{ handler, e.m_amask, e.m_dmask, e.m_ashift, e.m_offset, e.m_dshift, descriptor.get_subunit_width(), descriptor.get_subunit_endian() };
 	m_unmap = inh::m_space->unmap();
-	for(const auto &e : m_subunit_infos)
-		m_unmap &= ~e.m_dmask;
+	for(int i = 0; i < m_subunits; i++)
+		m_unmap &= ~m_subunit_infos[i].m_dmask;
 }
 
 
