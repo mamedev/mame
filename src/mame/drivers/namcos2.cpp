@@ -4477,6 +4477,14 @@ ROM_START( rthun2j )
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "rst1_voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
 	ROM_LOAD( "rst1_voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
+		
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0950, "plds", 0 )
+	ROM_LOAD( "pal12l10.8d",  0x0000, 0x0040, CRC(d3ae64a6) SHA1(8e56f447908246e84d5a79df1a1cd3d5c8a040fb) )
+	ROM_LOAD( "plhs18p8a.2p", 0x0200, 0x0149, CRC(28c634a4) SHA1(4df8ce2a3216a6b609921e102ec558efc8a735b9) )
+	ROM_LOAD( "plhs18p8a.4g", 0x0400, 0x0149, CRC(1932dd5e) SHA1(af6ee16fbd53c68c74dec4c3f6cb8e91b10e9249) )
+	ROM_LOAD( "plhs18p8a.5f", 0x0600, 0x0149, CRC(ab2fd9c2) SHA1(a70a00b00533bf1208c4c2633136e2fb01f77711) )
+	ROM_LOAD( "pal16l8.9d",   0x0800, 0x0104, NO_DUMP ) // Protected
 ROM_END
 
 /* STEEL GUNNER */
