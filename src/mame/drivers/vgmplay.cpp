@@ -870,8 +870,19 @@ void vgmplay_device::execute_run()
 				m_state = DONE;
 				break;
 			}
+
 			uint32_t version = m_file->read_dword(8);
-			m_pc = version < 0x150 ? 0x40 : 0x34 + m_file->read_dword(0x34);
+			m_pc = 0x34 + m_file->read_dword(0x34);
+
+			if ((version < 0x150 && m_pc != 0x34) ||
+				(version >= 0x150 && m_pc == 0x34))
+			{
+				osd_printf_error("bad rip detected, v%x invalid header size 0x%x\n", version, m_pc);
+				m_pc = 0x40;
+			}
+			else if (version < 0x150)
+				m_pc = 0x40;
+
 			m_state = RUN;
 			break;
 		}
