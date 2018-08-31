@@ -81,8 +81,8 @@ PWB403045B (C) 1997 KONAMI CO., LTD.
 |                                                          |
 |----------------------------------------------------------|
 Notes:
-      056879     - Konami custom IC, location 10E (QFP120)
-      058232     - Konami custom ceramic flat pack IC, DAC?
+      056879     - Konami custom IC, location 10E (TQFP120)
+      058232     - Konami custom ceramic flat pack IC, DAC? (SIP14)
       003461     - Konami custom IC, location 11K (QFP100)
       CN16       - 4 pin connector for CD-DA in from CDROM
       CN15       - Standard (PC-compatible) 40 pin IDE CDROM flat cable connector and 4 pin power plug connector,
