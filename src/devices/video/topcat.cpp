@@ -53,6 +53,8 @@ void topcat_device::device_start()
 	save_item(NAME(m_fb_enable));
 	save_item(NAME(m_unknown_reg4a));
 	save_item(NAME(m_unknown_reg4c));
+	save_item(NAME(m_cursor_state));
+	save_item(NAME(m_changed));
 }
 
 //-------------------------------------------------
@@ -93,6 +95,7 @@ WRITE16_MEMBER(topcat_device::vram_w)
 		execute_rule(src, (replacement_rule_t)((m_pixel_replacement_rule >> 8) & 0x0f), dst);
 		modify_vram_offset(offset * 2, dst);
 	}
+	m_changed = true;
 }
 
 void topcat_device::get_cursor_pos(int &startx, int &starty, int &endx, int &endy)
@@ -103,10 +106,10 @@ void topcat_device::get_cursor_pos(int &startx, int &starty, int &endx, int &end
 		endx = m_cursor_x_pos + m_cursor_width;
 		endy = m_cursor_y_pos;
 	} else {
-		startx = 0;
-		starty = 0;
-		endx = 0;
-		endy = 0;
+		startx = -1;
+		starty = -1;
+		endx = -1;
+		endy = -1;
 	}
 }
 
@@ -114,6 +117,7 @@ TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
 {
 	m_cursor_timer->adjust(attotime::from_hz(5));
 	m_cursor_state ^= true;
+	m_changed = true;
 }
 
 void topcat_device::update_cursor(int x, int y, uint16_t ctrl, uint8_t width)
@@ -347,6 +351,7 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	if (!m_write_enable)
 		return;
 
+	m_changed = true;
 	switch (offset) {
 	case TOPCAT_REG_VBLANK:
 		m_vblank = data;
