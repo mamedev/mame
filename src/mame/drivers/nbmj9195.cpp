@@ -2519,7 +2519,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	audiocpu.set_daisy_config(daisy_chain_sound);
 	audiocpu.set_addrmap(AS_PROGRAM, &nbmj9195_state::sailorws_sound_map);
 	audiocpu.set_addrmap(AS_IO, &nbmj9195_state::sailorws_sound_io_map);
-	audiocpu.zc0_callback().set(FUNC(tmpz84c011_device::trg3));
+	audiocpu.zc0_callback().set("audiocpu", FUNC(tmpz84c011_device::trg3));
 	audiocpu.out_pa_callback().set(FUNC(nbmj9195_state::soundbank_w));
 	audiocpu.out_pb_callback().set("dac1", FUNC(dac_byte_interface::data_w));
 	audiocpu.out_pc_callback().set("dac2", FUNC(dac_byte_interface::data_w));
