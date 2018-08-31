@@ -3189,24 +3189,25 @@ void mips3_device::handle_special(uint32_t op)
 			break;
 		case 0x1c:  /* DMULT */
 		{
-			int64_t a_hi = (int32_t)(RSVAL64 >> 32);
-			int64_t b_hi = (int32_t)(RTVAL64 >> 32);
-			int64_t a_lo = (uint32_t)RSVAL64;
-			int64_t b_lo = (uint32_t)RTVAL64;
+			uint64_t a_hi = (uint32_t)(RSVAL64 >> 32);
+			uint64_t b_hi = (uint32_t)(RTVAL64 >> 32);
+			uint64_t a_lo = (uint32_t)RSVAL64;
+			uint64_t b_lo = (uint32_t)RTVAL64;
 			uint64_t p1 = a_lo * b_lo;
 			uint64_t p2 = a_hi * b_lo;
 			uint64_t p3 = a_lo * b_hi;
 			uint64_t p4 = a_hi * b_hi;
+			uint64_t carry = (uint32_t)(((p1 >> 32) + (uint32_t)p2 + (uint32_t)p3) >> 32);
 
-			/* Now add up the LO and HI products */
-			uint64_t s1 = p1 + (p2 << 32);
-			uint64_t s2 = p2 >> 32;
-			uint64_t s3 = p3 + (p4 << 32);
-			uint64_t s4 = p4 >> 32;
-			uint64_t temp = (s4 << 32) + (s3 >> 32) + 1;
+			LOVAL64 = p1 + (p2 << 32) + (p3 << 32);
+			HIVAL64 = p4 + (p2 >> 32) + (p3 >> 32) + carry;
 
-			LOVAL64 = s1 + (s3 << 32);
-			HIVAL64 = s2 + temp;
+			// Adjust for sign
+			if (RSVAL64 < 0)
+				HIVAL64 -= RTVAL64;
+			if (RTVAL64 < 0)
+				HIVAL64 -= RSVAL64;
+
 			m_core->icount -= 7;
 			break;
 		}
@@ -3220,16 +3221,10 @@ void mips3_device::handle_special(uint32_t op)
 			uint64_t p2 = a_hi * b_lo;
 			uint64_t p3 = a_lo * b_hi;
 			uint64_t p4 = a_hi * b_hi;
+			uint64_t carry = (uint32_t)(((p1 >> 32) + (uint32_t)p2 + (uint32_t)p3) >> 32);
 
-			/* Now add up the LO and HI products */
-			uint64_t s1 = p1 + (p2 << 32);
-			uint64_t s2 = p2 >> 32;
-			uint64_t s3 = p3 + (p4 << 32);
-			uint64_t s4 = p4 >> 32;
-			uint64_t temp = ((s4 + s3) << 32);
-
-			LOVAL64 = s1 + (s3 << 32);
-			HIVAL64 = s2 + temp;
+			LOVAL64 = p1 + (p2 << 32) + (p3 << 32);
+			HIVAL64 = p4 + (p2 >> 32) + (p3 >> 32) + carry;
 
 			m_core->icount -= 7;
 			break;
