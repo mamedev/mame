@@ -138,12 +138,15 @@ protected:
 	TIMER_CALLBACK_MEMBER(handle_pwm_callback);
 	void calculate_pwm_timer();
 	uint16_t m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
-	uint16_t m_cur_lch[0x10],m_cur_rch[0x10];
+	static constexpr int PWM_FIFO_SIZE = 3;
+	uint16_t m_cur_lch[PWM_FIFO_SIZE],m_cur_rch[PWM_FIFO_SIZE];
 	uint16_t m_pwm_cycle_reg; //used for latching
 	uint8_t m_pwm_timer_tick;
-	uint8_t m_lch_index_r, m_rch_index_r, m_lch_index_w, m_rch_index_w;
+	uint8_t m_lch_size, m_rch_size;
 	uint16_t m_lch_fifo_state, m_rch_fifo_state;
 
+	void lch_pop();
+	void rch_pop();
 
 	uint16_t get_hposition(void);
 
