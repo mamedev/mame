@@ -3054,7 +3054,7 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_mpu4);
 MACHINE_CONFIG_END

@@ -365,10 +365,10 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_DEVICE_ADD("maincpu", Z80, 7372800/2)
 	MCFG_DEVICE_PROGRAM_MAP(cpu0_mem)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 7372800/2)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_mem)
-	MCFG_DEVICE_IO_MAP(sound_port)
+	z80_device& audiocpu(Z80(config, "audiocpu", 7372800/2));
+	audiocpu.set_daisy_config(daisy_chain_sound);
+	audiocpu.set_addrmap(AS_PROGRAM, &pipeline_state::cpu1_mem);
+	audiocpu.set_addrmap(AS_IO, &pipeline_state::sound_port);
 
 	MCFG_DEVICE_ADD("mcu", M68705R3, 7372800/2)
 	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pipeline_state, mcu_portA_w))

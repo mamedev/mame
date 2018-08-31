@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	/* sound hardware */
 	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alesis_state::sr16)

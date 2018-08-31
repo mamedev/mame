@@ -72,7 +72,7 @@ private:
 	emu_timer *m_pio_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_region_ptr<u8> m_p_vram;
 	required_device<i8255_device> m_ppi0;
@@ -288,10 +288,11 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 
 MACHINE_CONFIG_START(pasopia_state::pasopia)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(pasopia_map)
-	MCFG_DEVICE_IO_MAP(pasopia_io)
-	MCFG_Z80_DAISY_CHAIN(pasopia_daisy)
+
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pasopia_state::pasopia_map);
+	m_maincpu->set_addrmap(AS_IO, &pasopia_state::pasopia_io);
+	m_maincpu->set_daisy_config(pasopia_daisy);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -328,10 +329,10 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE("z80ctc", z80ctc_device, trg2))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, pasopia_state, mux_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pasopia_state, keyb_r))
+	Z80PIO(config, m_pio, XTAL(4'000'000));
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set(FUNC(pasopia_state::mux_w));
+	m_pio->in_pb_callback().set(FUNC(pasopia_state::keyb_r));
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -1076,7 +1076,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
 	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
+	EEPROM_2816(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
 

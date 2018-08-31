@@ -598,7 +598,7 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_COP400_WRITE_SO_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 	MCFG_COP400_WRITE_SK_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -184,7 +184,9 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map)
+	TMS9995(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cortex_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cortex_state::io_map);
 
 	ls259_device &control(LS259(config, "control")); // IC64
 	//control.q_out_cb<0>().set(FUNC(cortex_state::basic_led_w));
@@ -196,13 +198,12 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	control.q_out_cb<6>().set("beeper", FUNC(beep_device::set_state));
 
 	/* video hardware */
-	tms9929a_device &crtc(TMS9929A(config, "crtc", XTAL(10'738'635) / 2));
-	crtc.out_int_line_callback().set_inputline(m_maincpu, INT_9995_INT1);
-	crtc.out_int_line_callback().append(FUNC(cortex_state::vdp_int_w));
+	tms9929a_device &crtc(TMS9929A(config, "crtc", XTAL(10'738'635)));
+	crtc.set_screen("screen");
+	crtc.int_callback().set_inputline(m_maincpu, INT_9995_INT1);
+	crtc.int_callback().append(FUNC(cortex_state::vdp_int_w));
 	crtc.set_vram_size(0x4000);
-	device = &crtc; // FIXME: this line is needed because the following macro is nasty
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(cortex_state, kbd_put))

@@ -419,11 +419,11 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("i8155", I8155, 1000000 /*?*/)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, tourvision_state, tourvision_i8155_a_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, tourvision_state, tourvision_i8155_b_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, tourvision_state, tourvision_i8155_c_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, tourvision_state, tourvision_timer_out))
+	i8155_device &i8155(I8155(config, "i8155", 1000000 /*?*/));
+	i8155.out_pa_callback().set(FUNC(tourvision_state::tourvision_i8155_a_w));
+	i8155.out_pb_callback().set(FUNC(tourvision_state::tourvision_i8155_b_w));
+	i8155.out_pc_callback().set(FUNC(tourvision_state::tourvision_i8155_c_w));
+	i8155.out_to_callback().set(FUNC(tourvision_state::tourvision_timer_out));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

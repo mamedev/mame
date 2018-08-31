@@ -2591,7 +2591,7 @@ MACHINE_CONFIG_START(ssv_state::drifto94)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2606,7 +2606,7 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gdfs_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	ADC0809(config, m_adc, 1000000); // unknown clock
 	m_adc->in_callback<0>().set_ioport("GUNX1");
@@ -2691,7 +2691,7 @@ MACHINE_CONFIG_START(ssv_state::meosism)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(meosism_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2786,7 +2786,7 @@ MACHINE_CONFIG_START(ssv_state::stmblade)
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1)
@@ -2825,7 +2825,7 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(eaglshot_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX")
@@ -2850,7 +2850,7 @@ MACHINE_CONFIG_START(ssv_state::sxyreact)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2866,7 +2866,7 @@ MACHINE_CONFIG_START(ssv_state::sxyreac2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2882,7 +2882,7 @@ MACHINE_CONFIG_START(ssv_state::cairblad)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

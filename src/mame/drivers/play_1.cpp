@@ -472,16 +472,16 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 
 MACHINE_CONFIG_START(play_1_state::play_1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
-	MCFG_DEVICE_PROGRAM_MAP(play_1_map)
-	MCFG_DEVICE_IO_MAP(play_1_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, play_1_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_1_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, play_1_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, play_1_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, play_1_state, ef4_r))
+	CDP1802(config, m_maincpu, 400000); // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_1_state::play_1_map);
+	m_maincpu->set_addrmap(AS_IO, &play_1_state::play_1_io);
+	m_maincpu->wait_cb().set(FUNC(play_1_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(play_1_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(play_1_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(play_1_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(play_1_state::ef4_r));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_play_1);

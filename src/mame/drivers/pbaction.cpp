@@ -68,7 +68,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "emu.h"
 #include "includes/pbaction.h"
 
-#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/segacrpt_device.h"
 #include "screen.h"
@@ -327,10 +326,10 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
 	MCFG_DEVICE_PROGRAM_MAP(pbaction_map)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)
-	MCFG_DEVICE_PROGRAM_MAP(pbaction_sound_map)
-	MCFG_DEVICE_IO_MAP(pbaction_sound_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_audiocpu, 3072000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &pbaction_state::pbaction_sound_io_map);
+	m_audiocpu->set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 3072000)
 	MCFG_Z80CTC_INTR_CB(ASSERTLINE("audiocpu", 0))
@@ -367,9 +366,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pbaction_state::pbaction2)
 	pbaction(config);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(pbaction2_sound_map)
-	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(*this, pbaction_state, sound_irq_clear))
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction2_sound_map);
+	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pbaction_state::pbactionx)

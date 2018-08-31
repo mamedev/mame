@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	MCFG_DEVICE_PROGRAM_MAP(by6803_map)
 	MCFG_DEVICE_IO_MAP(by6803_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	//config.set_default_layout(layout_by6803);

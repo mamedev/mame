@@ -764,23 +764,23 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	// devices
-	MCFG_DEVICE_ADD(P8155H_TAG, I8155, 23.9616_MHz_XTAL / 6)
-	MCFG_I8155_IN_PORTA_CB(READ8(*this, vixen_state, i8155_pa_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, vixen_state, i8155_pb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, i8155_pc_w))
+	i8155_device &i8155(I8155(config, P8155H_TAG, 23.9616_MHz_XTAL / 6));
+	i8155.in_pa_callback().set(FUNC(vixen_state::i8155_pa_r));
+	i8155.out_pb_callback().set(FUNC(vixen_state::i8155_pb_w));
+	i8155.out_pc_callback().set(FUNC(vixen_state::i8155_pc_w));
 
-	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, 23.9616_MHz_XTAL / 6)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(m_ieee488, ieee488_device, host_dio_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, vixen_state, io_i8155_pb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, io_i8155_pc_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, vixen_state, io_i8155_to_w))
+	i8155_device &i8155_io(I8155(config, P8155H_IO_TAG, 23.9616_MHz_XTAL / 6));
+	i8155_io.out_pa_callback().set(m_ieee488, FUNC(ieee488_device::host_dio_w));
+	i8155_io.out_pb_callback().set(FUNC(vixen_state::io_i8155_pb_w));
+	i8155_io.out_pc_callback().set(FUNC(vixen_state::io_i8155_pc_w));
+	i8155_io.out_to_callback().set(FUNC(vixen_state::io_i8155_to_w));
 
-	MCFG_DEVICE_ADD(P8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, vixen_state, rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, vixen_state, txrdy_w))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_usart->rxrdy_handler().set(FUNC(vixen_state::rxrdy_w));
+	m_usart->txrdy_handler().set(FUNC(vixen_state::txrdy_w));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_rxd))
@@ -800,8 +800,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

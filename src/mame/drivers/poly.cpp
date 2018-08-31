@@ -253,12 +253,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_DEVICE_ADD("maincpu", MC6809, 12.0576_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(poly_mem)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(poly_bank)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&poly_state::poly_bank).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
@@ -285,9 +280,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K");
 
 	/* network */
 	MC6854(config, m_adlc);
@@ -357,8 +350,7 @@ MACHINE_CONFIG_START(poly_state::poly2)
 	poly(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY2")

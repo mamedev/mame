@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)

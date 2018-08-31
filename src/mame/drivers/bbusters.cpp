@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("eeprom")
+	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

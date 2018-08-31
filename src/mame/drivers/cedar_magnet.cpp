@@ -27,7 +27,7 @@
  notes:
   - high scores will be defaulted if the data in the table is corrupt, the games give no
     option to do this otherwise.  A backup copy of the score table is kept, so you also
-	have to enter and exit service mode.
+    have to enter and exit service mode.
 
 */
 
@@ -775,40 +775,23 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 	MCFG_DEVICE_IO_MAP(cedar_magnet_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cedar_magnet_state,  irq)
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_bank0)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&cedar_magnet_state::cedar_bank0).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "mb_sub_ram").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "mb_sub_pal").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map).set_options(ENDIANNESS_LITTLE, 8, 8+6, 0x100);
 
-	MCFG_DEVICE_ADD("mb_sub_ram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_mainboard_sub_ram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	Z80PIO(config, m_ic48_pio, 4000000/2);
+//  m_ic48_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ic48_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_r));
+	m_ic48_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_w));
+	m_ic48_pio->in_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_r));
+	m_ic48_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_w));
 
-	MCFG_DEVICE_ADD("mb_sub_pal", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_mainboard_sub_pal_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(8+6)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
-
-	MCFG_DEVICE_ADD("z80pio_ic48", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic48_pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic48_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pb_w))
-
-	MCFG_DEVICE_ADD("z80pio_ic49", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic49_pio_pa_r)) // NOT USED
-//  MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pa_w)) // NOT USED
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic49_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pb_w))
+	Z80PIO(config, m_ic49_pio, 4000000/2);
+//  m_ic49_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//  m_ic49_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_r)); // NOT USED
+//  m_ic49_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_w)); // NOT USED
+	m_ic49_pio->in_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_r));
+	m_ic49_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -867,12 +850,12 @@ ROM_START( mag_xain )
 ROM_END
 
 
-/*  
+/*
     Data after 0xd56b0 would not read consistently, however the game only appears to use the first 24 tracks (up to 0x48fff)
-	as it loads once on startup, not during gameplay, and all tracks before that gave consistent reads.  There is data after this
-	point but it is likely leftovers from another game / whatever was on the disk before, so for our purposes this should be fine.
+    as it loads once on startup, not during gameplay, and all tracks before that gave consistent reads.  There is data after this
+    point but it is likely leftovers from another game / whatever was on the disk before, so for our purposes this should be fine.
 
-	Some bullets do seem to spawn from locations where there are no enemies, but I think this is just annoying game design.
+    Some bullets do seem to spawn from locations where there are no enemies, but I think this is just annoying game design.
 */
 ROM_START( mag_war )
 	BIOS_ROM
@@ -882,7 +865,7 @@ ROM_START( mag_war )
 ROM_END
 
 /*
-	Data read 100% consistently with multiple drives
+    Data read 100% consistently with multiple drives
 */
 ROM_START( mag_wara )
 	BIOS_ROM
@@ -892,22 +875,22 @@ ROM_START( mag_wara )
 ROM_END
 
 /*
-	Data read 100% consistently with multiple drives
+    Data read 100% consistently with multiple drives
 */
 ROM_START( mag_burn )
 	BIOS_ROM
 
-	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 ) // 
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 ) //
 	ROM_LOAD( "theburningcavern 31_3_87.img", 0x00000, 0xf0000, CRC(c95911f8) SHA1(eda3bdbbcc3e00a7da83253209e832855c2968b1) )
 ROM_END
 
 /*
-	Data read 100% consistently with non-original drive (usually gives worse results)
-	later tracks showed differences with original drive on each read (around 0xeef80 onwards, doesn't seem to be game data)
+    Data read 100% consistently with non-original drive (usually gives worse results)
+    later tracks showed differences with original drive on each read (around 0xeef80 onwards, doesn't seem to be game data)
 
-	weirdly there's was a single byte in an earlier track that read consistently, but in a different way for each drive
-	0x2480e: 9d (non-original) vs 1d (original drive)
-	1d seems to be correct as the same data is also elsewhere on the disc
+    weirdly there's was a single byte in an earlier track that read consistently, but in a different way for each drive
+    0x2480e: 9d (non-original) vs 1d (original drive)
+    1d seems to be correct as the same data is also elsewhere on the disc
 */
 ROM_START( mag_day )
 	BIOS_ROM

@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_mpu3);
 MACHINE_CONFIG_END

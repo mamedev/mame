@@ -66,7 +66,7 @@ void hlcd0515_device::device_start()
 
 	// zerofill
 	m_cs = 0;
-	m_clock = 0;
+	m_pclock = 0;
 	m_data = 0;
 	m_count = 0;
 	m_control = 0;
@@ -79,7 +79,7 @@ void hlcd0515_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_cs));
-	save_item(NAME(m_clock));
+	save_item(NAME(m_pclock));
 	save_item(NAME(m_data));
 	save_item(NAME(m_count));
 	save_item(NAME(m_control));
@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 	state = (state) ? 1 : 0;
 
 	// clock/shift data on falling edge
-	if (!m_cs && !state && m_clock)
+	if (!m_cs && !state && m_pclock)
 	{
 		if (m_count < 5)
 		{
@@ -179,7 +179,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 			m_count++;
 	}
 
-	m_clock = state;
+	m_pclock = state;
 }
 
 

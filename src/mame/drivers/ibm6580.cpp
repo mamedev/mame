@@ -889,9 +889,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_DEVICE_IO_MAP(ibm6580_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("160K,192K,224K,256K,320K,384K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'000'000)/2, 833, 0, 640, 428, 0, 400)
@@ -935,24 +933,24 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD( "upd8251a", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	i8251_device &upd8251a(I8251(config, "upd8251a", 0));
+	upd8251a.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
+	upd8251a.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	upd8251a.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
+	upd8251a.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
+	upd8251a.txrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
 
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251a", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251a", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251a", i8251_device, write_cts))
 
-	MCFG_DEVICE_ADD( "upd8251b", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	i8251_device &upd8251b(I8251(config, "upd8251b", 0));
+	upd8251b.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
+	upd8251b.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	upd8251b.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
+	upd8251b.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
+	upd8251b.txrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
 
 	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251b", i8251_device, write_rxd))

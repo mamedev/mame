@@ -1948,8 +1948,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
@@ -2009,7 +2008,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
 
@@ -2077,7 +2076,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS_NAMCO480I

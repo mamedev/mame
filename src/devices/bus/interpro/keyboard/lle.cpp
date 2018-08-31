@@ -442,11 +442,7 @@ MACHINE_CONFIG_START(lle_device_base::device_add_mconfig)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, lle_device_base, bus_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, lle_device_base, bus_w))
 
-	MCFG_DEVICE_ADD(m_ext, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(ext_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
+	ADDRESS_MAP_BANK(config, m_ext).set_map(&lle_device_base::ext_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x100);
 
 	SPEAKER(config, "keyboard").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)

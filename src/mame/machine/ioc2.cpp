@@ -49,24 +49,24 @@ ioport_constructor ioc2_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(SCC_TAG, SCC85230, SCC_PCLK)
-	MCFG_Z80SCC_OFFSETS(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value())
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_rts))
+	SCC85230(config, m_scc, SCC_PCLK);
+	m_scc->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
+	m_scc->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsa_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_rts));
+	m_scc->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, scc85230_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, dcda_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc85230_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85230_device, dcda_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85230_device, rxa_w))
 
 	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, scc85230_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, dcdb_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc85230_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85230_device, dcdb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85230_device, rxb_w))
 
 	PC_LPT(config, m_pi1, 0);
 

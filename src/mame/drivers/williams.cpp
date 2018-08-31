@@ -1492,7 +1492,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
@@ -1554,12 +1554,7 @@ MACHINE_CONFIG_START(williams_state::defender)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(defender_sound_map)
 
-	MCFG_DEVICE_ADD("bankc000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(defender_bankc000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bankc000").set_map(&williams_state::defender_bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
@@ -1611,7 +1606,7 @@ MACHINE_CONFIG_START(spdball_state::spdball)
 	/* pia */
 	PIA6821(config, m_pia[3], 0);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
-	m_pia[3]->readpa_handler().set_ioport("IN4");
+	m_pia[3]->readpb_handler().set_ioport("IN4");
 MACHINE_CONFIG_END
 
 
@@ -1751,16 +1746,11 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_DEVICE_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
 	MCFG_DEVICE_PROGRAM_MAP(williams2_sound_map)
 
-	MCFG_DEVICE_ADD("bank8000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(williams2_bank8000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, "bank8000").set_map(&williams2_state::williams2_bank8000_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
 	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
 	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5114 + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)

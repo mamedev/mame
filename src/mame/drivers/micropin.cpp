@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(micropin_state::micropin)
 	MCFG_DEVICE_PROGRAM_MAP(micropin_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_micropin);
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(micropin_state::pentacup2)
 	MCFG_DEVICE_IO_MAP(pentacup2_io)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(micropin_state, irq2_line_hold, 50)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);

@@ -584,10 +584,10 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(m_uart, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, i8251_device, write_rxd))
@@ -605,9 +605,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");
 MACHINE_CONFIG_END
 
 

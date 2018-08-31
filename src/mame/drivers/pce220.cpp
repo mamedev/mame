@@ -969,11 +969,10 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
@@ -1004,11 +1003,10 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
@@ -1039,11 +1037,10 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END

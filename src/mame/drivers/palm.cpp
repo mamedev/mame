@@ -430,58 +430,53 @@ ROM_START( spt1740 )
 	ROM_RELOAD(0x000000, 0x004000)
 ROM_END
 
-MACHINE_CONFIG_START(palm_state::pilot1k)
+void palm_state::pilot1k(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M,2M,4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("512K,1M,2M,4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::pilot5k)
+void palm_state::pilot5k(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("1M,2M,4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmpro)
+void palm_state::palmpro(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M,4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmiii)
+void palm_state::palmiii(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmv)
+void palm_state::palmv(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,8M");
+}
 
-MACHINE_CONFIG_START(palm_state::palmvx)
+void palm_state::palmvx(machine_config &config)
+{
 	palm(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("8M");
+}
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY          FULLNAME               FLAGS
 COMP( 1996, pilot1k,  0,       0,      pilot1k, palm, palm_state, empty_init, "U.S. Robotics", "Pilot 1000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

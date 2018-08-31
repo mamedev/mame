@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
 	MCFG_DEVICE_PROGRAM_MAP(gts80a_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
 	config.set_default_layout(layout_gts80a);

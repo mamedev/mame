@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_DEVICE_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(punchout_sound_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2B
 	mainlatch.q_out_cb<0>().set(FUNC(punchout_state::nmi_mask_w));

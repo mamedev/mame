@@ -1053,7 +1053,7 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	MCFG_SET_TYPE2_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type2 )
 	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type3 )
 
-	MCFG_NVRAM_ADD_0FILL("saveram")
+	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)

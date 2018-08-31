@@ -210,6 +210,7 @@ public:
 	void fdes2325(machine_config &config);
 	void init_fdes2265();
 
+	void eag_base(machine_config &config);
 	void eag(machine_config &config);
 	void eagv7(machine_config &config);
 	void eagv9(machine_config &config);
@@ -626,7 +627,7 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2325)
 	config.set_default_layout(layout_fidel_desdis_68kg);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(fidel68k_state::eag)
+MACHINE_CONFIG_START(fidel68k_state::eag_base)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
@@ -635,14 +636,10 @@ MACHINE_CONFIG_START(fidel68k_state::eag)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(4.9152_MHz_XTAL/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(4.9152_MHz_XTAL/0x2000))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_eag_68k);
-
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 512K, 1M")
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -657,14 +654,17 @@ MACHINE_CONFIG_START(fidel68k_state::eag)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(fidel68k_state::eag)
+	eag_base(config);
+	RAM(config, "ram").set_default_size("1M").set_extra_options("128K, 512K, 1M");
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(fidel68k_state::eagv7)
-	eag(config);
+	eag_base(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REPLACE("maincpu", M68020, 20_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(eagv7_map)
-
-	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel68k_state::eagv9)

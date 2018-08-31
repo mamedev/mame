@@ -761,15 +761,15 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(DEVICE_SELF, compis_state, tmr1_w))
 
 	// devices
-	MCFG_DEVICE_ADD(I80130_TAG, I80130, 15.36_MHz_XTAL/2)
-	MCFG_I80130_IRQ_CALLBACK(WRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
-	MCFG_I80130_SYSTICK_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir3_w))
-	MCFG_I80130_DELAY_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir7_w))
-	MCFG_I80130_BAUD_CALLBACK(WRITELINE(*this, compis_state, tmr2_w))
+	I80130(config, m_osp, 15.36_MHz_XTAL/2);
+	m_osp->irq().set(I80186_TAG, FUNC(i80186_cpu_device::int0_w));
+	m_osp->systick().set(I80130_TAG, FUNC(i80130_device::ir3_w));
+	m_osp->delay().set(I80130_TAG, FUNC(i80130_device::ir7_w));
+	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8274_TAG, i8274_device, rxtxcb_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_mpsc, i8274_device, rxtxcb_w))
 	MCFG_PIT8253_CLK1(15.36_MHz_XTAL/8)
 	MCFG_PIT8253_CLK2(15.36_MHz_XTAL/8)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
@@ -779,22 +779,22 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, compis_state, ppi_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, compis_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(COMPIS_KEYBOARD_TAG, compis_keyboard_device, si_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(I80130_TAG, i80130_device, ir2_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(COMPIS_KEYBOARD_TAG, FUNC(compis_keyboard_device::si_w));
+	m_uart->rxrdy_handler().set(I80130_TAG, FUNC(i80130_device::ir2_w));
+	m_uart->txrdy_handler().set(I80186_TAG, FUNC(i80186_cpu_device::int1_w));
 
 	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
 	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD(I8274_TAG, I8274, 15.36_MHz_XTAL/4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(I80186_TAG, i80186_cpu_device, int3_w))
+	I8274(config, m_mpsc, 15.36_MHz_XTAL/4);
+	m_mpsc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_mpsc->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_mpsc->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
 
 	MCFG_DEVICE_ADD(MM58174A_TAG, MM58274C, 32.768_kHz_XTAL)
 	MCFG_MM58274C_MODE24(1) // 24 hour
@@ -806,14 +806,14 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8274_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(I8274_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(I8274_TAG, z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8274_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(I8274_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(I8274_TAG, z80dart_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))
@@ -835,9 +835,7 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K");
 MACHINE_CONFIG_END
 
 
@@ -853,9 +851,7 @@ MACHINE_CONFIG_START(compis_state::compis2)
 	// TODO 8087
 
 	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K")
+	m_ram->set_default_size("256K").set_extra_options("512K,768K");
 MACHINE_CONFIG_END
 
 

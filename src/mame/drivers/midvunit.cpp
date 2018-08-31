@@ -1069,7 +1069,7 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_ADD_NONE("timer0")
 	MCFG_TIMER_ADD_NONE("timer1")
@@ -1127,7 +1127,7 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(0)

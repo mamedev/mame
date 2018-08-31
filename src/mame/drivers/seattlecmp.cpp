@@ -127,12 +127,12 @@ MACHINE_CONFIG_START(seattle_comp_state::seattle)
 	stc.fout_cb().set("stc", FUNC(am9513_device::source1_w));
 	// FOUT not shown on schematics, which inexplicably have Source 1 tied to Gate 5
 
-	MCFG_DEVICE_ADD("uart", I8251, XTAL(24'000'000) / 12) // CLOCK on line 49
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic2", pic8259_device, ir1_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic2", pic8259_device, ir5_w))
+	i8251_device &uart(I8251(config, "uart", XTAL(24'000'000) / 12)); // CLOCK on line 49
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.rxrdy_handler().set("pic2", FUNC(pic8259_device::ir1_w));
+	uart.txrdy_handler().set("pic2", FUNC(pic8259_device::ir5_w));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))

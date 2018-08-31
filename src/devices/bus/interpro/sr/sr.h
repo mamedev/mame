@@ -13,12 +13,12 @@ public:
 	auto out_irq0_cb() { return m_out_irq0_cb.bind(); }
 	auto out_irq1_cb() { return m_out_irq1_cb.bind(); }
 	auto out_irq2_cb() { return m_out_irq2_cb.bind(); }
-	auto out_vblank_cb() { return m_out_vblank_cb.bind(); }
+	auto out_irq3_cb() { return m_out_irq3_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(irq0_w) { m_out_irq0_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq1_w) { m_out_irq1_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2_w) { m_out_irq2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(vblank_w) { m_out_vblank_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq3_w) { m_out_irq3_cb(state); }
 
 protected:
 	// construction/destruction
@@ -30,7 +30,7 @@ protected:
 		, m_out_irq0_cb(*this)
 		, m_out_irq1_cb(*this)
 		, m_out_irq2_cb(*this)
-		, m_out_vblank_cb(*this)
+		, m_out_irq3_cb(*this)
 	{
 	}
 
@@ -46,7 +46,7 @@ private:
 	devcb_write_line m_out_irq0_cb;
 	devcb_write_line m_out_irq1_cb;
 	devcb_write_line m_out_irq2_cb;
-	devcb_write_line m_out_vblank_cb;
+	devcb_write_line m_out_irq3_cb;
 };
 
 class device_cbus_card_interface;
@@ -133,7 +133,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq0) { m_bus->irq0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq1) { m_bus->irq1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2) { m_bus->irq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(vblank) { m_bus->vblank_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq3) { m_bus->irq3_w(state); }
 
 protected:
 	device_cbus_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")
@@ -251,7 +251,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq0) { m_bus->irq0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq1) { m_bus->irq1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2) { m_bus->irq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(vblank) { m_bus->vblank_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq3) { m_bus->irq3_w(state); }
 
 protected:
 	device_srx_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")

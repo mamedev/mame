@@ -1760,10 +1760,10 @@ MACHINE_CONFIG_START(fidelz80_state::vsc)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fidelz80_state, vsc_ppi_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vsc_ppi_portc_w))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3.9_MHz_XTAL)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, fidelz80_state, vsc_pio_porta_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, fidelz80_state, vsc_pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, fidelz80_state, vsc_pio_portb_w))
+	Z80PIO(config, m_z80pio, 3.9_MHz_XTAL);
+	m_z80pio->in_pa_callback().set(FUNC(fidelz80_state::vsc_pio_porta_r));
+	m_z80pio->in_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_r));
+	m_z80pio->out_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_vsc);
@@ -1786,12 +1786,14 @@ MACHINE_CONFIG_START(fidelz80_state::vbrc)
 	MCFG_DEVICE_ADD("mcu", I8041, 5_MHz_XTAL)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, fidelz80_state, vbrc_mcu_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, fidelz80_state, vbrc_mcu_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8("i8243", i8243_device, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(m_i8243, i8243_device, p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t1_r))
 
-	MCFG_I8243_ADD("i8243", CONSTANT(0), WRITE8(*this, fidelz80_state, vbrc_ioexp_port_w))
+	I8243(config, m_i8243);
+	m_i8243->read_handler().set_constant(0);
+	m_i8243->write_handler().set(FUNC(fidelz80_state::vbrc_ioexp_port_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_vbrc);

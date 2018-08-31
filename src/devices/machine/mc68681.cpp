@@ -760,7 +760,7 @@ WRITE8_MEMBER(xr68c681_device::write)
 			data &= 0x0f;
 			break;
 		}
-	
+
 	mc68681_device::write(space, offset, data, mem_mask); /* pass on 68681 command */
 }
 

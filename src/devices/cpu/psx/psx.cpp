@@ -3468,6 +3468,5 @@ MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "sio1", PSX_SIO1, 0 )
 	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin8 ) )
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_VALUE( 0x00 )
+	RAM( config, "ram" ).set_default_value( 0x00 );
 MACHINE_CONFIG_END

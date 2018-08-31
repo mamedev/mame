@@ -196,7 +196,7 @@ MACHINE_CONFIG_START(rltennis_state::rltennis)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_EEPROM_2864_ADD("eeprom")
+	EEPROM_2864(config, "eeprom");
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 	MCFG_RAMDAC_SPLIT_READ(1)

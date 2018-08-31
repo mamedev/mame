@@ -128,7 +128,7 @@ void abc_fd2_device::abc_fd2_mem(address_map &map)
 void abc_fd2_device::abc_fd2_io(address_map &map)
 {
 	map.global_mask(0x73);
-	map(0x30, 0x33).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x30, 0x33).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x50, 0x53).rw(FD1771_TAG, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
 	map(0x60, 0x60).w(FUNC(abc_fd2_device::status_w));
 }
@@ -243,17 +243,17 @@ MACHINE_CONFIG_START(abc_fd2_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(abc_fd2_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 4_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, abc_fd2_device, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, abc_fd2_device, pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, abc_fd2_device, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, abc_fd2_device, pio_pb_w))
+	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(abc_fd2_device::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(abc_fd2_device::pio_pa_w));
+	m_pio->in_pb_callback().set(FUNC(abc_fd2_device::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(abc_fd2_device::pio_pb_w));
 
 	MCFG_DEVICE_ADD(FD1771_TAG, FD1771, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb7_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb5_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(Z80PIO_TAG, z80pio_device, pb6_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_pio, z80pio_device, pb7_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_pio, z80pio_device, pb5_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(m_pio, z80pio_device, pb6_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)

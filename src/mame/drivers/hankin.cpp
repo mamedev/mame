@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(hankin_state::hankin)
 	MCFG_DEVICE_ADD("audiocpu", M6802, 3276800) // guess, xtal value not shown
 	MCFG_DEVICE_PROGRAM_MAP(hankin_sub_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_hankin);

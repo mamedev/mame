@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	mainlatch.q_out_cb<6>().set_nop(); // cleared at start
 	mainlatch.q_out_cb<7>().set_nop(); // cleared at start
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

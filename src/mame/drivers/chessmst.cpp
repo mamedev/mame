@@ -386,14 +386,14 @@ MACHINE_CONFIG_START(chessmst_state::chessmst)
 	MCFG_DEVICE_IO_MAP(chessmst_io)
 	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 9.8304_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 9.8304_MHz_XTAL/4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 9.8304_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 9.8304_MHz_XTAL/4);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmst);
 
@@ -411,14 +411,14 @@ MACHINE_CONFIG_START(chessmst_state::chessmsta)
 	MCFG_DEVICE_IO_MAP(chessmst_io)
 	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmst);
 
@@ -436,15 +436,15 @@ MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 	MCFG_DEVICE_IO_MAP(chessmstdm_io)
 	MCFG_Z80_DAISY_CHAIN(chessmstdm_daisy_chain)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_dm_w))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("EXTRA"))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", 8_MHz_XTAL/4));
+	pio1.out_pa_callback().set(FUNC(chessmst_state::pio1_port_a_w));
+	pio1.out_pb_callback().set(FUNC(chessmst_state::pio1_port_b_dm_w));
+	pio1.in_pb_callback().set_ioport("EXTRA");
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
+	Z80PIO(config, m_pia2, 8_MHz_XTAL/4);
+	m_pia2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pia2->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
+	m_pia2->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmstdm);
 

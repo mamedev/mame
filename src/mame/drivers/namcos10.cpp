@@ -932,8 +932,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 
 	MCFG_PSX_DISABLE_ROM_BERR
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("16M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("16M");
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
@@ -957,8 +956,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 
 	MCFG_PSX_DISABLE_ROM_BERR
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("16M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("16M");
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 

@@ -1764,29 +1764,33 @@ MACHINE_CONFIG_START(dkong_state::dkong2b)
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dkong_state::dk_braze)
+void dkong_state::dk_braze(machine_config &config)
+{
 	dkong2b(config);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
-MACHINE_CONFIG_START(dkong_state::dkj_braze)
+void dkong_state::dkj_braze(machine_config &config)
+{
 	dkongjr(config);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
-MACHINE_CONFIG_START(dkong_state::ddk_braze)
+void dkong_state::ddk_braze(machine_config &config)
+{
 	dkj_braze(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,ddk)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::dk3_braze)
+void dkong_state::dk3_braze(machine_config &config)
+{
 	dkong3(config);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(dkong_state::dkong3)
 
@@ -1797,10 +1801,10 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
-	MCFG_DEVICE_ADD("z80dma", Z80DMA, CLOCK_1H)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, dkong_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, dkong_state, memory_write_byte))
+	Z80DMA(config, m_z80dma, CLOCK_1H);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_z80dma->in_mreq_callback().set(FUNC(dkong_state::memory_read_byte));
+	m_z80dma->out_mreq_callback().set(FUNC(dkong_state::memory_write_byte));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

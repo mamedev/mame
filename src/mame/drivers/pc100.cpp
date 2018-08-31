@@ -662,11 +662,11 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(CONSTANT(0)) // ???
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
+	i8251_device &i8251(I8251(config, "uart8251", 0));
+	//i8251.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//i8251.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	//i8251.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	i8251.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc100_state, irqnmi_w))

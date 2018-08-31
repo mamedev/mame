@@ -9,7 +9,7 @@
     SNK Hyper NeoGeo 64 (arcade platform)
     AKAI MPC3000 (synth)
 
-    both are driven by a V53, the MPC3000 isn't dumped.
+    both are driven by a V53.
 
     appears to write a register number and channel/voice using
     l7a1045_sound_select_w (offset 0)
@@ -207,6 +207,8 @@ WRITE16_MEMBER( l7a1045_sound_device::l7a1045_sound_w )
 {
 	m_stream->update(); // TODO
 
+	//logerror("%s: %x to %x (mask %04x)\n", tag(), data, offset, mem_mask);
+
 	if(offset == 0)
 		sound_select_w(space, offset, data, mem_mask);
 	else if(offset == 8/2)
@@ -219,6 +221,8 @@ WRITE16_MEMBER( l7a1045_sound_device::l7a1045_sound_w )
 READ16_MEMBER( l7a1045_sound_device::l7a1045_sound_r )
 {
 	m_stream->update();
+
+	//logerror("%s: read at %x (mask %04x)\n", tag(), offset, mem_mask);
 
 	if(offset == 0)
 		printf("sound_select_r?\n");
@@ -261,6 +265,8 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
+	//logerror("%s: %x to ch %d reg %d\n", tag(), data, m_audiochannel, m_audioregister);
+
 	switch (m_audioregister)
 	{
 		case 0x00:
@@ -269,8 +275,15 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xffff) << (4);
 			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
 
+			//logerror("%s: channel %d start = %08x\n", tag(), m_audiochannel, vptr->start);
+
 			vptr->start &= m_rom.mask();
 
+			// if voice isn't active, clear the pos on start writes (required for DMA tests on MPC3000)
+			if (!(m_key & (1 << m_audiochannel)))
+			{
+				vptr->pos = 0;
+			}
 			break;
 		case 0x01:
 			// relative to start
@@ -296,7 +309,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 
 				vptr->end &= m_rom.mask();
 			}
-
+			//logerror("%s: channel %d end = %08x\n", tag(), m_audiochannel, vptr->start);
 			break;
 
 		case 0x07:
@@ -362,4 +375,23 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
 		vptr->pos = 0;
 		m_key |= 1 << m_audiochannel;
 	}
+}
+
+WRITE_LINE_MEMBER(l7a1045_sound_device::dma_hreq_cb)
+{
+//  m_maincpu->hack_w(1);
+}
+
+READ8_MEMBER(l7a1045_sound_device::dma_r_cb)
+{
+//    logerror("dma_ior3_cb: offset %x\n", offset);
+
+	m_voice[0].pos++;
+	return 0;
+}
+
+WRITE8_MEMBER(l7a1045_sound_device::dma_w_cb)
+{
+	m_voice[0].pos++;
+//    logerror("dma_iow3_cb: offset %x\n", offset);
 }

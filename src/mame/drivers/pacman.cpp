@@ -3867,7 +3867,7 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(superabc_map)
 
-	MCFG_NVRAM_ADD_0FILL("28c16.u17")
+	NVRAM(config, "28c16.u17", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 

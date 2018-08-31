@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("scc", SCC8530, 7000000)
+	SCC8530(config, m_scc, 7000000);
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_6)
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)

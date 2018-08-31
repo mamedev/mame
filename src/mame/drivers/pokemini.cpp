@@ -1767,8 +1767,7 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x2000);
 
 	/* This still needs to be improved to actually match the hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

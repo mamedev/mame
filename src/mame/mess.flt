@@ -195,6 +195,7 @@ e100.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp
+ec7915.cpp
 einstein.cpp
 electron.cpp
 elekscmp.cpp
@@ -304,6 +305,7 @@ ibm6580.cpp
 ibmpc.cpp
 ibmpcjr.cpp
 icatel.cpp
+icebox.cpp
 ie15.cpp
 if800.cpp
 imds.cpp
@@ -330,6 +332,7 @@ isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
 itt3030.cpp
+jade.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
@@ -754,7 +757,6 @@ tvc.cpp
 tvgame.cpp
 tx0.cpp
 uknc.cpp
-unkz80.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp
@@ -771,6 +773,7 @@ vax11.cpp
 vboy.cpp
 vc4000.cpp
 vcs80.cpp
+vdm7932x.cpp
 vector06.cpp
 vector4.cpp
 vectrex.cpp
@@ -805,6 +808,7 @@ vtech_unk2.cpp
 wangpc.cpp
 wicat.cpp
 wswan.cpp
+wy100.cpp
 wyse.cpp
 x07.cpp
 x1.cpp
@@ -817,6 +821,7 @@ xor100.cpp
 ymmu100.cpp
 z100.cpp
 z1013.cpp
+z29.cpp
 z80dev.cpp
 z80ne.cpp
 z88.cpp

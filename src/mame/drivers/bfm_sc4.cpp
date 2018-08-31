@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8)

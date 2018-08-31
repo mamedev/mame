@@ -1247,7 +1247,7 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 	MCFG_DEVICE_PROGRAM_MAP(norautp_map)
 	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   /* doesn't work if placed at derivative drivers */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   /* doesn't work if placed at derivative drivers */
 
 	I8255(config, m_ppi8255[0], 0);
 	/* (60-63) Mode 0 - Port A set as input */

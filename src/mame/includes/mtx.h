@@ -14,6 +14,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/z80/z80.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
@@ -51,7 +52,7 @@ public:
 	void mtx512(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<sn76489a_device> m_sn;
 	required_device<z80ctc_device> m_z80ctc;
 	optional_device<z80dart_device> m_z80dart;

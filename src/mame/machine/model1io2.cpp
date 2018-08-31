@@ -177,7 +177,7 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	io.out_pf_callback().set(FUNC(model1io2_device::io_pf_w));
 	io.out_pg_callback().set(FUNC(model1io2_device::io_pg_w));
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom); // 93C45
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
 	MB3773(config, m_watchdog, 0);
 

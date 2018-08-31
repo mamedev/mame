@@ -1493,7 +1493,7 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(crystal_state, icallback)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

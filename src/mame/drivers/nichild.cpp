@@ -69,7 +69,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tmpz84c011_device> m_maincpu;
 	required_device<v9938_device> m_v9938;
 	required_region_ptr<uint8_t> m_gfxrom;
 	uint32_t m_gfx_bank;
@@ -233,17 +233,17 @@ INTERRUPT_GEN_MEMBER(nichild_state::vdp_irq)
 MACHINE_CONFIG_START(nichild_state::nichild)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",TMPZ84C011,MAIN_CLOCK/4)
-//  MCFG_Z80_DAISY_CHAIN(daisy_chain_main)
-	MCFG_DEVICE_PROGRAM_MAP(nichild_map)
-	MCFG_DEVICE_IO_MAP(nichild_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nichild_state,  vdp_irq)
-	MCFG_TMPZ84C011_PORTB_READ_CB(READ8(*this, nichild_state, mux_r))
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(*this, nichild_state, porta_w))
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(*this, nichild_state, portb_w))
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(*this, nichild_state, portc_w))
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(*this, nichild_state, portd_w))
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, nichild_state, gfxbank_w))
+	TMPZ84C011(config, m_maincpu, MAIN_CLOCK/4);
+	//m_maincpu->set_daisy_config(daisy_chain_main);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nichild_state::nichild_map);
+	m_maincpu->set_addrmap(AS_IO, &nichild_state::nichild_io);
+	m_maincpu->set_vblank_int("screen", FUNC(nichild_state::vdp_irq));
+	m_maincpu->in_pb_callback().set(FUNC(nichild_state::mux_r));
+	m_maincpu->out_pa_callback().set(FUNC(nichild_state::porta_w));
+	m_maincpu->out_pb_callback().set(FUNC(nichild_state::portb_w));
+	m_maincpu->out_pc_callback().set(FUNC(nichild_state::portc_w));
+	m_maincpu->out_pd_callback().set(FUNC(nichild_state::portd_w));
+	m_maincpu->out_pe_callback().set(FUNC(nichild_state::gfxbank_w));
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", 0x40000, MAIN_CLOCK)

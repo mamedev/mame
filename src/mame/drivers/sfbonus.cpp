@@ -1384,7 +1384,7 @@ MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(sfbonus_state, nmi_line_pulse, 100)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sfbonus)
 

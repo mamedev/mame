@@ -68,8 +68,8 @@ void device_vtlb_interface::interface_validity_check(validity_checker &valid) co
 		const address_space_config *spaceconfig = intf->space_config(m_space);
 		if (spaceconfig == nullptr)
 			osd_printf_error("No memory address space configuration found for space %d\n", m_space);
-		else if ((1 << spaceconfig->m_page_shift) <= VTLB_FLAGS_MASK || spaceconfig->m_logaddr_width <= spaceconfig->m_page_shift)
-			osd_printf_error("Invalid page shift %d for VTLB\n", spaceconfig->m_page_shift);
+		else if ((1 << spaceconfig->page_shift()) <= VTLB_FLAGS_MASK || spaceconfig->logaddr_width() <= spaceconfig->page_shift())
+			osd_printf_error("Invalid page shift %d for VTLB\n", spaceconfig->page_shift());
 	}
 }
 
@@ -83,8 +83,8 @@ void device_vtlb_interface::interface_pre_start()
 {
 	// fill in CPU information
 	const address_space_config *spaceconfig = device().memory().space_config(m_space);
-	m_pageshift = spaceconfig->m_page_shift;
-	m_addrwidth = spaceconfig->m_logaddr_width;
+	m_pageshift = spaceconfig->page_shift();
+	m_addrwidth = spaceconfig->logaddr_width();
 
 	// allocate the entry array
 	m_live.resize(m_fixed + m_dynamic);

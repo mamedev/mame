@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(midwunit_state::wunit)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midwunit_state,midwunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -677,6 +677,40 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
+/*
+A Mortal Kombat 3 PCB with V2.1 program ROMs was seen with different styled labels:
+
+L1.0  3/29/95 9200  MORTAL KOMBAT III SOUND  U2
+ - Labels missing for U3 through U5 -
+
+MORTAL KOMBAT 3  U54  REV 2.1 5/3/95  CCFB  FM.0
+MORTAL KOMBAT 3  U63  REV 2.1 5/3/95  015E  FM.1
+
+PROTO  991A 3/20/95  MORTAL KOMBAT III  U133  2M.0
+PROTO  9FA5 3/20/95  MORTAL KOMBAT III  U132  2M.1
+PROTO  056F 3/20/95  MORTAL KOMBAT III  U131  2M.2
+PROTO  775D 3/20/95  MORTAL KOMBAT III  U130  2M.3
+
+PROTO  DE07 3/20/95  MORTAL KOMBAT III  U129  4M.0   <these labels were missing, except for one hand written label.  Following format of U133 - U130>
+PROTO  EEE2 3/20/95  MORTAL KOMBAT III  U128  4M.1
+PROTO  D3C6 3/20/95  MORTAL KOMBAT III  U127  4M.2
+PROTO  0F4D 3/20/95  MORTAL KOMBAT III  U126  4M.3
+
+PROTO  985D 3/20/95  MORTAL KOMBAT III  U125  6M.0  <these labels were missing, except for one hand written label.  Following format of U133 - U130>
+PROTO  F576 3/20/95  MORTAL KOMBAT III  U124  6M.1
+PROTO  7C81 3/20/95  MORTAL KOMBAT III  U123  6M.2
+PROTO  49FE 3/20/95  MORTAL KOMBAT III  U122  6M.3
+
+0435 3/29/95  MORTAL KOMBAT III  U121  8M.0  <these labels were missing, except for one hand written label>
+E667 3/29/95  MORTAL KOMBAT III  U120  8M.1
+0493 3/29/95  MORTAL KOMBAT III  U119  8M.2
+B037 3/29/95  MORTAL KOMBAT III  U118  8M.3
+
+A83E 4/6/95  MORTAL KOMBAT III  U117  AM.0
+7B1E 4/6/95  MORTAL KOMBAT III  U116  AM.1
+94A7 4/6/95  MORTAL KOMBAT III  U115  AM.2
+7F0B 4/6/95  MORTAL KOMBAT III  U114  AM.3
+*/
 ROM_START( mk3 )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u2_music_spch.u2", 0x000000, 0x100000, CRC(5273436f) SHA1(e1735842a0159eafe79d878d44e3828df9bfa5bb) )

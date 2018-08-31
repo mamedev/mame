@@ -187,7 +187,7 @@ void laser2001_state::lasr2001_map(address_map &map)
 
 INPUT_CHANGED_MEMBER( crvision_state::trigger_nmi )
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -774,9 +774,9 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K") // MAIN RAM
-	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+	RAM(config, RAM_TAG)
+		.set_default_size("1K") // MAIN RAM
+		.set_extra_options("15K"); // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "crvision")
@@ -786,29 +786,31 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_START( ntsc )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_state::ntsc)
+void crvision_state::ntsc(machine_config &config)
+{
 	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9918_device, screen_update )
-MACHINE_CONFIG_END
+	tms9918_device &vdp(TMS9918(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( pal )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_pal_state::pal)
+void crvision_pal_state::pal(machine_config &config)
+{
 	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929_device, screen_update )
-MACHINE_CONFIG_END
+	tms9929_device &vdp(TMS9929(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( lasr2001 )
@@ -838,11 +840,11 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -857,9 +859,7 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")

@@ -323,7 +323,8 @@ render_texture::render_texture()
 		m_next(nullptr),
 		m_bitmap(nullptr),
 		m_format(TEXFORMAT_ARGB32),
-		m_osddata(~0L),
+		m_id(~0ULL),
+		m_old_id(~0ULL),
 		m_scaler(nullptr),
 		m_param(nullptr),
 		m_curseq(0)
@@ -357,7 +358,8 @@ void render_texture::reset(render_manager &manager, texture_scaler_func scaler, 
 		m_scaler = scaler;
 		m_param = param;
 	}
-	m_osddata = ~0L;
+	m_old_id = m_id;
+	m_id = ~0L;
 }
 
 
@@ -447,7 +449,10 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 	if (dwidth < 1) dwidth = 1;
 	if (dheight < 1) dheight = 1;
 
-	texinfo.osddata = m_osddata;
+	texinfo.unique_id = m_id;
+	texinfo.old_id = m_old_id;
+	if (m_old_id != ~0ULL)
+		m_old_id = ~0ULL;
 
 	// are we scaler-free? if so, just return the source bitmap
 	if (m_scaler == nullptr || (m_bitmap != nullptr && swidth == dwidth && sheight == dheight))
@@ -2964,6 +2969,7 @@ render_manager::render_manager(running_machine &machine)
 	: m_machine(machine),
 		m_ui_target(nullptr),
 		m_live_textures(0),
+		m_texture_id(0),
 		m_ui_container(global_alloc(render_container(*this)))
 {
 	// register callbacks
@@ -3128,6 +3134,8 @@ render_texture *render_manager::texture_alloc(texture_scaler_func scaler, void *
 	// allocate a new texture and reset it
 	render_texture *tex = m_texture_allocator.alloc();
 	tex->reset(*this, scaler, param);
+	tex->set_id(m_texture_id);
+	m_texture_id++;
 	m_live_textures++;
 	return tex;
 }

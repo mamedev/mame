@@ -2219,10 +2219,11 @@ MACHINE_CONFIG_START(system1_state::sys1pio)
 	MCFG_DEVICE_IO_MAP(system1_pio_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("pio", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, system1_state, soundport_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, system1_state, videomode_w))
+
+	Z80PIO(config, m_pio, MASTER_CLOCK);
+	m_pio->out_pa_callback().set(FUNC(system1_state::soundport_w));
+	m_pio->out_ardy_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	m_pio->out_pb_callback().set(FUNC(system1_state::videomode_w));
 MACHINE_CONFIG_END
 
 #define ENCRYPTED_SYS1PPI_MAPS \
@@ -5521,7 +5522,7 @@ GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, i
 GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "hack (Vision Electronics)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nob,        0,        nobm,              nob,       system1_state, init_nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, init_nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 

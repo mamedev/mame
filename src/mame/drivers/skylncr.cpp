@@ -1653,7 +1653,7 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_DEVICE_IO_MAP(io_map_skylncr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* 1x M5M82C255, or 2x PPI8255 */
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)

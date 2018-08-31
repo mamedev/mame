@@ -228,13 +228,13 @@ MACHINE_CONFIG_START(decstation_state::kn02da)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("ioga", dec_ioga_device, rtc_irq_w))
 	MCFG_MC146818_BINARY(true)
 
-	MCFG_DEVICE_ADD("scc0", SCC85C30, XTAL(14'745'600)/2)
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE("ioga", dec_ioga_device, scc0_irq_w))
+	SCC85C30(config, m_scc0, XTAL(14'745'600)/2);
+	//m_scc0->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc0_irq_w));
 
-	MCFG_DEVICE_ADD("scc1", SCC85C30, XTAL(14'745'600)/2)
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE("ioga", dec_ioga_device, scc1_irq_w))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
+	SCC85C30(config, m_scc1, XTAL(14'745'600)/2);
+	//m_scc1->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc1_irq_w));
+	m_scc1->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_scc1->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("scc1", z80scc_device, rxa_w))

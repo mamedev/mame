@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<4>().set(FUNC(sauro_state::irq_reset_w));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

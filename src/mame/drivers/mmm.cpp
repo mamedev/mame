@@ -33,7 +33,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport_array<8> m_inputs;
 	u8 m_strobe;
@@ -175,10 +175,10 @@ static const z80_daisy_config mmm_daisy_chain[] =
 
 MACHINE_CONFIG_START(mmm_state::mmm)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,2000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(mmm_daisy_chain)
+	Z80(config, m_maincpu, 2000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mmm_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mmm_state::io_map);
+	m_maincpu->set_daisy_config(mmm_daisy_chain);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 2000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

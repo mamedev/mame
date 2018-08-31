@@ -656,7 +656,7 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, spinb_state, p3_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, spinb_state, p3_w))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	MCFG_SCREEN_ADD("screen", LCD)

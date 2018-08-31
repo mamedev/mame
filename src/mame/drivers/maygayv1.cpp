@@ -896,7 +896,7 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	pia.writepa_handler().set(FUNC(maygayv1_state::b_writ));
 	pia.writepb_handler().set(FUNC(maygayv1_state::b_writ));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* TODO: Use real video timings */
 	MCFG_SCREEN_ADD("screen", RASTER)

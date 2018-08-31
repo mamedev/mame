@@ -296,15 +296,14 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 
 	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
 
-	MCFG_DEVICE_ADD(MK3887N4_TAG, Z80SIO2, 8000000/2)
+	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
 
 	MCFG_DEVICE_ADD(FD1797PL02_TAG, FD1797, 8000000/4)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")

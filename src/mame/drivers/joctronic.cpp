@@ -74,7 +74,7 @@ private:
 	void slalom03_sound_io_map(address_map &map);
 	void slalom03_sound_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_oki;
@@ -337,16 +337,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(joctronic_state::joctronic)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4) // 3 MHz - uses WAIT
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map) // 139
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 3 MHz - uses WAIT
+	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::maincpu_map); // 139
+	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
 	MCFG_DEVICE_PROGRAM_MAP(joctronic_sound_map)
 	MCFG_DEVICE_IO_MAP(joctronic_sound_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
 	LS259(config, m_mainlatch); // IC4 - exact type unknown
 	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::display_select_w)); MCFG_DEVCB_MASK(0x07)
@@ -383,16 +383,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(joctronic_state::slalom03)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
-	MCFG_DEVICE_PROGRAM_MAP(slalom03_maincpu_map) // 138, 368, 32
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2); // 6 MHz - uses WAIT
+	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::slalom03_maincpu_map); // 138, 368, 32
+	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
 	MCFG_DEVICE_PROGRAM_MAP(slalom03_sound_map)
 	MCFG_DEVICE_IO_MAP(slalom03_sound_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
 	LS259(config, m_mainlatch); // IC6 - exact type unknown
 	//m_mainlatch->q_out_cb<0>().set(FUNC(joctronic_state::cont_w));
@@ -434,11 +434,11 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(joctronic_state::bldyrolr)
+void joctronic_state::bldyrolr(machine_config & config)
+{
 	slalom03(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bldyrolr_maincpu_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::bldyrolr_maincpu_map);
+}
 
 
 /*-------------------------------------------------------------------

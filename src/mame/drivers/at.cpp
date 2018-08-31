@@ -179,6 +179,7 @@ public:
 	megapc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
 		m_wd7600(*this, "wd7600"),
 		m_isabus(*this, "isabus"),
 		m_speaker(*this, "speaker")
@@ -192,6 +193,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<wd7600_device> m_wd7600;
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
@@ -459,9 +461,7 @@ MACHINE_CONFIG_START(at_state::ibm5170)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+	RAM(config, m_ram).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ibm5170a)
@@ -480,8 +480,7 @@ MACHINE_CONFIG_START(at_state::ews286)
 
 	MCFG_SOFTWARE_LIST_ADD("ews286_disk_list","ews286_flop")
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+	m_ram->set_default_size("640K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ec1842)
@@ -529,7 +528,7 @@ MACHINE_CONFIG_START(at_state::neat)
 	MCFG_DS12885_ADD("mb:rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
-	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
+	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "bios");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::xb42639)
@@ -557,7 +556,7 @@ MACHINE_CONFIG_START(at_state::at386)
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on-board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: deteremine ISA bus clock
@@ -573,9 +572,7 @@ MACHINE_CONFIG_START(at_state::at386)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M")
+	RAM(config, m_ram).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::at386l)
@@ -610,7 +607,7 @@ MACHINE_CONFIG_START(at_state::ct386sx)
 	at386sx(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(neat_io)
-	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
+	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "maincpu");
 MACHINE_CONFIG_END
 
 // Commodore PC 30-III
@@ -680,21 +677,20 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	// ISA cards
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, 12_MHz_XTAL)
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE("wd7600", wd7600_device, kbrst_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE("wd7600", wd7600_device, gatea20_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("wd7600", wd7600_device, irq01_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
+	keybc.system_reset_cb().set("wd7600", FUNC(wd7600_device::kbrst_w));
+	keybc.gate_a20_cb().set("wd7600", FUNC(wd7600_device::gatea20_w));
+	keybc.input_buffer_full_cb().set("wd7600", FUNC(wd7600_device::irq01_w));
+	keybc.keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,15M,16M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,15M,16M");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -725,7 +721,7 @@ MACHINE_CONFIG_START(at_vrom_fix_state::megapcpla)
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
@@ -741,9 +737,7 @@ MACHINE_CONFIG_START(at_vrom_fix_state::megapcpla)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,8M,15M,16M,32M,64M,128M,256M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("2M,8M,15M,16M,32M,64M,128M,256M");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
@@ -764,19 +758,17 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M")
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M");
 
 	// on board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
 	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "lpt", true)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir6_w))
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir7_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("mb:pic8259_slave", FUNC(pic8259_device::ir6_w));
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, "cdrom", nullptr, true));
+	ide2.irq_handler().set("mb:pic8259_slave", FUNC(pic8259_device::ir7_w));
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "vt82c505", true)
@@ -816,9 +808,7 @@ MACHINE_CONFIG_START(at_state::comportiii)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4736K,6784K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("1152K,1664K,2176K,2688K,4736K,6784K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::comportii)
@@ -829,9 +819,7 @@ MACHINE_CONFIG_START(at_state::comportii)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_360K)
 	MCFG_DEVICE_MODIFY("isa4")
 	MCFG_SLOT_DEFAULT_OPTION("hdc")
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4224K")
+	m_ram->set_default_size("640K").set_extra_options("1152K,1664K,2176K,2688K,4224K");
 MACHINE_CONFIG_END
 
 //**************************************************************************

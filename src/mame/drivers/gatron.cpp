@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_DEVICE_PROGRAM_MAP(gat_map)
 	MCFG_DEVICE_IO_MAP(gat_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))

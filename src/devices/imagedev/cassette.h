@@ -43,7 +43,8 @@ enum cassette_state
 // ======================> cassette_image_device
 
 class cassette_image_device :   public device_t,
-								public device_image_interface
+								public device_image_interface,
+								public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -90,6 +91,10 @@ public:
 	void go_reverse();
 	void seek(double time, int origin);
 
+	// sound stream update overrides
+	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
+
 protected:
 	bool is_motor_on();
 	void update();
@@ -115,6 +120,7 @@ private:
 	const char *                    m_interface;
 
 	image_init_result internal_load(bool is_create);
+	bool            m_stereo;
 };
 
 // device type definition

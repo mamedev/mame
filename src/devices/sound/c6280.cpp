@@ -36,9 +36,9 @@
     - http://www.hudsonsoft.net/ww/about/about.html
     - http://www.hudson.co.jp/corp/eng/coinfo/history.html
 
-	Integrated on:
-	HuC6280 CPU (PC Engine/TurboGrafx 16)
-	HuC6230 Sound Chip (PC-FX, with OKI ADPCM)
+    Integrated on:
+    HuC6280 CPU (PC Engine/TurboGrafx 16)
+    HuC6230 Sound Chip (PC-FX, with OKI ADPCM)
 
 */
 

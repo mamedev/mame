@@ -1898,7 +1898,7 @@ MACHINE_CONFIG_START(centiped_state::multiped)
 	MCFG_DEVICE_PROGRAM_MAP(multiped_map)
 
 	MCFG_DEVICE_REMOVE("earom")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 

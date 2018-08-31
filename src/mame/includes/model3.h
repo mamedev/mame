@@ -367,6 +367,8 @@ private:
 	void model3_10_mem(address_map &map);
 	void model3_mem(address_map &map);
 	void model3_snd(address_map &map);
+	void scsp1_map(address_map &map);
+	void scsp2_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MODEL3_H

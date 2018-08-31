@@ -565,7 +565,9 @@ MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
 //  MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, bitgraph_state, ppu_t0_r))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(*this, bitgraph_state, ppu_i8243_w))
+	i8243_device &i8243(I8243(config, "i8243"));
+	i8243.read_handler().set_nop();
+	i8243.write_handler().set(FUNC(bitgraph_state::ppu_i8243_w));
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
@@ -598,8 +600,7 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_cts))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
@@ -612,8 +613,7 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bitgraph_state, system_clock_write))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

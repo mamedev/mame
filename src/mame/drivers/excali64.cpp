@@ -560,9 +560,9 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 
 	MCFG_MACHINE_RESET_OVERRIDE(excali64_state, excali64)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, "uart", 0);
+	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(16_MHz_XTAL / 16) /* Timer 0: tone gen for speaker */
@@ -603,25 +603,25 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, 16_MHz_XTAL / 4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, excali64_state, busreq_w))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, excali64_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, excali64_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, excali64_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, excali64_state, io_write_byte))
+	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
+	m_dma->out_busreq_callback().set(FUNC(excali64_state::busreq_w));
+	m_dma->in_mreq_callback().set(FUNC(excali64_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(excali64_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(excali64_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(excali64_state::io_write_byte));
 
 	TTL74123(config, m_u12, 0);
-	m_u12->set_connection_type(TTL74123_GROUNDED);	/* Hook up type (no idea what this means) */
+	m_u12->set_connection_type(TTL74123_GROUNDED);  /* Hook up type (no idea what this means) */
 	m_u12->set_resistor_value(RES_K(100));          /* resistor connected between RCext & 5v */
 	m_u12->set_capacitor_value(CAP_U(100));         /* capacitor connected between Cext and RCext */
-	m_u12->set_a_pin_value(0);                  	/* A pin - grounded */
-	m_u12->set_b_pin_value(1);                  	/* B pin - driven by port e4 bit 5 */
+	m_u12->set_a_pin_value(0);                      /* A pin - grounded */
+	m_u12->set_b_pin_value(1);                      /* B pin - driven by port e4 bit 5 */
 	m_u12->set_clear_pin_value(1);                  /* Clear pin - pulled high */
 	m_u12->out_cb().set(FUNC(excali64_state::motor_w));
 

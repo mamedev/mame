@@ -1108,4 +1108,102 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="columns">
+		<description>Columns</description>
+		<year>2013</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lee Weber(D3thAdd3r)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="59936">
+				<rom name="columns.bin" size="59936" crc="a7086355" sha1="49a9890bdaf9dbf3d935c05b79c8be20ed15c171" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firemanr">
+		<description>Fireman Rescue</description>
+		<year>2013</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Arlof"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="35530">
+				<rom name="firemanr.bin" size="35530" crc="706ff909" sha1="6996e56f24d0403e05fcdac99d3a794b1849091c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foad">
+		<description>Flight of a Dragon</description>
+		<year>2017</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Sandor Zsuga (Jubatian)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61386">
+				<rom name="foad.bin" size="61386" crc="2c5696fa" sha1="1e106239b015c497ade60107e00cbfb306592640" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foaddemo" cloneof="foad">
+		<description>Flight of a Dragon (demo)</description>
+		<year>2017</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Sandor Zsuga (Jubatian)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60068">
+				<rom name="foaddemo.bin" size="60068" crc="5792d5cc" sha1="803deda7f2a240ee1c629df148aca0b88571dd61" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gghost">
+		<description>Ghosty Ghost</description>
+		<year>2015</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="James Elliott (kivan117)"/>
+		<info name="version" value="v1.0"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="46958">
+				<rom name="gghost.bin" size="46958" crc="6f6097e1" sha1="040bf135478b977968b9100c5cac9dcb0a52cd57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipes">
+		<description>Pipes</description>
+		<year>2012</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Harty123"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56186">
+				<rom name="pipes.bin" size="56186" crc="47d6d3d0" sha1="46bf227a5c3e3ad06d4aab53b5871d1b992d250b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stmforce">
+		<description>Stormforce</description>
+		<year>2016</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Grobian99"/>
+		<info name="version" value="1.0"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="43516">
+				<rom name="stmforce.bin" size="43516" crc="76174c0a" sha1="519743abcce781d9afb4dce57e39a1403670a7b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airhockey">
+		<description>Air Hockey</description>
+		<year>2013</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Omundodogabriel"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="25928">
+				<rom name="airhockey.bin" size="25928" crc="739f5901" sha1="c184a1562f430901d969bc536e4e8eb4eddf868a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

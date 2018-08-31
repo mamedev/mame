@@ -510,8 +510,8 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_DEVICE_ADD("hd44352", HD44352, 910000)
 	MCFG_HD44352_ON_CB(INPUTLINE("maincpu", HD61700_ON_INT))
 
-	MCFG_NVRAM_ADD_0FILL("nvram1")
-	MCFG_NVRAM_ADD_0FILL("nvram2")
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

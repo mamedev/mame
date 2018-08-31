@@ -116,7 +116,6 @@
 #include "emu.h"
 #include "includes/astrocde.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
@@ -1200,14 +1199,9 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&astrocde_state::bank4000_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1441,7 +1435,7 @@ MACHINE_CONFIG_START(astrocde_state::robby)
 	MCFG_DEVICE_PROGRAM_MAP(robby_map)
 	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + battery
 
 	cd4099_device &outlatch(CD4099(config, "outlatch")); // on game board at U1
 	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
@@ -1464,9 +1458,8 @@ MACHINE_CONFIG_START(astrocde_state::profpac)
 	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
 	MCFG_DEVICE_IO_MAP(port_map_16col_pattern)
 
-	MCFG_DEVICE_MODIFY("bank4000")
-	MCFG_DEVICE_PROGRAM_MAP(profpac_bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
+	m_bank4000->set_map(&astrocde_state::profpac_bank4000_map);
+	m_bank4000->set_addr_width(20);
 
 	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // 74LS174 on game board at U6
 	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
@@ -1519,10 +1512,10 @@ MACHINE_CONFIG_START(tenpindx_state::tenpindx)
 	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
 	MCFG_DEVICE_IO_MAP(port_map_16col_pattern_tenpindx)
 
-	MCFG_DEVICE_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
-	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(sub_io_map)
+	Z80(config, m_subcpu, ASTROCADE_CLOCK/4); /* real clock unknown */
+	m_subcpu->set_daisy_config(tenpin_daisy_chain);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tenpindx_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &tenpindx_state::sub_io_map);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, ASTROCADE_CLOCK/4 /* same as "sub" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))

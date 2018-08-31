@@ -161,9 +161,7 @@ MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
 	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, coco_ssc_device, ssc_port_d_r))
 	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, coco_ssc_device, ssc_port_d_w))
 
-	MCFG_RAM_ADD("staticram")
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, "staticram").set_default_size("2K").set_default_value(0);
 
 	SPEAKER(config, "ssc_audio").front_center();
 

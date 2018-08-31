@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/astrocde.h"
@@ -34,7 +35,6 @@ public:
 	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
 		m_videoram(*this, "videoram"),
@@ -48,7 +48,6 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
 	optional_device<votrax_sc01_device> m_votrax;
 	optional_device<astrocade_io_device> m_astrocade_sound1;
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -245,6 +244,7 @@ class tenpindx_state : public astrocde_state
 public:
 	tenpindx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: astrocde_state(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
 		, m_lamps(*this, "lamp%0", 0U)
 	{ }
 
@@ -260,5 +260,6 @@ private:
 	void sub_io_map(address_map &map);
 	void sub_map(address_map &map);
 
+	required_device<z80_device> m_subcpu;
 	output_finder<19> m_lamps;
 };

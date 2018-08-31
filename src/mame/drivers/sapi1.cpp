@@ -639,8 +639,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapi1_state::sapi2)
@@ -710,8 +709,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

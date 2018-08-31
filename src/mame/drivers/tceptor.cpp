@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
 	adc.in_callback<0>().set_constant(0); // unknown

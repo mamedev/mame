@@ -528,6 +528,8 @@ public:
 	void coolridr_submap(address_map &map);
 	void system_h1_map(address_map &map);
 	void system_h1_sound_map(address_map &map);
+	void scsp1_map(address_map &map);
+	void scsp2_map(address_map &map);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -2991,12 +2993,22 @@ WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 
 void coolridr_state::system_h1_sound_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().region("scsp1", 0).share("soundram");
+	map(0x000000, 0x07ffff).ram().share("soundram");
 	map(0x100000, 0x100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	map(0x200000, 0x27ffff).ram().region("scsp2", 0).share("soundram2");
+	map(0x200000, 0x27ffff).ram().share("soundram2");
 	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x800000, 0x80ffff).mirror(0x200000).ram();
 	map(0x900001, 0x900001).w(FUNC(coolridr_state::sound_to_sh1_w));
+}
+
+void coolridr_state::scsp1_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("soundram");
+}
+
+void coolridr_state::scsp2_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("soundram2");
 }
 
 
@@ -3276,7 +3288,7 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pb_callback().set(FUNC(coolridr_state::lamps_w));
@@ -3312,13 +3324,16 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
 	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp1_map)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, coolridr_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp1_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp2_map)
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp2_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
@@ -3355,8 +3370,6 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00002, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
 	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00000, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
 
-	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
 
@@ -3372,12 +3385,6 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-17646.ic7", 0x2000000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
-
-	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
-
-	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
 ROM_END
 
 /*
@@ -3399,8 +3406,6 @@ ROM_START( aquastge )
 	ROM_LOAD32_WORD_SWAP( "mpr-18284.ic18", 0x0c00000, 0x0200000, CRC(5fdf3c1f) SHA1(9976fe4afc3234eecbaf47a2e0f951b6fe1cb5f5) )
 	ROM_RELOAD(0x0000000, 0x0200000)
 
-	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "epr-18278.ic12", 0x000000, 0x020000,  CRC(e601132a) SHA1(bed103ef2e0dfa8bb485d93d661142b82c23088b) )
 
@@ -3416,12 +3421,6 @@ ROM_START( aquastge )
 	ROM_LOAD16_WORD_SWAP( "mpr-18292.ic8", 0x1c00000, 0x0200000, CRC(59a713f9) SHA1(388b833fa6fb930f26c80674606505ec80668a16) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-18291.ic7", 0x2000000, 0x0200000, CRC(b6c167bd) SHA1(4990bae50e8804b2e1048aa5c64b086e8427073f) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-18290.ic6", 0x2400000, 0x0200000, CRC(11f7adb0) SHA1(a72f9892f93506456edc7ffc66224446a58ca38b) ) // 0049
-
-	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
-
-	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
 ROM_END
 
 

@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(neoprint_state::neoprint)
 	MCFG_DEVICE_IO_MAP(neoprint_audio_io_map)
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_neoprint)
 
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(neoprint_state::nprsp)
 	MCFG_DEVICE_IO_MAP(neoprint_audio_io_map)
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_neoprint)
 

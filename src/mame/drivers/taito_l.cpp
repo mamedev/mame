@@ -1452,19 +1452,11 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 	//logerror ("YM2203 bank change val=%02x  %s\n", data & 0x03, machine().describe_context() );
 }
 
-#define TC0090LVC_BANK_ADD(_tag)                           \
-	MCFG_DEVICE_ADD(_tag, ADDRESS_MAP_BANK, 0)       \
-	MCFG_DEVICE_PROGRAM_MAP(tc0090lvc_map)                 \
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)    \
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)                    \
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)                   \
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
 MACHINE_CONFIG_START(taitol_state::l_system_video)
-	TC0090LVC_BANK_ADD("rambank1")
-	TC0090LVC_BANK_ADD("rambank2")
-	TC0090LVC_BANK_ADD("rambank3")
-	TC0090LVC_BANK_ADD("rambank4")
+	for (int bank = 0; bank < 4; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_ram_bnks[bank]).set_map(&taitol_state::tc0090lvc_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x1000);
+	}
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

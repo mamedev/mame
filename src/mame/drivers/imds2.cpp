@@ -781,18 +781,18 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, imds2_state , imds2_baud_clk_1_w))
 		MCFG_PIT8253_OUT2_HANDLER(WRITELINE("ipclocpic" , pic8259_device , ir4_w))
 
-		MCFG_DEVICE_ADD("ipcusart0" , I8251 , 0)
-		MCFG_I8251_RTS_HANDLER(WRITELINE("ipcusart0" , i8251_device , write_cts))
-		MCFG_I8251_RXRDY_HANDLER(WRITELINE("ipclocpic" , pic8259_device , ir0_w))
-		MCFG_I8251_TXRDY_HANDLER(WRITELINE("ipclocpic" , pic8259_device , ir1_w))
-		MCFG_I8251_TXD_HANDLER(WRITELINE("serial0" , rs232_port_device , write_txd))
+		I8251(config , m_ipcusart0 , 0);
+		m_ipcusart0->rts_handler().set("ipcusart0" , FUNC(i8251_device::write_cts));
+		m_ipcusart0->rxrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir0_w));
+		m_ipcusart0->txrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir1_w));
+		m_ipcusart0->txd_handler().set("serial0" , FUNC(rs232_port_device::write_txd));
 
-		MCFG_DEVICE_ADD("ipcusart1" , I8251 , 0)
-		MCFG_I8251_RXRDY_HANDLER(WRITELINE("ipclocpic" , pic8259_device , ir2_w))
-		MCFG_I8251_TXRDY_HANDLER(WRITELINE("ipclocpic" , pic8259_device , ir3_w))
-		MCFG_I8251_TXD_HANDLER(WRITELINE("serial1" , rs232_port_device , write_txd))
-		MCFG_I8251_RTS_HANDLER(WRITELINE("serial1" , rs232_port_device , write_rts))
-		MCFG_I8251_DTR_HANDLER(WRITELINE("serial1" , rs232_port_device , write_dtr))
+		I8251(config , m_ipcusart1 , 0);
+		m_ipcusart1->rxrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir2_w));
+		m_ipcusart1->txrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir3_w));
+		m_ipcusart1->txd_handler().set("serial1" , FUNC(rs232_port_device::write_txd));
+		m_ipcusart1->rts_handler().set("serial1" , FUNC(rs232_port_device::write_rts));
+		m_ipcusart1->dtr_handler().set("serial1" , FUNC(rs232_port_device::write_dtr));
 
 		MCFG_DEVICE_ADD("serial0" , RS232_PORT, default_rs232_devices , nullptr)
 		MCFG_RS232_RXD_HANDLER(WRITELINE("ipcusart0" , i8251_device , write_rxd))
@@ -861,8 +861,8 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_PIT8253_OUT0_HANDLER(WRITELINE("ioctimer" , pit8253_device , write_clk2));
 		MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, imds2_state , imds2_beep_timer_w));
 
-		MCFG_DEVICE_ADD("iocfdc" , I8271 , IOC_XTAL_Y1 / 2)
-		MCFG_I8271_DRQ_CALLBACK(WRITELINE("iocdma" , i8257_device , dreq1_w))
+		I8271(config, m_iocfdc, IOC_XTAL_Y1 / 2);
+		m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
 		MCFG_FLOPPY_DRIVE_ADD("iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 		MCFG_SLOT_FIXED(true)
 

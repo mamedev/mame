@@ -51,7 +51,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_memory_bank m_bank;
 
@@ -163,10 +163,10 @@ static const z80_daisy_config daisy_chain[] =
 MACHINE_CONFIG_START(cpzodiac_state::cpzodiac)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cpzodiac_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &cpzodiac_state::main_io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	te7750_device &io(TE7750(config, "io", 0));
 	io.ios_cb().set_constant(4);

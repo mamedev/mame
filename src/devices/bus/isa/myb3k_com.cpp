@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "usart", I8251, XTAL(15'974'400) / 8 )
-	MCFG_I8251_TXD_HANDLER(WRITELINE("com1", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("com1", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("com1", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, com_int_rx))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, com_int_tx))
+	I8251( config, m_usart, XTAL(15'974'400) / 8 );
+	m_usart->txd_handler().set("com1", FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set("com1", FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set("com1", FUNC(rs232_port_device::write_rts));
+	m_usart->rxrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_rx));
+	m_usart->txrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_tx));
 
 	MCFG_DEVICE_ADD( "com1", RS232_PORT, isa8_myb3k_com, nullptr )
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))

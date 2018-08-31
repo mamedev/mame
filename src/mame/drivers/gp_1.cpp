@@ -71,7 +71,7 @@ private:
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	optional_device<sn76477_device> m_sn;
 	required_ioport m_io_dsw0;
@@ -435,12 +435,12 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(gp_1_state::gp_1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2457600)
-	MCFG_DEVICE_PROGRAM_MAP(gp_1_map)
-	MCFG_DEVICE_IO_MAP(gp_1_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 2457600);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gp_1_state::gp_1_map);
+	m_maincpu->set_addrmap(AS_IO, &gp_1_state::gp_1_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_gp_1);

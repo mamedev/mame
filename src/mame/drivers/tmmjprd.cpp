@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_tmmjprd)
 

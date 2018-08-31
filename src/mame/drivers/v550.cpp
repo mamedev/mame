@@ -34,6 +34,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_chargen(*this, "chargen")
+		, m_usart(*this, "usart")
 	{ }
 
 	void v550(machine_config &config);
@@ -52,6 +53,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_chargen;
+	required_device<i8251_device> m_usart;
 };
 
 
@@ -68,8 +70,8 @@ void v550_state::io_map(address_map &map)
 	map(0x00, 0x01).rw("gdc", FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x23).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x31, 0x31).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x30).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x31, 0x31).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x40, 0x40).rw("mpsc", FUNC(upd7201_new_device::da_r), FUNC(upd7201_new_device::da_w));
 	map(0x41, 0x41).rw("mpsc", FUNC(upd7201_new_device::ca_r), FUNC(upd7201_new_device::ca_w));
 	map(0x48, 0x48).rw("mpsc", FUNC(upd7201_new_device::db_r), FUNC(upd7201_new_device::db_w));
@@ -102,7 +104,7 @@ INPUT_PORTS_END
 
 void v550_state::machine_start()
 {
-	subdevice<i8251_device>("usart")->write_cts(0);
+	m_usart->write_cts(0);
 }
 
 MACHINE_CONFIG_START(v550_state::v550)
@@ -110,18 +112,18 @@ MACHINE_CONFIG_START(v550_state::v550)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // NEC D444C-2 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // NEC D444C-2 + battery
 
 	MCFG_DEVICE_ADD("gdc", UPD7220, 34.846_MHz_XTAL / 16) // NEC D7220D (2.177875 MHz verified)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0) // NEC D8255AC-5
 
-	MCFG_DEVICE_ADD("usart", I8251, 34.846_MHz_XTAL / 16) // NEC D8251AC
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
+	I8251(config, m_usart, 34.846_MHz_XTAL / 16); // NEC D8251AC
+	m_usart->rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 34.846_MHz_XTAL / 16) // NEC D7201C
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 34.846_MHz_XTAL / 16)); // NEC D7201C
+	mpsc.out_int_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

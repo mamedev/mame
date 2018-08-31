@@ -158,10 +158,10 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 
 	MCFG_DEVICE_ADD("expromio", I8355, 6.144_MHz_XTAL / 2) // Expansion ROM (A15)
 
-	MCFG_DEVICE_ADD("ramio", I8155, 6.144_MHz_XTAL / 2) // Basic RAM (A16)
-	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_TRAP_LINE))
+	i8155_device &i8155(I8155(config, "ramio", 6.144_MHz_XTAL / 2)); // Basic RAM (A16)
+	i8155.out_to_callback().set_inputline(m_maincpu, I8085_TRAP_LINE);
 
-	MCFG_DEVICE_ADD("expramio", I8155, 6.144_MHz_XTAL / 2) // Expansion RAM (A17)
+	I8155(config, "expramio", 6.144_MHz_XTAL / 2); // Expansion RAM (A17)
 
 	/* video hardware */
 	config.set_default_layout(layout_sdk85);

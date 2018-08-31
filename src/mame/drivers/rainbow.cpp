@@ -3304,26 +3304,26 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
-	MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
+	DS1315(config, m_rtc, 0); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
 	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
 	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
 	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 24.0734_MHz_XTAL / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("printer", rs232_port_device, write_txd))
+	UPD7201_NEW(config, m_mpsc, 24.0734_MHz_XTAL / 5 / 2); // 2.4073 MHz (nominally 2.5 MHz)
+	m_mpsc->out_int_callback().set(FUNC(rainbow_state::mpsc_irq));
+	m_mpsc->out_txda_callback().set("comm", FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	// RTS and DTR outputs are not connected
 
 	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("mpsc", upd7201_new_device, dcda_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, dcda_w))
 
 	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsb_w)) // actually DTR
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, ctsb_w)) // actually DTR
 
 	MCFG_DEVICE_MODIFY("comm")
 	MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
@@ -3333,11 +3333,11 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_DEVICE_MODIFY("printer")
 	MCFG_SLOT_DEFAULT_OPTION("printer")
 
-	MCFG_DEVICE_ADD("kbdser", I8251, 24.0734_MHz_XTAL / 5 / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, rainbow_state, kbd_tx))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, rainbow_state, irq_hi_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_rxready_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_txready_w))
+	I8251(config, m_kbd8251, 24.0734_MHz_XTAL / 5 / 2);
+	m_kbd8251->txd_handler().set(FUNC(rainbow_state::kbd_tx));
+	m_kbd8251->dtr_handler().set(FUNC(rainbow_state::irq_hi_w));
+	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_state::kbd_rxready_w));
+	m_kbd8251->txrdy_handler().set(FUNC(rainbow_state::kbd_txready_w));
 
 	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
@@ -3349,7 +3349,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 //----------------------------------------------------------------------------------------

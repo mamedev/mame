@@ -544,7 +544,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
 
 	// nvram
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", rc759_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(rc759_state::nvram_init));
 
 	// ppi
 	MCFG_DEVICE_ADD("ppi", I8255, 0)

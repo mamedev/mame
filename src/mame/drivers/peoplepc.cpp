@@ -296,15 +296,15 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 
-	MCFG_DEVICE_ADD("i8251_0", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259_1", pic8259_device, ir1_w))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))
+	I8251(config, m_8251key, 0);
+	m_8251key->rxrdy_handler().set("pic8259_1", FUNC(pic8259_device::ir1_w));
+	m_8251key->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("kbd", RS232_PORT, peoplepc_keyboard_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_0", i8251_device, write_rxd))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
-	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
+	I8251(config, m_8251ser, 0);
 MACHINE_CONFIG_END
 
 ROM_START( olypeopl )

@@ -95,8 +95,7 @@ MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("96K")
+	RAM(config, RAM_TAG).set_default_size("96K");
 MACHINE_CONFIG_END
 
 

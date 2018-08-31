@@ -2201,17 +2201,12 @@ static void x1_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
-	MCFG_DEVICE_IO_MAP(x1_io)
-	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1_mem);
+	m_maincpu->set_addrmap(AS_IO, &x1_state::x1_io);
+	m_maincpu->set_daisy_config(x1_daisy);
 
-	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
@@ -2291,24 +2286,25 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x1_state::x1turbo)
 	x1(config);
-	MCFG_DEVICE_MODIFY("x1_cpu")
-	MCFG_DEVICE_PROGRAM_MAP(x1turbo_mem)
-	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1turbo_mem);
+	m_maincpu->set_daisy_config(x1turbo_daisy);
+
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
 	MCFG_DEVICE_MODIFY("iobank")
 	MCFG_DEVICE_PROGRAM_MAP(x1turbo_io_banks)
 
-	MCFG_DEVICE_ADD("sio", Z80SIO0, MAIN_CLOCK/4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
+	z80sio0_device& sio(Z80SIO0(config, "sio", MAIN_CLOCK/4));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK/4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("x1_cpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, x1_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, x1_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, x1_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, x1_state, io_write_byte))
+	Z80DMA(config, m_dma, MAIN_CLOCK/4);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set(FUNC(x1_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(x1_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(x1_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(x1_state::io_write_byte));
 
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, x1_state, fdc_drq_w))

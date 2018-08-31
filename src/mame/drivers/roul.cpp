@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* video hardware */

@@ -215,7 +215,8 @@ struct render_texinfo
 	u32                 width;              // width of the image
 	u32                 height;             // height of the image
 	u32                 seqid;              // sequence ID
-	u64                 osddata;            // aux data to pass to osd
+	u64                 unique_id;          // unique identifier to pass to osd
+	u64                 old_id;             // previously allocated id, if applicable
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
 };
 
@@ -441,8 +442,8 @@ public:
 	// configure the texture bitmap
 	void set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format);
 
-	// set any necessary aux data
-	void set_osd_data(u64 data) { m_osddata = data; }
+	// set a unique identifier
+	void set_id(u64 id) { m_old_id = m_id; m_id = id; }
 
 	// generic high-quality bitmap scaler
 	static void hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
@@ -467,7 +468,8 @@ private:
 	bitmap_t *          m_bitmap;                   // pointer to the original bitmap
 	rectangle           m_sbounds;                  // source bounds within the bitmap
 	texture_format      m_format;                   // format of the texture data
-	u64                 m_osddata;                  // aux data to pass to osd
+	u64                 m_id;                       // unique id to pass to osd
+	u64                 m_old_id;                   // previous id, if applicable
 
 	// scaling state (ARGB32 only)
 	texture_scaler_func m_scaler;                   // scaling callback
@@ -1181,6 +1183,7 @@ private:
 
 	// texture lists
 	u32                             m_live_textures;    // number of live textures
+	u64                             m_texture_id;       // rolling texture ID counter
 	fixed_allocator<render_texture> m_texture_allocator;// texture allocator
 
 	// containers for the UI and for screens

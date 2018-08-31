@@ -476,7 +476,6 @@ void microtan_state::machine_start()
 {
 	m_led.resolve();
 
-	save_item(NAME(m_chunky_graphics));
 	save_item(NAME(m_keypad_column));
 	save_item(NAME(m_keyboard_ascii));
 	save_item(NAME(m_keyrows));

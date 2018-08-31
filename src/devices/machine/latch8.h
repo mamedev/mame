@@ -26,8 +26,7 @@
 class latch8_device : public device_t
 {
 public:
-	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	/* write & read full byte */
 
@@ -79,8 +78,9 @@ public:
 	void set_nosync(uint32_t nosync) { m_nosync = nosync; }
 
 	template <unsigned N, class Object> devcb_base &set_write_cb(Object &&cb) { return m_write_cb[N].set_callback(std::forward<Object>(cb)); }
-
 	template <unsigned N, class Object> devcb_base &set_read_cb(Object &&cb) { return m_read_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto write_cb() { return m_write_cb[N].bind(); }
+	template <unsigned N> auto read_cb() { return m_read_cb[N].bind(); }
 
 protected:
 	// device-level overrides

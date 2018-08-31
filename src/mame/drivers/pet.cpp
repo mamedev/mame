@@ -1788,10 +1788,10 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
 	quickload.set_interface("cbm_quik");
 
-	SOFTWARE_LIST(config, "cass_list").set_type("pet_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "flop_list").set_type("pet_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "hdd_list").set_type("pet_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "quik_list").set_type("pet_quik", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("pet_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("pet_hdd");
+	SOFTWARE_LIST(config, "quik_list").set_original("pet_quik");
 }
 
 void pet_state::pet(machine_config &config)
@@ -1840,7 +1840,7 @@ void pet_state::pet2001n(machine_config &config, bool with_b000)
 	if (with_b000)
 		GENERIC_CARTSLOT(config, "cart_b000", generic_linear_slot, "pet_b000_rom", "bin,rom");
 
-	SOFTWARE_LIST(config, "rom_list").set_type("pet_rom", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "rom_list").set_original("pet_rom");
 }
 
 
@@ -2103,7 +2103,7 @@ void pet80_state::pet80(machine_config &config)
 	GENERIC_CARTSLOT(config, "cart_a000", generic_linear_slot, "pet_a000_rom", "bin,rom");
 
 	// software lists
-	SOFTWARE_LIST(config, "rom_list").set_type("pet_rom", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "rom_list").set_original("pet_rom");
 }
 
 void pet80_state::pet8032(machine_config &config)
@@ -2116,7 +2116,7 @@ void superpet_state::superpet(machine_config &config)
 {
 	pet8032(config);
 	m_exp->set_default_option("superpet");
-	SOFTWARE_LIST(config, "flop_list2").set_type("superpet_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("superpet_flop");
 }
 
 void cbm8096_state::cbm8096(machine_config &config)
@@ -2127,7 +2127,7 @@ void cbm8096_state::cbm8096(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("96K");
 
-	SOFTWARE_LIST(config, "flop_list2").set_type("cbm8096_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("cbm8096_flop");
 }
 
 void cbm8296_state::cbm8296(machine_config &config)
@@ -2152,7 +2152,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("128K");
 
-	SOFTWARE_LIST(config, "flop_list2").set_type("cbm8296_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("cbm8296_flop");
 }
 
 void cbm8296_state::cbm8296d(machine_config &config)

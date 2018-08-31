@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	m_outlatch->q_out_cb<1>().set(FUNC(wrally_state::coin2_lockout_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(wrally_state::coin1_counter_w));
 	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin2_counter_w));
-	m_outlatch->q_out_cb<4>().set_nop();                            	/* Sound muting */
+	m_outlatch->q_out_cb<4>().set_nop();                                /* Sound muting */
 	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));    /* Flip screen */
 	m_outlatch->q_out_cb<6>().set_nop();                                /* ??? */
 	m_outlatch->q_out_cb<7>().set_nop();                                /* ??? */

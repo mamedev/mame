@@ -1633,7 +1633,7 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1677,8 +1677,11 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("dasp")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3) // Connected to the aux input of respective 54539.
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
+
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.3)
 
 	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))

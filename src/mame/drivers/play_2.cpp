@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	m_maincpu->tpb_cb().set(m_4013a, FUNC(ttl7474_device::clock_w));
 	m_maincpu->tpb_cb().append(m_4020, FUNC(ripple_counter_device::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_play_2);

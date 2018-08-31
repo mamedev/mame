@@ -790,9 +790,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, tvc_state, int_ff_set))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -3440,12 +3440,13 @@ MACHINE_CONFIG_START(cps_state::cps1_12MHz)
 	MCFG_DEVICE_CLOCK( XTAL(12'000'000) )    /* verified on pcb */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cps_state::pang3)
+void cps_state::pang3(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(cps_state::ganbare)
 	cps1_10MHz(config);
@@ -3473,7 +3474,7 @@ MACHINE_CONFIG_START(cps_state::qsound)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
@@ -3490,12 +3491,13 @@ MACHINE_CONFIG_START(cps_state::qsound)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cps_state::wofhfh)
+void cps_state::wofhfh(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(cps_state::sf2m3)
 	cps1_12MHz(config);

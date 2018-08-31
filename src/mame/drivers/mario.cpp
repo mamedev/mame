@@ -343,20 +343,20 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 	MCFG_DEVICE_IO_MAP(mario_io_map)
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80dma", Z80DMA, Z80_CLOCK)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, mario_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, mario_state, memory_write_byte))
+	Z80DMA(config, m_z80dma, Z80_CLOCK);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_z80dma->in_mreq_callback().set(FUNC(mario_state::memory_read_byte));
+	m_z80dma->out_mreq_callback().set(FUNC(mario_state::memory_write_byte));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2L (7E80H)
-	mainlatch.q_out_cb<0>().set(FUNC(mario_state::gfx_bank_w));			// ~T ROM
-	mainlatch.q_out_cb<1>().set_nop();									// 2 PSL
-	mainlatch.q_out_cb<2>().set(FUNC(mario_state::flip_w));				// FLIP
-	mainlatch.q_out_cb<3>().set(FUNC(mario_state::palette_bank_w));		// CREF 0
-	mainlatch.q_out_cb<4>().set(FUNC(mario_state::nmi_mask_w));			// NMI EI
-	mainlatch.q_out_cb<5>().set("z80dma", FUNC(z80dma_device::rdy_w));	// DMA SET
-	mainlatch.q_out_cb<6>().set(FUNC(mario_state::coin_counter_1_w));	// COUNTER 2 (misnumbered on schematic)
-	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_2_w));	// COUNTER 1 (misnumbered on schematic)
+	mainlatch.q_out_cb<0>().set(FUNC(mario_state::gfx_bank_w));         // ~T ROM
+	mainlatch.q_out_cb<1>().set_nop();                                  // 2 PSL
+	mainlatch.q_out_cb<2>().set(FUNC(mario_state::flip_w));             // FLIP
+	mainlatch.q_out_cb<3>().set(FUNC(mario_state::palette_bank_w));     // CREF 0
+	mainlatch.q_out_cb<4>().set(FUNC(mario_state::nmi_mask_w));         // NMI EI
+	mainlatch.q_out_cb<5>().set("z80dma", FUNC(z80dma_device::rdy_w));  // DMA SET
+	mainlatch.q_out_cb<6>().set(FUNC(mario_state::coin_counter_1_w));   // COUNTER 2 (misnumbered on schematic)
+	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_2_w));   // COUNTER 1 (misnumbered on schematic)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

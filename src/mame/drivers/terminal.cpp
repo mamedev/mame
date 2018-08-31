@@ -127,19 +127,6 @@ ROM_START( feap90 ) // order unknown // i8031, i8742 (+SAA5351, 80C42C121) // 4+
 ROM_END
 
 
-ROM_START( ec7915 ) // Z80 // 6k ram // amber
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "50mp_0c10_30_lupper.bin", 0x0000, 0x0800, CRC(e019690f) SHA1(b0ce837a940ad82d2f39bd9d02e3c441cb9e83ed) )
-	ROM_LOAD( "50mp_0810_40.bin",        0x0800, 0x0800, CRC(ed7f12d6) SHA1(b6f1da6a74f77cf1d392eee79f5ea168f3626ee5) )
-	ROM_LOAD( "50mp_1010_49.bin",        0x1800, 0x0800, CRC(bfddf0e6) SHA1(dff4be8c0403519530e6c9106ab279a3037e074a) )
-	ROM_LOAD( "50mp_1810_60.bin",        0x2000, 0x0800, CRC(759f2dc7) SHA1(515778ea213b9204f75f920ef1fbff6c14f9cf3c) )
-	ROM_LOAD( "50mp_2c10_30_lower.bin",  0x5000, 0x0800, CRC(1ff59657) SHA1(777ef82e20a0100c0069ee5e7fbac5b3b86e3529) ) // keyboard rom?
-
-	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "char.bin",                0x0000, 0x0800, CRC(e75a6bc4) SHA1(04b56d1f5ab7f2145699555df5ac44d078804821) )
-ROM_END
-
-
 ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppercase only, screen 40x12 // green
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prom1_rear.bin", 0x0000, 0x0100, CRC(ab231a4c) SHA1(1412d0e9163125f28a777717c4dd9d5fd54b5196) )
@@ -147,15 +134,6 @@ ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppe
 
 	ROM_REGION( 0x0800, "chargen", ROMREGION_INVERT )
 	ROM_LOAD( "7951om.bin",     0x0000, 0x0800, CRC(36fc61c6) SHA1(6b5e8701b185b32a1a2630ddfc5402345628ecba) )
-ROM_END
-
-
-ROM_START( vdm79322 ) // Z80 (there's a 8255, 8253, UA857D) // 8k ram // b&w  // 8031 for kbd
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "27512_m322.bin",      0x00000, 0x10000, CRC(24573079) SHA1(b81c17e99493302054d78fbee2e416ab6493b5f3) )
-
-	ROM_REGION( 0x4000, "user1", 0 )  // keyboard?
-	ROM_LOAD( "27128_w322-3700.bin", 0x00000, 0x004000, CRC(e5e76ca2) SHA1(bb18c9fa29ef9fa0563aa07d2b856cf6594fc020) )
 ROM_END
 
 
@@ -186,8 +164,6 @@ COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty
 COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multicom 715L",          MACHINE_IS_SKELETON )
 COMP( 1986, t3210,     0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Bitel T3210",            MACHINE_IS_SKELETON )
 COMP( 1986, feap90,    0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Multitel Fe Ap 90-1.1",  MACHINE_IS_SKELETON )
-COMP( 198?, ec7915,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "EC-7915 (EC-7950)",      MACHINE_IS_SKELETON )
 COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_IS_SKELETON )
-COMP( 1992, vdm79322,  0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "VDM79322",               MACHINE_IS_SKELETON )
 COMP( 1993, ikt5a,     0,      0,      terminal, terminal, terminal_state, empty_init, "Creator / Fura Elektronik", "IKT-5A",          MACHINE_IS_SKELETON )
 COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )

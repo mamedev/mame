@@ -3994,97 +3994,46 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* DS1315 for no-slot clock */
-	MCFG_DS1315_ADD("nsc")
-	MCFG_DS1315_BACKING_HANDLER(READ8(*this, apple2e_state, nsc_backing_r))
+	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));
 
 	/* RAM */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
 
 	/* 0000 banking */
-	MCFG_DEVICE_ADD(A2_0000_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(r0000bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
+	ADDRESS_MAP_BANK(config, A2_0000_TAG).set_map(&apple2e_state::r0000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
 
 	/* 0200 banking */
-	MCFG_DEVICE_ADD(A2_0200_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(r0200bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
+	ADDRESS_MAP_BANK(config, A2_0200_TAG).set_map(&apple2e_state::r0200bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
 
 	/* 0400 banking */
-	MCFG_DEVICE_ADD(A2_0400_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(r0400bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+	ADDRESS_MAP_BANK(config, A2_0400_TAG).set_map(&apple2e_state::r0400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
 
 	/* 0800 banking */
-	MCFG_DEVICE_ADD(A2_0800_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(r0800bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, A2_0800_TAG).set_map(&apple2e_state::r0800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* 2000 banking */
-	MCFG_DEVICE_ADD(A2_2000_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(r2000bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, A2_2000_TAG).set_map(&apple2e_state::r2000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* 4000 banking */
-	MCFG_DEVICE_ADD(A2_4000_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(r4000bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, A2_4000_TAG).set_map(&apple2e_state::r4000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
 
 	/* C100 banking */
-	MCFG_DEVICE_ADD(A2_C100_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c100bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
+	ADDRESS_MAP_BANK(config, A2_C100_TAG).set_map(&apple2e_state::c100bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
 
 	/* C300 banking */
-	MCFG_DEVICE_ADD(A2_C300_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c300bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
+	ADDRESS_MAP_BANK(config, A2_C300_TAG).set_map(&apple2e_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
 
 	/* C400 banking */
-	MCFG_DEVICE_ADD(A2_C400_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c400bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+	ADDRESS_MAP_BANK(config, A2_C400_TAG).set_map(&apple2e_state::c400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
 
 	/* C800 banking */
-	MCFG_DEVICE_ADD(A2_C800_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c800bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
+	ADDRESS_MAP_BANK(config, A2_C800_TAG).set_map(&apple2e_state::c800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x800);
 
 	/* built-in language card emulation */
-	MCFG_DEVICE_ADD(A2_LCBANK_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lcbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2_LCBANK_TAG).set_map(&apple2e_state::lcbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2e_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
@@ -4131,12 +4080,12 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apple2e_state::mprof3)
+void apple2e_state::mprof3(machine_config &config)
+{
 	apple2e(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("128K");
+}
 
 MACHINE_CONFIG_START(apple2e_state::apple2ee)
 	apple2e(config);
@@ -4184,25 +4133,25 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	MCFG_DEVICE_REMOVE("sl6")
 	MCFG_DEVICE_REMOVE("sl7")
 
-	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(14'318'181) / 8) // ~1.789 MHz
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd))
+	MOS6551(config, m_acia1, 0);
+	m_acia1->set_xtal(XTAL(14'318'181) / 8); // ~1.789 MHz
+	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(IIC_ACIA2_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))   // matches SSC so modem software is compatible
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("modem", rs232_port_device, write_txd))
+	MOS6551(config, m_acia2, 0);
+	m_acia2->set_xtal(XTAL(1'843'200));   // matches SSC so modem software is compatible
+	m_acia2->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(PRINTER_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_cts))
+	rs232_port_device &printer(RS232_PORT(config, PRINTER_PORT_TAG, default_rs232_devices, nullptr));
+	printer.rxd_handler().set(m_acia1, FUNC(mos6551_device::write_rxd));
+	printer.dcd_handler().set(m_acia1, FUNC(mos6551_device::write_dcd));
+	printer.dsr_handler().set(m_acia1, FUNC(mos6551_device::write_dsr));
+	printer.cts_handler().set(m_acia1, FUNC(mos6551_device::write_cts));
 
-	MCFG_DEVICE_ADD(MODEM_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
+	rs232_port_device &modem(RS232_PORT(config, MODEM_PORT_TAG, default_rs232_devices, nullptr));
+	modem.rxd_handler().set(m_acia2, FUNC(mos6551_device::write_rxd));
+	modem.dcd_handler().set(m_acia2, FUNC(mos6551_device::write_dcd));
+	modem.dsr_handler().set(m_acia2, FUNC(mos6551_device::write_dsr));
+	modem.cts_handler().set(m_acia2, FUNC(mos6551_device::write_cts));
 
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
 	A2BUS_MOCKINGBOARD(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus); // Mockingboard 4C
@@ -4211,9 +4160,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
 	MCFG_DEVICE_REMOVE(A2_AUXSLOT_TAG)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
+	m_ram->set_default_size("128K").set_extra_options("128K");
 MACHINE_CONFIG_END
 
 static void apple2cp_set_lines(device_t *device, uint8_t lines)
@@ -4329,9 +4276,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2cp)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
@@ -4349,9 +4294,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
 	MCFG_DEVICE_REMOVE("sl6")
 	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 const applefdc_interface fdc_interface =
@@ -4383,9 +4326,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::laser128ex2)
@@ -4407,9 +4348,7 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
+	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::ceci)
@@ -4428,8 +4367,7 @@ MACHINE_CONFIG_START(apple2e_state::ceci)
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
 	MCFG_DEVICE_REMOVE(A2_AUXSLOT_TAG)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

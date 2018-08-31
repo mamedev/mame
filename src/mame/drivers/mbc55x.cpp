@@ -259,17 +259,15 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 //  MCFG_SCREEN_SIZE(650, 260)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K,576K,640K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("128K,192K,256K,320K,384K,448K,512K,576K,640K");
 
 	/* sound hardware */
 	SPEAKER(config, MONO_TAG).front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	/* Devices */
-	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir3_w))
+	I8251(config, m_kb_uart, 0);
+	m_kb_uart->rxrdy_handler().set(PIC8259_TAG, FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIT_C0_CLOCK)

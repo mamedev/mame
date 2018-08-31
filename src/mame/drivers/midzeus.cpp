@@ -1292,7 +1292,7 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -1335,7 +1335,7 @@ MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

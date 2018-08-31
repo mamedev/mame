@@ -10,7 +10,7 @@
 
     How to get the version and region:
     Heavy Smash: Exit test mode
-	World Cup Volleyball 95: Boot the game holding down player 2 button 1
+    World Cup Volleyball 95: Boot the game holding down player 2 button 1
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 */
@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_DEVICE_PROGRAM_MAP(hvysmsh_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_DEVICE_PROGRAM_MAP(wcvol95_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

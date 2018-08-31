@@ -59,10 +59,11 @@ DEFINE_DEVICE_TYPE(UPD7201,         upd7201_device,  "upd7201",         "NEC uPD
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(z80dart_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, Z80DART_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, Z80DART_CHANNEL, 0)
-MACHINE_CONFIG_END
+void z80dart_device::device_add_mconfig(machine_config &config)
+{
+	Z80DART_CHANNEL(config, m_chanA, 0);
+	Z80DART_CHANNEL(config, m_chanB, 0);
+}
 
 
 //**************************************************************************

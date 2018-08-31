@@ -435,9 +435,7 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("8K,16K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compclr2_flop")

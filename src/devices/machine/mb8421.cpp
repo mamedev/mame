@@ -9,14 +9,17 @@
     MB843x is same as MB842x, except that it supports slave mode for 16-bit or
     32-bit expansion. It makes sure there are no clashes with the _BUSY pin.
 
+    IDT71321 is function compatible, but not pin compatible with MB8421
+
 **********************************************************************/
 
 #include "emu.h"
 #include "machine/mb8421.h"
 
 
-DEFINE_DEVICE_TYPE(MB8421, mb8421_device, "mb8421", "MB8421 8-bit Dual-Port SRAM")
-DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "MB8421/MB8431 16-bit Dual-Port SRAM")
+DEFINE_DEVICE_TYPE(MB8421, mb8421_device, "mb8421", "MB8421 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(IDT71321, idt71321_device, "idt71321", "IDT71321 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "MB8421/MB8431 16-bit Dual-Port SRAM with Interrupts")
 
 //-------------------------------------------------
 //  mb8421_master_device - constructor
@@ -35,6 +38,20 @@ mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device
 
 mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mb8421_master_device(mconfig, MB8421, tag, owner, clock)
+{
+}
+
+mb8421_device::mb8421_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: mb8421_master_device(mconfig, type, tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  idt71321_device - constructor
+//-------------------------------------------------
+
+idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mb8421_device(mconfig, IDT71321, tag, owner, clock)
 {
 }
 

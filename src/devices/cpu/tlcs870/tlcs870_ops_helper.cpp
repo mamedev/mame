@@ -216,35 +216,35 @@ const bool tlcs870_device::check_jump_condition(int param1)
 	return takejump;
 }
 
-/* 
-	All 16-bit ALU ops that would set the 'H' flag list the behavior as undefined.
-	Logically the half flag would be the 8/9 bit carry (usual C flag) in a 16-bit
-	op, but since this isn't listed as being the case there's a chance the behavior
-	is something unexpected, such as still using the 3/4 carry, or, if it's
-	internally handled as 4 4-bit operations, maybe the 12/13 bit carry
+/*
+    All 16-bit ALU ops that would set the 'H' flag list the behavior as undefined.
+    Logically the half flag would be the 8/9 bit carry (usual C flag) in a 16-bit
+    op, but since this isn't listed as being the case there's a chance the behavior
+    is something unexpected, such as still using the 3/4 carry, or, if it's
+    internally handled as 4 4-bit operations, maybe the 12/13 bit carry
 
-	This needs testing on hardware.
+    This needs testing on hardware.
 
-	(8-bit)        JF ZF CF HF       
-	ADDC           C  Z  C  H    
-	ADD            C  Z  C  H    
-	SUBB           C  Z  C  H    
-	SUB            C  Z  C  H    
-	AND            Z  Z  -  -    
-	XOR            Z  Z  -  -    
-	OR             Z  Z  -  -    
-	CMP            Z  Z  C  H    
+    (8-bit)        JF ZF CF HF
+    ADDC           C  Z  C  H
+    ADD            C  Z  C  H
+    SUBB           C  Z  C  H
+    SUB            C  Z  C  H
+    AND            Z  Z  -  -
+    XOR            Z  Z  -  -
+    OR             Z  Z  -  -
+    CMP            Z  Z  C  H
 
-	(16-bit)
-	ADDC           C  Z  C  U   
-	ADD            C  Z  C  U   
-	SUBB           C  Z  C  U   
-	SUB            C  Z  C  U   
-	AND            Z  Z  -  -   
-	XOR            Z  Z  -  -   
-	OR             Z  Z  -  -   
-	CMP            Z  Z  C  U   	
-		
+    (16-bit)
+    ADDC           C  Z  C  U
+    ADD            C  Z  C  U
+    SUBB           C  Z  C  U
+    SUB            C  Z  C  U
+    AND            Z  Z  -  -
+    XOR            Z  Z  -  -
+    OR             Z  Z  -  -
+    CMP            Z  Z  C  U
+
 */
 
 uint8_t tlcs870_device::do_add_8bit(uint16_t param1, uint16_t param2)

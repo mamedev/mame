@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(cidelsa_state::destryer)
 	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
 	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound and video hardware */
 	destryer_video(config);
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(cidelsa_state::destryera)
 	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
 	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound and video hardware */
 	destryer_video(config);
@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(cidelsa_state::altair)
 	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 	cpu.tpb_cb().set("ic26", FUNC(cdp1852_device::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* input/output hardware */
 	cdp1852_device &ic23(CDP1852(config, "ic23")); // clock is really tied to CDP1869 CMSEL (pin 37)
@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(draco_state::draco)
 	cpu.q_cb().set(FUNC(draco_state::q_w));
 	cpu.tpb_cb().set("ic32", FUNC(cdp1852_device::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
 	MCFG_DEVICE_PROGRAM_MAP(draco_sound_map)

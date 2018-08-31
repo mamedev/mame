@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_DEVICE_PROGRAM_MAP(hanaroku_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 

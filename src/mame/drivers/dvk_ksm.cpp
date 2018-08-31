@@ -448,9 +448,9 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ksm_state, ksm_ppi_portc_w))
 
 	// D42 - serial connection to host
-	MCFG_DEVICE_ADD( "i8251line", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir3_w))
+	I8251(config, m_i8251line, 0);
+	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251line->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
@@ -458,10 +458,10 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
 
 	// D41 - serial connection to MS7004 keyboard
-	MCFG_DEVICE_ADD( "i8251kbd", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, ksm_state, write_brga))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, ksm_state, write_brgb))
+	I8251(config, m_i8251kbd, 0);
+	m_i8251kbd->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
+	m_i8251kbd->rts_handler().set(FUNC(ksm_state::write_brga));
+	m_i8251kbd->dtr_handler().set(FUNC(ksm_state::write_brgb));
 
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
 	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))

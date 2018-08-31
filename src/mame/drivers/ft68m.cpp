@@ -89,12 +89,12 @@ MACHINE_CONFIG_START(ft68m_state::ft68m)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(19'660'800) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 0)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 0));
+	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	mpsc.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	mpsc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
 	am9513_device &stc(AM9513A(config, "stc", XTAL(19'660'800) / 8));
 	stc.out2_cb().set_inputline(m_maincpu, M68K_IRQ_6);

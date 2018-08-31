@@ -560,8 +560,7 @@ MACHINE_CONFIG_START(lastfght_state::lastfght)
 	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD( "palette", 256 )

@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_DEVICE_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
 	MCFG_DEVICE_PROGRAM_MAP(snookr10_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 

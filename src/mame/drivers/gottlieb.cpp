@@ -1774,7 +1774,7 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 	MCFG_DEVICE_PROGRAM_MAP(gottlieb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)

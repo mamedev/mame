@@ -44,7 +44,7 @@ public:
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 };
 
 void ccs300_state::ccs300_mem(address_map &map)
@@ -116,10 +116,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(ccs300_state::ccs300)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ccs300_mem)
-	MCFG_DEVICE_IO_MAP(ccs300_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccs300_state::ccs300_mem);
+	m_maincpu->set_addrmap(AS_IO, &ccs300_state::ccs300_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ccs300_state, ccs300)
 
@@ -129,11 +129,11 @@ MACHINE_CONFIG_START(ccs300_state::ccs300)
 	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
@@ -143,8 +143,8 @@ MACHINE_CONFIG_START(ccs300_state::ccs300)
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(4'000'000)));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

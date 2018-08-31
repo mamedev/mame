@@ -840,10 +840,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K").set_default_value(0);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbca)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbca)
@@ -929,9 +926,7 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcb)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	m_ram->set_default_size("32K").set_default_value(0);
 
 	/* speech hardware */
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
@@ -1003,10 +998,10 @@ MACHINE_CONFIG_START(bbc_state::bbcb_de)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_state, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_state, side_w))
+	I8271(config, m_i8271, 0);
+	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
+	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
@@ -1031,10 +1026,10 @@ MACHINE_CONFIG_START(bbc_state::bbcb_us)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_state, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_state, side_w))
+	I8271(config, m_i8271, 0);
+	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
+	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -1098,10 +1093,10 @@ MACHINE_CONFIG_START(torch_state::torchf)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_state, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_state, side_w))
+	I8271(config, m_i8271, 0);
+	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
+	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -1317,9 +1312,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)

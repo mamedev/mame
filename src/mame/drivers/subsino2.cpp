@@ -2385,7 +2385,7 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_DEVICE_PROGRAM_MAP( bishjan_map )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	// video hardware
@@ -2436,7 +2436,7 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_DEVICE_PROGRAM_MAP( mtrain_map )
 	MCFG_DEVICE_IO_MAP( mtrain_io )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2470,7 +2470,7 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_DEVICE_PROGRAM_MAP( saklove_map )
 	MCFG_DEVICE_IO_MAP( saklove_io )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2508,7 +2508,7 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_DEVICE_IO_MAP( xplan_io )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

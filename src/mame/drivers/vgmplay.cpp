@@ -149,7 +149,9 @@ public:
 		A_POKEY_1 = 0x9e000000,
 		A_QSOUND = 0x1f000000,
 		A_SCSP_0 = 0x20000000,
+		A_SCSP_RAM_0 = 0x20010000,
 		A_SCSP_1 = 0xa0000000,
+		A_SCSP_RAM_1 = 0xa0010000,
 		A_WSWAN_0 = 0x21000000,
 		A_WSWAN_RAM_0 = 0x21000100,
 		A_WSWAN_1 = 0xa1000000,
@@ -291,8 +293,11 @@ private:
 
 	struct stream
 	{
+		uint8_t byte_depth;
+		uint32_t position;
+		emu_timer *timer;
 		// stream control
-		uint8_t type;
+		act_led chip_type;
 		uint8_t port;
 		uint8_t reg;
 		// stream data
@@ -304,7 +309,6 @@ private:
 		// start stream
 		uint32_t offset;
 		uint32_t length;
-		uint8_t length_mode;
 		bool loop;
 		bool reverse;
 	};
@@ -312,7 +316,6 @@ private:
 	TIMER_CALLBACK_MEMBER(stream_timer_expired);
 
 	stream m_streams[0xff];
-	emu_timer *m_stream_timers[0xff];
 
 	void pulse_act_led(act_led led);
 	TIMER_CALLBACK_MEMBER(act_led_expired);
@@ -340,8 +343,15 @@ private:
 
 	std::list<rom_block> m_rom_blocks[2][0x40];
 
-	std::vector<uint8_t> m_data_streams[0x40];
-	std::vector<uint32_t> m_data_stream_starts[0x40];
+	struct data_block
+	{
+		uint32_t start;
+		uint32_t size;
+		data_block(uint32_t _start, uint32_t _size) { start = _start; size = _size; }
+	};
+
+	std::array<std::vector<uint8_t>, 0x40> m_data_streams;
+	std::array<std::vector<data_block>, 0x40> m_data_stream_blocks;
 
 	uint32_t m_ym2612_stream_offset = 0U;
 
@@ -381,6 +391,8 @@ public:
 	template<int Chip> DECLARE_WRITE8_MEMBER(upd7759_reset_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(upd7759_data_w);
 	template<int Chip> DECLARE_WRITE_LINE_MEMBER(upd7759_drq_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6258_clock_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6258_divider_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(scc_w);
@@ -403,6 +415,7 @@ public:
 	template<int Chip> void c140_map(address_map &map);
 	template<int Chip> void k053260_map(address_map &map);
 	template<int Chip> void qsound_map(address_map &map);
+	template<int Chip> void scsp_map(address_map &map);
 	template<int Chip> void wswan_map(address_map &map);
 	template<int Chip> void es5503_map(address_map &map);
 	template<int Chip> void es5505_map(address_map &map);
@@ -457,8 +470,10 @@ private:
 	required_device_array<c352_device, 2> m_c352;
 	required_device_array<iremga20_device, 2> m_ga20;
 
+	uint32_t m_okim6258_clock[2];
+	uint8_t m_okim6258_divider[2];
 	uint32_t m_okim6295_clock[2];
-	uint32_t m_okim6295_pin7[2];
+	uint8_t m_okim6295_pin7[2];
 	uint8_t m_scc_reg[2];
 
 	int m_upd7759_md[2];
@@ -494,7 +509,7 @@ void vgmplay_device::device_start()
 	m_act_led_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_device::act_led_expired), this));
 
 	for (int i = 0; i < 0xff; i++)
-		m_stream_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_device::stream_timer_expired), this));
+		m_streams[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_device::stream_timer_expired), this));
 
 	save_item(NAME(m_pc));
 	//save_item(NAME(m_streams));
@@ -514,8 +529,11 @@ void vgmplay_device::device_reset()
 
 	for (int i = 0; i < 0xff; i++)
 	{
-		m_streams[i].type = 0xff;
-		m_stream_timers[i]->adjust(attotime::never);
+		stream& s(m_streams[i]);
+		s.chip_type = act_led(0xff);
+		s.bank = 0xff;
+		s.frequency = 0;
+		s.timer->enable(false);
 	}
 }
 
@@ -599,7 +617,7 @@ void vgmplay_device::blocks_clear()
 		m_rom_blocks[0][i].clear();
 		m_rom_blocks[1][i].clear();
 		m_data_streams[i].clear();
-		m_data_stream_starts[i].clear();
+		m_data_stream_blocks[i].clear();
 	}
 }
 
@@ -613,25 +631,113 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 	if (type < 0x40)
 	{
 		uint32_t start = m_data_streams[type].size();
-		m_data_stream_starts[type].push_back(start);
+		m_data_stream_blocks[type].push_back(data_block(start, size));
 		m_data_streams[type].resize(start + size);
 		for (uint32_t i = 0; i<size; i++)
 			m_data_streams[type][start + i] = m_file->read_byte(m_pc + 7 + i);
 	}
 	else if (type < 0x7f)
-		logerror("ignored compressed stream size %x type %02x\n", size, type);
+	{
+		uint8_t cmp_type = m_file->read_byte(m_pc + 0x07);
+		uint32_t out_size = m_file->read_dword(m_pc + 0x08);
 
+		uint32_t start = m_data_streams[type - 0x40].size();
+		m_data_stream_blocks[type - 0x40].push_back(data_block(start, out_size));
+		m_data_streams[type - 0x40].resize(start + out_size);
+
+		if (cmp_type == 0)
+		{
+			uint8_t bit_dec = m_file->read_byte(m_pc + 0x0c);
+			uint8_t bit_cmp = m_file->read_byte(m_pc + 0x0d);
+			uint8_t cmp_sub_type = m_file->read_byte(m_pc + 0x0e);
+			uint16_t add_val = m_file->read_word(m_pc + 0x0f);
+
+			if (cmp_sub_type == 0x02)
+				osd_printf_error("unhandled n-bit compressed stream size %x->%x type %02x bit_dec %02x bit_cmp %02x unsupported cmp_sub_type %02x add_val %04x\n", size, out_size, type - 0x40, bit_dec, bit_cmp, cmp_sub_type, add_val);
+			else
+			{
+				int in_pos = 0x11 - 0x07;
+				int in_shift = 0;
+				int out_pos = 0;
+
+				while (out_pos < out_size && in_pos < size)
+				{
+					int in_bits = bit_cmp;
+					uint16_t in_val = 0;
+					int out_bits = 0;
+
+					while (in_bits > 0 && in_pos < size)
+					{
+						int bits = std::min(in_bits, 8);
+						uint8_t mask = (1 << bits) - 1;
+						in_shift += bits;
+						in_bits -= bits;
+
+						uint16_t val = (m_file->read_byte(m_pc + 0x7 + in_pos) << in_shift >> 8) & mask;
+						if (in_shift >= 8)
+						{
+							in_pos++;
+
+							in_shift -= 8;
+							if (in_shift > 0)
+							{
+								if (in_pos < size)
+									val |= (m_file->read_byte(m_pc + 0x7 + in_pos) << in_shift >> 8) & mask;
+								else
+									break;
+							}
+						}
+
+						in_val |= val << out_bits;
+						out_bits += bits;
+					}
+
+					if (out_bits == bit_cmp)
+					{
+						uint16_t out_val = 0;
+
+						if (cmp_sub_type == 0)
+							out_val = in_val + add_val;
+						else if (cmp_sub_type == 1)
+							out_val = (in_val << (bit_dec - bit_cmp)) + add_val;
+						else
+							osd_printf_error("unhandled n-bit compressed stream size %x->%x type %02x bit_dec %02x bit_cmp %02x unsupported cmp_sub_type %02x add_val %04x\n", size, out_size, type - 0x40, bit_dec, bit_cmp, cmp_sub_type, add_val);
+
+						for (int i = 0; i < bit_dec; i += 8)
+						{
+							m_data_streams[type - 0x40][start + out_pos] = out_val;
+							out_pos++;
+							out_val >>= 8;
+						}
+					}
+				}
+
+				if (out_pos != out_size)
+					osd_printf_error("invalid n-bit compressed stream %02x in %x/%x out %x/%x\n", type - 0x40, in_pos, size, out_pos, out_size);
+			}
+		}
+		else if (cmp_type == 1)
+			osd_printf_error("unhandled delta-t compressed stream size %x->%x type %02x\n", size, out_size, type - 0x40);
+		else
+			osd_printf_error("unhandled unknown %02x compressed stream size %x->%x type %02x\n", cmp_type, size, out_size, type - 0x40);
+	}
 	else if (type < 0x80)
-		logerror("ignored compression table size %x\n", size);
+		osd_printf_error("unhandled compression table size %x\n", size);
 
 	else if (type < 0xc0)
 	{
-		//uint32_t rs = m_file->read_dword(m_pc+7);
+		uint32_t rom_size = m_file->read_dword(m_pc + 7);
 		uint32_t start = m_file->read_dword(m_pc + 11);
-		std::unique_ptr<uint8_t[]> block = std::make_unique<uint8_t[]>(size - 8);
-		for (uint32_t i = 0; i<size - 8; i++)
-			block[i] = m_file->read_byte(m_pc + 15 + i);
-		m_rom_blocks[second][type - 0x80].emplace_front(start, start + size - 9, std::move(block));
+
+		uint32_t data_size = start < rom_size ? std::min(size - 8, rom_size - start) : 0;
+
+		if (data_size)
+		{
+			std::unique_ptr<uint8_t[]> block = std::make_unique<uint8_t[]>(data_size);
+			for (uint32_t i = 0; i < data_size; i++)
+				block[i] = m_file->read_byte(m_pc + 15 + i);
+			m_rom_blocks[second][type - 0x80].emplace_front(start, start + size - 9, std::move(block));
+		}
 	}
 	else if (type <= 0xc2)
 	{
@@ -649,17 +755,18 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 	}
 	else if (type >= 0xe0 && type <= 0xe1)
 	{
-		uint16_t start = m_file->read_dword(m_pc + 7);
+		uint32_t start = m_file->read_dword(m_pc + 7);
 		uint32_t data_size = size - 4;
 		if (type == 0xe0)
-			; // TODO: SCSP
+			for (int i = 0; i < data_size; i++)
+				m_io16->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((start + i) ^ 1), m_file->read_byte(m_pc + 0xb + i));
 		else if (type == 0xe1)
 			for (int i = 0; i < data_size; i++)
 				m_io->write_byte((second ? A_ES5503_RAM_1 : A_ES5503_RAM_0) + start + i, m_file->read_byte(m_pc + 0xb + i));
 	}
 	else
 	{
-		logerror("ignored ram block size %x type %02x\n", size, type);
+		osd_printf_error("unhandled ram block size %x type %02x\n", size, type);
 	}
 	return 7 + size;
 }
@@ -670,12 +777,13 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	uint32_t src = m_file->read_dword(m_pc + 3) & 0xffffff;
 	uint32_t dst = m_file->read_dword(m_pc + 6) & 0xffffff;
 	uint32_t size = m_file->read_dword(m_pc + 9) & 0xffffff;
+	if (size == 0) size = 0x01000000;
 
 	int second = (type & 0x80) ? 1 : 0;
 	type &= 0x7f;
 
-	if (m_data_streams->size() <= type || m_data_streams[type].size() <= src + size)
-		logerror("ignored pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
+	if (m_data_streams.size() <= type || m_data_streams[type].size() <= src + size)
+		osd_printf_error("invalid pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
 	else if (type == 0x01 && !second)
 	{
 		for (int i = 0; i < size; i++)
@@ -688,9 +796,8 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	}
 	else if (type == 0x06)
 	{
-		// TODO: SCSP
-		//for (int i = 0; i < size; i++)
-		//m_io->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + dst + i, m_data_streams[type][src + i]);
+		for (int i = 0; i < size; i++)
+			m_io16->write_byte((second ? A_SCSP_RAM_1 : A_SCSP_RAM_0) + ((dst + i) ^ 1), m_data_streams[type][src + i]);
 	}
 	else if (type == 0x07)
 	{
@@ -698,15 +805,47 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 			m_io->write_byte((second ? A_NES_RAM_1 : A_NES_RAM_0) + dst + i, m_data_streams[type][src + i]);
 	}
 	else
-	{
-		logerror("ignored pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
-	}
+		osd_printf_error("unhandled pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
+
 	return 12;
 }
 
 TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 {
-	// TODO: stream audio to chip
+	stream& s(m_streams[param]);
+
+	uint32_t offset = s.offset;
+	if (s.reverse)
+		offset += (s.length - s.position - 1) * s.step_size * s.byte_depth;
+	else
+		offset += s.position * s.step_size * s.byte_depth;
+
+	if (offset + s.byte_depth >= m_data_streams[s.bank].size())
+	{
+		osd_printf_error("stream_timer_expired %02x: stream beyond end %u>=%u\n", param, offset, uint32_t(m_data_streams[s.bank].size()));
+		s.timer->enable(false);
+	}
+	else if (s.chip_type == LED_32X_PWM)
+		m_io16->write_word(A_32X_PWM + (s.reg << 1), ((m_data_streams[s.bank][offset + 1] & 0xf) << 8) | m_data_streams[s.bank][offset]);
+	else if (s.chip_type == LED_OKIM6258)
+		m_io->write_byte(A_OKIM6258_0 + s.reg, m_data_streams[s.bank][offset]);
+	else
+	{
+		osd_printf_error("stream_timer_expired %02x: unsupported stream to chip %02x\n", param, s.chip_type);
+		s.timer->enable(false);
+	}
+
+	s.position++;
+	if (s.position >= s.length)
+	{
+		if (s.loop)
+		{
+			pulse_act_led(s.chip_type);
+			s.position = 0;
+		}
+		else
+			s.timer->enable(false);
+	}
 }
 
 void vgmplay_device::execute_run()
@@ -925,11 +1064,26 @@ void vgmplay_device::execute_run()
 			case 0x90:
 			{
 				uint8_t id = m_file->read_byte(m_pc + 1);
-				if (id < 0xff)
+				if (id == 0xff)
+					osd_printf_error("stream control invalid id\n");
+				else
 				{
-					m_streams[id].type = m_file->read_byte(m_pc + 2);
-					m_streams[id].port = m_file->read_byte(m_pc + 3);
-					m_streams[id].reg = m_file->read_byte(m_pc + 4);
+					stream& s(m_streams[id]);
+
+					s.chip_type = act_led(m_file->read_byte(m_pc + 2));
+					s.port = m_file->read_byte(m_pc + 3);
+					s.reg = m_file->read_byte(m_pc + 4);
+
+					if (s.chip_type == LED_32X_PWM)
+						s.byte_depth = 2;
+					else
+						s.byte_depth = 1;
+
+					if (s.timer->enabled())
+					{
+						osd_printf_error("stream %02x control while playing\n", id);
+						s.timer->enable(false);
+					}
 				}
 				m_pc += 5;
 				break;
@@ -938,11 +1092,33 @@ void vgmplay_device::execute_run()
 			case 0x91:
 			{
 				uint8_t id = m_file->read_byte(m_pc + 1);
-				if (id < 0xff)
+				if (id == 0xff)
+					osd_printf_error("stream data invalid id\n");
+				else
 				{
-					m_streams[id].bank = m_file->read_byte(m_pc + 2);
-					m_streams[id].step_size = m_file->read_byte(m_pc + 3);
-					m_streams[id].step_base = m_file->read_byte(m_pc + 4);
+					stream& s(m_streams[id]);
+
+					s.bank = m_file->read_byte(m_pc + 2);
+					s.step_size = m_file->read_byte(m_pc + 3);
+					s.step_base = m_file->read_byte(m_pc + 4);
+
+					if (s.step_size == 0)
+					{
+						osd_printf_error("stream %02x data invalid step size %d\n", id, s.step_size);
+						s.step_size = 1;
+					}
+
+					if (s.step_base >= s.step_size)
+					{
+						osd_printf_error("stream %02x data step size %d invalid step base %d\n", id, s.step_size, s.step_base);
+						s.step_base %= s.step_size;
+					}
+
+					if (s.timer->enabled())
+					{
+						osd_printf_error("stream %02x data while playing\n", id);
+						s.timer->enable(false);
+					}
 				}
 				m_pc += 5;
 				break;
@@ -951,8 +1127,20 @@ void vgmplay_device::execute_run()
 			case 0x92:
 			{
 				uint8_t id = m_file->read_byte(m_pc + 1);
-				if (id < 0xff)
-					m_streams[id].frequency = m_file->read_dword(m_pc + 2);
+				if (id == 0xff)
+					osd_printf_error("stream frequency invalid id\n");
+				else
+				{
+					stream& s(m_streams[id]);
+
+					s.frequency = m_file->read_dword(m_pc + 2);
+
+					if (s.timer->enabled())
+					{
+						osd_printf_error("stream %02x frequency %d while playing\n", id, s.frequency);
+						s.timer->enable(false);
+					}
+				}
 				m_pc += 6;
 				break;
 			}
@@ -960,15 +1148,50 @@ void vgmplay_device::execute_run()
 			case 0x93:
 			{
 				uint8_t id = m_file->read_byte(m_pc + 1);
-				if (id < 0xff)
+				if (id == 0xff)
+					osd_printf_error("stream start invalid id\n");
+				else if (m_streams[id].chip_type >= LED_COUNT)
+					osd_printf_error("stream start %02x invalid chip type %02x\n", id, m_streams[id].chip_type);
+				else
 				{
-					uint8_t flags = m_file->read_byte(m_pc + 3);
-					m_streams[id].length_mode = flags & 3;
-					m_streams[id].reverse = BIT(flags, 4);
-					m_streams[id].loop = BIT(flags, 7);
-					m_streams[id].offset = m_file->read_dword(m_pc + 2);
-					m_streams[id].length = m_file->read_dword(m_pc + 7);
-					m_stream_timers[id]->adjust(attotime::zero, id, m_streams[id].frequency ? attotime::from_double(m_streams[id].frequency) : attotime::never);
+					stream& s(m_streams[id]);
+
+					pulse_act_led(s.chip_type);
+
+					uint32_t offset = m_file->read_dword(m_pc + 2);
+					uint8_t flags = m_file->read_byte(m_pc + 6);
+					uint32_t length = m_file->read_dword(m_pc + 7);
+
+					if (s.bank >= m_data_stream_blocks.size())
+						osd_printf_error("stream start %02x invalid bank %u>=%u\n", id, s.bank, uint8_t(m_data_stream_blocks.size()));
+					else if (s.frequency == 0)
+						osd_printf_error("stream start %02x invalid frequency\n", id);
+					else
+					{
+						if (offset != 0xffffffff)
+							s.offset = offset + (s.step_base * s.byte_depth);
+
+						s.reverse = BIT(flags, 4);
+						s.loop = BIT(flags, 7);
+
+						switch (flags & 3)
+						{
+						case 0:
+							break;
+						case 1:
+							s.length = length;
+							break;
+						case 2:
+							s.length = (length * 1000) / s.frequency;
+							break;
+						case 3:
+							s.length = (m_data_streams[s.bank].size() - (s.offset - (s.step_base * s.byte_depth))) / (s.step_size * s.byte_depth);
+							break;
+						}
+
+						s.position = 0;
+						s.timer->adjust(attotime::zero, id, attotime::from_hz(s.frequency));
+					}
 				}
 				m_pc += 11;
 				break;
@@ -977,11 +1200,12 @@ void vgmplay_device::execute_run()
 			case 0x94:
 			{
 				uint8_t id = m_file->read_byte(m_pc + 1);
-				if (id < 0xff)
-					m_stream_timers[id]->adjust(attotime::never, 0);
-				else
+				if (id == 0xff)
 					for (int i = 0; i < 0xff; i++)
-						m_stream_timers[i]->adjust(attotime::never, 0);
+						m_streams[id].timer->enable(false);
+				else
+					m_streams[id].timer->enable(false);
+
 				m_pc += 2;
 				break;
 			}
@@ -989,16 +1213,35 @@ void vgmplay_device::execute_run()
 			case 0x95:
 			{
 				uint8_t id = m_file->read_byte(m_pc + 1);
-				if (id < 0xff && m_streams[id].type < 0xff && m_data_streams[m_streams[id].bank].size() != 0)
+				if (id == 0xff)
+					osd_printf_error("stream start short invalid id\n");
+				else if (m_streams[id].chip_type >= LED_COUNT)
+					osd_printf_error("stream start short %02x invalid chip type %02x\n", id, m_streams[id].chip_type);
+				else
 				{
-					uint8_t flags = m_file->read_byte(m_pc + 3);
-					m_streams[id].loop = BIT(flags, 0);
-					m_streams[id].reverse = BIT(flags, 4);
-					/// TODO: get offset & length from????
-					m_streams[id].offset = 0;
-					m_streams[id].length = 0;
-					m_streams[id].length_mode = 0;
-					m_stream_timers[id]->adjust(attotime::zero, id, m_streams[id].frequency ? attotime::from_double(m_streams[id].frequency) : attotime::never);
+					stream& s(m_streams[id]);
+
+					pulse_act_led(s.chip_type);
+
+					uint8_t block = m_file->read_word(m_pc + 2);
+					uint8_t flags = m_file->read_byte(m_pc + 4);
+
+					if (s.bank >= m_data_stream_blocks.size())
+						osd_printf_error("stream start short %02x invalid bank %u>=%u\n", id, s.bank, uint8_t(m_data_stream_blocks.size()));
+					else if (block >= m_data_stream_blocks[s.bank].size())
+						osd_printf_error("stream start short %02x bank %u invalid block %u>=%u\n", id, s.bank, block, uint8_t(m_data_stream_blocks[s.bank].size()));
+					else if (s.frequency == 0)
+						osd_printf_error("stream start %02x invalid frequency\n", id);
+					else
+					{
+						s.loop = BIT(flags, 0);
+						s.reverse = BIT(flags, 4);
+						s.offset = m_data_stream_blocks[s.bank][block].start + (s.step_base * s.byte_depth);
+						s.length = m_data_stream_blocks[s.bank][block].size / (s.step_size * s.byte_depth);
+
+						s.position = 0;
+						s.timer->adjust(attotime::zero, id, attotime::from_hz(s.frequency));
+					}
 				}
 				m_pc += 5;
 				break;
@@ -1119,7 +1362,15 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_32X_PWM);
 				uint8_t offset = m_file->read_byte(m_pc + 1);
-				m_io16->write_word(A_32X_PWM + (offset >> 4), ((offset & 0xf) << 8) | m_file->read_byte(m_pc + 2));
+				uint8_t data = m_file->read_byte(m_pc + 2);
+
+				if ((offset & 0xf0) == 0 && data == 0)
+				{
+					osd_printf_error("HACK: enable 32x channels\n");
+					data |= 6;
+				}
+
+				m_io16->write_word(A_32X_PWM + ((offset & 0xf0) >> 3), ((offset & 0xf) << 8) | data);
 				m_pc += 3;
 				break;
 			}
@@ -1164,7 +1415,6 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_UPD7759);
 				uint8_t offset = m_file->read_byte(m_pc + 1);
-
 				if (offset & 0x80)
 					m_io->write_byte(A_UPD7759_1 + (offset & 0x7f), m_file->read_byte(m_pc + 2));
 				else
@@ -1336,7 +1586,11 @@ void vgmplay_device::execute_run()
 			case 0xc5:
 			{
 				pulse_act_led(LED_SCSP);
-				// TODO: SCSP memory
+				uint8_t offset = m_file->read_byte(m_pc + 1);
+				if (offset & 0x80)
+					m_io16->write_byte(A_SCSP_1 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
+				else
+					m_io16->write_byte(A_SCSP_0 + ((offset & 0x7f) << 8) + (m_file->read_byte(m_pc + 2) ^ 1), m_file->read_byte(m_pc + 3));
 				m_pc += 4;
 				break;
 			}
@@ -1496,7 +1750,7 @@ void vgmplay_device::execute_run()
 			}
 
 			default:
-				logerror("unhandled code %02x (%02x %02x %02x %02x)\n", code, m_file->read_byte(m_pc + 1), m_file->read_byte(m_pc + 2), m_file->read_byte(m_pc + 3), m_file->read_byte(m_pc + 4));
+				osd_printf_error("unhandled code %02x (%02x %02x %02x %02x)\n", code, m_file->read_byte(m_pc + 1), m_file->read_byte(m_pc + 2), m_file->read_byte(m_pc + 3), m_file->read_byte(m_pc + 4));
 
 				if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 					debugger_instruction_hook(m_pc);
@@ -1555,6 +1809,18 @@ uint32_t vgmplay_disassembler::opcode_alignment() const
 
 offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
+	static const char *const basic_types[8] =
+	{
+		"ym2612.%d pcm",
+		"rf5c68 pcm",
+		"rf5c164 pcm",
+		"sega32x.%d pcm",
+		"okim6258.%d adpcm",
+		"huc6280.%d pcm",
+		"scsp.%d pcm",
+		"nesapu.%d dpcm",
+	};
+
 	switch (opcodes.r8(pc))
 	{
 	case 0x30:
@@ -1642,80 +1908,100 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case 0x67:
 	{
-		static const char *const basic_types[8] =
-		{
-			"ym2612 pcm",
-			"rf5c68 pcm",
-			"rf5c164 pcm",
-			"pwm pcm",
-			"okim6258 adpcm",
-			"huc6280 pcm",
-			"scsp pcm",
-			"nes apu dpcm"
-		};
-
 		static const char *const rom_types[20] =
 		{
-			"sega pcm rom",
-			"ym2608 delta-t rom",
-			"ym2610 adpcm rom",
-			"ym2610 delta-t rom",
-			"ymf278b rom",
-			"ymf271 rom",
-			"ymz280b rom",
-			"ymf278b rom",
-			"y8950 delta-t rom",
-			"multipcm rom",
-			"upd7759 rom",
-			"okim6295 rom",
-			"k054539 rom",
-			"c140 rom",
-			"k053260 rom",
-			"qsound rom",
-			"es5505/es5506 rom",
-			"x1-010 rom",
-			"c352 rom",
-			"ga20 rom"
+			"segapcm.%d rom",
+			"ym2608.%d delta-t rom",
+			"ym2610.%d adpcm rom",
+			"ym2610.%d delta-t rom",
+			"ymf278b.%d rom",
+			"ymf271.%d rom",
+			"ymz280b.%d rom",
+			"ymf278b.%d rom",
+			"y8950.%d delta-t rom",
+			"multipcm.%d rom",
+			"upd7759.%d rom",
+			"okim6295.%d rom",
+			"k054539.%d rom",
+			"c140.%d rom",
+			"k053260.%d rom",
+			"qsound.%d rom",
+			"es5505.%d rom",
+			"x1-010.%d rom",
+			"c352.%d rom",
+			"ga20.%d rom"
 		};
 
-		static const char *const ram_types[3] =
+		static const char *const small_ram_types[3] =
 		{
 			"rf5c68 ram",
 			"rf5c164 ram",
-			"nes apu ram"
+			"nesapu.%d ram"
 		};
 
-		static const char *const ram2_types[2] =
+		static const char *const large_ram_types[2] =
 		{
-			"scsp ram",
-			"es5503 ram"
+			"scsp.%d ram",
+			"es5503.%d ram"
 		};
 
 		uint8_t type = opcodes.r8(pc + 2);
-		uint32_t size = opcodes.r8(pc + 3) | (opcodes.r8(pc + 4) << 8) | (opcodes.r8(pc + 5) << 16) | (opcodes.r8(pc + 6) << 24);
+		uint32_t size = opcodes.r32(pc + 3);
+		int second = (size & 0x80000000) ? 1 : 0;
+		size &= 0x7fffffff;
+
 		if (type < 0x8)
-			util::stream_format(stream, "data-block %x, %s", size, basic_types[type]);
+		{
+			util::stream_format(stream, basic_types[type], second);  util::stream_format(stream, " data-block %x", size);
+		}
 		else if (type < 0x40)
-			util::stream_format(stream, "data-block %x, %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d stream data-block %x", type, second, size);
 		else if (type < 0x48)
-			util::stream_format(stream, "data-block %x comp., %s", size, basic_types[type & 0x3f]);
+		{
+			util::stream_format(stream, basic_types[type - 0x40], second); util::stream_format(stream, " comp. data-block %x", size);
+		}
 		else if (type < 0x7f)
-			util::stream_format(stream, "data-block %x comp., %02x", size, type & 0x3f);
+			util::stream_format(stream, "unknown%02x.%d stream comp. data-block %x", type - 0x40, second, size);
 		else if (type < 0x80)
 			util::stream_format(stream, "decomp-table %x, %02x/%02x", size, opcodes.r8(pc + 7), opcodes.r8(pc + 8));
 		else if (type < 0x94)
-			util::stream_format(stream, "data-block %x, %s", size, rom_types[type & 0x7f]);
+		{
+			util::stream_format(stream, rom_types[type - 0x80], second); util::stream_format(stream, " data-block %x", size);
+		}
 		else if (type < 0xc0)
-			util::stream_format(stream, "data-block %x, rom %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d rom data-block %x", type - 0x80, second, size);
 		else if (type < 0xc3)
-			util::stream_format(stream, "data-block %x, %s", size, ram_types[type & 0x1f]);
+		{
+			util::stream_format(stream, small_ram_types[type - 0xc0], second);  util::stream_format(stream, " data-block %x", size);
+		}
 		else if (type < 0xe0)
-			util::stream_format(stream, "data-block %x, ram %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d small ram data-block %x", type - 0xc0, second, size);
 		else if (type < 0xe2)
-			util::stream_format(stream, "data-block %x, %s", size, ram2_types[type & 0x1f]);
+		{
+			util::stream_format(stream, large_ram_types[type - 0xe0], second); util::stream_format(stream, " data-block %x", size);
+		}
 		else
-			util::stream_format(stream, "data-block %x, ram %02x", size, type);
+			util::stream_format(stream, "unknown%02x.%d large ram data-block %x", type - 0xe0, second, size);
 		return (7 + size) | SUPPORTED;
+	}
+
+	case 0x68:
+	{
+		uint8_t type = opcodes.r8(pc + 2);
+		uint32_t src = opcodes.r32(pc + 3) & 0xffffff;
+		uint32_t dst = opcodes.r32(pc + 6) & 0xffffff;
+		uint32_t size = opcodes.r32(pc + 9) & 0xffffff;
+		if (size == 0) size = 0x01000000;
+		int second = (type & 0x80) ? 1 : 0;
+
+		if (type < 8)
+		{
+			util::stream_format(stream, basic_types[type], second); util::stream_format(stream, " write src %x dst %x size %x\n", src, dst, size);
+		}
+		else
+			util::stream_format(stream, "unknown%02x.%d pcm write src %x dst %x size %x\n", type, second, src, dst, size);
+
+		return 12 | SUPPORTED;
 	}
 
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
@@ -1753,7 +2039,7 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		return 2 | SUPPORTED;
 
 	case 0x95:
-		util::stream_format(stream, "stream start (fast) %02x %02x %02x %02x\n", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
+		util::stream_format(stream, "stream start short %02x %02x %02x %02x\n", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
 		return 5 | SUPPORTED;
 
 	case 0xa0:
@@ -2196,7 +2482,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 	m_file_data.resize(quickload_size);
 
-	if (!quickload_size || 
+	if (!quickload_size ||
 		image.fread(&m_file_data[0], quickload_size) != quickload_size)
 	{
 		m_file_data.clear();
@@ -2234,7 +2520,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 				str.avail_out = decomp.size() - str.total_out;
 				err = inflate(&str, Z_SYNC_FLUSH);
 			} while(err == Z_OK);
-			
+
 			if(err != Z_STREAM_END)
 			{
 				logerror("broken gzip file\n");
@@ -2277,10 +2563,12 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (r32(0x0c) & 0x80000000)
 			logerror("Warning: file requests an unsupported T6W28");
 
-		m_ym2413[0]->set_unscaled_clock(r32(0x10) & ~0x40000000);
-		m_ym2413[1]->set_unscaled_clock((r32(0x10) & 0x40000000) ? r32(0x10) & ~0x40000000 : 0);
-		m_ym2413[0]->set_output_gain(ALL_OUTPUTS, (r32(0x10) & ~0x40000000) ? volume : 0.0f);
+		m_ym2413[0]->set_unscaled_clock(r32(0x10) & ~0xc0000000);
+		m_ym2413[1]->set_unscaled_clock((r32(0x10) & 0x40000000) ? r32(0x10) & ~0xc0000000 : 0);
+		m_ym2413[0]->set_output_gain(ALL_OUTPUTS, (r32(0x10) & ~0xc0000000) ? volume : 0.0f);
 		m_ym2413[1]->set_output_gain(ALL_OUTPUTS, (r32(0x10) & 0x40000000) ? volume : 0.0f);
+		if (version >= 0x110 && (r32(0x2c) & 0x80000000))
+			logerror("Warning: file requests an unsupported VRC7\n");
 
 		m_ym2612[0]->set_unscaled_clock((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000);
 		m_ym2612[1]->set_unscaled_clock(((version >= 0x110 ? r32(0x2c) : r32(0x10)) & 0x40000000) ? (version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000 : 0);
@@ -2358,8 +2646,10 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_ymz280b[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && header_size >= 0x6c && (r32(0x68) & ~0x40000000) ? volume : 0.0f);
 		m_ymz280b[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && header_size >= 0x6c && (r32(0x68) & 0x40000000) ? volume : 0.0f);
 
-		m_rf5c164->set_unscaled_clock(version >= 0x151 && header_size >= 0x70 ? r32(0x6c) : 0);
-		m_rf5c164->set_output_gain(ALL_OUTPUTS, version >= 0x151 && header_size >= 0x70 && r32(0x6c) ? volume : 0.0f);
+		m_rf5c164->set_unscaled_clock(version >= 0x151 && header_size >= 0x70 ? r32(0x6c) & ~0x80000000 : 0);
+		m_rf5c164->set_output_gain(ALL_OUTPUTS, version >= 0x151 && header_size >= 0x70 && (r32(0x6c) & ~0x80000000) ? volume : 0.0f);
+		if (version >= 0x151 && header_size >= 0x70 && (r32(0x6c) & 0x80000000))
+			logerror("Warning: file requests an unsupported Cosmic Fantasy Stories HACK\n");
 
 		m_sega32x->set_unscaled_clock(version >= 0x151 && header_size >= 0x74 && r32(0x70) ? r32(0x70) : 0);
 		m_sega32x->set_ldac_output_gain(version >= 0x151 && header_size >= 0x74 && r32(0x70) ? volume : 0.0f);
@@ -2410,13 +2700,15 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_okim6258[0]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0x94 && (r32(0x90) & ~0x40000000) ? volume : 0.0f);
 		m_okim6258[1]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0x94 && (r32(0x90) & 0x40000000) ? volume : 0.0f);
 
-		uint8_t oki6258_flags = version >= 0x161 && header_size >= 0x95 ? r8(0x94) : 0;
-		m_okim6258[0]->set_divider(oki6258_flags & 3);
-		m_okim6258[0]->set_outbits(BIT(oki6258_flags, 3) ? 12 : 10);
-		m_okim6258[0]->set_type(BIT(oki6258_flags, 2));
-		m_okim6258[1]->set_divider(oki6258_flags & 3);
-		m_okim6258[1]->set_outbits(BIT(oki6258_flags, 3) ? 12 : 10);
-		m_okim6258[1]->set_type(BIT(oki6258_flags, 2));
+		uint8_t okim6258_flags = version >= 0x161 && header_size >= 0x95 ? r8(0x94) : 0;
+		m_okim6258_divider[0] = okim6258_flags & 3;
+		m_okim6258[0]->set_divider(m_okim6258_divider[0]);
+		m_okim6258[0]->set_outbits(BIT(okim6258_flags, 3) ? 12 : 10);
+		m_okim6258[0]->set_type(BIT(okim6258_flags, 2));
+		m_okim6258_divider[1] = okim6258_flags & 3;
+		m_okim6258[1]->set_divider(m_okim6258_divider[1]);
+		m_okim6258[1]->set_outbits(BIT(okim6258_flags, 3) ? 12 : 10);
+		m_okim6258[1]->set_type(BIT(okim6258_flags, 2));
 
 		m_k054539[0]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 		m_k054539[1]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
@@ -2446,6 +2738,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		// HACK: Some VGMs contain 48,000 instead of 18,432,000
 		if (version >= 0x161 && header_size >= 0xa4 && (r32(0xa0) & ~0x40000000) == 48000)
 		{
+			osd_printf_error("HACK: incorrect k054539 clock\n");
 			m_k054539[0]->set_clock_scale(384);
 			m_k054539[1]->set_clock_scale(384);
 		}
@@ -2481,7 +2774,10 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 		// HACK: VGMs contain 4,000,000 instead of 60,000,000
 		if (version >= 0x161 && header_size >= 0xb8 && r32(0xb4) == 4000000)
+		{
+			osd_printf_error("HACK: incorrect qsound clock\n");
 			m_qsound->set_clock_scale(15);
+		}
 
 		m_qsound->set_unscaled_clock(version >= 0x161 && header_size >= 0xb8 ? r32(0xb4) : 0);
 		m_qsound->set_output_gain(ALL_OUTPUTS, version >= 0x161 && header_size >= 0xb8 && r32(0xb4) ? volume : 0.0f);
@@ -2533,23 +2829,25 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_x1_010[0]->set_output_gain(ALL_OUTPUTS, version >= 0x171 && header_size >= 0xdc && (r32(0xd8) & ~0x40000000) ? volume : 0.0f);
 		m_x1_010[1]->set_output_gain(ALL_OUTPUTS, version >= 0x171 && header_size >= 0xdc && (r32(0xd8) & 0x40000000) ? volume : 0.0f);
 
-		m_c352[0]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe0 ? r32(0xdc) & ~0x40000000 : 0);
-		m_c352[1]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe0 && (r32(0xdc) & 0x40000000) ? r32(0xdc) & ~0x40000000 : 0);
-		m_c352[0]->set_output_gain(ALL_OUTPUTS, version >= 0x171 && header_size >= 0xe0 && (r32(0xdc) & ~0x40000000) ? volume : 0.0f);
+		m_c352[0]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe0 ? r32(0xdc) & ~0xc0000000 : 0);
+		m_c352[1]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe0 && (r32(0xdc) & 0x40000000) ? r32(0xdc) & ~0xc0000000 : 0);
+		m_c352[0]->set_output_gain(ALL_OUTPUTS, version >= 0x171 && header_size >= 0xe0 && (r32(0xdc) & ~0xc0000000) ? volume : 0.0f);
 		m_c352[1]->set_output_gain(ALL_OUTPUTS, version >= 0x171 && header_size >= 0xe0 && (r32(0xdc) & 0x40000000) ? volume : 0.0f);
+		if (version >= 0x171 && header_size >= 0xe0 && r32(0xdc) & 0x80000000)
+			logerror("Warning: file requests an unsupported disable rear speakers\n");
 
 		m_ga20[0]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe4 ? r32(0xe0) & ~0x40000000 : 0);
 		m_ga20[1]->set_unscaled_clock(version >= 0x171 && header_size >= 0xe4 && (r32(0xe0) & 0x40000000) ? r32(0xe0) & ~0x40000000 : 0);
 		m_ga20[0]->set_output_gain(ALL_OUTPUTS, version >= 0x171 && header_size >= 0xe4 && (r32(0xe0) & ~0x40000000) ? volume : 0.0f);
 		m_ga20[1]->set_output_gain(ALL_OUTPUTS, version >= 0x171 && header_size >= 0xe4 && (r32(0xe0) & 0x40000000) ? volume : 0.0f);
-		
+
 		for (device_t &child : subdevices())
 			if (child.clock() != 0)
 				logerror("%s %d\n", child.tag(), child.clock());
 
 		//for (auto &stream : machine().sound().streams())
-		//	if (stream->sample_rate() != 0)
-		//		logerror("%s %d\n", stream->device().tag(), stream->sample_rate());
+		//  if (stream->sample_rate() != 0)
+		//      logerror("%s %d\n", stream->device().tag(), stream->sample_rate());
 
 		machine().schedule_soft_reset();
 
@@ -2624,7 +2922,7 @@ template<int Chip>
 WRITE_LINE_MEMBER(vgmplay_state::upd7759_drq_w)
 {
 	if (m_upd7759_drq[Chip] && !state)
-		logerror("upd7759.%d underflow\n", Chip);
+		osd_printf_error("upd7759.%d underflow\n", Chip);
 
 	m_upd7759_drq[Chip] = state;
 
@@ -2641,8 +2939,28 @@ template<int Chip>
 WRITE8_MEMBER(vgmplay_device::upd7759_bank_w)
 {
 	// TODO: upd7759 update stream
-
 	m_upd7759_bank[Chip] = data * 0x20000;
+}
+
+template<int Chip>
+WRITE8_MEMBER(vgmplay_state::okim6258_clock_w)
+{
+	uint32_t old = m_okim6258_clock[Chip];
+	int shift = ((offset & 3) << 3);
+	m_okim6258_clock[Chip] = (m_okim6258_clock[Chip] & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
+	if (old != m_okim6258_clock[Chip])
+		m_okim6258[Chip]->set_unscaled_clock(m_okim6258_clock[Chip]);
+
+}
+
+template<int Chip>
+WRITE8_MEMBER(vgmplay_state::okim6258_divider_w)
+{
+	if ((data & mem_mask) != (m_okim6258_divider[Chip] & mem_mask))
+	{
+		COMBINE_DATA(&m_okim6258_divider[Chip]);
+		m_okim6258[Chip]->set_divider(m_okim6258_divider[Chip]);
+	}
 }
 
 template<int Chip>
@@ -2833,13 +3151,13 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_OKIM6258_0 + 0x0, vgmplay_device::A_OKIM6258_0 + 0x0).w(m_okim6258[0], FUNC(okim6258_device::ctrl_w));
 	map(vgmplay_device::A_OKIM6258_0 + 0x1, vgmplay_device::A_OKIM6258_0 + 0x1).w(m_okim6258[0], FUNC(okim6258_device::data_w));
 	map(vgmplay_device::A_OKIM6258_0 + 0x2, vgmplay_device::A_OKIM6258_0 + 0x2).nopw(); // TODO: okim6258 pan
-	map(vgmplay_device::A_OKIM6258_0 + 0x8, vgmplay_device::A_OKIM6258_0 + 0xb).nopw(); // TODO: okim6258 clock
-	map(vgmplay_device::A_OKIM6258_0 + 0xc, vgmplay_device::A_OKIM6258_0 + 0xc).nopw(); // TODO: okim6258 divider
+	map(vgmplay_device::A_OKIM6258_0 + 0x8, vgmplay_device::A_OKIM6258_0 + 0xb).w(FUNC(vgmplay_state::okim6258_clock_w<0>));
+	map(vgmplay_device::A_OKIM6258_0 + 0xc, vgmplay_device::A_OKIM6258_0 + 0xc).w(FUNC(vgmplay_state::okim6258_divider_w<0>));
 	map(vgmplay_device::A_OKIM6258_1 + 0x0, vgmplay_device::A_OKIM6258_1 + 0x0).w(m_okim6258[1], FUNC(okim6258_device::ctrl_w));
 	map(vgmplay_device::A_OKIM6258_1 + 0x1, vgmplay_device::A_OKIM6258_1 + 0x1).w(m_okim6258[1], FUNC(okim6258_device::data_w));
 	map(vgmplay_device::A_OKIM6258_1 + 0x2, vgmplay_device::A_OKIM6258_1 + 0x2).nopw(); // TODO: okim6258 pan
-	map(vgmplay_device::A_OKIM6258_1 + 0x8, vgmplay_device::A_OKIM6258_1 + 0xb).nopw(); // TODO: okim6258 clock
-	map(vgmplay_device::A_OKIM6258_1 + 0xc, vgmplay_device::A_OKIM6258_1 + 0xc).nopw(); // TODO: okim6258 divider
+	map(vgmplay_device::A_OKIM6258_1 + 0x8, vgmplay_device::A_OKIM6258_1 + 0xb).w(FUNC(vgmplay_state::okim6258_clock_w<1>));
+	map(vgmplay_device::A_OKIM6258_1 + 0xc, vgmplay_device::A_OKIM6258_1 + 0xc).w(FUNC(vgmplay_state::okim6258_divider_w<1>));
 	map(vgmplay_device::A_OKIM6295_0, vgmplay_device::A_OKIM6295_0).w(m_okim6295[0], FUNC(okim6295_device::write));
 	map(vgmplay_device::A_OKIM6295_0 + 0x8, vgmplay_device::A_OKIM6295_0 + 0xb).w(FUNC(vgmplay_state::okim6295_clock_w<0>));
 	map(vgmplay_device::A_OKIM6295_0 + 0xc, vgmplay_device::A_OKIM6295_0 + 0xc).w(FUNC(vgmplay_state::okim6295_pin7_w<0>));
@@ -2865,7 +3183,6 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
 	map(vgmplay_device::A_POKEY_1, vgmplay_device::A_POKEY_1 + 0xf).w(m_pokey[1], FUNC(pokey_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND + 0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
-	// TODO: scsp
 	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
 	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
 	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
@@ -2887,9 +3204,13 @@ void vgmplay_state::soundchips_map(address_map &map)
 
 void vgmplay_state::soundchips16_map(address_map &map)
 {
+	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::_32x_pwm_w));
+	map(vgmplay_device::A_SCSP_0, vgmplay_device::A_SCSP_0 + 0xfff).w(m_scsp[0], FUNC(scsp_device::write));
+	map(vgmplay_device::A_SCSP_1, vgmplay_device::A_SCSP_1 + 0xfff).w(m_scsp[1], FUNC(scsp_device::write));
+	map(vgmplay_device::A_SCSP_RAM_0, vgmplay_device::A_SCSP_RAM_0 + 0xfffff).ram().share("scsp_ram.0");
+	map(vgmplay_device::A_SCSP_RAM_1, vgmplay_device::A_SCSP_RAM_1 + 0xfffff).ram().share("scsp_ram.1");
 	map(vgmplay_device::A_C352_0, vgmplay_device::A_C352_0 + 0x7fff).w(m_c352[0], FUNC(c352_device::write));
 	map(vgmplay_device::A_C352_1, vgmplay_device::A_C352_1 + 0x7fff).w(m_c352[1], FUNC(c352_device::write));
-	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::_32x_pwm_w));
 }
 
 template<int Chip>
@@ -2971,6 +3292,12 @@ void vgmplay_state::qsound_map(address_map &map)
 }
 
 template<int Chip>
+void vgmplay_state::scsp_map(address_map &map)
+{
+	map(0, 0xfffff).ram().share(Chip ? "scsp_ram.1" : "scsp_ram.0");
+}
+
+template<int Chip>
 void vgmplay_state::wswan_map(address_map &map)
 {
 	map(0, 0x3fff).ram().share(Chip ? "wswan_ram.1" : "wswan_ram.0");
@@ -3024,9 +3351,6 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOFTWARE_LIST_ADD("vgm_list", "vgmplay")
 
 	config.set_default_layout(layout_vgmplay);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
 
 	SN76496(config, m_sn76496[0], 0);
 	m_sn76496[0]->add_route(0, "lspeaker", 0.5);
@@ -3186,8 +3510,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	PALETTE(config, "sega32x_palette", 0xc0 * 2);
 
-	dynamic_cast<cpu_device *>(config.device_find(m_sega32x, "32x_master_sh2"))->set_disable();
-	dynamic_cast<cpu_device *>(config.device_find(m_sega32x, "32x_slave_sh2"))->set_disable();
+	m_sega32x->subdevice<cpu_device>("32x_master_sh2")->set_disable();
+	m_sega32x->subdevice<cpu_device>("32x_slave_sh2")->set_disable();
 
 	// TODO: prevent error.log spew
 	AY8910(config, m_ay8910[0], 0);
@@ -3327,10 +3651,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_qsound->add_route(1, "rspeaker", 1);
 
 	SCSP(config, m_scsp[0], 0);
+	m_scsp[0]->set_addrmap(0, &vgmplay_state::scsp_map<0>);
 	m_scsp[0]->add_route(0, "lspeaker", 1);
 	m_scsp[0]->add_route(1, "rspeaker", 1);
 
 	SCSP(config, m_scsp[1], 0);
+	m_scsp[1]->set_addrmap(0, &vgmplay_state::scsp_map<1>);
 	m_scsp[1]->add_route(0, "lspeaker", 1);
 	m_scsp[1]->add_route(1, "rspeaker", 1);
 
@@ -3411,6 +3737,9 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_ga20[1]->set_addrmap(0, &vgmplay_state::ga20_map<1>);
 	m_ga20[1]->add_route(0, "lspeaker", 1);
 	m_ga20[1]->add_route(1, "rspeaker", 1);
+
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
@@ -3421,7 +3750,6 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2610.1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "y8950.0", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "y8950.1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "scsp", ROMREGION_ERASE00 )
 	// TODO: split up 32x to remove dependencies
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )
 	ROM_REGION( 0x4000, "slave", ROMREGION_ERASE00 )

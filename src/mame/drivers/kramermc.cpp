@@ -117,10 +117,10 @@ MACHINE_CONFIG_START(kramermc_state::kramermc)
 	MCFG_DEVICE_PROGRAM_MAP(kramermc_mem)
 	MCFG_DEVICE_IO_MAP(kramermc_io)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 1500000)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, kramermc_state, kramermc_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, kramermc_state, kramermc_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, kramermc_state, kramermc_port_b_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", 1500000));
+	pio.in_pa_callback().set(FUNC(kramermc_state::kramermc_port_a_r));
+	pio.out_pa_callback().set(FUNC(kramermc_state::kramermc_port_a_w));
+	pio.in_pb_callback().set(FUNC(kramermc_state::kramermc_port_b_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93C45
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

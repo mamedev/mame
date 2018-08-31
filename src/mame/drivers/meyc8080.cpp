@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(meyc8080_state::meyc8080)
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_DEVICE_PROGRAM_MAP(meyc8080_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

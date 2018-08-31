@@ -587,10 +587,10 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &uart(I8251(config, I8251_TAG, 0));
+	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
@@ -608,9 +608,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8500_state::pc8500)
@@ -629,10 +627,10 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &uart(I8251(config, I8251_TAG, 0));
+	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
@@ -650,9 +648,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
 MACHINE_CONFIG_END
 
 /* ROMs */

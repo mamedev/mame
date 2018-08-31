@@ -1394,103 +1394,17 @@ MACHINE_CONFIG_START(msx_state::msx)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(msx_state::msx_ntsc)
+template<typename VDPType>
+void msx_state::msx1(VDPType &vdp_type, machine_config &config)
+{
 	msx(config);
 	/* Video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_tms9118)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9118, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_tms9128)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9128, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_tms9918)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9918, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_tms9918a)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9918A, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_tms9928)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9928A, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_pal)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_tms9129)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9129, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(msx_state::msx_tms9929)
-	msx(config);
-	/* Video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	tms9928a_device &vdp(vdp_type(config, "tms9928a", 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(msx_state::msx_irq_source0));
+}
 
 
 MACHINE_CONFIG_START(msx_state::msx2)
@@ -1631,7 +1545,7 @@ ROM_START(ax150)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::ax150)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1655,7 +1569,7 @@ ROM_END
 
 
 MACHINE_CONFIG_START(msx_state::ax170)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1678,7 +1592,7 @@ ROM_START (canonv8)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::canonv8)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149??
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1700,7 +1614,7 @@ ROM_START (canonv10)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::canonv10)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1721,7 +1635,7 @@ ROM_START (canonv20)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::canonv20)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1770,7 +1684,7 @@ ROM_START (mx10)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mx10)
-	msx_tms9118(config);
+	msx1(TMS9918, config);
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
 	// Z80: uPD780C-1
@@ -1791,7 +1705,7 @@ ROM_START (mx15)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mx15)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// FDC: None, 0 drives
 	// 3 Cartridge slots
 	// T6950
@@ -1813,7 +1727,7 @@ ROM_START (mx101)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mx101)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
 
@@ -1833,7 +1747,7 @@ ROM_START (pv7)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::pv7)
-	msx_tms9118(config);
+	msx1(TMS9918, config);
 	// AY8910?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot + expansion slot, or 2 cartridge slots?
@@ -1859,7 +1773,7 @@ ROM_START (pv16)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::pv16)
-	msx_tms9118(config);
+	msx1(TMS9918, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -1882,7 +1796,7 @@ ROM_START (cpc88)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cpc88)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
@@ -1905,7 +1819,7 @@ ROM_START (dpc100)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::dpc100)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1928,7 +1842,7 @@ ROM_START (dpc180)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::dpc180)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1951,7 +1865,7 @@ ROM_START (dpc200)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::dpc200)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1973,7 +1887,7 @@ ROM_START (dpc200e)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::dpc200e)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1994,7 +1908,7 @@ ROM_START (cpc50a)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cpc50a)
-	msx_tms9918(config);
+	msx1(TMS9918, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -2018,7 +1932,7 @@ ROM_START (cpc50b)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cpc50b)
-	msx_tms9118(config);
+	msx1(TMS9918, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -2041,7 +1955,7 @@ ROM_START (cpc51)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cpc51)
-	msx_tms9118(config);
+	msx1(TMS9918, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -2065,7 +1979,7 @@ ROM_START(dgnmsx)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::dgnmsx)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2086,7 +2000,7 @@ ROM_START (fdpc200)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::fdpc200)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2107,7 +2021,7 @@ ROM_START (fpc500)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::fpc500)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2128,7 +2042,7 @@ ROM_START (fspc800)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::fspc800)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// AY8910?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2150,7 +2064,7 @@ ROM_START (bruc100)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::bruc100)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -2171,7 +2085,7 @@ ROM_START (fmx)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::fmx)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot, 2 "Fujistu expansion slots
@@ -2195,7 +2109,7 @@ ROM_START (gsfc80u)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::gsfc80u)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2218,7 +2132,7 @@ ROM_START (gsfc200)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::gsfc200)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2241,7 +2155,7 @@ ROM_START (gfc1080)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::gfc1080)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -2264,7 +2178,7 @@ ROM_START (gfc1080a)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::gfc1080a)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -2285,7 +2199,7 @@ ROM_START (expert10)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::expert10)
-	msx_tms9128(config);
+	msx1(TMS9128, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2305,7 +2219,7 @@ ROM_START (expert11)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::expert11)
-	msx_tms9128(config);
+	msx1(TMS9128, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2325,7 +2239,7 @@ ROM_START (expert13)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::expert13)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -2346,7 +2260,7 @@ ROM_START (expertdp)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::expertdp)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: mb8877a, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -2374,7 +2288,7 @@ ROM_START (expertpl)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::expertpl)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2398,7 +2312,7 @@ ROM_START (mbh2)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mbh2)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2421,7 +2335,7 @@ ROM_START (mbh25)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mbh25)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2442,7 +2356,7 @@ ROM_START (mbh50)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mbh50)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2464,7 +2378,7 @@ ROM_START (jvchc7gb)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::jvchc7gb)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2485,7 +2399,7 @@ ROM_START (mlf48)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mlf48)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2506,7 +2420,7 @@ ROM_START (mlf80)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mlf80)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2527,7 +2441,7 @@ ROM_START (mlf110)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mlf110)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2549,7 +2463,7 @@ ROM_START (mlf120)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mlf120)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
@@ -2571,7 +2485,7 @@ ROM_START (mlfx1)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mlfx1)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2592,7 +2506,7 @@ ROM_START (cf1200)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cf1200)
-	msx_tms9918a(config);
+	msx1(TMS9918A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2613,7 +2527,7 @@ ROM_START (cf2000)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cf2000)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2633,7 +2547,7 @@ ROM_START (cf2700)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cf2700)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2654,7 +2568,7 @@ ROM_START (cf3000)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cf3000)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2675,7 +2589,7 @@ ROM_START (cf3300)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cf3300)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: mb8877a, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -2701,7 +2615,7 @@ ROM_START (fs1300)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::fs1300)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2727,7 +2641,7 @@ ROM_START (fs4000)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::fs4000)
-	msx_tms9128(config);
+	msx1(TMS9128, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2755,7 +2669,7 @@ ROM_START (fs4000a)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::fs4000a)
-	msx_tms9128(config);
+	msx1(TMS9128, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2778,7 +2692,7 @@ ROM_START (phc2)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::phc2)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -2799,7 +2713,7 @@ ROM_START (phc28)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::phc28)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -2820,7 +2734,7 @@ ROM_START (cf2700g)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cf2700g)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2843,7 +2757,7 @@ ROM_START (perfect1)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::perfect1)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 dribes
 	// 1 Cartridge slot
@@ -2864,7 +2778,7 @@ ROM_START (nms801)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::nms801)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 0 Cartridge slots
@@ -2882,7 +2796,7 @@ ROM_START (vg8000)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::vg8000)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2904,7 +2818,7 @@ ROM_START (vg8010)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::vg8010)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2926,7 +2840,7 @@ ROM_START (vg8010f)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::vg8010f)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2948,7 +2862,7 @@ ROM_START (vg802000)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::vg802000)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2969,7 +2883,7 @@ ROM_START (vg802020)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::vg802020)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2991,7 +2905,7 @@ ROM_START (vg8020f)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::vg8020f)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3015,7 +2929,7 @@ ROM_START (piopx7)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::piopx7)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// TMS9129NL VDP with sync/overlay interface
 	// AY-3-8910 PSG
 	// Pioneer System Remote (SR) system control interface
@@ -3060,7 +2974,7 @@ ROM_START (piopx7uk)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::piopx7uk)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3084,7 +2998,7 @@ ROM_START (piopxv60)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::piopxv60)
-	msx_tms9128(config);
+	msx1(TMS9128, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3107,7 +3021,7 @@ ROM_START (spc800)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::spc800)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3129,7 +3043,7 @@ ROM_START (mpc64)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mpc64)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3150,7 +3064,7 @@ ROM_START (mpc100)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mpc100)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3171,7 +3085,7 @@ ROM_START (mpc200)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mpc200)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
@@ -3194,7 +3108,7 @@ ROM_START (mpc200sp)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mpc200sp)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
@@ -3215,7 +3129,7 @@ ROM_START (phc28l)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::phc28l)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3236,7 +3150,7 @@ ROM_START (phc28s)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::phc28s)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3257,7 +3171,7 @@ ROM_START (mpc10)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mpc10)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3278,7 +3192,7 @@ ROM_START (hotbit11)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hotbit11)
-	msx_tms9128(config);
+	msx1(TMS9128, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3299,7 +3213,7 @@ ROM_START (hotbit12)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hotbit12)
-	msx_tms9128(config);
+	msx1(TMS9128, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3320,7 +3234,7 @@ ROM_START (hotbi13b)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hotbi13b)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3341,7 +3255,7 @@ ROM_START (hotbi13p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hotbi13p)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3362,7 +3276,7 @@ ROM_START (hb10)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb10)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// YM2149 (in S-1985 MSX-Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3386,7 +3300,7 @@ ROM_START (hb10p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb10p)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3408,7 +3322,7 @@ ROM_START (hb20p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb20p)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3432,7 +3346,7 @@ ROM_START (hb201)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb201)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3455,7 +3369,7 @@ ROM_START (hb201p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb201p)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3477,7 +3391,7 @@ ROM_START (hb501p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb501p)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3499,7 +3413,7 @@ ROM_START (hb55)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb55)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3522,7 +3436,7 @@ ROM_START (hb55d)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb55d)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3546,7 +3460,7 @@ ROM_START (hb55p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb55p)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3569,7 +3483,7 @@ ROM_START (hb75d)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb75d)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3593,7 +3507,7 @@ ROM_START (hb75p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb75p)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3616,7 +3530,7 @@ ROM_START (hb101p)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb101p)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3639,7 +3553,7 @@ ROM_START (hb701fd)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hb701fd)
-	msx_tms9928(config);
+	msx1(TMS9928A, config);
 	// YM2149 (in S-1985)
 	// FDC: WD2793?, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3667,7 +3581,7 @@ ROM_START (svi728)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::svi728)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slots, 1 Expansion slot (eg for SVI-707)
@@ -3692,7 +3606,7 @@ ROM_START (svi738)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::svi738)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: wd1793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3725,7 +3639,7 @@ ROM_START (svi738ar)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::svi738ar)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3758,7 +3672,7 @@ ROM_START (svi738dk)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::svi738dk)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3790,7 +3704,7 @@ ROM_START (svi738sp)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::svi738sp)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3822,7 +3736,7 @@ ROM_START (svi738sw)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::svi738sw)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3854,7 +3768,7 @@ ROM_START (svi738pl)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::svi738pl)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3883,7 +3797,7 @@ ROM_START (tadpc200)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::tadpc200)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3904,7 +3818,7 @@ ROM_START (tadpc20a)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::tadpc20a)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3926,7 +3840,7 @@ ROM_START (hx10)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx10)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot, 1 Toshiba Expension slot
@@ -3947,7 +3861,7 @@ ROM_START (hx10d)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx10d)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3968,7 +3882,7 @@ ROM_START (hx10dp)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx10dp)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3989,7 +3903,7 @@ ROM_START (hx10e)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx10e)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4010,7 +3924,7 @@ ROM_START (hx10f)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx10f)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4031,7 +3945,7 @@ ROM_START (hx10s)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx10s)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4052,7 +3966,7 @@ ROM_START (hx10sa)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx10sa)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4074,7 +3988,7 @@ ROM_START (hx20)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx20)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4099,7 +4013,7 @@ ROM_START (hx20i)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx20i)
-	msx_tms9129(config);
+	msx1(TMS9129, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4127,7 +4041,7 @@ ROM_START (hx21)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx21)
-	msx_tms9928(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4150,7 +4064,7 @@ ROM_START (hx21i)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx21i)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4177,7 +4091,7 @@ ROM_START (hx22)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx22)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4201,7 +4115,7 @@ ROM_START (hx22i)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hx22i)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4226,7 +4140,7 @@ ROM_START (hc5)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hc5)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives,
 	// 2 Cartridge slots?
@@ -4247,7 +4161,7 @@ ROM_START (hc6)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hc6)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives,
 	// 2 Cartridge slots?
@@ -4268,7 +4182,7 @@ ROM_START (hc7)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::hc7)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives,
 	// 2 Cartridge slots?
@@ -4289,7 +4203,7 @@ ROM_START (cx5f1)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cx5f1)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot?
@@ -4312,7 +4226,7 @@ ROM_START (cx5f)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cx5f)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot?
@@ -4335,7 +4249,7 @@ ROM_START (cx5m)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cx5m)
-	msx_tms9929(config);
+	msx1(TMS9929A, config);
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4360,7 +4274,7 @@ ROM_START (cx5m128)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cx5m128)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4385,7 +4299,7 @@ ROM_START (cx5m2)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::cx5m2)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4409,7 +4323,7 @@ ROM_START (yis303)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::yis303)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4432,7 +4346,7 @@ ROM_START (yis503)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::yis503)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4454,7 +4368,7 @@ ROM_START (yis503f)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::yis503f)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -4475,7 +4389,7 @@ ROM_START (yis503ii)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::yis503ii)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4498,7 +4412,7 @@ ROM_START (y503iir)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::y503iir)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: wd2793/mb8877?, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -4530,7 +4444,7 @@ ROM_START (y503iir2)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::y503iir2)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: wd2793/mb8877?, 1 3.5" DSDD drive?
 	// 2 Cartridge slots?
@@ -4557,7 +4471,7 @@ ROM_START (yis503m)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::yis503m)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -4579,7 +4493,7 @@ ROM_START (yc64)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::yc64)
-	msx_pal(config);
+	msx1(TMS9929A, config);
 	// YM2149
 	// FDC: None, 0 drives
 	// 1 Cartridge slot (slot 1)
@@ -4599,7 +4513,7 @@ ROM_START (mx64)
 ROM_END
 
 MACHINE_CONFIG_START(msx_state::mx64)
-	msx_ntsc(config);
+	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?

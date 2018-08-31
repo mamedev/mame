@@ -54,21 +54,19 @@ void at586_state::tx_config(device_t *device)
 
 void at586_state::sb_config(device_t *device)
 {
-	devcb_base *devcb = nullptr;
-	(void)devcb;
-	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(":", at586_state, boot_state_w))
-	MCFG_I82371SB_SMI_CB(INPUTLINE(":maincpu", INPUT_LINE_SMI))
+	i82371sb_device &sb = *downcast<i82371sb_device *>(device);
+	sb.boot_state_hook().set(":", FUNC(at586_state::boot_state_w));
+	sb.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 }
 
 
 void at586_state::superio_config(device_t *device)
 {
-	devcb_base *devcb = nullptr;
-	(void)devcb;
-	MCFG_FDC37C93X_SYSOPT(1)
-	MCFG_FDC37C93X_GP20_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_FDC37C93X_GP25_GATEA20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
-	MCFG_FDC37C93X_IRQ1_CB(WRITELINE(":pcibus:7:i82371sb:pic8259_master", pic8259_device, ir1_w))
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pcibus:7:i82371sb:pic8259_master", FUNC(pic8259_device::ir1_w));
 }
 
 
@@ -111,9 +109,7 @@ MACHINE_CONFIG_START(at586_state::at586)
 	MCFG_DEVICE_IO_MAP(at586_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371ab:pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
@@ -138,9 +134,7 @@ MACHINE_CONFIG_START(at586_state::at586x3)
 	MCFG_I386_SMIACT(WRITELINE("pcibus:0:i82439tx", i82439tx_device, smi_act_w))
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371sb:pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
@@ -170,9 +164,7 @@ MACHINE_CONFIG_START(at586_state::at586m55)
 	MCFG_I386_SMIACT(WRITELINE("pcibus:0:i82439tx", i82439tx_device, smi_act_w))
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:7:i82371sb:pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)

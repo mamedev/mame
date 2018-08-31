@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	MCFG_DEVICE_IO_MAP(maincpu_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert, XTAL(24'000'000) / 4 / 4 / 4096)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 

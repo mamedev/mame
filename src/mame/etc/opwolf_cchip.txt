@@ -1,6 +1,17 @@
-// license:GPL-2.0+
-// copyright-holders:Bryan McPhail
-/*************************************************************************
+Operation Wolf C-Chip Protection simulation
+===========================================
+
+The below simulation was replaced by emulating the actual cchip using an
+extracted eprom image. The information previously contained in the MAME driver
+is contained below for documentation purposes.
+
+Start of original notes and simulation below.
+
+
+***************************************************************************
+File: mame/machine/opwolf.cpp
+***************************************************************************
+
 
   Operation Wolf C-Chip Protection
   ================================
@@ -103,10 +114,8 @@
 
   Notes by bmcphail@vcmame.net
 
-*************************************************************************/
 
-#include "emu.h"
-#include "includes/opwolf.h"
+
 
 /* Select how coinage data is initialised in opwolf_cchip_data_w : 0 = user-defined in function - 1 = automatic */
 #define OPWOLF_READ_COINAGE_FROM_ROM    1
@@ -476,7 +485,6 @@ static const uint16_t *const level_data_lookup[] =
 	level_data_09
 };
 
-
 void opwolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -491,7 +499,6 @@ void opwolf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		assert_always(false, "Unknown id in opwolf_state::device_timer");
 	}
 }
-
 
 TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
 {
@@ -732,7 +739,6 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 		}
 	}
 }
-
 
 /*************************************
  *
@@ -1149,3 +1155,74 @@ void opwolf_state::opwolf_cchip_init(  )
 	m_cchip_timer = timer_alloc(TIMER_CCHIP);
 	m_cchip_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
+
+
+***************************************************************************
+File: mame/drivers/opwolf.cpp
+***************************************************************************
+
+
+//  map(0x0f0000, 0x0f07ff).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_data_r));
+//  map(0x0f0802, 0x0f0803).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_status_r));
+//  map(0x0ff000, 0x0ff7ff).w(FUNC(opwolf_state::opwolf_cchip_data_w));
+//  map(0x0ff802, 0x0ff803).w(FUNC(opwolf_state::opwolf_cchip_status_w));
+//  map(0x0ffc00, 0x0ffc01).w(FUNC(opwolf_state::opwolf_cchip_bank_w));
+
+//  m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
+
+//  opwolf_cchip_init(); // start old simulation, including periodic timer
+
+
+***************************************************************************
+File: mame/includes/opwolf.h
+***************************************************************************
+
+
+enum
+{
+	TIMER_OPWOLF,
+	TIMER_CCHIP
+};
+
+DECLARE_WRITE16_MEMBER(opwolf_cchip_status_w);
+DECLARE_WRITE16_MEMBER(opwolf_cchip_bank_w);
+DECLARE_WRITE16_MEMBER(opwolf_cchip_data_w);
+DECLARE_READ16_MEMBER(opwolf_cchip_status_r);
+DECLARE_READ16_MEMBER(opwolf_cchip_data_r);
+
+virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
+TIMER_CALLBACK_MEMBER(cchip_timer);
+void updateDifficulty(int mode);
+void opwolf_cchip_init();
+
+emu_timer   *m_opwolf_timer;
+
+/* c-chip */
+emu_timer   *m_cchip_timer;
+
+int          m_opwolf_region;
+
+uint8_t        m_current_bank;
+uint8_t        m_current_cmd;
+uint8_t        m_cchip_last_7a;
+uint8_t        m_cchip_last_04;
+uint8_t        m_cchip_last_05;
+uint8_t        m_cchip_coins_for_credit[2];
+uint8_t        m_cchip_credits_for_coin[2];
+uint8_t        m_cchip_coins[2];
+uint8_t        m_c588;
+uint8_t        m_c589;
+uint8_t        m_c58a; // These variables derived from the bootleg
+uint8_t        m_triggeredLevel1b; // These variables derived from comparison to unprotection version
+uint8_t        m_triggeredLevel2;
+uint8_t        m_triggeredLevel2b;
+uint8_t        m_triggeredLevel2c;
+uint8_t        m_triggeredLevel3b;
+uint8_t        m_triggeredLevel13b;
+uint8_t        m_triggeredLevel4;
+uint8_t        m_triggeredLevel5;
+uint8_t        m_triggeredLevel7;
+uint8_t        m_triggeredLevel8;
+uint8_t        m_triggeredLevel9;

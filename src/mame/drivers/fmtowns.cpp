@@ -2861,13 +2861,14 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, towns_state, towns_rxrdy_irq))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, towns_state, towns_txrdy_irq))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, towns_state, towns_syndet_irq))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232c", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232c", rs232_port_device, write_rts))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232c", rs232_port_device, write_txd))
+	I8251(config, m_i8251, 0);
+	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
+	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_txrdy_irq));
+	m_i8251->syndet_handler().set(FUNC(towns_state::towns_syndet_irq));
+	m_i8251->dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
+	m_i8251->rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
+	m_i8251->txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251",i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251",i8251_device, write_dsr))
@@ -2876,9 +2877,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
+	RAM(config, m_ram).set_default_size("6M").set_extra_options("2M,4M,8M,16M,32M,64M,96M");
 
 	MCFG_DEVICE_ADD("rtc58321", MSM58321, 32768_Hz_XTAL)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, towns_state, rtc_d0_w))
@@ -2890,10 +2889,11 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_MSM58321_DEFAULT_24H(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(towns_state::towns)
+void towns_state::towns(machine_config &config)
+{
 	towns_base(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(towns16_state::townsux)
 	towns_base(config);
@@ -2904,11 +2904,9 @@ MACHINE_CONFIG_START(towns16_state::townsux)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("10M")
+	m_ram->set_default_size("2M").set_extra_options("10M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram16")
+	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townssj)
@@ -2920,9 +2918,7 @@ MACHINE_CONFIG_START(towns_state::townssj)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("40M,72M")
+	m_ram->set_default_size("8M").set_extra_options("40M,72M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townshr)
@@ -2933,9 +2929,7 @@ MACHINE_CONFIG_START(towns_state::townshr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("12M,20M,28M")
+	m_ram->set_default_size("4M").set_extra_options("12M,20M,28M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townsftv)
@@ -2946,9 +2940,7 @@ MACHINE_CONFIG_START(towns_state::townsftv)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
-	MCFG_RAM_EXTRA_OPTIONS("32M,68M")
+	m_ram->set_default_size("6M").set_extra_options("32M,68M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(marty_state::marty)
@@ -2960,10 +2952,9 @@ MACHINE_CONFIG_START(marty_state::marty)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
+	m_ram->set_default_size("6M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram16")
+	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /* ROM definitions */

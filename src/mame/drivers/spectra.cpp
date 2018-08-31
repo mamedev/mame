@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(spectra_state::spectra)
 	riot.out_pb_callback().set(FUNC(spectra_state::portb_w));
 	riot.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", spectra_state, nmitimer, attotime::from_hz(120))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))

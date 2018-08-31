@@ -2375,7 +2375,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))
 
 	#if USE_PROPER_I8214
-	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
+	I8214(config, I8214_TAG, MASTER_CLOCK);
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -2384,9 +2384,9 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, pc8801_state, txdata_callback))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, pc8801_state, rxrdy_w))
+	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251.txd_handler().set(FUNC(pc8801_state::txdata_callback));
+	i8251.rts_handler().set(FUNC(pc8801_state::rxrdy_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)

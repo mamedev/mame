@@ -3612,7 +3612,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3680,7 +3680,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3761,7 +3761,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -91,10 +91,7 @@ MACHINE_CONFIG_START(bbc_opus3_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* ram disk */
-	MCFG_RAM_ADD("ramdisk")
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, "ramdisk").set_default_size("512K").set_extra_options("256K").set_default_value(0);
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *bbc_opus3_device::device_rom_region() const

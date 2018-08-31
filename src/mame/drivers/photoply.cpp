@@ -311,11 +311,11 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vga", gfx_photoply)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir7_w))
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(5, DEVICE_SELF, photoply_state, sis_pcm_r, sis_pcm_w)
@@ -327,9 +327,9 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
-	MCFG_EEPROM_ERASE_ALL_TIME(attotime::from_usec(10))
+	EEPROM_93C46_16BIT(config, "eeprom")
+		.write_time(attotime::from_usec(1))
+		.erase_all_time(attotime::from_usec(10));
 MACHINE_CONFIG_END
 
 

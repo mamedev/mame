@@ -167,13 +167,12 @@ WRITE_LINE_MEMBER(ioport_attached_device::set_ready)
 
 }   }   } // end namespace bus::ti99::internal
 
-void ti99_io_port(device_slot_interface &device)
+void ti99_ioport_options_plain(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX);
 }
 
-void ti99_io_port_ev(device_slot_interface &device)
+void ti99_ioport_options_evpc(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX_EV);
 }
-

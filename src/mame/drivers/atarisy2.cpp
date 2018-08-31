@@ -1206,7 +1206,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	// IN6 = J102 pin 2 (unused)
 	// IN7 = J102 pin 3 (unused)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1228,17 +1228,12 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy2_state, vblank_int))
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&atarisy2_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000);
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu").int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)

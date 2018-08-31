@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 
 	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", nevada_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

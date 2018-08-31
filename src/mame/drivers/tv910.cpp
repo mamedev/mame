@@ -39,7 +39,7 @@
 #define RS232_TAG   "rs232"
 #define KBDC_TAG    "ay3600"
 
-#define MASTER_CLOCK XTAL(13'608'000)
+#define MASTER_CLOCK 13.608_MHz_XTAL
 
 class tv910_state : public driver_device
 {
@@ -543,16 +543,16 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, tv910_state, ay3600_data_ready_w))
 	MCFG_AY3600_AKO_CB(WRITELINE(*this, tv910_state, ay3600_ako_w))
 
-	MCFG_DEVICE_ADD(ACIA_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	mos6551_device &acia(MOS6551(config, ACIA_TAG, 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	acia.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_dcd));
+	rs232.cts_handler().set(ACIA_TAG, FUNC(mos6551_device::write_cts));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("bell", BEEP, MASTER_CLOCK / 8400) // 1620 Hz (Row 10 signal)

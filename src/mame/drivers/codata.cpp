@@ -67,12 +67,12 @@ MACHINE_CONFIG_START(codata_state::codata)
 	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(16'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("uart", UPD7201_NEW, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs423a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs423a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs423a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs423b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+	upd7201_new_device& uart(UPD7201_NEW(config, "uart", 16_MHz_XTAL / 4));
+	uart.out_txda_callback().set("rs423a", FUNC(rs232_port_device::write_txd));
+	uart.out_dtra_callback().set("rs423a", FUNC(rs232_port_device::write_dtr));
+	uart.out_rtsa_callback().set("rs423a", FUNC(rs232_port_device::write_rts));
+	uart.out_txdb_callback().set("rs423b", FUNC(rs232_port_device::write_txd));
+	uart.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
 	am9513_device &timer(AM9513A(config, "timer", 16_MHz_XTAL / 4));
 	timer.out1_cb().set_nop(); // Timer 1 = "Abort/Reset" (watchdog)

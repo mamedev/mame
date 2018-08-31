@@ -2408,24 +2408,41 @@ ROM_START( tumbleb )
 ROM_END
 
 ROM_START( tumbleb2 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE ("thumbpop.2", 0x00000, 0x40000, CRC(34b016e1) SHA1(b4c496358d48469d170a69e8bba58e0ea919b418) )
-	ROM_LOAD16_BYTE( "thumbpop.3", 0x00001, 0x40000, CRC(89501c71) SHA1(2c202218934b845fdf7c99eaf280dccad90767f2) )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 27c208, 68000 code */
+	ROM_LOAD16_BYTE ("wj-2", 0x00000, 0x40000, CRC(34b016e1) SHA1(b4c496358d48469d170a69e8bba58e0ea919b418) )
+	ROM_LOAD16_BYTE( "wj-3", 0x00001, 0x40000, CRC(89501c71) SHA1(2c202218934b845fdf7c99eaf280dccad90767f2) )
 
 	ROM_REGION( 0x2d4c, "cpu1", 0 ) /* PIC16c57 */
 	ROM_LOAD( "pic_16c57", 0x00000, 0x2d4c, NO_DUMP ) // protected
 
-	ROM_REGION( 0x080000, "tilegfx", 0 )
-	ROM_LOAD16_BYTE( "thumbpop.19",  0x00000, 0x40000, CRC(0795aab4) SHA1(85b38804446f6b0b4d8c3a59a8958d520c567a4e) )
-	ROM_LOAD16_BYTE( "thumbpop.18",  0x00001, 0x40000, CRC(ad58df43) SHA1(2e562bfffb42543af767dd9e82a1d2465dfcd8b8) )
+	ROM_REGION( 0x080000, "tilegfx", 0 ) // 27c208
+	ROM_LOAD16_BYTE( "wj-9",  0x00000, 0x40000, CRC(0795aab4) SHA1(85b38804446f6b0b4d8c3a59a8958d520c567a4e) )
+	ROM_LOAD16_BYTE( "wj-8",  0x00001, 0x40000, CRC(ad58df43) SHA1(2e562bfffb42543af767dd9e82a1d2465dfcd8b8) )
 
-	ROM_REGION( 0x100000, "sprgfx", 0 )
-	ROM_LOAD( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
-	ROM_LOAD( "map-00.rom",   0x80000, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
+	ROM_REGION( 0x100000, "sprgfx", 0 ) // in the 0.35 beta cycle this bootleg was added with the same sprite ROMs as the original, but a PCB was found with the following 27c208 ROMs
+	ROM_LOAD16_BYTE( "wj-6", 0x00000, 0x40000, CRC(ee91db18) SHA1(06a2f15228a8233b685506077ed1248cd5fc3bb3) ) // map-01.rom   [even]     IDENTICAL
+	ROM_LOAD16_BYTE( "wj-7", 0x00001, 0x40000, CRC(87cffb06) SHA1(db3adbbf33cdbff72b6c5ee1228c760cc4897ad0) ) // map-01.rom   [odd]      IDENTICAL 
+	ROM_LOAD16_BYTE( "wj-4", 0x80000, 0x40000, CRC(79a29725) SHA1(c47366dedaf821f452d8e5394d426f18a79d615e) ) // map-00.rom   [even]     IDENTICAL
+	ROM_LOAD16_BYTE( "wj-5", 0x80001, 0x40000, CRC(dda8932e) SHA1(bd20806916cc5774a5cc70907d88c7ab4eb7ac14) ) // map-00.rom   [odd]      IDENTICAL
+	//ROM_LOAD( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
+	//ROM_LOAD( "map-00.rom",   0x80000, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* Oki samples */
-	ROM_LOAD( "thumbpop.snd", 0x00000, 0x80000, CRC(fabbf15d) SHA1(de60be43a5cd1d4b93c142bde6cbfc48a25545a3) )
+	ROM_REGION( 0x100000, "oki", 0 ) /* 27c408, Oki samples */
+	ROM_LOAD( "wj-1", 0x00000, 0x80000, CRC(fabbf15d) SHA1(de60be43a5cd1d4b93c142bde6cbfc48a25545a3) )
 	ROM_RELOAD(0x80000,0x80000)
+
+	ROM_REGION(0x1500, "plds", 0 ) // not dumped one are soldered
+	ROM_LOAD( "palce16v8.1",   0x0000, 0x104, NO_DUMP )
+	ROM_LOAD( "palce20v8.2",   0x0000, 0x157, NO_DUMP )
+	ROM_LOAD( "palce16v8.3",   0x0200, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.4",   0x0400, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.5",   0x0600, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.6",   0x0800, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.7",   0x0a00, 0x104, NO_DUMP )
+	ROM_LOAD( "palce22v10.8",  0x0c00, 0x2dd, NO_DUMP )
+	ROM_LOAD( "palce22v10.9",  0x0f00, 0x2dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.10", 0x1100, 0x117, CRC(eef433f9) SHA1(996bfb88d114b661265edc975eef4c24d0f07b55) )
+	ROM_LOAD( "palce16v8.11",  0x1300, 0x104, NO_DUMP )
 ROM_END
 
 // different sprite / tilemap handling, might be Playmark style, it had Playmark stickers on the ROMs

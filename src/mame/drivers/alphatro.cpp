@@ -743,8 +743,8 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(alphatro_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("usart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, alphatro_state, txdata_callback))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(FUNC(alphatro_state::txdata_callback));
 
 	clock_device &usart_clock(CLOCK(config, "usart_clock", 19218)); // 19218 to load a real tape, 19222 to load a tape made by this driver
 	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
@@ -758,8 +758,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", alphatro_state, timer_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", alphatro_state, timer_p, attotime::from_hz(40000))
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, "ram").set_default_size("64K");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
@@ -768,25 +767,13 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","alphatro_cart")
 
 	/* 0000 banking */
-	MCFG_DEVICE_ADD("lowbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x6000)
+	ADDRESS_MAP_BANK(config, "lowbank").set_map(&alphatro_state::rombank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x6000);
 
 	/* A000 banking */
-	MCFG_DEVICE_ADD("cartbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cartbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "cartbank").set_map(&alphatro_state::cartbank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x4000);
 
 	/* F000 banking */
-	MCFG_DEVICE_ADD("monbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(monbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "monbank").set_map(&alphatro_state::monbank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x1000);
 MACHINE_CONFIG_END
 
 

@@ -1648,7 +1648,7 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	MCFG_DEVICE_PROGRAM_MAP(m6809_prog_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* TODO */

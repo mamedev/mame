@@ -1077,8 +1077,7 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( main_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this ) )
@@ -1099,9 +1098,9 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, twinkle_state, spu_ata_irq))
-	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(*this, twinkle_state, spu_ata_dmarq))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
+	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
@@ -1144,11 +1143,11 @@ MACHINE_CONFIG_START(twinkle_state::twinklex)
 	MCFG_X76F041_ADD( "security" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(twinkle_state::twinklei)
+void twinkle_state::twinklei(machine_config &config)
+{
 	twinkle(config);
-	MCFG_I2CMEM_ADD( "security" )
-	MCFG_I2CMEM_DATA_SIZE( 0x100 )
-MACHINE_CONFIG_END
+	I2CMEM(config, "security", 0).set_data_size(0x100);
+}
 
 static INPUT_PORTS_START( twinkle )
 

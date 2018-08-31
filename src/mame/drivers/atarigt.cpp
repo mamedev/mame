@@ -800,8 +800,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)

@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	latch3.q_out_cb<1>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));
 	latch3.q_out_cb<2>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 

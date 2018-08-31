@@ -174,7 +174,7 @@ private:
 	uint8_t m_port_out_latch[8];
 	int m_read_input_port;
 	uint8_t m_port0_cr, m_port1_cr, m_port6_cr, m_port7_cr;
-	
+
 	DECLARE_READ8_MEMBER(port0_r);
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
@@ -279,7 +279,7 @@ private:
 	uint16_t m_TREG1B;
 	uint8_t m_TC1CR;
 	uint16_t m_TREG2;
-	uint8_t m_TC2CR;	
+	uint8_t m_TC2CR;
 	uint8_t m_TREG3A;
 	uint8_t m_TREG3B;
 	uint8_t m_TC3CR;

@@ -17,6 +17,7 @@
 
 #include "peribox.h"
 #include "sound/tms5220.h"
+#include "machine/tms6100.h"
 
 namespace bus { namespace ti99 { namespace peb {
 
@@ -41,7 +42,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( speech_ready );
 
 	address_space*  m_space;
-	cd2501e_device* m_vsp;
+	required_device<cd2501e_device> m_vsp;
 	bool            m_reading;
 	bool            m_sbe;          // Signal "Speech block enable"
 };
