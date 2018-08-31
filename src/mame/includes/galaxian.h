@@ -185,7 +185,6 @@ public:
 	void init_timefgtr();
 	void init_kingball();
 	void init_scorpnmc();
-	void init_thepitm();
 	void init_theend();
 	void init_scramble();
 	void init_explorer();
@@ -211,7 +210,6 @@ public:
 	void init_warofbugg();
 	void init_jungsub();
 	void init_victoryc();
-	void init_victorycb();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	DECLARE_PALETTE_INIT(galaxian);
 	DECLARE_PALETTE_INIT(moonwar);
@@ -317,8 +315,18 @@ public:
 	void zigzag(machine_config &config);
 	void checkman(machine_config &config);
 	void jungsub(machine_config &config);
+	void victoryc(machine_config &config);
+	void frogg(machine_config &config);
+	void mandingarf(machine_config &config);
+	void thepitm(machine_config &config);
+	void skybase(machine_config &config);
+	void kong(machine_config &config);
+	void scorpnmc(machine_config &config);
+
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
+
+protected:
 	void amigo2_map(address_map &map);
 	void anteaterg_map(address_map &map);
 	void anteatergg_map(address_map &map);
@@ -329,10 +337,12 @@ public:
 	void explorer_map(address_map &map);
 	void fantastc_map(address_map &map);
 	void frogf_map(address_map &map);
+	void frogg_map(address_map &map);
 	void frogger_map(address_map &map);
 	void frogger_sound_map(address_map &map);
 	void frogger_sound_portmap(address_map &map);
 	void froggeram_map(address_map &map);
+	void froggermc_map(address_map &map);
 	void galaxian_map(address_map &map);
 	void galaxian_map_base(address_map &map);
 	void galaxian_map_discrete(address_map &map);
@@ -343,6 +353,8 @@ public:
 	void kingball_sound_portmap(address_map &map);
 	void konami_sound_map(address_map &map);
 	void konami_sound_portmap(address_map &map);
+	void kong_map(address_map &map);
+	void mandingarf_map(address_map &map);
 	void monsterz_map(address_map &map);
 	void mooncrst_map(address_map &map);
 	void mooncrst_map_base(address_map &map);
@@ -352,21 +364,24 @@ public:
 	void mshuttle_map(address_map &map);
 	void mshuttle_portmap(address_map &map);
 	void scobra_map(address_map &map);
+	void scorpnmc_map(address_map &map);
 	void sfx_map(address_map &map);
 	void sfx_sample_map(address_map &map);
 	void sfx_sample_portmap(address_map &map);
+	void skybase_map(address_map &map);
 	void spactrai_map(address_map &map);
 	void takeoff_sound_map(address_map &map);
 	void takeoff_sound_portmap(address_map &map);
 	void tenspot_select_map(address_map &map);
 	void theend_map(address_map &map);
+	void thepitm_map(address_map &map);
 	void timefgtr_map(address_map &map);
 	void turpins_map(address_map &map);
 	void turpins_sound_map(address_map &map);
 	void turtles_map(address_map &map);
+	void victoryc_map(address_map &map);
 	void zigzag_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
