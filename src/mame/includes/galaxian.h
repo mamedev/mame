@@ -364,6 +364,9 @@ protected:
 	void mshuttle_map(address_map &map);
 	void mshuttle_portmap(address_map &map);
 	void scobra_map(address_map &map);
+	void scorpion_map(address_map &map);
+	void scorpion_sound_map(address_map &map);
+	void scorpion_sound_portmap(address_map &map);
 	void scorpnmc_map(address_map &map);
 	void sfx_map(address_map &map);
 	void sfx_sample_map(address_map &map);

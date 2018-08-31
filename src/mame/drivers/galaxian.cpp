@@ -1818,6 +1818,14 @@ void galaxian_state::scobra_map(address_map &map)
 }
 
 
+void galaxian_state::scorpion_map(address_map &map)
+{
+	theend_map(map);
+	map(0x5800, 0x67ff).rom().region("maincpu", 0x5800); // extra ROM
+	//map(0x6803, 0x6803).nopw(); // no background related
+}
+
+
 void galaxian_state::anteateruk_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2221,7 +2229,8 @@ void galaxian_state::froggeram_map(address_map &map)
  *
  *************************************/
 
-/* Konami Frogger with 1 x AY-8910A */
+// Konami Frogger with 1 x AY-8910A
+
 void galaxian_state::frogger_sound_map(address_map &map)
 {
 	map.global_mask(0x7fff);
@@ -2237,7 +2246,8 @@ void galaxian_state::frogger_sound_portmap(address_map &map)
 }
 
 
-/* Konami generic with 2 x AY-8910A */
+// Konami generic with 2 x AY-8910A
+
 void galaxian_state::konami_sound_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
@@ -2252,7 +2262,8 @@ void galaxian_state::konami_sound_portmap(address_map &map)
 }
 
 
-/* Checkman with 1 x AY-8910A */
+// Checkman with 1 x AY-8910A
+
 void galaxian_state::checkman_sound_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2270,7 +2281,8 @@ void galaxian_state::checkman_sound_portmap(address_map &map)
 }
 
 
-/* Checkman alternate with 1 x AY-8910A */
+// Checkman alternate with 1 x AY-8910A
+
 void galaxian_state::checkmaj_sound_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2281,7 +2293,7 @@ void galaxian_state::checkmaj_sound_map(address_map &map)
 }
 
 
-/* Take Off with 1x AY-8912*/
+// Take Off with 1 x AY-8912
 
 void galaxian_state::takeoff_sound_map(address_map &map)
 {
@@ -2298,7 +2310,24 @@ void galaxian_state::takeoff_sound_portmap(address_map &map)
 	map(0x80, 0x80).rw("8912", FUNC(ay8912_device::data_r), FUNC(ay8912_device::data_w));
 }
 
-/* King and Balloon with DAC */
+
+// Scorpion with 3 x AY-8910A and Digitalker
+
+void galaxian_state::scorpion_sound_map(address_map &map)
+{
+	konami_sound_map(map);
+	map(0x3000, 0x3000).r(FUNC(galaxian_state::scorpion_digitalker_intr_r));
+}
+
+void galaxian_state::scorpion_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(galaxian_state::scorpion_ay8910_r), FUNC(galaxian_state::scorpion_ay8910_w));
+}
+
+
+// King and Balloon with DAC
+
 void galaxian_state::kingball_sound_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2315,7 +2344,8 @@ void galaxian_state::kingball_sound_portmap(address_map &map)
 }
 
 
-/* SF-X sample player */
+// SF-X sample player
+
 void galaxian_state::sfx_sample_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
@@ -6437,7 +6467,11 @@ MACHINE_CONFIG_START(galaxian_state::scorpion)
 	scramble_base(config);
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(theend_map)
+	MCFG_DEVICE_PROGRAM_MAP(scorpion_map)
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(scorpion_sound_map)
+	MCFG_DEVICE_IO_MAP(scorpion_sound_portmap)
 
 	MCFG_DEVICE_MODIFY("ppi8255_1")
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, scorpion_protection_r))
@@ -7561,21 +7595,7 @@ void galaxian_state::init_amidar()
 
 void galaxian_state::init_scorpion()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
-
-	/* hook up AY8910 */
-	m_audiocpu->space(AS_IO).install_readwrite_handler(0x00, 0xff, read8_delegate(FUNC(galaxian_state::scorpion_ay8910_r),this), write8_delegate(FUNC(galaxian_state::scorpion_ay8910_w),this));
-
-	/* extra ROM */
-	space.install_read_bank(0x5800, 0x67ff, "bank1");
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x5800);
-
-	/* no background related */
-//  space.nop_write(0x6803, 0x6803);
-
-	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),this));
 
 	save_item(NAME(m_protection_state));
 /*
