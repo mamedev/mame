@@ -1136,5 +1136,5 @@ GAME( 200?, lhzb4,     0,        igs_majhong, sdwx, igs_m027_state, init_lhzb4, 
 GAME( 200?, klxyj,     0,        igs_majhong, sdwx, igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
 GAME( 2000, mgfx,      0,        igs_majhong, sdwx, igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
 GAME( 200?, gonefsh2,  0,        igs_majhong, sdwx, igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
-GAME( 200?, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge 2",   MACHINE_IS_SKELETON )
+GAME( 2002, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
 GAME( 200?, haunthig,  0,        igs_majhong, sdwx, igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
