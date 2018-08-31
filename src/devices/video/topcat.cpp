@@ -11,8 +11,8 @@ DEFINE_DEVICE_TYPE(TOPCAT, topcat_device, "topcat", "HP Topcat ASIC")
 
 topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_cursor_timer(nullptr),
 	m_int_write_func(*this),
+	m_cursor_timer(nullptr),
 	m_vram(*this, "^vram")
 {
 }

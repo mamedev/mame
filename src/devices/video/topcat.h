@@ -41,7 +41,6 @@ public:
 
 	bool plane_enabled();
 
-	devcb_write_line m_int_write_func;
 protected:
 	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -123,6 +122,9 @@ private:
 	}
 
 	void update_int();
+
+	devcb_write_line m_int_write_func;
+
 	uint16_t m_vblank;
 	uint8_t m_wmove_active;
 	uint16_t m_vert_retrace_intrq;
