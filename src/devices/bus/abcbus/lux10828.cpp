@@ -321,10 +321,10 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(luxor_55_10828_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(luxor_55_10828_mem)
-	MCFG_DEVICE_IO_MAP(luxor_55_10828_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+ 	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_10828_device::luxor_55_10828_mem);
+	m_maincpu->set_addrmap(AS_IO, &luxor_55_10828_device::luxor_55_10828_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

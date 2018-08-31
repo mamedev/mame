@@ -98,7 +98,7 @@ private:
 	void luxor_55_21046_io(address_map &map);
 	void luxor_55_21046_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

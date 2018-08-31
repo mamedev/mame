@@ -70,7 +70,7 @@ public:
 		, m_expansions(*this, {"m8", "mc", "exp"})
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<ram_device> m_ram;

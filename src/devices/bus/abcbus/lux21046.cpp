@@ -291,10 +291,10 @@ static const z80_daisy_config z80_daisy_chain[] =
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(luxor_55_21046_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(luxor_55_21046_mem)
-	MCFG_DEVICE_IO_MAP(luxor_55_21046_io)
+ 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_daisy_config(z80_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_21046_device::luxor_55_21046_mem);
+	m_maincpu->set_addrmap(AS_IO, &luxor_55_21046_device::luxor_55_21046_io);
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);

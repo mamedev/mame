@@ -148,7 +148,7 @@ private:
 	address_space *m_mem;
 	address_space *m_io;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
@@ -549,10 +549,10 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(bigbord2_mem)
-	MCFG_DEVICE_IO_MAP(bigbord2_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::bigbord2_mem);
+	m_maincpu->set_addrmap(AS_IO, &bigbord2_state::bigbord2_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

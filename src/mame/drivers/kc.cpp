@@ -98,10 +98,11 @@ void kc85_exp(device_slot_interface &device)
 
 MACHINE_CONFIG_START(kc_state::kc85_3)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, KC85_3_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kc85_3_mem)
-	MCFG_DEVICE_IO_MAP(kc85_3_io)
-	MCFG_Z80_DAISY_CHAIN(kc85_daisy_chain)
+	Z80(config, m_maincpu, KC85_3_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_3_mem);
+	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_3_io);
+	m_maincpu->set_daisy_config(kc85_daisy_chain);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	Z80PIO(config, m_z80pio, KC85_3_CLOCK);
@@ -179,10 +180,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, KC85_4_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kc85_4_mem)
-	MCFG_DEVICE_IO_MAP(kc85_4_io)
-	MCFG_Z80_DAISY_CHAIN(kc85_daisy_chain)
+	Z80(config, m_maincpu, KC85_4_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_4_state::kc85_4_mem);
+	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
+	m_maincpu->set_daisy_config(kc85_daisy_chain);
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	Z80PIO(config, m_z80pio, KC85_4_CLOCK);

@@ -47,7 +47,7 @@ private:
 
 	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_ioport_array<7> m_keyboard;
 };
 
@@ -299,10 +299,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(mc8020_state::mc8020)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(2'457'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc8020_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mc8020_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

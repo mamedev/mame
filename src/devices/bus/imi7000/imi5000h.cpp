@@ -343,10 +343,10 @@ WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(imi5000h_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(imi5000h_mem)
-	MCFG_DEVICE_IO_MAP(imi5000h_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_daisy_config(z80_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &imi5000h_device::imi5000h_mem);
+	m_maincpu->set_addrmap(AS_IO, &imi5000h_device::imi5000h_io);
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

@@ -97,7 +97,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_kbpio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio0_device> m_sio;

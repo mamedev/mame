@@ -407,10 +407,10 @@ void ecb_grip21_device::kb_w(uint8_t data)
 
 MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_Z80_DAISY_CHAIN(grip_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(grip_mem)
-	MCFG_DEVICE_IO_MAP(grip_io)
+	z80_device& z80(Z80(config, Z80_TAG, XTAL(16'000'000)/4));
+	z80.set_daisy_config(grip_daisy_chain);
+	z80.set_addrmap(AS_PROGRAM, &ecb_grip21_device::grip_mem);
+	z80.set_addrmap(AS_IO, &ecb_grip21_device::grip_io);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::white())

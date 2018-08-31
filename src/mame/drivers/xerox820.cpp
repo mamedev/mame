@@ -597,10 +597,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(xerox820_state::xerox820)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 20_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(xerox820_mem)
-	MCFG_DEVICE_IO_MAP(xerox820_io)
-	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
+	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820_state::xerox820_mem);
+	m_maincpu->set_addrmap(AS_IO, &xerox820_state::xerox820_io);
+	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -673,10 +673,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(xerox820ii_mem)
-	MCFG_DEVICE_IO_MAP(xerox820ii_io)
-	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820ii_state::xerox820ii_mem);
+	m_maincpu->set_addrmap(AS_IO, &xerox820ii_state::xerox820ii_io);
+	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -776,11 +776,12 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox168)
 	m_ram->set_default_size("192K").set_extra_options("320K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xerox820_state::mk83)
+void xerox820_state::mk83(machine_config & config)
+{
 	xerox820(config);
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(mk83_mem)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820_state::mk83_mem);
+}
 
 /* ROMs */
 

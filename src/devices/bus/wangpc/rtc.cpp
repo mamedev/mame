@@ -106,12 +106,12 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(wangpc_rtc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2000000)
-	MCFG_Z80_DAISY_CHAIN(wangpc_rtc_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(wangpc_rtc_mem)
-	MCFG_DEVICE_IO_MAP(wangpc_rtc_io)
+	Z80(config, m_maincpu, 2000000);
+	m_maincpu->set_daisy_config(wangpc_rtc_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wangpc_rtc_device::wangpc_rtc_mem);
+	m_maincpu->set_addrmap(AS_IO, &wangpc_rtc_device::wangpc_rtc_io);
 
-	MCFG_DEVICE_ADD(AM9517A_TAG, AM9517A, 2000000)
+	AM9517A(config, m_dmac, 2000000);
 
 	MCFG_DEVICE_ADD(Z80CTC_0_TAG, Z80CTC, 2000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

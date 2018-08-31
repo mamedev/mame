@@ -1108,10 +1108,10 @@ void bulletf_state::machine_reset()
 
 MACHINE_CONFIG_START(bullet_state::bullet)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bullet_mem)
-	MCFG_DEVICE_IO_MAP(bullet_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bullet_state::bullet_mem);
+	m_maincpu->set_addrmap(AS_IO, &bullet_state::bullet_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
@@ -1187,10 +1187,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bulletf_state::bulletf)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bulletf_mem)
-	MCFG_DEVICE_IO_MAP(bulletf_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bulletf_state::bulletf_mem);
+	m_maincpu->set_addrmap(AS_IO, &bulletf_state::bulletf_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
