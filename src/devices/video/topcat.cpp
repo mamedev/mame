@@ -82,19 +82,20 @@ READ16_MEMBER(topcat_device::vram_r)
 
 WRITE16_MEMBER(topcat_device::vram_w)
 {
-	if (mem_mask & m_plane_mask) {
+	if (mem_mask & m_plane_mask && (m_fb_write_enable & (m_plane_mask << 8))) {
 		bool src = data & m_plane_mask;
 		bool dst = m_vram[offset * 2 + 1] & m_plane_mask;
 		execute_rule(src, (replacement_rule_t)((m_pixel_replacement_rule >> 8) & 0x0f), dst);
 		modify_vram_offset(offset * 2 + 1, dst);
 	}
 
-	if (mem_mask & (m_plane_mask << 8)) {
+	if (mem_mask & (m_plane_mask << 8) && (m_fb_write_enable & (m_plane_mask << 8))) {
 		bool src = data & (m_plane_mask << 8);
 		bool dst = m_vram[offset * 2] & m_plane_mask;
 		execute_rule(src, (replacement_rule_t)((m_pixel_replacement_rule >> 8) & 0x0f), dst);
 		modify_vram_offset(offset * 2, dst);
 	}
+
 	m_changed = true;
 }
 
