@@ -284,7 +284,7 @@ void mcr68_state::mcr68_map(address_map &map)
 	map(0x071000, 0x071fff).ram();
 	map(0x080000, 0x080fff).ram().share("spriteram");
 	map(0x090000, 0x09007f).w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x0a0000, 0x0a000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x0a0000, 0x0a000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0b0000, 0x0bffff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0d0000, 0x0dffff).portr("IN0");
 	map(0x0e0000, 0x0effff).portr("IN1");
@@ -1523,9 +1523,6 @@ void mcr68_state::init_blasted()
 
 	/* handle control writes */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
-
-	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 void mcr68_state::init_intlaser()
@@ -1554,9 +1551,6 @@ void mcr68_state::init_archrivl()
 
 	/* 49-way joystick handling is a bit tricky */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
-
-	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
@@ -1576,9 +1570,6 @@ void mcr68_state::init_archrivlb()
 
 	/* 49-way joystick replaced by standard 8way stick */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivlb_port_1_r),this));
-
-	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 
