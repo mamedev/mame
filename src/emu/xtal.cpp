@@ -191,6 +191,7 @@ const double XTAL::known_xtals[] = {
 	 14'218'000, /* 14.218_MHz_XTAL        Dragon */
 	 14'300'000, /* 14.3_MHz_XTAL          Agat-7 */
 	 14'314'000, /* 14.314_MHz_XTAL        Taito TTL Board  */
+	 14'318'180, /* 14.31818_MHz_XTAL      Some Seibu Kaihatsu 68000 Boards, etc... */
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */

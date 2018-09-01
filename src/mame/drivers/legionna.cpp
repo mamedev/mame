@@ -1159,52 +1159,43 @@ static const gfx_layout legionna_spritelayout =
 };
 
 static GFXDECODE_START( gfx_legionna )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout, 48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,      0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,     32*16, 16 )
+	GFXDECODE_ENTRY( "char",   0, legionna_new_charlayout, 48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3",   0, legionna_tilelayout,      0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4",   0, legionna_tilelayout,     32*16, 16 )
 	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,    0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout2,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx5",   0, legionna_tilelayout2,    32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6",   0, legionna_tilelayout,     16*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_heatbrl )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "char",   0, legionna_new_charlayout, 48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3",   0, legionna_tilelayout,      0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4",   0, legionna_tilelayout,     32*16, 16 ) /* unused */
+	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,    0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5",   0, legionna_tilelayout,     32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6",   0, legionna_tilelayout,     16*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cupsoc )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,   0, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "char",   0, legionna_new_charlayout, 48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3",   0, legionna_tilelayout,         0, 32 )
+	GFXDECODE_ENTRY( "gfx4",   0, legionna_tilelayout,     32*16, 16 ) /* unused */
+	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,    0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5",   0, legionna_tilelayout,     32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6",   0, legionna_tilelayout,     16*16, 16 )
 GFXDECODE_END
 
-
-static GFXDECODE_START( gfx_grainbow )
-	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,        0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,        32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, legionna_spritelayout,      0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,        32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,        16*16, 16 )
-GFXDECODE_END
 
 /*****************************************************************************/
 
 MACHINE_CONFIG_START(legionna_state::legionna)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* ??? */
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)  /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(legionna_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14.31818_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
@@ -1236,11 +1227,11 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14.31818_MHz_XTAL / 4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1254,11 +1245,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::heatbrl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* ??? */
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)  /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(heatbrl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14.31818_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
@@ -1281,7 +1272,6 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
@@ -1292,11 +1282,11 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14.31818_MHz_XTAL / 4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1309,11 +1299,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(godzilla_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14.31818_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IO_MAP(godzilla_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
@@ -1349,12 +1339,12 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14.31818_MHz_XTAL / 4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1367,11 +1357,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(denjinmk_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14.31818_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
@@ -1383,7 +1373,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
-	MCFG_SCREEN_REFRESH_RATE(61)
+	MCFG_SCREEN_REFRESH_RATE(56) // value from doc
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
@@ -1396,7 +1386,6 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 
-
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1405,12 +1394,12 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14.31818_MHz_XTAL / 4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1423,11 +1412,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::grainbow)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(grainbow_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14.31818_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
@@ -1450,8 +1439,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grainbow)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1461,12 +1449,12 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14.31818_MHz_XTAL / 4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1480,11 +1468,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::cupsoc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(cupsoc_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14.31818_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
@@ -1507,7 +1495,6 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cupsoc)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
@@ -1518,11 +1505,11 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14.31818_MHz_XTAL / 4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
