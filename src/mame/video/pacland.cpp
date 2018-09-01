@@ -382,18 +382,7 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	/* draw sprites with regular transparency */
 	m_sprite1_bitmap.fill(0, cliprect);
 	draw_sprites(screen, m_sprite1_bitmap, cliprect, flip, 1);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		uint16_t *src = &m_sprite1_bitmap.pix16(y);
-		uint16_t *dst = &bitmap.pix16(y);
-
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			uint16_t pix = src[x];
-			if (pix != 0)
-				dst[x] = pix;
-		}
-	}
+	copybitmap_trans(bitmap, m_sprite1_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	/* draw high priority fg tiles */
 	draw_fg(screen, bitmap, cliprect, 1);
