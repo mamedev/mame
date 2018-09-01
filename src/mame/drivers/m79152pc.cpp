@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/i8212.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
@@ -38,20 +39,34 @@ public:
 	void m79152pc(machine_config &config);
 
 private:
-	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(latch_full_w);
+	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void mcu_map(address_map &map);
 	void mcu_io_map(address_map &map);
 
-	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attributes;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80sio_device> m_uart;
+
+	bool m_latch_full;
 };
+
+WRITE_LINE_MEMBER(m79152pc_state::latch_full_w)
+{
+	m_latch_full = state == ASSERT_LINE;
+}
+
+READ_LINE_MEMBER(m79152pc_state::mcu_t0_r)
+{
+	return m_latch_full ? 0 : 1;
+}
 
 void m79152pc_state::mem_map(address_map &map)
 {
@@ -69,6 +84,7 @@ void m79152pc_state::io_map(address_map &map)
 	map(0x40, 0x43).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x44, 0x47).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x48, 0x4b).w("pit", FUNC(pit8253_device::write));
+	map(0x4c, 0x4c).w("mculatch", FUNC(i8212_device::strobe));
 	map(0x54, 0x57).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -79,7 +95,7 @@ void m79152pc_state::mcu_map(address_map &map)
 
 void m79152pc_state::mcu_io_map(address_map &map)
 {
-	map(0x0f, 0x0f).nopr();
+	map(0x00, 0x00).mirror(0xff).r("mculatch", FUNC(i8212_device::read));
 }
 
 /* Input ports */
@@ -87,12 +103,7 @@ static INPUT_PORTS_START( m79152pc )
 INPUT_PORTS_END
 
 
-void m79152pc_state::machine_reset()
-{
-	m_uart->ctsb_w(1); // this is checked before writing to port 47.
-}
-
-uint32_t m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m79152pc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Attributes are unknown so are not implemented
 	uint8_t y,ra,chr,gfx; //,attr;
@@ -161,6 +172,7 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	mcs48_cpu_device &mcu(I8035(config, "mcu", 6'000'000)); // NEC D8035HLC
 	mcu.set_addrmap(AS_PROGRAM, &m79152pc_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &m79152pc_state::mcu_io_map);
+	mcu.t0_in_cb().set(FUNC(m79152pc_state::mcu_t0_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -168,36 +180,46 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update_m79152pc)
+	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
-	uart_clock.signal_handler().set(m_uart, FUNC(z80sio_device::txca_w));
-	uart_clock.signal_handler().append(m_uart, FUNC(z80sio_device::rxca_w));
+	clock_device &baudclk(CLOCK(config, "baudclk", 921600));
+	baudclk.signal_handler().set("ctc", FUNC(z80ctc_device::trg2));
+	baudclk.signal_handler().append("pit", FUNC(pit8253_device::write_clk1));
+	baudclk.signal_handler().append("pit", FUNC(pit8253_device::write_clk2));
 
-	PIT8253(config, "pit", 0); // КР580ВИ53
+	pit8253_device &pit(PIT8253(config, "pit", 0)); // КР580ВИ53
+	pit.out_handler<1>().set(m_uart, FUNC(z80sio_device::txcb_w));
+	pit.out_handler<2>().set(m_uart, FUNC(z80sio_device::rxcb_w));
+
+	i8212_device &mculatch(I8212(config, "mculatch")); // CEMI UCY74S412
+	mculatch.md_rd_callback().set_constant(0);
+	mculatch.int_wr_callback().set(m_uart, FUNC(z80sio_device::ctsb_w)).invert();
+	mculatch.int_wr_callback().append(FUNC(m79152pc_state::latch_full_w));
 
 	I8255A(config, "ppi"); // NEC D8255AD-2
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4'000'000));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<2>().set(m_uart, FUNC(z80sio_device::txca_w));
+	ctc.zc_callback<2>().append(m_uart, FUNC(z80sio_device::rxca_w));
 
 	Z80SIO(config, m_uart, 4'000'000); // UB8560D
 	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_uart->out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
-	//m_uart->out_txdb_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
-	//m_uart->out_dtrb_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
-	//m_uart->out_rtsb_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_uart->out_txda_callback().set("keyboard", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtra_callback().set("keyboard", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rtsa_callback().set("keyboard", FUNC(rs232_port_device::write_rts));
+	m_uart->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtrb_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rtsb_callback().set("modem", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsa_w))
-	//MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	//MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxb_w))
+	MCFG_DEVICE_ADD("modem", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxb_w))
 	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
