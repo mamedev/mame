@@ -94,20 +94,6 @@
 
 *******************************************************************************
 
-
-  DRIVER UPDATES:
-
-
-  [2010-02-04]
-
-  - Initial release.
-  - Pre-defined Xtals.
-  - Started a preliminary memory map.
-  - Hooked both CPUs.
-  - Preliminary ACRTC support.
-  - Added technical notes.
-
-
   TODO:
 
   - Verify clocks.
@@ -250,7 +236,7 @@ READ8_MEMBER(sigmab52_state::in0_r)
 	}
 
 	uint16_t in0 = m_in0->read();
-	for(int i=0; i<16; i++)
+	for (int i = 0; i < 16; i++)
 		if (!BIT(in0, i))
 		{
 			data &= ~(i << 4);
@@ -309,7 +295,7 @@ WRITE8_MEMBER(sigmab52_state::palette_bank_w)
 {
 	int bank = data & 0x0f;
 
-	for (int i = 0; i<m_palette->entries(); i++)
+	for (int i = 0; i < m_palette->entries(); i++)
 	{
 		uint8_t d = m_prom[(bank << 4) | i];
 		m_palette->set_pen_color(i, pal3bit(d >> 5), pal3bit(d >> 2), pal2bit(d >> 0));
@@ -382,10 +368,6 @@ void sigmab52_state::sound_prog_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("audiocpu", 0);
 }
 
-/* Unknown R/W:
-
-
-*/
 
 void sigmab52_state::jwildb52_hd63484_map(address_map &map)
 {
@@ -588,6 +570,7 @@ void sigmab52_state::machine_reset()
 	m_audiocpu_cmd_irq = CLEAR_LINE;
 }
 
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -601,10 +584,10 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
 
-	ptm6840_device &ptm1(PTM6840(config, "6840ptm_1", XTAL(8'000'000)/8)); // FIXME
+	ptm6840_device &ptm1(PTM6840(config, "6840ptm_1", XTAL(8'000'000) / 8));  // FIXME
 	ptm1.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	PTM6840(config, m_6840ptm_2, XTAL(8'000'000)/8); // FIXME
+	PTM6840(config, m_6840ptm_2, XTAL(8'000'000) / 8);  // FIXME
 	m_6840ptm_2->irq_callback().set(FUNC(sigmab52_state::ptm2_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
