@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic,AJR
 /***************************************************************************
 
         Mera-Elzab 79152pc
@@ -19,9 +19,11 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/clock.h"
+#include "sound/beep.h"
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class m79152pc_state : public driver_device
@@ -34,11 +36,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
 		, m_uart(*this, "uart")
+		, m_beep(*this, "beep")
 	{ }
 
 	void m79152pc(machine_config &config);
 
 private:
+	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE_LINE_MEMBER(latch_full_w);
 	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
 
@@ -54,9 +58,15 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80sio_device> m_uart;
+	required_device<beep_device> m_beep;
 
 	bool m_latch_full;
 };
+
+WRITE8_MEMBER(m79152pc_state::beep_w)
+{
+	m_beep->set_state(BIT(offset, 2));
+}
 
 WRITE_LINE_MEMBER(m79152pc_state::latch_full_w)
 {
@@ -86,6 +96,7 @@ void m79152pc_state::io_map(address_map &map)
 	map(0x48, 0x4b).w("pit", FUNC(pit8253_device::write));
 	map(0x4c, 0x4c).w("mculatch", FUNC(i8212_device::strobe));
 	map(0x54, 0x57).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x58, 0x58).select(4).w(FUNC(m79152pc_state::beep_w));
 }
 
 void m79152pc_state::mcu_map(address_map &map)
@@ -182,6 +193,8 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("ctc", z80ctc_device, trg0)) // determines beep duration (probably too slow)
+
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -221,6 +234,10 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_DEVICE_ADD("modem", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxb_w))
 	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsb_w))
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 1000);
+	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -238,4 +255,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME         FLAGS
-COMP( ????, m79152pc, 0,      0,      m79152pc, m79152pc, m79152pc_state, empty_init, "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, m79152pc, 0,      0,      m79152pc, m79152pc, m79152pc_state, empty_init, "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
