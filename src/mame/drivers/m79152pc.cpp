@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/pit8253.h"
+#include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/clock.h"
@@ -41,11 +43,12 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void mcu_map(address_map &map);
+	void mcu_io_map(address_map &map);
 
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attributes;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80sio_device> m_uart;
 };
@@ -65,11 +68,18 @@ void m79152pc_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x44, 0x47).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x48, 0x4b).w("pit", FUNC(pit8253_device::write));
+	map(0x54, 0x57).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void m79152pc_state::mcu_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom().region("mcu", 0);
+}
+
+void m79152pc_state::mcu_io_map(address_map &map)
+{
+	map(0x0f, 0x0f).nopr();
 }
 
 /* Input ports */
@@ -134,14 +144,23 @@ static GFXDECODE_START( gfx_m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
+static const z80_daisy_config daisy_chain[] =
+{
+	{ "ctc" },
+	{ "uart" },
+	{ nullptr }
+};
+
 MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 4'000'000); // UA880D
+	m_maincpu->set_addrmap(AS_PROGRAM, &m79152pc_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &m79152pc_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("mcu", I8035, 6'000'000)
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	mcs48_cpu_device &mcu(I8035(config, "mcu", 6'000'000)); // NEC D8035HLC
+	mcu.set_addrmap(AS_PROGRAM, &m79152pc_state::mcu_map);
+	mcu.set_addrmap(AS_IO, &m79152pc_state::mcu_io_map);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -158,11 +177,15 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	uart_clock.signal_handler().set(m_uart, FUNC(z80sio_device::txca_w));
 	uart_clock.signal_handler().append(m_uart, FUNC(z80sio_device::rxca_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	PIT8253(config, "pit", 0); // КР580ВИ53
 
-	Z80SIO(config, m_uart, XTAL(4'000'000));
-	//m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	I8255A(config, "ppi"); // NEC D8255AD-2
+
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 4'000'000));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	Z80SIO(config, m_uart, 4'000'000); // UB8560D
+	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_uart->out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
