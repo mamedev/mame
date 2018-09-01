@@ -1488,7 +1488,6 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x30:  /* LL - MIPS II */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
 			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
 			if (RTREG != 0)
 				UML_DSEXT(block, R64(RTREG), I0, SIZE_DWORD);                       // dsext   <rtreg>,i0
@@ -1535,7 +1534,6 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x34:  /* LLD - MIPS III */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
 			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
 			if (RTREG != 0)
 				UML_DMOV(block, R64(RTREG), I0);                                // dmov    <rtreg>,i0

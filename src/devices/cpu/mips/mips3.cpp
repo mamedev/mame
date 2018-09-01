@@ -138,6 +138,8 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_delayslot(false)
 	, m_op(0)
 	, m_interrupt_cycles(0)
+	, m_ll_value(0)
+	, m_lld_value(0)
 	, m_badcop_value(0)
 	, m_lwl(endianness == ENDIANNESS_BIG ? &mips3_device::lwl_be : &mips3_device::lwl_le)
 	, m_lwr(endianness == ENDIANNESS_BIG ? &mips3_device::lwr_be : &mips3_device::lwr_le)
@@ -709,7 +711,6 @@ void mips3_device::device_start()
 	state_add( MIPS3_PAGEMASK,     "PageMask", m_core->cpr[0][COP0_PageMask]).formatstr("%016X");
 	state_add( MIPS3_WIRED,        "Wired", m_core->cpr[0][COP0_Wired]).formatstr("%08X");
 	state_add( MIPS3_BADVADDR,     "BadVAddr", m_core->cpr[0][COP0_BadVAddr]).formatstr("%08X");
-	//state_add( MIPS3_LLADDR,       "LLAddr", m_core->cpr[0][COP0_LLAddr]).formatstr("%08X");
 
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 	state_add( STATE_GENSP, "CURSP", m_core->r[31]).noshow();
@@ -1825,7 +1826,7 @@ void mips3_device::handle_cop0(uint32_t op)
 					break;
 
 				case 0x10:  /* RFE */   invalid_instruction(op);                            break;
-				case 0x18:  /* ERET */ m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_core->llbit = 0;  break;
+				case 0x18:  /* ERET */ m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_lld_value ^= 0xffffffff; m_ll_value ^= 0xffffffff;  break;
 				case 0x20:  /* WAIT */                                                      break;
 				default:    handle_extra_cop0(op);                                          break;
 			}
@@ -5171,14 +5172,7 @@ void mips3_device::execute_run()
 			case 0x2d:  /* SDR */       (this->*m_sdr)(op);                                                       break;
 			case 0x2e:  /* SWR */       (this->*m_swr)(op);                                                       break;
 			case 0x2f:  /* CACHE */     /* effective no-op */                                                   break;
-			case 0x30:  /* LL */        if (RWORD(SIMMVAL + RSVAL32, &temp) && RTREG)
-			{
-				RTVAL64 = temp;
-				m_core->llbit = 1;
-				// Should actually use physical address
-				m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
-				break;
-			}
+			case 0x30:  /* LL */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (uint32_t)temp; m_ll_value = RTVAL32;       break;
 			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
 				{
@@ -5191,13 +5185,7 @@ void mips3_device::execute_run()
 				break;
 			case 0x32:  /* LWC2 */      if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop2_reg(RTREG, temp);           break;
 			case 0x33:  /* PREF */      /* effective no-op */                                                   break;
-			case 0x34:  /* LLD */       if (RDOUBLE(SIMMVAL + RSVAL32, &temp64) && RTREG)
-			{
-				RTVAL64 = temp64;
-				m_core->llbit = 1;
-				m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
-				break;
-			}
+			case 0x34:  /* LLD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64; m_lld_value = temp64;     break;
 			case 0x35:  /* LDC1 */
 			if (!(SR & SR_COP1))
 			{
@@ -5212,9 +5200,15 @@ void mips3_device::execute_run()
 			case 0x37:  /* LD */        if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64;       break;
 			case 0x38:  /* SC */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG)
 			{
-				if (m_core->llbit)
+				if (temp == m_ll_value)
+				{
 					WWORD(SIMMVAL+RSVAL32, RTVAL32);
-				RTVAL64 = m_core->llbit;
+					RTVAL64 = (uint32_t)1;
+				}
+				else
+				{
+					RTVAL64 = (uint32_t)0;
+				}
 			}
 			break;
 			case 0x39:  /* SWC1 */
@@ -5230,9 +5224,15 @@ void mips3_device::execute_run()
 			case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
 			case 0x3c:  /* SCD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG)
 			{
-				if (m_core->llbit)
+				if (temp64 == m_lld_value)
+				{
 					WDOUBLE(SIMMVAL+RSVAL32, RTVAL64);
-				RTVAL64 = m_core->llbit;
+					RTVAL64 = 1;
+				}
+				else
+				{
+					RTVAL64 = 0;
+				}
 			}
 			break;
 			case 0x3d:  /* SDC1 */
