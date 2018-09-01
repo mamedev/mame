@@ -3997,7 +3997,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));
 
 	/* RAM */
-	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
+	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);
 
 	/* 0000 banking */
 	ADDRESS_MAP_BANK(config, A2_0000_TAG).set_map(&apple2e_state::r0000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);

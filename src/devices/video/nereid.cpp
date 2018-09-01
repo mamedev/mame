@@ -87,9 +87,9 @@ WRITE16_MEMBER(nereid_device::ctrl_w)
 		m_palette[m_index] = rgb_t(m_red, m_green, m_blue);
 		break;
 	case NEREID_READ_STROBE:
-		m_red = (m_palette[m_index]).r();
-		m_green = (m_palette[m_index]).g();
-		m_blue = (m_palette[m_index]).b();
+		m_red = m_palette[m_index].r();
+		m_green = m_palette[m_index].g();
+		m_blue = m_palette[m_index].b();
 		break;
 	case NEREID_PLANE_MASK:
 		m_plane_mask = data;

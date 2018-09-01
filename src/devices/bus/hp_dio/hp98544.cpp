@@ -149,7 +149,7 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 	m_topcat->get_cursor_pos(startx, starty, endx, endy);
 
-	for(int y = starty; y <= endy; y++) {
+	for (int y = starty; y <= endy; y++) {
 		uint32_t *scanline = &bitmap.pix32(y);
 		memset(scanline + startx, 0xff, (endx - startx) << 2);
 	}

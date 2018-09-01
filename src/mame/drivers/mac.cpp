@@ -1048,7 +1048,7 @@ void mac_state::mac512ke_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, 2);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(mac_state::palette_init_mac));
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
@@ -1182,7 +1182,7 @@ void mac_state::macprtb(machine_config &config)
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macprtb));
 
 	PALETTE(config, m_palette, 2);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(mac_state::palette_init_mac));
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
@@ -1408,7 +1408,7 @@ void mac_state::macse30(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, 2);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(mac_state::palette_init_mac));
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
@@ -1438,7 +1438,7 @@ void mac_state::macpb140(machine_config &config)
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpb140));
 
 	PALETTE(config, m_palette, 2);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(mac_state::palette_init_mac));
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_mac));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
@@ -1484,7 +1484,7 @@ void mac_state::macpb160(machine_config &config)
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpb160));
 
 	PALETTE(config, m_palette, 16);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(mac_state::palette_init_macgsc));
+	m_palette->set_init(DEVICE_SELF, FUNC(mac_state::palette_init_macgsc));
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 

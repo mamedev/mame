@@ -3548,7 +3548,7 @@ void pacman_state::pacman(machine_config &config, bool latch)
 
 	PALETTE(config, m_palette, 128*4);
 	m_palette->set_indirect_entries(32);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(pacman_state::palette_init_pacman));
+	m_palette->set_init(DEVICE_SELF, FUNC(pacman_state::palette_init_pacman));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);

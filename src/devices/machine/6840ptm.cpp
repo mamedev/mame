@@ -597,11 +597,14 @@ void ptm6840_device::timeout(int idx)
 		{
 			case 0:
 			case 2:
-				if (m_control_reg[idx] & COUNT_MODE_8BIT) {
-					m_hightime ^= true;
+				if (m_control_reg[idx] & COUNT_MODE_8BIT)
+				{
+					m_hightime = !m_hightime;
 					m_output[idx] = m_hightime;
 					m_out_cb[idx](m_output[idx]);
-				} else {
+				}
+				else
+				{
 					m_output[idx] = m_output[idx] ^ 1;
 					m_out_cb[idx](m_output[idx]);
 				}

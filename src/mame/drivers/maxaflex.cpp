@@ -371,7 +371,7 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	RAM(config, m_ram).set_default_size("16K");
+	RAM(config, RAM_TAG).set_default_size("16K");
 MACHINE_CONFIG_END
 
 

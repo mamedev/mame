@@ -1455,14 +1455,14 @@ void napple2_state::apple2(machine_config &config)
 {
 	apple2_common(config);
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,32K,36K,48K").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,32K,36K,48K").set_default_value(0x00);
 }
 
 void napple2_state::apple2p(machine_config &config)
 {
 	apple2_common(config);
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 }
 
 void napple2_state::space84(machine_config &config)

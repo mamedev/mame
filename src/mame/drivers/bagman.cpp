@@ -449,7 +449,7 @@ void bagman_state::bagman_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bagman);
 
 	PALETTE(config, m_palette, 64);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(bagman_state::palette_init_bagman));
+	m_palette->set_init(DEVICE_SELF, FUNC(bagman_state::palette_init_bagman));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

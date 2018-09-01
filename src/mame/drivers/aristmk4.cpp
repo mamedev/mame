@@ -1802,7 +1802,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aristmk4);
 	PALETTE(config, m_palette, 512);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(aristmk4_state::aristmk4_palette));
+	m_palette->set_init(DEVICE_SELF, FUNC(aristmk4_state::aristmk4_palette));
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set(FUNC(aristmk4_state::pa1_r));
@@ -1876,7 +1876,7 @@ void aristmk4_state::lions_palette(palette_device &palette)
 void aristmk4_state::_86lions(machine_config &config)
 {
 	aristmk4(config);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(aristmk4_state::lions_palette));
+	m_palette->set_init(DEVICE_SELF, FUNC(aristmk4_state::lions_palette));
 }
 
 ROM_START( 3bagflvt )

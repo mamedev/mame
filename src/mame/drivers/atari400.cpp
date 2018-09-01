@@ -249,8 +249,8 @@
 class a400_state : public atari_common_state
 {
 public:
-	a400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atari_common_state(mconfig, type, tag),
+	a400_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atari_common_state(mconfig, type, tag),
 		m_ram(*this, RAM_TAG),
 		m_pia(*this, "pia"),
 		m_dac(*this, "dac"),
@@ -259,7 +259,8 @@ public:
 		m_8000(*this, "8000"),
 		m_a000(*this, "a000"),
 		m_cart(*this, "cartleft"),
-		m_cart2(*this, "cartright") { }
+		m_cart2(*this, "cartright")
+	{ }
 
 	void atari_common_nodac(machine_config &config);
 	void atari_common(machine_config &config);
@@ -338,7 +339,7 @@ private:
 	int m_last_offs;
 	uint8_t m_mmu, m_ext_bank;
 
-	void setup_ram(int bank,uint32_t size);
+	void setup_ram(int bank, uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
 };
 
