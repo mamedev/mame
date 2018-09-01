@@ -5,6 +5,10 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_ASTROCDE_H
+#define MAME_INCLUDES_ASTROCDE_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
@@ -32,8 +36,8 @@ public:
 		TIMER_SCANLINE
 	};
 
-	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	astrocde_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
@@ -181,9 +185,9 @@ protected:
 class seawolf2_state : public astrocde_state
 {
 public:
-	seawolf2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_samples(*this, "samples")
+	seawolf2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_samples(*this, "samples")
 	{ }
 
 	void seawolf2(machine_config &config);
@@ -203,9 +207,9 @@ private:
 class ebases_state : public astrocde_state
 {
 public:
-	ebases_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_trackball(*this, {"TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1"})
+	ebases_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_trackball(*this, {"TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1"})
 	{ }
 
 	void ebases(machine_config &config);
@@ -242,10 +246,10 @@ private:
 class tenpindx_state : public astrocde_state
 {
 public:
-	tenpindx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_subcpu(*this, "sub")
-		, m_lamps(*this, "lamp%0", 0U)
+	tenpindx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_subcpu(*this, "sub"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void tenpindx(machine_config &config);
@@ -263,3 +267,5 @@ private:
 	required_device<z80_device> m_subcpu;
 	output_finder<19> m_lamps;
 };
+
+#endif // MAME_INCLUDES_ASTROCDE_H

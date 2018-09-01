@@ -376,7 +376,7 @@ void midway_ssio_device::ssio_map(address_map &map)
 //  default ports map
 //-------------------------------------------------
 
-void midway_ssio_device::ssio_input_ports(address_map &map, const char *ssio) const
+void midway_ssio_device::ssio_input_ports(address_map &map, const char *ssio)
 {
 	map(0x00, 0x04).mirror(0x18).r(ssio, FUNC(midway_ssio_device::ioport_read));
 	map(0x07, 0x07).mirror(0x18).r(ssio, FUNC(midway_ssio_device::read));

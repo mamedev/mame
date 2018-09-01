@@ -707,7 +707,7 @@ void mcr_state::cpu_90009_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -736,7 +736,7 @@ void mcr_state::cpu_90010_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -766,7 +766,7 @@ void mcr_state::cpu_91490_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));

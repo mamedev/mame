@@ -526,7 +526,7 @@ void mcr3_state::spyhunt_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0x84, 0x86).w(FUNC(mcr3_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
