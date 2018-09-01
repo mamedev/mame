@@ -1909,7 +1909,7 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
 
-	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
 
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
 
@@ -1964,7 +1964,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4c_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
 
-	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
 
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
 

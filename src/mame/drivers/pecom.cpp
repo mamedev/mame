@@ -193,7 +193,7 @@ void pecom_state::pecom64(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("pecom_cass");
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
 }
 
 /* ROM definition */

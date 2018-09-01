@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0); // 64 + 4*48 + 2 = 258
+	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258
 MACHINE_CONFIG_END
 
 /* ROM definition */

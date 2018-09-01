@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	Z80PIO(config, "a72", 9.832_MHz_XTAL / 4);
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rt1715_state::rt1715w)

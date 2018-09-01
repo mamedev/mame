@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(special_state::specimx)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","special_flop")
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("128K").set_default_value(0);
+	RAM(config, m_ram).set_default_size("128K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(special_state::erik)
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("192K").set_default_value(0);
+	RAM(config, m_ram).set_default_size("192K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 /* ROM definition */
