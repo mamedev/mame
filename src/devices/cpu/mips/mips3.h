@@ -195,6 +195,7 @@ enum {
 	MIPS3_PAGEMASK,
 	MIPS3_WIRED,
 	MIPS3_BADVADDR,
+	MIPS3_LLADDR,
 	MIPS3_R0H,
 	MIPS3_R1H,
 	MIPS3_R2H,
@@ -405,8 +406,6 @@ protected:
 	bool            m_delayslot;
 	int             m_op;
 	int             m_interrupt_cycles;
-	uint32_t        m_ll_value;
-	uint64_t        m_lld_value;
 	uint32_t        m_badcop_value;
 
 	/* endian-dependent load/store */
