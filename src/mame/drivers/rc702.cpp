@@ -15,7 +15,7 @@ ToDo:
 - Other things
 
 Issues:
-- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 1)
+- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 0)
 
 
 ****************************************************************************************************************/
@@ -241,7 +241,7 @@ WRITE8_MEMBER( rc702_state::port1c_w )
 }
 
 // monitor is orange even when powered off
-static const rgb_t our_palette[3] = {
+static const rgb_t our_palette[2] = {
 	rgb_t(0xc0, 0x60, 0x00), // off
 	rgb_t(0xff, 0xb4, 0x00), // on
 };
