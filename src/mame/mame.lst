@@ -35038,7 +35038,8 @@ simpsons2p2                     // GX072 (c) 1991
 simpsons2p3                     // GX072 (c) 1991
 simpsons2pa                     // GX072 (c) 1991 (Asia)
 simpsons2pj                     // GX072 (c) 1991 (Japan)
-simpsons4pa                     // GX072 (c) 1991
+simpsons4pa                     // GX072 (c) 1991 (Asia)
+simpsons4pe                     // GX072 (c) 1991 (World)
 
 @source:sitcom.cpp
 sitcom                          //
