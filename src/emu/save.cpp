@@ -64,8 +64,9 @@ save_manager::save_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_reg_allowed(true)
 	, m_illegal_regs(0)
+#if defined(__LIBRETRO__)
 	, m_state_size(-1)
-
+#endif
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -331,6 +332,7 @@ save_error save_manager::write_file(emu_file &file)
 	return STATERR_NONE;
 }
 
+#if defined(__LIBRETRO__)
 //-------------------------------------------------
 //  write_data - writes the data to buffer
 //-------------------------------------------------
@@ -442,7 +444,7 @@ s32 save_manager::state_size()
 
 	return m_state_size ;
 }
-
+#endif
 
 //-------------------------------------------------
 //  signature - compute the signature, which
