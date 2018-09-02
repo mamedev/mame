@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

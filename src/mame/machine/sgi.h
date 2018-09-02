@@ -16,6 +16,11 @@
 class sgi_mc_device : public device_t
 {
 public:
+	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: sgi_mc_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER(read);

@@ -424,9 +424,9 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(4800.0);
+	m_uart->set_rx_clock(4800.0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -439,8 +439,7 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	config.set_default_layout(layout_z80ne);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	RAM(config, m_ram).set_default_size("32K");
 
 	// all known tapes require LX.388 expansion
 	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
@@ -479,9 +478,7 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	config.set_default_layout(layout_z80net);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("1K")
+	m_ram->set_default_size("32K").set_extra_options("1K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
@@ -495,9 +492,9 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(4800.0);
+	m_uart->set_rx_clock(4800.0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -530,9 +527,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	config.set_default_layout(layout_z80netb);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("1K")
+	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
@@ -546,9 +541,9 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	MCFG_MACHINE_START_OVERRIDE(z80netf_state,z80netf)
 	MCFG_MACHINE_RESET_OVERRIDE(z80netf_state,z80netf)
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(4800.0);
+	m_uart->set_rx_clock(4800.0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -577,8 +572,7 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	config.set_default_layout(layout_z80netf);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("56K")
+	RAM(config, m_ram).set_default_size("56K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","z80ne_flop")

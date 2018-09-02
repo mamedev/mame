@@ -277,7 +277,6 @@ disabled). Perhaps power on/off related??
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -289,9 +288,10 @@ class nakajies_state : public driver_device
 {
 public:
 	nakajies_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "v20hl")
-		{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "v20hl")
+	{
+	}
 
 	void nakajies210(machine_config &config);
 	void nakajies220(machine_config &config);
@@ -340,7 +340,7 @@ private:
 	uint32_t  m_rom_size;
 
 	/* RAM */
-	uint8_t   *m_ram_base;
+	std::unique_ptr<uint8_t[]> m_ram_base;
 	uint32_t  m_ram_size;
 
 	/* Banking */
@@ -364,13 +364,13 @@ void nakajies_state::update_banks()
 		{
 			/* RAM banking */
 			/* Not entirely sure if bank 0x1f refers to first or second ram bank ... */
-			m_bank_base[i] = m_ram_base + ( ( ( ( m_bank[i] & 0x0f ) ^ 0xf ) << 17 ) % m_ram_size );
+			m_bank_base[i] = &m_ram_base[(((m_bank[i] & 0x0f) ^ 0xf) << 17) % m_ram_size];
 		}
 		else
 		{
 			/* ROM banking */
 			/* 0 is last bank, 1 bank before last, etc */
-			m_bank_base[i] = m_rom_base + ( ( ( ( m_bank[i] & 0x0f ) ^ 0xf ) << 17 ) % m_rom_size );
+			m_bank_base[i] = &m_rom_base[(((m_bank[i] & 0x0f) ^ 0xf) << 17) % m_rom_size];
 		}
 	}
 	membank( "bank0" )->set_base( m_bank_base[0] );
@@ -651,7 +651,7 @@ void nakajies_state::machine_start()
 	{
 		m_ram_size = 256 * 1024;
 	}
-	m_ram_base = machine().memory().region_alloc( "mainram", m_ram_size, 1, ENDIANNESS_LITTLE )->base();
+	m_ram_base = make_unique_clear<uint8_t[]>(m_ram_size);
 }
 
 
@@ -667,13 +667,12 @@ void nakajies_state::machine_reset()
 	{
 		elem = 0;
 	}
-	memset(m_ram_base, 0, m_ram_size);
 	update_banks();
 }
 
 uint32_t nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t* lcd_memory_start = m_ram_base + (m_lcd_memory_start<<9);
+	uint8_t* lcd_memory_start = &m_ram_base[m_lcd_memory_start << 9];
 	int height = screen.height();
 
 	for (int y=0; y<height; y++)
@@ -763,7 +762,6 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wales210)
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
-	config.set_default_layout(layout_lcd);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

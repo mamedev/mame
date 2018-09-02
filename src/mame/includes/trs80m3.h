@@ -44,8 +44,6 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
-		, m_floppy2(*this, "fdc:2")
-		, m_floppy3(*this, "fdc:3")
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_config(*this, "CONFIG")
@@ -98,13 +96,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(trs80_cmd);
-	DECLARE_MACHINE_RESET(trs80m3);
-	DECLARE_MACHINE_RESET(cp500);
 	uint32_t screen_update_trs80m3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cp500_io(address_map &map);
 	void m3_io(address_map &map);
 	void m3_mem(address_map &map);
+	void m4_mem(address_map &map);
+	void m4p_mem(address_map &map);
 	void m4_io(address_map &map);
 	void m4p_io(address_map &map);
 	void m4_banked_mem(address_map &map);
@@ -126,6 +124,9 @@ private:
 	uint8_t m_size_store;
 	bool m_a11_flipflop;
 	uint16_t m_timeout;
+	bool m_wait;
+	bool m_drq_off;
+	bool m_intrq_off;
 	floppy_image_device *m_floppy;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -142,8 +143,6 @@ private:
 	optional_device<fd1793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
-	optional_device<floppy_connector> m_floppy2;
-	optional_device<floppy_connector> m_floppy3;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	optional_ioport m_io_config;

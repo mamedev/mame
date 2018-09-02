@@ -116,33 +116,12 @@ namespace emu { namespace detail {
 template <typename T, typename Enable = void> struct read_line_device_class { };
 template <typename T, typename Enable = void> struct write_line_device_class { };
 
-template <typename T, typename Ret, typename... Params>
-struct read_line_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<read_line_delegate, Ret (T::*)(Params...), char const *, char const *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read_line_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<read_line_delegate, Ret (T::*)(Params...) const, char const *, char const *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read_line_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<read_line_delegate, Ret (*)(T &, Params...), char const *, char const *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct read_line_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<read_line_delegate, Ret (*)(T *, Params...), char const *, char const *, T *>::value> > { using type = T; };
-
-template <typename T, typename Ret, typename... Params>
-struct write_line_device_class<Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<write_line_delegate, Ret (T::*)(Params...), char const *, char const *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write_line_device_class<Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<write_line_delegate, Ret (T::*)(Params...) const, char const *, char const *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write_line_device_class<Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<write_line_delegate, Ret (*)(T &, Params...), char const *, char const *, T *>::value> > { using type = T; };
-template <typename T, typename Ret, typename... Params>
-struct write_line_device_class<Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<write_line_delegate, Ret (*)(T *, Params...), char const *, char const *, T *>::value> > { using type = T; };
-
-template <typename T> using read_line_device_class_t = typename read_line_device_class<T>::type;
-template <typename T> using write_line_device_class_t = typename write_line_device_class<T>::type;
-
 template <typename T>
-inline read_line_delegate make_delegate(T &&func, char const *name, char const *tag, read_line_device_class_t<std::remove_reference_t<T> > *obj)
+inline read_line_delegate make_delegate(T &&func, char const *name, char const *tag, rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > *obj)
 { return read_line_delegate(func, name, tag, obj); }
 
 template <typename T>
-inline write_line_delegate make_delegate(T &&func, char const *name, char const *tag, write_line_device_class_t<std::remove_reference_t<T> > *obj)
+inline write_line_delegate make_delegate(T &&func, char const *name, char const *tag, rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > *obj)
 { return write_line_delegate(func, name, tag, obj); }
 
 } } // namespace emu::detail
@@ -206,16 +185,40 @@ protected:
 
 	// Mapping method types to delegate types
 	template <typename T, typename Enable = void> struct delegate_type;
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read8_device_class_t<std::remove_reference_t<T> > > > { using type = read8_delegate; using device_class = emu::detail::read8_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read16_device_class_t<std::remove_reference_t<T> > > > { using type = read16_delegate; using device_class = emu::detail::read16_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read32_device_class_t<std::remove_reference_t<T> > > > { using type = read32_delegate; using device_class = emu::detail::read32_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read64_device_class_t<std::remove_reference_t<T> > > > { using type = read64_delegate; using device_class = emu::detail::read64_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read_line_device_class_t<std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = emu::detail::read_line_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write8_device_class_t<std::remove_reference_t<T> > > > { using type = write8_delegate; using device_class = emu::detail::write8_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write16_device_class_t<std::remove_reference_t<T> > > > { using type = write16_delegate; using device_class = emu::detail::write16_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write32_device_class_t<std::remove_reference_t<T> > > > { using type = write32_delegate; using device_class = emu::detail::write32_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write64_device_class_t<std::remove_reference_t<T> > > > { using type = write64_delegate; using device_class = emu::detail::write64_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write_line_device_class_t<std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = emu::detail::write_line_device_class_t<std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8_delegate, std::remove_reference_t<T> > > > { using type = read8_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16_delegate, std::remove_reference_t<T> > > > { using type = read16_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32_delegate, std::remove_reference_t<T> > > > { using type = read32_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64_delegate, std::remove_reference_t<T> > > > { using type = read64_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > { using type = read8s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > { using type = read16s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > { using type = read32s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > { using type = read64s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > { using type = read8sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > { using type = read16sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > { using type = read32sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > { using type = read64sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > { using type = read8smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > { using type = read16smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > { using type = read32smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > { using type = read64smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8_delegate, std::remove_reference_t<T> > > > { using type = write8_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16_delegate, std::remove_reference_t<T> > > > { using type = write16_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32_delegate, std::remove_reference_t<T> > > > { using type = write32_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64_delegate, std::remove_reference_t<T> > > > { using type = write64_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > { using type = write8s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > { using type = write16s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > { using type = write32s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > { using type = write64s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > { using type = write8sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > { using type = write16sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > { using type = write32sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > { using type = write64sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > { using type = write8smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > { using type = write16smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > { using type = write32smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > { using type = write64smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
 	template <typename T> using delegate_type_t = typename delegate_type<T>::type;
 	template <typename T> using delegate_device_class_t = typename delegate_type<T>::device_class;
 
@@ -330,11 +333,23 @@ protected:
 
 	// Detecting candidates for read delegates
 	template <typename T, typename Enable = void> struct is_read_method { static constexpr bool value = false; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read8_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read16_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read32_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read64_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read_line_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
 
 	// Invoking read callbacks
 	template <typename Result, typename T> static std::enable_if_t<is_read_form1<Result, T>::value, mask_t<read_result_t<Result, T>, Result> > invoke_read(T const &cb, address_space &space, offs_t offset, std::make_unsigned_t<Result> mem_mask) { return std::make_unsigned_t<read_result_t<Result, T> >(cb(space, offset, mem_mask)); }
@@ -350,6 +365,18 @@ protected:
 	template <typename Dummy> struct delegate_traits<read16_delegate, Dummy> { static constexpr u16 default_mask = ~u16(0); };
 	template <typename Dummy> struct delegate_traits<read32_delegate, Dummy> { static constexpr u32 default_mask = ~u32(0); };
 	template <typename Dummy> struct delegate_traits<read64_delegate, Dummy> { static constexpr u64 default_mask = ~u64(0); };
+	template <typename Dummy> struct delegate_traits<read8s_delegate, Dummy> { static constexpr u8 default_mask = ~u8(0); };
+	template <typename Dummy> struct delegate_traits<read16s_delegate, Dummy> { static constexpr u16 default_mask = ~u16(0); };
+	template <typename Dummy> struct delegate_traits<read32s_delegate, Dummy> { static constexpr u32 default_mask = ~u32(0); };
+	template <typename Dummy> struct delegate_traits<read64s_delegate, Dummy> { static constexpr u64 default_mask = ~u64(0); };
+	template <typename Dummy> struct delegate_traits<read8sm_delegate, Dummy> { static constexpr u8 default_mask = ~u8(0); };
+	template <typename Dummy> struct delegate_traits<read16sm_delegate, Dummy> { static constexpr u16 default_mask = ~u16(0); };
+	template <typename Dummy> struct delegate_traits<read32sm_delegate, Dummy> { static constexpr u32 default_mask = ~u32(0); };
+	template <typename Dummy> struct delegate_traits<read64sm_delegate, Dummy> { static constexpr u64 default_mask = ~u64(0); };
+	template <typename Dummy> struct delegate_traits<read8smo_delegate, Dummy> { static constexpr u8 default_mask = ~u8(0); };
+	template <typename Dummy> struct delegate_traits<read16smo_delegate, Dummy> { static constexpr u16 default_mask = ~u16(0); };
+	template <typename Dummy> struct delegate_traits<read32smo_delegate, Dummy> { static constexpr u32 default_mask = ~u32(0); };
+	template <typename Dummy> struct delegate_traits<read64smo_delegate, Dummy> { static constexpr u64 default_mask = ~u64(0); };
 	template <typename Dummy> struct delegate_traits<read_line_delegate, Dummy> { static constexpr unsigned default_mask = 1U; };
 
 	using devcb_base::devcb_base;
@@ -380,15 +407,27 @@ protected:
 
 	// Detecting candidates for write delegates
 	template <typename T, typename Enable = void> struct is_write_method { static constexpr bool value = false; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write8_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write16_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write32_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write64_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write_line_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
 
 	// Invoking write callbacks
 	template <typename Input, typename T> static std::enable_if_t<is_write_form1<Input, T>::value> invoke_write(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(space, offset, data, mem_mask); }
-	template <typename Input, typename T> static std::enable_if_t<is_write_form2<Input, T>::value> invoke_write(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(space, data, offset); }
+	template <typename Input, typename T> static std::enable_if_t<is_write_form2<Input, T>::value> invoke_write(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(space, offset, data); }
 	template <typename Input, typename T> static std::enable_if_t<is_write_form3<Input, T>::value> invoke_write(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(offset, data, mem_mask); }
 	template <typename Input, typename T> static std::enable_if_t<is_write_form4<Input, T>::value> invoke_write(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(offset, data); }
 	template <typename Input, typename T> static std::enable_if_t<is_write_form5<Input, T>::value> invoke_write(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(space, data); }
@@ -400,6 +439,18 @@ protected:
 	template <typename Dummy> struct delegate_traits<write16_delegate, Dummy> { using input_t = u16; static constexpr u16 default_mask = ~u16(0); };
 	template <typename Dummy> struct delegate_traits<write32_delegate, Dummy> { using input_t = u32; static constexpr u32 default_mask = ~u32(0); };
 	template <typename Dummy> struct delegate_traits<write64_delegate, Dummy> { using input_t = u64; static constexpr u64 default_mask = ~u64(0); };
+	template <typename Dummy> struct delegate_traits<write8s_delegate, Dummy> { using input_t = u8; static constexpr u8 default_mask = ~u8(0); };
+	template <typename Dummy> struct delegate_traits<write16s_delegate, Dummy> { using input_t = u16; static constexpr u16 default_mask = ~u16(0); };
+	template <typename Dummy> struct delegate_traits<write32s_delegate, Dummy> { using input_t = u32; static constexpr u32 default_mask = ~u32(0); };
+	template <typename Dummy> struct delegate_traits<write64s_delegate, Dummy> { using input_t = u64; static constexpr u64 default_mask = ~u64(0); };
+	template <typename Dummy> struct delegate_traits<write8sm_delegate, Dummy> { using input_t = u8; static constexpr u8 default_mask = ~u8(0); };
+	template <typename Dummy> struct delegate_traits<write16sm_delegate, Dummy> { using input_t = u16; static constexpr u16 default_mask = ~u16(0); };
+	template <typename Dummy> struct delegate_traits<write32sm_delegate, Dummy> { using input_t = u32; static constexpr u32 default_mask = ~u32(0); };
+	template <typename Dummy> struct delegate_traits<write64sm_delegate, Dummy> { using input_t = u64; static constexpr u64 default_mask = ~u64(0); };
+	template <typename Dummy> struct delegate_traits<write8smo_delegate, Dummy> { using input_t = u8; static constexpr u8 default_mask = ~u8(0); };
+	template <typename Dummy> struct delegate_traits<write16smo_delegate, Dummy> { using input_t = u16; static constexpr u16 default_mask = ~u16(0); };
+	template <typename Dummy> struct delegate_traits<write32smo_delegate, Dummy> { using input_t = u32; static constexpr u32 default_mask = ~u32(0); };
+	template <typename Dummy> struct delegate_traits<write64smo_delegate, Dummy> { using input_t = u64; static constexpr u64 default_mask = ~u64(0); };
 	template <typename Dummy> struct delegate_traits<write_line_delegate, Dummy> { using input_t = int; static constexpr unsigned default_mask = 1U; };
 
 	using devcb_base::devcb_base;
@@ -1069,12 +1120,14 @@ private:
 
 	template <typename Source, typename Func> class transform_builder; // workaround for MSVC
 	template <typename Sink, typename Func> class first_transform_builder; // workaround for MSVC
+	template <typename Func> class functoid_builder; // workaround for MSVC
 
 	class builder_base
 	{
 	protected:
 		template <typename T, typename U> friend class transform_builder; // workaround for MSVC
 		template <typename T, typename U> friend class first_transform_builder; // workaround for MSVC
+		template <typename Func> friend class functoid_builder; // workaround for MSVC
 
 		builder_base(devcb_write &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;
@@ -2529,36 +2582,108 @@ extern template class devcb_read8::delegate_builder<read8_delegate>;
 extern template class devcb_read8::delegate_builder<read16_delegate>;
 extern template class devcb_read8::delegate_builder<read32_delegate>;
 extern template class devcb_read8::delegate_builder<read64_delegate>;
+extern template class devcb_read8::delegate_builder<read8s_delegate>;
+extern template class devcb_read8::delegate_builder<read16s_delegate>;
+extern template class devcb_read8::delegate_builder<read32s_delegate>;
+extern template class devcb_read8::delegate_builder<read64s_delegate>;
+extern template class devcb_read8::delegate_builder<read8sm_delegate>;
+extern template class devcb_read8::delegate_builder<read16sm_delegate>;
+extern template class devcb_read8::delegate_builder<read32sm_delegate>;
+extern template class devcb_read8::delegate_builder<read64sm_delegate>;
+extern template class devcb_read8::delegate_builder<read8smo_delegate>;
+extern template class devcb_read8::delegate_builder<read16smo_delegate>;
+extern template class devcb_read8::delegate_builder<read32smo_delegate>;
+extern template class devcb_read8::delegate_builder<read64smo_delegate>;
 extern template class devcb_read8::delegate_builder<read_line_delegate>;
 
 extern template class devcb_read16::delegate_builder<read8_delegate>;
 extern template class devcb_read16::delegate_builder<read16_delegate>;
 extern template class devcb_read16::delegate_builder<read32_delegate>;
 extern template class devcb_read16::delegate_builder<read64_delegate>;
+extern template class devcb_read16::delegate_builder<read8s_delegate>;
+extern template class devcb_read16::delegate_builder<read16s_delegate>;
+extern template class devcb_read16::delegate_builder<read32s_delegate>;
+extern template class devcb_read16::delegate_builder<read64s_delegate>;
+extern template class devcb_read16::delegate_builder<read8sm_delegate>;
+extern template class devcb_read16::delegate_builder<read16sm_delegate>;
+extern template class devcb_read16::delegate_builder<read32sm_delegate>;
+extern template class devcb_read16::delegate_builder<read64sm_delegate>;
+extern template class devcb_read16::delegate_builder<read8smo_delegate>;
+extern template class devcb_read16::delegate_builder<read16smo_delegate>;
+extern template class devcb_read16::delegate_builder<read32smo_delegate>;
+extern template class devcb_read16::delegate_builder<read64smo_delegate>;
 extern template class devcb_read16::delegate_builder<read_line_delegate>;
 
 extern template class devcb_read32::delegate_builder<read8_delegate>;
 extern template class devcb_read32::delegate_builder<read16_delegate>;
 extern template class devcb_read32::delegate_builder<read32_delegate>;
 extern template class devcb_read32::delegate_builder<read64_delegate>;
+extern template class devcb_read32::delegate_builder<read8s_delegate>;
+extern template class devcb_read32::delegate_builder<read16s_delegate>;
+extern template class devcb_read32::delegate_builder<read32s_delegate>;
+extern template class devcb_read32::delegate_builder<read64s_delegate>;
+extern template class devcb_read32::delegate_builder<read8sm_delegate>;
+extern template class devcb_read32::delegate_builder<read16sm_delegate>;
+extern template class devcb_read32::delegate_builder<read32sm_delegate>;
+extern template class devcb_read32::delegate_builder<read64sm_delegate>;
+extern template class devcb_read32::delegate_builder<read8smo_delegate>;
+extern template class devcb_read32::delegate_builder<read16smo_delegate>;
+extern template class devcb_read32::delegate_builder<read32smo_delegate>;
+extern template class devcb_read32::delegate_builder<read64smo_delegate>;
 extern template class devcb_read32::delegate_builder<read_line_delegate>;
 
 extern template class devcb_read64::delegate_builder<read8_delegate>;
 extern template class devcb_read64::delegate_builder<read16_delegate>;
 extern template class devcb_read64::delegate_builder<read32_delegate>;
 extern template class devcb_read64::delegate_builder<read64_delegate>;
+extern template class devcb_read64::delegate_builder<read8s_delegate>;
+extern template class devcb_read64::delegate_builder<read16s_delegate>;
+extern template class devcb_read64::delegate_builder<read32s_delegate>;
+extern template class devcb_read64::delegate_builder<read64s_delegate>;
+extern template class devcb_read64::delegate_builder<read8sm_delegate>;
+extern template class devcb_read64::delegate_builder<read16sm_delegate>;
+extern template class devcb_read64::delegate_builder<read32sm_delegate>;
+extern template class devcb_read64::delegate_builder<read64sm_delegate>;
+extern template class devcb_read64::delegate_builder<read8smo_delegate>;
+extern template class devcb_read64::delegate_builder<read16smo_delegate>;
+extern template class devcb_read64::delegate_builder<read32smo_delegate>;
+extern template class devcb_read64::delegate_builder<read64smo_delegate>;
 extern template class devcb_read64::delegate_builder<read_line_delegate>;
 
 extern template class devcb_read_line::delegate_builder<read8_delegate>;
 extern template class devcb_read_line::delegate_builder<read16_delegate>;
 extern template class devcb_read_line::delegate_builder<read32_delegate>;
 extern template class devcb_read_line::delegate_builder<read64_delegate>;
+extern template class devcb_read_line::delegate_builder<read8s_delegate>;
+extern template class devcb_read_line::delegate_builder<read16s_delegate>;
+extern template class devcb_read_line::delegate_builder<read32s_delegate>;
+extern template class devcb_read_line::delegate_builder<read64s_delegate>;
+extern template class devcb_read_line::delegate_builder<read8sm_delegate>;
+extern template class devcb_read_line::delegate_builder<read16sm_delegate>;
+extern template class devcb_read_line::delegate_builder<read32sm_delegate>;
+extern template class devcb_read_line::delegate_builder<read64sm_delegate>;
+extern template class devcb_read_line::delegate_builder<read8smo_delegate>;
+extern template class devcb_read_line::delegate_builder<read16smo_delegate>;
+extern template class devcb_read_line::delegate_builder<read32smo_delegate>;
+extern template class devcb_read_line::delegate_builder<read64smo_delegate>;
 extern template class devcb_read_line::delegate_builder<read_line_delegate>;
 
 extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read8_delegate> >;
 extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read16_delegate> >;
 extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read32_delegate> >;
 extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read64_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read8s_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read16s_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read32s_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read64s_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read8sm_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read16sm_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read32sm_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read64sm_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read8smo_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read16smo_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read32smo_delegate> >;
+extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read64smo_delegate> >;
 extern template class devcb_read8::creator_impl<devcb_read8::delegate_builder<read_line_delegate> >;
 extern template class devcb_read8::creator_impl<devcb_read8::ioport_builder>;
 
@@ -2566,6 +2691,18 @@ extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<
 extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read16_delegate> >;
 extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read32_delegate> >;
 extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read64_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read8s_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read16s_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read32s_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read64s_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read8sm_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read16sm_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read32sm_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read64sm_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read8smo_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read16smo_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read32smo_delegate> >;
+extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read64smo_delegate> >;
 extern template class devcb_read16::creator_impl<devcb_read16::delegate_builder<read_line_delegate> >;
 extern template class devcb_read16::creator_impl<devcb_read16::ioport_builder>;
 
@@ -2573,6 +2710,18 @@ extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<
 extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read16_delegate> >;
 extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read32_delegate> >;
 extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read64_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read8s_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read16s_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read32s_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read64s_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read8sm_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read16sm_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read32sm_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read64sm_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read8smo_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read16smo_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read32smo_delegate> >;
+extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read64smo_delegate> >;
 extern template class devcb_read32::creator_impl<devcb_read32::delegate_builder<read_line_delegate> >;
 extern template class devcb_read32::creator_impl<devcb_read32::ioport_builder>;
 
@@ -2580,6 +2729,18 @@ extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<
 extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read16_delegate> >;
 extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read32_delegate> >;
 extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read64_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read8s_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read16s_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read32s_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read64s_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read8sm_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read16sm_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read32sm_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read64sm_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read8smo_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read16smo_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read32smo_delegate> >;
+extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read64smo_delegate> >;
 extern template class devcb_read64::creator_impl<devcb_read64::delegate_builder<read_line_delegate> >;
 extern template class devcb_read64::creator_impl<devcb_read64::ioport_builder>;
 
@@ -2587,6 +2748,18 @@ extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_bu
 extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read16_delegate> >;
 extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read32_delegate> >;
 extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read64_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read8s_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read16s_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read32s_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read64s_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read8sm_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read16sm_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read32sm_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read64sm_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read8smo_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read16smo_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read32smo_delegate> >;
+extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read64smo_delegate> >;
 extern template class devcb_read_line::creator_impl<devcb_read_line::delegate_builder<read_line_delegate> >;
 extern template class devcb_read_line::creator_impl<devcb_read_line::ioport_builder>;
 
@@ -2600,36 +2773,108 @@ extern template class devcb_write8::delegate_builder<write8_delegate>;
 extern template class devcb_write8::delegate_builder<write16_delegate>;
 extern template class devcb_write8::delegate_builder<write32_delegate>;
 extern template class devcb_write8::delegate_builder<write64_delegate>;
+extern template class devcb_write8::delegate_builder<write8s_delegate>;
+extern template class devcb_write8::delegate_builder<write16s_delegate>;
+extern template class devcb_write8::delegate_builder<write32s_delegate>;
+extern template class devcb_write8::delegate_builder<write64s_delegate>;
+extern template class devcb_write8::delegate_builder<write8sm_delegate>;
+extern template class devcb_write8::delegate_builder<write16sm_delegate>;
+extern template class devcb_write8::delegate_builder<write32sm_delegate>;
+extern template class devcb_write8::delegate_builder<write64sm_delegate>;
+extern template class devcb_write8::delegate_builder<write8smo_delegate>;
+extern template class devcb_write8::delegate_builder<write16smo_delegate>;
+extern template class devcb_write8::delegate_builder<write32smo_delegate>;
+extern template class devcb_write8::delegate_builder<write64smo_delegate>;
 extern template class devcb_write8::delegate_builder<write_line_delegate>;
 
 extern template class devcb_write16::delegate_builder<write8_delegate>;
 extern template class devcb_write16::delegate_builder<write16_delegate>;
 extern template class devcb_write16::delegate_builder<write32_delegate>;
 extern template class devcb_write16::delegate_builder<write64_delegate>;
+extern template class devcb_write16::delegate_builder<write8s_delegate>;
+extern template class devcb_write16::delegate_builder<write16s_delegate>;
+extern template class devcb_write16::delegate_builder<write32s_delegate>;
+extern template class devcb_write16::delegate_builder<write64s_delegate>;
+extern template class devcb_write16::delegate_builder<write8sm_delegate>;
+extern template class devcb_write16::delegate_builder<write16sm_delegate>;
+extern template class devcb_write16::delegate_builder<write32sm_delegate>;
+extern template class devcb_write16::delegate_builder<write64sm_delegate>;
+extern template class devcb_write16::delegate_builder<write8smo_delegate>;
+extern template class devcb_write16::delegate_builder<write16smo_delegate>;
+extern template class devcb_write16::delegate_builder<write32smo_delegate>;
+extern template class devcb_write16::delegate_builder<write64smo_delegate>;
 extern template class devcb_write16::delegate_builder<write_line_delegate>;
 
 extern template class devcb_write32::delegate_builder<write8_delegate>;
 extern template class devcb_write32::delegate_builder<write16_delegate>;
 extern template class devcb_write32::delegate_builder<write32_delegate>;
 extern template class devcb_write32::delegate_builder<write64_delegate>;
+extern template class devcb_write32::delegate_builder<write8s_delegate>;
+extern template class devcb_write32::delegate_builder<write16s_delegate>;
+extern template class devcb_write32::delegate_builder<write32s_delegate>;
+extern template class devcb_write32::delegate_builder<write64s_delegate>;
+extern template class devcb_write32::delegate_builder<write8sm_delegate>;
+extern template class devcb_write32::delegate_builder<write16sm_delegate>;
+extern template class devcb_write32::delegate_builder<write32sm_delegate>;
+extern template class devcb_write32::delegate_builder<write64sm_delegate>;
+extern template class devcb_write32::delegate_builder<write8smo_delegate>;
+extern template class devcb_write32::delegate_builder<write16smo_delegate>;
+extern template class devcb_write32::delegate_builder<write32smo_delegate>;
+extern template class devcb_write32::delegate_builder<write64smo_delegate>;
 extern template class devcb_write32::delegate_builder<write_line_delegate>;
 
 extern template class devcb_write64::delegate_builder<write8_delegate>;
 extern template class devcb_write64::delegate_builder<write16_delegate>;
 extern template class devcb_write64::delegate_builder<write32_delegate>;
 extern template class devcb_write64::delegate_builder<write64_delegate>;
+extern template class devcb_write64::delegate_builder<write8s_delegate>;
+extern template class devcb_write64::delegate_builder<write16s_delegate>;
+extern template class devcb_write64::delegate_builder<write32s_delegate>;
+extern template class devcb_write64::delegate_builder<write64s_delegate>;
+extern template class devcb_write64::delegate_builder<write8sm_delegate>;
+extern template class devcb_write64::delegate_builder<write16sm_delegate>;
+extern template class devcb_write64::delegate_builder<write32sm_delegate>;
+extern template class devcb_write64::delegate_builder<write64sm_delegate>;
+extern template class devcb_write64::delegate_builder<write8smo_delegate>;
+extern template class devcb_write64::delegate_builder<write16smo_delegate>;
+extern template class devcb_write64::delegate_builder<write32smo_delegate>;
+extern template class devcb_write64::delegate_builder<write64smo_delegate>;
 extern template class devcb_write64::delegate_builder<write_line_delegate>;
 
 extern template class devcb_write_line::delegate_builder<write8_delegate>;
 extern template class devcb_write_line::delegate_builder<write16_delegate>;
 extern template class devcb_write_line::delegate_builder<write32_delegate>;
 extern template class devcb_write_line::delegate_builder<write64_delegate>;
+extern template class devcb_write_line::delegate_builder<write8s_delegate>;
+extern template class devcb_write_line::delegate_builder<write16s_delegate>;
+extern template class devcb_write_line::delegate_builder<write32s_delegate>;
+extern template class devcb_write_line::delegate_builder<write64s_delegate>;
+extern template class devcb_write_line::delegate_builder<write8sm_delegate>;
+extern template class devcb_write_line::delegate_builder<write16sm_delegate>;
+extern template class devcb_write_line::delegate_builder<write32sm_delegate>;
+extern template class devcb_write_line::delegate_builder<write64sm_delegate>;
+extern template class devcb_write_line::delegate_builder<write8smo_delegate>;
+extern template class devcb_write_line::delegate_builder<write16smo_delegate>;
+extern template class devcb_write_line::delegate_builder<write32smo_delegate>;
+extern template class devcb_write_line::delegate_builder<write64smo_delegate>;
 extern template class devcb_write_line::delegate_builder<write_line_delegate>;
 
 extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write8_delegate> >;
 extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write16_delegate> >;
 extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write32_delegate> >;
 extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write64_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write8s_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write16s_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write32s_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write64s_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write8sm_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write16sm_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write32sm_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write64sm_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write8smo_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write16smo_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write32smo_delegate> >;
+extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write64smo_delegate> >;
 extern template class devcb_write8::creator_impl<devcb_write8::delegate_builder<write_line_delegate> >;
 extern template class devcb_write8::creator_impl<devcb_write8::inputline_builder>;
 extern template class devcb_write8::creator_impl<devcb_write8::latched_inputline_builder>;
@@ -2642,6 +2887,18 @@ extern template class devcb_write16::creator_impl<devcb_write16::delegate_builde
 extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write16_delegate> >;
 extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write32_delegate> >;
 extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write64_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write8s_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write16s_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write32s_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write64s_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write8sm_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write16sm_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write32sm_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write64sm_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write8smo_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write16smo_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write32smo_delegate> >;
+extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write64smo_delegate> >;
 extern template class devcb_write16::creator_impl<devcb_write16::delegate_builder<write_line_delegate> >;
 extern template class devcb_write16::creator_impl<devcb_write16::inputline_builder>;
 extern template class devcb_write16::creator_impl<devcb_write16::latched_inputline_builder>;
@@ -2654,6 +2911,18 @@ extern template class devcb_write32::creator_impl<devcb_write32::delegate_builde
 extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write16_delegate> >;
 extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write32_delegate> >;
 extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write64_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write8s_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write16s_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write32s_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write64s_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write8sm_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write16sm_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write32sm_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write64sm_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write8smo_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write16smo_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write32smo_delegate> >;
+extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write64smo_delegate> >;
 extern template class devcb_write32::creator_impl<devcb_write32::delegate_builder<write_line_delegate> >;
 extern template class devcb_write32::creator_impl<devcb_write32::inputline_builder>;
 extern template class devcb_write32::creator_impl<devcb_write32::latched_inputline_builder>;
@@ -2666,6 +2935,18 @@ extern template class devcb_write64::creator_impl<devcb_write64::delegate_builde
 extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write16_delegate> >;
 extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write32_delegate> >;
 extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write64_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write8s_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write16s_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write32s_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write64s_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write8sm_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write16sm_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write32sm_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write64sm_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write8smo_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write16smo_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write32smo_delegate> >;
+extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write64smo_delegate> >;
 extern template class devcb_write64::creator_impl<devcb_write64::delegate_builder<write_line_delegate> >;
 extern template class devcb_write64::creator_impl<devcb_write64::inputline_builder>;
 extern template class devcb_write64::creator_impl<devcb_write64::latched_inputline_builder>;
@@ -2678,6 +2959,18 @@ extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_
 extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write16_delegate> >;
 extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write32_delegate> >;
 extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write64_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write8s_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write16s_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write32s_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write64s_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write8sm_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write16sm_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write32sm_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write64sm_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write8smo_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write16smo_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write32smo_delegate> >;
+extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write64smo_delegate> >;
 extern template class devcb_write_line::creator_impl<devcb_write_line::delegate_builder<write_line_delegate> >;
 extern template class devcb_write_line::creator_impl<devcb_write_line::inputline_builder>;
 extern template class devcb_write_line::creator_impl<devcb_write_line::latched_inputline_builder>;

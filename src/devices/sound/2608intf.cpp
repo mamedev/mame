@@ -11,9 +11,6 @@
   - Control Write B
   - Data Write B
 
-  TODO:
-  - fix set_unscaled_clock() changes (currently done only by vgmplay driver)
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -52,7 +49,7 @@ void ym2608_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void ym2608_device::timer_handler(int c,int count,int clock)
 {
-	if( count == 0 )
+	if( count == 0 || clock == 0 )
 	{   /* Reset FM Timer */
 		m_timer[c]->enable(false);
 	}
@@ -108,6 +105,16 @@ void ym2608_device::device_start()
 					pcmbufa,pcmsizea,
 					&ym2608_device::static_timer_handler,&ym2608_device::static_irq_handler,&psgintf);
 	assert_always(m_chip != nullptr, "Error creating YM2608 chip");
+}
+
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void ym2608_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 72);
+	ym2608_clock_changed(m_chip, clock(), clock() / 72);
 }
 
 //-------------------------------------------------

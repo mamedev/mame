@@ -110,7 +110,7 @@ MACHINE_CONFIG_START(v550_state::v550)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // NEC D446-2 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // NEC D444C-2 + battery
 
 	MCFG_DEVICE_ADD("gdc", UPD7220, 34.846_MHz_XTAL / 16) // NEC D7220D (2.177875 MHz verified)
 	MCFG_VIDEO_SET_SCREEN("screen")

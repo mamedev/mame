@@ -388,8 +388,8 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	itm.o3_callback().append("itm", FUNC(ptm6840_device::set_c2));
 	itm.irq_callback().set(m_tmint, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic", pic8259_device, ir1_w)) // INT5
+	upd7201_new_device& sio(UPD7201_NEW(config, "sio", 8_MHz_XTAL / 2));
+	sio.out_int_callback().set("pic", FUNC(pic8259_device::ir1_w)); // INT5
 
 	MCFG_DEVICE_ADD("kbusart", I8251, 8_MHz_XTAL / 4)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))

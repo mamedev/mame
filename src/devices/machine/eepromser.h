@@ -15,19 +15,6 @@
 
 #include "eeprom.h"
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EEPROM_SERIAL_DO_CALLBACK(_devcb) \
-	downcast<eeprom_serial_base_device &>(*device).set_do_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
 enum class eeprom_serial_streaming : bool
 {
 	DISABLE = false,
@@ -233,7 +220,7 @@ public: \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming = eeprom_serial_streaming::DISABLE); \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock); \
 }; \
-DECLARE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
+DECLARE_DEVICE_TYPE(EEPROM_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
 
 // standard 93CX6 class of 16-bit EEPROMs
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16)

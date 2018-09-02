@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

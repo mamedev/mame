@@ -320,20 +320,20 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io )
+	TI990_10(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::ti990_10_memmap);
+	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::ti990_10_io);
 
 	// VDT 911 terminal
-	MCFG_DEVICE_ADD(m_terminal, VDT911, 0)
-	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(*this, ti990_10_state, key_interrupt))
-	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(*this, ti990_10_state, line_interrupt))
+	VDT911(config, m_terminal, 0);
+	m_terminal->keyint_cb().set(FUNC(ti990_10_state::key_interrupt));
+	m_terminal->lineint_cb().set(FUNC(ti990_10_state::line_interrupt));
 
 	// Hard disk
-	MCFG_DEVICE_ADD("hdc", TI990_HDC, 0)
-	MCFG_TI990_HDC_INT_CALLBACK(WRITELINE(*this, ti990_10_state, ti990_set_int13))
+	TI990_HDC(config, "hdc", 0).int_cb().set(FUNC(ti990_10_state::ti990_set_int13));
 
 	// Tape controller
-	MCFG_DEVICE_ADD("tpc", TI990_TAPE_CTRL, 0)
-	MCFG_TI990_TAPE_INT_HANDLER(WRITELINE(*this, ti990_10_state, tape_interrupt))
+	TI990_TAPE_CTRL(config, "tpc", 0).int_cb().set(FUNC(ti990_10_state::tape_interrupt));
 MACHINE_CONFIG_END
 
 

@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))

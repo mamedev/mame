@@ -292,25 +292,24 @@ MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL(2'000'000)) // unknown frequency
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial0", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial0", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia0, XTAL(2'000'000)); // unknown frequency
+	m_acia0->txd_handler().set("serial0", FUNC(rs232_port_device::write_txd));
+	m_acia0->rts_handler().set("serial0", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("serial0", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia0", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia0", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL(2'000'000)) // unknown frequency
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial1", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial1", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia1, XTAL(2'000'000)); // unknown frequency
+	m_acia1->txd_handler().set("serial1", FUNC(rs232_port_device::write_txd));
+	m_acia1->rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("serial1", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -344,8 +343,7 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(jupiter3_state, kbd_put))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

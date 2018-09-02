@@ -44,38 +44,6 @@
 
 #pragma once
 
-//**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CXD1095_IN_PORTA_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
-#define MCFG_CXD1095_IN_PORTB_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
-#define MCFG_CXD1095_IN_PORTC_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
-#define MCFG_CXD1095_IN_PORTD_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
-#define MCFG_CXD1095_IN_PORTE_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_input_cb(4, DEVCB_##_devcb);
-
-#define MCFG_CXD1095_OUT_PORTA_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
-#define MCFG_CXD1095_OUT_PORTB_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
-#define MCFG_CXD1095_OUT_PORTC_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
-#define MCFG_CXD1095_OUT_PORTD_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
-#define MCFG_CXD1095_OUT_PORTE_CB(_devcb) \
-	downcast<cxd1095_device &>(*device).set_output_cb(4, DEVCB_##_devcb);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> cxd1095_device
-
 class cxd1095_device : public device_t
 {
 public:
@@ -83,8 +51,18 @@ public:
 	cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	template <class Object> devcb_base &set_input_cb(int p, Object &&cb) { assert(p >= 0 && p < 5); return m_input_cb[p].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_cb(int p, Object &&cb) { assert(p >= 0 && p < 5); return m_output_cb[p].set_callback(std::forward<Object>(cb)); }
+	template <std::size_t Port> auto in_port_cb() { static_assert(Port >= 0 && Port < 5, "invalid port"); return m_input_cb[Port].bind(); }
+	template <std::size_t Port> auto out_port_cb() { static_assert(Port >= 0 && Port < 5, "invalid port"); return m_output_cb[Port].bind(); }
+	auto in_porta_cb() { return in_port_cb<0>(); }
+	auto in_portb_cb() { return in_port_cb<1>(); }
+	auto in_portc_cb() { return in_port_cb<2>(); }
+	auto in_portd_cb() { return in_port_cb<3>(); }
+	auto in_porte_cb() { return in_port_cb<4>(); }
+	auto out_porta_cb() { return out_port_cb<0>(); }
+	auto out_portb_cb() { return out_port_cb<1>(); }
+	auto out_portc_cb() { return out_port_cb<2>(); }
+	auto out_portd_cb() { return out_port_cb<3>(); }
+	auto out_porte_cb() { return out_port_cb<4>(); }
 
 	// memory handlers
 	DECLARE_READ8_MEMBER(read);
@@ -105,7 +83,6 @@ private:
 	u8                  m_data_dir[5];
 };
 
-// device type definition
 DECLARE_DEVICE_TYPE(CXD1095, cxd1095_device)
 
 #endif // MAME_MACHINE_CXD1095_H

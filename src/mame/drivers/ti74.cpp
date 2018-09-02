@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
 	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
-	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
+	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -562,7 +562,7 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
 	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
-	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
+	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -614,8 +614,6 @@ MACHINE_CONFIG_START(z88_state::z88)
 	device = &PALETTE(config, m_palette, Z88_NUM_COLOURS);
 	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
 
-	config.set_default_layout(layout_lcd);
-
 	device = &UPD65031(config, m_blink, XTAL(9'830'400));
 	m_blink->kb_rd_callback().set(FUNC(z88_state::kb_r));
 	m_blink->int_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -629,9 +627,7 @@ MACHINE_CONFIG_START(z88_state::z88)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("32K,64K,256K,512K");
 
 	/* cartridges */
 	device = &Z88CART_SLOT(config, m_carts[1]);

@@ -255,7 +255,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			if (!BIT(sel, b))
 			{
 				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(XTAL(23'814'000) / 3.5 / divisor), !param);
+				m_baudgen_timer->adjust(attotime::from_hz(23.814_MHz_XTAL / 3.5 / divisor), !param);
 				break;
 			}
 		}
@@ -884,7 +884,7 @@ void tv912_state::tv912(machine_config &config)
 	maincpu.t1_in_cb().set(m_crtc, FUNC(tms9927_device::bl_r)).invert();
 	maincpu.prog_out_cb().set(m_uart, FUNC(ay51013_device::write_xr)).invert();
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(0, &tv912_state::bank_map);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(12);
@@ -899,7 +899,7 @@ void tv912_state::tv912(machine_config &config)
 	m_crtc->vsyn_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc->set_screen("screen");
 
-	AY51013(config, m_uart, 0);
+	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true);

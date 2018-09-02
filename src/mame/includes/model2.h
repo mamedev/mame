@@ -185,6 +185,10 @@ protected:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
 	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	DECLARE_READ32_MEMBER(doa_prot_r);
+	DECLARE_READ32_MEMBER(doa_unk_r);
+	void sega_0229_map(address_map &map);
+	int m_prot_a;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
@@ -230,7 +234,9 @@ protected:
 	void geo_sharc_map(address_map &map);
 	void model2_base_mem(address_map &map);
 	void model2_5881_mem(address_map &map);
+	void model2_0229_mem(address_map &map);
 	void model2_snd(address_map &map);
+	void scsp_map(address_map &map);
 
 	void debug_init();
 	void debug_commands( int ref, const std::vector<std::string> &params );
@@ -469,6 +475,7 @@ public:
 protected:
 	void model2a_crx_mem(address_map &map);
 	void model2a_5881_mem(address_map &map);
+	void model2a_0229_mem(address_map &map);
 };
 
 /*****************************
@@ -509,6 +516,7 @@ protected:
 
 	void model2b_crx_mem(address_map &map);
 	void model2b_5881_mem(address_map &map);
+	void model2b_0229_mem(address_map &map);
 	// TODO: split into own class
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);

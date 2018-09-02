@@ -407,13 +407,10 @@ void coco_state::coco_floating_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(coco_state::coco_floating)
-	MCFG_DEVICE_ADD(FLOATING_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(coco_floating_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-MACHINE_CONFIG_END
+void coco_state::coco_floating(machine_config &config)
+{
+	ADDRESS_MAP_BANK(config, FLOATING_TAG).set_map(&coco_state::coco_floating_map).set_options(ENDIANNESS_BIG, 8, 16);
+}
 
 
 //-------------------------------------------------
@@ -442,23 +439,23 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
 
 	// devices
-	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia0_irq_b))
+	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
+	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
+	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
+	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
+	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
+	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
 
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, coco_state, pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, coco_state, pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_state, pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, coco_state, pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, coco_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, coco_state, pia1_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
+	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
+	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
+	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
+	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
+	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
+	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
+	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
+	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
+	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
 	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, XTAL(14'318'181), MAINCPU_TAG)
 	MCFG_SAM6883_RES_CALLBACK(READ8(*this, coco12_state, sam_read))
@@ -491,9 +488,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	coco_sound(config);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,16K,32K")
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("4K,16K,32K");
 
 	// floating space
 	coco_floating(config);
@@ -510,8 +505,7 @@ MACHINE_CONFIG_START(coco12_state::cocoh)
 	coco(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::cocoe)
@@ -528,8 +522,7 @@ MACHINE_CONFIG_START(coco12_state::cocoeh)
 	cocoe(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::coco2)
@@ -546,8 +539,7 @@ MACHINE_CONFIG_START(coco12_state::coco2h)
 	coco2(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::coco2b)
@@ -563,8 +555,7 @@ MACHINE_CONFIG_START(coco12_state::coco2bh)
 	coco2b(config);
 	MCFG_DEVICE_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_DEVICE_PROGRAM_MAP(coco_mem)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 void coco12_state::cp400(machine_config &config)

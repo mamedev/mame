@@ -15,12 +15,17 @@
 #include "emu.h"
 #include "memex.h"
 
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_MEMEX, bus::ti99::peb, geneve_memex_device, "ti99_memex", "Geneve memory expansion card")
 
 namespace bus { namespace ti99 { namespace peb {
 
 #define RAMREGION "ram2meg"
-#define TRACE_CONFIG 0
 
 enum
 {
@@ -56,7 +61,7 @@ bool geneve_memex_device::access_enabled(offs_t offset)
 	if (page == 0xba) return false;
 	if ((page & 0xc7)==0x82 && ((m_switches & MDIP2)==0))
 	{
-		if (TRACE_CONFIG) logerror("memex blocks page %02x; dip2=%d\n", page,  (m_switches & MDIP2)!=0);
+		LOGMASKED(LOG_CONFIG, "memex blocks page %02x; dip2=%d\n", page,  (m_switches & MDIP2)!=0);
 		return false;
 	}
 
@@ -116,7 +121,7 @@ void geneve_memex_device::device_start()
 void geneve_memex_device::device_reset()
 {
 	m_switches = ioport("MEMEXDIPS")->read();
-	if (TRACE_CONFIG) logerror("memex dips = %02x\n", m_switches);
+	LOGMASKED(LOG_CONFIG, "memex dips = %02x\n", m_switches);
 }
 
 INPUT_PORTS_START( memex )
@@ -148,9 +153,9 @@ INPUT_PORTS_START( memex )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(geneve_memex_device::device_add_mconfig)
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("2M");
+	m_ram->set_default_value(0);
 MACHINE_CONFIG_END
 
 ioport_constructor geneve_memex_device::device_input_ports() const

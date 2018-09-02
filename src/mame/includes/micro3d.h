@@ -13,6 +13,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
+#include "machine/adc0844.h"
 #include "machine/mc2661.h"
 #include "machine/mc68681.h"
 #include "emupal.h"
@@ -54,6 +55,7 @@ public:
 		m_duart(*this, "duart"),
 		m_noise_1(*this, "noise_1"),
 		m_noise_2(*this, "noise_2"),
+		m_adc(*this, "adc"),
 		m_vertex(*this, "vertex"),
 		m_sound_sw(*this, "SOUND_SW"),
 		m_volume(*this, "VOLUME"),
@@ -88,6 +90,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<micro3d_sound_device> m_noise_1;
 	required_device<micro3d_sound_device> m_noise_2;
+	optional_device<adc0844_device> m_adc;
 	required_memory_region m_vertex;
 
 	required_ioport m_sound_sw;

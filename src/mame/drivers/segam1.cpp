@@ -375,8 +375,8 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 
 	MCFG_DEVICE_ADD("uart", I8251, 4000000) // unknown clock
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("m1comm", 0))
+	mb8421_device &dpram(MB8421(config, "dpram"));
+	dpram.intl_callback().set_inputline("m1comm", 0);
 
 	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
 	MCFG_GFX_PALETTE("palette")

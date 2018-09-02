@@ -9,8 +9,6 @@
 
 11/09/2011 - modernised. The portable doesn't seem to have
              scroll registers, and it sets the palette to black.
-             I've added a temporary video output so that you can get
-             an idea of what the screen should look like. [Robbbert]
 
 ****************************************************************************/
 
@@ -575,11 +573,6 @@ FLOPPY_FORMATS_MEMBER( fp_state::floppy_formats )
 	FLOPPY_APRIDISK_FORMAT
 FLOPPY_FORMATS_END
 
-static void fp_floppies(device_slot_interface &device)
-{
-	device.option_add("d32w", SONY_OA_D32W);
-}
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( fp )
@@ -633,8 +626,8 @@ MACHINE_CONFIG_START(fp_state::fp)
 
 	AM9517A(config, m_dmac, 250000);
 	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
-	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(wd_fdc_device_base::data_r));
-	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(wd_fdc_device_base::data_w));
+	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
+	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -652,8 +645,8 @@ MACHINE_CONFIG_START(fp_state::fp)
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, fp_floppies, "d32w", fp_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, fp_floppies, nullptr,   fp_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, "d32w", SONY_OA_D32W, true,  floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, "d32w", SONY_OA_D32W, false, floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(fp_state::write_centronics_busy));
@@ -664,9 +657,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,1M");
 MACHINE_CONFIG_END
 
 

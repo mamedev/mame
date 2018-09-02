@@ -3812,9 +3812,7 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 
 	// LPU memory options
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("192K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 320K, 448K")
+	RAM(config, RAM_TAG).set_default_size("192K").set_extra_options("64K, 320K, 448K");
 
 	// Internal printer
 	MCFG_DEVICE_ADD("printer" , HP9845_PRINTER , 0)

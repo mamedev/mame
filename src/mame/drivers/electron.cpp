@@ -230,8 +230,7 @@ MACHINE_CONFIG_START(electron_state::electron)
 	MCFG_DEVICE_ADD( "beeper", BEEP, 300 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	RAM(config, m_ram).set_default_size("32K");
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
@@ -272,8 +271,7 @@ MACHINE_CONFIG_START(electron_state::electron64)
 	MCFG_DEVICE_PROGRAM_MAP(electron_mem)
 	MCFG_DEVICE_OPCODES_MAP(electron64_opcodes)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
 

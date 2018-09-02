@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(rungun_state::rng)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rungun)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

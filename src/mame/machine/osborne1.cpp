@@ -35,7 +35,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	// simulated by ANDing all the values together.
 	uint8_t data = 0xFF;
 	if ((offset & 0x900) == 0x100) // Floppy
-		data &= m_fdc->read(space, offset & 0x03);
+		data &= m_fdc->read(offset & 0x03);
 	if ((offset & 0x900) == 0x900) // IEEE488 PIA
 		data &= m_pia0->read(space, offset & 0x03);
 	if ((offset & 0xA00) == 0x200) // Keyboard
@@ -72,7 +72,7 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 	{
 		// Handle writes to the I/O area
 		if ((offset & 0x900) == 0x100) // Floppy
-			m_fdc->write(space, offset & 0x03, data);
+			m_fdc->write(offset & 0x03, data);
 		if ((offset & 0x900) == 0x900) // IEEE488 PIA
 			m_pia0->write(space, offset & 0x03, data);
 		if ((offset & 0xA00) == 0xA00) // Serial

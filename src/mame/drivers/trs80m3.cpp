@@ -23,7 +23,6 @@ EA:
 - UART status (read and write) on a Model III/4
 
 E9:
-- UART Configuration jumpers (read) on a Model III/4
 - Set baud rate (Model III/4)
 
 E8:
@@ -34,19 +33,18 @@ Model 4 - C0-CF = hard drive (optional)
     - 90-93 write sound (optional)
     - 80-8F hires graphics (optional)
 
+Shift and Right-arrow will enable 32 cpl.
+
 About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
     of bytes in the computer's work area. The bytes are in a certain order, this is:
-    seconds, minutes, hours, year, day, month. On a model 1, the seconds are stored at
-    0x4041, while on the model 4 it is 0x4217. A reboot always sets the time to zero.
+    seconds, minutes, hours, year, day, month. The seconds are stored at 0x4217.
+    A reboot always sets the time to zero.
 
 Model 4 memory organisation -
     Mode 0: ROM=0-37E7 and 37EA-3FFF; Printer=37E8-37E9; Keyboard=3800-3BFF; Video=3C00-3FFF
     Mode 1: Keyboard and Video as above; 0-3FFF read=ROM and write=RAM
     Mode 2: Keyboard=F400-F7FF; Video=F800-FFFF; the rest is RAM
     Mode 3: All RAM
-    In the "maincpu" memory map, the first 64k is given to the ROM, keyboard, printer and video,
-        while the second 64k is RAM that is switched in as needed. The area from 4800-FFFF
-        is considered a "black hole", any writes to there will disappear.
     The video is organised as 2 banks of 0x400 bytes, except in Mode 2 where it becomes contiguous.
 
 Model 4P - is the same as Model 4 except:
@@ -60,10 +58,9 @@ To Do / Status:
 --------------
 
 trs80m3:   works
-           floppy not working
 
 trs80m4:   works
-           floppy not working
+           will boot model 3 floppies, but not model 4 ones
 
 trs80m4p:  floppy not working, so machine is useless
 
@@ -96,7 +93,7 @@ void trs80m3_state::m3_io(address_map &map)
 	map(0xe0, 0xe3).rw(FUNC(trs80m3_state::port_e0_r), FUNC(trs80m3_state::port_e0_w));
 	map(0xe4, 0xe4).rw(FUNC(trs80m3_state::port_e4_r), FUNC(trs80m3_state::port_e4_w));
 	map(0xe8, 0xe8).rw(FUNC(trs80m3_state::port_e8_r), FUNC(trs80m3_state::port_e8_w));
-	map(0xe9, 0xe9).portr("E9").w(m_brg, FUNC(com8116_device::stt_str_w));
+	map(0xe9, 0xe9).w(m_brg, FUNC(com8116_device::stt_str_w));
 	map(0xea, 0xea).rw(FUNC(trs80m3_state::port_ea_r), FUNC(trs80m3_state::port_ea_w));
 	map(0xeb, 0xeb).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	map(0xec, 0xef).rw(FUNC(trs80m3_state::port_ec_r), FUNC(trs80m3_state::port_ec_w));
@@ -108,6 +105,11 @@ void trs80m3_state::m3_io(address_map &map)
 	map(0xf4, 0xf7).w(FUNC(trs80m3_state::port_f4_w));
 	map(0xf8, 0xfb).rw(FUNC(trs80m3_state::printer_r), FUNC(trs80m3_state::printer_w));
 	map(0xfc, 0xff).rw(FUNC(trs80m3_state::port_ff_r), FUNC(trs80m3_state::port_ff_w));
+}
+
+void trs80m3_state::m4_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_m4_bank, FUNC(address_map_bank_device::amap8));
 }
 
 void trs80m3_state::m4_banked_mem(address_map &map)
@@ -146,6 +148,11 @@ void trs80m3_state::m4_io(address_map &map)
 	map(0x84, 0x87).w(FUNC(trs80m3_state::port_84_w));
 	map(0x88, 0x89).w(FUNC(trs80m3_state::port_88_w));
 	map(0x90, 0x93).w(FUNC(trs80m3_state::port_90_w));
+}
+
+void trs80m3_state::m4p_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_m4p_bank, FUNC(address_map_bank_device::amap8));
 }
 
 void trs80m3_state::m4p_banked_mem(address_map &map)
@@ -208,8 +215,8 @@ void trs80m3_state::cp500_io(address_map &map)
 
 static INPUT_PORTS_START( trs80m4p )
 	PORT_START("LINE0")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE)      PORT_CHAR('@')
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)              PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
@@ -241,64 +248,49 @@ static INPUT_PORTS_START( trs80m4p )
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0xF8, 0x00, IPT_UNUSED)
+	PORT_BIT(0xF8, 0x00, IPT_UNUSED) // these bits were tested and do nothing useful
 
 	PORT_START("LINE4")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)              PORT_CHAR('0') PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$') PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%') PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&') PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)          PORT_CHAR('0')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)          PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)          PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)          PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)          PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)          PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)          PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)          PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_START("LINE5")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')') PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)          PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD)          PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME(": *") PORT_CODE(KEYCODE_MINUS)        PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("; +") PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("- =") PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP)     PORT_CHAR('.') PORT_CHAR('>') PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("LINE6")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)                          PORT_CHAR(13) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(F8)) // 3rd line, 1st key from right
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(F9)) // 1st line, 1st key from right
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)                PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)        PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	/* backspace do the same as cursor left */
 	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)              PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)              PORT_CHAR(' ')
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 
 	PORT_START("LINE7")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)                PORT_CHAR(UCHAR_SHIFT_1)
-	/* These keys are only on a Model 4. The one marked CTL seems to be another shift key (4 in total). */
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
+	// These keys are only on a Model 4. These bits do nothing on Model 3.
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("CTL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) // When activated, lowercase entry is possible
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) // prints tic character
 	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
 	PORT_BIT(0x80, 0x00, IPT_UNUSED)
-
-	PORT_START("E9")    // these are the power-on uart settings
-	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x88, 0x08, "Parity")
-	PORT_DIPSETTING(    0x08, DEF_STR(None))
-	PORT_DIPSETTING(    0x00, "Odd")
-	PORT_DIPSETTING(    0x80, "Even")
-	PORT_DIPNAME( 0x10, 0x10, "Stop Bits")
-	PORT_DIPSETTING(    0x10, "2")
-	PORT_DIPSETTING(    0x00, "1")
-	PORT_DIPNAME( 0x60, 0x60, "Bits")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPSETTING(    0x20, "6")
-	PORT_DIPSETTING(    0x40, "7")
-	PORT_DIPSETTING(    0x60, "8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trs80m3 )
@@ -378,11 +370,6 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", trs80_floppies, "sssd", trs80m3_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	// Optional external unit
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80m3_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80m3_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
@@ -398,19 +385,18 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_brg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 
-	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	AY31015(config, m_uart);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
-	MCFG_AY31015_AUTO_RDAV(true)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-
-	MCFG_MACHINE_RESET_OVERRIDE(trs80m3_state, trs80m3)
+	m_uart->set_auto_rdav(true);
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m3_state::model4)
 	model3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m4_mem)
 	MCFG_DEVICE_IO_MAP(m4_io)
 
 	RAM(config, m_mainram, 0);
@@ -428,11 +414,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(trs80m3_state::model4p)
 	model3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m4p_mem)
 	MCFG_DEVICE_IO_MAP(m4p_io)
 
 	RAM(config, m_mainram, 0);
 	m_mainram->set_default_size("64K");
-	m_mainram->set_extra_options("16K,128K");
+	m_mainram->set_extra_options("128K");
 
 	ADDRESS_MAP_BANK(config, m_m4p_bank, 0);
 	m_m4p_bank->set_map(&trs80m3_state::m4p_banked_mem);
@@ -448,8 +435,6 @@ MACHINE_CONFIG_START(trs80m3_state::cp500)
 	model3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(cp500_io)
-
-	MCFG_MACHINE_RESET_OVERRIDE(trs80m3_state, cp500)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -547,5 +532,5 @@ void trs80m3_state::init_trs80m4p()
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT     CLASS          INIT             COMPANY               FULLNAME                FLAGS
 COMP( 1980, trs80m3,     0,        trs80l2,  model3,   trs80m3,  trs80m3_state, init_trs80m3,  "Tandy Radio Shack", "TRS-80 Model III",        0 )
 COMP( 1980, trs80m4,     trs80m3,  0,        model4,   trs80m3,  trs80m3_state, init_trs80m4,  "Tandy Radio Shack", "TRS-80 Model 4",          0 )
-COMP( 1983, trs80m4p,    trs80m3,  0,        model4p,  trs80m4p, trs80m3_state, init_trs80m4p, "Tandy Radio Shack", "TRS-80 Model 4P",         0 )
+COMP( 1983, trs80m4p,    trs80m3,  0,        model4p,  trs80m4p, trs80m3_state, init_trs80m4p, "Tandy Radio Shack", "TRS-80 Model 4P",         MACHINE_NOT_WORKING )
 COMP( 1982, cp500,       trs80m3,  0,        cp500,    trs80m3,  trs80m3_state, init_trs80m3,  "Prológica",         "CP-500 (PVIII REV.3)",    0 )

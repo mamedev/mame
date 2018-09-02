@@ -385,8 +385,7 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
@@ -432,8 +431,7 @@ MACHINE_CONFIG_START(zn_state::zn2)
 	MCFG_DEVICE_ADD( m_maincpu, CXD8661R, XTAL(100'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
 	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
@@ -1198,17 +1196,19 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
-	MCFG_NVRAM_ADD_1FILL("fm1208s")
+	NVRAM(config, "fm1208s", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MB3773_ADD("mb3773")
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002tb)
@@ -1220,17 +1220,19 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
-	MCFG_NVRAM_ADD_1FILL("fm1208s")
+	NVRAM(config, "fm1208s", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MB3773_ADD("mb3773")
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 /*
@@ -1464,11 +1466,10 @@ MACHINE_CONFIG_START(zn_state::coh1000w)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(coh1000w_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("8M");
 
-	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	VT83C461(config, m_vt83c461).options(ata_devices, "hdd", nullptr, true);
+	m_vt83c461->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&zn_state::atpsx_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&zn_state::atpsx_dma_write, this ) )
 MACHINE_CONFIG_END
@@ -2195,17 +2196,12 @@ MACHINE_CONFIG_START(zn_state::nbajamex)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nbajamex_map)
 
-	MCFG_NVRAM_ADD_1FILL("71256")
+	NVRAM(config, "71256", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, nbajamex)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)
 
-	MCFG_DEVICE_ADD("nbajamex_bankmap", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nbajamex_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800000)
+	ADDRESS_MAP_BANK(config, "nbajamex_bankmap").set_map(&zn_state::nbajamex_bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
@@ -2218,8 +2214,8 @@ MACHINE_CONFIG_START(zn_state::jdredd)
 	MCFG_DEVICE_MODIFY("gpu")
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 MACHINE_CONFIG_END
 
 /*
@@ -2690,8 +2686,8 @@ MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	MCFG_DEVICE_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_DEVICE_IO_MAP(cbaj_z80_port_map)
 
-	MCFG_FIFO7200_ADD("cbaj_fifo1", 0x400) // LH540202
-	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // "
+	FIFO7200(config, m_cbaj_fifo[0], 0x400); // LH540202
+	FIFO7200(config, m_cbaj_fifo[1], 0x400); // "
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -4686,7 +4682,7 @@ ROM_START( psyforcex )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
-	ROM_LOAD16_BYTE( "e22-11.2",     0x0000001, 0x080000, CRC(a263b41f) SHA1(a797f1eb74a7ba7aeefabd9f5d55e6eec2df46e2) )
+	ROM_LOAD16_BYTE( "e22-11.2",     0x0000001, 0x080000, CRC(29ebebc9) SHA1(48a3371460d69ae5ba58d3e24615f389bf43b2cc) )
 	ROM_LOAD16_BYTE( "e22-12.7",     0x0000000, 0x080000, CRC(7426ffc5) SHA1(24b0132241e2e49109e585b082bf4ab67f86b294) )
 	ROM_LOAD( "e22-02.16",           0x0800000, 0x200000, CRC(03b50064) SHA1(0259537e86b266b3f34308c4fc0bcc04c037da71) )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
@@ -5437,7 +5433,7 @@ GAME( 1995, sfchampu,  sfchamp,  coh1000ta,   znt,      zn_state, empty_init, RO
 GAME( 1995, sfchampj,  sfchamp,  coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, psyforce,  coh1000t, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, psyforcej, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforcex, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // exception in attract after reading 0xbbbbbbbb from 0x8025ed18 leads to watchdog reset
+GAME( 1995, psyforcex, psyforce, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgcldate,  mgcldtex, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, mgcldtex,  coh1000t, coh1000ta,   znt,      zn_state, empty_init, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

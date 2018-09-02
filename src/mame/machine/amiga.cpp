@@ -278,7 +278,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 	}
 
 	// vblank end
-	if (scanline == m_screen->visible_area().min_y)
+	if (scanline == m_screen->visible_area().top())
 	{
 		m_cia_0->tod_w(0);
 	}

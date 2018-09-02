@@ -616,14 +616,14 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, excali64_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, excali64_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("u12", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* Hook up type (no idea what this means) */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(100))               /* resistor connected between RCext & 5v */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(100))               /* capacitor connected between Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(0)                  /* A pin - grounded */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - driven by port e4 bit 5 */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, excali64_state, motor_w))
+	TTL74123(config, m_u12, 0);
+	m_u12->set_connection_type(TTL74123_GROUNDED);  /* Hook up type (no idea what this means) */
+	m_u12->set_resistor_value(RES_K(100));          /* resistor connected between RCext & 5v */
+	m_u12->set_capacitor_value(CAP_U(100));         /* capacitor connected between Cext and RCext */
+	m_u12->set_a_pin_value(0);                      /* A pin - grounded */
+	m_u12->set_b_pin_value(1);                      /* B pin - driven by port e4 bit 5 */
+	m_u12->set_clear_pin_value(1);                  /* Clear pin - pulled high */
+	m_u12->out_cb().set(FUNC(excali64_state::motor_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, excali64_state, cent_busy_w))

@@ -263,7 +263,7 @@ private:
 	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
-	ADC083X_INPUT_CB(adc0838_callback);
+	double adc0838_callback(uint8_t input);
 	K056832_CB_MEMBER(tile_callback);
 
 	void jetwave_map(address_map &map);
@@ -719,7 +719,7 @@ INPUT_PORTS_END
 
 /* ADC0838 Interface */
 
-ADC083X_INPUT_CB(zr107_state::adc0838_callback)
+double zr107_state::adc0838_callback(uint8_t input)
 {
 	switch (input)
 	{
@@ -729,16 +729,11 @@ ADC083X_INPUT_CB(zr107_state::adc0838_callback)
 		return (double)(5 * m_analog2->read()) / 255.0;
 	case ADC083X_CH2:
 		return (double)(5 * m_analog3->read()) / 255.0;
-	case ADC083X_CH3:
-		return 0;
-	case ADC083X_COM:
-		return 0;
-	case ADC083X_AGND:
-		return 0;
 	case ADC083X_VREF:
 		return 5;
+	default:
+		return 0;
 	}
-	return 0;
 }
 
 
@@ -789,7 +784,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(750000))// Very high sync needed to prevent lockups - why?
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
@@ -835,8 +830,8 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
+	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
@@ -860,7 +855,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2000000)) // Very high sync needed to prevent lockups - why?
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
@@ -914,8 +909,8 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
+	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)

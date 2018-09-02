@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_DEVICE_IO_MAP(d9final_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // Sharp LH5116D-10 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

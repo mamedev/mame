@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_DEVICE_IO_MAP(statriv2_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	/* PPI 8255 group A & B set to Mode 0.

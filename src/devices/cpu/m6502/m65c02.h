@@ -4,8 +4,8 @@
 
     m65c02.h
 
-    Mostek 6502, CMOS variant with some additional instructions (but
-    not the bitwise ones)
+    MOS Technology 6502, CMOS variant with some additional instructions
+    (but not the bitwise ones)
 
 ***************************************************************************/
 #ifndef MAME_CPU_M6502_M65C02_H

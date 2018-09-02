@@ -1259,7 +1259,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
 

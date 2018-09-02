@@ -542,7 +542,7 @@ MACHINE_CONFIG_START(cubeqst_state::cubeqst)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_LASERDISC_SIMUTREK_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(CUBEQST_HBLANK, CUBEQST_VCOUNT, cubeqst_state, screen_update_cubeqst)

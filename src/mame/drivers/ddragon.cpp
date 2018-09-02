@@ -1127,12 +1127,7 @@ MACHINE_CONFIG_START(darktowr_state::darktowr)
 	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000))
 	MCFG_M68705_PORTA_W_CB(WRITE8(*this, darktowr_state, mcu_port_a_w))
 
-	MCFG_DEVICE_ADD("darktowr_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(darktowr_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "darktowr_bank").set_map(&darktowr_state::darktowr_banked_map).set_options(ENDIANNESS_BIG, 8, 17, 0x4000);
 
 	/* video hardware */
 MACHINE_CONFIG_END

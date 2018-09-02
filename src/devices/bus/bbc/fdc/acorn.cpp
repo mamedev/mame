@@ -122,10 +122,10 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_acorn8271_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_acorn8271_device, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_acorn8271_device, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_acorn8271_device, side_w))
+	I8271(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_acorn8271_device::fdc_intrq_w));
+	m_fdc->hdl_wr_callback().set(FUNC(bbc_acorn8271_device::motor_w));
+	m_fdc->opt_wr_callback().set(FUNC(bbc_acorn8271_device::side_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
@@ -203,7 +203,7 @@ void bbc_acorn1770_device::device_start()
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_acorn1770_device, wd1770l_read), WRITE8_DELEGATE(bbc_acorn1770_device, wd1770l_write));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, wd1770_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_device, write));
+	space.install_readwrite_handler(0xfe84, 0xfe9f, read8sm_delegate(FUNC(wd1770_device::read), m_fdc.target()), write8sm_delegate(FUNC(wd1770_device::write), m_fdc.target()));
 
 	m_drive_control = 0xfe;
 }

@@ -2986,8 +2986,10 @@ if (BUSES["AMIGA_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/keyboard/matrix.h",
 		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.h",
-		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.cpp",
-		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a2000.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a2000.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/mitsumi.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/mitsumi.h",
 	}
 end
 

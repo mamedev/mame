@@ -74,7 +74,7 @@ class i8255_device : public device_t
 {
 public:
 	// construction/destruction
-	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
@@ -98,9 +98,11 @@ public:
 
 	DECLARE_READ8_MEMBER( pa_r );
 	uint8_t read_pa();
+	DECLARE_READ8_MEMBER( acka_r );
 
 	DECLARE_READ8_MEMBER( pb_r );
 	uint8_t read_pb();
+	DECLARE_READ8_MEMBER( ackb_r );
 
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc4_w );

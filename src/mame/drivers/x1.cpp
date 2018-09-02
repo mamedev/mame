@@ -733,13 +733,13 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			return m_fdc->status_r(space, offset);
+			return m_fdc->status_r();
 		case 0x0ff9:
-			return m_fdc->track_r(space, offset);
+			return m_fdc->track_r();
 		case 0x0ffa:
-			return m_fdc->sector_r(space, offset);
+			return m_fdc->sector_r();
 		case 0x0ffb:
-			return m_fdc->data_r(space, offset);
+			return m_fdc->data_r();
 		case 0x0ffc:
 			logerror("FDC: read FM type\n");
 			return 0xff;
@@ -764,16 +764,16 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			m_fdc->cmd_w(space, offset,data);
+			m_fdc->cmd_w(data);
 			break;
 		case 0x0ff9:
-			m_fdc->track_w(space, offset,data);
+			m_fdc->track_w(data);
 			break;
 		case 0x0ffa:
-			m_fdc->sector_w(space, offset,data);
+			m_fdc->sector_w(data);
 			break;
 		case 0x0ffb:
-			m_fdc->data_w(space, offset,data);
+			m_fdc->data_w(data);
 			break;
 
 		case 0x0ffc:
@@ -2206,12 +2206,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_DEVICE_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
 
-	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))

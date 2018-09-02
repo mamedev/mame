@@ -295,11 +295,11 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, mtx_state, mtx_tms9929a_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, "tms9929a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(mtx_state::mtx_tms9929a_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -330,9 +330,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K,128K,192K,320K,448K,512K")
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("96K,128K,192K,320K,448K,512K");
 
 	/* rom extension board */
 	MCFG_GENERIC_SOCKET_ADD("extrom", generic_plain_slot, "mtx_rom")
@@ -350,18 +348,13 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "mtx_rom")
 MACHINE_CONFIG_END
 
-/*-------------------------------------------------
-    MACHINE_CONFIG_START( mtx500 )
--------------------------------------------------*/
-
-MACHINE_CONFIG_START(mtx_state::mtx500)
+void mtx_state::mtx500(machine_config &config)
+{
 	mtx512(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,288K,416K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("32K").set_extra_options("64K,96K,128K,160K,288K,416K");
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( rs128 )
@@ -380,9 +373,7 @@ MACHINE_CONFIG_START(mtx_state::rs128)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("192K,320K,448K,512K")
+	m_ram->set_default_size("128K").set_extra_options("192K,320K,448K,512K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

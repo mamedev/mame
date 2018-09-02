@@ -521,8 +521,7 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( psx_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
 	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
 	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
@@ -572,8 +571,7 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( psx_map)
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
 	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
 	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))

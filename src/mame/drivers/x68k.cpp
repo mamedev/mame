@@ -1608,13 +1608,13 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* device hardware */
-	MCFG_DEVICE_ADD("mc68901", MC68901, 16_MHz_XTAL / 4)
-	MCFG_MC68901_TIMER_CLOCK(16_MHz_XTAL / 4)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(*this, x68k_state, mfp_irq_callback))
-	MCFG_MC68901_OUT_TBO_CB(WRITELINE("mc68901", mc68901_device, clock_w))
-	MCFG_MC68901_OUT_SO_CB(WRITELINE("keyboard", rs232_port_device, write_txd))
+	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);
+	m_mfpdev->set_timer_clock(16_MHz_XTAL / 4);
+	m_mfpdev->set_rx_clock(0);
+	m_mfpdev->set_tx_clock(0);
+	m_mfpdev->out_irq_cb().set(FUNC(x68k_state::mfp_irq_callback));
+	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::clock_w));
+	m_mfpdev->out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "x68k")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("mc68901", mc68901_device, write_rx))
@@ -1702,11 +1702,9 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", M68K_IRQ_7))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 MACHINE_CONFIG_END
@@ -1727,10 +1725,10 @@ MACHINE_CONFIG_START(x68k_state::x68ksupr)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "cdrom", SCSICD, SCSI_ID_6)
 
-	MCFG_DEVICE_ADD("mb89352", MB89352A, 40_MHz_XTAL / 8)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_irq))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_drq))
+	mb89352_device &scsictrl(MB89352A(config, "mb89352", 40_MHz_XTAL / 8));
+	scsictrl.set_scsi_port("scsi");
+	scsictrl.irq_cb().set(FUNC(x68k_state::x68k_scsi_irq));
+	scsictrl.drq_cb().set(FUNC(x68k_state::x68k_scsi_drq));
 
 	VICON(config.replace(), m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_screen("screen");

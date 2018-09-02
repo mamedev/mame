@@ -107,7 +107,7 @@ MACHINE_CONFIG_START(dual68_state::dual68)
 	MCFG_DEVICE_IO_MAP(sio4_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)

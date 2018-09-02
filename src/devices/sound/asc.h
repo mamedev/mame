@@ -59,18 +59,20 @@ public:
 		ARDBEG = 7  // Subset of ASC included in the Ardbeg ASIC (LC520)
 	};
 
+	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, asc_type type)
+		: asc_device(mconfig, tag, owner, clock)
+	{
+		set_type(type);
+	}
 
-	// construction/destruction
 	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// inline configuration helpers
 	void set_type(asc_type type) { m_chip_type = type; }
-
-
 	template <class Write> devcb_base &set_irqf(Write &&wr)
 	{
 		return write_irq.set_callback(std::forward<Write>(wr));
 	}
+	auto irqf_callback() { return write_irq.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

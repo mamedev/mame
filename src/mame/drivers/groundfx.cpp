@@ -242,14 +242,14 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_DEVICE_PROGRAM_MAP(groundfx_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))
-	MCFG_ADC0808_IN0_CB(CONSTANT(0)) // unknown
-	MCFG_ADC0808_IN1_CB(CONSTANT(0)) // unknown (used to be labeled 'volume' - but doesn't seem to affect it
-	MCFG_ADC0808_IN2_CB(IOPORT("WHEEL"))
-	MCFG_ADC0808_IN3_CB(IOPORT("ACCEL"))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 5);
+	adc.in_callback<0>().set_constant(0); // unknown
+	adc.in_callback<1>().set_constant(0); // unknown (used to be labeled 'volume' - but doesn't seem to affect it
+	adc.in_callback<2>().set_ioport("WHEEL");
+	adc.in_callback<3>().set_ioport("ACCEL");
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_2_callback().set_ioport("BUTTONS");

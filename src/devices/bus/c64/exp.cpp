@@ -101,14 +101,6 @@ void c64_expansion_slot_device::device_start()
 	m_write_nmi.resolve_safe();
 	m_write_dma.resolve_safe();
 	m_write_reset.resolve_safe();
-
-	// inherit bus clock
-	if (clock() == 0)
-	{
-		c64_expansion_slot_device *root = machine().device<c64_expansion_slot_device>(C64_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
 }
 
 
@@ -294,6 +286,16 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 	return state;
 }
 
+
+void c64_expansion_slot_device::set_passthrough()
+{
+	irq_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::irq_w));
+	nmi_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::nmi_w));
+	reset_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::reset_w));
+	cd_input_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_cd_r));
+	cd_output_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_cd_w));
+	dma_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::dma_w));
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( c64_expansion_cards )

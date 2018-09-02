@@ -501,12 +501,12 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x01:
 		case 0x02:
 			if(ACCESSING_BITS_0_7)
-				m_fdc->write(space,offset,data & 0xff);
+				m_fdc->write(offset,data & 0xff);
 			break;
 		case 0x03:
 			if(ACCESSING_BITS_0_7)
 			{
-				m_fdc->write(space,offset,data & 0xff);
+				m_fdc->write(offset,data & 0xff);
 				m_fdc_timer->write_clk0(1);
 				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
 			}
@@ -562,12 +562,12 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x01:
 		case 0x02:
 			if(ACCESSING_BITS_0_7)
-				ret = m_fdc->read(space,offset);
+				ret = m_fdc->read(offset);
 			break;
 		case 0x03:
 			if(ACCESSING_BITS_0_7)
 			{
-				ret = m_fdc->read(space,offset);
+				ret = m_fdc->read(offset);
 				m_fdc_timer->write_clk0(1);
 				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
 			}

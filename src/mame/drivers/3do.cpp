@@ -160,7 +160,7 @@ MACHINE_CONFIG_START(_3do_state::_3do)
 	MCFG_DEVICE_ADD( m_maincpu, ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_DEVICE_PROGRAM_MAP( main_mem)
 
-	MCFG_NVRAM_ADD_1FILL(m_nvram)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 
@@ -178,7 +178,7 @@ MACHINE_CONFIG_START(_3do_state::_3do_pal)
 	MCFG_DEVICE_ADD(m_maincpu, ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_DEVICE_PROGRAM_MAP( main_mem)
 
-	MCFG_NVRAM_ADD_1FILL(m_nvram)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 

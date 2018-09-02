@@ -1094,7 +1094,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -1128,14 +1128,16 @@ MACHINE_CONFIG_START(mcr3_state::mono_tcs)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mcr3_state::maxrpm)
+void mcr3_state::maxrpm(machine_config &config)
+{
 	mono_tcs(config);
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
-	MCFG_ADC0844_CH3_CB(IOPORT("MONO.IP1.ALT2"))
-	MCFG_ADC0844_CH4_CB(IOPORT("MONO.IP1.ALT3"))
-MACHINE_CONFIG_END
+
+	ADC0844(config, m_maxrpm_adc, 0);
+	m_maxrpm_adc->ch1_callback().set_ioport("MONO.IP1");
+	m_maxrpm_adc->ch2_callback().set_ioport("MONO.IP1.ALT1");
+	m_maxrpm_adc->ch3_callback().set_ioport("MONO.IP1.ALT2");
+	m_maxrpm_adc->ch4_callback().set_ioport("MONO.IP1.ALT3");
+}
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
@@ -1188,15 +1190,15 @@ MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // U1 on Lamp Driver Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("lamp0"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("lamp1"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("lamp2"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("lamp3"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("lamp4"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("lamp5"))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("lamp6"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("lamp7"))
+	CD4099(config, m_lamplatch); // U1 on Lamp Driver Board
+	m_lamplatch->q_out_cb<0>().set_output("lamp0");
+	m_lamplatch->q_out_cb<1>().set_output("lamp1");
+	m_lamplatch->q_out_cb<2>().set_output("lamp2");
+	m_lamplatch->q_out_cb<3>().set_output("lamp3");
+	m_lamplatch->q_out_cb<4>().set_output("lamp4");
+	m_lamplatch->q_out_cb<5>().set_output("lamp5");
+	m_lamplatch->q_out_cb<6>().set_output("lamp6");
+	m_lamplatch->q_out_cb<7>().set_output("lamp7");
 MACHINE_CONFIG_END
 
 

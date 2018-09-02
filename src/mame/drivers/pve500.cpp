@@ -393,12 +393,12 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, pve500_state, eeprom_w))
 
 	// ICG3: I/O Expander
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(*this, pve500_state, io_sc_w))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, pve500_state, io_le_w))
-	MCFG_CXD1095_IN_PORTC_CB(READ8(*this, pve500_state, io_ky_r))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, pve500_state, io_ld_w))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, pve500_state, io_sel_w))
+	CXD1095(config, m_cxdio, 0);
+	m_cxdio->out_porta_cb().set(FUNC(pve500_state::io_sc_w));
+	m_cxdio->out_portb_cb().set(FUNC(pve500_state::io_le_w));
+	m_cxdio->in_portc_cb().set(FUNC(pve500_state::io_ky_r));
+	m_cxdio->out_portd_cb().set(FUNC(pve500_state::io_ld_w));
+	m_cxdio->out_porte_cb().set(FUNC(pve500_state::io_sel_w));
 
 	/* Search Dial MCUs */
 	MCFG_DEVICE_ADD("dial_mcu_left", MB88201, 4_MHz_XTAL) /* PLAYER DIAL MCU */
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 
 	/* Serial EEPROM (128 bytes, 8-bit data organization) */
 	/* The EEPROM stores the setup data */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_MSM16911_8BIT)
+	EEPROM_MSM16911_8BIT(config, "eeprom");
 
 	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
 	MCFG_DEVICE_ADD("recorder", RS232_PORT, default_rs232_devices, nullptr)
@@ -440,9 +440,9 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::txcb_w));
 
 	/* ICF5: 2kbytes of RAM shared between the two CPUs (dual-port RAM)*/
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(*this, pve500_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(*this, pve500_state, mb8421_intr))
+	mb8421_device &mb8421(MB8421(config, "mb8421"));
+	mb8421.intl_callback().set(FUNC(pve500_state::mb8421_intl));
+	mb8421.intr_callback().set(FUNC(pve500_state::mb8421_intr));
 
 	/* video hardware */
 	config.set_default_layout(layout_pve500);

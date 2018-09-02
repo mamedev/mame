@@ -236,11 +236,11 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sonson_state, irq0_line_hold, 4*60)    /* FIRQs are triggered by the main CPU */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // A9
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sonson_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sonson_state, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sonson_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, sonson_state, coin1_counter_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // A9
+	mainlatch.q_out_cb<0>().set(FUNC(sonson_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(sonson_state::sh_irqtrigger_w));
+	mainlatch.q_out_cb<6>().set(FUNC(sonson_state::coin2_counter_w));
+	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin1_counter_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

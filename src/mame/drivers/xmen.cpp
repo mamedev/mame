@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

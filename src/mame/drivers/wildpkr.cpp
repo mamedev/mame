@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wildpkr_state, irq3_line_assert, 60*256)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(wildpkr_state, tabpkr_irq_ack)
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // DS1220Y
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // DS1220Y
 
 	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
 	MCFG_MC68681_IRQ_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_2))

@@ -20,6 +20,7 @@ public:
 		m_cart3(*this, "stv_slot3"),
 		m_cart4(*this, "stv_slot4"),
 		m_rax(*this, "rax"),
+		m_protbank(*this, "protbank"),
 		m_eeprom(*this, "eeprom"),
 		m_cryptdevice(*this, "315_5881"),
 		m_5838crypt(*this, "315_5838"),
@@ -40,6 +41,7 @@ public:
 	void init_batmanfr();
 	void init_finlarch();
 	void init_decathlt();
+	void init_decathlt_nokey();
 	void init_sanjeon();
 	void init_puyosun();
 	void init_winterht();
@@ -132,6 +134,13 @@ private:
 	uint32_t m_abus_protenable;
 	uint32_t m_abus_protkey;
 
+	READ32_MEMBER(decathlt_prot_r);
+	void sega5838_map(address_map &map);
+	optional_memory_bank m_protbank;
+	bool m_newprotection_element; // debug helper only, doesn't need saving
+	int m_protbankval; // debug helper only, doesn't need saving
+	WRITE32_MEMBER(decathlt_prot_srcaddr_w);
+
 	uint32_t m_a_bus[4];
 
 	DECLARE_READ32_MEMBER( common_prot_r );
@@ -145,8 +154,6 @@ private:
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	optional_device<ticket_dispenser_device> m_hopper;
 	uint16_t crypt_read_callback(uint32_t addr);
-	uint16_t crypt_read_callback_ch1(uint32_t addr);
-	uint16_t crypt_read_callback_ch2(uint32_t addr);
 
 	DECLARE_READ8_MEMBER(pdr1_input_r);
 	DECLARE_READ8_MEMBER(pdr2_input_r);
@@ -156,6 +163,7 @@ private:
 	uint8_t     m_prev_gamebank_select;
 
 	void sound_mem(address_map &map);
+	void scsp_mem(address_map &map);
 	void stv_mem(address_map &map);
 	void stvcd_mem(address_map &map);
 };

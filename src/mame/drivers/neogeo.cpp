@@ -551,7 +551,6 @@
 #include "emu.h"
 #include "includes/neogeo.h"
 
-#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "softlist.h"
@@ -1942,13 +1941,13 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_IO_MAP(audio_io_map)
 
-	MCFG_DEVICE_ADD("systemlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, neogeo_base_state, set_screen_shadow))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, neogeo_base_state, set_use_cart_vectors))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // memory card 1: write enable/disable
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // memory card 2: write disable/enable
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // memory card: register select enable/set to normal (what does it mean?)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, neogeo_base_state, set_palette_bank))
+	HC259(config, m_systemlatch);
+	m_systemlatch->q_out_cb<0>().set(FUNC(neogeo_base_state::set_screen_shadow));
+	m_systemlatch->q_out_cb<1>().set(FUNC(neogeo_base_state::set_use_cart_vectors));
+	m_systemlatch->q_out_cb<2>().set_nop(); // memory card 1: write enable/disable
+	m_systemlatch->q_out_cb<3>().set_nop(); // memory card 2: write disable/enable
+	m_systemlatch->q_out_cb<4>().set_nop(); // memory card: register select enable/set to normal (what does it mean?)
+	m_systemlatch->q_out_cb<7>().set(FUNC(neogeo_base_state::set_palette_bank));
 
 	/* video hardware */
 	config.set_default_layout(layout_neogeo);
@@ -1995,16 +1994,15 @@ MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(neogeo_main_map)
 
-	MCFG_DEVICE_MODIFY("systemlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ngarcade_base_state, set_use_cart_audio))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ngarcade_base_state, set_save_ram_unlock))
+	m_systemlatch->q_out_cb<5>().set(FUNC(ngarcade_base_state::set_use_cart_audio));
+	m_systemlatch->q_out_cb<6>().set(FUNC(ngarcade_base_state::set_save_ram_unlock));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK))
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 
-	MCFG_NVRAM_ADD_0FILL("saveram")
+	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 

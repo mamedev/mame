@@ -840,10 +840,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K").set_default_value(0);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbca)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbca)
@@ -893,10 +890,10 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_a", "bbca_cass")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bbc_state, bbc_txd_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bbc_state::bbc_txd_w));
+	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))
@@ -907,12 +904,12 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bbc_state, write_acia_clock))
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_porta))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
+	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);
+	m_via6522_0->readpa_handler().set(FUNC(bbc_state::bbcb_via_system_read_porta));
+	m_via6522_0->readpb_handler().set(FUNC(bbc_state::bbcb_via_system_read_portb));
+	m_via6522_0->writepa_handler().set(FUNC(bbc_state::bbcb_via_system_write_porta));
+	m_via6522_0->writepb_handler().set(FUNC(bbc_state::bbcb_via_system_write_portb));
+	m_via6522_0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* EPROM sockets */
 	bbc_eprom_sockets(config);
@@ -929,9 +926,7 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcb)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	m_ram->set_default_size("32K").set_default_value(0);
 
 	/* speech hardware */
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
@@ -940,12 +935,12 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8("userport", bbc_userport_slot_device, pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("userport", bbc_userport_slot_device, pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
+	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
+	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via6522_1->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
+	m_via6522_1->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
+	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
 	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
@@ -963,9 +958,9 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_BBC_FDC_SLOT_DRQ_HANDLER(WRITELINE(*this, bbc_state, fdc_drq_w))
 
 	/* econet */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
-	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
+	MC6854(config, m_adlc);
+	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
+	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))
@@ -1003,10 +998,10 @@ MACHINE_CONFIG_START(bbc_state::bbcb_de)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_state, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_state, side_w))
+	I8271(config, m_i8271, 0);
+	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
+	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
@@ -1031,10 +1026,10 @@ MACHINE_CONFIG_START(bbc_state::bbcb_us)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_state, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_state, side_w))
+	I8271(config, m_i8271, 0);
+	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
+	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -1098,10 +1093,10 @@ MACHINE_CONFIG_START(torch_state::torchf)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_state, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_state, side_w))
+	I8271(config, m_i8271, 0);
+	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
+	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -1153,18 +1148,29 @@ MACHINE_CONFIG_START(bbc_state::abc110)
 	MCFG_SLOT_FIXED(true)
 
 	/* Add ADAPTEC ACB-4000 Winchester Disc Controller */
-	//MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
-	//MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	//MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0))
-	//MCFG_SCSI_BSY_HANDLER(WRITELINE(*this, bbc_state, scsi_bsy_w))
-	//MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, bbc_state, scsi_req_w))
-	//MCFG_SCSI_IO_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
-	//MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
-	//MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", ACB4070, SCSI_ID_0)
+	//scsi_port_device &scsibus(SCSI_PORT(config, SCSIBUS_TAG));
+	//scsibus.set_data_input_buffer("scsi_data_in");
+	//scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit0));
+	//scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::scsi_bsy_w))
+	//scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::scsi_req_w))
+	//scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	//scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
+	//scsibus.set_slot_device(1, "harddisk", ACB4070, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	//MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SCSIBUS_TAG)
-	//MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
-	//MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
+	//output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
+	//scsibus.set_output_latch(scsiout);
+	//scsiout.bit_handler<0>().set("scsi", FUNC(scsi_port_device::write_data0));
+	//scsiout.bit_handler<1>().set("scsi", FUNC(scsi_port_device::write_data1));
+	//scsiout.bit_handler<2>().set("scsi", FUNC(scsi_port_device::write_data2));
+	//scsiout.bit_handler<3>().set("scsi", FUNC(scsi_port_device::write_data3));
+	//scsiout.bit_handler<4>().set("scsi", FUNC(scsi_port_device::write_data4));
+	//scsiout.bit_handler<5>().set("scsi", FUNC(scsi_port_device::write_data5));
+	//scsiout.bit_handler<6>().set("scsi", FUNC(scsi_port_device::write_data6));
+	//scsiout.bit_handler<7>().set("scsi", FUNC(scsi_port_device::write_data7));
+
+	//INPUT_BUFFER(config, "scsi_ctrl_in");
+	//INPUT_BUFFER(config, "scsi_data_in");
+
 	/* Add 10MB ST-412 Winchester */
 
 	/* software lists */
@@ -1306,9 +1312,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
@@ -1379,10 +1383,10 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_flop_orig")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bbc_state, bbc_txd_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bbc_state::bbc_txd_w));
+	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))
@@ -1398,20 +1402,20 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_porta))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, bbc_state, bbcb_via_system_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
+	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);
+	m_via6522_0->readpa_handler().set(FUNC(bbc_state::bbcb_via_system_read_porta));
+	m_via6522_0->readpb_handler().set(FUNC(bbc_state::bbcb_via_system_read_portb));
+	m_via6522_0->writepa_handler().set(FUNC(bbc_state::bbcb_via_system_write_porta));
+	m_via6522_0->writepb_handler().set(FUNC(bbc_state::bbcb_via_system_write_portb));
+	m_via6522_0->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 16_MHz_XTAL / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8("userport", bbc_userport_slot_device, pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("userport", bbc_userport_slot_device, pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
+	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
+	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via6522_1->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
+	m_via6522_1->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
+	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
 	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
@@ -1424,9 +1428,9 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* econet */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
-	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
+	MC6854(config, m_adlc);
+	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
+	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))
@@ -1629,10 +1633,9 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
 
 	/* user via */
-	MCFG_DEVICE_MODIFY("via6522_1")
 	// TODO: Joyport connected to PB0-PB4 only. PB5-PB7 are expansion port.
-	MCFG_VIA6522_READPB_HANDLER(READ8("joyport", bbc_joyport_slot_device, pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8("joyport", bbc_joyport_slot_device, pb_w))
+	m_via6522_1->readpb_handler().set("joyport", FUNC(bbc_joyport_slot_device::pb_r));
+	m_via6522_1->writepb_handler().set("joyport", FUNC(bbc_joyport_slot_device::pb_w));
 
 	/* cartridge sockets */
 	MCFG_DEVICE_REMOVE("exp_rom1")

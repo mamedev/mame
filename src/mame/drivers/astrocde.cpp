@@ -1200,14 +1200,9 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&astrocde_state::bank4000_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1351,14 +1346,14 @@ MACHINE_CONFIG_START(astrocde_state::wow)
 	MCFG_DEVICE_PROGRAM_MAP(wow_map)
 	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<2>))
+	cd4099_device &outlatch(CD4099(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.q_out_cb<2>().set(FUNC(astrocde_state::sparkle_w<0>));
+	outlatch.q_out_cb<3>().set(FUNC(astrocde_state::sparkle_w<1>));
+	outlatch.q_out_cb<4>().set(FUNC(astrocde_state::sparkle_w<2>));
+	outlatch.q_out_cb<5>().set(FUNC(astrocde_state::sparkle_w<3>));
+	outlatch.q_out_cb<7>().set(FUNC(astrocde_state::coin_counter_w<2>));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1385,25 +1380,25 @@ MACHINE_CONFIG_START(astrocde_state::gorf)
 	MCFG_DEVICE_PROGRAM_MAP(wow_map)
 	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0) // MC14099B on game board at U6
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, astrocde_state, sparkle_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, astrocde_state, gorf_sound_switch_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("lamp6"))
+	cd4099_device &outlatch(CD4099(config, "outlatch")); // MC14099B on game board at U6
+	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.q_out_cb<2>().set(FUNC(astrocde_state::sparkle_w<0>));
+	outlatch.q_out_cb<3>().set(FUNC(astrocde_state::sparkle_w<1>));
+	outlatch.q_out_cb<4>().set(FUNC(astrocde_state::sparkle_w<2>));
+	outlatch.q_out_cb<5>().set(FUNC(astrocde_state::sparkle_w<3>));
+	outlatch.q_out_cb<6>().set(FUNC(astrocde_state::gorf_sound_switch_w));
+	outlatch.q_out_cb<7>().set_output("lamp6");
 
-	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // MC14099B on game board at U7
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("lamp0"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("lamp1"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("lamp2"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("lamp3"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("lamp4"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("lamp5"))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // n/c
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("lamp7"))
+	cd4099_device &lamplatch(CD4099(config, "lamplatch")); // MC14099B on game board at U7
+	lamplatch.q_out_cb<0>().set_output("lamp0");
+	lamplatch.q_out_cb<1>().set_output("lamp1");
+	lamplatch.q_out_cb<2>().set_output("lamp2");
+	lamplatch.q_out_cb<3>().set_output("lamp3");
+	lamplatch.q_out_cb<4>().set_output("lamp4");
+	lamplatch.q_out_cb<5>().set_output("lamp5");
+	lamplatch.q_out_cb<6>().set_nop(); // n/c
+	lamplatch.q_out_cb<7>().set_output("lamp7");
 
 	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
@@ -1441,14 +1436,14 @@ MACHINE_CONFIG_START(astrocde_state::robby)
 	MCFG_DEVICE_PROGRAM_MAP(robby_map)
 	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + battery
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0) // on game board at U1
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, astrocde_state, coin_counter_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led1"))
+	cd4099_device &outlatch(CD4099(config, "outlatch")); // on game board at U1
+	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
+	outlatch.q_out_cb<2>().set(FUNC(astrocde_state::coin_counter_w<2>));
+	outlatch.q_out_cb<6>().set_output("led0");
+	outlatch.q_out_cb<7>().set_output("led1");
 
 	MCFG_DEVICE_MODIFY("astrocade1")
 	MCFG_ASTROCADE_IO_SO5_STROBE_CB(WRITE8("outlatch", cd4099_device, write_nibble_d0))
@@ -1464,9 +1459,8 @@ MACHINE_CONFIG_START(astrocde_state::profpac)
 	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
 	MCFG_DEVICE_IO_MAP(port_map_16col_pattern)
 
-	MCFG_DEVICE_MODIFY("bank4000")
-	MCFG_DEVICE_PROGRAM_MAP(profpac_bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
+	m_bank4000->set_map(&astrocde_state::profpac_bank4000_map);
+	m_bank4000->set_addr_width(20);
 
 	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // 74LS174 on game board at U6
 	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))

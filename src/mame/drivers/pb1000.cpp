@@ -26,7 +26,6 @@
 #include "video/hd44352.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -504,7 +503,6 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pb1000)
@@ -512,8 +510,8 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_DEVICE_ADD("hd44352", HD44352, 910000)
 	MCFG_HD44352_ON_CB(INPUTLINE("maincpu", HD61700_ON_INT))
 
-	MCFG_NVRAM_ADD_0FILL("nvram1")
-	MCFG_NVRAM_ADD_0FILL("nvram2")
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -799,22 +799,12 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_AMD_29F080_ADD("flash2")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&avigo_state::avigo_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&avigo_state::avigo_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", avigo_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(avigo_state::nvram_init));
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scan_timer", avigo_state, avigo_scan_timer, attotime::from_hz(50))

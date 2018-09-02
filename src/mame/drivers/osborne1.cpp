@@ -336,8 +336,7 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("68K")    // 64kB main RAM and 4kbit video attribute RAM
+	RAM(config, RAM_TAG).set_default_size("68K"); // 64kB main RAM and 4kbit video attribute RAM
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END

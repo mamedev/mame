@@ -992,7 +992,7 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 
 	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))

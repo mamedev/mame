@@ -345,8 +345,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 
 	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)

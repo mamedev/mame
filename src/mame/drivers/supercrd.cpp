@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_DEVICE_PROGRAM_MAP(supercrd_map)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 //  MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 //  MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)

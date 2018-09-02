@@ -134,7 +134,7 @@ public:
 
 	// driver state
 	uint8_t *             m_ram_base;
-	uint8_t *             m_video_ram;
+	std::unique_ptr<uint8_t[]> m_video_ram;
 	int                 m_pio_data[2];
 	int                 m_high_resolution;
 	uint8_t               m_ardy;

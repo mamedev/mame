@@ -660,7 +660,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, kongambl_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD

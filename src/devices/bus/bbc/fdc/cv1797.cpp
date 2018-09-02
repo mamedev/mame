@@ -96,7 +96,7 @@ void bbc_cv1797_device::device_start()
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe80, read8_delegate(FUNC(fd1797_device::read), (fd1797_device *)m_fdc), write8_delegate(FUNC(fd1797_device::write), (fd1797_device *)m_fdc));
+	space.install_readwrite_handler(0xfe80, 0xfe80, read8sm_delegate(FUNC(fd1797_device::read), m_fdc.target()), write8sm_delegate(FUNC(fd1797_device::write), m_fdc.target()));
 	space.install_readwrite_handler(0xfe84, 0xfe9f, read8_delegate(FUNC(bbc_cv1797_device::fd1797l_read), this), write8_delegate(FUNC(bbc_cv1797_device::fd1797l_write), this));
 }
 

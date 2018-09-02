@@ -522,13 +522,13 @@ to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char
 
 MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
 	/// THIS PIO is part of CC 90-232 expansion
-	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, to7_io_line_device, porta_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, to7_io_line_device, porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("^mainfirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("^mainfirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia_io, 0);
+	m_pia_io->readpa_handler().set(FUNC(to7_io_line_device::porta_in));
+	m_pia_io->writepa_handler().set(FUNC(to7_io_line_device::porta_out));
+	m_pia_io->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pia_io->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_pia_io->irqa_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_io->irqb_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, to7_io_line_device, write_rxd))

@@ -611,8 +611,7 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("c76", NAMCO_C76, 16934400)
@@ -642,8 +641,7 @@ MACHINE_CONFIG_START(namcos11_state::coh100)
 	MCFG_DEVICE_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175) )
 MACHINE_CONFIG_END

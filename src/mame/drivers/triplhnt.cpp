@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_DEVICE_PROGRAM_MAP(triplhnt_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // battery-backed 74C89 at J5
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery-backed 74C89 at J5
 
 	F9334(config, m_latch); // J7
 	m_latch->q_out_cb<0>().set_nop(); // unused

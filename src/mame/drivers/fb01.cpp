@@ -17,7 +17,6 @@
 #include "video/hd44780.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -195,7 +194,6 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_lcd); // why set layout only to replace?
 	config.set_default_layout(layout_fb01);
 
 	MCFG_PALETTE_ADD("palette", 2)
@@ -227,7 +225,7 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 

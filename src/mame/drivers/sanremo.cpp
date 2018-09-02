@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_DEVICE_IO_MAP(sanremo_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sanremo_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

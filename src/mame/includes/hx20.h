@@ -18,7 +18,6 @@
 #include "bus/rs232/rs232.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 
 #define HD6301V1_MAIN_TAG   "8g"
 #define HD6301V1_SLAVE_TAG  "6d"

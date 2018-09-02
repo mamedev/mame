@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 	MCFG_DEVICE_IO_MAP(gp_2_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_gp_2);

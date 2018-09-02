@@ -1172,7 +1172,7 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1213,7 +1213,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1241,10 +1241,11 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mitchell_state::pangnv)
+void mitchell_state::pangnv(machine_config &config)
+{
 	pang(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 
 static const gfx_layout blcharlayout =
@@ -1302,8 +1303,8 @@ MACHINE_CONFIG_START(mitchell_state::spangbl)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mitchell_state::pangba)
@@ -1368,7 +1369,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1423,7 +1424,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

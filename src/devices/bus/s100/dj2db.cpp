@@ -359,7 +359,7 @@ uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 	{
 		m_bus->rdy_w(ASSERT_LINE);
 
-		data = m_fdc->gen_r(offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{
@@ -459,7 +459,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		m_fdc->gen_w(offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{

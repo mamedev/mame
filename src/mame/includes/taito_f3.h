@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 #include "audio/taito_en.h"
+#include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -61,6 +63,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_eeprom(*this, "eeprom"),
 		m_f3_ram(*this,"f3_ram"),
 		m_paletteram32(*this, "paletteram"),
 		m_input(*this, "IN.%u", 0),
@@ -133,6 +136,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<eeprom_serial_base_device> m_eeprom;
 
 	optional_shared_ptr<uint32_t> m_f3_ram;
 	optional_shared_ptr<uint32_t> m_paletteram32;

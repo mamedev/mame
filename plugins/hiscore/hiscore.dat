@@ -21,7 +21,6 @@
 ;
 ; This hiscore.dat is only usable with lua enabled versions of mame since 0.172
 
-
 ;@s:1942.cpp
 
 ;1942w:******1942 (Williams Electronics license)
@@ -2870,6 +2869,7 @@ sf2hf:
 sf2hfj:
 sf2hfu:
 sf2koryu:
+sf2level:
 sf2m1:
 sf2m2:
 sf2m4:
@@ -2885,7 +2885,6 @@ sf2rb:
 sf2rb2:
 sf2rb3:
 sf2yyc:
-sf2level:
 @:maincpu,program,ffd276,28,00,20
 @:maincpu,program,ffd2c6,14,ff,96
 @:maincpu,program,ffd2ee,04,00,00
@@ -3104,8 +3103,8 @@ willowuo:
 kodb:
 kodj:
 kodja:
-kodu:
 kodr2:
+kodu:
 @:maincpu,program,ff9d94,28,00,04
 
 
@@ -3574,12 +3573,12 @@ progearud:
 msh:
 msha:
 mshb:
+mshbr1:
 mshh:
 mshj:
 mshjr1:
 mshu:
 mshud:
-mshbr1:
 @:maincpu,program,ff2720,9f,00,0b
 
 
@@ -4124,9 +4123,9 @@ stoffyu:
 ;wwfwfestb:******www wrestlefest (us bootleg)
 ;wwfwfesta:******www wrestlefest (us tecmo)
 wwfwfest:
-wwfwfestb:
 wwfwfestj:
 wwfwfestu:
+wwfwfestub:
 @:maincpu,program,1c00c2,84,08,01
 
 
@@ -6855,15 +6854,10 @@ venus:
 
 ;@s:halleys.cpp
 
-halley87:
-@:maincpu,program,fc5a,23,02,54
-@:maincpu,program,fc3f,3,02,00
-
-
 ;*******(halley's comet)(By Firebrand)
-halleycj:
-halleys:
 halleysc:
+halleyscj:
+halleyscja:
 @:maincpu,program,fc3c,23,02,54
 @:maincpu,program,fc21,3,02,00
 
@@ -6871,6 +6865,11 @@ halleysc:
 ;*******ben bero beh (japan)
 benberob:
 @:maincpu,program,fa4d,3,00,96
+
+
+halleysc87:
+@:maincpu,program,fc5a,23,02,54
+@:maincpu,program,fc3f,3,02,00
 
 
 ;@s:hcastle.cpp
@@ -8224,8 +8223,8 @@ magmax:
 
 ;Devastators clones
 devstors:
-devstors2:
-devstors3:
+devstorsv:
+devstorsx:
 garuka:
 @:maincpu,program,41c4,2e,01,01
 

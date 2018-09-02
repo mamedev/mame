@@ -25,7 +25,6 @@
 #include "bus/generic/carts.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -898,7 +897,6 @@ MACHINE_CONFIG_START(pc2000_state::pc2000)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc2000)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)

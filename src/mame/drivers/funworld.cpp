@@ -48,6 +48,7 @@
   * Pool 10 (Italian, set 6),                                   C.M.C.,             1996.
   * Pool 10 (Italian, set 7),                                   C.M.C.,             1997.
   * Pool 10 (Italian, set 8),                                   C.M.C.,             1997.
+  * Pool 10 (Italian, set 9),                                   bootleg (R.B.),     1996.
   * Pool 10 (Italian, Dino 4 hardware, encrypted),              C.M.C.,             1997.
   * Royal (Pool 10 hack),                                       unknown,            2001.
   * Tortuga Family (Italian),                                   C.M.C.,             1997.
@@ -3070,16 +3071,16 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_DEVICE_ADD("maincpu", M65SC02, CPU_CLOCK)    /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, funworld_state, pia1_ca2_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.readpb_handler().set_ioport("DSW");
+	pia1.ca2_handler().set(FUNC(funworld_state::pia1_ca2_w));
 
 	/* video hardware */
 
@@ -4497,6 +4498,25 @@ ROM_START( pool10i )
 	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 ROM_END
 
+ROM_START( pool10j )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cmcpool10.u2", 0x8000, 0x8000, CRC(f7fa2b12) SHA1(743563e51327b00dd638bcb2233e833ce74e62a0) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "cmcpool10.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
+	ROM_LOAD( "cmcpool10.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "pool10j_nvram.bin",  0x0000, 0x0800, CRC(48684b02) SHA1(6f2fbd0e2621e31b881edd8056ff93ee78f331ab) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29pc.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+
+	ROM_REGION( 0x0600, "plds", 0 ) // all read protected
+	ROM_LOAD( "palce16v8h.u5", 0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u22",  0x0200, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u23",  0x0400, 0x0157, NO_DUMP )
+ROM_END
 
 /*
   Royal...
@@ -7103,6 +7123,7 @@ GAMEL( 1997, pool10f,   pool10,   cuoreuno, cuoreuno,  funworld_state, empty_ini
 GAMEL( 1996, pool10g,   pool10,   cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Pool 10 (Italian, set 6)",                        0,                       layout_jollycrd )
 GAMEL( 1996, pool10h,   pool10,   cuoreuno, pool10,    funworld_state, empty_init,    ROT0, "C.M.C.",          "Pool 10 (Italian, set 7)",                        0,                       layout_jollycrd )
 GAMEL( 1997, pool10i,   pool10,   cuoreuno, pool10,    funworld_state, empty_init,    ROT0, "C.M.C.",          "Pool 10 (Italian, set 8)",                        0,                       layout_jollycrd )
+GAMEL( 1996, pool10j,   pool10,   cuoreuno, pool10,    funworld_state, empty_init,    ROT0, "bootleg (R.B.)",  "Pool 10 (Italian, set 9)",                        0,                       layout_jollycrd )
 GAMEL( 2001, royal,     pool10,   royalcd1, royal,     funworld_state, empty_init,    ROT0, "<unknown>",       "Royal (Pool 10 hack)",                            0,                       layout_jollycrd )
 GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Tortuga Family (Italian)",                        0,                       layout_jollycrd )
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )

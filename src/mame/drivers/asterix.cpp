@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // 8MHz Z80E ??
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

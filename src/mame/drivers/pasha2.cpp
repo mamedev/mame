@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_DEVICE_ADD("audiocpu", AT89C52, 12000000)     /* clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

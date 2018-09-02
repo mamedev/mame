@@ -3641,6 +3641,36 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="vterm2">
+		<!-- Dumped via Kryoflux, 2 tracks modified -->
+		<description>VTERM II (V2.00, newer)</description>
+		<year>1984</year>
+		<publisher>Coefficient Systems Corporation</publisher>
+		<info name="version" value="2.00" /> <!-- minor program update with no change to version number -->
+		<info name="serial" value="201 34085" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "377856">
+				<!-- Simple copy protection based on existence of 41st track - representable with oversized sector image -->
+				<rom name="disk03.img" size="377856" crc="63ca9889" sha1="cc685232f330e85a3e3fa7eb1082771c44e51efd" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vterm2a" cloneof="vterm2">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>VTERM II (V2.00, older)</description>
+		<year>1984</year>
+		<publisher>Coefficient Systems Corporation</publisher>
+		<info name="version" value="2.00" />
+		<info name="serial" value="201 34535" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "377856">
+				<!-- Simple copy protection based on existence of 41st track - representable with oversized sector image -->
+				<rom name="disk02.img" size="377856" crc="5d905105" sha1="1c1a7868e4b07be1de96833b216149f5d6693d0f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msword1">
 		<description>Word 1.15</description>
 		<year>1984</year>
@@ -8903,6 +8933,25 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="mathblst">
+		<description>Math Blaster</description>
+		<year>1983</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="usage" value="Requires BASICA" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1 - Program"/>
+			<dataarea name="flop" size = "163840">
+				<rom name="Math Blaster! (USA) (Side 1 - Program).img" size="163840" crc="b73a1e48" sha1="01cedf6b1b079b2403e88803d26fb89818bda895" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2 - Data"/>
+			<dataarea name="flop" size = "163840">
+				<rom name="Math Blaster! (USA) (Side 2 - Data).img" size="163840" crc="8880c9f6" sha1="b09383d9746665d90d0d9435857e7d4e3e89eb28" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="meanst">
 		<description>Mean Streets</description>
 		<year>1989</year>
@@ -9040,6 +9089,51 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="The Monuments of Mars [Apogee Software] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5750f887" sha1="40eacb771aad0a017aece21be734f1fd4253d1a7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murdersv">
+		<description>Murders in Space (VGA)</description>
+		<year>1990</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Murders in Space (VGA disk) [Infogrames] [1990] [3.5DD].img" size="737280" crc="5fde1c9f" sha1="2993f907c2583013f571a3ff7ed3608106296c36" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murdersc" cloneof="murdersv">
+		<description>Murders in Space (CGA)</description>
+		<year>1990</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Murders in Space (CGA disk) [Infogrames] [1990] [3.5DD].img" size="737280" crc="2335b213" sha1="3402c31d23a97c822bc57b15103b2e014445a5c8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murderse" cloneof="murdersv">
+		<description>Murders in Space (EGA)</description>
+		<year>1990</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Murders in Space (EGA disk) [Infogrames] [1990] [3.5DD].img" size="737280" crc="8900bce3" sha1="961380ab04c8f685ec86bdbbb145b2ae382e2ac2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nethrwld">
+		<description>Netherworld</description>
+		<year>1990</year>
+		<publisher>Hewson</publisher>
+		<info name="version" value="v1.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Netherworld [Hewson] [1990] [5.25] [Disk 1 of 1].img" size="368640" crc="b5c934e1" sha1="5bfd8676a39e75725f2c509fe4c9a9042e068298" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10597,6 +10691,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Wrath of the Demon [ReadySoft] [1991] [3.5DD] [Disk 3 of 3].img" size="737280" crc="94bf555d" sha1="d7840469273ff4e1be35ac5449a7b90f844e7fb4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writrrab">
+		<description>Writer Rabbit</description>
+		<year>1988</year>
+		<publisher>The Learning Company</publisher>
+		<info name="version" value="1.3" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Writer Rabbit (USA) (v1.3) [5.25-inch].img" size="368640" crc="c5c51062" sha1="f56a708fb819fc73cd6b94f942c4103c09ea7e7d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -18,8 +18,8 @@
   Version: 3.50 - 627
 
   Each set has:
-  1x 64K program ROM (unknown CPU)
-  1x 512K sound ROM (unsigned 8-bit PCM @ 11025 KHz)
+  1x 64K program ROM (unknown CPU).
+  1x 512K sound ROM (unsigned 8-bit PCM @ 11025 KHz).
 
 
 *********************************************************************

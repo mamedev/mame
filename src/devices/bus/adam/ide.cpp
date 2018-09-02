@@ -62,12 +62,14 @@ const tiny_rom_entry *powermate_ide_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(powermate_ide_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
+void powermate_ide_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	centronics_device &centronics(CENTRONICS(config, CENTRONICS_TAG, centronics_devices, "printer"));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
-MACHINE_CONFIG_END
+	OUTPUT_LATCH(config, m_cent_data_out);
+	centronics.set_output_latch(*m_cent_data_out);
+}
 
 
 

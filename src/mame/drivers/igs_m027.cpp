@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 

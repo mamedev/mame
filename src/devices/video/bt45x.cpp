@@ -146,7 +146,7 @@ void bt45x_rgb_device_base::device_start()
 
 	m_color_ram = std::make_unique<std::array<u8, 3>[]>(m_palette_colors + m_overlay_colors);
 
-	//save_pointer(NAME(m_color_ram), m_palette_colors + m_overlay_colors);
+	save_pointer(NAME(m_color_ram), m_palette_colors + m_overlay_colors);
 }
 
 void bt45x_mono_device_base::device_start()

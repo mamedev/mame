@@ -2054,10 +2054,10 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_DEVICE_ADD("eeprom0", EEPROM_SERIAL_93C56_16BIT)
-	MCFG_DEVICE_ADD("eeprom1", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom0");
+	EEPROM_93C56_16BIT(config, "eeprom1");
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// TL16C452FN U71
 	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)

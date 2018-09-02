@@ -1449,7 +1449,7 @@ MACHINE_CONFIG_START(merit_state::casino5)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(casino5_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(merit_state,casino5)
 MACHINE_CONFIG_END
@@ -1461,7 +1461,7 @@ MACHINE_CONFIG_START(merit_state::bigappg)
 	MCFG_DEVICE_PROGRAM_MAP(bigappg_map)
 	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::misdraw)
@@ -1470,7 +1470,7 @@ MACHINE_CONFIG_START(merit_state::misdraw)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(misdraw_map)
 
-	MCFG_NVRAM_ADD_0FILL("cpunvram")
+	NVRAM(config, "cpunvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::dodge)
@@ -1480,7 +1480,7 @@ MACHINE_CONFIG_START(merit_state::dodge)
 	MCFG_DEVICE_PROGRAM_MAP(dodge_map)
 	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(merit_state::dodge_nvram_init));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::tictac)

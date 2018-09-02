@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO, 4000000) /* ?? Mhz */
+	Z80SIO(config, m_z80sio, 4000000); /* ?? Mhz */
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

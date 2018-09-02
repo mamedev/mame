@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midxunit_state,midxunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -270,14 +270,14 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	/* serial prefixes 419, 420 */
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(419);
 
-	MCFG_ADC0848_ADD("adc")
-	MCFG_ADC0848_INTR_CB(WRITELINE(*this, midxunit_state, adc_int_w)) // ADC INT passed through PLSI1032
-	MCFG_ADC0848_CH1_CB(IOPORT("AN0"))
-	MCFG_ADC0848_CH2_CB(IOPORT("AN1"))
-	MCFG_ADC0848_CH3_CB(IOPORT("AN2"))
-	MCFG_ADC0848_CH4_CB(IOPORT("AN3"))
-	MCFG_ADC0848_CH5_CB(IOPORT("AN4"))
-	MCFG_ADC0848_CH6_CB(IOPORT("AN5"))
+	adc0848_device &adc(ADC0848(config, "adc", 0));
+	adc.intr_callback().set(FUNC(midxunit_state::adc_int_w)); // ADC INT passed through PLSI1032
+	adc.ch1_callback().set_ioport("AN0");
+	adc.ch2_callback().set_ioport("AN1");
+	adc.ch3_callback().set_ioport("AN2");
+	adc.ch4_callback().set_ioport("AN3");
+	adc.ch5_callback().set_ioport("AN4");
+	adc.ch6_callback().set_ioport("AN5");
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K_UART, 0)

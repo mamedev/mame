@@ -445,8 +445,8 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 
 	/* devices */
 
-	MCFG_DEVICE_ADD("uic", AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	AM9519(config, m_uic, 0);
+	m_uic->out_int_callback().set_inputline("maincpu", 0);
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();

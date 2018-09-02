@@ -2680,12 +2680,7 @@ MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
 	MCFG_DEVICE_DATA_MAP(dsio_data_map)
 	MCFG_DEVICE_IO_MAP(dsio_io_map)
 
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dsio_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_dsio_device::dsio_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
@@ -2719,12 +2714,7 @@ MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
 	MCFG_DEVICE_DATA_MAP(denver_data_map)
 	MCFG_DEVICE_IO_MAP(denver_io_map)
 
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(denver_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)

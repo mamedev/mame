@@ -77,7 +77,6 @@
 #include "sound/spkrdev.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -384,11 +383,10 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
 	MCFG_SCREEN_UPDATE_DRIVER(gridcomp_state, screen_update_110x)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240) // XXX 66 Hz refresh
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir3_w))
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -423,20 +421,18 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib", tms9914_device, ren_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(4'032'000))
+	I8274_NEW(config, m_uart8274, XTAL(4'032'000));
 
 	MCFG_DEVICE_ADD("modem", I8255, 0)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1109)
+void gridcomp_state::grid1109(machine_config &config)
+{
 	grid1101(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 MACHINE_CONFIG_START(gridcomp_state::grid1121)
 	grid1101(config);
@@ -445,11 +441,11 @@ MACHINE_CONFIG_START(gridcomp_state::grid1121)
 	MCFG_DEVICE_PROGRAM_MAP(grid1121_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1129)
+void gridcomp_state::grid1129(machine_config &config)
+{
 	grid1121(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 MACHINE_CONFIG_START(gridcomp_state::grid1131)
 	grid1121(config);
@@ -458,11 +454,11 @@ MACHINE_CONFIG_START(gridcomp_state::grid1131)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240) // XXX
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gridcomp_state::grid1139)
+void gridcomp_state::grid1139(machine_config &config)
+{
 	grid1131(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K");
+}
 
 
 ROM_START( grid1101 )
@@ -628,4 +624,3 @@ COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empt
 COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )
 COMP( 1984, grid1131, grid1121, 0,      grid1131, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1131", MACHINE_IS_SKELETON )
 COMP( 1984, grid1139, grid1121, 0,      grid1139, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1139", MACHINE_IS_SKELETON )
-

@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", mgavegas_state, int_0, attotime::from_hz(6000))  //6KHz from MSM5205 /VCK
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper",attotime::from_msec(200),TICKET_MOTOR_ACTIVE_HIGH,TICKET_STATUS_ACTIVE_LOW);
 

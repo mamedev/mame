@@ -581,13 +581,13 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
 
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, bw12_state, pia_pa_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, bw12_state, pia_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
+	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
+	m_pia->cb2_handler().set(FUNC(bw12_state::pia_cb2_w));
+	m_pia->irqa_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	m_pia->irqb_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(16'000'000)/4)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
@@ -650,8 +650,7 @@ MACHINE_CONFIG_START(bw12_state::bw12)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bw12_state::bw14)
@@ -664,8 +663,7 @@ MACHINE_CONFIG_START(bw12_state::bw14)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw14")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 /* ROMs */

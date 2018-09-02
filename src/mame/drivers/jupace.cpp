@@ -807,9 +807,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
+	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "jupace_cass")
 MACHINE_CONFIG_END

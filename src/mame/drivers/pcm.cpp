@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pcm_state, pcm_85_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, pcm_state, pcm_85_w))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(10'000'000) /4)
+	Z80SIO(config, "sio", XTAL(10'000'000) /4);
 
 	Z80CTC(config, m_ctc_u, 10_MHz_XTAL / 4);
 	m_ctc_u->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

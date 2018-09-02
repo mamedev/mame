@@ -12,7 +12,6 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -22,8 +21,8 @@
 class mini2440_state : public driver_device
 {
 public:
-	mini2440_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mini2440_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s3c2440(*this, "s3c2440"),
 		m_nand(*this, "nand"),
@@ -237,7 +236,6 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 

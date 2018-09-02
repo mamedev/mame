@@ -8309,7 +8309,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldstar)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -8346,7 +8346,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -8394,7 +8394,7 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sangho)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(sanghopm_state, sangho)
 
@@ -8433,7 +8433,7 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super9)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -8542,7 +8542,7 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -8616,7 +8616,7 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb3e)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -8663,7 +8663,7 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmbitmap)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
@@ -8711,7 +8711,7 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmast91)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cmast91)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
@@ -8768,7 +8768,7 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -8822,7 +8822,7 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
 
@@ -8949,7 +8949,7 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magodds)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wingco_state, magodds)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
 
@@ -9040,7 +9040,7 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -9091,7 +9091,7 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -9142,7 +9142,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
@@ -9199,7 +9199,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
@@ -9235,7 +9235,7 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_DEVICE_PROGRAM_MAP(unkch_map)
 	MCFG_DEVICE_IO_MAP(unkch_portmap)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9287,7 +9287,7 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkrmast)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
@@ -9324,7 +9324,7 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megaline)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-//  MCFG_NVRAM_ADD_1FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
@@ -16649,10 +16649,12 @@ GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   init_flami
 GAME(  199?, fl7_tw,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs proper reels gfx roms decryption.
 
 
+// --- Wing W-6 hardware ---
+GAME(  1986, feverch,   0,        feverch,  feverch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6)",                                       MACHINE_NOT_WORKING )  // inputs, reels, etc..
+
+
 // --- Wing W-8 hardware ---
 GAME(  1990, bonusch,   0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8)",                                       MACHINE_NOT_WORKING )  // M80C51F MCU
-
-GAME(  1986, feverch,   0,        feverch,  feverch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance",                                             MACHINE_NOT_WORKING ) // inputs, reels, etc..
 
 
 // --- Magical Odds hardware ---

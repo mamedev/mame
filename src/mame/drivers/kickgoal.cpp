@@ -645,8 +645,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_DEVICE_DISABLE()   /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -684,8 +683,7 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -44,7 +44,6 @@
 #include "video/hd61830.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1031,8 +1030,6 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_lcd);
-
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
 
@@ -1066,10 +1063,9 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 MACHINE_CONFIG_END
 
 

@@ -369,8 +369,8 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
 
 	// devices
-	MCFG_DEVICE_ADD(AM9519_TAG, AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	am9519_device &am9519(AM9519(config, AM9519_TAG, 0));
+	am9519.out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -423,9 +423,7 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	m_dbrg->ft_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("128K");
 MACHINE_CONFIG_END
 
 

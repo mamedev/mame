@@ -14,10 +14,15 @@
 class hal2_device : public device_t
 {
 public:
+	hal2_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: hal2_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	hal2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	DECLARE_WRITE32_MEMBER(write);
+	DECLARE_READ32_MEMBER(read);
 
 protected:
 	virtual void device_start() override;

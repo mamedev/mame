@@ -123,6 +123,17 @@ public:
 	template <class Object> devcb_base &set_drq1_handler(Object &&cb) { return m_drq1_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_drq2_handler(Object &&cb) { return m_drq2_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	auto txirq_handler() { return m_txirq_handler.bind(); }
+	auto rxirq_handler() { return m_rxirq_handler.bind(); }
+	auto wave_irq_handler() { return m_wave_irq_handler.bind(); }
+	auto ramp_irq_handler() { return m_ramp_irq_handler.bind(); }
+	auto timer1_irq_handler() { return m_timer1_irq_handler.bind(); }
+	auto timer2_irq_handler() { return m_timer2_irq_handler.bind(); }
+	auto sb_irq_handler() { return m_sb_irq_handler.bind(); }
+	auto dma_irq_handler() { return m_dma_irq_handler.bind(); }
+	auto drq1_handler() { return m_drq1_handler.bind(); }
+	auto drq2_handler() { return m_drq2_handler.bind(); }
+	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	// current IRQ/DMA channel getters
 	uint8_t gf1_irq() { if(m_gf1_irq != 0) return m_gf1_irq; else return m_midi_irq; }  // workaround for win95 loading dumb values

@@ -389,9 +389,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "aquarius_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,20K,36K")
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("8K,20K,36K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aquarius")

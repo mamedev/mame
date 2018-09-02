@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/clock.h"
@@ -37,8 +38,9 @@ public:
 private:
 	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
 	void mem_map(address_map &map);
+	void io_map(address_map &map);
+	void mcu_map(address_map &map);
 
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -51,7 +53,7 @@ private:
 void m79152pc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom();
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);;
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0x8fff).ram().share("videoram");
 	map(0x9000, 0x9fff).ram().share("attributes");
@@ -63,6 +65,11 @@ void m79152pc_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x44, 0x47).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
+
+void m79152pc_state::mcu_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("mcu", 0);
 }
 
 /* Input ports */
@@ -133,6 +140,9 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
+	MCFG_DEVICE_ADD("mcu", I8035, 6'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -151,31 +161,33 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	//MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	//MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	//MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	Z80SIO(config, m_uart, XTAL(4'000'000));
+	//m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_uart->out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	//m_uart->out_txdb_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	//m_uart->out_dtrb_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	//m_uart->out_rtsb_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", z80sio_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsa_w))
 	//MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	//MCFG_RS232_RXD_HANDLER(WRITELINE("uart", z80sio_device, rxb_w))
-	//MCFG_RS232_CTS_HANDLER(WRITELINE("uart", z80sio_device, ctsb_w))
+	//MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxb_w))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( m79152pc )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "left.bin", 0x0000, 0x4000, CRC(8cd677fc) SHA1(7ad28f3ba984383f24a36639ca27fc1eb5a5d002))
 
-	ROM_REGION( 0x1800, "chargen", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "chargen", ROMREGION_INVERT )
 	ROM_LOAD( "right.bin", 0x0000, 0x1000, CRC(93f83fdc) SHA1(e8121b3d175c46c02828f43ec071a7d9c62e7c26)) // chargen
-	ROM_LOAD( "char.bin",  0x1000, 0x0800, CRC(da3792a5) SHA1(b4a4f0d61d8082b7909a346a5b01494c53cf8d05)) // unknown
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "char.bin",  0x0000, 0x0800, CRC(da3792a5) SHA1(b4a4f0d61d8082b7909a346a5b01494c53cf8d05))
 ROM_END
 
 /* Driver */

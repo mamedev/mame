@@ -15636,42 +15636,42 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<info name="release" value="19900713"/>
 		<info name="alt_title" value="ランス2-反逆の少女たち-"/>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
 				<rom name="adisk.xdf" size="1261568" crc="959d531e" sha1="8bfa67e8290f195f6325cc03ff667a7c935958ba" offset="000000" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
 				<rom name="bdisk.xdf" size="1261568" crc="c51e2d10" sha1="3e82f90249ec3545a67758970e018d297ffb8f23" offset="000000" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="Disk C" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
 				<rom name="cdisk.xdf" size="1261568" crc="473aaf1c" sha1="e3bc65950531df8dda0e5392323cebb6cb92c44f" offset="000000" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="Disk D" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
 				<rom name="ddisk.xdf" size="1261568" crc="b84fdce5" sha1="ba80bdd9d32cda0713abfc7259c841237463a512" offset="000000" />
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part id" value="Disk E" />
+			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
 				<rom name="edisk.xdf" size="1261568" crc="df3de612" sha1="0cec33872aa32c1451a0741064a1db86f92ebfd7" offset="000000" />
 			</dataarea>
 		</part>
 
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part id" value="Disk F" />
+			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fdisk.xdf" size="1261568" crc="0d9a2891" sha1="834cd1495d36217fb0e7d19814abd3ea387d4fc0" offset="000000" />
 			</dataarea>

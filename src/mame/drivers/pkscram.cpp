@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	MCFG_DEVICE_PROGRAM_MAP(pkscramble_map)
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", pkscram_state, scanline_callback)

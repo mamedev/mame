@@ -99,7 +99,7 @@ uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int in
 		case 0x91:
 		case 0x92:
 		case 0x93:
-			data = m_fdc->read(space, offset & 0x03);
+			data = m_fdc->read(offset & 0x03);
 			break;
 		case 0x98:
 		case 0x9c:
@@ -145,7 +145,7 @@ void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t 
 		case 0x91:
 		case 0x92:
 		case 0x93:
-			m_fdc->write(space, offset & 0x03, data);
+			m_fdc->write(offset & 0x03, data);
 			break;
 		case 0x94:
 			wd1793_control_w(space, 0, data);

@@ -68,17 +68,17 @@ MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, dcdb_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, scc85230_device, rxb_w))
 
-	MCFG_DEVICE_ADD(PI1_TAG, PC_LPT, 0)
+	PC_LPT(config, m_pi1, 0);
 
-	MCFG_DEVICE_ADD(KBDC_TAG, KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_PS2)
-	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("^maincpu", INPUT_LINE_RESET))
+	KBDC8042(config, m_kbdc);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
+	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	MCFG_DEVICE_ADD(PIT_TAG, PIT8254, 0)
-	MCFG_PIT8253_CLK0(1000000)
-	MCFG_PIT8253_CLK1(1000000)
-	MCFG_PIT8253_CLK2(1000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(KBDC_TAG, kbdc8042_device, write_out2))
+	PIT8254(config, m_pit, 0);
+	m_pit->set_clk<0>(1000000);
+	m_pit->set_clk<1>(1000000);
+	m_pit->set_clk<2>(1000000);
+	m_pit->out_handler<2>().set(m_kbdc, FUNC(kbdc8042_device::write_out2));
 MACHINE_CONFIG_END
 
 

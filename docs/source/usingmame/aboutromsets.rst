@@ -24,7 +24,7 @@ As such, a copy of the data necessary to reconstitute and replace a dead data ch
 Parents, Clones, Splitting, and Merging
 ---------------------------------------
 
-As the MAME developers received their third or fourth revision of Pac-Man, with bugfixes and other code changes, they quickly discovered that nearly all of the board and chips were identical to the previously dumped version. In order to save space, MAME was adjusted to use a parent set system.
+As the MAME developers received their third or fourth revision of Pac-Man, with bugfixes and other code changes, they quickly discovered that nearly all of the board and chips were identical to the previously dumped version. In order to save space, MAME was adjusted to use a parent/clone set system.
 
 A given set, usually (but not necessarily) the most recent bugfixed World revision of a game, will be designated as the parent. All sets that use mostly the same chips (e.g. Japanese Puckman and USA/World Pac-Man) will be clones that contain only the changed data compared to the parent set.
 
@@ -38,7 +38,7 @@ A **non-merged set** is one that contains absolutely everything necessary for a 
 
 A **split set** is one where the parent set contains all of the normal data it should, and the clone sets contain *only* what has changed as compared to the parent set. This saves some space, but isn't quite as efficient as
 
-A **merged set** takes the parent set and one or more clone sets and puts them all inside the parent set's storage. To use the existing Pac-Man example, combining the Puckman, Midway Pac-Man (USA) sets, along with various bootleg versions-- and combining it all into ((PUCKMAN.ZIP**, would be making a merged set. A complete merged set with the parent and all clones is the most common format MAME sets are stored in as it saves the most space.
+A **merged set** takes the parent set and one or more clone sets and puts them all inside the parent set's storage. For instance, if we combine the Puckman sets, Midway Pac-Man (USA) sets, and various other related official and bootleg sets all into **PUCKMAN.ZIP**, the result would be a **merged set**. A complete merged set with the parent and all clones uses less disk space than a split set.
 
 With those basic principles, there are two other kinds of set that will come up in MAME use from time to time.
 

@@ -601,13 +601,13 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
 
-	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL(8'000'000)/8) // FIXME
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ptm6840_device &ptm1(PTM6840(config, "6840ptm_1", XTAL(8'000'000)/8)); // FIXME
+	ptm1.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL(8'000'000)/8) // FIXME
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, sigmab52_state, ptm2_irq))
+	PTM6840(config, m_6840ptm_2, XTAL(8'000'000)/8); // FIXME
+	m_6840ptm_2->irq_callback().set(FUNC(sigmab52_state::ptm2_irq));
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

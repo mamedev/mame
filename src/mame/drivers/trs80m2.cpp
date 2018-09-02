@@ -254,12 +254,12 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 READ8_MEMBER( trs80m2_state::fdc_r )
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( trs80m2_state::fdc_w )
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER( trs80m16_state::tcl_w )
@@ -779,9 +779,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
@@ -856,8 +854,8 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(AM9519A_TAG, AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
+	AM9519(config, m_uic, 0);
+	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
@@ -872,9 +870,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")

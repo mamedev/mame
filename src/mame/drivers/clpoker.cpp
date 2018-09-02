@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HY6116ALP-12
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HY6116ALP-12
 
 	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0) // M5L8255AP-5
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, clpoker_state, output_a_w))

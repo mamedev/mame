@@ -23,7 +23,7 @@
     - Keyboard is not interfaced through 8255
     - Non standard graphics board
 
-    These and other incompatibilities required many PC software's to be
+    These and other incompatibilities required many PC softwares to be
     recompiled to work on this computer.
 
 ****************************************************************************/
@@ -938,9 +938,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
 	/* RAM options */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 256K");
 
 	/* Interrupt controller */
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)

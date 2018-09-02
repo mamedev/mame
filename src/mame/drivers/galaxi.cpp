@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 	MCFG_DEVICE_PROGRAM_MAP(galaxi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -665,7 +665,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 
 	if (m_wait_enable)
 	{
-		data = m_fdc->gen_r(offset);
+		data = m_fdc->read(offset);
 	}
 	else if (!m_fdc_irq && !m_fdc_drq)
 	{
@@ -673,7 +673,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 	}
 	else
 	{
-		data = m_fdc->gen_r(offset);
+		data = m_fdc->read(offset);
 	}
 
 	return data;
@@ -689,7 +689,7 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 	if (machine().side_effects_disabled())
 		return;
 
-	m_fdc->gen_w(offset, data);
+	m_fdc->write(offset, data);
 
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{

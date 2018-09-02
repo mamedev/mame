@@ -43,7 +43,6 @@ To Do:
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 //#include "machine/z80dma.h"
-#include "machine/terminal.h"
 
 class onyx_state : public driver_device
 {
@@ -51,16 +50,9 @@ public:
 	onyx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sio1(*this, "sio1")
-		, m_sio2(*this, "sio2")
-		, m_sio3(*this, "sio3")
-		, m_sio4(*this, "sio4")
-		, m_sio5(*this, "sio5")
-		, m_ctc1(*this, "ctc1")
-		, m_ctc2(*this, "ctc2")
-		, m_ctc3(*this, "ctc3")
-		, m_pio1(*this, "pio1")
-		, m_pio2(*this, "pio2")
+		, m_sio(*this, "sio%u", 1U)
+		, m_ctc(*this, "ctc%u", 1U)
+		, m_pio(*this, "pio%u", 1U)
 	{ }
 
 	void c8002(machine_config &config);
@@ -73,11 +65,12 @@ public:
 	void submem(address_map &map);
 private:
 	DECLARE_MACHINE_RESET(c8002);
+	void z8002_m1_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<z80sio_device> m_sio1, m_sio2, m_sio3, m_sio4, m_sio5;
-	optional_device<z80ctc_device> m_ctc1, m_ctc2, m_ctc3;
-	optional_device<z80pio_device> m_pio1, m_pio2;
+	optional_device_array<z80sio_device, 5> m_sio;
+	optional_device_array<z80ctc_device, 3> m_ctc;
+	optional_device_array<z80pio_device, 2> m_pio;
 };
 
 
@@ -97,18 +90,30 @@ void onyx_state::c8002_mem(address_map &map)
 	map(0x08000, 0x0ffff).ram().share("share2"); // Z8002 has 64k memory
 }
 
+void onyx_state::z8002_m1_w(uint8_t data)
+{
+	// ED 4D (Z80 RETI opcode) is written here
+	for (auto &sio : m_sio)
+		sio->z80daisy_decode(data);
+	for (auto &ctc : m_ctc)
+		ctc->z80daisy_decode(data);
+	for (auto &pio : m_pio)
+		pio->z80daisy_decode(data);
+}
+
 void onyx_state::c8002_io(address_map &map)
 {
-	map(0xff00, 0xff07).lrw8("sio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
-	map(0xff08, 0xff0f).lrw8("sio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
-	map(0xff10, 0xff17).lrw8("sio3_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
-	map(0xff18, 0xff1f).lrw8("sio4_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
-	map(0xff20, 0xff27).lrw8("sio5_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
-	map(0xff30, 0xff37).lrw8("ctc1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ctc1->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ctc1->write(space, offset >> 1, data, mem_mask); });
-	map(0xff38, 0xff3f).lrw8("ctc2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ctc2->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ctc2->write(space, offset >> 1, data, mem_mask); });
-	map(0xff40, 0xff47).lrw8("ctc3_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ctc3->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ctc3->write(space, offset >> 1, data, mem_mask); });
-	map(0xff50, 0xff57).lrw8("pio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio1->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio1->write(space, offset >> 1, data, mem_mask); });
-	map(0xff58, 0xff5f).lrw8("pio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio2->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio2->write(space, offset >> 1, data, mem_mask); });
+	map(0xff00, 0xff07).lrw8("sio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio[0]->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio[0]->cd_ba_w(space, offset >> 1, data, mem_mask); });
+	map(0xff08, 0xff0f).lrw8("sio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio[1]->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio[1]->cd_ba_w(space, offset >> 1, data, mem_mask); });
+	map(0xff10, 0xff17).lrw8("sio3_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio[2]->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio[2]->cd_ba_w(space, offset >> 1, data, mem_mask); });
+	map(0xff18, 0xff1f).lrw8("sio4_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio[3]->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio[3]->cd_ba_w(space, offset >> 1, data, mem_mask); });
+	map(0xff20, 0xff27).lrw8("sio5_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio[4]->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio[4]->cd_ba_w(space, offset >> 1, data, mem_mask); });
+	map(0xff30, 0xff37).lrw8("ctc1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ctc[0]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ctc[0]->write(space, offset >> 1, data, mem_mask); });
+	map(0xff38, 0xff3f).lrw8("ctc2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ctc[1]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ctc[1]->write(space, offset >> 1, data, mem_mask); });
+	map(0xff40, 0xff47).lrw8("ctc3_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ctc[2]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ctc[2]->write(space, offset >> 1, data, mem_mask); });
+	map(0xff50, 0xff57).lrw8("pio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio[0]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio[0]->write(space, offset >> 1, data, mem_mask); });
+	map(0xff58, 0xff5f).lrw8("pio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio[1]->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio[1]->write(space, offset >> 1, data, mem_mask); });
+	map(0xffb9, 0xffb9).w(FUNC(onyx_state::z8002_m1_w));
 }
 
 void onyx_state::submem(address_map &map)
@@ -146,8 +151,8 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	clock_device &sio1_clock(CLOCK(config, "sio1_clock", 307200));
-	sio1_clock.signal_handler().set(m_sio1, FUNC(z80sio_device::rxca_w));
-	sio1_clock.signal_handler().append(m_sio1, FUNC(z80sio_device::txca_w));
+	sio1_clock.signal_handler().set(m_sio[0], FUNC(z80sio_device::rxca_w));
+	sio1_clock.signal_handler().append(m_sio[0], FUNC(z80sio_device::txca_w));
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000)/4)
@@ -240,7 +245,7 @@ void onyx_state::c5000_mem(address_map &map)
 void onyx_state::c5000_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x13).rw(m_sio1, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x10, 0x13).rw(m_sio[0], FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 }
 
 MACHINE_CONFIG_START(onyx_state::c5000)

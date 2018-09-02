@@ -397,16 +397,18 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, proteus3_state, video_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, proteus3_state, ca2_w))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(proteus3_state::video_w));
+	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
+	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
 
 	/* cassette */
-	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, proteus3_state, acia1_txdata_w))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set(FUNC(proteus3_state::acia1_txdata_w));
+
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	SPEAKER(config, "mono").front_center();
@@ -415,9 +417,10 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", proteus3_state, timer_p, attotime::from_hz(40000))
 
 	// optional tty keyboard
-	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia2, 0);
+	m_acia2->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia2->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))

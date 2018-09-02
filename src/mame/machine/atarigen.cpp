@@ -56,9 +56,8 @@ DEFINE_DEVICE_TYPE(ATARI_SOUND_COMM, atari_sound_comm_device, "atarscom", "Atari
 
 atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ATARI_SOUND_COMM, tag, owner, clock),
-		m_sound_cpu_tag(nullptr),
 		m_main_int_cb(*this),
-		m_sound_cpu(nullptr),
+		m_sound_cpu(*this, finder_base::DUMMY_TAG),
 		m_main_to_sound_ready(false),
 		m_sound_to_main_ready(false),
 		m_main_to_sound_data(0),
@@ -75,13 +74,6 @@ atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, 
 
 void atari_sound_comm_device::device_start()
 {
-	// find the sound CPU
-	if (m_sound_cpu_tag == nullptr)
-		throw emu_fatalerror("No sound CPU specified!");
-	m_sound_cpu = siblingdevice<m6502_device>(m_sound_cpu_tag);
-	if (m_sound_cpu == nullptr)
-		throw emu_fatalerror("Sound CPU '%s' not found!", m_sound_cpu_tag);
-
 	// resolve callbacks
 	m_main_int_cb.resolve_safe();
 
@@ -142,10 +134,14 @@ void atari_sound_comm_device::device_timer(emu_timer &timer, device_timer_id id,
 
 INTERRUPT_GEN_MEMBER(atari_sound_comm_device::sound_irq_gen)
 {
+	sound_irq();
+}
+
+void atari_sound_comm_device::sound_irq()
+{
 	m_timed_int = 1;
 	update_sound_irq();
 }
-
 
 //-------------------------------------------------
 //  sound_irq_ack_r: Resets the IRQ signal to the

@@ -378,11 +378,11 @@ MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 	MCFG_DEVICE_PROGRAM_MAP(csplayh5_sub_map)
 	MCFG_DEVICE_IO_MAP(csplayh5_sub_io_map)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, csplayh5_state, ide_irq))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true)); // dvd
+	ide.irq_handler().set(FUNC(csplayh5_state::ide_irq));
 #endif
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified

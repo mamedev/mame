@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.80)
 
-	MCFG_NVRAM_ADD_0FILL("nvram");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("isa_fdc", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true) // FIXME: determine ISA bus clock
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_35)
@@ -673,8 +673,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+	RAM(config, m_ram).set_default_size("640K");
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","t1000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
@@ -700,8 +699,8 @@ MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 
 	// plus cards are isa with a nonstandard conntector
 	MCFG_DEVICE_ADD("plus1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_EXTRA_OPTIONS("256K, 384K")
+
+	m_ram->set_extra_options("256K, 384K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000sx)
@@ -714,9 +713,7 @@ MACHINE_CONFIG_START(tandy1000_state::t1000sx)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
-	/* software lists */
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_EXTRA_OPTIONS("384K")
+	m_ram->set_extra_options("384K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000rl)
@@ -729,16 +726,11 @@ MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 
 	tandy1000_101key(config);
 
-	MCFG_DEVICE_ADD("biosbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(biosbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "biosbank").set_map(&tandy1000_state::biosbank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x10000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_EXTRA_OPTIONS("384K")
+
+	m_ram->set_extra_options("384K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000sl2)

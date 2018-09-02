@@ -483,6 +483,8 @@ void dragngun_state::dragngun_map(address_map &map)
 	map(0x0130000, 0x0131fff).ram().w(FUNC(dragngun_state::buffered_palette_w)).share("paletteram");
 	map(0x0138000, 0x0138003).noprw(); /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
 	map(0x0138008, 0x013800b).w(FUNC(dragngun_state::palette_dma_w));
+//  map(0x0150000, 0x0150003).nopw(); // Unknown; Masking related?
+//  map(0x0160000, 0x0160003).w(FUNC(dragngun_state::pri_w)); // priority
 	map(0x0170100, 0x0170103).nopw();
 	map(0x0170038, 0x017003b).nopw();
 	map(0x017002C, 0x017002f).nopw();
@@ -650,8 +652,6 @@ void deco32_state::h6280_sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void deco32_state::h6280_sound_custom_latch_map(address_map &map)
@@ -1869,8 +1869,10 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
 	MCFG_DEVICE_PROGRAM_MAP(captaven_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000)/4/3));  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
+	audiocpu.set_addrmap(AS_PROGRAM, &captaven_state::h6280_sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
@@ -1956,10 +1958,12 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_DEVICE_PROGRAM_MAP(fghthist_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_custom_latch_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_custom_latch_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -2079,8 +2083,10 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(dragngun_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, 32220000/8)
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
@@ -2089,7 +2095,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
 	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2223,7 +2229,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2309,7 +2315,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DEVICE_PROGRAM_MAP(tattass_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
+	EEPROM_93C76_8BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -2388,7 +2394,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -2469,9 +2475,12 @@ MACHINE_CONFIG_END
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
 MACHINE_CONFIG_START(nslasher_state::nslasheru)
 	nslasher(config);
+	MCFG_DEVICE_REMOVE("audiocpu")
 
-	MCFG_DEVICE_REPLACE("audiocpu", H6280, 32220000/8)
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	audiocpu.set_addrmap(AS_PROGRAM, &nslasher_state::h6280_sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_DEVICE_REMOVE("sound_irq_merger")
 

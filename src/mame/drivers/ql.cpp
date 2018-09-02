@@ -972,8 +972,7 @@ MACHINE_CONFIG_START(ql_state::ql)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ql_flop")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, m_ram).set_default_size("128K");
 MACHINE_CONFIG_END
 
 
@@ -995,13 +994,12 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( opd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ql_state::opd)
+void ql_state::opd(machine_config &config)
+{
 	ql(config);
 	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("128K").set_extra_options("256K");
+}
 
 
 /*
@@ -1009,12 +1007,12 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megaopd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( megaopd )
-static  ql(config);
+void ql_state::megaopd(machine_config &config)
+{
+    ql(config);
     // internal ram
-    MCFG_RAM_MODIFY(RAM_TAG)
-    MCFG_RAM_DEFAULT_SIZE("256K")
-MACHINE_CONFIG_END
+    m_ram->set_default_size("256K");
+}
 */
 
 

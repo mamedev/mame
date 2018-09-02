@@ -314,6 +314,7 @@ void vga_device::device_start()
 	save_item(NAME(vga.crtc.map13));
 	save_item(NAME(vga.crtc.irq_clear));
 	save_item(NAME(vga.crtc.irq_disable));
+	save_item(NAME(vga.crtc.no_wrap));
 
 	save_item(NAME(vga.gc.index));
 	save_item(NAME(vga.gc.latch));
@@ -359,6 +360,7 @@ void svga_device::device_start()
 
 	save_item(NAME(svga.bank_r));
 	save_item(NAME(svga.bank_w));
+	save_item(NAME(svga.rgb8_en));
 	save_item(NAME(svga.rgb15_en));
 	save_item(NAME(svga.rgb16_en));
 	save_item(NAME(svga.rgb24_en));
@@ -575,6 +577,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int yi;
 	int xi;
 	int pel_shift = (vga.attribute.pel_shift & 6);
+	int addrmask = vga.crtc.no_wrap ? -1 : 0xffff;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff; //| (LINES & 0x300);
@@ -605,7 +608,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]);
+						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & addrmask)+((xi >> 1)*0x10000)]);
 					}
 				}
 			}
@@ -632,7 +635,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-pel_shift] = pen(vga.memory[(pos+(xi >> 1)) & 0xffff]);
+						bitmapline[c+xi-pel_shift] = pen(vga.memory[(pos+(xi >> 1)) & addrmask]);
 					}
 				}
 			}
@@ -2219,7 +2222,7 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 
 MACHINE_CONFIG_START(ati_vga_device::device_add_mconfig)
 	MCFG_MACH8_ADD_OWNER("8514a")
-	MCFG_DEVICE_ADD("ati_eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "ati_eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(s3_vga_device::device_add_mconfig)

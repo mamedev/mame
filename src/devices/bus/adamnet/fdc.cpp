@@ -210,7 +210,7 @@ void adam_fdc_device::adamnet_reset_w(int state)
 
 READ8_MEMBER( adam_fdc_device::data_r )
 {
-	uint8_t data = m_fdc->read_data();
+	uint8_t data = m_fdc->data_r();
 
 	m_ram[offset & 0x3ff] = data;
 

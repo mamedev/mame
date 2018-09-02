@@ -131,19 +131,44 @@ reelquak:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::sound_bank_w)
+void seta2_state::machine_start()
 {
-	if (ACCESSING_BITS_0_7)
+	if (memregion( "x1snd" ) != nullptr)
 	{
-		uint8_t *ROM = memregion( "x1snd" )->base();
-		int banks = (memregion( "x1snd" )->bytes() - 0x100000) / 0x20000;
-		if (data >= banks)
+		uint32_t const max = memregion( "x1snd" )->bytes() / 0x20000;
+		for (int i = 0; i < 8; i++)
 		{
-			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",m_maincpu->pc(),data);
-			data %= banks;
+			if (m_x1_bank[i] != nullptr)
+			{
+				uint32_t ind = 0;
+				while (ind < 256)
+				{
+					m_x1_bank[i]->configure_entries(ind, max, memregion( "x1snd" )->base(), 0x20000); // TODO : Mirrored?
+					ind += max;
+				}
+			}
 		}
-		memcpy(ROM + offset * 0x20000, ROM + 0x100000 + data * 0x20000, 0x20000);
 	}
+
+	m_leds.resolve();
+	m_lamps.resolve();
+}
+
+WRITE8_MEMBER(seta2_state::sound_bank_w)
+{
+	m_x1_bank[offset & 7]->set_entry(data);
+}
+
+void seta2_state::x1_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr("x1_bank_1");
+	map(0x20000, 0x3ffff).bankr("x1_bank_2");
+	map(0x40000, 0x5ffff).bankr("x1_bank_3");
+	map(0x60000, 0x7ffff).bankr("x1_bank_4");
+	map(0x80000, 0x9ffff).bankr("x1_bank_5");
+	map(0xa0000, 0xbffff).bankr("x1_bank_6");
+	map(0xc0000, 0xdffff).bankr("x1_bank_7");
+	map(0xe0000, 0xfffff).bankr("x1_bank_8");
 }
 
 
@@ -179,7 +204,7 @@ void seta2_state::grdians_map(address_map &map)
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
 	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
-	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -218,7 +243,7 @@ void seta2_state::gundamex_map(address_map &map)
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
 	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
-	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -277,7 +302,7 @@ void seta2_state::mj4simai_map(address_map &map)
 	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
 	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
 	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
-	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
@@ -301,7 +326,7 @@ void seta2_state::myangel_map(address_map &map)
 	map(0x700200, 0x700201).nopw();                        // Leds? Coins?
 	map(0x700300, 0x700301).portr("DSW1");               // DSW 1
 	map(0x700302, 0x700303).portr("DSW2");               // DSW 2
-	map(0x700310, 0x70031f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x700310, 0x70031f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
@@ -325,7 +350,7 @@ void seta2_state::myangel2_map(address_map &map)
 	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
 	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
 	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
-	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xd00000, 0xd3ffff).ram().share("spriteram");       // Sprites
 	map(0xd40000, 0xd4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
@@ -366,7 +391,7 @@ void seta2_state::pzlbowl_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();                                 // RAM
 	map(0x400300, 0x400301).portr("DSW1");                   // DSW 1
 	map(0x400302, 0x400303).portr("DSW2");                   // DSW 2
-	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w));           // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);           // Samples Banks
 	map(0x500000, 0x500001).portr("P1");                     // P1
 	map(0x500002, 0x500003).portr("P2");                     // P2
 	map(0x500004, 0x500005).rw(FUNC(seta2_state::pzlbowl_coins_r), FUNC(seta2_state::pzlbowl_coin_counter_w));   // Coins + Protection?
@@ -407,7 +432,7 @@ void seta2_state::penbros_map(address_map &map)
 	map(0x300000, 0x30ffff).ram();
 	map(0x500300, 0x500301).portr("DSW1");
 	map(0x500302, 0x500303).portr("DSW2");
-	map(0x500300, 0x50030f).w(FUNC(seta2_state::sound_bank_w));
+	map(0x500300, 0x50030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);
 	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
@@ -471,7 +496,7 @@ void seta2_state::reelquak_map(address_map &map)
 	map(0x400200, 0x400201).w(FUNC(seta2_state::reelquak_coin_w));          // Coin Counters / IRQ Ack
 	map(0x400300, 0x400301).portr("DSW1");               // DSW 1
 	map(0x400302, 0x400303).portr("DSW2");               // DSW 2
-	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w));       // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
@@ -521,7 +546,7 @@ void seta2_state::samshoot_map(address_map &map)
 	map(0x400000, 0x400001).portr("DSW1");             // DSW 1
 	map(0x400002, 0x400003).portr("BUTTONS");          // Buttons
 
-	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w));    // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);    // Samples Banks
 
 	map(0x500000, 0x500001).portr("GUN1");             // P1
 	map(0x580000, 0x580001).portr("GUN2");             // P2
@@ -713,7 +738,7 @@ void seta2_state::telpacfl_map(address_map &map)
 	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
 	map(0xd00006, 0xd00007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITE
-	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w));              // Samples Banks
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);              // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -2579,6 +2604,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, x1_map)
 MACHINE_CONFIG_END
 
 
@@ -2591,7 +2617,7 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, seta2_state, gundamex_eeprom_r))
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, gundamex_eeprom_w))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2674,7 +2700,7 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, reelquak_leds_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
@@ -2694,7 +2720,7 @@ MACHINE_CONFIG_START(seta2_state::samshoot)
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("DSW2"))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2727,9 +2753,9 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) // not hooked up, seems unused
+	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_HOPPER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
@@ -2782,7 +2808,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	MCFG_FUNCUBE_TOUCHSCREEN_ADD("touchscreen", 200)
 	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(WRITELINE(":sub:sci1", h8_sci_device, rx_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3166,9 +3192,8 @@ ROM_START( grdians )
 	ROM_LOAD( "u21.bin",  0x1e00000, 0x200000, CRC(6f95e466) SHA1(28482fad16a3ac9302f152d81552e6f84a44f3e4) )
 	ROM_CONTINUE(         0x1c00000, 0x200000 )
 
-	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "u32.bin", 0x100000, 0x100000, CRC(cf0f3017) SHA1(8376d3a674f71aec72f52c72758fbc53d9feb1a1) )
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "u32.bin", 0x000000, 0x100000, CRC(cf0f3017) SHA1(8376d3a674f71aec72f52c72758fbc53d9feb1a1) )
 ROM_END
 
 /***************************************************************************
@@ -3226,9 +3251,8 @@ ROM_START( gundamex )
 	ROM_LOAD( "ka001008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
 	ROM_FILL(                  0x1800000, 0x600000, 0x00 ) // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "ka001015.u28", 0x100000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "ka001015.u28", 0x000000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom.bin", 0x0000, 0x0080, CRC(80f8e248) SHA1(1a9787811e56d95f7acbedfb00225b6e7df265eb) )
@@ -3265,9 +3289,8 @@ ROM_START( mj4simai )
 	ROM_LOAD( "cha-02.u22",  0x1400000, 0x400000, CRC(f6346860) SHA1(4eebd3fa315b97964fa39b88224f9de7622ba881) )
 	ROM_FILL(                0x1800000, 0x800000, 0x00 )   // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "cha-07.u32",  0x100000, 0x400000, CRC(817519ee) SHA1(ed09740cdbf61a328f7b50eb569cf498fb749416) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "cha-07.u32",  0x000000, 0x400000, CRC(817519ee) SHA1(ed09740cdbf61a328f7b50eb569cf498fb749416) )
 ROM_END
 
 /***************************************************************************
@@ -3302,9 +3325,8 @@ ROM_START( myangel )
 	ROM_LOAD( "kq1-cg7.u21", 0xc00000, 0x200000, CRC(9f48382c) SHA1(80dfc33a55123b5d3cdb3ed97b43a527f0254d61) )
 	ROM_LOAD( "kq1-cg5.u17", 0xe00000, 0x200000, CRC(a4bc4516) SHA1(0eb11fa54d16bba1b96f9dd943a68949a3bb9a2f) )
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kq1-snd.u32", 0x100000, 0x200000, CRC(8ca1b449) SHA1(f54096fb5400843af4879135c96760485b6cb319) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kq1-snd.u32", 0x000000, 0x200000, CRC(8ca1b449) SHA1(f54096fb5400843af4879135c96760485b6cb319) )
 ROM_END
 
 /***************************************************************************
@@ -3339,9 +3361,8 @@ ROM_START( myangel2 )
 	ROM_LOAD( "kqs1-cg7.u21", 0x1200000, 0x200000, CRC(2c977904) SHA1(2589447f2471cdc414266b34aff552044c680d93) )
 	ROM_LOAD( "kqs1-cg3.u17", 0x1400000, 0x400000, CRC(de3b2191) SHA1(d7d6ea07b665cfd834747d3c0776b968ce03bc6a) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kqs1-snd.u32", 0x100000, 0x400000, CRC(792a6b49) SHA1(341b4e8f248b5032217733bada32e353c67e3888) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kqs1-snd.u32", 0x000000, 0x400000, CRC(792a6b49) SHA1(341b4e8f248b5032217733bada32e353c67e3888) )
 ROM_END
 
 /***************************************************************************
@@ -3461,9 +3482,8 @@ ROM_START( pzlbowl )
 	ROM_LOAD( "kuc-u40.i00", 0x800000, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
 	ROM_LOAD( "kuc-u41.i00", 0xc00000, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kus-u18.i00", 0x100000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kus-u18.i00", 0x000000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
 ROM_END
 
 /***************************************************************************
@@ -3547,9 +3567,8 @@ ROM_START( penbros ) // Genuine P0-142A PCB & original ROM labels
 	ROM_LOAD( "a-blast_jpn_u40.u40", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
 	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "a-blast_jpn_u18.u18", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "a-blast_jpn_u18.u18", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
@@ -3563,9 +3582,8 @@ ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
 	ROM_LOAD( "a-blast_twn_u40.u40", 0x800000, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
 	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "a-blast_twn_u18.u18", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "a-blast_twn_u18.u18", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
 ROM_START( ablastb ) // bootleg PCB with standard 68000 instead of TMP68301 and 4 FPGAs (3 A40MX04 and 1 A54SX16A)
@@ -3682,9 +3700,8 @@ ROM_START( reelquak )
 	ROM_LOAD( "kf-001-007_t44.u18", 0x400000, 0x200000, CRC(9daec83d) SHA1(07de144898deac5058d05466f29682d7840323b7) )
 	ROM_LOAD( "kf-001-008_t45.u17", 0x600000, 0x200000, CRC(f6ef6e41) SHA1(c3e838dd4dc340f44abdf45ec0b90de24f50dda9) )
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kf-001-009_t46.u32", 0x100000, 0x200000, CRC(2a9641f9) SHA1(efb9df78f1877eddf29c4dae2461546adb9cea8f) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kf-001-009_t46.u32", 0x000000, 0x200000, CRC(2a9641f9) SHA1(efb9df78f1877eddf29c4dae2461546adb9cea8f) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
@@ -3777,9 +3794,8 @@ ROM_START( endrichs )
 	ROM_LOAD( "kfc-u18-c00.u18", 0x400000, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
 	ROM_LOAD( "kfc-u17-c00.u17", 0x600000, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
 
-	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "kfs-u32-c00.u32", 0x100000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) ) // Yes, it's actually "KFS" here
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) ) // Yes, it's actually "KFS" here
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
@@ -3828,9 +3844,8 @@ ROM_START( staraudi )
 	ROM_REGION( 0x200000, "flash", ROMREGION_ERASE )
 	ROM_LOAD( "lh28f016sat_flash.u08", 0x000000, 0x200000, CRC(002255bd) SHA1(5e94c29e9a785fe49229f57bc94234ac79dd2f3b) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "su1_snd.u32", 0x100000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "su1_snd.u32", 0x000000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
 void staraudi_state::driver_start()
@@ -3838,7 +3853,7 @@ void staraudi_state::driver_start()
 	seta2_state::driver_start();
 
 	// bad sound rom: replace the missing (zero) sample with the previous one
-	uint8_t *samples = memregion("x1snd")->base() + 0x100000;
+	uint8_t *samples = memregion("x1snd")->base();
 	for (int i = 0; i < 0x400000; i += 2)
 		samples[i + 1] = samples[i];
 }
@@ -4094,9 +4109,8 @@ ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks ve
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhunta ) /* Deer Hunting USA V4.2 (xx/x/2000) */
@@ -4110,9 +4124,8 @@ ROM_START( deerhunta ) /* Deer Hunting USA V4.2 (xx/x/2000) */
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhuntb ) /* Deer Hunting USA V4.0 (6/15/2000) */
@@ -4126,9 +4139,8 @@ ROM_START( deerhuntb ) /* Deer Hunting USA V4.0 (6/15/2000) */
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 	/* Are there versions 3.x of Deer Hunting USA with labels "AS0906 E03 U06" & "AS0907 E03 U07" ?? */
@@ -4144,9 +4156,8 @@ ROM_START( deerhuntc ) /* These rom labels break label conventions but is correc
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhuntd ) /* Deer Hunting USA V2.x - No version number is printed to screen but "E02" in EPROM label signifies V2 */
@@ -4160,9 +4171,8 @@ ROM_START( deerhuntd ) /* Deer Hunting USA V2.x - No version number is printed t
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( deerhunte ) /* Deer Hunting USA V1.x - No version number is printed to screen but "E01" in EPROM label signifies V1 */
@@ -4176,9 +4186,8 @@ ROM_START( deerhunte ) /* Deer Hunting USA V1.x - No version number is printed t
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
 
 ROM_START( turkhunt ) /* V1.0 is currently the only known version */
@@ -4192,9 +4201,8 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "asx903m01.u40", 0x1000000, 0x800000, CRC(5f86c322) SHA1(5a72adb99eea176199f172384cb051e2b045ab94) )
 	ROM_LOAD( "asx904m01.u41", 0x1800000, 0x800000, CRC(c77e0b66) SHA1(0eba30e62e4bd38c198fa6cb69fb94d002ded77a) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "asx905m01.u18", 0x100000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "asx905m01.u18", 0x000000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
 ROM_END
 
 ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
@@ -4208,9 +4216,8 @@ ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
 ROM_START( wschampa ) /* Wing Shooting Championship V1.01 */
@@ -4224,9 +4231,8 @@ ROM_START( wschampa ) /* Wing Shooting Championship V1.01 */
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
 ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed checksum but shows as "NG" on boot screen - need to verify correct at some point if possible */
@@ -4240,9 +4246,8 @@ ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed ch
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
 ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all MASK ROMs */
@@ -4256,9 +4261,8 @@ ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a 
 	ROM_LOAD( "as1103m01.u40", 0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) )
 	ROM_LOAD( "as1104m01.u41", 0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) )
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
 ROM_END
 
 ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9 - on a P0-145-1 main PCB with a P1-115A flash ROM board */
@@ -4288,9 +4292,8 @@ ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9
 	ROM_LOAD( "as1103m01.u40",   0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) ) /* Load these in until the flash ROMs are dumped */
 	ROM_LOAD( "as1104m01.u41",   0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) ) /* Load these in until the flash ROMs are dumped */
 
-	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 MASK rom */
+	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 MASK rom */
 ROM_END
 
 /***************************************************************************
@@ -4329,10 +4332,9 @@ ROM_START( telpacfl )
 	ROM_FILL (                          0x400000, 0x200000, 0 ) // wipe out the bad rom
 	// Empty sockets: 23C16000 (@ U17-20, U22-23)
 
-	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	// Leave 1MB empty (addressable by the chip)
-	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x100000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
-	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x180000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x000000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
+	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x080000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )
 
 	ROM_REGION( 0x117 * 2, "plds", 0 )
 	ROM_LOAD( "kc-001c.u51", 0x000, 0x117, NO_DUMP )
