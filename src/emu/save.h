@@ -182,6 +182,9 @@ public:
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
 	save_error write_file(emu_file &file);
 	save_error read_file(emu_file &file);
+	save_error write_data(void *data, size_t size);
+	save_error read_data(void *data, size_t size);
+	s32 state_size() ;
 
 private:
 	// internal helpers
@@ -204,6 +207,7 @@ private:
 	std::unique_ptr<rewinder> m_rewind;               // rewinder
 	bool                      m_reg_allowed;          // are registrations allowed?
 	s32                       m_illegal_regs;         // number of illegal registrations
+	s32                       m_state_size;           // the buffer size required to store save-state data
 
 	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
 	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states
