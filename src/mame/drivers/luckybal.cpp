@@ -262,7 +262,7 @@
 *********************************************************************/
 
 
-#define CPU_CLOCK       XTAL(12'000'000)
+#define CPU_CLOCK       XTAL(12'000'000)	// 12MHz. from schematics.
 #define MCU_CLOCK       XTAL(8'000'000)
 #define VID_CLOCK       XTAL(21'477'272)
 
@@ -340,10 +340,7 @@ private:
 
 void luckybal_state::main_map(address_map &map)
 {
-	map(0x0000, 0x57ff).rom();
-	map(0x6000, 0x7fff).bankr("bank1");	 // Banked ROM.
-	map(0x8000, 0x9fff).bankr("bank1");	 // Banked ROM.
-	map(0xa000, 0xbfff).bankr("bank1");	 // Banked ROM.
+	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).bankr("bank1");	 // Banked ROM.
 	map(0xe000, 0xffff).ram().share("nvram");  // 6264 SRAM
 }
