@@ -2263,7 +2263,8 @@ MACHINE_CONFIG_END
    Game Start Compulsion: 30 seconds
    They also allow you to set the continue price, rather than the Coin 2 rate (Coin 2 rate doesn't show up, even if you set Dipswitch to 'VS mode')
 
-   Differences between Yellow & Green are unkonwn.
+   The Yellow bios ROM does not show the 'Winners Don't Use Drugs' logo for several earlier games (eg. Metal Slug, Neo Bomberman) but does still show other US specific screens (Parental Advisory)
+   Later games seem to be unaffected by this and show all screens regardless
 */
 
 #define NEOGEO_BIOS \
