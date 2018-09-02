@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "decodmd1.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(DECODMD1, decodmd_type1_device, "decodmd1", "Data East Pinball Dot Matrix Display Type 1")
@@ -206,16 +205,13 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", decodmd_type1_device, dmd_nmi, attotime::from_hz(2000))  // seems a lot
 
-	config.set_default_layout(layout_lcd);
-
-	MCFG_SCREEN_ADD("dmd",LCD)
+	MCFG_SCREEN_ADD("dmd", LCD)
 	MCFG_SCREEN_SIZE(128, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
+	RAM(config, RAM_TAG).set_default_size("8K");
 
 	HC259(config, m_bitlatch); // U4
 	m_bitlatch->parallel_out_cb().set_membank(m_rombank1).mask(0x07).invert();

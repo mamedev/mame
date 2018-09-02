@@ -534,11 +534,11 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_DEVICE_IO_MAP(sg1000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -556,8 +556,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, m_ram).set_default_size("1K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -573,8 +572,7 @@ MACHINE_CONFIG_START(sg1000_state::omv)
 	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
 	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	m_ram->set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -588,11 +586,11 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	MCFG_DEVICE_IO_MAP(sc3000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -611,8 +609,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* the sk1100 device will add sc3000 cart and cass lists */
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	RAM(config, m_ram).set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -626,11 +623,11 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_DEVICE_IO_MAP(sf7000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -667,8 +664,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

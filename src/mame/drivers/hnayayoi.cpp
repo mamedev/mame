@@ -44,7 +44,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-#include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
@@ -124,7 +123,7 @@ void hnayayoi_state::hnayayoi_io_map(address_map &map)
 	map(0x09, 0x09).w("crtc", FUNC(hd6845_device::register_w));
 	map(0x0a, 0x0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
 	map(0x0c, 0x0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
-	map(0x20, 0x27).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x20, 0x27).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x40, 0x40).w(FUNC(hnayayoi_state::keyboard_w));
 	map(0x41, 0x41).r(FUNC(hnayayoi_state::keyboard_0_r));
 	map(0x42, 0x42).r(FUNC(hnayayoi_state::keyboard_1_r));
@@ -146,7 +145,7 @@ void hnayayoi_state::hnfubuki_map(address_map &map)
 	map(0xff09, 0xff09).w("crtc", FUNC(hd6845_device::register_w));
 	map(0xff0a, 0xff0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
 	map(0xff0c, 0xff0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
-	map(0xff20, 0xff27).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xff20, 0xff27).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xff40, 0xff40).w(FUNC(hnayayoi_state::keyboard_w));
 	map(0xff41, 0xff41).r(FUNC(hnayayoi_state::keyboard_0_r));
 	map(0xff42, 0xff42).r(FUNC(hnayayoi_state::keyboard_1_r));
@@ -177,7 +176,7 @@ void hnayayoi_state::untoucha_io_map(address_map &map)
 	map(0x1a, 0x1f).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
 	map(0x20, 0x20).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
 	map(0x28, 0x28).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
-	map(0x30, 0x37).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x30, 0x37).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::write_port_w));
 	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::read_port_r));
 	map(0x52, 0x52).w("crtc", FUNC(hd6845_device::register_w));
@@ -553,13 +552,13 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, hnayayoi_state, nmi_clock_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(hnayayoi_state::coin_counter_w));
-	mainlatch.q_out_cb<2>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
-	mainlatch.q_out_cb<3>().set(m_msm, FUNC(msm5205_device::vclk_w));
-	mainlatch.q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w)).invert();
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(hnayayoi_state::coin_counter_w));
+	m_mainlatch->q_out_cb<2>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
+	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::vclk_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w)).invert();
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -598,8 +597,8 @@ MACHINE_CONFIG_START(hnayayoi_state::hnfubuki)
 	MCFG_DEVICE_PROGRAM_MAP(hnfubuki_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_DEVICE_MODIFY("mainlatch") // D5
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
+	// D5
+	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hnayayoi_state::untoucha)
@@ -608,11 +607,10 @@ MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	MCFG_DEVICE_PROGRAM_MAP(untoucha_map)
 	MCFG_DEVICE_IO_MAP(untoucha_io_map)
 
-	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
-	mainlatch.q_out_cb<1>().set(m_msm, FUNC(msm5205_device::vclk_w));
-	mainlatch.q_out_cb<2>().set(FUNC(hnayayoi_state::nmi_enable_w));
-	mainlatch.q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
-	mainlatch.q_out_cb<4>().set_nop(); // ?
+	m_mainlatch->q_out_cb<1>().set(m_msm, FUNC(msm5205_device::vclk_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(hnayayoi_state::nmi_enable_w));
+	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
+	m_mainlatch->q_out_cb<4>().set_nop(); // ?
 
 	MCFG_DEVICE_MODIFY("crtc")
 	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, untoucha_update_row)

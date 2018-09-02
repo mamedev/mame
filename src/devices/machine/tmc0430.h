@@ -26,9 +26,15 @@ enum
 class tmc0430_device : public device_t
 {
 public:
+	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *regionname, int offset, int ident)
+		: tmc0430_device(mconfig, tag, owner, 0)
+	{
+		set_region_and_ident(regionname, offset, ident);
+	}
+
 	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_gromready.set_callback(std::forward<Object>(cb)); }
+	auto ready_cb() { return m_gromready.bind(); }
 
 	void readz(uint8_t *value);
 	void write(uint8_t data);
@@ -100,10 +106,5 @@ private:
 	/* Pointer to the memory region contained in this GROM. */
 	uint8_t *m_memptr;
 };
-
-#define MCFG_GROM_ADD(_tag, _ident, _region, _offset, _ready)    \
-		MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
-		downcast<tmc0430_device &>(*device).set_region_and_ident(_region, _offset, _ident); \
-		downcast<tmc0430_device &>(*device).set_ready_wr_callback(DEVCB_##_ready);
 
 #endif // MAME_MACHINE_TMC0430_H

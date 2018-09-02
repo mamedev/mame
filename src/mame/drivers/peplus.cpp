@@ -1376,7 +1376,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, peplus_state, paldata_w<0>))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, peplus_state, paldata_w<1>))
 
-	MCFG_NVRAM_ADD_0FILL("cmos")
+	NVRAM(config, "cmos", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD(m_screen, RASTER)

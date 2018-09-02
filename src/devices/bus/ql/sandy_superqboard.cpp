@@ -292,7 +292,7 @@ uint8_t sandy_superqboard_device::read(address_space &space, offs_t offset, uint
 			switch ((offset >> 2) & 0x07)
 			{
 			case 0:
-				data = m_fdc->read(space, offset & 0x03);
+				data = m_fdc->read(offset & 0x03);
 				break;
 
 			case 3:
@@ -352,7 +352,7 @@ void sandy_superqboard_device::write(address_space &space, offs_t offset, uint8_
 			switch ((offset >> 2) & 0x07)
 			{
 			case 0:
-				m_fdc->write(space, offset & 0x03, data);
+				m_fdc->write(offset & 0x03, data);
 				break;
 
 			case 1:

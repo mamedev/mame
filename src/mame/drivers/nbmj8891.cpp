@@ -2234,7 +2234,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mgion)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MGION )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::omotesnd)
@@ -2248,7 +2248,7 @@ MACHINE_CONFIG_START(nbmj8891_state::omotesnd)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OMOTESND )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)
@@ -2275,7 +2275,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjcamerb)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJCAMERB )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2293,7 +2293,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mmcamera)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMCAMERA )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2410,7 +2410,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mmaiko)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMAIKO )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::lovehous)
@@ -2424,7 +2424,7 @@ MACHINE_CONFIG_START(nbmj8891_state::lovehous)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_LOVEHOUS )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::hanaoji)
@@ -2437,7 +2437,7 @@ MACHINE_CONFIG_START(nbmj8891_state::hanaoji)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HANAOJI )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::hnxmasev)
@@ -2481,7 +2481,7 @@ MACHINE_CONFIG_START(nbmj8891_state::bananadr)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_BANANADR )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::club90s)
@@ -2517,7 +2517,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJFOCUSM )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2550,7 +2550,7 @@ MACHINE_CONFIG_START(nbmj8891_state::taiwanmb)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_TAIWANMB )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

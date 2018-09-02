@@ -528,10 +528,10 @@ MACHINE_CONFIG_START(vp415_state::vp415)
 	MCFG_DEVICE_PROGRAM_MAP(drive_program_map)
 	MCFG_DEVICE_IO_MAP(drive_io_map)
 
-	MCFG_DEVICE_ADD(I8155_TAG, I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(CHARGEN_TAG, mb88303_device, da_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(*this, vp415_state, drive_i8155_pb_r))
-	MCFG_I8155_IN_PORTC_CB(READ8(*this, vp415_state, drive_i8155_pc_r))
+	i8155_device &i8155(I8155(config, I8155_TAG, 0));
+	i8155.out_pa_callback().set(CHARGEN_TAG, FUNC(mb88303_device::da_w));
+	i8155.in_pb_callback().set(FUNC(vp415_state::drive_i8155_pb_r));
+	i8155.in_pc_callback().set(FUNC(vp415_state::drive_i8155_pc_r));
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vp415_state, drive_i8255_pa_w))

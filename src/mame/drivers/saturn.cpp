@@ -503,6 +503,7 @@ private:
 
 	void saturn_mem(address_map &map);
 	void sound_mem(address_map &map);
+	void scsp_mem(address_map &map);
 };
 
 
@@ -558,6 +559,11 @@ void sat_console_state::sound_mem(address_map &map)
 	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 }
 
+void sat_console_state::scsp_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+}
+
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
 {
@@ -600,8 +606,6 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
-	m_scsp->set_ram_base(m_sound_ram);
-
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 
@@ -827,7 +831,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(sat_console_state::nvram_init));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -843,6 +847,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD(m_scsp, SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp_mem)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))

@@ -297,7 +297,7 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	count = test;
 
-	for (y=cliprect.min_y;y<cliprect.max_y;y++)
+	for (y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
 		for(x=0;x<256;x++)
 		{

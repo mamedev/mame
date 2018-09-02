@@ -40,6 +40,7 @@ altos8600.cpp
 amico2k.cpp
 amiga.cpp
 ampex.cpp
+ampex210.cpp
 ampro.cpp
 ampscarp.cpp
 amstr_pc.cpp
@@ -94,6 +95,7 @@ bigbord2.cpp
 binbug.cpp
 bitgraph.cpp
 bk.cpp
+blw700i.cpp
 bmjr.cpp
 bml3.cpp
 bob85.cpp
@@ -193,12 +195,14 @@ e100.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp
+ec7915.cpp
 einstein.cpp
 electron.cpp
 elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+emate.cpp
 enmirage.cpp
 ep64.cpp
 esprit.cpp
@@ -301,6 +305,7 @@ ibm6580.cpp
 ibmpc.cpp
 ibmpcjr.cpp
 icatel.cpp
+icebox.cpp
 ie15.cpp
 if800.cpp
 imds.cpp
@@ -400,6 +405,7 @@ microkit.cpp
 micronic.cpp
 microtan.cpp
 microterm.cpp
+microterm_f8.cpp
 microvsn.cpp
 mikro80.cpp
 mikromik.cpp
@@ -423,8 +429,10 @@ mmd1.cpp
 mmodular.cpp
 mod8.cpp
 modellot.cpp
+modena.cpp
 molecular.cpp
 monty.cpp
+mpc3000.cpp
 mpf1.cpp
 mps1230.cpp
 mpz80.cpp
@@ -692,8 +700,10 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 terco.cpp
+terminal.cpp
 test_t400.cpp
 testconsole.cpp
+textelcomp.cpp
 tg100.cpp
 thomson.cpp
 ti630.cpp
@@ -763,6 +773,7 @@ vax11.cpp
 vboy.cpp
 vc4000.cpp
 vcs80.cpp
+vdm7932x.cpp
 vector06.cpp
 vector4.cpp
 vectrex.cpp
@@ -797,6 +808,7 @@ vtech_unk2.cpp
 wangpc.cpp
 wicat.cpp
 wswan.cpp
+wy100.cpp
 wyse.cpp
 x07.cpp
 x1.cpp
@@ -809,6 +821,7 @@ xor100.cpp
 ymmu100.cpp
 z100.cpp
 z1013.cpp
+z29.cpp
 z80dev.cpp
 z80ne.cpp
 z88.cpp

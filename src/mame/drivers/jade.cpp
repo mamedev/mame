@@ -2,10 +2,8 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Jade JGZ80 (with Serial Parallel Interrupt Controller)
-
-    Single board Z80 computer on a S100 card.
-    The SPIO board adds four CTCs, two SIOs and one PIO.
+    Single board Z80 computer on a S100 card (not the JGZ80).
+    The Jade SPIO board adds four CTCs, two SIOs and one PIO.
 
     2013-09-12 Skeleton driver.
 
@@ -91,12 +89,12 @@ MACHINE_CONFIG_START(jade_state::jade)
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( jgz80 )
+ROM_START( jade )
 	ROM_REGION( 0x800, "roms", 0 )
-	ROM_LOAD( "jgz80.rom",   0x0000, 0x0800, CRC(90c4a1ef) SHA1(8a93a11051cc27f3edca24f0f4297ebe0099964e) )
+	ROM_LOAD( "jade.rom", 0x0000, 0x0800, CRC(90c4a1ef) SHA1(8a93a11051cc27f3edca24f0f4297ebe0099964e) )
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME  FLAGS
-COMP( 1983, jgz80, 0,      0,      jade,    jade,  jade_state, empty_init, "Jade Computer Products", "JGZ80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME                                                            FLAGS
+COMP( 1983, jade, 0,      0,      jade,    jade,  jade_state, empty_init, "Jade Computer Products", "unknown S-100 computer with Serial/Parallel/Interrupt Controller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

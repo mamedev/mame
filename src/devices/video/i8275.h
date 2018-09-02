@@ -102,6 +102,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -235,8 +237,16 @@ protected:
 	emu_timer *m_scanline_timer;
 };
 
+class i8276_device : public i8275_device
+{
+public:
+	// construction/destruction
+	i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8275, i8275_device)
+DECLARE_DEVICE_TYPE(I8276, i8276_device)
 
 #endif // MAME_VIDEO_I8275_H

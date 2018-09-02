@@ -1269,7 +1269,7 @@ MACHINE_CONFIG_START(hp48_state::hp48_common)
 						WRITE32(*this, hp48_state, mem_crc), WRITELINE(*this, hp48_state, rsi) )
 
 	/* memory */
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video */
 	MCFG_SCREEN_ADD( "screen", RASTER )

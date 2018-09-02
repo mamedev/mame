@@ -211,7 +211,6 @@ GFX check (these don't explicitly fails):
 #define MAX_HPOSITION 480
 /* need to make some pwm stuff part of device */
 #define PWM_FIFO_SIZE m_pwm_tm_reg // guess, Marsch calls this register as FIFO width
-#define PWM_CLOCK m_32x_pal ? ((MASTER_CLOCK_PAL*3) / 7) : ((MASTER_CLOCK_NTSC*3) / 7)
 
 
 
@@ -220,9 +219,6 @@ GFX check (these don't explicitly fails):
 #define SH2_HINT_IRQ_LEVEL 10
 #define SH2_CINT_IRQ_LEVEL 8
 #define SH2_PINT_IRQ_LEVEL 6
-
-#define MASTER_CLOCK_NTSC 53693175
-#define MASTER_CLOCK_PAL  53203424
 
 
 DEFINE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device, "sega_32x_ntsc", "Sega 32X (NTSC)")
@@ -824,7 +820,7 @@ void sega_32x_device::calculate_pwm_timer()
 		m_lch_fifo_state = m_rch_fifo_state = 0x4000;
 		m_lch_index_r = m_rch_index_r = 0;
 		m_lch_index_w = m_rch_index_w = 0;
-		m_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (m_pwm_cycle - 1)));
+		m_32x_pwm_timer->adjust(attotime::from_hz(clock() / (m_pwm_cycle - 1)));
 	}
 }
 
@@ -870,7 +866,7 @@ TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 		if(sh2_slave_pwmint_enable) { m_slave_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 	}
 
-	m_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (m_pwm_cycle - 1)));
+	m_32x_pwm_timer->adjust(attotime::from_hz(clock() / (m_pwm_cycle - 1)));
 }
 
 READ16_MEMBER( sega_32x_device::_32x_pwm_r )
@@ -1768,19 +1764,19 @@ const rom_entry *sega_32x_device::device_rom_region() const
 MACHINE_CONFIG_START(sega_32x_ntsc_device::device_add_mconfig)
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
 	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
 	MCFG_SH2_IS_SLAVE(0)
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
-	MCFG_DEVICE_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_DEVICE_ADD("32x_slave_sh2", SH2, DERIVED_CLOCK(1, 1) )
 	MCFG_DEVICE_PROGRAM_MAP(sh2_slave_map)
 	MCFG_SH2_IS_SLAVE(1)
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
 	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
 	MCFG_SH2_IS_SLAVE(0)
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
@@ -1798,19 +1794,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sega_32x_pal_device::device_add_mconfig)
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
 	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
 	MCFG_SH2_IS_SLAVE(0)
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
-	MCFG_DEVICE_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_DEVICE_ADD("32x_slave_sh2", SH2, DERIVED_CLOCK(1, 1) )
 	MCFG_DEVICE_PROGRAM_MAP(sh2_slave_map)
 	MCFG_SH2_IS_SLAVE(1)
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
 	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
 	MCFG_SH2_IS_SLAVE(0)
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
@@ -1829,7 +1825,6 @@ MACHINE_CONFIG_END
 void sega_32x_device::device_start()
 {
 	m_32x_pwm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_32x_device::handle_pwm_callback), this));
-	m_32x_pwm_timer->adjust(attotime::never);
 
 	m_32x_dram0 = std::make_unique<uint16_t[]>(0x40000/2);
 	m_32x_dram1 = std::make_unique<uint16_t[]>(0x40000/2);
@@ -1884,8 +1879,9 @@ void sega_32x_device::device_reset()
 	m_32x_fb_swap = 0;
 
 	m_pwm_tm_reg = 0;
-	m_pwm_cycle = 0;
+	m_pwm_cycle = m_pwm_cycle_reg = 0;
 	m_pwm_ctrl = 0;
+	calculate_pwm_timer();
 
 	m_lch_index_w = 0;
 	m_rch_index_w = 0;

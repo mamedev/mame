@@ -412,13 +412,7 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	MCFG_DEVICE_IO_MAP(cultures_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&cultures_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

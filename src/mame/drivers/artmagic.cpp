@@ -823,8 +823,8 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1)) // FIXME: false-readback polling should make this unnecessary
+
+	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

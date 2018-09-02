@@ -632,17 +632,17 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_DEVICE_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(punchout_sound_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, punchout_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // watchdog reset, seldom used because 08 clears the watchdog as well
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("vlm", vlm5030_device, rst))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("vlm", vlm5030_device, st))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("vlm", vlm5030_device, vcu))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // enable NVRAM?
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2B
+	mainlatch.q_out_cb<0>().set(FUNC(punchout_state::nmi_mask_w));
+	mainlatch.q_out_cb<1>().set_nop(); // watchdog reset, seldom used because 08 clears the watchdog as well
+	mainlatch.q_out_cb<2>().set_nop(); // ?
+	mainlatch.q_out_cb<3>().set_inputline("audiocpu", INPUT_LINE_RESET);
+	mainlatch.q_out_cb<4>().set("vlm", FUNC(vlm5030_device::rst));
+	mainlatch.q_out_cb<5>().set("vlm", FUNC(vlm5030_device::st));
+	mainlatch.q_out_cb<6>().set("vlm", FUNC(vlm5030_device::vcu));
+	mainlatch.q_out_cb<7>().set_nop(); // enable NVRAM?
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_punchout)

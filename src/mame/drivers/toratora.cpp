@@ -402,22 +402,22 @@ MACHINE_CONFIG_START(toratora_state::toratora)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 250) /* timer counting at 250 Hz */
 
-	MCFG_DEVICE_ADD("pia_u1", PIA6821, 0)
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, toratora_state,port_b_u1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, toratora_state,main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, toratora_state,main_cpu_irq))
+	PIA6821(config, m_pia_u1, 0);
+	m_pia_u1->writepb_handler().set(FUNC(toratora_state::port_b_u1_w));
+	m_pia_u1->irqa_handler().set(FUNC(toratora_state::main_cpu_irq));
+	m_pia_u1->irqb_handler().set(FUNC(toratora_state::main_cpu_irq));
 
-	MCFG_DEVICE_ADD("pia_u3", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, toratora_state, sn1_port_a_u3_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, toratora_state, sn1_port_b_u3_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, toratora_state, sn1_ca2_u3_w))
+	PIA6821(config, m_pia_u3, 0);
+	m_pia_u3->writepa_handler().set(FUNC(toratora_state::sn1_port_a_u3_w));
+	m_pia_u3->writepb_handler().set(FUNC(toratora_state::sn1_port_b_u3_w));
+	m_pia_u3->ca2_handler().set(FUNC(toratora_state::sn1_ca2_u3_w));
 
-	MCFG_DEVICE_ADD("pia_u2", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, toratora_state,sn2_port_a_u2_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, toratora_state,sn2_port_b_u2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, toratora_state,sn2_ca2_u2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, toratora_state,cb2_u2_w))
+	PIA6821(config, m_pia_u2, 0);
+	m_pia_u2->readpb_handler().set_ioport("DSW");
+	m_pia_u2->writepa_handler().set(FUNC(toratora_state::sn2_port_a_u2_w));
+	m_pia_u2->writepb_handler().set(FUNC(toratora_state::sn2_port_b_u2_w));
+	m_pia_u2->ca2_handler().set(FUNC(toratora_state::sn2_ca2_u2_w));
+	m_pia_u2->cb2_handler().set(FUNC(toratora_state::cb2_u2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1766,7 +1766,7 @@ MACHINE_CONFIG_START(namcos2_state::base)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
@@ -1844,7 +1844,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
@@ -1956,7 +1956,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
@@ -2013,7 +2013,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
@@ -2065,7 +2065,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
@@ -2120,7 +2120,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);

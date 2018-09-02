@@ -3481,7 +3481,7 @@ MACHINE_CONFIG_START(royalmah_state::royalmah)
 	MCFG_DEVICE_IO_MAP(royalmah_iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 16*2)

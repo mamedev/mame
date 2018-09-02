@@ -130,7 +130,7 @@ uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset, uin
 	}
 	else if (offset >= 0xfcc4 && offset < 0xfcc8)
 	{
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 
 	data &= m_exp->expbus_r(space, offset, data);
@@ -152,7 +152,7 @@ void electron_plus3_device::expbus_w(address_space &space, offs_t offset, uint8_
 	}
 	else if (offset >= 0xfcc4 && offset < 0xfcc8)
 	{
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 	else if (offset == 0xfe05)
 	{

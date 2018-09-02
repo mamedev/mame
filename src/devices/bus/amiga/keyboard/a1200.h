@@ -20,8 +20,6 @@ namespace bus { namespace amiga { namespace keyboard {
 //  TYPE DECLARATIONS
 //**************************************************************************
 
-// ======================> a1200_kbd_device
-
 class a1200_kbd_device : public device_t, public device_amiga_keyboard_interface
 {
 public:
@@ -31,6 +29,8 @@ public:
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
 
+	DECLARE_INPUT_CHANGED_MEMBER(layout_changed);
+
 protected:
 	// MPU I/O
 	DECLARE_READ8_MEMBER(mpu_portb_r);
@@ -39,12 +39,12 @@ protected:
 	DECLARE_WRITE8_MEMBER(mpu_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(mpu_tcmp);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 
 private:
 	required_ioport_array<15>   m_rows;

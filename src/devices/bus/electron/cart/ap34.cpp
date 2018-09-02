@@ -94,7 +94,7 @@ uint8_t electron_ap34_device::read(address_space &space, offs_t offset, int infc
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			data = m_fdc->read(space, offset & 0x03);
+			data = m_fdc->read(offset & 0x03);
 			break;
 		}
 	}
@@ -132,7 +132,7 @@ void electron_ap34_device::write(address_space &space, offs_t offset, uint8_t da
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			m_fdc->write(space, offset & 0x03, data);
+			m_fdc->write(offset & 0x03, data);
 			break;
 		}
 	}

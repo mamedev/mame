@@ -227,7 +227,7 @@ static const game_offset game_offsets[] =
         ---- ---0     Coin #0 Counter     */
 
 // some games haven't the coin lockout device (blandia, eightfrc, extdwnhl, gundhara, kamenrid, magspeed, sokonuke, zingzip, zombraid)
-WRITE8_MEMBER(seta_state::seta_coin_counter_w)
+void seta_state::seta_coin_counter_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -236,9 +236,9 @@ WRITE8_MEMBER(seta_state::seta_coin_counter_w)
 		m_x1->enable_w(BIT(data, 6));
 }
 
-WRITE8_MEMBER(seta_state::seta_coin_lockout_w)
+void seta_state::seta_coin_lockout_w(u8 data)
 {
-	seta_coin_counter_w(space, 0, data);
+	seta_coin_counter_w(data);
 
 	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2));
 	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
@@ -262,34 +262,9 @@ WRITE8_MEMBER(seta_state::seta_vregs_w)
 
 	if (new_bank != m_samples_bank)
 	{
-		if (!m_x1.found()) // triplfun no longer has the hardware, but still writes here
-			return;
-
-		uint8_t *rom = memregion("x1snd")->base();
-		int samples_len = memregion("x1snd")->bytes();
-		int addr;
-
 		m_samples_bank = new_bank;
-
-		if (samples_len == 0x240000)    /* blandia, eightfrc */
-		{
-			addr = 0x40000 * new_bank;
-			if (new_bank >= 3)  addr += 0x40000;
-
-			if ( (samples_len > 0x100000) && ((addr+0x40000) <= samples_len) )
-				memcpy(&rom[0xc0000],&rom[addr],0x40000);
-			else
-				logerror("PC %06X - Invalid samples bank %02X !\n", m_maincpu->pc(), new_bank);
-		}
-		else if (samples_len == 0x480000)   /* zombraid */
-		{
-			/* bank 1 is never explicitly selected, 0 is used in its place */
-			if (new_bank == 0) new_bank = 1;
-			addr = 0x80000 * new_bank;
-			if (new_bank > 0) addr += 0x80000;
-
-			memcpy(&rom[0x80000],&rom[addr],0x80000);
-		}
+		if (m_x1_bank != nullptr)
+			m_x1_bank->set_entry(m_samples_bank);
 	}
 }
 
@@ -480,6 +455,8 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	while (m_global_offsets->gamename && strcmp(machine().system().name, m_global_offsets->gamename))
 		m_global_offsets++;
 	m_samples_bank = -1;    // set the samples bank to an out of range value at start-up
+	if (m_x1_bank != nullptr)
+		m_x1_bank->set_entry(0); // TODO : Unknown init
 
 	// position kludges
 	m_seta001->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);

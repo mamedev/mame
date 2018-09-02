@@ -578,3 +578,9 @@ void sonydriv_floppy_image_device::call_unload()
 
 	legacy_floppy_image_device::call_unload();
 }
+
+void sonydriv_floppy_image_device::legacy_2_drives_add(machine_config &mconfig, const floppy_interface *config)
+{
+	FLOPPY_SONY(mconfig, FLOPPY_0).set_floppy_config(config);
+	FLOPPY_SONY(mconfig, FLOPPY_1).set_floppy_config(config);
+}

@@ -880,9 +880,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tandy2k")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,384K,512K,640K,768K,896K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy2k_state::tandy2k_hd)

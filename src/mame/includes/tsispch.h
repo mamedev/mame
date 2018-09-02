@@ -13,9 +13,6 @@
 
 #include "cpu/upd7725/upd7725.h"
 #include "machine/pic8259.h"
-#include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
 
 class tsispch_state : public driver_device
 {
@@ -24,7 +21,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
-		m_terminal(*this, TERMINAL_TAG),
 		m_pic(*this, "pic8259")
 	{
 	}
@@ -55,7 +51,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7725_device> m_dsp;
-	required_device<generic_terminal_device> m_terminal;
 	required_device<pic8259_device> m_pic;
 
 	uint8_t m_paramReg;           // status leds and resets and etc

@@ -607,8 +607,7 @@ MACHINE_CONFIG_START(ep64_state::ep64)
 	MCFG_CASSETTE_INTERFACE("ep64_cass")
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "ep64_cart")
@@ -631,8 +630,7 @@ MACHINE_CONFIG_START(ep64_state::ep128)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, dave_128k_mem)
 
 	// internal RAM
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 MACHINE_CONFIG_END
 
 

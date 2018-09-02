@@ -87,7 +87,6 @@ Notes:
 #include "bus/generic/carts.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -760,8 +759,6 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_lcd);
-
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(prestige_state, prestige)
 
@@ -769,9 +766,7 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glcolor)

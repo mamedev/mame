@@ -424,34 +424,44 @@ WRITE_LINE_MEMBER(bagman_state::vblank_irq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
+void bagman_state::bagman_base(machine_config &config)
+{
+	Z80(config, m_maincpu, BAGMAN_H0);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bagman_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &bagman_state::main_portmap);
 
-MACHINE_CONFIG_START(bagman_state::bagman)
-
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, BAGMAN_H0)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 8H
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_y_w))
+	LS259(config, m_mainlatch); // 8H
+	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(bagman_state::flipscreen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(bagman_state::flipscreen_y_w));
 	// video enable register not available on earlier hardware revision(s)
 	// Bagman is supposed to have glitches during screen transitions
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)    // ????
+	m_mainlatch->q_out_cb<4>().set(FUNC(bagman_state::coin_counter_w));
+	m_mainlatch->q_out_cb<4>().set_nop();    // ????
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(bagman_state::screen_update));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bagman)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bagman);
 
-	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
+	PALETTE(config, m_palette, 64);
+	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(bagman_state::palette_init_bagman));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	ay8910_device &aysnd(AY8910(config, "aysnd", BAGMAN_H0 / 2));
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
+}
+
+MACHINE_CONFIG_START(bagman_state::bagman)
+	bagman_base(config);
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, 640000 / 2)  /* rom clock */
 	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
@@ -467,42 +477,31 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_TMSPROM_PDC_CB(WRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
 	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("aysnd", AY8910, BAGMAN_H0 / 2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
 	MCFG_DEVICE_ADD("tms", TMS5110A, 640000)
 	MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
 	MCFG_TMS5110_DATA_CB(READLINE("tmsprom", tmsprom_device, data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("tmslatch", LS259, 0) // 7H
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_bit_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_bit_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_bit_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("tmsprom", tmsprom_device, enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_csq0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_csq1_w))
+	LS259(config, m_tmslatch); // 7H
+	m_tmslatch->q_out_cb<0>().set(FUNC(bagman_state::tmsprom_bit_w));
+	m_tmslatch->q_out_cb<1>().set(FUNC(bagman_state::tmsprom_bit_w));
+	m_tmslatch->q_out_cb<2>().set(FUNC(bagman_state::tmsprom_bit_w));
+	m_tmslatch->q_out_cb<3>().set("tmsprom", FUNC(tmsprom_device::enable_w));
+	m_tmslatch->q_out_cb<4>().set(FUNC(bagman_state::tmsprom_csq0_w));
+	m_tmslatch->q_out_cb<5>().set(FUNC(bagman_state::tmsprom_csq1_w));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bagman_state::sbagman)
+void bagman_state::sbagman(machine_config &config)
+{
 	bagman(config);
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, bagman_state, video_enable_w))
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
+}
 
-MACHINE_CONFIG_START(bagman_state::sbagmani)
-	sbagman(config);
-
-	// only 1 AY8910
-	MCFG_DEVICE_REMOVE("tmsprom")
-	MCFG_DEVICE_REMOVE("tms")
-	MCFG_DEVICE_REMOVE("tmslatch")
-MACHINE_CONFIG_END
+void bagman_state::sbagmani(machine_config &config)
+{
+	bagman_base(config);
+	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
+}
 
 MACHINE_CONFIG_START(bagman_state::pickin)
 
@@ -511,15 +510,15 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_DEVICE_PROGRAM_MAP(pickin_map)
 	MCFG_DEVICE_IO_MAP(main_portmap)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, bagman_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ????
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)    // ????
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)    // ????
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(bagman_state::flipscreen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(bagman_state::flipscreen_y_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(bagman_state::coin_counter_w));
+	m_mainlatch->q_out_cb<5>().set_nop();    // ????
+	m_mainlatch->q_out_cb<6>().set_nop();    // ????
+	m_mainlatch->q_out_cb<7>().set_nop();    // ????
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -571,15 +570,15 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_DEVICE_PROGRAM_MAP(pickin_map)
 	MCFG_DEVICE_IO_MAP(main_portmap)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, bagman_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ????
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)    // ????
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)    // ????
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(bagman_state::flipscreen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(bagman_state::flipscreen_y_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(bagman_state::coin_counter_w));
+	m_mainlatch->q_out_cb<5>().set_nop();    // ????
+	m_mainlatch->q_out_cb<6>().set_nop();    // ????
+	m_mainlatch->q_out_cb<7>().set_nop();    // ????
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

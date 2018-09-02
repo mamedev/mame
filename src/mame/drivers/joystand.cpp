@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_TMS_29F040_ADD("cart.u12")
 
 	// devices
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 

@@ -202,6 +202,11 @@ namespace sol
 						typestr = "unmap";
 						break;
 					case AMH_DEVICE_DELEGATE:
+					case AMH_DEVICE_DELEGATE_M:
+					case AMH_DEVICE_DELEGATE_S:
+					case AMH_DEVICE_DELEGATE_SM:
+					case AMH_DEVICE_DELEGATE_MO:
+					case AMH_DEVICE_DELEGATE_SMO:
 						typestr = "delegate";
 						break;
 					case AMH_PORT:
@@ -1782,7 +1787,7 @@ void lua_engine::initialize()
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
 			"orientation", [](screen_device &sdev) {
-					uint32_t flags = sdev.machine().system().flags & machine_flags::MASK_ORIENTATION;
+					uint32_t flags = sdev.orientation();
 					int rotation_angle = 0;
 					switch (flags)
 					{

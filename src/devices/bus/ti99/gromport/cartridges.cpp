@@ -242,7 +242,7 @@ image_init_result ti99_cartridge_device::call_load()
 		}
 		catch (rpk_exception& err)
 		{
-			logerror("Failed to load cartridge '%s': %s\n", basename(), err.to_string().c_str());
+			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.to_string().c_str());
 			m_rpk = nullptr;
 			m_err = IMAGE_ERROR_INVALIDIMAGE;
 			return image_init_result::FAIL;
@@ -399,14 +399,14 @@ void ti99_cartridge_device::device_config_complete()
 /*
     5 GROMs that may be contained in a cartridge
 */
-MACHINE_CONFIG_START(ti99_cartridge_device::device_add_mconfig)
-	MCFG_GROM_ADD( GROM3_TAG, 3, CARTGROM_TAG, 0x0000, WRITELINE(*this, ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM4_TAG, 4, CARTGROM_TAG, 0x2000, WRITELINE(*this, ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM5_TAG, 5, CARTGROM_TAG, 0x4000, WRITELINE(*this, ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM6_TAG, 6, CARTGROM_TAG, 0x6000, WRITELINE(*this, ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM7_TAG, 7, CARTGROM_TAG, 0x8000, WRITELINE(*this, ti99_cartridge_device, ready_line))
-MACHINE_CONFIG_END
-
+void ti99_cartridge_device::device_add_mconfig(machine_config& config)
+{
+	TMC0430(config, GROM3_TAG, CARTGROM_TAG, 0x0000, 3).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM4_TAG, CARTGROM_TAG, 0x2000, 4).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM5_TAG, CARTGROM_TAG, 0x4000, 5).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM6_TAG, CARTGROM_TAG, 0x6000, 6).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+	TMC0430(config, GROM7_TAG, CARTGROM_TAG, 0x8000, 7).ready_cb().set(FUNC(ti99_cartridge_device::ready_line));
+}
 
 /*
     Memory area for one cartridge. For most cartridges we only need 8 KiB for

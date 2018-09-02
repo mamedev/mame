@@ -1916,8 +1916,7 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, seattle_state, vblank_assert))
 	MCFG_VOODOO_STALL_CB(WRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
 
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

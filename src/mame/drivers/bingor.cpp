@@ -701,7 +701,7 @@ MACHINE_CONFIG_START(bingor_state::bingor)
 	MCFG_DEVICE_ADD("pic", PIC16C57, 12000000) //?? Mhz
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bingor)
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

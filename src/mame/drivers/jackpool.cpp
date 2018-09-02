@@ -245,28 +245,28 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // HOLD3 lamp
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // HOLD4 lamp
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // HOLD2 lamp
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // HOLD1 lamp
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // HOLD5 lamp
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // START1 lamp
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // BET lamp
+	ls259_device &latch1(LS259(config, "latch1"));
+	latch1.q_out_cb<0>().set_nop(); // HOLD3 lamp
+	latch1.q_out_cb<1>().set_nop(); // HOLD4 lamp
+	latch1.q_out_cb<2>().set_nop(); // HOLD2 lamp
+	latch1.q_out_cb<3>().set_nop(); // HOLD1 lamp
+	latch1.q_out_cb<4>().set_nop(); // HOLD5 lamp
+	latch1.q_out_cb<5>().set_nop(); // START1 lamp
+	latch1.q_out_cb<6>().set_nop(); // BET lamp
 
-	MCFG_DEVICE_ADD("latch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // PAYOUT lamp
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // Coin counter
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // Ticket motor
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // Hopper motor
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, jackpool_state, map_vreg_w))
+	ls259_device &latch2(LS259(config, "latch2"));
+	latch2.q_out_cb<0>().set_nop(); // PAYOUT lamp
+	latch2.q_out_cb<3>().set_nop(); // Coin counter
+	latch2.q_out_cb<5>().set_nop(); // Ticket motor
+	latch2.q_out_cb<6>().set_nop(); // Hopper motor
+	latch2.q_out_cb<7>().set(FUNC(jackpool_state::map_vreg_w));
 
-	MCFG_DEVICE_ADD("latch3", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
+	ls259_device &latch3(LS259(config, "latch3"));
+	latch3.q_out_cb<0>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));
+	latch3.q_out_cb<1>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));
+	latch3.q_out_cb<2>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 

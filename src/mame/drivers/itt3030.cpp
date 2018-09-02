@@ -598,12 +598,12 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 /* As far as we can tell, the mess of ttl de-inverts the bus */
 READ8_MEMBER(itt3030_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(itt3030_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 /*
@@ -722,12 +722,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD("lowerbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lower48_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0xc000)
+	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
 
 	MCFG_DEVICE_ADD("crt5027", CRT5027, 6_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
@@ -746,8 +741,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)
 
 	/* internal ram */
-	MCFG_RAM_ADD("mainram")
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, "mainram").set_default_size("256K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -721,8 +721,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
+	m_ram->set_default_size("48K");
 MACHINE_CONFIG_END
 
 
@@ -752,8 +751,7 @@ MACHINE_CONFIG_START(spectrum_state::tc2048)
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
+	m_ram->set_default_size("48K");
 MACHINE_CONFIG_END
 
 

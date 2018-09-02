@@ -17,17 +17,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VICTOR9K_KBRDY_HANDLER(_devcb) \
-	downcast<victor_9000_keyboard_device &>(*device).set_kbrdy_cb(DEVCB_##_devcb);
-
-#define MCFG_VICTOR9K_KBDATA_HANDLER(_devcb) \
-	downcast<victor_9000_keyboard_device &>(*device).set_kbdata_cb(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -39,8 +28,8 @@ public:
 	// construction/destruction
 	victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_kbrdy_cb(Object &&cb) { return m_kbrdy_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_kbdata_cb(Object &&cb) { return m_kbdata_cb.set_callback(std::forward<Object>(cb)); }
+	auto kbrdy_handler() { return m_kbrdy_cb.bind(); }
+	auto kbdata_handler() { return m_kbdata_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( kback_w );
 
@@ -76,7 +65,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VICTOR9K_KEYBOARD, victor_9000_keyboard_device)
-
-
 
 #endif // MAME_MACHINE_VICTOR9K_KB_H

@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	MCFG_DEVICE_PROGRAM_MAP(tonton_map)
 	MCFG_DEVICE_IO_MAP(tonton_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* video hardware */

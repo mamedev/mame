@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
 
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
 

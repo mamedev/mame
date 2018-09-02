@@ -233,15 +233,10 @@ MACHINE_CONFIG_START(vcs80_state::vcs80)
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, vcs80_state, pio_pb_w))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, RAM_TAG).set_default_size("1K");
 
 	/* bankdev */
-	MCFG_DEVICE_ADD("bdmem", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vcs80_bd_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bdmem").set_map(&vcs80_state::vcs80_bd_mem).set_options(ENDIANNESS_BIG, 8, 32, 0x10000);
 MACHINE_CONFIG_END
 
 /* ROMs */

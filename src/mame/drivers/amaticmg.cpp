@@ -849,7 +849,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_DEVICE_PROGRAM_MAP(amaticmg_map)
 	MCFG_DEVICE_IO_MAP(amaticmg_portmap)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* 3x 8255 */
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)

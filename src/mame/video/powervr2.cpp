@@ -2301,7 +2301,54 @@ void powervr2_device::computedilated()
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
 }
 
-void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr, float const bl_in[4], float const br_in[4], float const offl_in[4], float const offr_in[4])
+inline uint32_t powervr2_device::sample_nontextured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color)
+{
+	return bls24(base_color, offset_color) | (base_color & 0xff000000);
+}
+
+template <int tsinst, bool bilinear>
+inline uint32_t powervr2_device::sample_textured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color)
+{
+	uint32_t tmp;
+	uint32_t c = (this->*(ti->r))(ti, u, v);
+	if (bilinear)
+	{
+		uint32_t c1 = (this->*(ti->r))(ti, u+1.0f, v);
+		uint32_t c2 = (this->*(ti->r))(ti, u+1.0f, v+1.0f);
+		uint32_t c3 = (this->*(ti->r))(ti, u, v+1.0f);
+		c = bilinear_filter(c, c1, c2, c3, u, v);
+	}
+
+	switch (tsinst) {
+		case 0:
+			// decal
+			c = bls24(c, offset_color) | (c & 0xff000000);
+			break;
+		case 1:
+			// modulate
+			tmp = blc(c, base_color);
+			tmp = bls24(tmp, offset_color);
+			tmp |= c & 0xff000000;
+			c = tmp;
+			break;
+		case 2:
+			// decal with alpha
+			tmp = bls24(bla(c, c), blia(base_color, c));
+			c = bls24(tmp, offset_color) | (base_color & 0xff000000);
+			break;
+		case 3:
+			// modulate with alpha
+			tmp = blc(c, base_color);
+			tmp = bls24(tmp, offset_color);
+			tmp |= (((c >> 24) * (base_color >> 24)) >> 8) << 24;
+			c = tmp;
+			break;
+	}
+	return c;
+}
+
+template <powervr2_device::pix_sample_fn sample_fn>
+inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr, float const bl_in[4], float const br_in[4], float const offl_in[4], float const offr_in[4])
 {
 	int idx;
 	int xxl, xxr;
@@ -2309,12 +2356,7 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 	uint32_t *tdata;
 	float *wbufline;
 
-	// untextured cases aren't handled
-//  if (!ti->textured) return;
-
 	float bl[4], offl[4];
-	memcpy(bl, bl_in, sizeof(bl));
-	memcpy(offl, offl_in, sizeof(offl));
 
 	if(xr < 0 || xl >= 640)
 		return;
@@ -2325,23 +2367,28 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 	if(xxl == xxr)
 		return;
 
+	memcpy(bl, bl_in, sizeof(bl));
+	memcpy(offl, offl_in, sizeof(offl));
+
 	dx = xr-xl;
-	dudx = (ur-ul)/dx;
-	dvdx = (vr-vl)/dx;
-	dwdx = (wr-wl)/dx;
+	float dx_recip = 1.0f / dx;
+
+	dudx = (ur-ul) * dx_recip;
+	dvdx = (vr-vl) * dx_recip;
+	dwdx = (wr-wl) * dx_recip;
 
 	float dbdx[4] = {
-		(br_in[0] - bl[0]) / dx,
-		(br_in[1] - bl[1]) / dx,
-		(br_in[2] - bl[2]) / dx,
-		(br_in[3] - bl[3]) / dx
+		(br_in[0] - bl[0]) * dx_recip,
+		(br_in[1] - bl[1]) * dx_recip,
+		(br_in[2] - bl[2]) * dx_recip,
+		(br_in[3] - bl[3]) * dx_recip
 	};
 
 	float dodx[4] = {
-		(offr_in[0] - offl[0]) / dx,
-		(offr_in[1] - offl[1]) / dx,
-		(offr_in[2] - offl[2]) / dx,
-		(offr_in[3] - offl[3]) / dx
+		(offr_in[0] - offl[0]) * dx_recip,
+		(offr_in[1] - offl[1]) * dx_recip,
+		(offr_in[2] - offl[2]) * dx_recip,
+		(offr_in[3] - offl[3]) * dx_recip
 	};
 
 	if(xxl < 0)
@@ -2364,64 +2411,15 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 
 	while(xxl < xxr) {
 		if((wl >= *wbufline)) {
+			uint32_t c;
 			float u = ul/wl;
 			float v = vl/wl;
-
-			/*
-			 * TODO: Not sure if blending should be done in
-			 * floating point or fixed point, or if it even matters.
-			 */
-			uint32_t c;
 			uint32_t offset_color = float_argb_to_packed_argb(offl);
 			uint32_t base_color = float_argb_to_packed_argb(bl);
-
-			if (ti->textured) {
-				c = (this->*(ti->r))(ti, u, v);
-				// debug dip to turn on/off bilinear filtering, it's slooooow
-				if (debug_dip_status&0x1)
-				{
-					if(ti->filter_mode >= TEX_FILTER_BILINEAR)
-					{
-						uint32_t c1 = (this->*(ti->r))(ti, u+1.0f, v);
-						uint32_t c2 = (this->*(ti->r))(ti, u+1.0f, v+1.0f);
-						uint32_t c3 = (this->*(ti->r))(ti, u, v+1.0f);
-						c = bilinear_filter(c, c1, c2, c3, u, v);
-					}
-				}
-
-				uint32_t tmp;
-				switch (ti->tsinstruction) {
-				case 0:
-					// decal
-					c = bls24(c, offset_color) | (c & 0xff000000);
-					break;
-				case 1:
-					// modulate
-					tmp = blc(c, base_color);
-					tmp = bls24(tmp, offset_color);
-					tmp |= c & 0xff000000;
-					c = tmp;
-					break;
-				case 2:
-					// decal with alpha
-					tmp = bls24(bla(c, c), blia(base_color, c));
-					c = bls24(tmp, offset_color) | (base_color & 0xff000000);
-					break;
-				case 3:
-					// modulate with alpha
-					tmp = blc(c, base_color);
-					tmp = bls24(tmp, offset_color);
-					tmp |= (((c >> 24) * (base_color >> 24)) >> 8) << 24;
-					c = tmp;
-					break;
-				}
-			} else {
-				c = bls24(base_color, offset_color) | (base_color & 0xff000000);
-			}
-
+			c = (this->*sample_fn)(ti, u, v, offset_color, base_color);
 			if(c & 0xff000000) {
-				*tdata = ti->blend(c, *tdata);
 				*wbufline = wl;
+				*tdata = ti->blend(c, *tdata);
 			}
 		}
 		wbufline++;
@@ -2438,7 +2436,8 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 	}
 }
 
-void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
+template <powervr2_device::pix_sample_fn sample_fn>
+inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 									float y0, float y1,
 									float xl, float xr,
 									float ul, float ur,
@@ -2516,7 +2515,7 @@ void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	}
 
 	while(yy0 < yy1) {
-		render_hline(bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr, bl, br, offl, offr);
+		render_hline<sample_fn>(bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr, bl, br, offl, offr);
 
 		xl += dxldy;
 		xr += dxrdy;
@@ -2568,7 +2567,8 @@ void powervr2_device::sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 }
 
 
-void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
+template <powervr2_device::pix_sample_fn sample_fn>
+inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
 
@@ -2686,15 +2686,15 @@ void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const
 			return;
 
 		if(v1->x > v0->x)
-			render_span(bitmap, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, v0->b, v1->b, v0->o, v1->o, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
+			render_span<sample_fn>(bitmap, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, v0->b, v1->b, v0->o, v1->o, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
 		else
-			render_span(bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, v1->b, v0->b, v1->o, v0->o, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
+			render_span<sample_fn>(bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, v1->b, v0->b, v1->o, v0->o, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
 
 	} else if(!dy12) {
 		if(v2->x > v1->x)
-			render_span(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
+			render_span<sample_fn>(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
 		else
-			render_span(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
+			render_span<sample_fn>(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
 
 	} else {
 			float idk_b[4] = {
@@ -2710,17 +2710,17 @@ void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const
 				v0->o[3] + do02dy[3] * dy01
 			};
 		if(dx01dy < dx02dy) {
-			render_span(bitmap, ti, v0->y, v1->y,
+			render_span<sample_fn>(bitmap, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o,
 						dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
-			render_span(bitmap, ti, v1->y, v2->y,
+			render_span<sample_fn>(bitmap, ti, v1->y, v2->y,
 						v1->x, v0->x + dx02dy*dy01, v1->u, v0->u + du02dy*dy01, v1->v, v0->v + dv02dy*dy01, v1->w, v0->w + dw02dy*dy01, v1->b, idk_b, v1->o, idk_o,
 						dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
 		} else {
-			render_span(bitmap, ti, v0->y, v1->y,
+			render_span<sample_fn>(bitmap, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o,
 						dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
-			render_span(bitmap, ti, v1->y, v2->y,
+			render_span<sample_fn>(bitmap, ti, v1->y, v2->y,
 						v0->x + dx02dy*dy01, v1->x, v0->u + du02dy*dy01, v1->u, v0->v + dv02dy*dy01, v1->v, v0->w + dw02dy*dy01, v1->w, idk_b, v1->b, idk_o, v1->o,
 						dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
 		}
@@ -2732,7 +2732,59 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 	int i0, i1, i2;
 
 	sort_vertices(v, &i0, &i1, &i2);
-	render_tri_sorted(bitmap, ti, v+i0, v+i1, v+i2);
+
+	bool textured = ti->textured;
+	if (textured) {
+		bool bilinear = (debug_dip_status & 1) &&
+			(ti->filter_mode >= TEX_FILTER_BILINEAR);
+		if (bilinear) {
+			switch (ti->tsinstruction) {
+			case 0:
+				render_tri_sorted<&powervr2_device::sample_textured<0,true>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			case 1:
+				render_tri_sorted<&powervr2_device::sample_textured<1,true>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			case 2:
+				render_tri_sorted<&powervr2_device::sample_textured<2,true>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			case 3:
+				render_tri_sorted<&powervr2_device::sample_textured<3,true>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			default:
+				/*
+				 * This should be impossible because tsinstruction was previously
+				 * AND'd with 3
+				 */
+				logerror("%s - tsinstruction is 0x%08x\n", (unsigned)ti->tsinstruction);
+				render_tri_sorted<&powervr2_device::sample_nontextured>(bitmap, ti, v+i0, v+i1, v+i2);
+			}
+		} else {
+			switch (ti->tsinstruction) {
+			case 0:
+				render_tri_sorted<&powervr2_device::sample_textured<0,false>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			case 1:
+				render_tri_sorted<&powervr2_device::sample_textured<1,false>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			case 2:
+				render_tri_sorted<&powervr2_device::sample_textured<2,false>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			case 3:
+				render_tri_sorted<&powervr2_device::sample_textured<3,false>>(bitmap, ti, v+i0, v+i1, v+i2);
+				break;
+			default:
+				/*
+				 * This should be impossible because tsinstruction was previously
+				 * AND'd with 3
+				 */
+				logerror("%s - tsinstruction is 0x%08x\n", (unsigned)ti->tsinstruction);
+				render_tri_sorted<&powervr2_device::sample_nontextured>(bitmap, ti, v+i0, v+i1, v+i2);
+			}
+		}
+	} else {
+			render_tri_sorted<&powervr2_device::sample_nontextured>(bitmap, ti, v+i0, v+i1, v+i2);
+	}
 }
 
 void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap,const rectangle &cliprect)

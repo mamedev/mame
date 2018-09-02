@@ -91,6 +91,9 @@ protected:
 	virtual void parallel_data_w(uint8_t data) override;
 	virtual void parallel_strobe_w(int state) override;
 
+	void add_base_mconfig(machine_config &config);
+	void add_cia_mconfig(machine_config &config);
+
 	enum
 	{
 		LED_POWER = 0,

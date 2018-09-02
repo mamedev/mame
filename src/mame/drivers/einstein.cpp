@@ -616,11 +616,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
-	MCFG_TMS9928A_SET_SCREEN("screen")
-	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9129_device, screen_update)
+	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000); // 16k RAM, provided by IC i040 and i041
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -629,12 +628,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE("adc_daisy", z80daisy_generic_device, int_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("analogue_1_x"))
-	MCFG_ADC0844_CH2_CB(IOPORT("analogue_1_y"))
-	MCFG_ADC0844_CH3_CB(IOPORT("analogue_2_x"))
-	MCFG_ADC0844_CH4_CB(IOPORT("analogue_2_y"))
+	adc0844_device &adc(ADC0844(config, "adc", 0));
+	adc.intr_callback().set("adc_daisy", FUNC(z80daisy_generic_device::int_w));
+	adc.ch1_callback().set_ioport("analogue_1_x");
+	adc.ch2_callback().set_ioport("analogue_1_y");
+	adc.ch3_callback().set_ioport("analogue_2_x");
+	adc.ch4_callback().set_ioport("analogue_2_y");
 
 	/* printer */
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
@@ -672,8 +671,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// tatung pipe connector
 	MCFG_TATUNG_PIPE_ADD("pipe")

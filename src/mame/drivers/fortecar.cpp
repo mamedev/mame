@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -701,8 +701,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	EEPROM_93C56_16BIT(config, "eeprom").default_value(0);
 
 	MCFG_DEVICE_ADD("fcppi0", I8255A, 0)
 	/*  Init with 0x9a... A, B and high C as input

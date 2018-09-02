@@ -97,7 +97,7 @@ MACHINE_CONFIG_START(lft_state::lft)
 	MCFG_DEVICE_IO_MAP(lft_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(lft_state, kbd_put))
 MACHINE_CONFIG_END
 

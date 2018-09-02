@@ -14,6 +14,18 @@
 		</part>
 	</software>
 
+	<software name="cmpqdiag">
+		<description>Compaq Portable Diagnostic Disk (SP0308)</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<info name="version" value="8.00 DP256" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Compaq Portable Diagnostic Disk.img" size="737280" crc="47fba91e" sha1="f3aafb3010173966a4a5038bfa4cf2ff537a6efc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fdtest">
 		<description>IBM Personal Computer AT Fixed Disk/Diskette Drive Adapter Test Diskette (v1.00)</description>
 		<year>1985</year>
@@ -53,6 +65,54 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="alinuz2.img" size="1474560" crc="1091fe7b" sha1="b26301b0321bb5defec42a5ef2f879b91ef85f5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allinone">
+		<description>The All In One Boot Floppy 1.0</description>
+		<year>2008</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="allinone.img" size="1474560" crc="b9d206e2" sha1="48993ad7769f655a46180db1e4dd2cf6811299ed" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allinonea" cloneof="allinone">
+		<description>The All In One Boot Floppy 0.9</description>
+		<year>2006</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="0.9" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="allinone09.img" size="1474560" crc="f97836fd" sha1="f1c6cdb2a56010d5cc7d36609c343c5f434c98dc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allinonel" cloneof="allinone">
+		<description>The All In One Boot Floppy 0.9 (Lite Version)</description>
+		<year>2006</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="0.9" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="lite.img" size="737280" crc="a817a384" sha1="28d34559991788ce2e0b8ef486a8265c42e4e03d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allinonef" cloneof="allinone">
+		<description>The All In One Boot Floppy 0.9 (FreeDOS only)</description>
+		<year>2006</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="0.9" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="freedos.img" size="737280" crc="57e02573" sha1="17226bd9bb3fc593084fadb52727defffdf51433" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2491,7 +2551,7 @@
 		</part>
 	</software>
 
-	<software name="msdos622th">
+	<software name="msdos622th" cloneof="msdos622">
 		<description>MS-DOS (Version 6.22, Thai)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
@@ -4746,6 +4806,19 @@
 		</part>
 	</software>
 
+	<software name="mitscd" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Mitsumi IDE CD-ROM Driver</description>
+		<year>1994</year>
+		<publisher>Mitsumi</publisher>
+		<info name="version" value="1.21" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="mtm disk1.img" size="1474560" crc="b174a5a1" sha1="8e540c920ec5737786f4bb2d0c10bc5362cd3fdc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mitsmous">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Mitsumi Mouse Driver</description>
@@ -5111,6 +5184,18 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="win529.img" size="1474560" crc="9578bf9a" sha1="6dd7b4ac9e18c6d9cd6685230b5245321ffc43ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="absdemo">
+		<description>ABS Self Running Demo</description>
+		<year>1995</year>
+		<publisher>American Business Solutions</publisher>
+		<info name="version" value="2.0A" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="ABS Self Running Demo v2.0A (American Business Solutions, Inc.)(1995).img" size="1474560" crc="28b8c301" sha1="153dbf509d103110bd9c17ad43ba1e36c04f1b2e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5667,6 +5752,17 @@
 		</part>
 	</software>
 
+	<software name="486demo">
+		<description>Intel 486 SX Microprocessor Demo</description>
+		<year>1991</year>
+		<publisher>Intel</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Intel486SXMicroprocessor.img" size="1228800" crc="51ea6d4f" sha1="74827f81f2ae8fd21fdbe817a8f62603aed601ea" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="l123r3">
 		<description>Lotus 1-2-3 Release 3 (5.25")</description>
 		<year>1989</year>
@@ -5792,6 +5888,52 @@
 		</part>
 	</software>
 
+	<software name="prodpack">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Microsoft Productivity Pack for Windows</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="3.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodpack disk1.img" size="1474560" crc="67c7b595" sha1="ca17fdba8e2bcc267e38e47cd919ef7955b72494" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodpack disk2.img" size="1474560" crc="68093322" sha1="54cc63457af4926f542b0445aedefef28b0bb59c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msworks3">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Microsoft Works 3.0b</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="3.0b" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk1.img" size="1474560" crc="24ca92fe" sha1="f462e7da1704eccdc0fa6fcb51c938c585c98136" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk2.img" size="1474560" crc="ed3d23d3" sha1="4ad83f15aabf69d3ae845656c2cf76378446dc5e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk3.img" size="1474560" crc="0d207897" sha1="c1332a1f8c59c746306a2f374dbd3aa62861c8be" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk4.img" size="1474560" crc="2c98fcd2" sha1="1733f95eb545eee83d6afcf69600094ecae08758" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mbhh95">
 		<description>MikroBITTI Huvi- ja hyötylevyke 1995 (Fin)</description>
 		<year>1995</year>
@@ -5810,6 +5952,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="284775">
 				<rom name="ncr system diagnostics at class.td0" size="284775" crc="e73601ed" sha1="f253bb8ea508c98b88dd94c130e0dc87b9934b99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="netcom">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>NETCOM NetCruiser</description>
+		<year>1994</year>
+		<publisher>NETCOM</publisher>
+		<info name="version" value="1.51" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="netcom disk1.img" size="1474560" crc="ff7fa3f6" sha1="13099e622c0e1b1a127c433e8900e83b541a45dc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8207,6 +8362,38 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5115f916" sha1="2745fbbe403911e5beceb983cbf86ee501cd69e7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking">
+		<description>Disney's The Lion King</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive Entertainment, Inc.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disney's The Lion King (USA) (Disk 1).img" size="1474560" crc="732d455a" sha1="20e85e8c381263363250c5b509fbc24415ed2e5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disney's The Lion King (USA) (Disk 2).img" size="1474560" crc="9101af49" sha1="ffa0965807bc23747d4aea77a67b3448df558b04" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disney's The Lion King (USA) (Disk 3).img" size="1474560" crc="2eb5e888" sha1="267b9fb48d5721d09dcc5fccbe2074024a2bb4bb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingd" cloneof="lionking">
+		<description>Disney's The Lion King (Playable Demo)</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive Entertainment</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="lion.img" size="1474560" crc="e4767eb0" sha1="752b4b6268d464a6b7a8700152ca746f1e81b74b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

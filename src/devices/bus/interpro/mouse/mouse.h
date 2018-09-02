@@ -5,9 +5,6 @@
 
 #pragma once
 
-#define MCFG_MOUSE_STATE_CB(_state_cb) \
-	downcast<interpro_mouse_port_device &>(*device).set_state_callback(DEVCB_##_state_cb);
-
 class device_interpro_mouse_port_interface;
 
 class interpro_mouse_port_device : public device_t, public device_slot_interface
@@ -15,9 +12,20 @@ class interpro_mouse_port_device : public device_t, public device_slot_interface
 	friend class device_interpro_mouse_port_interface;
 
 public:
-	interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: interpro_mouse_port_device(mconfig, tag, owner)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
 
-	template <class Object> devcb_base &set_state_callback(Object &&cb) { return m_state_func.set_callback(std::forward<Object>(cb)); }
+	interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+
+	// callback configuration
+	auto state_func() { return m_state_func.bind(); }
 
 protected:
 	// device-level overrides
@@ -25,9 +33,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
+private:
 	devcb_write32 m_state_func;
 
-private:
 	device_interpro_mouse_port_interface *m_device;
 };
 
@@ -41,6 +49,7 @@ public:
 protected:
 	device_interpro_mouse_port_interface(machine_config const &mconfig, device_t &device);
 
+private:
 	interpro_mouse_port_device *m_port;
 };
 

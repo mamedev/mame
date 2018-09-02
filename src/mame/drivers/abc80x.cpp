@@ -1067,14 +1067,14 @@ MACHINE_CONFIG_START(abc800_state::common)
 	m_ctc->zc_callback<2>().append(m_dart, FUNC(z80dart_device::txca_w));
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CTC_TAG, abc800_state, ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, ABC800_X01/2/2)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(*this, abc800_state, sio_txdb_w))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(*this, abc800_state, sio_dtrb_w))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(*this, abc800_state, sio_rtsb_w))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80SIO(config, m_sio, ABC800_X01/2/2);
+	m_sio->out_txda_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(FUNC(abc800_state::sio_txdb_w));
+	m_sio->out_dtrb_callback().set(FUNC(abc800_state::sio_dtrb_w));
+	m_sio->out_rtsb_callback().set(FUNC(abc800_state::sio_rtsb_w));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
@@ -1093,9 +1093,9 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio, z80sio_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
 
 	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, nullptr)
 	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
@@ -1142,9 +1142,7 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 
@@ -1172,9 +1170,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 
@@ -1205,8 +1201,7 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	MCFG_SLOT_DEFAULT_OPTION("abc834")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1226,7 +1221,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	abc806_video(config);
 
 	// peripheral hardware
-	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
+	E0516(config, E0516_TAG, ABC806_X02);
 
 	MCFG_DEVICE_MODIFY(Z80DART_TAG)
 	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, abc806_state, keydtr_w))
@@ -1238,9 +1233,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	MCFG_SLOT_DEFAULT_OPTION("abc832")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("160K")
-	MCFG_RAM_EXTRA_OPTIONS("544K")
+	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")

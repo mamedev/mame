@@ -244,8 +244,8 @@ MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
 
 	/* PIT Parallel Interface and Timer device */
-	MCFG_DEVICE_ADD("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, vme_fcscsi1_card_device, led_w))
+	PIT68230(config, m_pit, PIT_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
+	m_pit->pb_out_callback().set(FUNC(vme_fcscsi1_card_device::led_w));
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
 	MCFG_DEVICE_ADD("mc68450", HD63450, CPU_CRYSTAL / 2)   // MC68450 compatible
@@ -417,12 +417,12 @@ WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 
 READ8_MEMBER(vme_fcscsi1_card_device::fdc_read_byte)
 {
-	return m_fdc->read_data();
+	return m_fdc->data_r();
 }
 
 WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_write_byte)
 {
-	m_fdc->write_data(data & 0xff);
+	m_fdc->data_w(data & 0xff);
 }
 
 READ8_MEMBER(vme_fcscsi1_card_device::scsi_r)

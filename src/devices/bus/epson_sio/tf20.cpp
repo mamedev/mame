@@ -93,8 +93,7 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device, irq_callback)
 
 	// 64k internal ram
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("64k")
+	RAM(config, "ram").set_default_size("64K");
 
 	// upd7201 serial interface
 	MCFG_DEVICE_ADD("3a", UPD7201, XTAL_CR1 / 2)

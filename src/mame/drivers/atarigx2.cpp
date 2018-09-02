@@ -1490,18 +1490,17 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_IN0_CB(IOPORT("A2D0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("A2D1"))
-	MCFG_ADC0808_IN2_CB(IOPORT("A2D2"))
-	MCFG_ADC0808_IN3_CB(IOPORT("A2D3"))
-	MCFG_ADC0808_IN4_CB(IOPORT("A2D4"))
-	MCFG_ADC0808_IN5_CB(IOPORT("A2D5"))
-	MCFG_ADC0808_IN6_CB(IOPORT("A2D6"))
-	MCFG_ADC0808_IN7_CB(IOPORT("A2D7"))
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	m_adc->in_callback<0>().set_ioport("A2D0");
+	m_adc->in_callback<1>().set_ioport("A2D1");
+	m_adc->in_callback<2>().set_ioport("A2D2");
+	m_adc->in_callback<3>().set_ioport("A2D3");
+	m_adc->in_callback<4>().set_ioport("A2D4");
+	m_adc->in_callback<5>().set_ioport("A2D5");
+	m_adc->in_callback<6>().set_ioport("A2D6");
+	m_adc->in_callback<7>().set_ioport("A2D7");
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)

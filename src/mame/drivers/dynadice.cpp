@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_DEVICE_IO_MAP(dynadice_sound_io_map)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

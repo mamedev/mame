@@ -540,14 +540,14 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, XTAL(16'000'000)/4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(*this, a7150_state, kgs_iml_w))
-//  MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(*this, a7150_state, kgs_ifss_loopback_w))
+	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, XTAL(16'000'000)/4));
+	sio.out_int_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	sio.out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	sio.out_dtrb_callback().set(FUNC(a7150_state::kgs_iml_w));
+	//sio.out_rtsb_callback().set(FUNC(a7150_state::kgs_ifss_loopback_w));
 
 	// V.24 port (graphics tablet)
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "loopback")

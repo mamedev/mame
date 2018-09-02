@@ -331,6 +331,13 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
 	return ioport("IN0")->read();   /* needed for coins */
 }
 
+WRITE8_MEMBER(opwolf_state::counters_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);
+}
 
 /******************************************************
                 SOUND
@@ -349,11 +356,13 @@ WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 void opwolf_state::opwolf_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0000, 0x0f07ff).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_data_r));
-	map(0x0f0802, 0x0f0803).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_status_r));
-	map(0x0ff000, 0x0ff7ff).w(FUNC(opwolf_state::opwolf_cchip_data_w));
-	map(0x0ff802, 0x0ff803).w(FUNC(opwolf_state::opwolf_cchip_status_w));
-	map(0x0ffc00, 0x0ffc01).w(FUNC(opwolf_state::opwolf_cchip_bank_w));
+//  map(0x0f0000, 0x0f07ff).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_data_r));
+//  map(0x0f0802, 0x0f0803).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_status_r));
+//  map(0x0ff000, 0x0ff7ff).w(FUNC(opwolf_state::opwolf_cchip_data_w));
+//  map(0x0ff802, 0x0ff803).w(FUNC(opwolf_state::opwolf_cchip_status_w));
+//  map(0x0ffc00, 0x0ffc01).w(FUNC(opwolf_state::opwolf_cchip_bank_w));
+	map(0x0f0000, 0x0f07ff).mirror(0xf000).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);
+	map(0x0f0800, 0x0f0fff).mirror(0xf000).rw(m_cchip, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic68_w)).umask16(0x00ff);
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
@@ -446,7 +455,7 @@ void opwolf_state::opwolfb_sub_z80_map(address_map &map)
 
 void opwolf_state::machine_start()
 {
-	m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
+	//m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
 
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
@@ -777,6 +786,19 @@ static GFXDECODE_START( gfx_opwolfb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_b,  0, 128 ) /* scr tiles */
 GFXDECODE_END
 
+/***********************************************************/
+
+INTERRUPT_GEN_MEMBER(opwolf_state::interrupt)
+{
+	m_maincpu->set_input_line(5, HOLD_LINE);
+	if (m_cchip) m_cchip->ext_interrupt(ASSERT_LINE);
+	if (m_cchip_irq_clear) m_cchip_irq_clear->adjust(attotime::zero);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(opwolf_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
 
 /***********************************************************
                  MACHINE DRIVERS
@@ -787,12 +809,17 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(opwolf_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", opwolf_state, interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(opwolf_sound_z80_map)
 
 	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); /* 12MHz measured on pin 20 */
+	m_cchip->in_pb_callback().set_ioport("IN0");
+	m_cchip->in_pc_callback().set_ioport("IN1");
+	m_cchip->out_pb_callback().set(FUNC(opwolf_state::counters_w));
+
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", opwolf_state, cchip_irq_clear_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -855,6 +882,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolfp)
 	MCFG_DEVICE_PROGRAM_MAP(opwolfp_map)
 
 	MCFG_DEVICE_REMOVE("cchip")
+	MCFG_DEVICE_REMOVE("cchip_irq_clear")
 MACHINE_CONFIG_END
 
 
@@ -929,31 +957,6 @@ MACHINE_CONFIG_END
                     DRIVERS
 ***************************************************************************/
 
-/*
-
-Note about current c-chip eprom dump
-
-the current dump is bad because data with address bit 0x200 set is missing (always read out as 0xff)
-
-you can however locate some of the tables used by the current simulation code in the rom
-
-for example
-
-Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B
-00001128                 07 80 02 09 03 00 4C
-00001134  01 00 04 00 10 07 80 02 09 03 00 4C
-00001140  01 40 04 00 20
-
-is the following data from machine/opwolf.cpp
-
-static const uint16_t level_data_04[] = {
-  0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
-  0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
-
-however without the correct dump of the cchip eprom we can't run the actual cchip code
-
-*/
-
 ROM_START( opwolf )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
@@ -965,7 +968,7 @@ ROM_START( opwolf )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -993,7 +996,7 @@ ROM_START( opwolfa )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1016,7 +1019,7 @@ ROM_START( opwolfj )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1039,7 +1042,7 @@ ROM_START( opwolfjsc )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1062,7 +1065,7 @@ ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specif
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1152,7 +1155,7 @@ void opwolf_state::init_opwolf()
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
-	opwolf_cchip_init();
+	//opwolf_cchip_init(); // start old simulation, including periodic timer
 
 	// World & US version have different gun offsets, presumably slightly different gun hardware
 	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
@@ -1189,6 +1192,7 @@ void opwolf_state::init_opwolfp()
 
 // Prototype rom set includes the string - 'T KATO 10/6/87'
 // Regular rom set includes the string '11 Sep 1987'
+// C-Chip includes the string 'By_TAITO_Copration_On_OSAKA_BUNSHITU._01.Sep.1987_Toshiaki.Kato_Tsutomuawa_4
 
 // MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
 

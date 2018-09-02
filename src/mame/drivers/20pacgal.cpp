@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	MCFG_DEVICE_PROGRAM_MAP(_20pacgal_map)
 	MCFG_DEVICE_IO_MAP(_20pacgal_io_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

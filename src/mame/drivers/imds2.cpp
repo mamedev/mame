@@ -861,8 +861,8 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_PIT8253_OUT0_HANDLER(WRITELINE("ioctimer" , pit8253_device , write_clk2));
 		MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, imds2_state , imds2_beep_timer_w));
 
-		MCFG_DEVICE_ADD("iocfdc" , I8271 , IOC_XTAL_Y1 / 2)
-		MCFG_I8271_DRQ_CALLBACK(WRITELINE("iocdma" , i8257_device , dreq1_w))
+		I8271(config, m_iocfdc, IOC_XTAL_Y1 / 2);
+		m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
 		MCFG_FLOPPY_DRIVE_ADD("iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 		MCFG_SLOT_FIXED(true)
 

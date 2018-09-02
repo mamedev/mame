@@ -404,15 +404,7 @@ public:
 	void hbf700p(machine_config &config);
 
 	void msx(machine_config &config);
-	void msx_ntsc(machine_config &config);
-	void msx_tms9118(machine_config &config);
-	void msx_tms9128(machine_config &config);
-	void msx_tms9918(machine_config &config);
-	void msx_tms9918a(machine_config &config);
-	void msx_tms9928(machine_config &config);
-	void msx_pal(machine_config &config);
-	void msx_tms9129(machine_config &config);
-	void msx_tms9929(machine_config &config);
+	template<typename VDPType> void msx1(VDPType &vdp_type, machine_config &config);
 	void msx2(machine_config &config);
 	void msx2p(machine_config &config);
 	void msx2_pal(machine_config &config);

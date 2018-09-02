@@ -887,14 +887,10 @@ void tnzs_base_state::mainbank_map(address_map &map)
 	map(0x08000, 0x1ffff).rom().region(":maincpu", 0x8000);
 }
 
-MACHINE_CONFIG_START(tnzs_base_state::tnzs_mainbank)
-	MCFG_DEVICE_ADD("mainbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mainbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-MACHINE_CONFIG_END
+void tnzs_base_state::tnzs_mainbank(machine_config &config)
+{
+	ADDRESS_MAP_BANK(config, "mainbank").set_map(&tnzs_base_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x4000);
+}
 
 #define COMMON_IN2\
 	PORT_START("IN2")\

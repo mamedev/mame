@@ -92,6 +92,15 @@ public:
 	template <class Object> devcb_base &set_bkdet_callback(Object &&cb) { return m_write_bkdet.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_xsync_callback(Object &&cb) { return m_write_xsync.set_callback(std::forward<Object>(cb)); }
 
+	auto txd_handler() { return m_write_txd.bind(); }
+	auto rxrdy_handler() { return m_write_rxrdy.bind(); }
+	auto txrdy_handler() { return m_write_txrdy.bind(); }
+	auto rts_handler() { return m_write_rts.bind(); }
+	auto dtr_handler() { return m_write_dtr.bind(); }
+	auto txemt_dschg_handler() { return m_write_txemt_dschg.bind(); }
+	auto bkdet_handler() { return m_write_bkdet.bind(); }
+	auto xsync_handler() { return m_write_xsync.bind(); }
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

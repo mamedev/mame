@@ -344,19 +344,19 @@ READ8_MEMBER(msx_cart_disk_type1_device::read_cart)
 	{
 		case 0x7ff8:
 		case 0xbff8:
-			return m_fdc->read_status();
+			return m_fdc->status_r();
 
 		case 0x7ff9:
 		case 0xbff9:
-			return m_fdc->read_track();
+			return m_fdc->track_r();
 
 		case 0x7ffa:
 		case 0xbffa:
-			return m_fdc->read_sector();
+			return m_fdc->sector_r();
 
 		case 0x7ffb:
 		case 0xbffb:
-			return m_fdc->read_data();
+			return m_fdc->data_r();
 
 		case 0x7ffc:
 		case 0xbffc:
@@ -385,22 +385,22 @@ WRITE8_MEMBER(msx_cart_disk_type1_device::write_cart)
 	{
 		case 0x7ff8:
 		case 0xbff8:
-			m_fdc->write_cmd(data);
+			m_fdc->cmd_w(data);
 			break;
 
 		case 0x7ff9:
 		case 0xbff9:
-			m_fdc->write_track(data);
+			m_fdc->track_w(data);
 			break;
 
 		case 0x7ffa:
 		case 0xbffa:
-			m_fdc->write_sector(data);
+			m_fdc->sector_w(data);
 			break;
 
 		case 0x7ffb:
 		case 0xbffb:
-			m_fdc->write_data(data);
+			m_fdc->data_w(data);
 			break;
 
 		case 0x7ffc:
@@ -489,19 +489,19 @@ READ8_MEMBER(msx_cart_disk_type2_device::read_cart)
 	{
 		case 0x7fb8:
 		case 0xbfb8:
-			return m_fdc->read_status();
+			return m_fdc->status_r();
 
 		case 0x7fb9:
 		case 0xbfb9:
-			return m_fdc->read_track();
+			return m_fdc->track_r();
 
 		case 0x7fba:
 		case 0xbfba:
-			return m_fdc->read_sector();
+			return m_fdc->sector_r();
 
 		case 0x7fbb:
 		case 0xbfbb:
-			return m_fdc->read_data();
+			return m_fdc->data_r();
 
 		case 0x7fbc:
 		case 0xbfbc:
@@ -522,22 +522,22 @@ WRITE8_MEMBER(msx_cart_disk_type2_device::write_cart)
 	{
 		case 0x7fb8:
 		case 0xbfb8:
-			m_fdc->write_cmd(data);
+			m_fdc->cmd_w(data);
 			break;
 
 		case 0x7fb9:
 		case 0xbfb9:
-			m_fdc->write_track(data);
+			m_fdc->track_w(data);
 			break;
 
 		case 0x7fba:
 		case 0xbfba:
-			m_fdc->write_sector(data);
+			m_fdc->sector_w(data);
 			break;
 
 		case 0x7fbb:
 		case 0xbfbb:
-			m_fdc->write_data(data);
+			m_fdc->data_w(data);
 			break;
 
 		case 0x7fbc:

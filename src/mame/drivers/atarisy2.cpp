@@ -1196,17 +1196,17 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/32) // 625 kHz
-	MCFG_ADC0808_IN0_CB(IOPORT("ADC0")) // J102 pin 5 (POT1)
-	MCFG_ADC0808_IN1_CB(IOPORT("ADC1")) // J102 pin 7 (POT2)
-	MCFG_ADC0808_IN2_CB(IOPORT("ADC2")) // J102 pin 9 (POT3)
-	MCFG_ADC0808_IN3_CB(IOPORT("ADC3")) // J102 pin 8 (POT4)
+	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK/32)); // 625 kHz
+	adc.in_callback<0>().set_ioport("ADC0"); // J102 pin 5 (POT1)
+	adc.in_callback<1>().set_ioport("ADC1"); // J102 pin 7 (POT2)
+	adc.in_callback<2>().set_ioport("ADC2"); // J102 pin 9 (POT3)
+	adc.in_callback<3>().set_ioport("ADC3"); // J102 pin 8 (POT4)
 	// IN4 = J102 pin 6 (unused)
 	// IN5 = J102 pin 4 (unused)
 	// IN6 = J102 pin 2 (unused)
 	// IN7 = J102 pin 3 (unused)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1228,17 +1228,12 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy2_state, vblank_int))
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&atarisy2_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000);
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu").int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)

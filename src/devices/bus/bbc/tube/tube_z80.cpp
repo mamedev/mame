@@ -74,9 +74,7 @@ MACHINE_CONFIG_START(bbc_tube_z80_device::device_add_mconfig)
 	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("z80", INPUT_LINE_IRQ0))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_flop_z80")

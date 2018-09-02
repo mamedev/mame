@@ -345,8 +345,7 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_16BIT)
-	MCFG_EEPROM_DATA(overdriv_default_eeprom, 128)
+	EEPROM_ER5911_16BIT(config, "eeprom").default_data(overdriv_default_eeprom, 128);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

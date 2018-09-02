@@ -206,12 +206,12 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 	MCFG_DEVICE_PROGRAM_MAP(galastrm_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 6))
-	MCFG_ADC0808_IN0_CB(IOPORT("STICKX"))
-	MCFG_ADC0808_IN1_CB(IOPORT("STICKY"))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 6);
+	adc.in_callback<0>().set_ioport("STICKX");
+	adc.in_callback<1>().set_ioport("STICKY");
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_2_callback().set_ioport("IN0");

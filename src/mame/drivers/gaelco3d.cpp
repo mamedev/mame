@@ -939,7 +939,7 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
 	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C66_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C66_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -948,24 +948,24 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_DEVICE_ADD(m_serial, GAELCO_SERIAL, 0)
 	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(*this, gaelco3d_state, ser_irq))
 
-	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0) // IC5 on bottom board next to EEPROM
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(m_serial, gaelco_serial_device, tr_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(m_serial, gaelco_serial_device, rts_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m_eeprom, eeprom_serial_93cxx_device, di_write))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(m_eeprom, eeprom_serial_93cxx_device, clk_write))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(m_eeprom, eeprom_serial_93cxx_device, cs_write))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gaelco3d_state, unknown_13a_w))
+	LS259(config, m_mainlatch); // IC5 on bottom board next to EEPROM
+	m_mainlatch->q_out_cb<0>().set(m_serial, FUNC(gaelco_serial_device::tr_w));
+	m_mainlatch->q_out_cb<1>().set(m_serial, FUNC(gaelco_serial_device::rts_w));
+	m_mainlatch->q_out_cb<2>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
+	m_mainlatch->q_out_cb<3>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write));
+	m_mainlatch->q_out_cb<4>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
+	m_mainlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::tms_reset_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(gaelco3d_state::tms_irq_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(gaelco3d_state::unknown_13a_w));
 
-	MCFG_DEVICE_ADD(m_outlatch, LS259, 0) // IC2 on top board near edge connector
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_control3_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco3d_state, radikalb_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco3d_state, unknown_137_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(m_serial, gaelco_serial_device, irq_enable))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, analog_port_clock_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, gaelco3d_state, analog_port_latch_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m_serial, gaelco_serial_device, unknown_w))
+	LS259(config, m_outlatch); // IC2 on top board near edge connector
+	m_outlatch->q_out_cb<1>().set(FUNC(gaelco3d_state::tms_control3_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(gaelco3d_state::radikalb_lamp_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(gaelco3d_state::unknown_137_w));
+	m_outlatch->q_out_cb<4>().set(m_serial, FUNC(gaelco_serial_device::irq_enable));
+	m_outlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::analog_port_clock_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(gaelco3d_state::analog_port_latch_w));
+	m_outlatch->q_out_cb<7>().set(m_serial, FUNC(gaelco_serial_device::unknown_w));
 
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_adsp, ADSP2115_IRQ2);
 
@@ -1011,11 +1011,11 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d2)
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gaelco3d_state::footbpow)
+void gaelco3d_state::footbpow(machine_config &config)
+{
 	gaelco3d2(config);
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, fp_analog_clock_w))
-MACHINE_CONFIG_END
+	m_outlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::fp_analog_clock_w));
+}
 
 
 /*************************************

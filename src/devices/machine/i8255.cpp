@@ -314,14 +314,17 @@ uint8_t i8255_device::read_mode1(int port)
 		// read data from input latch
 		data = m_input[port];
 
-		// clear input buffer full flag
-		set_ibf(port, 0);
+		if (!machine().side_effects_disabled())
+		{
+			// clear input buffer full flag
+			set_ibf(port, 0);
 
-		// clear interrupt
-		set_intr(port, 0);
+			// clear interrupt
+			set_intr(port, 0);
 
-		// clear input latch
-		m_input[port] = 0;
+			// clear input latch
+			m_input[port] = 0;
+		}
 	}
 
 	return data;
@@ -333,14 +336,17 @@ uint8_t i8255_device::read_mode2()
 	// read data from input latch
 	uint8_t const data = m_input[PORT_A];
 
-	// clear input buffer full flag
-	set_ibf(PORT_A, 0);
+	if (!machine().side_effects_disabled())
+	{
+		// clear input buffer full flag
+		set_ibf(PORT_A, 0);
 
-	// clear interrupt
-	set_intr(PORT_A, 0);
+		// clear interrupt
+		set_intr(PORT_A, 0);
 
-	// clear input latch
-	m_input[PORT_A] = 0;
+		// clear input latch
+		m_input[PORT_A] = 0;
+	}
 
 	return data;
 }
@@ -822,6 +828,24 @@ uint8_t i8255_device::read_pa()
 }
 
 
+//-------------------------------------------------
+//  acka_r - port A read with PC6 strobe
+//-------------------------------------------------
+
+READ8_MEMBER( i8255_device::acka_r )
+{
+	if (!machine().side_effects_disabled())
+		pc6_w(0);
+
+	uint8_t data = read_pa();
+
+	if (!machine().side_effects_disabled())
+		pc6_w(1);
+
+	return data;
+}
+
+
 READ8_MEMBER( i8255_device::pb_r )
 {
 	return read_pb();
@@ -840,6 +864,24 @@ uint8_t i8255_device::read_pb()
 	{
 		data = m_output[PORT_B];
 	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  ackb_r - port B read with PC2 strobe
+//-------------------------------------------------
+
+READ8_MEMBER( i8255_device::ackb_r )
+{
+	if (!machine().side_effects_disabled())
+		pc2_w(0);
+
+	uint8_t data = read_pb();
+
+	if (!machine().side_effects_disabled())
+		pc2_w(1);
 
 	return data;
 }

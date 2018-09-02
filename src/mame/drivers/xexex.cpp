@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

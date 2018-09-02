@@ -114,7 +114,7 @@ MACHINE_CONFIG_START(imsai_state::imsai)
 	MCFG_DEVICE_IO_MAP(imsai_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(imsai_state, kbd_put))
 
 	/* Devices */

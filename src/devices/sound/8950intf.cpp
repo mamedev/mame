@@ -101,6 +101,16 @@ void y8950_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void y8950_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 72);
+	y8950_clock_changed(m_chip, clock(), clock() / 72);
+}
+
+//-------------------------------------------------
 //  device_stop - device-specific stop
 //-------------------------------------------------
 

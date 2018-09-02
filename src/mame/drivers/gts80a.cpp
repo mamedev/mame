@@ -352,30 +352,32 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
 	MCFG_DEVICE_PROGRAM_MAP(gts80a_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
 	config.set_default_layout(layout_gts80a);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80a_state, port1a_r)) // sw_r
-	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80a_state, port1a_w))
-	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80a_state, port1b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80a_state, port1b_w)) // sw_w
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80a_state, port2a_r)) // pa7 - slam tilt
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80a_state, port2a_w)) // digit select
-	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80a_state, port2b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80a_state, port2b_w)) // seg
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL(3'579'545)/4)
-	//MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80a_state, port3a_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80a_state, port3a_w)) // sol, snd
-	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80a_state, port3b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80a_state, port3b_w)) // lamps
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	riot6532_device &riot1(RIOT6532(config, "riot1", XTAL(3'579'545)/4));
+	riot1.in_pa_callback().set(FUNC(gts80a_state::port1a_r)); // sw_r
+	//riot1.out_pa_callback().set(FUNC(gts80a_state::port1a_w));
+	//riot1.in_pb_callback().set(FUNC(gts80a_state::port1b_r));
+	riot1.out_pb_callback().set(FUNC(gts80a_state::port1b_w)); // sw_w
+	riot1.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+
+	riot6532_device &riot2(RIOT6532(config, "riot2", XTAL(3'579'545)/4));
+	riot2.in_pa_callback().set(FUNC(gts80a_state::port2a_r)); // pa7 - slam tilt
+	riot2.out_pa_callback().set(FUNC(gts80a_state::port2a_w)); // digit select
+	//riot2.in_pb_callback().set(FUNC(gts80a_state::port2b_r));
+	riot2.out_pb_callback().set(FUNC(gts80a_state::port2b_w)); // seg
+	riot2.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+
+	riot6532_device &riot3(RIOT6532(config, "riot3", XTAL(3'579'545)/4));
+	//riot3.in_pa_callback().set(FUNC(gts80a_state::port3a_r));
+	riot3.out_pa_callback().set(FUNC(gts80a_state::port3a_w)); // sol, snd
+	//riot3.in_pb_callback().set(FUNC(gts80a_state::port3b_r));
+	riot3.out_pb_callback().set(FUNC(gts80a_state::port3b_w)); // lamps
+	riot3.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	/* Sound */
 	genpin_audio(config);

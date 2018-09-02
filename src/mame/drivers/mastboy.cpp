@@ -813,21 +813,16 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_DEVICE_PROGRAM_MAP(mastboy_map)
 	MCFG_DEVICE_IO_MAP(mastboy_io_map)
 
-	MCFG_EEPROM_2816_ADD("earom")
+	EEPROM_2816(config, "earom");
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC17
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mastboy_state, irq0_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, s2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, s1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
+	LS259(config, m_outlatch); // IC17
+	m_outlatch->q_out_cb<0>().set(FUNC(mastboy_state::irq0_ack_w));
+	m_outlatch->q_out_cb<1>().set("msm", FUNC(msm5205_device::s2_w));
+	m_outlatch->q_out_cb<2>().set("msm", FUNC(msm5205_device::s1_w));
+	m_outlatch->q_out_cb<3>().set("msm", FUNC(msm5205_device::reset_w));
+	m_outlatch->q_out_cb<4>().set("earom", FUNC(eeprom_parallel_28xx_device::oe_w));
 
-	MCFG_DEVICE_ADD("bank_c000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_c000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bank_c000").set_map(&mastboy_state::bank_c000_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

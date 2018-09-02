@@ -431,7 +431,6 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
@@ -446,7 +445,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	/* sound hardware */
 	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alesis_state::sr16)

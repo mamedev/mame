@@ -582,7 +582,7 @@ void apple3_state::apple3_update_memory()
 		m_bank7rd = m_bank7wr;
 
 		// if we had an IRQ waiting for RAM to be paged in...
-		apple3_irq_update();
+		//apple3_irq_update();
 	}
 }
 
@@ -620,43 +620,6 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 	apple3_via_out(&m_via_1_b, data);
 }
 
-void apple3_state::apple3_irq_update()
-{
-	if (m_acia_irq || m_via_1_irq || m_via_0_irq)
-	{
-//      printf("   setting IRQ\n");
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		m_via[1]->write_pa7(0);  // this is active low
-	}
-	else
-	{
-//      printf("   clearing IRQ\n");
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-		m_via[1]->write_pa7(1);
-	}
-}
-
-WRITE_LINE_MEMBER(apple3_state::apple3_acia_irq_func)
-{
-//  printf("acia IRQ: %d\n", state);
-	m_acia_irq = state;
-	apple3_irq_update();
-}
-
-WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
-{
-//  printf("via 1 IRQ: %d\n", state);
-	m_via_1_irq = state;
-	apple3_irq_update();
-}
-
-
-WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
-{
-//  printf("via 0 IRQ: %d\n", state);
-	m_via_0_irq = state;
-	apple3_irq_update();
-}
 
 MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
@@ -709,11 +672,8 @@ void apple3_state::init_apple3()
 	m_enable_mask = 0;
 
 	m_flags = 0;
-	m_acia_irq = 0;
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
-	m_via_0_irq = 0;
-	m_via_1_irq = 0;
 	m_va = 0;
 	m_vb = 0;
 	m_vc = 0;
@@ -746,13 +706,10 @@ void apple3_state::init_apple3()
 
 	apple3_update_memory();
 
-	save_item(NAME(m_acia_irq));
 	save_item(NAME(m_via_0_a));
 	save_item(NAME(m_via_0_b));
 	save_item(NAME(m_via_1_a));
 	save_item(NAME(m_via_1_b));
-	save_item(NAME(m_via_0_irq));
-	save_item(NAME(m_via_1_irq));
 	save_item(NAME(m_zpa));
 	save_item(NAME(m_last_n));
 	save_item(NAME(m_sync));
@@ -902,11 +859,11 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		}
 		else if (offset >= 0xffd0 && offset <= 0xffdf)
 		{
-			rv = m_via[0]->read(space, offset);
+			rv = m_via[0]->read(offset);
 		}
 		else if (offset >= 0xffe0 && offset <= 0xffef)
 		{
-			rv = m_via[1]->read(space, offset);
+			rv = m_via[1]->read(offset);
 		}
 		else
 		{
@@ -1049,14 +1006,14 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 		{
 			if (!machine().side_effects_disabled())
 			{
-				m_via[0]->write(space, offset, data);
+				m_via[0]->write(offset, data);
 			}
 		}
 		else if (offset >= 0xffe0 && offset <= 0xffef)
 		{
 			if (!machine().side_effects_disabled())
 			{
-				m_via[1]->write(space, offset, data);
+				m_via[1]->write(offset, data);
 			}
 		}
 		else

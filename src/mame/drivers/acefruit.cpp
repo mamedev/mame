@@ -649,7 +649,7 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(acefruit_state, acefruit)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* sound hardware */

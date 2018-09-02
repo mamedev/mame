@@ -374,8 +374,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_I8089_SINTR2(WRITELINE("ic31", pic8259_device, ir1_w))
 
 	// ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256k")
+	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -418,9 +417,9 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2a_w));
 	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2b_w));
 
-	MCFG_DEVICE_ADD("ic14", TTL153)
-	MCFG_TTL153_ZA_CB(WRITELINE("ic15", z80sio_device, rxca_w))
-	MCFG_TTL153_ZB_CB(WRITELINE("ic15", z80sio_device, txca_w))
+	ttl153_device &ttl74153(TTL153(config, "ic14"));
+	ttl74153.za_cb().set("ic15", FUNC(z80sio_device::rxca_w));
+	ttl74153.zb_cb().set("ic15", FUNC(z80sio_device::txca_w));
 
 	CLOCK(config, "ic15_rxtxcb", 4_MHz_XTAL / 16).signal_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 

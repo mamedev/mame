@@ -7,14 +7,6 @@
   PCB is manufactured by either Hot-B or Taito, but uses Data East custom
   chips.
 
-  HB-PCB-A4
-  M6100691A (distributed by Taito)
-
-  CPU  : 68000
-  Sound: Z80B YM2203 Y3014 M6295
-  OSC  : 28.0000MHz 16.0000MHz
-
-
   Emulation by Bryan McPhail, mish@tendril.co.uk
   + Charles MacDonald, David Haywood
 
@@ -43,6 +35,49 @@ Stephh's notes (based on the games M68000 code and some tests) :
   - The "Quest Mode" Dip Switch determines if "Shanghai Quest" is available.
   - The "Use Mahjong Tiles" Dip Switch only has an effect when playing
     "Shanghai Advanced".
+
+
+
+HB-PCB-A5   M6100691A (distributed by Taito)
++-----------------------------------------------------------+
+|         GAL.U89  16.000MHz  28.000MHz                     |
+|       YM2203C                                             |
+|                   +----+  +------+    SS004.U46 SS003.U47 |
+|     Y3014B  Z80   |DE71|  |  DE  |                        |
+|                   +----+  |  52  |                        |
+|         SS008-1   +----+  +------+          U36*      U38*|
+|                   |DE71|  +------+                        |
+|                   +----+  |  DE  |                        |
+|J      M6295               |  52  |    SS004.U37 SS003.U39 |
+|A                  GAL.U64 +------+                        |
+|M            58257 GAL.U70                                 |
+|M                   84256 +------+                         |
+|A  SS005.U86 58257  84256 |  DE  |                         |
+|           SS007E.U28     |  55  |                         |
+|           SS006E.U27     +------+                     U9* |
+|                                                           |
+|         MCM2018                                       U10*|
+|         MCM2018  GAL.U94                                  |
+|         MCM2018  GAL.U63                         SS002.U7 |
+|          +-----+ GAL.U66                                  |
+|          |DE146|         MC68000P12F-16MHZ       SS001.U8 |
+|  SW2 SW1 +-----+                                          |
++-----------------------------------------------------------+
+
+* Denotes unpopulated:
+    U9 & U10 are 28pin 27C512
+    U36 & U38 are 42pin 8/16Meg mask
+
+    CPU: MC68000P12F 16 MHZ
+  Sound: Z80B, YM2203C, Y3014B, OKI M6295
+    OSC: 28.0000MHz, 16.0000MHz
+    DSW: 8 position dipswitch x 2
+    RAM: Sony CXK58257P-12L 32K x 8 SRAM x 2
+         Motorola MCM2018AN25 2K x 8 SRAM x 3
+         Fujitsu 84256A-70L 32K x 8 SRAM x 2
+ Custom: Data East 52 x 2 + Data East 71 x 2 (Sprites)
+         Data East 55 (Playfield)
+         Data East 146 (I/O, Protection)
 
 ***************************************************************************/
 
@@ -384,15 +419,14 @@ DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 MACHINE_CONFIG_START(sshangha_state::sshangha)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) /* CPU marked as 16MHz part */
 	MCFG_DEVICE_PROGRAM_MAP(sshangha_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sshangha_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sshangha_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -437,12 +471,12 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	SPEAKER(config, "lspeaker").front_left(); // sure it's stereo?
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.27)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END
@@ -457,6 +491,26 @@ MACHINE_CONFIG_END
 /******************************************************************************/
 
 ROM_START( sshangha )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "ss007e.u28", 0x00000, 0x20000, CRC(5f275f6e) SHA1(ca7790d2401c95aff48098800f0da9590a0d88a2) )
+	ROM_LOAD16_BYTE( "ss006e.u27", 0x00001, 0x20000, CRC(111327fe) SHA1(60f9e839a027eab5ef019dcb27cac2f0f9bf04d8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "ss008-1.u82", 0x000000, 0x010000, CRC(ff128b54) SHA1(2cdae94000c695417ebfe302999baa8e8cec09bf) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "ss001.u8",  0x000000, 0x100000, CRC(ebeca5b7) SHA1(1746e757ad9bbef2aa9028c54f25d4aa4dedf79e) )
+	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) ) /* Copy of rom at u47 */
+	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) ) /* Copy of rom at u46 */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
+ROM_END
+
+ROM_START( sshanghaj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ss007-1.u28", 0x00000, 0x20000, CRC(bc466edf) SHA1(b96525b2c879d15b46a7753fa6ebf12a851cd019) )
 	ROM_LOAD16_BYTE( "ss006-1.u27", 0x00001, 0x20000, CRC(872a2a2d) SHA1(42d7a01465d5c403354aaf0f2dab8adb9afe61b0) )
@@ -514,5 +568,6 @@ void sshangha_state::init_sshangha()
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
-GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
+GAME( 1992, sshangha,  0,        sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (World)", 0 )
+GAME( 1992, sshanghaj, sshangha, sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
+GAME( 1992, sshanghab, sshangha, sshanghb, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )

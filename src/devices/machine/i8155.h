@@ -35,53 +35,18 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I8155_IN_PORTA_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_IN_PORTB_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_IN_PORTC_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_PORTA_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_PORTB_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_PORTC_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
-
-#define MCFG_I8155_OUT_TIMEROUT_CB(_devcb) \
-	downcast<i8155_device &>(*device).set_out_to_callback(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> i8155_device
 
-class i8155_device :    public device_t,
-						public device_memory_interface
+class i8155_device : public device_t
 {
 public:
 	// construction/destruction
 	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_to_callback(Object &&cb) { return m_out_to_cb.set_callback(std::forward<Object>(cb)); }
 	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
 	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
 	auto in_pc_callback()  { return m_in_pc_cb.bind(); }
@@ -108,8 +73,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual space_config_vector memory_space_config() const override;
-
 private:
 	devcb_read8        m_in_pa_cb;
 	devcb_read8        m_in_pb_cb;
@@ -130,6 +93,9 @@ private:
 	uint8_t m_command;          // command register
 	uint8_t m_status;           // status register
 	uint8_t m_output[3];        // output latches
+
+	// RAM
+	std::unique_ptr<uint8_t[]> m_ram;
 
 	// counter
 	uint16_t m_count_length;    // count length register (assigned)
@@ -152,8 +118,6 @@ private:
 	inline void write_port(int port, uint8_t data);
 
 	void register_w(int offset, uint8_t data);
-
-	void i8155(address_map &map);
 };
 
 

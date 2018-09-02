@@ -56,6 +56,10 @@ public:
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_readyq_handler(Object &&cb) { return m_readyq_handler.set_callback(std::forward<Object>(cb)); }
+
+	auto irq_cb() { return m_irq_handler.bind(); }
+	auto ready_cb() { return m_readyq_handler.bind(); }
+
 	// old VSM support, remove me!
 	void set_speechrom_tag(const char *_tag) { m_speechrom_tag = _tag; }
 	// new VSM support
@@ -64,6 +68,12 @@ public:
 	template <class Object> devcb_base &set_addr_callback(Object &&cb) { return m_addr_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_data_callback(Object &&cb) { return m_data_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_romclk_callback(Object &&cb) { return m_romclk_cb.set_callback(std::forward<Object>(cb)); }
+
+	auto m0_cb() { return m_m0_cb.bind(); }
+	auto m1_cb() { return m_m1_cb.bind(); }
+	auto addr_cb() { return m_addr_cb.bind(); }
+	auto data_cb() { return m_data_cb.bind(); }
+	auto romclk_cb() { return m_romclk_cb.bind(); }
 
 	// Control lines - once written to will switch interface into * "true" timing behaviour.
 

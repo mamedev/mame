@@ -8,8 +8,6 @@
 
     The TLCS-870/C appears to have a completely different encoding.
 
-    loosely baesd on the tlcs90 core by Luca Elia
-
 *************************************************************************************************************/
 
 #include "emu.h"
@@ -1020,7 +1018,7 @@ void tlcs870_disassembler::decode_register_prefix(uint8_t b0)
 		break;
 
 	case 0x02:
-		// MUL ggG, ggL
+		// MUL ggH, ggL
 		m_op = MUL;
 
 		m_param1_type = REG_16BIT; // odd syntax
@@ -1416,6 +1414,10 @@ void tlcs870_disassembler::decode_register_prefix(uint8_t b0)
 	case 0x97:
 		break;
 
+	case 0x98:
+	case 0x99:
+		break;
+
 	case 0x9a:
 	case 0x9b:
 		// LD (pp).g,CF
@@ -1458,6 +1460,25 @@ void tlcs870_disassembler::decode_register_prefix(uint8_t b0)
 	case 0xa7:
 		break;
 
+	case 0xa8:
+	case 0xa9:
+	case 0xaa:
+	case 0xab:
+	case 0xac:
+	case 0xad:
+	case 0xae:
+	case 0xaf:
+		// XCH r,g
+		m_op = XCH;
+
+		//m_flagsaffected |= FLAG_J | FLAG_Z;
+
+		m_param1_type = REG_8BIT;
+		m_param1 = bx & 0x7;
+
+		m_param2_type = REG_8BIT;
+		m_param2 = b0 & 0x7;
+		break;
 	case 0xb0:
 	case 0xb1:
 	case 0xb2:

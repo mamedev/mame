@@ -12,6 +12,8 @@
       game bug or 6802 core bug or something else?
       This bug behaves slightly differently in the different sets, depending on whether
       nvram is cleared beforehand or not, and whether the last reset was soft or hard.
+      Proximate cause is smashing the stack, after which the RTS at 61DE (in bk2k_l4)
+      transfers to 0000 (where no valid code exists).
     - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
     - Advance button doesn't seem to work well (TODO: check if this may have been fixed with the irq and diagnostic button masking changes)
     - Jokerz has an entirely different "Pin Sound '88" stereo audio board (D-12338-567)
@@ -261,52 +263,52 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, sol2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s11_state, pia21_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	PIA6821(config, m_pia21, 0);
+	m_pia21->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pia21->writepa_handler().set(FUNC(s11_state::sound_w));
+	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
+	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
+	m_pia21->cb2_handler().set(FUNC(s11_state::pia21_cb2_w));
+	m_pia21->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia21->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, lamp1_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	PIA6821(config, m_pia24, 0);
+	m_pia24->writepa_handler().set(FUNC(s11_state::lamp0_w));
+	m_pia24->writepb_handler().set(FUNC(s11_state::lamp1_w));
+	m_pia24->cb2_handler().set(FUNC(s11_state::pia24_cb2_w));
+	m_pia24->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia24->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, pia28_w7_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11a_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11b_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s11_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	PIA6821(config, m_pia28, 0);
+	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
+	m_pia28->writepa_handler().set(FUNC(s11a_state::dig0_w));
+	m_pia28->writepb_handler().set(FUNC(s11b_state::dig1_w));
+	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
+	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
+	m_pia28->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia28->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia2c", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11b_state, pia2c_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11b_state, pia2c_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	PIA6821(config, m_pia2c, 0);
+	m_pia2c->writepa_handler().set(FUNC(s11b_state::pia2c_pa_w));
+	m_pia2c->writepb_handler().set(FUNC(s11b_state::pia2c_pb_w));
+	m_pia2c->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia2c->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, switch_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	PIA6821(config, m_pia30, 0);
+	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
+	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
+	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
+	m_pia30->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia30->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia34", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11b_state, pia34_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, pia34_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia34_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	PIA6821(config, m_pia34, 0);
+	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
+	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
+	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
+	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6802, XTAL(4'000'000))
@@ -322,14 +324,14 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
 
-	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s11_state, pias_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pias_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
+	PIA6821(config, m_pias, 0);
+	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
+	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pias->ca2_handler().set("hc55516", FUNC(hc55516_device::clock_w));
+	m_pias->cb2_handler().set("hc55516", FUNC(hc55516_device::digit_w));
+	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
 	/* Add the background music card */
 	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
@@ -346,13 +348,13 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_DEVICE_ADD("hc55516_bg", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
 
-	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac1", dac_byte_interface, data_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, pia40_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("ym2151", ym2151_device, reset_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia40_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))
+	PIA6821(config, m_pia40, 0);
+	m_pia40->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));
+	m_pia40->writepb_handler().set(FUNC(s11_state::pia40_pb_w));
+	m_pia40->ca2_handler().set("ym2151", FUNC(ym2151_device::reset_w));
+	m_pia40->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
+	m_pia40->irqa_handler().set_inputline("bgcpu", M6809_FIRQ_LINE);
+	m_pia40->irqb_handler().set_inputline("bgcpu", INPUT_LINE_NMI);
 
 MACHINE_CONFIG_END
 

@@ -2,8 +2,8 @@
 // copyright-holders:Ryan Holtz
 #pragma once
 
-#ifndef __RENDER_BGFX__
-#define __RENDER_BGFX__
+#ifndef RENDER_BGFX
+#define RENDER_BGFX
 
 #include <bgfx/bgfx.h>
 
@@ -162,4 +162,4 @@ private:
 	static uint32_t s_current_view;
 };
 
-#endif
+#endif // RENDER_BGFX

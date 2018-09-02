@@ -53,6 +53,16 @@
 #include "emu.h"
 #include "horizon.h"
 
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_READ        (1U<<3)
+#define LOG_WRITE       (1U<<4)
+#define LOG_CRU         (1U<<5)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000 Ramdisk")
 
 namespace bus { namespace ti99 { namespace peb {
@@ -63,11 +73,6 @@ namespace bus { namespace ti99 { namespace peb {
 
 #define MAXSIZE 16777216
 #define ROSSIZE 8192
-
-#define TRACE_CONFIG 0
-#define TRACE_READ 0
-#define TRACE_WRITE 0
-#define TRACE_CRU 0
 
 horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, TI99_HORIZON, tag, owner, clock),
@@ -186,13 +191,13 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 			{
 				// NVRAM page of size 2 KiB
 				*value = m_nvram->pointer()[(m_page << 11)|(offset & 0x07ff)];
-				if (TRACE_READ) logerror("offset=%04x, page=%04x -> %02x\n", offset&0xffff,  m_page, *value);
+				LOGMASKED(LOG_READ, "offset=%04x, page=%04x -> %02x\n", offset&0xffff,  m_page, *value);
 			}
 			else
 			{
 				// ROS
 				*value = m_ros->pointer()[offset & 0x1fff];
-				if (TRACE_READ) logerror("offset=%04x (ROS) -> %02x\n", offset&0xffff,  *value);
+				LOGMASKED(LOG_READ, "offset=%04x (ROS) -> %02x\n", offset&0xffff,  *value);
 			}
 		}
 	}
@@ -201,7 +206,7 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 		if ((offset & m_select_mask)==m_select_value)
 		{
 			*value = m_ros->pointer()[offset & 0x1fff];
-			if (TRACE_READ) logerror("offset=%04x (Rambo) -> %02x\n", offset&0xffff,  *value);
+			LOGMASKED(LOG_READ, "offset=%04x (Rambo) -> %02x\n", offset&0xffff,  *value);
 		}
 		if ((offset & m_select_mask)==m_select6_value)
 		{
@@ -209,7 +214,7 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 			// (encompassing 4 Horizon pages)
 			// We clear away the rightmost two bits
 			*value = m_nvram->pointer()[((m_page&0xfffc)<<11) | (offset & 0x1fff)];
-			if (TRACE_READ) logerror("offset=%04x, page=%04x (Rambo) -> %02x\n", offset&0xffff,  m_page, *value);
+			LOGMASKED(LOG_READ, "offset=%04x, page=%04x (Rambo) -> %02x\n", offset&0xffff,  m_page, *value);
 		}
 	}
 }
@@ -252,13 +257,13 @@ WRITE8_MEMBER(horizon_ramdisk_device::write)
 			{
 				// NVRAM page of size 2 KiB
 				m_nvram->pointer()[(m_page << 11)|(offset & 0x07ff)] = data;
-				if (TRACE_WRITE) logerror("offset=%04x, page=%04x <- %02x\n", offset&0xffff,  m_page, data);
+				LOGMASKED(LOG_WRITE, "offset=%04x, page=%04x <- %02x\n", offset&0xffff,  m_page, data);
 			}
 			else
 			{
 				// ROS
 				m_ros->pointer()[offset & 0x1fff] = data;
-				if (TRACE_WRITE) logerror("offset=%04x (ROS) <- %02x\n", offset&0xffff,  data);
+				LOGMASKED(LOG_WRITE, "offset=%04x (ROS) <- %02x\n", offset&0xffff,  data);
 			}
 		}
 	}
@@ -267,7 +272,7 @@ WRITE8_MEMBER(horizon_ramdisk_device::write)
 		if ((offset & m_select_mask)==m_select_value)
 		{
 			m_ros->pointer()[offset & 0x1fff] = data;
-			if (TRACE_WRITE) logerror("offset=%04x (Rambo) <- %02x\n", offset&0xffff,  data);
+			LOGMASKED(LOG_WRITE, "offset=%04x (Rambo) <- %02x\n", offset&0xffff,  data);
 		}
 		if ((offset & m_select_mask)==m_select6_value)
 		{
@@ -275,7 +280,7 @@ WRITE8_MEMBER(horizon_ramdisk_device::write)
 			// (encompassing 4 Horizon pages)
 			// We clear away the rightmost two bits
 			m_nvram->pointer()[((m_page&0xfffc)<<11) | (offset & 0x1fff)] = data;
-			if (TRACE_WRITE) logerror("offset=%04x, page=%04x (Rambo) <- %02x\n", offset&0xffff,  m_page, data);
+			LOGMASKED(LOG_WRITE, "offset=%04x, page=%04x (Rambo) <- %02x\n", offset&0xffff,  m_page, data);
 		}
 	}
 }
@@ -307,12 +312,12 @@ WRITE8_MEMBER(horizon_ramdisk_device::cruwrite)
 	if (((offset & 0xff00)==m_cru_horizon)||((offset & 0xff00)==m_cru_phoenix))
 	{
 		int bit = (offset >> 1) & 0x0f;
-		if (TRACE_CRU) logerror("CRU write bit %d <- %d\n", bit, data);
+		LOGMASKED(LOG_CRU, "CRU write bit %d <- %d\n", bit, data);
 		switch (bit)
 		{
 		case 0:
 			m_selected = (data!=0);
-			if (TRACE_CRU) logerror("Activate ROS = %d\n", m_selected);
+			LOGMASKED(LOG_CRU, "Activate ROS = %d\n", m_selected);
 			break;
 		case 1:
 			// Swap the lines so that the access with RAMBO is consistent
@@ -337,7 +342,7 @@ WRITE8_MEMBER(horizon_ramdisk_device::cruwrite)
 			if (m_use_rambo)
 			{
 				m_rambo_mode = (data != 0);
-				if (TRACE_CRU) logerror("RAMBO = %d\n", m_rambo_mode);
+				LOGMASKED(LOG_CRU, "RAMBO = %d\n", m_rambo_mode);
 			}
 			break;
 
@@ -420,7 +425,7 @@ void horizon_ramdisk_device::device_reset(void)
 
 INPUT_CHANGED_MEMBER( horizon_ramdisk_device::hs_changed )
 {
-	if (TRACE_CONFIG) logerror("hideswitch changed %d\n", newval);
+	LOGMASKED(LOG_CONFIG, "hideswitch changed %d\n", newval);
 	m_hideswitch = (newval!=0);
 }
 
@@ -474,17 +479,12 @@ INPUT_PORTS_START( horizon )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(horizon_ramdisk_device::device_add_mconfig)
-	MCFG_RAM_ADD(NVRAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("16M")
-
-	MCFG_RAM_ADD(ROSREGION)
-	MCFG_RAM_DEFAULT_SIZE("8k")
-
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("32k")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+void horizon_ramdisk_device::device_add_mconfig(machine_config &config)
+{
+	RAM(config, NVRAMREGION).set_default_size("16M");
+	RAM(config, ROSREGION).set_default_size("8K");
+	RAM(config, RAMREGION).set_default_size("32K").set_default_value(0);
+}
 
 ioport_constructor horizon_ramdisk_device::device_input_ports() const
 {

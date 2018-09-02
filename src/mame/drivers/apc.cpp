@@ -970,7 +970,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_dmac->out_dack_callback<2>().set(FUNC(apc_state::apc_dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(apc_state::apc_dack3_w));
 
-	MCFG_NVRAM_ADD_1FILL(m_cmos)
+	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
 	MCFG_UPD1990A_ADD(m_rtc, XTAL(32'768), NOOP, NOOP)
 
 	MCFG_UPD765A_ADD(m_fdc, true, true)

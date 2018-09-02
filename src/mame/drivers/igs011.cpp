@@ -4184,7 +4184,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(igs011_state::igs011_base)
 	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(22'000'000)/3)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

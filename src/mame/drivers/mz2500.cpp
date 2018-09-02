@@ -996,12 +996,12 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 
 READ8_MEMBER(mz2500_state::fdc_r)
 {
-	return m_fdc->read(space, offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(mz2500_state::fdc_w)
 {
-	m_fdc->write(space, offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -1793,15 +1793,6 @@ static void mz2500_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_35_DD);
 }
 
-#define MCFG_ADDRESS_BANK(tag) \
-MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
-MCFG_DEVICE_PROGRAM_MAP(mz2500_bank_window_map) \
-MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
-MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
-MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16+3) \
-MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
-
-
 MACHINE_CONFIG_START(mz2500_state::mz2500)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
@@ -1810,14 +1801,10 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
 
-	MCFG_ADDRESS_BANK("rambank0")
-	MCFG_ADDRESS_BANK("rambank1")
-	MCFG_ADDRESS_BANK("rambank2")
-	MCFG_ADDRESS_BANK("rambank3")
-	MCFG_ADDRESS_BANK("rambank4")
-	MCFG_ADDRESS_BANK("rambank5")
-	MCFG_ADDRESS_BANK("rambank6")
-	MCFG_ADDRESS_BANK("rambank7")
+	for (int bank = 0; bank < 8; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_rambank[bank]).set_map(&mz2500_state::mz2500_bank_window_map).set_options(ENDIANNESS_LITTLE, 8, 16+3, 0x2000);
+	}
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2500_state, mz2500_porta_r))
@@ -1832,7 +1819,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2500_state, mz2500_pio1_porta_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
+	Z80SIO(config, "z80sio", 6000000);
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, 32.768_kHz_XTAL)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))

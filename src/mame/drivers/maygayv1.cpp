@@ -890,13 +890,13 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, maygayv1_state, data_to_i8031))
 
 	/* U25 ST 2 9148 EF68B21P */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, maygayv1_state, b_read))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, maygayv1_state, b_read))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, maygayv1_state, b_writ))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, maygayv1_state, b_writ))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set(FUNC(maygayv1_state::b_read));
+	pia.readpb_handler().set(FUNC(maygayv1_state::b_read));
+	pia.writepa_handler().set(FUNC(maygayv1_state::b_writ));
+	pia.writepb_handler().set(FUNC(maygayv1_state::b_writ));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* TODO: Use real video timings */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -102,7 +102,6 @@
 #include "machine/mc146818.h"   // for NC200 real time clock
 #include "machine/rp5c01.h"     // for NC100 real time clock
 #include "formats/pc_dsk.h"     // for NC200 disk image
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1393,8 +1392,6 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_PALETTE_ADD("palette", NC_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(nc_state, nc)
 
-	config.set_default_layout(layout_lcd);
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep.1", BEEP, 0)
@@ -1420,9 +1417,8 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_GENERIC_UNLOAD(nc_state, nc_pcmcia_card)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	RAM(config, m_ram).set_default_size("64K");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* dummy timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
@@ -1498,8 +1494,7 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 MACHINE_CONFIG_END
 
 

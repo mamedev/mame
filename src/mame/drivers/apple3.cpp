@@ -28,6 +28,8 @@
 
 #include "bus/rs232/rs232.h"
 
+#include "machine/input_merger.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -59,6 +61,10 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_M6502_SYNC_CALLBACK(WRITELINE(*this, apple3_state, apple3_sync_w))
 	MCFG_DEVICE_PROGRAM_MAP(apple3_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
+	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	mainirq.output_handler().append(m_via[1], FUNC(via6522_device::write_pa7)).invert(); // this is active low
 
 	MCFG_MACHINE_RESET_OVERRIDE(apple3_state, apple3 )
 
@@ -115,12 +121,12 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple3")
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200)) // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, apple3_state, apple3_acia_irq_func))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(XTAL(1'843'200)); // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
+	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
@@ -135,15 +141,15 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, apple3_state, apple3_via_0_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, apple3_state, apple3_via_0_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, apple3_state, apple3_via_0_irq_func))
+	VIA6522(config, m_via[0], 1000000);
+	m_via[0]->writepa_handler().set(FUNC(apple3_state::apple3_via_0_out_a));
+	m_via[0]->writepb_handler().set(FUNC(apple3_state::apple3_via_0_out_b));
+	m_via[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, apple3_state, apple3_via_1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, apple3_state, apple3_via_1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, apple3_state, apple3_via_1_irq_func))
+	VIA6522(config, m_via[1], 1000000);
+	m_via[1]->writepa_handler().set(FUNC(apple3_state::apple3_via_1_out_a));
+	m_via[1]->writepb_handler().set(FUNC(apple3_state::apple3_via_1_out_b));
+	m_via[1]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	/* sound */
 	SPEAKER(config, "speaker").front_center();
@@ -156,9 +162,7 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 512K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 512K");
 MACHINE_CONFIG_END
 
 

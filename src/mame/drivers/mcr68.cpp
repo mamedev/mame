@@ -907,8 +907,8 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 2))
+	PTM6840(config, m_ptm, 7723800 / 10);
+	m_ptm->irq_callback().set_inputline("maincpu", 2);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -961,11 +961,11 @@ MACHINE_CONFIG_START(mcr68_state::spyhunt2)
 	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_CH1_CB(IOPORT("AN1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("AN2"))
-	MCFG_ADC0844_CH3_CB(IOPORT("AN3"))
-	MCFG_ADC0844_CH4_CB(IOPORT("AN4"))
+	ADC0844(config, m_adc, 0);
+	m_adc->ch1_callback().set_ioport("AN1");
+	m_adc->ch2_callback().set_ioport("AN2");
+	m_adc->ch3_callback().set_ioport("AN3");
+	m_adc->ch4_callback().set_ioport("AN4");
 MACHINE_CONFIG_END
 
 
@@ -1000,7 +1000,7 @@ MACHINE_CONFIG_START(mcr68_state::trisport)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(trisport_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 

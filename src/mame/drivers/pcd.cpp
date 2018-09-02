@@ -514,11 +514,10 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 
 	MCFG_DEVICE_ADD("video", PCD_VIDEO, 0)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, RAM_TAG).set_default_size("1M");
 
 	// nvram
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// floppy disk controller
 	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 8)

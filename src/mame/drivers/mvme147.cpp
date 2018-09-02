@@ -8,7 +8,7 @@
  *
  * Thanks to Plamen Mihaylov and his site http://www.m88k.com/ I got the information
  * required to start the work with this driver. The goal is to boot a tape through
- * the MVME-350 devide connected over a VME bus device.
+ * the MVME-350 device connected over a VME bus device.
  *
  *
  *       ||

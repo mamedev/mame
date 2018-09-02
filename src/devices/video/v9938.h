@@ -84,6 +84,8 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	auto int_cb() { return m_int_callback.bind(); }
+
 	uint8_t vram_r();
 	uint8_t status_r();
 	void palette_w(uint8_t data);

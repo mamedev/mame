@@ -14,6 +14,7 @@
 #include "mips3com.h"
 #include "mips3dsm.h"
 #include "ps2vu.h"
+#include <cmath>
 
 #define ENABLE_OVERFLOWS        (0)
 #define ENABLE_EE_ELF_LOADER    (0)

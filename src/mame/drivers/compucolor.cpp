@@ -419,11 +419,11 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	blink.count_out_cb().set(m_mioc, FUNC(tms5501_device::sens_w)).bit(4);
 
 	// devices
-	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL(17'971'200)/9)
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE(I8080_TAG, I8085_INTR_LINE))
-	MCFG_TMS5501_XMT_CALLBACK(WRITELINE(*this, compucolor2_state, xmt_w))
-	MCFG_TMS5501_XI_CALLBACK(READ8(*this, compucolor2_state, xi_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(*this, compucolor2_state, xo_w))
+	TMS5501(config, m_mioc, XTAL(17'971'200)/9);
+	m_mioc->int_callback().set_inputline(I8080_TAG, I8085_INTR_LINE);
+	m_mioc->xmt_callback().set(FUNC(compucolor2_state::xmt_w));
+	m_mioc->xi_callback().set(FUNC(compucolor2_state::xi_r));
+	m_mioc->xo_callback().set(FUNC(compucolor2_state::xo_w));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
@@ -435,9 +435,7 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("8K,16K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compclr2_flop")

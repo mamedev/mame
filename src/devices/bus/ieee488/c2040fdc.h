@@ -49,6 +49,9 @@ public:
 	template <class Object> devcb_base &set_sync_wr_callback(Object &&cb) { return m_write_sync.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_write_ready.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_error_wr_callback(Object &&cb) { return m_write_error.set_callback(std::forward<Object>(cb)); }
+	auto sync_wr_callback() { return m_write_sync.bind(); }
+	auto ready_wr_callback() { return m_write_ready.bind(); }
+	auto error_wr_callback() { return m_write_error.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
