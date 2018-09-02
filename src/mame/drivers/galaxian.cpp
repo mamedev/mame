@@ -12495,7 +12495,7 @@ GAME( 1981, froggers3,   frogger,  frogger,    frogger,    galaxian_state, init_
 GAME( 1981, froggermc,   frogger,  froggermc,  froggermc,  galaxian_state, init_froggermc,  ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg", "Frog", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, frogg,       frogger,  galaxian,   frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, frogg,       frogger,  frogg,      frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, init_froggrs,    ROT90,  "bootleg (Coin Music)", "Frogger (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, quaak,       frogger,  quaak,      frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg", "Quaak (bootleg of Frogger)", MACHINE_SUPPORTS_SAVE ) // closest to Super Cobra hardware, presumably a bootleg from Germany (Quaak is the German frog sound)
 GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_quaak,      ROT90,  "bootleg", "Frogger (bootleg on Amigo? hardware)", MACHINE_SUPPORTS_SAVE ) // meant to be Amigo hardware, but maybe a different bootleg than the one we have?
