@@ -453,7 +453,7 @@ ROM_START( simpsons4pa ) /* Asia 4 Player */
 	ROM_LOAD( "072-x12.15c", 0x60000, 0x20000, CRC(fa4fca12) SHA1(3b52a8a52bddfa73d8577315b655eb57ac758326) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
-	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
