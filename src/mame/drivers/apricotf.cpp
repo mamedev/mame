@@ -372,10 +372,10 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	Z80SIO(config, m_sio, 2500000);
 	m_sio->out_int_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, f1_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, f1_state, ctc_z2_w))
+	Z80CTC(config, m_ctc, 2500000);
+	m_ctc->intr_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
+	m_ctc->zc_callback<1>().set(FUNC(f1_state::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(FUNC(f1_state::ctc_z2_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))

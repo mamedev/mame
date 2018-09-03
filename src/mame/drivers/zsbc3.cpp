@@ -83,7 +83,8 @@ static INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(zsbc3_state::zsbc3)
+void zsbc3_state::zsbc3(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zsbc3_state::zsbc3_mem);
@@ -111,7 +112,7 @@ MACHINE_CONFIG_START(zsbc3_state::zsbc3)
 
 	/*z80pio_device &pio(*/Z80PIO(config, "pio", 16_MHz_XTAL / 4)/*)*/;
 	//pio.out_int_callback.set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( zsbc3 )

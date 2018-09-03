@@ -402,8 +402,8 @@ MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jankenmn_state, lamps1_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps2_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MASTER_CLOCK));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* NO VIDEO */
 

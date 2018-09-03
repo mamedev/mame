@@ -301,10 +301,11 @@ MACHINE_CONFIG_START(ts816_state::ts816)
 	//pio.in_pb_callback().set(FUNC(ts816_state::portb_r));
 	//pio.out_pb_callback().set(FUNC(ts816_state::portb_w));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc1(Z80CTC(config, "ctc1", XTAL(16'000'000) / 4));
+	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	z80ctc_device& ctc2(Z80CTC(config, "ctc2", XTAL(16'000'000) / 4));
+	ctc2.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dma_device& dma(Z80DMA(config, "dma", XTAL(16'000'000) / 4));
 	//dma.out_busreq_callback().set(FUNC(ts816_state::busreq_w));

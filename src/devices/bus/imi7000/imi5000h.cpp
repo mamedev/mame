@@ -87,7 +87,7 @@ void imi5000h_device::imi5000h_io(address_map &map)
 	map(0x10, 0x10).mirror(0x03); // BEGRDY
 	map(0x14, 0x14).mirror(0x03); // HSXCLR
 	map(0x18, 0x18).mirror(0x03); // XFERSTB
-	map(0x1c, 0x1f).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1c, 0x1f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
@@ -342,17 +342,18 @@ WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(imi5000h_device::device_add_mconfig)
+void imi5000h_device::device_add_mconfig(machine_config & config)
+{
 	Z80(config, m_maincpu, XTAL(8'000'000)/2);
 	m_maincpu->set_daisy_config(z80_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &imi5000h_device::imi5000h_mem);
 	m_maincpu->set_addrmap(AS_IO, &imi5000h_device::imi5000h_io);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000) / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, imi5000h_device, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, imi5000h_device, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, imi5000h_device, ctc_z2_w))
+	Z80CTC(config, m_ctc, XTAL(8'000'000) / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(imi5000h_device::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(imi5000h_device::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(FUNC(imi5000h_device::ctc_z2_w));
 
 	z80pio_device& pio0(Z80PIO(config, Z80PIO_0_TAG, XTAL(8'000'000)/2));
 	pio0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -379,8 +380,8 @@ MACHINE_CONFIG_START(imi5000h_device::device_add_mconfig)
 	pio3.out_pb_callback().set(FUNC(imi5000h_device::pio3_pb_w));
 	pio3.out_brdy_callback().set(Z80PIO_3_TAG, FUNC(z80pio_device::strobe_b));
 
-	//MCFG_HARDDISK_ADD("harddisk1")
-MACHINE_CONFIG_END
+	//HARDDISK(config, "harddisk1", 0);
+}
 
 
 //-------------------------------------------------

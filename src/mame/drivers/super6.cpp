@@ -451,9 +451,9 @@ MACHINE_CONFIG_START(super6_state::super6)
 	//m_maincpu->set_daisy_config(super6_daisy_chain);
 
 	// devices
-	MCFG_DEVICE_ADD(m_ctc, Z80CTC, 24_MHz_XTAL / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(m_ctc, z80ctc_device, trg1))     // J6 pin 2-3
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 24_MHz_XTAL / 4);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));   // J6 pin 2-3
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	clock_device &ctc_tick(CLOCK(config, "ctc_tick", 24_MHz_XTAL / 16));
 	ctc_tick.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));   // J6 pin 1-14 (1.5MHz)

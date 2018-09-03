@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(TMPZ84C011, tmpz84c011_device, "tmpz84c011", "Toshiba TMPZ84C
 
 void tmpz84c011_device::tmpz84c011_internal_io_map(address_map &map)
 {
-	map(0x10, 0x13).mirror(0xff00).rw("tmpz84c011_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x13).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	map(0x50, 0x50).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_pa_r), FUNC(tmpz84c011_device::tmpz84c011_pa_w));
 	map(0x51, 0x51).mirror(0xff00).rw(FUNC(tmpz84c011_device::tmpz84c011_pb_r), FUNC(tmpz84c011_device::tmpz84c011_pb_w));
@@ -118,10 +118,11 @@ void tmpz84c011_device::device_reset()
 
 
 /* CPU interface */
-MACHINE_CONFIG_START(tmpz84c011_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("tmpz84c011_ctc", Z80CTC, DERIVED_CLOCK(1,1) )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, tmpz84c011_device, zc0_cb_trampoline_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, tmpz84c011_device, zc1_cb_trampoline_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, tmpz84c011_device, zc2_cb_trampoline_w))
-MACHINE_CONFIG_END
+void tmpz84c011_device::device_add_mconfig(machine_config &config)
+{
+	Z80CTC(config, m_ctc, DERIVED_CLOCK(1,1));
+	m_ctc->intr_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(tmpz84c011_device::zc0_cb_trampoline_w));
+	m_ctc->zc_callback<1>().set(FUNC(tmpz84c011_device::zc1_cb_trampoline_w));
+	m_ctc->zc_callback<2>().set(FUNC(tmpz84c011_device::zc2_cb_trampoline_w));
+}

@@ -75,7 +75,7 @@ void pioneer_ldv1000_device::ldv1000_portmap(address_map &map)
 	map(0x00, 0x07).mirror(0x38).rw(FUNC(pioneer_ldv1000_device::z80_decoder_display_port_r), FUNC(pioneer_ldv1000_device::z80_decoder_display_port_w));
 	map(0x40, 0x40).mirror(0x3f).r(FUNC(pioneer_ldv1000_device::z80_controller_r));
 	map(0x80, 0x80).mirror(0x3f).w(FUNC(pioneer_ldv1000_device::z80_controller_w));
-	map(0xc0, 0xc3).mirror(0x3c).rw("ldvctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xc0, 0xc3).mirror(0x3c).rw(m_z80_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
@@ -278,8 +278,8 @@ MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
 	m_z80_cpu->set_addrmap(AS_PROGRAM, &pioneer_ldv1000_device::ldv1000_map);
 	m_z80_cpu->set_addrmap(AS_IO, &pioneer_ldv1000_device::ldv1000_portmap);
 
-	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL(5'000'000)/2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, pioneer_ldv1000_device, ctc_interrupt))
+	Z80CTC(config, m_z80_ctc, XTAL(5'000'000)/2);
+	m_z80_ctc->intr_callback().set(FUNC(pioneer_ldv1000_device::ctc_interrupt));
 
 	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pioneer_ldv1000_device, ppi0_porta_w))

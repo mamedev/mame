@@ -1517,8 +1517,8 @@ MACHINE_CONFIG_START(tenpindx_state::tenpindx)
 	m_subcpu->set_addrmap(AS_PROGRAM, &tenpindx_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &tenpindx_state::sub_io_map);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, ASTROCADE_CLOCK/4 /* same as "sub" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", ASTROCADE_CLOCK/4 /* same as "sub" */));
+	ctc.intr_callback().set_inputline(m_subcpu, INPUT_LINE_IRQ0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

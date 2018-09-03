@@ -25,10 +25,10 @@ DEFINE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device, "cpc_playcity", "PlayCity"
 
 // device machine config
 MACHINE_CONFIG_START(cpc_playcity_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, cpc_playcity_device, ctc_zc1_cb))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc",z80ctc_device, trg3))
-	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, cpc_playcity_device, ctc_intr_cb))
+	Z80CTC(config, m_ctc, XTAL(4'000'000));
+	m_ctc->zc_callback<1>().set(FUNC(cpc_playcity_device::ctc_zc1_cb));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
+	m_ctc->intr_callback().set(FUNC(cpc_playcity_device::ctc_intr_cb));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

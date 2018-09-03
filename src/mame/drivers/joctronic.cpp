@@ -349,13 +349,13 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
 	LS259(config, m_mainlatch); // IC4 - exact type unknown
-	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::display_select_w)); MCFG_DEVCB_MASK(0x07)
-	//MCFG_DEVCB_CHAIN_OUTPUT(WRITE8(*this, joctronic_state, ls145_w)) MCFG_DEVCB_RSHIFT(4)
+	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::display_select_w)).mask(0x07);
+	//m_mainlatch->parallel_out_cb().append(FUNC(joctronic_state::ls145_w)).rshift(4);
 	//m_mainlatch->q_out_cb<3>().set(FUNC(joctronic_state::display_reset_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(12'000'000)/4) // 3 MHz
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(12'000'000)/4)); // 3 MHz
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
 
 	MCFG_DEVICE_ADD("drivers1", LS259, 0) // IC4
 	MCFG_DEVICE_ADD("drivers2", LS259, 0) // IC3
@@ -396,12 +396,12 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 
 	LS259(config, m_mainlatch); // IC6 - exact type unknown
 	//m_mainlatch->q_out_cb<0>().set(FUNC(joctronic_state::cont_w));
-	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::ls145_w)); MCFG_DEVCB_RSHIFT(3) MCFG_DEVCB_MASK(0x38)
+	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::ls145_w)).rshift(3).mask(0x38);
 	//m_mainlatch->q_out_cb<7>().set(FUNC(joctronic_state::slalom03_reset_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(12'000'000)/2) // 6 MHz
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(12'000'000)/2)); // 6 MHz
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
 
 	MCFG_DEVICE_ADD("drivers1", HC259, 0) // IC1
 	MCFG_DEVICE_ADD("drivers2", HC259, 0) // IC2
