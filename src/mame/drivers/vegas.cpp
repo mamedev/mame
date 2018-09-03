@@ -1750,14 +1750,14 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	// PCI Bus Devices
 	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 
-	MCFG_DEVICE_ADD(PCI_ID_NILE, VRC5074, 0, m_maincpu)
-	MCFG_VRC5074_SET_SDRAM(0, 0x00800000)
-	MCFG_VRC5074_SET_CS(2, vegas_state::vegas_cs2_map)
-	MCFG_VRC5074_SET_CS(3, vegas_state::vegas_cs3_map)
-	MCFG_VRC5074_SET_CS(4, vegas_state::vegas_cs4_map)
-	MCFG_VRC5074_SET_CS(5, vegas_state::vegas_cs5_map)
-	MCFG_VRC5074_SET_CS(6, vegas_state::vegas_cs6_map)
-	MCFG_VRC5074_SET_CS(7, vegas_state::vegas_cs7_map)
+	VRC5074(config, m_nile, vegas_state::SYSTEM_CLOCK, m_maincpu);
+	m_nile->set_sdram_size(0, 0x00800000);
+	m_nile->set_map(2, address_map_constructor(&vegas_state::vegas_cs2_map, "vegas_cs2_map", this), this);
+	m_nile->set_map(3, address_map_constructor(&vegas_state::vegas_cs3_map, "vegas_cs3_map", this), this);
+	m_nile->set_map(4, address_map_constructor(&vegas_state::vegas_cs4_map, "vegas_cs4_map", this), this);
+	m_nile->set_map(5, address_map_constructor(&vegas_state::vegas_cs5_map, "vegas_cs5_map", this), this);
+	m_nile->set_map(6, address_map_constructor(&vegas_state::vegas_cs6_map, "vegas_cs6_map", this), this);
+	m_nile->set_map(7, address_map_constructor(&vegas_state::vegas_cs7_map, "vegas_cs7_map", this), this);
 
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x10950646, 0x05, 0x0));
 	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
@@ -1802,8 +1802,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::vegas32m)
 	vegas250(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_NILE)
-	MCFG_VRC5074_SET_SDRAM(0, 0x02000000)
+	m_nile->set_sdram_size(0, 0x02000000);
 MACHINE_CONFIG_END
 
 
@@ -1837,9 +1836,8 @@ MACHINE_CONFIG_START(vegas_state::denver)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(vegas_state::SYSTEM_CLOCK)
 
-	MCFG_DEVICE_MODIFY(PCI_ID_NILE)
-	MCFG_VRC5074_SET_SDRAM(0, 0x02000000)
-	MCFG_VRC5074_SET_CS(8, vegas_state::vegas_cs8_map)
+	m_nile->set_sdram_size(0, 0x02000000);
+	m_nile->set_map(8, address_map_constructor(&vegas_state::vegas_cs8_map, "vegas_cs8_map", this), this);
 
 	MCFG_DEVICE_REPLACE(PCI_ID_VIDEO, VOODOO_3_PCI, 0, m_maincpu, "screen")
 	MCFG_VOODOO_PCI_FBMEM(16)
