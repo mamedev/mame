@@ -893,6 +893,7 @@ WRITE8_MEMBER(galaxian_state::theend_protection_w)
 	    Handled by a PAL16VR8(?) at 6J. Both inputs and outputs are a nibble.
 	    Logic is not exactly known, but this implementation works well enough.
 	*/
+	m_protection_state = (m_protection_state << 4) | (data & 0x0f);
 
 	const uint8_t num1 = (m_protection_state >> 8) & 0x0f;
 	const uint8_t num2 = (m_protection_state >> 4) & 0x0f;
