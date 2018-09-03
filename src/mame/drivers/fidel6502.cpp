@@ -471,7 +471,6 @@ class fidel6502_state : public fidelbase_state
 public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelbase_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
 		m_mainmap(*this, "mainmap"),
@@ -483,7 +482,8 @@ public:
 	void rsc(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
 
-	void eas(machine_config &config, bool with_ppi_and_nvram = true);
+	void eas_base(machine_config &config);
+	void eas(machine_config &config);
 	void eag(machine_config &config);
 	void pc(machine_config &config);
 	void init_eag();
@@ -524,7 +524,6 @@ public:
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
 	optional_device<address_map_bank_device> m_mainmap;
@@ -1914,13 +1913,11 @@ void fidel6502_state::su9(machine_config &config)
 	config.set_default_layout(layout_fidel_su9);
 }
 
-void fidel6502_state::eas(machine_config &config, bool with_ppi_and_nvram)
-{
+MACHINE_CONFIG_START(fidel6502_state::eas_base)
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 3_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::div_trampoline);
 
-	device_t *device;
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(38.4_kHz_XTAL/64)) // through 4060 IC, 600Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
 
@@ -1928,17 +1925,6 @@ void fidel6502_state::eas(machine_config &config, bool with_ppi_and_nvram)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL))
 
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&fidel6502_state::eas_map).set_options(ENDIANNESS_LITTLE, 8, 16);
-
-	if (with_ppi_and_nvram)
-	{
-		I8255(config, m_ppi8255); // port B: input, port A & C: output
-		m_ppi8255->out_pa_callback().set(FUNC(fidel6502_state::eas_ppi_porta_w));
-		m_ppi8255->tri_pa_callback().set_constant(0);
-		m_ppi8255->in_pb_callback().set(FUNC(fidel6502_state::eas_ppi_portb_r));
-		m_ppi8255->out_pc_callback().set(FUNC(fidel6502_state::eas_ppi_portc_w));
-
-		NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	}
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_eas);
@@ -1959,10 +1945,23 @@ void fidel6502_state::eas(machine_config &config, bool with_ppi_and_nvram)
 	cartslot.set_device_load(device_image_load_delegate(&fidelbase_state::device_image_load_scc_cartridge, this));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
+MACHINE_CONFIG_END
+
+void fidel6502_state::eas(machine_config &config)
+{
+	eas_base(config);
+
+	I8255(config, m_ppi8255); // port B: input, port A & C: output
+	m_ppi8255->out_pa_callback().set(FUNC(fidel6502_state::eas_ppi_porta_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->in_pb_callback().set(FUNC(fidel6502_state::eas_ppi_portb_r));
+	m_ppi8255->out_pc_callback().set(FUNC(fidel6502_state::eas_ppi_portc_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 MACHINE_CONFIG_START(fidel6502_state::pc)
-	eas(config, false);
+	eas_base(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
