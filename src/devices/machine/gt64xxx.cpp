@@ -147,7 +147,8 @@
 #define GINT_RETRYCTR_SHIFT (20)
 
 
-DEFINE_DEVICE_TYPE(GT64XXX, gt64xxx_device, "gt64xxx", "Galileo GT-64XXX System Controller")
+DEFINE_DEVICE_TYPE(GT64010, gt64010_device, "gt64010", "Galileo GT-64010 System Controller")
+DEFINE_DEVICE_TYPE(GT64111, gt64111_device, "gt64111", "Galileo GT-64111 System Controller")
 
 void gt64xxx_device::config_map(address_map &map)
 {
@@ -160,8 +161,8 @@ void gt64xxx_device::cpu_map(address_map &map)
 	map(0x00000000, 0x00000cff).rw(FUNC(gt64xxx_device::cpu_if_r), FUNC(gt64xxx_device::cpu_if_w));
 }
 
-gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, GT64XXX, tag, owner, clock)
+gt64xxx_device::gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, type, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG), m_be(0), m_autoconfig(0), m_irq_num(-1)
 	, m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32)
 	, m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32)

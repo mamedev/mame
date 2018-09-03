@@ -36,6 +36,7 @@ public:
 
 	void set_speedup(offs_t speedup) { m_speedup = speedup; }
 	template <class Object> devcb_base &set_irqhandler_callback(Object &&cb) { return m_irqhandler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irqhandler.bind(); }
 
 	void reset_w(int state);
 
