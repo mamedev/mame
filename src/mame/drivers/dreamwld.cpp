@@ -357,7 +357,10 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 		{
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				tmptilemap[layer]->set_scroll_rows(1);
+				for (int i = 0; i < 2; i++)
+				{
+					m_tilemap[layer][i]->set_scroll_rows(1);
+				}
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 
