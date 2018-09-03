@@ -1715,32 +1715,6 @@ ROM_START( legionjb )
 	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
 ROM_END
 
-ROM_START( legionjb2 )
-	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
-	ROM_LOAD16_BYTE( "6-legion-27512.e1", 0x000001, 0x010000, CRC(fb3d944f) SHA1(fd96fca81b6ea793e8d0d0fd9b2497ec81262ece) )
-	ROM_LOAD16_BYTE( "4-legion-27512.e5", 0x000000, 0x010000, CRC(73a68507) SHA1(79349a5f4f510a7ffb456115a05e40765f6c6d89) )
-	ROM_LOAD16_BYTE( "5-legion-27512.e3", 0x020001, 0x010000, CRC(c306660a) SHA1(31c6b868ba07677b5110c577335873354bff596f) )
-	ROM_LOAD16_BYTE( "3-legion-27512.e7", 0x020000, 0x010000, CRC(c2e45e1e) SHA1(95cc359145b1b03123262891feed358407ba105a) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
-	ROM_LOAD( "9-legion-24128.h15", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) )
-	ROM_LOAD( "8-legion-24256.h17", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
-
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "7-legion-24256.c9", 0x00000, 0x08000, CRC(c50b0125) SHA1(83b5e9707152d97777fb65fa8820ba34ec2fac8d) )
-
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "2-legion-27512.e12", 0x00000, 0x10000, CRC(a9d70faf) SHA1(8b8b60ae49c55e931d6838e863463f6b2bf7adb0) )
-	ROM_LOAD( "1-legion-24256.e14", 0x18000, 0x08000, CRC(f018313b) SHA1(860bc9937202dc3a40c9fa7caad11c2c2aa19f5c) )
-
-	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "10-legion-27512.e15", 0x00000, 0x10000, CRC(29b8adaa) SHA1(10338ebe7324960683de1f796dd311ed662e42b4) )
-
-	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "11-legion-27512.e10", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
-	ROM_LOAD( "12-legion-27512.e7", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
-ROM_END
-
 ROM_START( terraf )
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "8.6e", 0x00000, 0x10000, CRC(fd58fa06) SHA1(f1f5fbd153be5fd5669aada66134baedfeac5d32) )
@@ -2273,7 +2247,6 @@ void armedf_state::init_cclimbr2()
 GAME( 1987, legion,    0,        legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, legionj,   legion,   legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, legionjb,  legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
-GAME( 1987, legionjb2, legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING)
 
 GAME( 1987, terraf,    0,        terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafu,   terraf,   terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
