@@ -22,7 +22,7 @@ class gt64xxx_device : public pci_host_device {
 public:
 	template <typename T>
 	gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
-		: gt64xxx_device(mconfig, type, const char *tag, owner, clock)
+		: gt64xxx_device(mconfig, type, tag, owner, clock)
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_irq_num(irq_num);

@@ -1992,7 +1992,7 @@ MACHINE_CONFIG_START(seattle_state::wg3dh)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(310/* others? */);
 	m_ioasic->set_yearoffs(80);
@@ -2006,7 +2006,7 @@ MACHINE_CONFIG_START(seattle_state::mace)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
 	m_ioasic->set_upper(319/* others? */);
 	m_ioasic->set_yearoffs(80);
@@ -2019,7 +2019,7 @@ MACHINE_CONFIG_START(seattle_state::sfrush)
 	cage.set_speedup(0x5236);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(315/* no alternates */);
 	m_ioasic->set_yearoffs(100);
@@ -2033,7 +2033,7 @@ MACHINE_CONFIG_START(seattle_state::sfrushrk)
 	cage.set_speedup(0x5329);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
 	m_ioasic->set_upper(331/* unknown */);
 	m_ioasic->set_yearoffs(100);
@@ -2052,7 +2052,7 @@ MACHINE_CONFIG_START(seattle_state::calspeed)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c0);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
 	m_ioasic->set_upper(328/* others? */);
 	m_ioasic->set_yearoffs(100);
@@ -2066,7 +2066,7 @@ MACHINE_CONFIG_START(seattle_state::vaportrx)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
 	m_ioasic->set_upper(324/* 334? unknown */);
 	m_ioasic->set_yearoffs(100);
@@ -2079,7 +2079,7 @@ MACHINE_CONFIG_START(seattle_state::biofreak)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3835);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(231/* no alternates */);
 	m_ioasic->set_yearoffs(80);
@@ -2092,7 +2092,7 @@ MACHINE_CONFIG_START(seattle_state::blitz)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(444/* or 528 */);
 	m_ioasic->set_yearoffs(80);
@@ -2105,7 +2105,7 @@ MACHINE_CONFIG_START(seattle_state::blitz99)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0afb);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(481/* or 484 or 520 */);
 	m_ioasic->set_yearoffs(80);
@@ -2118,7 +2118,7 @@ MACHINE_CONFIG_START(seattle_state::blitz2k)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(494/* or 498 */);
 	m_ioasic->set_yearoffs(80);
@@ -2131,7 +2131,7 @@ MACHINE_CONFIG_START(seattle_state::carnevil)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
 	m_ioasic->set_upper(469/* 469 or 486 or 528 */);
 	m_ioasic->set_yearoffs(80);
@@ -2144,7 +2144,7 @@ MACHINE_CONFIG_START(seattle_state::hyprdriv)
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
 	m_ioasic->set_upper(469/* unknown */);
 	m_ioasic->set_yearoffs(80);

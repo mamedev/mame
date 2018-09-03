@@ -1880,7 +1880,7 @@ MACHINE_CONFIG_START(vegas_state::gauntleg)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
 	m_ioasic->set_upper(340/* 340=39", 322=27", others? */);
 	m_ioasic->set_yearoffs(80);
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_START(vegas_state::gauntdl)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
 	m_ioasic->set_upper(346/* 347, others? */);
 	m_ioasic->set_yearoffs(80);
@@ -1908,7 +1908,7 @@ MACHINE_CONFIG_START(vegas_state::warfa)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
 	m_ioasic->set_upper(337/* others? */);
 	m_ioasic->set_yearoffs(80);
@@ -1922,7 +1922,7 @@ MACHINE_CONFIG_START(vegas_state::tenthdeg)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0afb);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
 	m_ioasic->set_upper(330/* others? */);
 	m_ioasic->set_yearoffs(80);
@@ -1936,7 +1936,7 @@ MACHINE_CONFIG_START(vegas_state::roadburn)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0ddd);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(325/* others? */);
 	m_ioasic->set_yearoffs(80);
@@ -1950,7 +1950,7 @@ MACHINE_CONFIG_START(vegas_state::nbashowt)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
 	// 528 494 478 development pic, 487 NBA
 	m_ioasic->set_upper(487/* or 478 or 487 */);
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_START(vegas_state::nbanfl)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(498/* or 478 or 487 */);
 	m_ioasic->set_yearoffs(80);
@@ -1981,7 +1981,7 @@ MACHINE_CONFIG_START(vegas_state::nbagold)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
 	m_ioasic->set_upper(494 /* 494 109 ??? */);
 	m_ioasic->set_yearoffs(80);
@@ -1996,7 +1996,7 @@ MACHINE_CONFIG_START(vegas_state::sf2049)
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(336/* others? */);
 	m_ioasic->set_yearoffs(80);
@@ -2011,7 +2011,7 @@ MACHINE_CONFIG_START(vegas_state::sf2049se)
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
 	m_ioasic->set_upper(352/*352 336 others? */);
 	m_ioasic->set_yearoffs(80);
@@ -2026,7 +2026,7 @@ MACHINE_CONFIG_START(vegas_state::sf2049te)
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
 	m_ioasic->set_upper(348/* 348 others? */);
 	m_ioasic->set_yearoffs(80);
@@ -2041,7 +2041,7 @@ MACHINE_CONFIG_START(vegas_state::cartfury)
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	midway_ioasic_device &ioasic(MIDWAY_IOASIC(config, m_ioasic, 0));
+	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
 	// 433, 495 Development PIC
 	m_ioasic->set_upper(495/*433,  495 others? */);
