@@ -1702,11 +1702,13 @@ void galaxian_state::fantastc_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8803, 0x8803).w("8910.0", FUNC(ay8910_device::address_w));
+	map(0x8807, 0x8807).r("8910.0", FUNC(ay8910_device::data_r));
 	map(0x880b, 0x880b).w("8910.0", FUNC(ay8910_device::data_w));
 	map(0x880c, 0x880c).w("8910.1", FUNC(ay8910_device::address_w));
+	map(0x880d, 0x880d).r("8910.1", FUNC(ay8910_device::data_r));
 	map(0x880e, 0x880e).w("8910.1", FUNC(ay8910_device::data_w));
 	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9800, 0x98ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x9800, 0x9bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
 	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
 	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
