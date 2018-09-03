@@ -1750,7 +1750,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	// PCI Bus Devices
 	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 
-	VRC5074(config, m_nile, vegas_state::SYSTEM_CLOCK, m_maincpu);
+	VRC5074(config, m_nile, 100000000, m_maincpu);
 	m_nile->set_sdram_size(0, 0x00800000);
 	m_nile->set_map(2, address_map_constructor(&vegas_state::vegas_cs2_map, "vegas_cs2_map", this), this);
 	m_nile->set_map(3, address_map_constructor(&vegas_state::vegas_cs3_map, "vegas_cs3_map", this), this);
