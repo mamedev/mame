@@ -62,6 +62,7 @@ CPU #    Game                      Notes              Seed   Upper Limit
 317-5014 DakkoChan Jansoh          NEC MC-8123B       206850  1C00
 317-0029 Block Gal                 NEC MC-8123B 651   091755  1800?
 317-0030 Perfect Billiard                             9451EC  1C00
+317-0040 Toki no Senshi - Chrono Soldier              068713  1c00
 317-0042 Opa Opa                                      B31FD0  1C00
 317-0043 Wonder Boy Monster Land                      640708  1C00
 317-0054 Shinobi (sound CPU)       NEC MC-8123B 652   088992  1800
