@@ -95,7 +95,6 @@ public:
 	DECLARE_WRITE8_MEMBER(scramble_background_green_w);
 	DECLARE_WRITE8_MEMBER(scramble_background_blue_w);
 	DECLARE_WRITE8_MEMBER(galaxian_gfxbank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(scramble_protection_alt_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gmgalax_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(azurian_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kingball_muxbit_r);
@@ -111,6 +110,9 @@ public:
 	DECLARE_WRITE8_MEMBER(konami_sound_filter_w);
 	DECLARE_READ8_MEMBER(theend_ppi8255_r);
 	DECLARE_WRITE8_MEMBER(theend_ppi8255_w);
+	DECLARE_WRITE8_MEMBER(theend_protection_w);
+	DECLARE_READ8_MEMBER(theend_protection_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(theend_protection_alt_r);
 	DECLARE_WRITE8_MEMBER(explorer_sound_control_w);
 	DECLARE_READ8_MEMBER(sfx_sample_io_r);
 	DECLARE_WRITE8_MEMBER(sfx_sample_io_w);
@@ -158,8 +160,6 @@ public:
 	DECLARE_WRITE8_MEMBER(konami_portc_0_w);
 	DECLARE_WRITE8_MEMBER(konami_portc_1_w);
 	DECLARE_WRITE8_MEMBER(theend_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(scramble_protection_w);
-	DECLARE_READ8_MEMBER(scramble_protection_r);
 	DECLARE_READ8_MEMBER(explorer_sound_latch_r);
 	DECLARE_WRITE8_MEMBER(sfx_sample_control_w);
 	DECLARE_WRITE8_MEMBER(monsterz_porta_1_w);

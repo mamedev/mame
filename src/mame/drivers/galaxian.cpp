@@ -887,48 +887,56 @@ WRITE8_MEMBER(galaxian_state::theend_coin_counter_w)
 }
 
 
-/*************************************
- *
- *  Scramble I/O
- *
- *************************************/
-
-WRITE8_MEMBER(galaxian_state::scramble_protection_w)
+WRITE8_MEMBER(galaxian_state::theend_protection_w)
 {
 	/*
-	    This is not fully understood; the low 4 bits of port C are
-	    inputs; the upper 4 bits are outputs. Scramble main set always
-	    writes sequences of 3 or more nibbles to the low port and
-	    expects certain results in the upper nibble afterwards.
+	    Handled by a PAL16VR8(?) at 6J. Both inputs and outputs are a nibble.
+	    Logic is not exactly known, but this implementation works well enough.
 	*/
-	m_protection_state = (m_protection_state << 4) | (data & 0x0f);
-	switch (m_protection_state & 0xfff)
-	{
-		/* scramble */
-		case 0xf09:     m_protection_result = 0xff; break;
-		case 0xa49:     m_protection_result = 0xbf; break;
-		case 0x319:     m_protection_result = 0x4f; break;
-		case 0x5c9:     m_protection_result = 0x6f; break;
 
-		/* scrambls */
-		case 0x246:     m_protection_result ^= 0x80;    break;
-		case 0xb5f:     m_protection_result = 0x6f; break;
+	const uint8_t num1 = (m_protection_state >> 8) & 0x0f;
+	const uint8_t num2 = (m_protection_state >> 4) & 0x0f;
+	const uint8_t op = m_protection_state & 0x0f;
+
+	/* TODO: theend writes several, other mystery sequences */
+	switch (op)
+	{
+	case 0x6:
+		/* scrambles */
+		m_protection_result ^= 0x80;
+		break;
+	case 0x9:
+		/* scramble */
+		m_protection_result = std::min(num1 + 1, 0xf) << 4; // does not want overflow
+		break;
+	case 0xb:
+		/* theend */
+		m_protection_result = std::max(num2 - num1, 0) << 4; // assume no underflow
+		break;
+	case 0xa:
+		/* theend */
+		m_protection_result = 0x00; // needs this to avoid glitches after first round
+		break;
+	case 0xf:
+		/* scrambles */
+		m_protection_result = std::max(num1 - num2, 0) << 4; // assume no underflow
+		break;
 	}
 }
 
 
-READ8_MEMBER(galaxian_state::scramble_protection_r)
+READ8_MEMBER(galaxian_state::theend_protection_r)
 {
 	return m_protection_result;
 }
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::scramble_protection_alt_r)
+CUSTOM_INPUT_MEMBER(galaxian_state::theend_protection_alt_r)
 {
 	/*
-	    There are two additional bits that are derived from bit 7 of
-	    the protection result. This is just a guess but works well enough
-	    to boot scrambls.
+	    Handled by a custom IC. Holds two bits derived from the upper bit of
+	    the nibble that the IC at 6J returns; scrambles reads this area and
+	    expects said behavior, or else it will crash.
 	*/
 	return (m_protection_result >> 7) & 1;
 }
@@ -4727,7 +4735,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( theend )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -4750,7 +4758,7 @@ static INPUT_PORTS_START( theend )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -4759,7 +4767,10 @@ static INPUT_PORTS_START( theend )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )     /* output bits */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)0) /* protection bit */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)1) /* protection bit */
 
 	PORT_START("IN3")   /* need for some PPI accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -4801,9 +4812,9 @@ static INPUT_PORTS_START( scramble )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, scramble_protection_alt_r, (void *)0)  /* protection bit */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)0)  /* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, scramble_protection_alt_r, (void *)1)  /* protection bit */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)1)  /* protection bit */
 
 	PORT_START("IN3")   /* need for some PPI accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -6349,9 +6360,14 @@ MACHINE_CONFIG_START(galaxian_state::theend)
 
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, theend_coin_counter_w))
+
+	MCFG_DEVICE_MODIFY("ppi8255_1")
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, theend_protection_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, theend_protection_w))
 MACHINE_CONFIG_END
 
 
+/* TODO: should be derived from theend, resort machine configs later */
 MACHINE_CONFIG_START(galaxian_state::scramble)
 	scramble_base(config);
 	/* alternate memory map */
@@ -6359,8 +6375,8 @@ MACHINE_CONFIG_START(galaxian_state::scramble)
 	MCFG_DEVICE_PROGRAM_MAP(theend_map)
 
 	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, scramble_protection_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, scramble_protection_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, theend_protection_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, theend_protection_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::jungsub)
