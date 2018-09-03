@@ -785,8 +785,10 @@ READ32_MEMBER(konamigx_state::type3_sync_r)
 /*
     Run and Gun 2, Rushing Heroes, Winning Spike, and Vs. Net Soccer contain a XILINX FPGA that serves as security.
 
-    RnG2's version is stamped "K002204", while Rushing Heroes' is "K0000035891".  Vs Net's is unknown at this time.
-    Winning Spike's is "0000032652".
+    RnG2's version is "K002204"
+    Rushing Heroes' is "K0000035891"
+    Vs Net Soccer is "003462"
+    Winning Spike's is "0000032652"
 
     RnG2's is used to generate the sprite list just like the ESC, among other tasks.  (RnG2 sends many commands per frame to the protection).
 
@@ -3180,9 +3182,9 @@ Notes:
                      058143      - QFP160
                      058142      - QFP120
                      058141      - QFP120
-                     056832      - QFP120
-                     055555      - QFP160
-                     055673      - QFP160
+                     056832      - TQFP144
+                     055555      - TQFP176
+                     055673      - TQFP176
 
 
 Game Board (This sits on top of the Mother PCB)
@@ -3218,8 +3220,8 @@ Notes:
 
       Konami Customs:
                      003462 - Xilinx PLCC84 FPGA stamped 003462
-                     053936 - QFP100, also marked KS10011-PF PSAC2
-                     058146 - QFP160
+                     053936 - QFP80, also marked KS10011-PF PSAC2
+                     058146 - TQFP176
 
       RAM:
           814260 : 256K x16 DRAM
