@@ -61,6 +61,8 @@ public:
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void lightgun_set( int, int );
 
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 protected:
 	static constexpr unsigned MAX_LEVEL = 32;
 	static constexpr unsigned MID_LEVEL = (MAX_LEVEL / 2) << 8;
