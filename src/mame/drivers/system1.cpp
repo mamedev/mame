@@ -1952,9 +1952,9 @@ static INPUT_PORTS_START( tokisens )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("SWA")
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
@@ -1972,6 +1972,15 @@ static INPUT_PORTS_START( tokisens )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tokisensa )
+	PORT_INCLUDE( tokisens )
+
+	PORT_MODIFY("SWA")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wbml )
@@ -5611,7 +5620,7 @@ GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, i
 GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, tokisens,   0,        sys2xb,            tokisens,  system1_state, init_tokisens,     ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (MC-8123, 317-0040)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tokisensa,  tokisens, sys2,              tokisens,  system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (prototype?)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1987, tokisensa,  tokisens, sys2,              tokisensa, system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (prototype?)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
