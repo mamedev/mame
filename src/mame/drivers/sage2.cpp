@@ -419,15 +419,15 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_DEVICE_ADD(I8259_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_1))
 
-	MCFG_DEVICE_ADD(I8255A_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("J7"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("J6"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi0_pc_w))
+	i8255_device &ppi0(I8255A(config, I8255A_0_TAG));
+	ppi0.in_pa_callback().set_ioport("J7");
+	ppi0.in_pb_callback().set_ioport("J6");
+	ppi0.out_pc_callback().set(FUNC(sage2_state::ppi0_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, sage2_state, ppi1_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi1_pc_w))
+	i8255_device &ppi1(I8255A(config, I8255A_1_TAG));
+	ppi1.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi1.in_pb_callback().set(FUNC(sage2_state::ppi1_pb_r));
+	ppi1.out_pc_callback().set(FUNC(sage2_state::ppi1_pc_w));
 
 	MCFG_DEVICE_ADD(I8253_0_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(0) // from U75 OUT0

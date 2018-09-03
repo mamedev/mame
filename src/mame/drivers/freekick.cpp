@@ -844,15 +844,15 @@ MACHINE_CONFIG_START(freekick_state::freekick)
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, freekick_state, snd_rom_addr_l_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, freekick_state, snd_rom_addr_h_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, freekick_state, snd_rom_r))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.out_pa_callback().set(FUNC(freekick_state::snd_rom_addr_l_w));
+	ppi0.out_pb_callback().set(FUNC(freekick_state::snd_rom_addr_h_w));
+	ppi0.in_pc_callback().set(FUNC(freekick_state::snd_rom_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
+	ppi1.in_pb_callback().set_ioport("DSW2");
+	ppi1.in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

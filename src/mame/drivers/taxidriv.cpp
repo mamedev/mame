@@ -353,32 +353,32 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, taxidriv_state, p0a_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p0b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, taxidriv_state, p0c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p0c_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set(FUNC(taxidriv_state::p0a_r));
+	ppi0.out_pb_callback().set(FUNC(taxidriv_state::p0b_w));
+	ppi0.in_pc_callback().set(FUNC(taxidriv_state::p0c_r));
+	ppi0.out_pc_callback().set(FUNC(taxidriv_state::p0c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p1a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, taxidriv_state, p1b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, taxidriv_state, p1c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p1c_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(taxidriv_state::p1a_w));
+	ppi1.in_pb_callback().set(FUNC(taxidriv_state::p1b_r));
+	ppi1.in_pc_callback().set(FUNC(taxidriv_state::p1c_r));
+	ppi1.out_pc_callback().set(FUNC(taxidriv_state::p1c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p2a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p2b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p2c_w))
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(taxidriv_state::p2a_w));
+	ppi2.out_pb_callback().set(FUNC(taxidriv_state::p2b_w));
+	ppi2.out_pc_callback().set(FUNC(taxidriv_state::p2c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p3a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p3b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p3c_w))
+	i8255_device &ppi3(I8255A(config, "ppi8255_3"));
+	ppi3.out_pa_callback().set(FUNC(taxidriv_state::p3a_w));
+	ppi3.out_pb_callback().set(FUNC(taxidriv_state::p3b_w));
+	ppi3.out_pc_callback().set(FUNC(taxidriv_state::p3c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_4", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, taxidriv_state, p4a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, taxidriv_state, p4b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, taxidriv_state, p4c_w))
+	i8255_device &ppi4(I8255A(config, "ppi8255_4"));
+	ppi4.out_pa_callback().set(FUNC(taxidriv_state::p4a_w));
+	ppi4.out_pb_callback().set(FUNC(taxidriv_state::p4b_w));
+	ppi4.out_pc_callback().set(FUNC(taxidriv_state::p4c_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

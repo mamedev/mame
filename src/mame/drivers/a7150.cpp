@@ -485,10 +485,10 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	// IFSP port on processor card
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-//  MCFG_I8255_IN_PORTA_CB(READ8("cent_status_in", input_buffer_device, bus_r))
-//  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a7150_state, ppi_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::bus_w));
+	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(14.7456_MHz_XTAL/4);

@@ -372,21 +372,21 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 	MCFG_DEVICE_IO_MAP(cabaret_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
 
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS2"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.in_pa_callback().set_ioport("BUTTONS2");
+	ppi1.in_pb_callback().set_ioport("SERVICE");
+	ppi1.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cabaret_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cabaret_state, ppi2_c_w))
+	i8255_device &ppi2(I8255(config, "ppi2"));
+	ppi2.in_pa_callback().set_ioport("BUTTONS1");
+	ppi2.out_pb_callback().set(FUNC(cabaret_state::ppi2_b_w));
+	ppi2.out_pc_callback().set(FUNC(cabaret_state::ppi2_c_w));
 
-	MCFG_DEVICE_ADD("ppi3", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cabaret_state, nmi_and_coins_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0xf0))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
+	i8255_device &ppi3(I8255(config, "ppi3"));
+	ppi3.out_pa_callback().set(FUNC(cabaret_state::nmi_and_coins_w));
+	ppi3.tri_pa_callback().set_constant(0xf0);
+	ppi3.in_pb_callback().set_ioport("DSW1");
+	ppi3.in_pc_callback().set_ioport("DSW2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

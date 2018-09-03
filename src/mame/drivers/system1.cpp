@@ -2166,10 +2166,10 @@ MACHINE_CONFIG_START(system1_state::sys1ppi)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, system1_state, soundport_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, system1_state, videomode_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, system1_state, sound_control_w))
+	I8255A(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(system1_state::soundport_w));
+	m_ppi8255->out_pb_callback().set(FUNC(system1_state::videomode_w));
+	m_ppi8255->out_pc_callback().set(FUNC(system1_state::sound_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

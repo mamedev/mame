@@ -850,25 +850,25 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_DEVICE_PROGRAM_MAP(turbo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, turbo_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, turbo_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_ppi0c_w))
+	I8255(config, m_i8255_0);
+	m_i8255_0->out_pa_callback().set(FUNC(turbo_state::turbo_ppi0a_w));
+	m_i8255_0->out_pb_callback().set(FUNC(turbo_state::turbo_ppi0b_w));
+	m_i8255_0->out_pc_callback().set(FUNC(turbo_state::turbo_ppi0c_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, turbo_ppi1a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, turbo_ppi1b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_ppi1c_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set(FUNC(turbo_state::turbo_ppi1a_w));
+	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::turbo_ppi1b_w));
+	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::turbo_ppi1c_w));
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, turbo_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, turbo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_sound_c_w))
+	I8255(config, m_i8255_2);
+	m_i8255_2->out_pa_callback().set(FUNC(turbo_state::turbo_sound_a_w));
+	m_i8255_2->out_pb_callback().set(FUNC(turbo_state::turbo_sound_b_w));
+	m_i8255_2->out_pc_callback().set(FUNC(turbo_state::turbo_sound_c_w));
 
-	MCFG_DEVICE_ADD("i8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, turbo_state, turbo_analog_r))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_ppi3c_w))
+	I8255(config, m_i8255_3);
+	m_i8255_3->in_pa_callback().set(FUNC(turbo_state::turbo_analog_r));
+	m_i8255_3->in_pb_callback().set_ioport("DSW2");
+	m_i8255_3->out_pc_callback().set(FUNC(turbo_state::turbo_ppi3c_w));
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, turbo_state, scanlines_w))    // scan SL lines
@@ -905,15 +905,15 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_DEVICE_PROGRAM_MAP(subroc3d_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, subroc3d_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, subroc3d_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, subroc3d_ppi0c_w))
+	I8255(config, m_i8255_0);
+	m_i8255_0->out_pa_callback().set(FUNC(turbo_state::subroc3d_ppi0a_w));
+	m_i8255_0->out_pb_callback().set(FUNC(turbo_state::subroc3d_ppi0b_w));
+	m_i8255_0->out_pc_callback().set(FUNC(turbo_state::subroc3d_ppi0c_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, subroc3d_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, subroc3d_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, subroc3d_sound_c_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set(FUNC(turbo_state::subroc3d_sound_a_w));
+	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::subroc3d_sound_b_w));
+	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::subroc3d_sound_c_w));
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, turbo_state, scanlines_w))    // scan SL lines
@@ -953,15 +953,15 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, buckrog_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, buckrog_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, buckrog_ppi0c_w))
+	I8255(config, m_i8255_0);
+	m_i8255_0->out_pa_callback().set(FUNC(turbo_state::buckrog_ppi0a_w));
+	m_i8255_0->out_pb_callback().set(FUNC(turbo_state::buckrog_ppi0b_w));
+	m_i8255_0->out_pc_callback().set(FUNC(turbo_state::buckrog_ppi0c_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, buckrog_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, buckrog_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, buckrog_ppi1c_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set(FUNC(turbo_state::buckrog_sound_a_w));
+	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::buckrog_sound_b_w));
+	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::buckrog_ppi1c_w));
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, turbo_state, scanlines_w))    // scan SL lines

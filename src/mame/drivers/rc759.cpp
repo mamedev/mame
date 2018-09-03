@@ -547,10 +547,10 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(rc759_state::nvram_init));
 
 	// ppi
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, rc759_state, ppi_porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, rc759_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, rc759_state, ppi_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(rc759_state::ppi_porta_r));
+	m_ppi->in_pb_callback().set(FUNC(rc759_state::ppi_portb_r));
+	m_ppi->out_pc_callback().set(FUNC(rc759_state::ppi_portc_w));
 
 	// rtc
 	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)

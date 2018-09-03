@@ -438,15 +438,15 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm1)
 	MCFG_DEVICE_IO_MAP(himesiki_iom1)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("1P"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("2P"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("OTHERS"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("1P");
+	ppi0.in_pb_callback().set_ioport("2P");
+	ppi0.in_pc_callback().set_ioport("OTHERS");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, himesiki_state, himesiki_rombank_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
+	ppi1.in_pb_callback().set_ioport("DSW2");
+	ppi1.out_pc_callback().set(FUNC(himesiki_state::himesiki_rombank_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

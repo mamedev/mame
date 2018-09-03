@@ -600,10 +600,10 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(multi8_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, multi8_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, multi8_state, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, multi8_state, portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(multi8_state::porta_r));
+	m_ppi->out_pb_callback().set(FUNC(multi8_state::portb_w));
+	m_ppi->out_pc_callback().set(FUNC(multi8_state::portc_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));

@@ -626,10 +626,10 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dblcrown_state, lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dblcrown_state, bank_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dblcrown_state, mux_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(dblcrown_state::lamps_w));
+	ppi.out_pb_callback().set(FUNC(dblcrown_state::bank_w));
+	ppi.out_pc_callback().set(FUNC(dblcrown_state::mux_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

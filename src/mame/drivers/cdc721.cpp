@@ -334,9 +334,9 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg2));
 	//ctc.zc_callback<2>().set("comuart", FUNC(ins8250_device::rclk_w));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cdc721_state, interrupt_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cdc721_state, misc_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pb_callback().set(FUNC(cdc721_state::interrupt_mask_w));
+	ppi.out_pc_callback().set(FUNC(cdc721_state::misc_w));
 
 	output_latch_device &ledlatch(OUTPUT_LATCH(config, "ledlatch"));
 	ledlatch.bit_handler<0>().set_output("error").invert();

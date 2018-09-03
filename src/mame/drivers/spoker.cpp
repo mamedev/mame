@@ -617,15 +617,15 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)  // Control 0x8b --> A:out; B:input; C:input.
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spoker_state, nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));  // Control 0x8b --> A:out; B:input; C:input.
+	ppi0.out_pa_callback().set(FUNC(spoker_state::nmi_and_coins_w));
+	ppi0.in_pb_callback().set_ioport("SERVICE");
+	ppi0.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)  // Control 0x90 --> A:input; B:out; C:out.
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spoker_state, video_and_leds_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spoker_state, leds_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));  // Control 0x90 --> A:input; B:out; C:out.
+	ppi1.in_pa_callback().set_ioport("BUTTONS1");
+	ppi1.out_pb_callback().set(FUNC(spoker_state::video_and_leds_w));
+	ppi1.out_pc_callback().set(FUNC(spoker_state::leds_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

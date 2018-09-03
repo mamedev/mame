@@ -427,13 +427,13 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
+	ppi.in_pb_callback().set(FUNC(x1_state::x1_portb_r));
+	ppi.in_pc_callback().set(FUNC(x1_state::x1_portc_r));
+	ppi.out_pa_callback().set(FUNC(x1_state::x1_porta_w));
+	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
+	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)

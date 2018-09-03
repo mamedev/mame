@@ -1806,13 +1806,13 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 		ADDRESS_MAP_BANK(config, m_rambank[bank]).set_map(&mz2500_state::mz2500_bank_window_map).set_options(ENDIANNESS_LITTLE, 8, 16+3, 0x2000);
 	}
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2500_state, mz2500_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2500_state, mz2500_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2500_state, mz2500_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2500_state, mz2500_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2500_state, mz2500_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2500_state, mz2500_portc_w))
+	i8255_device &ppi(I8255(config, "i8255_0"));
+	ppi.in_pa_callback().set(FUNC(mz2500_state::mz2500_porta_r));
+	ppi.out_pa_callback().set(FUNC(mz2500_state::mz2500_porta_w));
+	ppi.in_pb_callback().set(FUNC(mz2500_state::mz2500_portb_r));
+	ppi.out_pb_callback().set(FUNC(mz2500_state::mz2500_portb_w));
+	ppi.in_pc_callback().set(FUNC(mz2500_state::mz2500_portc_r));
+	ppi.out_pc_callback().set(FUNC(mz2500_state::mz2500_portc_w));
 
 	z80pio_device& pio(Z80PIO(config, "z80pio_1", 6000000));
 	pio.in_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));

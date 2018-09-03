@@ -819,10 +819,10 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, tandy2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tandy2k_state, ppi_pc_w))
+	I8255A(config, m_i8255a);
+	m_i8255a->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255a->in_pb_callback().set(FUNC(tandy2k_state::ppi_pb_r));
+	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

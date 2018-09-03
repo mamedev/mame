@@ -636,11 +636,11 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_radionic)
 
 	// Interface to external circuits
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pulsar_state, ppi_pa_w))    // Data for external plugin printer module
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pulsar_state, ppi_pb_w))    // Control data to external
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))      // Sensing from external and printer status
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))    // Printer strobe
+	I8255(config, m_ppi);
+	//m_ppi->in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));      // Sensing from external and printer status
+	//m_ppi->out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));    // Data for external plugin printer module
+	//m_ppi->out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));    // Control data to external
+	//m_ppi->out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));    // Printer strobe
 MACHINE_CONFIG_END
 
 

@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(isbc_state::isbc86)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
 	I8251(config, m_uart8251, 0);
 	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(isbc_state::rpc86)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
 	I8251(config, m_uart8251, 0);
 	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -453,10 +453,10 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc286_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8("cent_status_in", input_buffer_device, bus_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isbc_state, ppi_c_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.in_pb_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+	ppi.out_pc_callback().set(FUNC(isbc_state::ppi_c_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, isbc_state, write_centronics_ack))

@@ -123,9 +123,9 @@ MACHINE_CONFIG_START(tvgame_state::tvgame)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// Devices
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("LINE0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tvgame_state, speaker_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("LINE0");
+	ppi.out_pc_callback().set(FUNC(tvgame_state::speaker_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */

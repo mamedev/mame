@@ -441,11 +441,11 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	// D30
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ksm_state, ksm_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SA1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SA2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ksm_state, ksm_ppi_portc_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(ksm_state::ksm_ppi_porta_w));
+	ppi.in_pb_callback().set_ioport("SA1");
+	ppi.in_pc_callback().set_ioport("SA2");
+	ppi.out_pc_callback().set(FUNC(ksm_state::ksm_ppi_portc_w));
 
 	// D42 - serial connection to host
 	I8251(config, m_i8251line, 0);

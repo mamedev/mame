@@ -281,16 +281,16 @@ MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
 	Z80CTC(config, m_z80_ctc, XTAL(5'000'000)/2);
 	m_z80_ctc->intr_callback().set(FUNC(pioneer_ldv1000_device::ctc_interrupt));
 
-	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pioneer_ldv1000_device, ppi0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pioneer_ldv1000_device, ppi0_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pioneer_ldv1000_device, ppi0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pioneer_ldv1000_device, ppi0_portc_w))
+	i8255_device &ldvppi0(I8255(config, "ldvppi0"));
+	ldvppi0.out_pa_callback().set(FUNC(pioneer_ldv1000_device::ppi0_porta_w));
+	ldvppi0.in_pb_callback().set(FUNC(pioneer_ldv1000_device::ppi0_portb_r));
+	ldvppi0.in_pc_callback().set(FUNC(pioneer_ldv1000_device::ppi0_portc_r));
+	ldvppi0.out_pc_callback().set(FUNC(pioneer_ldv1000_device::ppi0_portc_w));
 
-	MCFG_DEVICE_ADD("ldvppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pioneer_ldv1000_device, ppi1_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pioneer_ldv1000_device, ppi1_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pioneer_ldv1000_device, ppi1_portc_w))
+	i8255_device &ldvppi1(I8255(config, "ldvppi1"));
+	ldvppi1.in_pa_callback().set(FUNC(pioneer_ldv1000_device::ppi1_porta_r));
+	ldvppi1.out_pb_callback().set(FUNC(pioneer_ldv1000_device::ppi1_portb_w));
+	ldvppi1.out_pc_callback().set(FUNC(pioneer_ldv1000_device::ppi1_portc_w));
 MACHINE_CONFIG_END
 
 

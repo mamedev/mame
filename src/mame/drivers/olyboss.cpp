@@ -470,9 +470,9 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
 	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, olyboss_state, keyboard_read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, olyboss_state, ppic_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(olyboss_state::keyboard_read));
+	m_ppi->out_pc_callback().set(FUNC(olyboss_state::ppic_w));
 
 	/* keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)

@@ -217,19 +217,19 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, b2m_state, b2m_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, b2m_state, b2m_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, b2m_state, b2m_8255_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, b2m_state, b2m_8255_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(b2m_state::b2m_8255_porta_w));
+	ppi1.in_pb_callback().set(FUNC(b2m_state::b2m_8255_portb_r));
+	ppi1.out_pb_callback().set(FUNC(b2m_state::b2m_8255_portb_w));
+	ppi1.out_pc_callback().set(FUNC(b2m_state::b2m_8255_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, b2m_state, b2m_ext_8255_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.out_pc_callback().set(FUNC(b2m_state::b2m_ext_8255_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, b2m_state, b2m_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, b2m_state, b2m_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, b2m_state, b2m_romdisk_portc_w))
+	i8255_device &ppi3(I8255(config, "ppi8255_3"));
+	ppi3.in_pa_callback().set(FUNC(b2m_state::b2m_romdisk_porta_r));
+	ppi3.out_pb_callback().set(FUNC(b2m_state::b2m_romdisk_portb_w));
+	ppi3.out_pc_callback().set(FUNC(b2m_state::b2m_romdisk_portc_w));
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

@@ -612,10 +612,10 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, pcjr_state, pic8259_set_int_line))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pcjr_state, pcjr_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pcjr_state, pcjr_ppi_portc_r))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set_constant(0xff);
+	ppi.out_pb_callback().set(FUNC(pcjr_state::pcjr_ppi_portb_w));
+	ppi.in_pc_callback().set(FUNC(pcjr_state::pcjr_ppi_portc_r));
 
 	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))

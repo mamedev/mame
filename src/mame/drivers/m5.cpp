@@ -1436,12 +1436,12 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("m5_cass")
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, m5_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, m5_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, m5_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, m5_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, m5_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(m5_state::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(m5_state::ppi_pa_w));
+	m_ppi->out_pb_callback().set(FUNC(m5_state::ppi_pb_w));
+	m_ppi->in_pc_callback().set(FUNC(m5_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(m5_state::ppi_pc_w));
 
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))

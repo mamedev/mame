@@ -310,18 +310,18 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pasopia_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia_state, vram_addr_lo_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pasopia_state, vram_latch_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pasopia_state, vram_latch_r))
+	I8255A(config, m_ppi0);
+	m_ppi0->out_pa_callback().set(FUNC(pasopia_state::vram_addr_lo_w));
+	m_ppi0->out_pb_callback().set(FUNC(pasopia_state::vram_latch_w));
+	m_ppi0->in_pc_callback().set(FUNC(pasopia_state::vram_latch_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia_state, screen_mode_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia_state, portb_1_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia_state, vram_addr_hi_w))
+	I8255A(config, m_ppi1);
+	m_ppi1->out_pa_callback().set(FUNC(pasopia_state::screen_mode_w));
+	m_ppi1->in_pb_callback().set(FUNC(pasopia_state::portb_1_r));
+	m_ppi1->out_pc_callback().set(FUNC(pasopia_state::vram_addr_hi_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pasopia_state, rombank_r))
+	I8255A(config, m_ppi2);
+	m_ppi2->in_pc_callback().set(FUNC(pasopia_state::rombank_r));
 
 	Z80CTC(config, m_ctc, XTAL(4'000'000));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

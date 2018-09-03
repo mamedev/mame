@@ -182,11 +182,11 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sm1800_state, sm1800_8255_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sm1800_state, sm1800_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, sm1800_state, sm1800_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sm1800_state, sm1800_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(sm1800_state::sm1800_8255_porta_r));
+	m_ppi->out_pb_callback().set(FUNC(sm1800_state::sm1800_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_w));
 
 	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
 	MCFG_I8275_CHARACTER_WIDTH(8)

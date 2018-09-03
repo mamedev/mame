@@ -197,6 +197,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_z80pio(*this, "z80pio%u", 0U),
 			m_ds1204(*this, "ds1204"),
+			m_ppi(*this, "ppi8255"),
 			m_v9938(*this, "v9938_%u", 0U),
 			m_microtouch(*this, "microtouch") ,
 			m_uart(*this, "ns16550"),
@@ -220,6 +221,7 @@ protected:
 private:
 	required_device_array<z80pio_device, 2> m_z80pio;
 	required_device<ds1204_device> m_ds1204;
+	required_device<i8255_device> m_ppi;
 	required_device_array<v9938_device, 2> m_v9938;
 	optional_device<microtouch_device> m_microtouch;
 	optional_device<ns16550_device> m_uart;
@@ -1106,9 +1108,9 @@ MACHINE_CONFIG_START(meritm_state::crt250)
 	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_io_map);
 	m_maincpu->set_daisy_config(meritm_daisy_chain);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, crt250_port_b_w))   // used LMP x DRIVE
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, _8255_port_c_r))
+	I8255(config, m_ppi);
+	m_ppi->out_pb_callback().set(FUNC(meritm_state::crt250_port_b_w));   // used LMP x DRIVE
+	m_ppi->in_pc_callback().set(FUNC(meritm_state::_8255_port_c_r));
 
 	Z80PIO(config, m_z80pio[0], SYSTEM_CLK/6);
 	m_z80pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1175,9 +1177,7 @@ MACHINE_CONFIG_START(meritm_state::crt260)
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::map);
 	m_maincpu->set_addrmap(AS_IO, &meritm_state::io_map);
 
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, _8255_port_c_r))
+	m_ppi->out_pb_callback().set_nop();
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC

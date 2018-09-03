@@ -280,13 +280,13 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_DEVICE_ADD(PIC8259_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(PPI8255_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mbc55x_state, mbc55x_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(mbc55x_state::mbc55x_ppi_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(mbc55x_state::mbc55x_ppi_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portc_w));
 
 	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

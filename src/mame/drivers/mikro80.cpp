@@ -171,10 +171,10 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_DEVICE_PROGRAM_MAP(mikro80_mem)
 	MCFG_DEVICE_IO_MAP(mikro80_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mikro80_state, mikro80_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mikro80_state, mikro80_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mikro80_state, mikro80_8255_portc_r))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(mikro80_state::mikro80_8255_porta_w));
+	m_ppi8255->in_pb_callback().set(FUNC(mikro80_state::mikro80_8255_portb_r));
+	m_ppi8255->in_pc_callback().set(FUNC(mikro80_state::mikro80_8255_portc_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

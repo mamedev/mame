@@ -284,13 +284,13 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	pit.set_clk<1>(8_MHz_XTAL / 256); // Timer 1: Pitch
 	pit.set_clk<2>(8_MHz_XTAL / 4096); // Timer 2: Volume
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, votrpss_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, votrpss_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, votrpss_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, votrpss_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, votrpss_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, votrpss_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(votrpss_state::ppi_pa_r));
+	m_ppi->in_pb_callback().set(FUNC(votrpss_state::ppi_pb_r));
+	m_ppi->in_pc_callback().set(FUNC(votrpss_state::ppi_pc_r));
+	m_ppi->out_pa_callback().set(FUNC(votrpss_state::ppi_pa_w));
+	m_ppi->out_pb_callback().set(FUNC(votrpss_state::ppi_pb_w));
+	m_ppi->out_pc_callback().set(FUNC(votrpss_state::ppi_pc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))
 MACHINE_CONFIG_END

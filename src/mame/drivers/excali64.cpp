@@ -571,11 +571,11 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, excali64_state, write_uart_clock))
 	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 16) /* Timer 2: not used */
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w)) // parallel port
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, excali64_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, excali64_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, excali64_state, ppic_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w)); // parallel port
+	ppi.out_pb_callback().set(FUNC(excali64_state::ppib_w));
+	ppi.in_pc_callback().set(FUNC(excali64_state::ppic_r));
+	ppi.out_pc_callback().set(FUNC(excali64_state::ppic_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

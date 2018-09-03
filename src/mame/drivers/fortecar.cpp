@@ -703,13 +703,13 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 
 	EEPROM_93C56_16BIT(config, "eeprom").default_value(0);
 
-	MCFG_DEVICE_ADD("fcppi0", I8255A, 0)
+	i8255_device &fcppi0(I8255A(config, "fcppi0"));
 	/*  Init with 0x9a... A, B and high C as input
 	 Serial Eprom connected to Port C */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("INPUT"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fortecar_state, ppi0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fortecar_state, ppi0_portc_w))
+	fcppi0.in_pa_callback().set_ioport("SYSTEM");
+	fcppi0.in_pb_callback().set_ioport("INPUT");
+	fcppi0.in_pc_callback().set(FUNC(fortecar_state::ppi0_portc_r));
+	fcppi0.out_pc_callback().set(FUNC(fortecar_state::ppi0_portc_w));
 
 	MCFG_V3021_ADD("rtc")
 

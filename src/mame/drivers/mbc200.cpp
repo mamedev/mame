@@ -335,15 +335,12 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("ppi_1", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc200_state, p1_portc_w))
+	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
+	I8255(config, "ppi_2").in_pa_callback().set(FUNC(mbc200_state::p2_porta_r));
 
-	MCFG_DEVICE_ADD("ppi_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mbc200_state, p2_porta_r))
-
-	MCFG_DEVICE_ADD("ppi_m", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mbc200_state, pm_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mbc200_state, pm_portb_w))
+	I8255(config, m_ppi_m);
+	m_ppi_m->out_pa_callback().set(FUNC(mbc200_state::pm_porta_w));
+	m_ppi_m->out_pb_callback().set(FUNC(mbc200_state::pm_portb_w));
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0) // INS8251N
 

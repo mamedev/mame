@@ -190,9 +190,9 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk80bs)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, tk80bs_state, port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, tk80bs_state, port_b_r))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(tk80bs_state::port_a_r));
+	m_ppi->in_pb_callback().set(FUNC(tk80bs_state::port_b_r));
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(tk80bs_state, kbd_put))

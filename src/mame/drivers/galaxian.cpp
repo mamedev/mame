@@ -5966,21 +5966,22 @@ MACHINE_CONFIG_START(galaxian_state::sidam_bootleg_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(galaxian_state::konami_base)
+void galaxian_state::konami_base(machine_config &config)
+{
 	galaxian_base(config);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, konami_portc_0_w))
+	I8255A(config, m_ppi8255[0]);
+	m_ppi8255[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi8255[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi8255[0]->in_pc_callback().set_ioport("IN2");
+	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_0_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, galaxian_state, konami_sound_control_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, konami_portc_1_w))
-MACHINE_CONFIG_END
+	I8255A(config, m_ppi8255[1]);
+	m_ppi8255[1]->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
+	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
+	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
+}
 
 
 MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
@@ -6358,12 +6359,10 @@ MACHINE_CONFIG_START(galaxian_state::theend)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(theend_map)
 
-	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, theend_coin_counter_w))
+	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::theend_coin_counter_w));
 
-	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, theend_protection_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, theend_protection_w))
+	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::theend_protection_r));
+	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::theend_protection_w));
 MACHINE_CONFIG_END
 
 
@@ -6374,9 +6373,8 @@ MACHINE_CONFIG_START(galaxian_state::scramble)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(theend_map)
 
-	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, theend_protection_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, theend_protection_w))
+	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::theend_protection_r));
+	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::theend_protection_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::jungsub)
@@ -6473,9 +6471,8 @@ MACHINE_CONFIG_START(galaxian_state::scorpion)
 	MCFG_DEVICE_PROGRAM_MAP(scorpion_sound_map)
 	MCFG_DEVICE_IO_MAP(scorpion_sound_portmap)
 
-	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, scorpion_protection_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, scorpion_protection_w))
+	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::scorpion_protection_r));
+	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::scorpion_protection_w));
 
 	/* extra AY8910 with I/O ports */
 	MCFG_DEVICE_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
@@ -6501,8 +6498,8 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	MCFG_DEVICE_PROGRAM_MAP(sfx_sample_map)
 	MCFG_DEVICE_IO_MAP(sfx_sample_portmap)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("soundlatch2", generic_latch_8_device, read))
+	I8255A(config, m_ppi8255[2]);
+	m_ppi8255[2]->in_pa_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
@@ -6526,9 +6523,9 @@ MACHINE_CONFIG_START(galaxian_state::monsterz)
 	MCFG_DEVICE_PROGRAM_MAP(monsterz_map)
 
 	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, galaxian_state, monsterz_porta_1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, galaxian_state, monsterz_portb_1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, monsterz_portc_1_w))
+	m_ppi8255[1]->out_pa_callback().set(FUNC(galaxian_state::monsterz_porta_1_w));
+	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::monsterz_portb_1_w));
+	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::monsterz_portc_1_w));
 
 	/* there are likely other differences too, but those can wait until after protection is sorted out */
 
@@ -6662,8 +6659,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxian_state::moonwar)
 	scobra(config);
 
-	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, moonwar_port_select_w))
+	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::moonwar_port_select_w));
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(galaxian_state,moonwar) // bullets are less yellow

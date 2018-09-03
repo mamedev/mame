@@ -945,10 +945,10 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, myb3k_state, pic_int_w))
 
 	/* Parallel port */
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, myb3k_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, myb3k_state, ppi_portc_w))
+	I8255A(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255->in_pb_callback().set(FUNC(myb3k_state::ppi_portb_r));
+	m_ppi8255->out_pc_callback().set(FUNC(myb3k_state::ppi_portc_w));
 
 	/* DMA controller */
 	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'318'181) / 6)

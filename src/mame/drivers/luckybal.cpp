@@ -217,7 +217,7 @@
   Inputs...
 
     4512 #0                     4512 #1                           4512 #2
-  .----v----.                 .----v----.                       .----v----.                      
+  .----v----.                 .----v----.                       .----v----.
   |      D0 |----> AUX IN     |      D0 |----> CREDITS IN       |      D0 |----> DSW #1
   |      D1 |----> N/C        |      D1 |----> PLAYER UP        |      D1 |----> DSW #2
   |      D2 |----> N/C        |      D2 |----> PLAYER BET       |      D2 |----> DSW #3
@@ -232,7 +232,7 @@
   Outputs...
 
     4099 #0                     4099 #1                                   4099 #2
-  .----v----.                 .----v----.                               .----v----.                      
+  .----v----.                 .----v----.                               .----v----.
   |      Q0 |----> PL. 1      |      Q0 |----> AUX OUT1                 |      Q0 |----> N/C
   |      Q1 |----> PL. 2      |      Q1 |----> AUX OUT2  (ULN2004)      |      Q1 |----> N/C
   |      Q2 |----> PL. 3      |      Q2 |----> AUX OUT3  (ULN2004)      |      Q2 |----> N/C
@@ -315,7 +315,7 @@ private:
 	DECLARE_WRITE8_MEMBER(output_port_c_w);
 
 	uint8_t m_trdr;
-	uint8_t m_led_on = 0;		
+	uint8_t m_led_on = 0;
 
 	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
@@ -328,7 +328,7 @@ private:
 
 	void main_io(address_map &map);
 	void main_map(address_map &map);
-	
+
 	virtual void machine_start() override { m_lamps.resolve(); }
 	output_finder<38> m_lamps;
 };
@@ -413,7 +413,7 @@ WRITE8_MEMBER(luckybal_state::output_port_a_w)
 	m_lamps[m_led_on] = 0;
 	m_lamps[m_trdr] = 1;
 	m_led_on = m_trdr;
-		
+
 	m_dac->write(data);
 }
 
@@ -521,7 +521,7 @@ static INPUT_PORTS_START( luckybal )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(6)  PORT_CODE(KEYCODE_8_PAD)	PORT_NAME("Player 6 - Down")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // 'Player 6 - Coins' in the schematics. Maybe for another game.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(6)  PORT_CODE(KEYCODE_6_PAD)    PORT_NAME("Player 6 - Left")
-	
+
 	PORT_START("AUX")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -531,7 +531,7 @@ static INPUT_PORTS_START( luckybal )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0)  PORT_NAME("Operator Key")  PORT_TOGGLE  // Allow to credit in/out for all players.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)  PORT_NAME("Test Mode / Books / Page")   // Need the Oper Key active to work.
-	
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Setting Access" )        PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -572,11 +572,11 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IO_MAP(main_io)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, luckybal_state, output_port_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, luckybal_state, output_port_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, luckybal_state, input_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, luckybal_state, output_port_c_w))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(luckybal_state::output_port_a_w));
+	m_ppi->out_pb_callback().set(FUNC(luckybal_state::output_port_b_w));
+	m_ppi->in_pc_callback().set(FUNC(luckybal_state::input_port_c_r));
+	m_ppi->out_pc_callback().set(FUNC(luckybal_state::output_port_c_w));
 
 	MCFG_DEVICE_ADD("latch1", CD4099, 0)
 
@@ -586,7 +586,7 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	/* nvram */
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	
+
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, VID_CLOCK)
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
@@ -657,7 +657,7 @@ void luckybal_state::init_luckybal()
 	}
 
 	membank("bank1")->configure_entries(0, 0x40, &rom[0x10000], 0x2000);
-}		
+}
 
 void luckybal_state::init_luckybala()
 {
@@ -669,7 +669,7 @@ void luckybal_state::init_luckybala()
 	{
 		rom[i] = bitswap<8>(rom[i], 6, 7, 4, 5, 2, 3, 0, 1);
 	}
-	
+
 	/* The following patches are to avoid hardware verifications through
        the unemulated synchronic serial comm of the z180...
     */
@@ -682,7 +682,7 @@ void luckybal_state::init_luckybala()
 	rom[0x1D65] = 0x0E;	//0C
 	rom[0x4499] = 0x00;	//FF	<------- Checksum.
 	rom[0x4AB6] = 0xAF;	//B9
-	
+
 	membank("bank1")->configure_entries(0, 0x40, &rom[0x10000], 0x2000);
 }
 
@@ -696,7 +696,7 @@ void luckybal_state::init_luckybald()
 	{
 		rom[i] = bitswap<8>(rom[i], 6, 7, 4, 5, 2, 3, 0, 1);
 	}
-	
+
 	/* The following patches are to avoid hardware verifications through
        the unemulated synchronic serial comm of the z180...
     */

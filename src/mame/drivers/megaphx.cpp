@@ -396,11 +396,11 @@ MACHINE_CONFIG_START(megaphx_state::megaphx)
 	m_dsw_shifter[1]->data_callback().set_ioport("DSW2");
 	m_dsw_shifter[1]->qh_callback().set(FUNC(megaphx_state::dsw_w));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, megaphx_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, megaphx_state, ppi_portc_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("P1");
+	m_ppi->in_pb_callback().set_ioport("P2");
+	m_ppi->in_pc_callback().set(FUNC(megaphx_state::ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
 
 	MCFG_INDER_VIDEO_ADD("inder_vid")
 

@@ -235,13 +235,13 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pp01_state, pp01_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pp01_state, pp01_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pp01_state, pp01_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pp01_state, pp01_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pp01_state, pp01_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pp01_state, pp01_8255_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_r));
+	ppi.out_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_w));
+	ppi.in_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_r));
+	ppi.out_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_w));
+	ppi.in_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_r));
+	ppi.out_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);

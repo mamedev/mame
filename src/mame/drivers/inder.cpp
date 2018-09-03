@@ -1441,45 +1441,23 @@ MACHINE_CONFIG_START(inder_state::inder)
 	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi60a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi60a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi60b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi60b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, sw_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi60c_w))
+	i8255_device &ppi60(I8255A(config, "ppi60"));
+	ppi60.out_pa_callback().set(FUNC(inder_state::ppi60a_w));
+	ppi60.out_pb_callback().set(FUNC(inder_state::ppi60b_w));
+	ppi60.in_pc_callback().set(FUNC(inder_state::sw_r));
 
-	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi64a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi64a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi64b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi64b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi64c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi64c_w))
+	i8255_device &ppi64(I8255A(config, "ppi64"));
+	ppi64.out_pc_callback().set(FUNC(inder_state::ppi64c_w));
 
-	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi68a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi68a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi68b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi68b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi68c_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi68c_w))
+	I8255A(config, "ppi68");
 
-	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi6ca_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi6ca_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi6cb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi6cb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi6cc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi6cc_w))
+	I8255A(config, "ppi6c");
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppia_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppia_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppib_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppic_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(inder_state::ppia_w));
+	ppi.out_pb_callback().set(FUNC(inder_state::ppib_w));
+	ppi.in_pc_callback().set(FUNC(inder_state::ppic_r));
+	ppi.out_pc_callback().set(FUNC(inder_state::ppic_w));
 
 	TTL7474(config, m_7a, 0);
 	m_7a->comp_output_cb().set(FUNC(inder_state::qc7a_w));

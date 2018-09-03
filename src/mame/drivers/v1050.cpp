@@ -1054,26 +1054,26 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_3_w))
 	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pc_3_w))
 
-	MCFG_DEVICE_ADD(I8255A_DISP_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_M6502_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, disp_ppi_pc_w))
+	I8255A(config, m_ppi_disp);
+	m_ppi_disp->in_pa_callback().set(I8255A_M6502_TAG, FUNC(i8255_device::pb_r));
+	m_ppi_disp->out_pc_callback().set(FUNC(v1050_state::disp_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_MISC_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, misc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state,misc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state,misc_ppi_pc_w))
+	i8255_device &ppi_misc(I8255A(config, I8255A_MISC_TAG));
+	ppi_misc.in_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_r));
+	ppi_misc.out_pa_callback().set(FUNC(v1050_state::misc_ppi_pa_w));
+	ppi_misc.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi_misc.out_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_RTC_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, v1050_state, rtc_ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, rtc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, v1050_state, rtc_ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state, rtc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, rtc_ppi_pc_w))
+	i8255_device &ppi_rtc(I8255A(config, I8255A_RTC_TAG));
+	ppi_rtc.in_pa_callback().set(FUNC(v1050_state::rtc_ppi_pa_r));
+	ppi_rtc.in_pc_callback().set(FUNC(v1050_state::rtc_ppi_pc_r));
+	ppi_rtc.out_pa_callback().set(FUNC(v1050_state::rtc_ppi_pa_w));
+	ppi_rtc.out_pb_callback().set(FUNC(v1050_state::rtc_ppi_pb_w));
+	ppi_rtc.out_pc_callback().set(FUNC(v1050_state::rtc_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_M6502_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_DISP_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, m6502_ppi_pc_w))
+	I8255A(config, m_ppi_6502);
+	m_ppi_6502->in_pa_callback().set(m_ppi_disp, FUNC(i8255_device::pb_r));
+	m_ppi_6502->out_pc_callback().set(FUNC(v1050_state::m6502_ppi_pc_w));
 
 	I8251(config, m_uart_kb, 0/*16_MHz_XTAL/8,*/);
 	m_uart_kb->txd_handler().set(V1050_KEYBOARD_TAG, FUNC(v1050_keyboard_device::si_w));

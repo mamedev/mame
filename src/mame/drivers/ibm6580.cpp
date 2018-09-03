@@ -904,11 +904,11 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ibm6580_state, ppi_a_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ibm6580_state, led_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ibm6580_state, ppi_c_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ibm6580_state, ppi_c_r))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(ibm6580_state::ppi_a_r));
+	ppi.out_pb_callback().set(FUNC(ibm6580_state::led_w));
+	ppi.out_pc_callback().set(FUNC(ibm6580_state::ppi_c_w));
+	ppi.in_pc_callback().set(FUNC(ibm6580_state::ppi_c_r));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 

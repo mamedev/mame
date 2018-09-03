@@ -569,11 +569,11 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	m_pit->set_clk<2>(0); // Floppy /MTRON
 	m_pit->out_handler<2>().set(FUNC(bw2_state::mtron_w));
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, bw2_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, bw2_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, bw2_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bw2_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.out_pa_callback().set(FUNC(bw2_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(bw2_state::ppi_pb_r));
+	ppi.in_pc_callback().set(FUNC(bw2_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(bw2_state::ppi_pc_w));
 
 	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, 16_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)

@@ -949,22 +949,22 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	m_pio->out_pa_callback().set(FUNC(pasopia7_state::mux_w));
 	m_pio->in_pb_callback().set(FUNC(pasopia7_state::keyb_r));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pasopia7_state, unk_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, screen_mode_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia7_state, crtc_portb_r))
+	I8255(config, m_ppi0);
+	m_ppi0->in_pa_callback().set(FUNC(pasopia7_state::unk_r));
+	m_ppi0->out_pa_callback().set(FUNC(pasopia7_state::screen_mode_w));
+	m_ppi0->in_pb_callback().set(FUNC(pasopia7_state::crtc_portb_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, plane_reg_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pasopia7_state, video_attr_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia7_state, video_misc_w))
+	I8255(config, m_ppi1);
+	m_ppi1->out_pa_callback().set(FUNC(pasopia7_state::plane_reg_w));
+	m_ppi1->out_pb_callback().set(FUNC(pasopia7_state::video_attr_w));
+	m_ppi1->out_pc_callback().set(FUNC(pasopia7_state::video_misc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pasopia7_state, nmi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, nmi_mask_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia7_state, nmi_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pasopia7_state, nmi_reg_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia7_state, nmi_reg_w))
+	I8255(config, m_ppi2);
+	m_ppi2->in_pa_callback().set(FUNC(pasopia7_state::nmi_porta_r));
+	m_ppi2->out_pa_callback().set(FUNC(pasopia7_state::nmi_mask_w));
+	m_ppi2->in_pb_callback().set(FUNC(pasopia7_state::nmi_portb_r));
+	m_ppi2->in_pc_callback().set(FUNC(pasopia7_state::nmi_reg_r));
+	m_ppi2->out_pc_callback().set(FUNC(pasopia7_state::nmi_reg_w));
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)

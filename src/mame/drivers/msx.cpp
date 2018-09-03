@@ -1353,10 +1353,10 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(msx_state::msx_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(msx_state::msx_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1414,10 +1414,10 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	MCFG_DEVICE_IO_MAP(msx2_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(msx_state::msx_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(msx_state::msx_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", 0x20000, 21.477272_MHz_XTAL)
@@ -1471,10 +1471,10 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	MCFG_DEVICE_IO_MAP(msx2p_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(msx_state::msx_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(msx_state::msx_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, 21.477272_MHz_XTAL)

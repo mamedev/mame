@@ -368,14 +368,15 @@ MACHINE_CONFIG_START(idsa_state::bsktbllp)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ppi_control_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ppi_data_w))
 
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi1_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi1_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi1_c_w))
-	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi2_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi2_c_w))
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->out_pa_callback().set(FUNC(idsa_state::ppi1_a_w));
+	m_ppi[0]->out_pb_callback().set(FUNC(idsa_state::ppi1_b_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(idsa_state::ppi1_c_w));
+
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->out_pa_callback().set(FUNC(idsa_state::ppi2_a_w));
+	m_ppi[1]->out_pb_callback().set(FUNC(idsa_state::ppi2_b_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(idsa_state::ppi2_c_w));
 MACHINE_CONFIG_END
 
 

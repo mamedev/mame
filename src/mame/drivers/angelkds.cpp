@@ -528,16 +528,16 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 	MCFG_DEVICE_IO_MAP(sub_portmap)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("I40"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("I41"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, angelkds_state, angeklds_ff_r)) // or left inputs don't work
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, angelkds_state, angelkds_cpu_bank_write))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("I40");
+	ppi0.in_pb_callback().set_ioport("I41");
+	ppi0.in_pc_callback().set(FUNC(angelkds_state::angeklds_ff_r)); // or left inputs don't work
+	ppi0.out_pc_callback().set(FUNC(angelkds_state::angelkds_cpu_bank_write));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("I80"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("I81"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("I82"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("I80");
+	ppi1.in_pb_callback().set_ioport("I81");
+	ppi1.in_pc_callback().set_ioport("I82");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
