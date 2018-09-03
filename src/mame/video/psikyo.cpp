@@ -491,14 +491,14 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 			assert(tile_rowscroll == 0 || tile_rowscroll == 4);
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				tmptilemap[layer]->set_scroll_rows(tilemap_width(tmsize[layer]) >> tile_rowscroll);
+				tmptilemap[layer]->set_scroll_rows(tilemap_width(tmsize[layer]));
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
-			for (i = 0; i < (256 >> tile_rowscroll); i++)   /* 256 screen lines */
+			for (i = 0; i < 256; i++)   /* 256 screen lines */
 			{
-				int x0 = ((uint16_t *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + i)];
+				int x0 = ((uint16_t *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + (i >> tile_rowscroll))];
 				tmptilemap[layer]->set_scrollx(
-				(i + scrolly[layer]) % (tilemap_width(tmsize[layer]) >> tile_rowscroll),
+				(i + scrolly[layer]) % (tilemap_width(tmsize[layer])),
 				scrollx[layer] + x0 );
 			}
 		}
@@ -619,14 +619,14 @@ uint32_t psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitma
 			assert(tile_rowscroll == 0 || tile_rowscroll == 4);
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				tmptilemap[layer]->set_scroll_rows(tilemap_width(tmsize[layer]) >> tile_rowscroll);
+				tmptilemap[layer]->set_scroll_rows(tilemap_width(tmsize[layer]));
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
-			for (i = 0; i < (256 >> tile_rowscroll); i++)   /* 256 screen lines */
+			for (i = 0; i < 256; i++)   /* 256 screen lines */
 			{
-				int x0 = ((uint16_t *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + i)];
+				int x0 = ((uint16_t *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + (i >> tile_rowscroll))];
 				tmptilemap[layer]->set_scrollx(
-				(i + scrolly[layer]) % (tilemap_width(tmsize[layer]) >> tile_rowscroll),
+				(i + scrolly[layer]) % (tilemap_width(tmsize[layer])),
 				scrollx[layer] + x0 );
 			}
 		}
