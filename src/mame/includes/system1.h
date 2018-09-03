@@ -96,6 +96,7 @@ public:
 	void init_myherok();
 	void init_ufosensi();
 	void init_wbml();
+	void init_tokisens();
 	void init_bootsys2();
 	void init_bootsys2d();
 	void init_choplift();
