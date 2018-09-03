@@ -2272,7 +2272,7 @@ void armedf_state::init_cclimbr2()
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,                         FULLNAME, FLAGS */
 GAME( 1987, legion,    0,        legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, legionj,   legion,   legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, legionjb,  legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
+GAME( 1987, legionjb,  legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 1)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
 GAME( 1987, legionjb2, legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING)
 
 GAME( 1987, terraf,    0,        terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
