@@ -18,9 +18,6 @@
     than just ram.  Beast Busters has 4 sprite chips as it has two sprite
     banks.
 
-    Todo: Sprite priority looks to be wrong on level 2 (some sprites should
-    be behind the playfield).
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -176,7 +173,7 @@ void bbusters_state::draw_block(bitmap_ind16 &dest,int x,int y,int size,int flip
 	}
 }
 
-void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask)
+void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int pass)
 {
 	int offs;
 
@@ -218,9 +215,12 @@ void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, 
 		fx=source[offs+0]&0x800;
 		sprite=sprite&0x3fff;
 
-		if ((colour&colmask)!=colval)
+		// Palettes 0xc-0xf confirmed to be behind tilemap on Beast Busters
+		if (pass==1 && (colour&0xc)!=0xc)
 			continue;
-
+		if (pass==0 && (colour&0xc)==0xc)
+			continue;
+		
 		switch ((source[offs+0]>>8)&0x3) {
 			case 0:
 				scale=source[offs+0]&0x7;
@@ -260,10 +260,10 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_data[1][1]);
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	//draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 0x8, 0x8);
+	draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 1);
 	m_pf_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 0, 0);
-	draw_sprites(bitmap, m_spriteram[0]->buffer(), 1, 0, 0);
+	draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 0);
+	draw_sprites(bitmap, m_spriteram[0]->buffer(), 1, -1);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -277,7 +277,7 @@ uint32_t mechatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_pf_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, m_spriteram[0]->buffer(), 1, 0, 0);
+	draw_sprites(bitmap, m_spriteram[0]->buffer(), 1, -1);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

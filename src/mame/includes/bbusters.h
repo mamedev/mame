@@ -59,7 +59,7 @@ protected:
 
 	inline const uint8_t *get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block);
 	void draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block);
-	void draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask);
+	void draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int pass);
 
 	void sound_map(address_map &map);
 private:
