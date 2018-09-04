@@ -380,11 +380,11 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* Keyboard interface */
-	MCFG_DEVICE_ADD("i8279", I8279, 4000000) /* guessed value. TODO: verify on PCB */
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, i7000_state, i7000_scanlines_w))          // scan SL lines
-	MCFG_I8279_IN_RL_CB(READ8(*this, i7000_state, i7000_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1)) // TODO: Shift key
-	MCFG_I8279_IN_CTRL_CB(CONSTANT(1)) // TODO: Ctrl key
+	i8279_device &kbdc(I8279(config, "i8279", 4000000)); /* guessed value. TODO: verify on PCB */
+	kbdc.out_sl_callback().set(FUNC(i7000_state::i7000_scanlines_w));	// scan SL lines
+	kbdc.in_rl_callback().set(FUNC(i7000_state::i7000_kbd_r));			// kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);							// TODO: Shift key
+	kbdc.in_ctrl_callback().set_constant(1);							// TODO: Ctrl key
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")

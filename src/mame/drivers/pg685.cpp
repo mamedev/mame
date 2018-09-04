@@ -458,8 +458,8 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", XTAL(12'288'000) / 6)); // divider guessed
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
@@ -508,8 +508,8 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", XTAL(12'288'000) / 6)); // divider guessed
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
@@ -559,8 +559,8 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, 12288000 / 6) // wrong
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", 12288000 / 6)); // wrong
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
