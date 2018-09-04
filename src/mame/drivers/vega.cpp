@@ -816,11 +816,11 @@ MACHINE_CONFIG_START(vega_state::vega)
 	m_i8255->out_pb_callback().set(FUNC(vega_state::ppi_pb_w));
 	m_i8255->out_pc_callback().set(FUNC(vega_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD( "ins8154", INS8154, 0 )
-	MCFG_INS8154_IN_A_CB(READ8(*this, vega_state, ins8154_pa_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(*this, vega_state, ins8154_pa_w))
-	MCFG_INS8154_IN_B_CB(READ8(*this, vega_state, ins8154_pb_r))
-	MCFG_INS8154_OUT_B_CB(WRITE8(*this, vega_state, ins8154_pb_w))
+	INS8154(config, m_ins8154);
+	m_ins8154->in_a().set(FUNC(vega_state::ins8154_pa_r));
+	m_ins8154->out_a().set(FUNC(vega_state::ins8154_pa_w));
+	m_ins8154->in_b().set(FUNC(vega_state::ins8154_pb_r));
+	m_ins8154->out_b().set(FUNC(vega_state::ins8154_pb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1371,10 +1371,11 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	IM6402(config, m_uart, 0, 0);
+	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
@@ -1419,10 +1420,11 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	IM6402(config, m_uart, 0, 0);
+	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
@@ -1477,10 +1479,11 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	IM6402(config, m_uart, 0, 0);
+	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
