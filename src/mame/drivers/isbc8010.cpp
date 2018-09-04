@@ -225,13 +225,13 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  MCFG_AY51013_WRITE_SO_CB(WRITE8(*this, sdk80_state, nascom1_hd6402_so))
 
 	/* Devices */
-//  MCFG_DEVICE_ADD("i8279", I8279, 3100000) // based on divider
-//  MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-//  MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk80_state, scanlines_w))          // scan SL lines
-//  MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk80_state, digit_w))            // display A&B
-//  MCFG_I8279_IN_RL_CB(READ8(*this, sdk80_state, kbd_r))                  // kbd RL lines
-//  MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-//  MCFG_I8279_IN_CTRL_CB(VCC)
+//  i8279_device &kbdc(I8279(config, "i8279", 3100000)); // based on divider
+//  kbdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE);	// irq
+//  kbdc.out_sl_callback().set(FUNC(sdk80_state::scanlines_w));			// scan SL lines
+//  kbdc.out_disp_callback().set(FUNC(sdk80_state::digit_w));			// display A&B
+//  kbdc.in_rl_callback().set(FUNC(sdk80_state::kbd_r));				// kbd RL lines
+//  kbdc.in_shift_callback().set_constant(1);							// Shift key
+//  kbdc.in_ctrl_callback().set_constant(1);
 
 MACHINE_CONFIG_END
 
