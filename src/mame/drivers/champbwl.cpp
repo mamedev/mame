@@ -478,7 +478,7 @@ uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_in
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -539,7 +539,7 @@ uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_in
 	m_seta001->set_bg_yoffsets( 0x00, 0x01 );
 	m_seta001->set_fg_yoffsets( 0x00, 0x10 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
