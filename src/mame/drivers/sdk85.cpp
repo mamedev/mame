@@ -154,9 +154,9 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 	MCFG_DEVICE_PROGRAM_MAP(sdk85_mem)
 	MCFG_DEVICE_IO_MAP(sdk85_io)
 
-	MCFG_DEVICE_ADD("romio", I8355, 6.144_MHz_XTAL / 2) // Monitor ROM (A14)
+	I8355(config, "romio", 6.144_MHz_XTAL / 2); // Monitor ROM (A14)
 
-	MCFG_DEVICE_ADD("expromio", I8355, 6.144_MHz_XTAL / 2) // Expansion ROM (A15)
+	I8355(config, "expromio", 6.144_MHz_XTAL / 2); // Expansion ROM (A15)
 
 	i8155_device &i8155(I8155(config, "ramio", 6.144_MHz_XTAL / 2)); // Basic RAM (A16)
 	i8155.out_to_callback().set_inputline(m_maincpu, I8085_TRAP_LINE);
