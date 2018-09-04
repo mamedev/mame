@@ -543,4 +543,4 @@ ROM_END
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY      FULLNAME                     FLAGS
 COMP( 1981, eurocom2,  0,        0,      eurocom2,  eurocom2, eurocom2_state, empty_init, "Eltec",     "Eurocom II V7",             MACHINE_IS_SKELETON )
 COMP( 1982, waveterm,  eurocom2, 0,      waveterm,  waveterm, waveterm_state, empty_init, "PPG",       "Waveterm A",                MACHINE_IS_SKELETON )
-COMP( 1985, microtrol, eurocom2, 0,      microtrol, eurocom2, eurocom2_state, empty_init, "Microtrol", "Unknown portable computer", MACHINE_IS_SKELETON )
+COMP( 1985, microtrol, eurocom2, 0,      microtrol, eurocom2, eurocom2_state, empty_init, "Microtrol", "unknown Microtrol portable computer", MACHINE_IS_SKELETON )

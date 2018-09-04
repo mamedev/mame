@@ -7218,7 +7218,7 @@ MACHINE_CONFIG_END
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
   the ON button. Otherwise, it is in test-mode where you can hear all sounds.
-  For the patent romset, the game needs to be turned off and on to play it.
+  For the patent romset, it needs to be turned off and on to exit test mode.
 
 ***************************************************************************/
 
