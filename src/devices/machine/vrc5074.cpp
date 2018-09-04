@@ -144,7 +144,7 @@ void vrc5074_device::target1_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("uart", NS16550, this->clock() / 12)
+	MCFG_DEVICE_ADD("uart", NS16550, DERIVED_CLOCK(1, 12))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vrc5074_device, uart_irq_callback))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys00", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys00", rs232_port_device, write_dtr))
