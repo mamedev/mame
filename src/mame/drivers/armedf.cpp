@@ -56,7 +56,7 @@ Notes:
       010178: bra     $f9f0 ;timer over event occurs
   btanb perhaps? Currently patched to work, might also be that DSW2 bit 7 is actually a MCU bit ready flag, so it
   definitely needs PCB tests.
-- Takatae! Big Fighter third attract mode "NIHON BUSSAN" text has wrong colors, happens the same on real HW reference
+- Tatakae! Big Fighter third attract mode "NIHON BUSSAN" text has wrong colors, happens the same on real HW reference
   (palette not updated properly, BTANB)
 
 
@@ -474,13 +474,12 @@ void armedf_state::cclimbr2_map(address_map &map)
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
 
-void armedf_state::legion_map(address_map &map)
+void armedf_state::legion_common_map(address_map &map)
 {
-	map(0x000000, 0x05ffff).rom();
+	map(0x000000, 0x03ffff).rom();
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::nb1414m4_text_videoram_r), FUNC(armedf_state::nb1414m4_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
 	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::armedf_fg_videoram_w)).share("fg_videoram");
@@ -489,12 +488,19 @@ void armedf_state::legion_map(address_map &map)
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(legion_io_w)
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
 	map(0x07c00a, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
 	map(0x07c00c, 0x07c00d).nopw();        /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
+}
+
+void armedf_state::legion_map(address_map &map)
+{
+	legion_common_map(map);
+
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::nb1414m4_text_videoram_r), FUNC(armedf_state::nb1414m4_text_videoram_w)).umask16(0x00ff);
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
 }
 
 WRITE8_MEMBER(armedf_state::legionjb_fg_scroll_w)
@@ -508,26 +514,20 @@ WRITE8_MEMBER(armedf_state::legionjb_fg_scroll_w)
 
 void armedf_state::legionjb_map(address_map &map)
 {
+	legion_common_map(map);
+
 	map(0x040000, 0x04003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x063fff).ram();
-	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::armedf_text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
-	map(0x06a000, 0x06a9ff).ram();
-	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
-	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::armedf_fg_videoram_w)).share("fg_videoram");
-	map(0x074000, 0x074fff).ram().w(FUNC(armedf_state::armedf_bg_videoram_w)).share("bg_videoram");
-	map(0x078000, 0x078001).portr("P1");
-	map(0x078002, 0x078003).portr("P2");
-	map(0x078004, 0x078005).portr("DSW1");
-	map(0x078006, 0x078007).portr("DSW2");
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(bootleg_io_w)
-	map(0x07c002, 0x07c003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
-	map(0x07c004, 0x07c005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
-	map(0x07c00a, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x07c00c, 0x07c00d).nopw();      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::bootleg_io_w));
+}
+
+void armedf_state::legionjb2_map(address_map &map)
+{
+	legion_common_map(map);
+
+	map(0x000000, 0x00003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::armedf_text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
+	map(0x07c000, 0x07c001).w(FUNC(armedf_state::bootleg_io_w));
 }
 
 void armedf_state::armedf_map(address_map &map)
@@ -1225,7 +1225,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(armedf_state,armedf)
+void armedf_state::machine_start()
 {
 	save_item(NAME(m_old_mcu_mode));
 	save_item(NAME(m_scroll_msb));
@@ -1237,7 +1237,7 @@ MACHINE_START_MEMBER(armedf_state,armedf)
 	save_item(NAME(m_bg_scrolly));
 }
 
-MACHINE_RESET_MEMBER(armedf_state,armedf)
+void armedf_state::machine_reset()
 {
 	m_old_mcu_mode = 0;
 	m_scroll_msb = 0;
@@ -1276,9 +1276,6 @@ MACHINE_CONFIG_START(armedf_state::terraf)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz?
 	MCFG_DEVICE_PROGRAM_MAP(terraf_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
-
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
@@ -1320,9 +1317,6 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_DEVICE_ADD("extra", Z80, XTAL(16'000'000)/4)         // 4mhz?
 	MCFG_DEVICE_PROGRAM_MAP(terrafjb_extraz80_map)
 	MCFG_DEVICE_IO_MAP(terrafjb_extraz80_portmap)
-
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1369,9 +1363,6 @@ MACHINE_CONFIG_START(armedf_state::kozure)
 	MCFG_DEVICE_PROGRAM_MAP(kozure_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
@@ -1407,9 +1398,6 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
-
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1456,9 +1444,6 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
@@ -1494,22 +1479,14 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(armedf_state::legion)
-
+MACHINE_CONFIG_START(armedf_state::legion_common)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
-	MCFG_DEVICE_PROGRAM_MAP(legion_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_DEVICE_PROGRAM_MAP(cclimbr2_soundmap)
-	MCFG_DEVICE_IO_MAP(sound_3526_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
-
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-
-	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1533,9 +1510,6 @@ MACHINE_CONFIG_START(armedf_state::legion)
 	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(24'000'000)/6)      // 4mhz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch
 	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch
@@ -1544,52 +1518,39 @@ MACHINE_CONFIG_START(armedf_state::legion)
 	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(armedf_state::legion)
+	legion_common(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(legion_map)
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_IO_MAP(sound_3526_portmap)
+
+	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
+
+	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(24'000'000)/6)      // 4mhz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(armedf_state::legionjb)
+	legion_common(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(legionjb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
-	MCFG_DEVICE_PROGRAM_MAP(cclimbr2_soundmap)
+	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
-
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(24'000'000)/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+MACHINE_CONFIG_END
 
-	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_START(armedf_state::legionjb2)
+	legionjb(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(legionjb2_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
@@ -1602,9 +1563,6 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	MCFG_DEVICE_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_DEVICE_IO_MAP(bigfghtr_mcu_io_map)
 	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0xdf)) // bit 5: bus contention related?
-
-	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
-	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2119,7 +2077,7 @@ ROM_START( skyrobo )
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* Intel C8751 read protected MCU */
-	// coming from Takatae Big Fighter, might or might not be correct for this version
+	// coming from Tatakae Big Fighter, might or might not be correct for this version
 	ROM_LOAD( "i8751.bin", 0x00000, 0x1000, BAD_DUMP CRC(64a0d225) SHA1(ccc5c33c0c412bf9e3a4f7de5e39b042e00c41dd) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -2234,8 +2192,6 @@ void armedf_state::init_legion()
 	RAM[0x000488 / 2] = 0x4e71;
 #endif
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
-
 	m_scroll_type = 2;
 }
 
@@ -2248,8 +2204,6 @@ void armedf_state::init_legionjb()
 	RAM[0x0001d6/2] = 0x0001;
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
 
 	m_scroll_type = 2;
 
@@ -2270,24 +2224,24 @@ void armedf_state::init_cclimbr2()
  *************************************/
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,                         FULLNAME, FLAGS */
-GAME( 1987, legion,    0,        legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, legionj,   legion,   legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, legionjb,  legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 1)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
-GAME( 1987, legionjb2, legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING)
+GAME( 1987, legion,    0,        legion,    legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionj,   legion,   legion,    legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionjb,  legion,   legionjb,  legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 1)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
+GAME( 1987, legionjb2, legion,   legionjb2, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 2)", MACHINE_SUPPORTS_SAVE)
 
-GAME( 1987, terraf,    0,        terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafu,   terraf,   terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafj,   terraf,   terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafjb,  terraf,   terrafjb, terraf,   armedf_state,   init_terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafb,   terraf,   terrafb,  terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terraf,    0,        terraf,    terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafu,   terraf,   terraf,    terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafj,   terraf,   terraf,    terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafjb,  terraf,   terrafjb,  terraf,   armedf_state,   init_terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafb,   terraf,   terrafb,   terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, kozure,    0,        kozure,   kozure,   armedf_state,   init_kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, kozure,    0,        kozure,    kozure,   armedf_state,   init_kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cclimbr2,  0,        cclimbr2, cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cclimbr2a, cclimbr2, cclimbr2, cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
+GAME( 1988, cclimbr2,  0,        cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2a, cclimbr2, cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
 
-GAME( 1988, armedf,    0,        armedf,   armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, armedff,   armedf,   armedf,   armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,   0,        bigfghtr, bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr,  skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,   0,        bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr,  skyrobo,  bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

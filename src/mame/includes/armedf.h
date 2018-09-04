@@ -23,6 +23,34 @@ public:
 		m_bg_videoram(*this, "bg_videoram")
 		{ }
 
+	void init_cclimbr2();
+	void init_armedf();
+	void init_legion();
+	void init_terrafu();
+	void init_legionjb();
+	void init_kozure();
+	void init_terraf();
+	void init_terrafjb();
+
+	void terraf_sound(machine_config &config);
+	void terraf(machine_config &config);
+	void terrafb(machine_config &config);
+	void legion_common(machine_config &config);
+	void legion(machine_config &config);
+	void legionjb(machine_config &config);
+	void legionjb2(machine_config &config);
+	void cclimbr2(machine_config &config);
+	void terrafjb(machine_config &config);
+	void armedf(machine_config &config);
+	void kozure(machine_config &config);
+
+	uint32_t screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_VIDEO_START(armedf);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_extra;
@@ -80,14 +108,6 @@ public:
 	DECLARE_WRITE16_MEMBER(armedf_fg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrolly_w);
-	void init_cclimbr2();
-	void init_armedf();
-	void init_legion();
-	void init_terrafu();
-	void init_legionjb();
-	void init_kozure();
-	void init_terraf();
-	void init_terrafjb();
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type1);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type2);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type3);
@@ -95,30 +115,19 @@ public:
 	TILE_GET_INFO_MEMBER(get_armedf_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(armedf);
-	DECLARE_MACHINE_RESET(armedf);
 	DECLARE_VIDEO_START(terraf);
-	DECLARE_VIDEO_START(armedf);
-	uint32_t screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 						uint32_t code,uint32_t color, uint32_t clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
-	void terraf_sound(machine_config &config);
-	void terrafb(machine_config &config);
-	void legion(machine_config &config);
-	void terraf(machine_config &config);
-	void legionjb(machine_config &config);
-	void cclimbr2(machine_config &config);
-	void terrafjb(machine_config &config);
-	void armedf(machine_config &config);
-	void kozure(machine_config &config);
 	void armedf_map(address_map &map);
 	void cclimbr2_map(address_map &map);
 	void cclimbr2_soundmap(address_map &map);
 	void kozure_map(address_map &map);
+	void legion_common_map(address_map &map);
 	void legion_map(address_map &map);
 	void legionjb_map(address_map &map);
+	void legionjb2_map(address_map &map);
 	void sound_3526_portmap(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
@@ -136,6 +145,9 @@ public:
 		m_sharedram(*this, "sharedram")
 		{ }
 
+	void bigfghtr(machine_config &config);
+
+private:
 	required_device<cpu_device> m_mcu;
 	required_shared_ptr<uint8_t> m_sharedram;
 
@@ -143,7 +155,6 @@ public:
 	DECLARE_WRITE8_MEMBER(main_sharedram_w);
 	DECLARE_READ8_MEMBER(main_sharedram_r);
 	DECLARE_WRITE8_MEMBER(mcu_spritelist_w);
-	void bigfghtr(machine_config &config);
 	void bigfghtr_map(address_map &map);
 	void bigfghtr_mcu_io_map(address_map &map);
 	void bigfghtr_mcu_map(address_map &map);
