@@ -52,17 +52,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
 	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
 
-	template <class Object> devcb_base &set_out_hrq_callback(Object &&cb) { return m_out_hrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_tc_callback(Object &&cb) { return m_out_tc_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_in_memr_callback(Object &&cb) { return m_in_memr_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_memw_callback(Object &&cb) { return m_out_memw_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <unsigned Ch, class Object> devcb_base &set_in_ior_callback(Object &&cb) { return m_in_ior_cb[Ch].set_callback(std::forward<Object>(cb)); }
-	template <unsigned Ch, class Object> devcb_base &set_out_iow_callback(Object &&cb) { return m_out_iow_cb[Ch].set_callback(std::forward<Object>(cb)); }
-
-	template <unsigned Ch, class Object> devcb_base &set_out_dack_callback(Object &&cb) { return m_out_dack_cb[Ch].set_callback(std::forward<Object>(cb)); }
-
 	auto out_hrq_cb() { return m_out_hrq_cb.bind(); }
 	auto out_tc_cb() { return m_out_tc_cb.bind(); }
 	auto in_memr_cb() { return m_in_memr_cb.bind(); }
