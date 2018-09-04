@@ -1914,9 +1914,10 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, m_screen));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 0);
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, seattle_state, vblank_assert))
-	MCFG_VOODOO_STALL_CB(WRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
+
+	voodoo_device *voodoo_base = static_cast<voodoo_device*>(config.device_find(this, PCI_ID_VIDEO":voodoo"));
+	voodoo_base->vblank_callback().set(FUNC(seattle_state::vblank_assert));
+	voodoo_base->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1979,9 +1980,9 @@ MACHINE_CONFIG_START(seattle_state::flagstaff)
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO)
-	MCFG_VOODOO_PCI_FBMEM(2)
-	MCFG_VOODOO_PCI_TMUMEM(4, 4)
+	voodoo_1_pci_device *voodoo = static_cast<voodoo_1_pci_device*>(config.device_find(this, PCI_ID_VIDEO));
+	voodoo->set_fbmem(2);
+	voodoo->set_tmumem(4, 4);
 MACHINE_CONFIG_END
 
 // Per game configurations

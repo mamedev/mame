@@ -101,15 +101,6 @@ typedef zeus2_renderer::extent_t z2_poly_extent;
 /*************************************
 *  Zeus2 Video Device
 *************************************/
-#define MCFG_ZEUS2_VBLANK_CB(_devcb) \
-	downcast<zeus2_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
-
-#define MCFG_ZEUS2_IRQ_CB(_devcb) \
-	downcast<zeus2_device &>(*device).set_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_ZEUS2_FLOAT_MODE(_mode) \
-	downcast<zeus2_device *>(device)->set_float_mode(_mode);
-
 class zeus2_device : public device_t, public device_video_interface
 {
 public:

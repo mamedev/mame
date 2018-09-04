@@ -10,16 +10,6 @@
 #include "pci.h"
 #include "cpu/mips/mips3.h"
 
-#define MCFG_VRC4373_SET_RAM(_size) \
-	downcast<vrc4373_device &>(*device).set_ram_size(_size);
-
-#define MCFG_VRC4373_SET_SIMM0(_size) \
-	downcast<vrc4373_device &>(*device).set_simm0_size(_size);
-
-#define MCFG_VRC4373_IRQ_CB(_devcb) \
-	ide_pci_device::set_irq_cb(*device, DEVCB_##_devcb);
-
-
 class vrc4373_device : public pci_host_device {
 public:
 	template <typename T>
