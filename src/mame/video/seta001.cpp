@@ -341,8 +341,10 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 
 	int const max_y = screen.height();
 
-	/* Draw up to 512 sprites, mjyuugi has glitches if you draw them all.. */
-	for (i = m_spritelimit; i >= 0; i--)
+	/* Draw up to 512 sprites, mjyuugi has glitches if you draw them all.. 
+	   jjsquawk has an invalid tile if you draw sprite 0, other games seem to leave it unused, has another meaning?
+	*/
+	for (i = m_spritelimit; i > 0; i--)
 	{
 		int code, color, sx, sy, flipx, flipy;
 
