@@ -180,8 +180,7 @@ MACHINE_CONFIG_START(iteagle_state::iteagle)
 
 	ITEAGLE_PERIPH(config, PCI_ID_PERIPH, 0);
 	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080C693, 0x00, 0x0)
-		.irq_handler()
-		.set_inputline(m_maincpu, MIPS3_IRQ2);
+		.irq_handler().set_inputline(m_maincpu, MIPS3_IRQ2);
 
 	ITEAGLE_FPGA(config, m_fpga, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4);
 	m_fpga->in_callback<iteagle_fpga_device::IO_SW5>().set_ioport("SW5");

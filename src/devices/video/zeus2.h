@@ -123,6 +123,9 @@ public:
 
 	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq.set_callback(std::forward<Object>(cb)); }
+	auto vblank_callback() { return m_vblank.bind(); }
+	auto irq_callback() { return m_irq.bind(); }
+
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_irq;
 
