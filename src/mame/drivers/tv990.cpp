@@ -387,17 +387,17 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD( UART0_TAG, NS16450, XTAL(3'686'400) )
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart0_irq))
+	NS16450(config, m_uart0, XTAL(3'686'400));
+	m_uart0->out_dtr_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart0->out_rts_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart0->out_tx_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart0->out_int_callback().set(FUNC(tv990_state::uart0_irq));
 
-	MCFG_DEVICE_ADD( UART1_TAG, NS16450, XTAL(3'686'400) )
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart1_irq))
+	NS16450(config, m_uart1, XTAL(3'686'400));
+	m_uart1->out_dtr_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart1->out_rts_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart1->out_tx_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart1->out_int_callback().set(FUNC(tv990_state::uart1_irq));
 
 	MCFG_DEVICE_ADD(LPT_TAG, PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, tv990_state, lpt_irq))

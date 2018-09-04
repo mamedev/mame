@@ -348,11 +348,11 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	ledlatch.bit_handler<6>().set_output("prog3").invert();
 	ledlatch.bit_handler<7>().set_output("dsr").invert();
 
-	MCFG_DEVICE_ADD("comuart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<0>))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("comm", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("comm", rs232_port_device, write_rts))
+	ins8250_device &comuart(INS8250(config, "comuart", 1.8432_MHz_XTAL));
+	comuart.out_int_callback().set(FUNC(cdc721_state::int_w<0>));
+	comuart.out_tx_callback().set("comm", FUNC(rs232_port_device::write_txd));
+	comuart.out_dtr_callback().set("comm", FUNC(rs232_port_device::write_dtr));
+	comuart.out_rts_callback().set("comm", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", ins8250_device, rx_w))
@@ -361,18 +361,18 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("comuart", ins8250_device, cts_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE("comuart", ins8250_device, ri_w))
 
-	MCFG_DEVICE_ADD("kbduart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<5>))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<2>))
-	//MCFG_INS8250_OUT_RTS_CB(WRITELINE(*this, cdc721_state, alarm_high_low_w))
-	MCFG_INS8250_OUT_OUT1_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<1>))
-	MCFG_INS8250_OUT_OUT2_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<0>))
+	ins8250_device &kbduart(INS8250(config, "kbduart", 1.8432_MHz_XTAL));
+	kbduart.out_int_callback().set(FUNC(cdc721_state::int_w<5>));
+	kbduart.out_dtr_callback().set(FUNC(cdc721_state::foreign_char_bank_w<2>));
+	//kbduart.out_rts_callback().set(FUNC(cdc721_state::alarm_high_low_w));
+	kbduart.out_out1_callback().set(FUNC(cdc721_state::foreign_char_bank_w<1>));
+	kbduart.out_out2_callback().set(FUNC(cdc721_state::foreign_char_bank_w<0>));
 
-	MCFG_DEVICE_ADD("pauart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<1>))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("cha", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("cha", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("cha", rs232_port_device, write_rts))
+	ins8250_device &pauart(INS8250(config, "pauart", 1.8432_MHz_XTAL));
+	pauart.out_int_callback().set("int2", FUNC(input_merger_device::in_w<1>));
+	pauart.out_tx_callback().set("cha", FUNC(rs232_port_device::write_txd));
+	pauart.out_dtr_callback().set("cha", FUNC(rs232_port_device::write_dtr));
+	pauart.out_rts_callback().set("cha", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("cha", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("pauart", ins8250_device, rx_w))
@@ -381,11 +381,11 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("pauart", ins8250_device, cts_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE("pauart", ins8250_device, ri_w))
 
-	MCFG_DEVICE_ADD("pbuart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<0>))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("chb", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("chb", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("chb", rs232_port_device, write_rts))
+	ins8250_device &pbuart(INS8250(config, "pbuart", 1.8432_MHz_XTAL));
+	pbuart.out_int_callback().set("int2", FUNC(input_merger_device::in_w<0>));
+	pbuart.out_tx_callback().set("chb", FUNC(rs232_port_device::write_txd));
+	pbuart.out_dtr_callback().set("chb", FUNC(rs232_port_device::write_dtr));
+	pbuart.out_rts_callback().set("chb", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("chb", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("pbuart", ins8250_device, rx_w))

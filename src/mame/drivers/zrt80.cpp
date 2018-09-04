@@ -302,8 +302,9 @@ MACHINE_CONFIG_START(zrt80_state::zrt80)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(zrt80_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, 2457600 )
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	INS8250(config, m_8250, 2457600);
+	m_8250->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(zrt80_state, kbd_put))
 MACHINE_CONFIG_END

@@ -1165,8 +1165,9 @@ MACHINE_CONFIG_START(meritm_state::crt250_crt252_crt258)
 
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_crt252_crt258)
 
-	MCFG_DEVICE_ADD(m_uart, NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(m_microtouch, microtouch_device, rx))
+	NS16550(config, m_uart, UART_CLK);
+	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
+
 	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
 MACHINE_CONFIG_END
@@ -1183,8 +1184,9 @@ MACHINE_CONFIG_START(meritm_state::crt260)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt260)
 
-	MCFG_DEVICE_ADD(m_uart, NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(m_microtouch, microtouch_device, rx))
+	NS16550(config, m_uart, UART_CLK);
+	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
+
 	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
 MACHINE_CONFIG_END

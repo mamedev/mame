@@ -85,22 +85,13 @@ void imds_state::machine_reset()
 	m_term_data = 0;
 }
 
-//static const ins8250_interface imds_com_interface =
-//{
-//  1843200,
-//  DEVCB_NOOP,
-//  nullptr,
-//  nullptr,
-//  nullptr
-//};
-
 MACHINE_CONFIG_START(imds_state::imds)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080, 4_MHz_XTAL) // no idea of clock.
 	MCFG_DEVICE_PROGRAM_MAP(imds_mem)
 	MCFG_DEVICE_IO_MAP(imds_io)
 
-//  MCFG_INS8250_ADD( "ins8250", imds_com_interface )
+//  INS8250(config, "ins8250", 1843200);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)

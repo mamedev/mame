@@ -1116,10 +1116,10 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_RS232_RI_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, cts_w))
 
-	MCFG_DEVICE_MODIFY("fdc37c665gt:uart2")
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	ins8250_device &uart(*subdevice<ins8250_device>("fdc37c665gt:uart2"));
+	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )

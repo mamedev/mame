@@ -144,16 +144,16 @@ void vrc5074_device::target1_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("uart", NS16550, DERIVED_CLOCK(1, 12))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vrc5074_device, uart_irq_callback))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys00", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys00", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys00", rs232_port_device, write_rts))
+	ns16550_device &uart(NS16550(config, "uart", DERIVED_CLOCK(1, 12)));
+	uart.out_int_callback().set(FUNC(vrc5074_device::uart_irq_callback));
+	uart.out_tx_callback().set("ttys00", FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set("ttys00", FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set("ttys00", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("ttys00", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", ns16550_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart", ns16550_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", ns16550_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(uart, ns16550_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(uart, ns16550_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(uart, ns16550_device, cts_w))
 MACHINE_CONFIG_END
 
 vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

@@ -921,18 +921,18 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, rex6000_state, serial_irq))
+	NS16550(config, m_uart, XTAL(1'843'200));
+	m_uart->out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(FUNC(rex6000_state::serial_irq));
 
 	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
@@ -971,18 +971,18 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(64))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(8192))
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(9'830'400) / 4 )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, rex6000_state, serial_irq))
+	NS16550(config, m_uart, XTAL(9'830'400) / 4);
+	m_uart->out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(FUNC(rex6000_state::serial_irq));
 
 	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
-	//MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
