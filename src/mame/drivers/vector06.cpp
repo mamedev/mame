@@ -199,7 +199,7 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_DEVICE_ADD("wd1793", KR1818VG93, 1_MHz_XTAL)
+	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)

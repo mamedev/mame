@@ -383,9 +383,9 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// floppy
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 4_MHz_XTAL / 2 /* ? */)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_TEST))
+	WD2797(config, m_fdc, 4_MHz_XTAL / 2 /* ? */);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats)

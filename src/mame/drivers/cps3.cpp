@@ -2527,8 +2527,8 @@ MACHINE_CONFIG_START(cps3_state::cps3)
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
 
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
+	wd33c93_device& wd33c93(WD33C93(config, "wd33c93"));
+	wd33c93.set_scsi_port("scsi");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

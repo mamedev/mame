@@ -137,7 +137,8 @@ WRITE8_MEMBER( wdxt_gen_device::ram_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wdxt_gen_device::device_add_mconfig)
+void wdxt_gen_device::device_add_mconfig(machine_config &config)
+{
 	mcs48_cpu_device &cpu(I8049(config, m_maincpu, 5000000));
 	cpu.set_addrmap(AS_IO, &wdxt_gen_device::wd1015_io);
 	cpu.t0_in_cb().set(m_host, FUNC(wd11c00_17_device::busy_r));
@@ -168,9 +169,9 @@ MACHINE_CONFIG_START(wdxt_gen_device::device_add_mconfig)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	MCFG_HARDDISK_ADD("hard0")
-	MCFG_HARDDISK_ADD("hard1")
-MACHINE_CONFIG_END
+	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hard1", 0);
+}
 
 
 //**************************************************************************

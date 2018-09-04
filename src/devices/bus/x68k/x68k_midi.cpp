@@ -18,9 +18,9 @@
 DEFINE_DEVICE_TYPE(X68K_MIDI, x68k_midi_device, "x68k_midi", "X68000 MIDI Interface")
 
 MACHINE_CONFIG_START(x68k_midi_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("midi", YM3802, XTAL(1'000'000))  // clock is unknown
-	MCFG_YM3802_TXD_HANDLER(WRITELINE("mdout",midi_port_device,write_txd))
-	MCFG_YM3802_IRQ_HANDLER(WRITELINE(*this, x68k_midi_device,irq_w))
+	YM3802(config, m_midi, XTAL(1'000'000));  // clock is unknown
+	m_midi->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_midi->irq_handler().set(FUNC(x68k_midi_device::irq_w));
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 //  MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")

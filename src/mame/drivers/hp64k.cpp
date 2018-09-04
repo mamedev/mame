@@ -1412,10 +1412,10 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 390-1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_flp_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_flp_drq_w))
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
+	m_fdc->intrq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats)

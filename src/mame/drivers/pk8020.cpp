@@ -245,8 +245,8 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 
 	I8251(config, m_lan, 0);
 
-	MCFG_DEVICE_ADD("wd1793", FD1793, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259", pic8259_device, ir7_w))
+	FD1793(config, m_wd1793, 20_MHz_XTAL / 20);
+	m_wd1793->intrq_wr_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)

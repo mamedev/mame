@@ -546,8 +546,8 @@ MACHINE_CONFIG_START(guab_state::guab)
 	ACIA6850(config, "acia6850_2", 0);
 
 	// floppy
-	MCFG_DEVICE_ADD("fdc", WD1773, 8000000)
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", 6))
+	WD1773(config, m_fdc, 8000000);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, 6);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)

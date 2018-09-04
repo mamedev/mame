@@ -1288,39 +1288,44 @@ static void msx_floppies(device_slot_interface &device)
 	device.option_add("35ssdd", FLOPPY_35_SSDD);
 }
 
-MACHINE_CONFIG_START(msx_state::msx_fd1793)
-	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+void msx_state::msx_fd1793(machine_config &config)
+{
+	fd1793_device& fdc(FD1793(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_wd2793_force_ready)
+void msx_state::msx_wd2793_force_ready(machine_config &config)
+{
 	// From NMS8245 schematics:
 	// READY + HLT - pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+	wd2793_device& fdc(WD2793(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_wd2793)
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
-MACHINE_CONFIG_END
+void msx_state::msx_wd2793(machine_config &config)
+{
+	WD2793(config, "fdc", 4_MHz_XTAL / 4);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_mb8877a)
+void msx_state::msx_mb8877a(machine_config & config)
+{
 	// From CF-3300 FDC schematic:
 	// READY + HLT - pulled high
 	// -DDEN - pulled low
-	MCFG_DEVICE_ADD("fdc", MB8877, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+	mb8877_device& fdc(MB8877(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
 MACHINE_CONFIG_START(msx_state::msx_tc8566af)
 	MCFG_TC8566AF_ADD("fdc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(msx_state::msx_microsol)
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+void msx_state::msx_microsol(machine_config &config)
+{
+	wd2793_device& fdc(WD2793(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
 MACHINE_CONFIG_START(msx_state::msx_1_35_ssdd_drive)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_state::floppy_formats)

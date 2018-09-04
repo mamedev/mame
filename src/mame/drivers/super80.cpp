@@ -871,8 +871,8 @@ MACHINE_CONFIG_START(super80_state::super80r)
 	m_dma->in_iorq_callback().set(FUNC(super80_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(super80_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 2_MHz_XTAL)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	WD2793(config, m_fdc, 2_MHz_XTAL);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)

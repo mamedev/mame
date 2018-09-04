@@ -776,7 +776,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsb_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi", 0);
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(1228800);
@@ -787,9 +787,9 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	pit.set_clk<2>(1228800);
 	pit.out_handler<1>().set(m_pic1, FUNC(pic8259_device::ir1_w));
 
-	MCFG_DEVICE_ADD("fd1797", FD1797, 2000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259_2", pic8259_device, ir1_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, altos8600_state, fddrq_w))
+	FD1797(config, m_fdc, 2000000);
+	m_fdc->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir1_w));
+	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)

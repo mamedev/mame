@@ -1138,10 +1138,11 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(twinkle_state::twinklex)
+void twinkle_state::twinklex(machine_config &config)
+{
 	twinkle(config);
-	MCFG_X76F041_ADD( "security" )
-MACHINE_CONFIG_END
+	X76F041(config, "security");
+}
 
 void twinkle_state::twinklei(machine_config &config)
 {

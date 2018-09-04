@@ -469,10 +469,10 @@ MACHINE_CONFIG_START(super6_state::super6)
 	Z80PIO(config, m_pio, 24_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(m_fdc, WD2793, 24_MHz_XTAL / 12)
-	MCFG_WD_FDC_FORCE_READY
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_drq_w))
+	WD2793(config, m_fdc, 24_MHz_XTAL / 12);
+	m_fdc->set_force_ready(true);
+	m_fdc->intrq_wr_callback().set(FUNC(super6_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(super6_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

@@ -2954,7 +2954,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
-	MCFG_X76F100_ADD("naomibd_eeprom")
+	X76F100(config, "naomibd_eeprom");
 	MCFG_M3COMM_ADD("comm_board")
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);

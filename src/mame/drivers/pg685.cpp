@@ -520,8 +520,8 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
+	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
+	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685oua12)
@@ -571,8 +571,8 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
+	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
+	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
 
 MACHINE_CONFIG_END
 

@@ -380,9 +380,9 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&unixpc_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 40_MHz_XTAL / 40) // 1PCK (CPU clock) divided by custom DMA chip
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, unixpc_state, wd2797_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, unixpc_state, wd2797_drq_w))
+	WD2797(config, m_wd2797, 40_MHz_XTAL / 40); // 1PCK (CPU clock) divided by custom DMA chip
+	m_wd2797->intrq_wr_callback().set(FUNC(unixpc_state::wd2797_intrq_w));
+	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));

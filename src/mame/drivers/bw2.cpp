@@ -593,9 +593,9 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bw2_state, fdc_drq_w))
+	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_fdc->drq_wr_callback().set(FUNC(bw2_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)

@@ -2068,9 +2068,9 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
@@ -2117,9 +2117,9 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
@@ -2176,9 +2176,9 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
@@ -2234,9 +2234,9 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
@@ -2280,9 +2280,9 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
