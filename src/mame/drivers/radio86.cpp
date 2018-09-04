@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	i8275_device &crtc(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	crtc.set_character_width(6);
 	crtc.set_display_callback(FUNC(radio86_state::display_pixels), this);
-	crtc.drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
+	crtc.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,12 +490,12 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	m_dma8257->set_reverse_rw_mode(1);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rkr_cassette_formats)

@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257,i8257_device, dreq2_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
@@ -245,12 +245,12 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	m_dma8257->set_reverse_rw_mode(1);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rkm_cassette_formats)

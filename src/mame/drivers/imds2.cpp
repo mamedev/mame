@@ -834,7 +834,7 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_DEVICE_ADD("ioccrtc" , I8275 , 22853600 / 14)
 		MCFG_I8275_CHARACTER_WIDTH(14)
 		MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(imds2_state , crtc_display_pixels)
-		MCFG_I8275_DRQ_CALLBACK(WRITELINE("iocdma" , i8257_device , dreq2_w))
+		MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_iocdma , i8257_device , dreq2_w))
 		MCFG_I8275_IRQ_CALLBACK(INPUTLINE("ioccpu" , I8085_INTR_LINE))
 		MCFG_VIDEO_SET_SCREEN("screen")
 
@@ -848,13 +848,13 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_DEVICE_ADD("iocbeep" , BEEP , IOC_BEEP_FREQ)
 		MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 
-		MCFG_DEVICE_ADD("iocdma" , I8257 , IOC_XTAL_Y2 / 9)
-		MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, imds2_state, imds2_hrq_w))
-		MCFG_I8257_IN_MEMR_CB(READ8(*this, imds2_state , imds2_ioc_mem_r))
-		MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, imds2_state , imds2_ioc_mem_w))
-		MCFG_I8257_IN_IOR_1_CB(READ8("iocfdc" , i8271_device , data_r))
-		MCFG_I8257_OUT_IOW_1_CB(WRITE8("iocfdc" , i8271_device , data_w))
-		MCFG_I8257_OUT_IOW_2_CB(WRITE8("ioccrtc" , i8275_device , dack_w))
+		I8257(config , m_iocdma , IOC_XTAL_Y2 / 9);
+		m_iocdma->out_hrq_cb().set(FUNC(imds2_state::imds2_hrq_w));
+		m_iocdma->in_memr_cb().set(FUNC(imds2_state::imds2_ioc_mem_r));
+		m_iocdma->out_memw_cb().set(FUNC(imds2_state::imds2_ioc_mem_w));
+		m_iocdma->in_ior_cb<1>().set("iocfdc" , FUNC(i8271_device::data_r));
+		m_iocdma->out_iow_cb<1>().set("iocfdc" , FUNC(i8271_device::data_w));
+		m_iocdma->out_iow_cb<2>().set("ioccrtc" , FUNC(i8275_device::dack_w));
 
 		MCFG_DEVICE_ADD("ioctimer" , PIT8253 , 0)
 		MCFG_PIT8253_CLK0(IOC_XTAL_Y1 / 4)

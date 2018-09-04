@@ -998,13 +998,13 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12)
 	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
 
-	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL(15'000'000) / 5)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, fanucspmg_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, fanucspmg_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, fanucspmg_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fanucspmg_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(*this, fanucspmg_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, fanucspmg_state, fdcdma_w))
+	I8257(config, m_dmac, XTAL(15'000'000) / 5);
+	m_dmac->out_hrq_cb().set(FUNC(fanucspmg_state::hrq_w));
+	m_dmac->out_tc_cb().set(FUNC(fanucspmg_state::tc_w));
+	m_dmac->in_memr_cb().set(FUNC(fanucspmg_state::memory_read_byte));
+	m_dmac->out_memw_cb().set(FUNC(fanucspmg_state::memory_write_byte));
+	m_dmac->in_ior_cb<0>().set(FUNC(fanucspmg_state::fdcdma_r));
+	m_dmac->out_iow_cb<0>().set(FUNC(fanucspmg_state::fdcdma_w));
 
 	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
