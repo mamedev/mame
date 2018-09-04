@@ -211,6 +211,12 @@ private:
 			PAIR n_bgr;
 			struct FLATVERTEX vertex;
 		} Dot;
+
+		struct
+		{
+			PAIR n_bgr;
+			struct FLATTEXTUREDVERTEX vertex;
+		} TexturedDot;
 	};
 
 	void updatevisiblearea();
@@ -229,6 +235,7 @@ private:
 	void Sprite8x8();
 	void Sprite16x16();
 	void Dot();
+	void TexturedDot();
 	void MoveImage();
 	void psx_gpu_init( int n_gputype );
 	void gpu_reset();

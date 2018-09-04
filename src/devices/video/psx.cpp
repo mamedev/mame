@@ -2997,6 +2997,70 @@ void psxgpu_device::Dot()
 	}
 }
 
+void psxgpu_device::TexturedDot()
+{
+#if PSXGPU_DEBUG_VIEWER
+	if (m_debug.n_skip == 15)
+	{
+		return;
+	}
+	DebugMesh(SINT11(COORD_X(m_packet.TexturedDot.vertex.n_coord)) + n_drawoffset_x, SINT11(COORD_Y(m_packet.TexturedDot.vertex.n_coord)) + n_drawoffset_y);
+	DebugMeshEnd();
+#endif
+
+	uint8_t n_cmd = BGR_C(m_packet.TexturedDot.n_bgr);
+
+	PAIR n_r;
+	PAIR n_g;
+	PAIR n_b;
+
+	switch (n_cmd & 0x01)
+	{
+	case 0:
+		n_r.w.h = BGR_R(m_packet.TexturedDot.n_bgr); n_r.w.l = 0;
+		n_g.w.h = BGR_G(m_packet.TexturedDot.n_bgr); n_g.w.l = 0;
+		n_b.w.h = BGR_B(m_packet.TexturedDot.n_bgr); n_b.w.l = 0;
+		break;
+	case 1:
+		n_r.w.h = 0x80; n_r.w.l = 0;
+		n_g.w.h = 0x80; n_g.w.l = 0;
+		n_b.w.h = 0x80; n_b.w.l = 0;
+		break;
+	}
+
+	int32_t n_x = SINT11(COORD_X(m_packet.TexturedDot.vertex.n_coord));
+	int32_t n_y = SINT11(COORD_Y(m_packet.TexturedDot.vertex.n_coord));
+	uint8_t n_u = TEXTURE_U(m_packet.TexturedDot.vertex.n_texture);
+	uint8_t n_v = TEXTURE_V(m_packet.TexturedDot.vertex.n_texture);
+	uint32_t n_clutx = (m_packet.TexturedDot.vertex.n_texture.w.h & 0x3f) << 4;
+	uint32_t n_cluty = (m_packet.TexturedDot.vertex.n_texture.w.h >> 6) & 0x3ff;
+
+	uint16_t *p_n_f;
+	uint16_t *p_n_redb;
+	uint16_t *p_n_greenb;
+	uint16_t *p_n_blueb;
+	uint16_t *p_n_redtrans;
+	uint16_t *p_n_greentrans;
+	uint16_t *p_n_bluetrans;
+	int n_tx;
+	int n_ty;
+	uint32_t n_bgr;
+	uint16_t *p_clut;
+	int32_t n_distance = 1;
+
+	TEXTURESETUP
+
+	int drawx = n_x + n_drawoffset_x;
+	int drawy = n_y + n_drawoffset_y;
+
+	if (drawx >= (int32_t)n_drawarea_x1 && drawy >= (int32_t)n_drawarea_y1 &&
+		drawx <= (int32_t)n_drawarea_x2 && drawy <= (int32_t)n_drawarea_y2)
+	{
+		uint16_t *p_vram = p_p_vram[drawy] + drawx;
+		TEXTUREFILL({}, n_u, n_v);
+	}
+}
+
 void psxgpu_device::MoveImage()
 {
 	int16_t n_w;
@@ -3008,7 +3072,7 @@ void psxgpu_device::MoveImage()
 	uint16_t *p_vram;
 
 #if PSXGPU_DEBUG_VIEWER
-	if( m_debug.n_skip == 15 )
+	if( m_debug.n_skip == 16 )
 	{
 		return;
 	}
@@ -3329,6 +3393,24 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 					(int16_t)( m_packet.n_entry[ 1 ] & 0xffff ), (int16_t)( m_packet.n_entry[ 1 ] >> 16 ),
 					m_packet.n_entry[ 0 ] & 0xffffff );
 				Dot();
+				n_gpu_buffer_offset = 0;
+			}
+			break;
+		case 0x6c:
+		case 0x6d:
+		case 0x6e:
+		case 0x6f:
+			if (n_gpu_buffer_offset < 2)
+			{
+				n_gpu_buffer_offset++;
+			}
+			else
+			{
+				verboselog(*this, 1, "%02x: textured dot %d,%d %08x\n",
+					m_packet.n_entry[0] >> 24,
+					(int16_t)(m_packet.n_entry[1] & 0xffff), (int16_t)(m_packet.n_entry[1] >> 16),
+					m_packet.n_entry[0] & 0xffffff);
+				TexturedDot();
 				n_gpu_buffer_offset = 0;
 			}
 			break;
