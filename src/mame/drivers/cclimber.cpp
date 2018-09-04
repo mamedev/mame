@@ -2100,24 +2100,24 @@ ROM_START( rpatrol )
 ROM_END
 
 ROM_START( rpatroln )
-	ROM_REGION( 0x6000, "maincpu", 0 ) /* located original ORCA OVG-51A PCB */
+	ROM_REGION( 0x6000, "maincpu", 0 ) /* located on an original ORCA OVG-51A PCB */
 	ROM_LOAD( "1_2.3k", 0x0000, 0x1000, CRC(33b01c90) SHA1(9c8da6dd963bfb0544ef99b8fdedcf86c32cdb6b) ) /* hand written "2" on original ORCA labels */
 	ROM_LOAD( "2_2.3l", 0x1000, 0x1000, CRC(03f53340) SHA1(35336945f4b634fc4c7791ac9c9e6643c8cd8006) )
 	ROM_LOAD( "3_2.3n", 0x2000, 0x1000, CRC(8fa300df) SHA1(5c3ba1ef6c1ce8df437b4fa464293208630b5e8d) )
 	ROM_LOAD( "4_2.3p", 0x3000, 0x1000, CRC(74a8f1f4) SHA1(6bbc4944e4b31425a6b82f370b6760e5a4b36f56) )
 	ROM_LOAD( "5_2.3r", 0x4000, 0x1000, CRC(d7ef6c87) SHA1(38e3b44b355907824919acc4f5064dcb98ebb1d0) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 ) /* located original ORCA OVG-50B PCB */
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* located on an original ORCA OVG-50B PCB */
 	ROM_LOAD( "6.6l.2732", 0x000000, 0x000800, CRC(b38d8aca) SHA1(b93aa0010b0c0ab23284188a881d4a9bb0fd4582) )
 	ROM_CONTINUE(          0x001000, 0x000800 )
 	ROM_LOAD( "7.6p.2732", 0x002000, 0x000800, CRC(bc2bddf9) SHA1(4057fc535b1a2db943f893290afe9bfd865ac84b) )
 	ROM_CONTINUE(          0x003000, 0x000800 )
 
-	ROM_REGION( 0x1000, "gfx2", 0 ) /* located original ORCA OVG-50B PCB */
+	ROM_REGION( 0x1000, "gfx2", 0 ) /* located on an original ORCA OVG-50B PCB */
 	ROM_LOAD( "9.2t", 0x000000, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 	ROM_LOAD( "8.2s", 0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 
-	ROM_REGION( 0x0060, "proms", 0 ) /* located original ORCA OVG-50B PCB */
+	ROM_REGION( 0x0060, "proms", 0 ) /* located on an original ORCA OVG-50B PCB */
 	ROM_LOAD( "mb7051.1b", 0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) ) /* or compatible like 82S123 - Had a RED stipe across chip */
 	ROM_LOAD( "mb7051.1c", 0x0020, 0x0020, CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) ) /* or compatible like 82S123 - Had a BLUE stipe across chip */
 	ROM_LOAD( "mb7051.1u", 0x0040, 0x0020, CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) ) /* or compatible like 82S123 - Had a GREEN stipe across chip */
