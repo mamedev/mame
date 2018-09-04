@@ -114,7 +114,7 @@ uint32_t thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_seta001->set_bg_yoffsets(  0x11+1, -0x10 );   // + is up (down with flip)
 	m_seta001->set_fg_yoffsets( -0x12+1, -0x01 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000, 1);
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000);
 	return 0;
 }
 
