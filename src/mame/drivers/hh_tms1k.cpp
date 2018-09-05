@@ -71,6 +71,7 @@
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
+ *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
