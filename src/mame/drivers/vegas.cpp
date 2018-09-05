@@ -1766,8 +1766,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 4);
-	voodoo_device *voodoo_base = static_cast<voodoo_device*>(config.device_find(this, PCI_ID_VIDEO":voodoo"));
-	voodoo_base->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	M48T37(config, m_timekeeper);
 	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
@@ -1809,8 +1808,7 @@ MACHINE_CONFIG_START(vegas_state::vegasban)
 	vegas32m(config);
 	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	voodoo_device *voodoo_base = static_cast<voodoo_device*>(config.device_find(this, PCI_ID_VIDEO":voodoo"));
-	voodoo_base->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 MACHINE_CONFIG_END
 
 
@@ -1823,8 +1821,7 @@ MACHINE_CONFIG_START(vegas_state::vegasv3)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	voodoo_device *voodoo_base = static_cast<voodoo_device*>(config.device_find(this, PCI_ID_VIDEO":voodoo"));
-	voodoo_base->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 MACHINE_CONFIG_END
 
 
@@ -1840,8 +1837,7 @@ MACHINE_CONFIG_START(vegas_state::denver)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	voodoo_device *voodoo_base = static_cast<voodoo_device*>(config.device_find(this, PCI_ID_VIDEO":voodoo"));
-	voodoo_base->vblank_callback().set(FUNC(vegas_state::vblank_assert));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	// TL16C552 UART
 	NS16550(config, m_uart1, XTAL(1'843'200));

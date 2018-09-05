@@ -2113,7 +2113,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
 	aristmk5(config);
-	subdevice<ins8250_device>("uart_0a")
+	subdevice<ns16450_device>("uart_0a")
 			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
@@ -2127,7 +2127,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
 	aristmk5_usa(config);
-	subdevice<ins8250_device>("uart_0a")
+	subdevice<ns16450_device>("uart_0a")
 			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
