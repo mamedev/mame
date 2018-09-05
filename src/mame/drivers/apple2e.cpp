@@ -4040,20 +4040,20 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2e_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* keyboard controller */
-	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, apple2e_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, apple2e_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple2e_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(*this, apple2e_state, ay3600_ako_w))
+	ay3600_device &kbdc(AY3600(config, "ay3600", 0));
+	kbdc.x0().set_ioport("X0");
+	kbdc.x1().set_ioport("X1");
+	kbdc.x2().set_ioport("X2");
+	kbdc.x3().set_ioport("X3");
+	kbdc.x4().set_ioport("X4");
+	kbdc.x5().set_ioport("X5");
+	kbdc.x6().set_ioport("X6");
+	kbdc.x7().set_ioport("X7");
+	kbdc.x8().set_ioport("X8");
+	kbdc.shift().set(FUNC(apple2e_state::ay3600_shift_r));
+	kbdc.control().set(FUNC(apple2e_state::ay3600_control_r));
+	kbdc.data_ready().set(FUNC(apple2e_state::ay3600_data_ready_w));
+	kbdc.ako().set(FUNC(apple2e_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2e_state, ay3600_repeat, attotime::from_hz(15))

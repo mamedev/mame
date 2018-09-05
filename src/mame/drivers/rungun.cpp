@@ -438,9 +438,9 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	MCFG_K055673_PALETTE("palette")
 	MCFG_K055673_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(9*8, 24)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	K053252(config, m_k053252, 16000000/2);
+	m_k053252->set_offsets(9*8, 24);
+	m_k053252->set_screen("screen");
 
 	MCFG_PALETTE_ADD("palette2", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	// SFX
 	MCFG_DEVICE_ADD("k054539_1", K054539, 18.432_MHz_XTAL)
@@ -484,9 +484,7 @@ MACHINE_CONFIG_START(rungun_state::rng_dual)
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
-
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_SET_SLAVE_SCREEN("demultiplex2")
+	m_k053252->set_slave_screen("demultiplex2");
 MACHINE_CONFIG_END
 
 

@@ -406,10 +406,10 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	MCFG_DEVICE_PROGRAM_MAP(quickpick5_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", quickpick5_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) /* K053252, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, quickpick5_state, vbl_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, quickpick5_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(*this, quickpick5_state, ccu_int_time_w))
+	K053252(config, m_k053252, XTAL(32'000'000)/4); /* K053252, xtal verified, divider not verified */
+	m_k053252->int1_ack().set(FUNC(quickpick5_state::vbl_ack_w));
+	m_k053252->int2_ack().set(FUNC(quickpick5_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(quickpick5_state::ccu_int_time_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

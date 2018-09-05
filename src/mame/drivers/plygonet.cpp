@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, polygonet_state, k054539_nmi_gen))

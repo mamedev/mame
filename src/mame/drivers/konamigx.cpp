@@ -1624,11 +1624,11 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_DEVICE_ADD("dasp", TMS57002, MASTER_CLOCK/2)
 	MCFG_DEVICE_DATA_MAP(gxtmsmap)
 
-	MCFG_DEVICE_ADD("k053252", K053252, MASTER_CLOCK/4)
-	MCFG_K053252_OFFSETS(24, 16)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, konamigx_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, konamigx_state, hblank_irq_ack_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	K053252(config, m_k053252, MASTER_CLOCK/4);
+	m_k053252->set_offsets(24, 16);
+	m_k053252->int1_ack().set(FUNC(konamigx_state::vblank_irq_ack_w));
+	m_k053252->int2_ack().set(FUNC(konamigx_state::hblank_irq_ack_w));
+	m_k053252->set_screen("screen");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1736,8 +1736,7 @@ MACHINE_CONFIG_START(konamigx_state::dragoonj)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24+16, 16)
+	m_k053252->set_offsets(24+16, 16);
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 1, 0)
@@ -1809,8 +1808,7 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_racinfrc)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, racinfrc)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24-8+16, 0)
+	m_k053252->set_offsets(24-8+16, 0);
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0)
@@ -1837,9 +1835,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type3)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
+	m_k053252->set_offsets(0, 16);
+	m_k053252->set_slave_screen("screen2");
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 2)
@@ -1896,10 +1893,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type4)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
-
+	m_k053252->set_offsets(0, 16);
+	m_k053252->set_slave_screen("screen2");
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 0)
@@ -1916,9 +1911,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
 	//MCFG_SCREEN_SIZE(128*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-
+	m_k053252->set_offsets(0, 16);
 
 	MCFG_SCREEN_MODIFY("screen2")
 	MCFG_SCREEN_SIZE(1024, 1024)
@@ -1946,8 +1939,7 @@ MACHINE_CONFIG_START(konamigx_state::winspike)
 	//MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24+15, 16)
+	m_k053252->set_offsets(24+15, 16);
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)

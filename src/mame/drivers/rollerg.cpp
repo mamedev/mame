@@ -281,9 +281,9 @@ MACHINE_CONFIG_START(rollerg_state::rollerg)
 	MCFG_K051316_OFFSETS(22, 1)
 	MCFG_K051316_CB(rollerg_state, zoom_callback)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 3000000*2)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, rollerg_state,rollerg_irq_ack_w))
-	MCFG_K053252_OFFSETS(14*8, 2*8)
+	K053252(config, m_k053252, 3000000*2);
+	m_k053252->int1_ack().set(FUNC(rollerg_state::rollerg_irq_ack_w));
+	m_k053252->set_offsets(14*8, 2*8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

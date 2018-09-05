@@ -786,8 +786,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, "k056230", "maincpu");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -857,8 +856,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, "k056230", "maincpu");
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
