@@ -60,9 +60,8 @@ uint32_t sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rg
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	//                                                          pri,   primask,palbase,palmask
-	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x000,  0x0ff); // low pri spr1  (definitely needs to be below low pri spr2, game tiles)
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x000,  0x000,  0x0ff); // low+high pri spr1 (definitely needs to be below low pri spr2 - game tiles & definitely needs to be below tilemap1 - lightning on win screen in traditional mode)
 	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x100,  0x0ff); // low pri spr2  (definitely needs to be below tilemap1 - 2nd level failure screen etc.)
-	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x200,  0x000,  0x0ff); // high pri spr1
 
 	if (!combine_tilemaps)
 		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
