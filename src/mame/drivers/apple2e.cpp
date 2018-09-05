@@ -208,6 +208,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_screen(*this, "screen"),
+		m_scantimer(*this, "scantimer"),
+		m_palette(*this, "palette"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
 		m_cecbanks(*this, "cecexp"),
@@ -249,6 +251,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<timer_device> m_scantimer;
+	required_device<palette_device> m_palette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	optional_memory_region m_cecbanks;
@@ -3971,27 +3975,30 @@ static void apple2eaux_cards(device_slot_interface &device)
 	device.option_add("rw3", A2EAUX_RAMWORKS3);  /* Applied Engineering RamWorks III */
 }
 
+#define NOMCFG_TIMER_DRIVER_ADD_SCANLINE(_class, _callback, _screen, _first_vpos, _increment) \
+		configure_scanline(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _screen, _first_vpos, _increment);
+
 MACHINE_CONFIG_START(apple2e_state::apple2e)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(apple2e_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2e_state, apple2_interrupt, "screen", 0, 1)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6502(config, m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	TIMER(config, m_scantimer, 0);
+	m_scantimer->NOMCFG_TIMER_DRIVER_ADD_SCANLINE(apple2e_state, apple2_interrupt, "screen", 0, 1)
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL(14'318'181))
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(apple2e_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(apple2e_state, apple2)
+	PALETTE(config, m_palette, 16);
+	m_palette->set_init(DEVICE_SELF, FUNC(apple2e_state::palette_init_apple2));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* DS1315 for no-slot clock */
 	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));
