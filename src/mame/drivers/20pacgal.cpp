@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(_25pacman_state::_25pacman)
 	MCFG_DEVICE_PROGRAM_MAP(_25pacman_map)
 	MCFG_DEVICE_IO_MAP(_25pacman_io_map)
 
-	MCFG_AMD_29LV200T_ADD("flash")
+	AMD_29LV200T(config, "flash");
 MACHINE_CONFIG_END
 
 

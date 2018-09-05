@@ -2733,7 +2733,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(staraudi_map)
 
-	MCFG_SHARP_LH28F016S_16BIT_ADD("flash")
+	SHARP_LH28F016S_16BIT(config, "flash");
 	MCFG_UPD4992_ADD("rtc")
 
 	// video hardware

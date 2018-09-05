@@ -722,11 +722,11 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 
 	MCFG_MB3773_ADD("mb3773")
 
-	MCFG_INTEL_TE28F160_ADD("biosflash")
-	MCFG_INTEL_E28F400B_ADD("pgmflash")
-	MCFG_INTEL_TE28F160_ADD("sndflash0")
-	MCFG_INTEL_TE28F160_ADD("sndflash1")
-	MCFG_INTEL_TE28F160_ADD("sndflash2")
+	INTEL_TE28F160(config, "biosflash");
+	INTEL_E28F400B(config, "pgmflash");
+	INTEL_TE28F160(config, "sndflash0");
+	INTEL_TE28F160(config, "sndflash1");
+	INTEL_TE28F160(config, "sndflash2");
 
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 

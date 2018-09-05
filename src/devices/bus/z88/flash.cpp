@@ -53,9 +53,10 @@ void z88_1024k_flash_device::device_start()
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(z88_1024k_flash_device::device_add_mconfig)
-	MCFG_INTEL_E28F008SA_ADD(FLASH_TAG)
-MACHINE_CONFIG_END
+void z88_1024k_flash_device::device_add_mconfig(machine_config &config)
+{
+	INTEL_E28F008SA(config, FLASH_TAG);
+}
 
 /*-------------------------------------------------
     get_cart_base

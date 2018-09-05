@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* Flash ROM */
-	MCFG_AMD_29F040_ADD("flash")
+	AMD_29F040(config, "flash");
 
 	/* Security key */
 	MCFG_DS1205_ADD("multikey")

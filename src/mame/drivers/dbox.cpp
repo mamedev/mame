@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_b_w))
 
 	/* Add the boot flash */
-	MCFG_AMD_29F800B_16BIT_ADD("flash")
+	AMD_29F800B_16BIT(config, "flash");
 
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")

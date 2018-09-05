@@ -462,8 +462,8 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)
 
-	MCFG_AMD_29F080_ADD("flash0")
-	MCFG_SST_28SF040_ADD("flash1")
+	AMD_29F080(config, "flash0");
+	SST_28SF040(config, "flash1");
 
 	// IRQ 4 is generated every second, used for auto power off
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", mstation_state, mstation_1hz_timer, attotime::from_hz(1))
