@@ -6,6 +6,8 @@
 
 **************************************************************************/
 
+#define MIDZEUS_VIDEO_CLOCK     XTAL(66'666'700)
+
 #include "machine/timekpr.h"
 #include "emupal.h"
 #include "screen.h"
@@ -38,7 +40,6 @@ public:
 	{ }
 
 	//static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
-	static constexpr XTAL MIDZEUS_VIDEO_CLOCK = XTAL(66'666'700);
 	static constexpr int BEAM_DY = 3;
 	static constexpr int BEAM_DX = 3;
 	static constexpr int BEAM_XOFFS = 40; // table in the code indicates an offset of 20 with a beam height of 7
