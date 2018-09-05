@@ -3975,15 +3975,12 @@ static void apple2eaux_cards(device_slot_interface &device)
 	device.option_add("rw3", A2EAUX_RAMWORKS3);  /* Applied Engineering RamWorks III */
 }
 
-#define NOMCFG_TIMER_DRIVER_ADD_SCANLINE(_class, _callback, _screen, _first_vpos, _increment) \
-		configure_scanline(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _screen, _first_vpos, _increment);
-
 MACHINE_CONFIG_START(apple2e_state::apple2e)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
 	TIMER(config, m_scantimer, 0);
-	m_scantimer->NOMCFG_TIMER_DRIVER_ADD_SCANLINE(apple2e_state, apple2_interrupt, "screen", 0, 1)
+	m_scantimer->configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
