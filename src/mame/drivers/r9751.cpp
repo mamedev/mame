@@ -198,7 +198,7 @@ static const char * DeviceNames[] = {
 	"SMIOCc?",nullptr,"SMIOCd?",nullptr,nullptr,nullptr,nullptr,"??" // 0x38-0x3F
 };
 struct GenericCommandRecord {
-	int AddressPattern;
+	u32 AddressPattern;
 	const char * Name;
 };
 
@@ -207,9 +207,14 @@ static const GenericCommandRecord GenericCommands[] = {
 	{ 0x800, "Status" },
 	{ 0x1000, "Word Count" },
 	{ 0x3000, "Command Result" },
-	{ 0x4000, "Command/etc" },  // Also a write length.
-	{ 0x8000, "various" },  // Read address, 
-	{ 0xC000, "various" },  // Write address, Read length
+	{ 0x4000, "Command" },  // Also a write length.
+	//{ 0x8000, "various" },  // Read address, 
+	//{ 0xC000, "various" },  // Write address, Read length
+};
+
+static const GenericCommandRecord SpecificCommands[] = {
+	{ 0x5FF00198, "" },
+
 };
 
 
@@ -343,7 +348,9 @@ static const SystemRegisterInfo SystemRegisters[] = {
 	{ 5, 0xff050540, "EV16" },{ 5, 0xff050544, "EV17" },{ 5, 0xff050548, "EV18" },{ 5, 0xff05054c, "EV19" },
 	{ 5, 0xff050550, "EV20" },{ 5, 0xff050554, "EV21" },{ 5, 0xff050558, "EV22" },{ 5, 0xff05055c, "EV23" },
 	{ 5, 0xff050560, "EV24" },{ 5, 0xff050564, "EV25" },
-	{ 5, 0xff050580, "PISR" },{ 5, 0xff050584, "PIMR" },{ 5, 0xff050600, "CDMR" },{ 5, 0xff050604, "CDER" },
+	{ 5, 0xff050580, "PISR" },
+	{ 2, 0xff050584, "PIMR" }, // PIMR use in the bios is noisy
+	{ 5, 0xff050600, "CDMR" },{ 5, 0xff050604, "CDER" },
 	{ 5, 0xff050610, "CIV0" },{ 5, 0xff050614, "CIV1" },{ 5, 0xff050618, "CIV2" },{ 5, 0xff05061c, "CIV3" },
 	{ 5, 0xff050620, "CIV4" },{ 5, 0xff050624, "CIV5" },{ 5, 0xff050628, "CIV6" },{ 5, 0xff05062c, "CIV7" },
 	{ 5, 0xff050630, "CCV0" },{ 5, 0xff050634, "CCV1" },{ 5, 0xff050638, "CCV2" },{ 5, 0xff05063c, "CCV3" },
@@ -645,6 +652,12 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 
 		case 0x1098: /* Serial word count register */
 			data = m_smioc->m_wordcount;
+			m_smioc->ClearParameter();
+			break;
+
+		case 0x1070: /* Serial word count register (alternate) */
+			data = m_smioc->m_wordcount2;
+			m_smioc->ClearParameter2();
 			break;
 
 		case 0x2898: /* SMIOC DMA Busy register - nonzero = busy */
@@ -661,7 +674,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			data = 0;
 			break;
 
-		case 0x1890: /* SMIOC ??? (Bit 7 needs to be set) */
+		case 0x1890: /* Device offset 0x90 (Bit 7 needs to be set) */
 			data = 0x80;
 			break;
 
@@ -727,7 +740,14 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Status 2", nullptr);
 			break;
 
-		case 0x4090:
+		case 0x0198: // SMIOC soft reset?
+			m_smioc->SoftReset();
+			break;
+
+		case 0x4090: // Command to device 0x90/4
+			
+			break;
+
 		case 0x4098: /* Serial DMA Command */
 			m_smioc->SendCommand(data);
 			switch(data)

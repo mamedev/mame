@@ -67,10 +67,14 @@ public:
 	u16 m_commandValue;
 	u16 m_commandValue2;
 
+	void SoftReset();
+
 	void SendCommand(u16 command);
 	void SendCommand2(u16 command);
 	void ClearStatus();
 	void ClearStatus2();
+	void ClearParameter();
+	void ClearParameter2();
 
 protected:
 	/* Device-level overrides */

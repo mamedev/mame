@@ -238,10 +238,18 @@ void smioc_device::device_reset()
 	/* Reset CPU */
 	m_smioccpu->reset();
 	m_smioccpu->drq0_w(1);
-
+	m_deviceBusy = 1;
 
 
 }
+
+void smioc_device::SoftReset()
+{
+	m_smioccpu->reset();
+	m_smioccpu->drq0_w(1);
+	m_deviceBusy = 1;
+}
+
 
 void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
@@ -267,6 +275,9 @@ void smioc_device::SendCommand(u16 command)
 	m_commandValue = command;
 	m_requestFlags_11D |= 1;
 	m_deviceBusy = 1;
+
+	// Additionally send command bits to clear status and parameters for previous commands
+	//m_requestFlags_11D |= 0x12;
 	
 	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
 	m_smioccpu->int2_w(HOLD_LINE);
@@ -281,6 +292,9 @@ void smioc_device::SendCommand2(u16 command)
 	m_requestFlags_11D |= 4;
 	m_deviceBusy = 1;
 
+	// Additionally send command bits to clear status and parameters for previous commands
+	//m_requestFlags_11D |= 0x28;
+
 	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
 	m_smioccpu->int2_w(HOLD_LINE);
 
@@ -289,12 +303,39 @@ void smioc_device::SendCommand2(u16 command)
 
 void smioc_device::ClearStatus()
 {
+	// Indicate to SMIOC that status has been read.
+	m_requestFlags_11D |= 0x10; // bit 4 - E2E 0x200
+	m_smioccpu->int2_w(HOLD_LINE);
+
 	m_status = 0;
 }
 void smioc_device::ClearStatus2()
 {
+	m_requestFlags_11D |= 0x20; // bit 5 - E2E 0x100
+	m_smioccpu->int2_w(HOLD_LINE);
+
 	m_status2 = 0;
 }
+
+void smioc_device::ClearParameter()
+{
+	// Indicate to SMIOC that parameter has been read.
+	m_requestFlags_11D |= 0x02; // bit 1 - E2E 0x800
+	m_smioccpu->int2_w(HOLD_LINE);
+
+	m_wordcount = 0;
+}
+void smioc_device::ClearParameter2()
+{
+	// Indicate to SMIOC that alternate endpoint parameter has been read.
+	m_requestFlags_11D |= 0x08; // bit 3 - E2E 0x400
+	m_smioccpu->int2_w(HOLD_LINE);
+
+	m_wordcount2 = 0;
+}
+
+
+
 
 
 void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_name)
@@ -423,12 +464,16 @@ WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 
 	case 0xCC8:
 		update_and_log(m_wordcount, (m_wordcount & 0xFF00) | (data), "Wordcount[40CC8]");
-		//update_and_log(m_status, (m_status & 0xFF) | (data << 8), "Status[40CC8]");
 		return;
 	case 0xCC9:
 		update_and_log(m_wordcount, (m_wordcount & 0xFF) | (data << 8), "Wordcount[40CC9]");
-		//update_and_log(m_status, (m_status & 0xFF00) | (data), "Status[40CC9]");
-		//m_status3 |= 0x40;
+		return;
+
+	case 0xB88:
+		update_and_log(m_wordcount, (m_wordcount & 0xFF00) | (data), "Wordcount2[40B88]");
+		return;
+	case 0xB89:
+		update_and_log(m_wordcount, (m_wordcount & 0xFF) | (data << 8), "Wordcount2[40CC9]");
 		return;
 	}
 
@@ -510,14 +555,15 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 		break;
 
 	case 0x11: // C0111 - Set to 1 after providing a status - Acknowledge by hardware by raising bit 4 in C011D (SMIOC E2E flag 0x200
-		m_requestFlags_11D |= 0x10; // bit 4
-		m_smioccpu->int2_w(HOLD_LINE);
+		// Hypothesis: Status needs to be acknowledged before we trigger the interrupt - so moving the following code to clear status callback.
+		//m_requestFlags_11D |= 0x10; // bit 4
+		//m_smioccpu->int2_w(HOLD_LINE);
 		logerror("%s C0111 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
 	case 0x12: // C0112 - Set to 1 after providing a status(2?) - Acknowledge by hardware by raising bit 5 in C011D (SMIOC E2E flag 0x100)
-		m_requestFlags_11D |= 0x20; // bit 5
-		m_smioccpu->int2_w(HOLD_LINE);
+		//m_requestFlags_11D |= 0x20; // bit 5
+		//m_smioccpu->int2_w(HOLD_LINE);
 		logerror("%s C0112 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
