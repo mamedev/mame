@@ -32,7 +32,7 @@ void sshangha_state::video_start()
 
 uint32_t sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const int combine_tilemaps = (m_video_control&4) ? 0 : 1;
+	const bool combine_tilemaps = (m_video_control&4) ? false : true;
 
 	// sprites are flipped relative to tilemaps
 	address_space &space = machine().dummy_space();
@@ -60,15 +60,15 @@ uint32_t sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rg
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	//                                                          pri,   primask,palbase,palmask
-	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x000,  0x0ff); // low pri spr1
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x000,  0x0ff); // low pri spr1  (definitely needs to be below low pri spr2, game tiles)
 	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x100,  0x0ff); // low pri spr2  (definitely needs to be below tilemap1 - 2nd level failure screen etc.)
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x200,  0x000,  0x0ff); // high pri spr1
 
 	if (!combine_tilemaps)
 		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	//                                                          pri,   primask,palbase,palmask
 	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x200,  0x100,  0x0ff); // high pri spr2 (definitely needs to be above tilemap1 - title logo)
-	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x200,  0x000,  0x0ff); // high pri spr1
 
 	return 0;
 }
