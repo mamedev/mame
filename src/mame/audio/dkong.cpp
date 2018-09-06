@@ -1315,16 +1315,16 @@ void dkong_state::dkong3_sound2_map(address_map &map)
 MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 
 	/* sound latches */
-	MCFG_LATCH8_ADD("ls175.3d") /* sound cmd latch */
-	MCFG_LATCH8_MASKOUT(0xf0)
-	MCFG_LATCH8_INVERT(0x0F)
+	LATCH8(config, m_ls175_3d); /* sound cmd latch */
+	m_ls175_3d->set_maskout(0xf0);
+	m_ls175_3d->set_xorvalue(0x0f);
 
-	MCFG_LATCH8_ADD("ls259.6h")
-	MCFG_LATCH8_WRITE_0(WRITELINE("discrete", discrete_device, write_line<DS_SOUND0_INP>))
-	MCFG_LATCH8_WRITE_1(WRITELINE("discrete", discrete_device, write_line<DS_SOUND1_INP>))
-	MCFG_LATCH8_WRITE_2(WRITELINE("discrete", discrete_device, write_line<DS_SOUND2_INP>))
-	MCFG_LATCH8_WRITE_6(WRITELINE("discrete", discrete_device, write_line<DS_SOUND6_INP>))
-	MCFG_LATCH8_WRITE_7(WRITELINE("discrete", discrete_device, write_line<DS_SOUND7_INP>))
+	LATCH8(config, m_dev_6h);
+	m_dev_6h->write_cb<0>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND0_INP>));
+	m_dev_6h->write_cb<1>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND1_INP>));
+	m_dev_6h->write_cb<2>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND2_INP>));
+	m_dev_6h->write_cb<6>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND6_INP>));
+	m_dev_6h->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND7_INP>));
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
 	 *   If P2.Bit6 -> activates the external compressed sample ROM (not radarscp1)
@@ -1333,10 +1333,10 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	 *   P2.Bit2-0  -> select the 256 byte bank for external ROM
 	 */
 
-	MCFG_LATCH8_ADD( "virtual_p2" ) /* virtual latch for port B */
-	MCFG_LATCH8_INVERT( 0x20 )      /* signal is inverted       */
-	MCFG_LATCH8_READ_5(READLINE("ls259.6h", latch8_device, bit3_r))
-	MCFG_LATCH8_WRITE_7(WRITELINE("discrete", discrete_device, write_line<DS_DISCHARGE_INV>))
+	LATCH8(config, m_dev_vp2);		/* virtual latch for port B */
+	m_dev_vp2->set_xorvalue(0x20);	/* signal is inverted       */
+	m_dev_vp2->read_cb<5>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
+	m_dev_vp2->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_DISCHARGE_INV>));
 
 	MCFG_DEVICE_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(dkong_sound_map)
@@ -1372,10 +1372,10 @@ MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
 	MCFG_MCS48_PORT_P2_IN_CB(CONSTANT(0))
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
-	MCFG_LATCH8_ADD( "virtual_p1" ) /* virtual latch for port A */
-	MCFG_LATCH8_INVERT( 0x80 )      /* signal is inverted       */
-	MCFG_LATCH8_READ_7(READLINE("ls259.6h", latch8_device, bit3_r))
-	MCFG_LATCH8_READ_6(READ8("tms", m58817_device, status_r))
+	latch8_device &vp1(LATCH8(config, "virtual_p1"));	/* virtual latch for port A */
+	vp1.set_xorvalue(0x80);								/* signal is inverted       */
+	vp1.read_cb<7>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
+	vp1.read_cb<6>().set("tms", FUNC(m58817_device::status_r));
 
 	/* tms memory controller */
 	MCFG_DEVICE_ADD("m58819", M58819, 0)
@@ -1392,26 +1392,25 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
 
 	/* sound latches */
-	MCFG_LATCH8_ADD("ls174.3d")
-	MCFG_LATCH8_MASKOUT(0xE0)
+	LATCH8(config, "ls174.3d").set_maskout(0xe0);
 
-	MCFG_LATCH8_ADD( "ls259.6h")
-	MCFG_LATCH8_WRITE_0(WRITELINE("discrete", discrete_device, write_line<DS_SOUND0_INP>))
-	MCFG_LATCH8_WRITE_1(WRITELINE("discrete", discrete_device, write_line<DS_SOUND1_INP>))
-	MCFG_LATCH8_WRITE_2(WRITELINE("discrete", discrete_device, write_line<DS_SOUND2_INP>))
-	MCFG_LATCH8_WRITE_7(WRITELINE("discrete", discrete_device, write_line<DS_SOUND7_INP>))
+	LATCH8(config, m_dev_6h);
+	m_dev_6h->write_cb<0>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND0_INP>));
+	m_dev_6h->write_cb<1>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND1_INP>));
+	m_dev_6h->write_cb<2>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND2_INP>));
+	m_dev_6h->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND7_INP>));
 
-	MCFG_LATCH8_ADD( "ls259.5h")
-	MCFG_LATCH8_WRITE_1(WRITELINE("discrete", discrete_device, write_line<DS_SOUND9_INP>))
+	latch8_device &dev_5h(LATCH8(config, "ls259.5h"));
+	dev_5h.write_cb<1>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND9_INP>));
 
-	MCFG_LATCH8_ADD( "ls259.4h")
+	latch8_device &dev_4h(LATCH8(config, "ls259.4h"));
 
-	MCFG_LATCH8_ADD( "virtual_p2" ) /* virtual latch for port B */
-	MCFG_LATCH8_INVERT( 0x70 )      /* all signals are inverted */
-	MCFG_LATCH8_READ_6(READLINE("ls259.4h", latch8_device, bit1_r))
-	MCFG_LATCH8_READ_5(READLINE("ls259.6h", latch8_device, bit3_r))
-	MCFG_LATCH8_READ_4(READLINE("ls259.6h", latch8_device, bit6_r))
-	MCFG_LATCH8_WRITE_7(WRITELINE("discrete", discrete_device, write_line<DS_DISCHARGE_INV>))
+	LATCH8(config, m_dev_vp2);		/* virtual latch for port B */
+	m_dev_vp2->set_xorvalue(0x70);	/* all signals are inverted */
+	m_dev_vp2->read_cb<6>().set(dev_4h, FUNC(latch8_device::bit1_r));
+	m_dev_vp2->read_cb<5>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
+	m_dev_vp2->read_cb<4>().set(m_dev_6h, FUNC(latch8_device::bit6_r));
+	m_dev_vp2->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_DISCHARGE_INV>));
 
 	MCFG_DEVICE_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(dkong_sound_map)
@@ -1437,9 +1436,9 @@ MACHINE_CONFIG_START(dkong_state::dkong3_audio)
 	MCFG_DEVICE_PROGRAM_MAP(dkong3_sound2_map)
 
 	/* sound latches */
-	MCFG_LATCH8_ADD( "latch1")
-	MCFG_LATCH8_ADD( "latch2")
-	MCFG_LATCH8_ADD( "latch3")
+	LATCH8(config, "latch1");
+	LATCH8(config, "latch2");
+	LATCH8(config, "latch3");
 
 	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
