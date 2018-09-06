@@ -57,7 +57,7 @@ public:
 	~netdev_tap();
 
 	int send(uint8_t *buf, int len) override;
-	void set_mac(const char *mac);
+	void set_mac(const char *mac) override;
 protected:
 	int recv_dev(uint8_t **buf) override;
 private:
