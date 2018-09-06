@@ -138,6 +138,7 @@ private:
 	uint8_t m_tandy_data[8];
 
 	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
+	uint8_t m_tandy_ppi_porta, m_tandy_ppi_ack;
 	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
 	uint8_t m_vram_bank;
 	static void cfg_fdc_35(device_t *device);
@@ -315,7 +316,10 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
 		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict
 		m_keyboard->enable(data&0x48);
 		if ( data & 0x80 )
+		{
 			m_mb->m_pic8259->ir1_w(0);
+			m_tandy_ppi_ack = 1;
+		}
 		break;
 	case 2:
 		m_tandy_ppi_portc = data;
@@ -333,7 +337,12 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	switch (offset)
 	{
 	case 0:
-		data = m_keyboard->read(space, 0);
+		if (m_tandy_ppi_ack)
+		{
+			m_tandy_ppi_porta = m_keyboard->read(space, 0);
+			m_tandy_ppi_ack = 0;
+		}
+		data = m_tandy_ppi_porta;
 		break;
 	case 1:
 		data=m_tandy_ppi_portb;
