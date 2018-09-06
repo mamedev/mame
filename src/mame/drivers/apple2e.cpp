@@ -4056,7 +4056,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	kbdc.ako().set(FUNC(apple2e_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2e_state, ay3600_repeat, attotime::from_hz(15))
+	timer_device &timer(TIMER(config, "repttmr", 0));
+	timer.configure_periodic(timer_device::expired_delegate(FUNC(apple2e_state::ay3600_repeat), this), attotime::from_hz(15));
 
 	/* slot devices */
 	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
