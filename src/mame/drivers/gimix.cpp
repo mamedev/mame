@@ -494,10 +494,10 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	ptm.irq_callback().set(FUNC(gimix_state::irq_w));  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_drq_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1797(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(gimix_state::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(gimix_state::fdc_drq_w));
+	m_fdc->set_force_ready(true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
 

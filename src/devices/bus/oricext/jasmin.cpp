@@ -72,15 +72,16 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 	return ROM_NAME( jasmin );
 }
 
-MACHINE_CONFIG_START(jasmin_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", WD1770, 8_MHz_XTAL)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, oricext_device, irq_w))
+void jasmin_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, fdc, 8_MHz_XTAL);
+	fdc->drq_wr_callback().set(FUNC(oricext_device::irq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", jasmin_floppies, nullptr, jasmin_device::floppy_formats);
+}
 
 ioport_constructor jasmin_device::device_input_ports() const
 {

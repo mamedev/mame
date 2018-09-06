@@ -635,10 +635,11 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
 	WD7600(config, m_wd7600, 50_MHz_XTAL / 2);
-	m_wd7600->set_cputag(":maincpu");
-	m_wd7600->set_isatag(":isa");
-	m_wd7600->set_biostag(":bios");
-	m_wd7600->set_keybctag(":keybc");
+	m_wd7600->set_cputag(m_maincpu);
+	m_wd7600->set_isatag("isa");
+	m_wd7600->set_ramtag(m_ram);
+	m_wd7600->set_biostag("bios");
+	m_wd7600->set_keybctag("keybc");
 	m_wd7600->hold_callback().set(FUNC(megapc_state::wd7600_hold));
 	m_wd7600->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_wd7600->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

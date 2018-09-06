@@ -1100,9 +1100,9 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))
 
-	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL/16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_drq_w))
+	MB8877(config, m_fdc, 16_MHz_XTAL/16);
+	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(v1050_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)

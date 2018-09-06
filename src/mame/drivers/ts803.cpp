@@ -462,8 +462,8 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
 
 	/* floppy disk */
-	MCFG_DEVICE_ADD("fdc", FD1793, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("sti", z80sti_device, i7_w))
+	FD1793(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)

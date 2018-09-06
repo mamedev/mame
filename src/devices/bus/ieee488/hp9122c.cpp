@@ -372,9 +372,9 @@ MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
 	// will not work
 	MCFG_QUANTUM_PERFECT_CPU("cpu")
 
-	MCFG_DEVICE_ADD("mb8876", MB8876, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp9122c_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this,hp9122c_device, fdc_drq_w))
+	MB8876(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(hp9122c_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(hp9122c_device::fdc_drq_w));
 
 	I8291A(config, m_i8291a, XTAL(2'000'000));
 	m_i8291a->eoi_write().set(FUNC(hp9122c_device::i8291a_eoi_w));

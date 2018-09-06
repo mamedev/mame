@@ -103,14 +103,15 @@ static void ep64_exdos_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ep64_exdos_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 8_MHz_XTAL)
+void ep64_exdos_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":2", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":3", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+}
 
 
 //**************************************************************************

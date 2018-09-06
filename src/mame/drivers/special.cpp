@@ -468,8 +468,8 @@ MACHINE_CONFIG_START(special_state::specimx)
 	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, special_state, fdc_drq))
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","special_flop")
@@ -520,8 +520,8 @@ MACHINE_CONFIG_START(special_state::erik)
 	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, special_state, fdc_drq))
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 

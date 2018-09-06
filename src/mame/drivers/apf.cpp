@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("apf_cass")
 
-	MCFG_DEVICE_ADD("fdc", FD1771, 1000000) // guess
+	FD1771(config, m_fdc, 1000000); // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)

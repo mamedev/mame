@@ -89,43 +89,40 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_opus8272_device::device_add_mconfig)
-	MCFG_I8272A_ADD("i8272", true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, bbc_opus8272_device, fdc_intrq_w))
-	MCFG_FLOPPY_DRIVE_ADD("i8272:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("i8272:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_opus8272_device::device_add_mconfig(machine_config &config)
+{
+	I8272A(config, m_fdc, 0);
+	m_fdc->set_ready_line_connected(true);
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_opus8272_device::fdc_intrq_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(bbc_opus2791_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", WD2791, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, motor_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_opus2791_device::device_add_mconfig(machine_config &config)
+{
+	WD2791(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->drq_wr_callback().set(FUNC(bbc_opusfdc_device::fdc_drq_w));
+	m_fdc->hld_wr_callback().set(FUNC(bbc_opusfdc_device::motor_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(bbc_opus2793_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, motor_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_opus2793_device::device_add_mconfig(machine_config &config)
+{
+	WD2793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->drq_wr_callback().set(FUNC(bbc_opusfdc_device::fdc_drq_w));
+	m_fdc->hld_wr_callback().set(FUNC(bbc_opusfdc_device::motor_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(bbc_opus1770_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", WD1770, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_opus1770_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->drq_wr_callback().set(FUNC(bbc_opusfdc_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
+}
 
 const tiny_rom_entry *bbc_opus8272_device::device_rom_region() const
 {
@@ -169,10 +166,10 @@ bbc_opus8272_device::bbc_opus8272_device(const machine_config &mconfig, const ch
 bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
-	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1")
+	m_floppy1(*this, "fdc:1"),
+	m_dfs_rom(*this, "dfs_rom")
 {
 }
 

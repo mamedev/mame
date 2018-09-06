@@ -342,11 +342,11 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	m_ppi_m->out_pa_callback().set(FUNC(mbc200_state::pm_porta_w));
 	m_ppi_m->out_pb_callback().set(FUNC(mbc200_state::pm_portb_w));
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0) // INS8251N
+	I8251(config, "uart1", 0); // INS8251N
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0) // INS8251A
+	I8251(config, "uart2", 0); // INS8251A
 
-	MCFG_DEVICE_ADD("fdc", MB8876, 8_MHz_XTAL / 8) // guess
+	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
