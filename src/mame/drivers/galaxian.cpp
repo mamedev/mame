@@ -10725,6 +10725,29 @@ ROM_START( froggrs )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
+/* Video Dens Frogger */
+ROM_START( froggervd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "frogvd_r1-libro-s1.ac9", 0x0000, 0x0800, CRC(81c2020e) SHA1(8c9292b399a408795e78b7dc5c706d3b526d3751) ) // 2716
+	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(70385c20) SHA1(db60199e52a71ec404e54705abed646449aa13f4) ) // 2716
+	ROM_LOAD( "frogvd_r3-libro-s3.af9", 0x1000, 0x0800, CRC(637a2ff8) SHA1(e9b9fc692ca5d8deb9cd30d9d73ad25c8d8bafe1) ) // 2716
+	ROM_LOAD( "frogvd_r4-libro-s4.ah9", 0x1800, 0x0800, CRC(1dc9ab15) SHA1(94b327dd2eaf0ffb19fee86a2a890a0012d52849) ) // 2716
+	ROM_LOAD( "frogvd_r5-libro-s5.aj9", 0x2000, 0x0800, CRC(35e11cd2) SHA1(c2d01324c052d79ad9de00d13ddc4322f9c44292) ) // 2716
+	ROM_LOAD( "frogvd_r6-libro-s6.al9", 0x2800, 0x0800, CRC(5db899ed) SHA1(e8d75daba8dfdb89078068a29a0ccf040dfca4da) ) // 2716
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "frogvd_r11-ot1.bc5", 0x0000, 0x0800, CRC(79326efe) SHA1(087cd61ba9c09be6ff71be8f89933a4a0f620650) ) // 2716
+	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(1310187a) SHA1(4126fea917268391d96901a4fa474a444380427f) ) // 2716
+	ROM_LOAD( "frogvd_r13-ot3.be5", 0x1000, 0x0800, CRC(31d7eb27) SHA1(2e1d34ae4da385fd7cac94707d25eeddf4604e1a) ) // 2716
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "frogvd_r9-libro-c1.af9",  0x0000, 0x0800, CRC(05f7d883) SHA1(78831fd287da18928651a8adb7e578d291493eff) ) // 2716
+	ROM_LOAD( "frogvd_r10-libro-c2.ah9", 0x0800, 0x0800, CRC(658745f8) SHA1(e4e5c3e011c8a7233a36d29e10e08905873500aa) ) // 2716
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "frogvd.5e", 0x0000, 0x0020, CRC(c5f12bc3) SHA1(b746ba06b596d4227fdc730a23bdf495f84e6a72) ) // 74s288n dumped as 82s123
+ROM_END
+
 ROM_START( quaak )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1f.bin",   0x0000, 0x0800, CRC(5d0e2716) SHA1(c484ae162bfe5ef9d5d2a6930c9c476394e70bbd) )
@@ -12537,6 +12560,7 @@ GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, init_
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogg,       frogger,  frogg,      frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, init_froggrs,    ROT90,  "bootleg (Coin Music)", "Frogger (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggervd,   frogger,  froggers,   frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Video Dens)", "Frogger (Video Dens, Spanish bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1981, quaak,       frogger,  quaak,      frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg", "Quaak (bootleg of Frogger)", MACHINE_SUPPORTS_SAVE ) // closest to Super Cobra hardware, presumably a bootleg from Germany (Quaak is the German frog sound)
 GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_quaak,      ROT90,  "bootleg", "Frogger (bootleg on Amigo? hardware)", MACHINE_SUPPORTS_SAVE ) // meant to be Amigo hardware, but maybe a different bootleg than the one we have?
 
