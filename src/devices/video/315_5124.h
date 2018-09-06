@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -28,7 +27,8 @@ DECLARE_DEVICE_TYPE(SEGA315_5377, sega315_5377_device)      /* aka Gamegear (2 A
 
 class sega315_5124_device : public device_t,
 							public device_memory_interface,
-							public device_video_interface
+							public device_video_interface,
+							public device_palette_interface
 {
 public:
 	static constexpr unsigned WIDTH                      = 342;    /* 342 pixels */
@@ -67,8 +67,6 @@ public:
 	DECLARE_READ8_MEMBER( vcount_read );
 	DECLARE_READ8_MEMBER( hcount_read );
 
-	DECLARE_PALETTE_INIT( sega315_5124 );
-
 	void hcount_latch() { hcount_latch_at_hpos(screen().hpos()); };
 	void hcount_latch_at_hpos(int hpos);
 
@@ -94,8 +92,12 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 64+16; }
+
 	void set_display_settings();
 	void set_frame_timing();
+	virtual void init_palette();
 	virtual void update_palette();
 	virtual void write_memory(uint8_t data);
 	virtual void cram_write(uint8_t data);
@@ -189,8 +191,6 @@ protected:
 	static constexpr device_timer_id TIMER_VINT = 5;
 	static constexpr device_timer_id TIMER_NMI = 6;
 	static constexpr device_timer_id TIMER_FLAGS = 7;
-
-	required_device<palette_device> m_palette;
 };
 
 
@@ -220,12 +220,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 4096; }
+
+	virtual void init_palette() override;
 	virtual void update_palette() override;
 	virtual void cram_write(uint8_t data) override;
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line) override;
-
-private:
-	DECLARE_PALETTE_INIT( sega315_5377 );
 };
 
 
@@ -238,6 +239,11 @@ public:
 	void stop_timers();
 
 protected:
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 512; }
+
+	virtual void init_palette() override;
+	virtual void update_palette() override;
 	virtual void write_memory(uint8_t data) override;
 	virtual void load_vram_addr(uint8_t data) override;
 	virtual void select_sprites(int line) override;

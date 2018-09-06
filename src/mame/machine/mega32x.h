@@ -11,9 +11,8 @@
 #include "cpu/sh/sh2comn.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "emupal.h"
 
-class sega_32x_device : public device_t
+class sega_32x_device : public device_t, public device_palette_interface
 {
 public:
 	void pause_cpu();
@@ -29,9 +28,6 @@ public:
 		m_32x_hcount_compare_val = -1;
 		update_total_scanlines(mode3);
 	}
-
-	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
@@ -101,7 +97,7 @@ public:
 	SH2_DMA_FIFO_DATA_AVAILABLE_CB(_32x_fifo_available_callback);
 
 	void _32x_render_videobuffer_to_screenbuffer_helper(int scanline);
-	void _32x_render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint16_t &lineptr);
+	void _32x_render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
 	void _32x_check_framebuffer_swap(bool enabled);
@@ -118,6 +114,9 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 32*32*32; }
 
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
@@ -193,7 +192,6 @@ private:
 	std::unique_ptr<uint16_t[]> m_32x_dram1;
 	uint16_t *m_32x_display_dram, *m_32x_access_dram;
 	std::unique_ptr<uint16_t[]> m_32x_palette;
-	std::unique_ptr<uint16_t[]> m_32x_palette_lookup;
 
 	uint16_t m_fifo_block_a[4];
 	uint16_t m_fifo_block_b[4];
@@ -203,8 +201,6 @@ private:
 	int m_current_fifo_read_pos;
 	int m_fifo_block_a_full;
 	int m_fifo_block_b_full;
-
-	required_device<palette_device> m_palette;
 };
 
 
@@ -246,8 +242,5 @@ protected:
 
 DECLARE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device)
 DECLARE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device)
-
-#define MCFG_SEGA_32X_PALETTE(_palette_tag) \
-	downcast<sega_32x_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_MACHINE_MEGA32X_H

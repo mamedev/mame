@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "sound/sn76496.h"
 
+#include "emupal.h"
 
 #define MCFG_SEGA315_5313_IS_PAL(_bool) \
 	downcast<sega315_5313_device &>(*device).set_signal_type(_bool);
@@ -63,7 +64,7 @@ public:
 
 	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	typedef device_delegate<void (int x, uint32_t priority, uint16_t &lineptr)> md_32x_scanline_delegate;
+	typedef device_delegate<void (int x, uint32_t priority, uint32_t &lineptr)> md_32x_scanline_delegate;
 	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
 	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 
@@ -113,8 +114,8 @@ public:
 			m_render_bitmap->fill(0);
 	}
 
-	std::unique_ptr<bitmap_ind16> m_render_bitmap;
-	std::unique_ptr<uint16_t[]> m_render_line;
+	std::unique_ptr<bitmap_rgb32> m_render_bitmap;
+	std::unique_ptr<uint32_t[]> m_render_line;
 	std::unique_ptr<uint16_t[]> m_render_line_raw;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
@@ -225,6 +226,7 @@ private:
 	address_space *m_space68k;
 	required_device<m68000_base_device> m_cpu68k;
 	required_device<sn76496_base_device> m_snsnd;
+	optional_device<palette_device> m_palette;
 };
 
 

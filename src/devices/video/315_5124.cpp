@@ -69,9 +69,6 @@ PAL frame timing
 #include "video/315_5124.h"
 
 
-#define SEGA315_5124_PALETTE_SIZE     (64 + 16)
-#define SEGA315_5377_PALETTE_SIZE     4096
-
 #define VRAM_SIZE             0x4000
 
 #define STATUS_VINT           0x80  /* Pending vertical interrupt flag */
@@ -119,44 +116,56 @@ DEFINE_DEVICE_TYPE(SEGA315_5246, sega315_5246_device, "sega315_5246", "Sega 315-
 DEFINE_DEVICE_TYPE(SEGA315_5377, sega315_5377_device, "sega315_5377", "Sega 315-5377 Gamegear VDP")
 
 
-PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
+void sega315_5124_device::init_palette()
 {
 	for (int i = 0; i < 64; i++)
 	{
 		const int r = i & 0x03;
 		const int g = (i & 0x0c) >> 2;
 		const int b = (i & 0x30) >> 4;
-		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
+		set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 	/* sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette */
 	/* TMS9918 palette */
-	palette.set_pen_color(64+ 0,   0,   0,   0); // palette.set_pen_color(64+ 0,   0,   0,   0);
-	palette.set_pen_color(64+ 1,   0,   0,   0); // palette.set_pen_color(64+ 1,   0,   0,   0);
-	palette.set_pen_color(64+ 2,   0, 170,   0); // palette.set_pen_color(64+ 2,  33, 200,  66);
-	palette.set_pen_color(64+ 3,   0, 255,   0); // palette.set_pen_color(64+ 3,  94, 220, 120);
-	palette.set_pen_color(64+ 4,   0,   0,  85); // palette.set_pen_color(64+ 4,  84,  85, 237);
-	palette.set_pen_color(64+ 5,   0,   0, 255); // palette.set_pen_color(64+ 5, 125, 118, 252);
-	palette.set_pen_color(64+ 6,  85,   0,   0); // palette.set_pen_color(64+ 6, 212,  82,  77);
-	palette.set_pen_color(64+ 7,   0, 255, 255); // palette.set_pen_color(64+ 7,  66, 235, 245);
-	palette.set_pen_color(64+ 8, 170,   0,   0); // palette.set_pen_color(64+ 8, 252,  85,  84);
-	palette.set_pen_color(64+ 9, 255,   0,   0); // palette.set_pen_color(64+ 9, 255, 121, 120);
-	palette.set_pen_color(64+10,  85,  85,   0); // palette.set_pen_color(64+10, 212, 193,  84);
-	palette.set_pen_color(64+11, 255, 255,   0); // palette.set_pen_color(64+11, 230, 206, 128);
-	palette.set_pen_color(64+12,   0,  85,   0); // palette.set_pen_color(64+12,  33, 176,  59);
-	palette.set_pen_color(64+13, 255,   0, 255); // palette.set_pen_color(64+13, 201,  91, 186);
-	palette.set_pen_color(64+14,  85,  85,  85); // palette.set_pen_color(64+14, 204, 204, 204);
-	palette.set_pen_color(64+15, 255, 255, 255); // palette.set_pen_color(64+15, 255, 255, 255);
+	set_pen_color(64+ 0,   0,   0,   0); // set_pen_color(64+ 0,   0,   0,   0);
+	set_pen_color(64+ 1,   0,   0,   0); // set_pen_color(64+ 1,   0,   0,   0);
+	set_pen_color(64+ 2,   0, 170,   0); // set_pen_color(64+ 2,  33, 200,  66);
+	set_pen_color(64+ 3,   0, 255,   0); // set_pen_color(64+ 3,  94, 220, 120);
+	set_pen_color(64+ 4,   0,   0,  85); // set_pen_color(64+ 4,  84,  85, 237);
+	set_pen_color(64+ 5,   0,   0, 255); // set_pen_color(64+ 5, 125, 118, 252);
+	set_pen_color(64+ 6,  85,   0,   0); // set_pen_color(64+ 6, 212,  82,  77);
+	set_pen_color(64+ 7,   0, 255, 255); // set_pen_color(64+ 7,  66, 235, 245);
+	set_pen_color(64+ 8, 170,   0,   0); // set_pen_color(64+ 8, 252,  85,  84);
+	set_pen_color(64+ 9, 255,   0,   0); // set_pen_color(64+ 9, 255, 121, 120);
+	set_pen_color(64+10,  85,  85,   0); // set_pen_color(64+10, 212, 193,  84);
+	set_pen_color(64+11, 255, 255,   0); // set_pen_color(64+11, 230, 206, 128);
+	set_pen_color(64+12,   0,  85,   0); // set_pen_color(64+12,  33, 176,  59);
+	set_pen_color(64+13, 255,   0, 255); // set_pen_color(64+13, 201,  91, 186);
+	set_pen_color(64+14,  85,  85,  85); // set_pen_color(64+14, 204, 204, 204);
+	set_pen_color(64+15, 255, 255, 255); // set_pen_color(64+15, 255, 255, 255);
 }
 
 
-PALETTE_INIT_MEMBER(sega315_5377_device, sega315_5377)
+void sega315_5377_device::init_palette()
 {
 	for (int i = 0; i < 4096; i++)
 	{
 		const int r = i & 0x000f;
 		const int g = (i & 0x00f0) >> 4;
 		const int b = (i & 0x0f00) >> 8;
-		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
+		set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
+	}
+}
+
+
+void sega315_5313_mode4_device::init_palette()
+{
+	for (int i = 0; i < 512; i++)
+	{
+		const int r = i & 0x0007;
+		const int g = (i & 0x0038) >> 3;
+		const int b = (i & 0x01c0) >> 6;
+		set_pen_color(i, pal3bit(r), pal3bit(g), pal3bit(b));
 	}
 }
 
@@ -178,6 +187,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_cram_size(cram_size)
 	, m_line_timing(line_timing)
 	, m_palette_offset(palette_offset)
@@ -189,7 +199,6 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_csync_cb(*this)
 	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
-	, m_palette(*this, "palette")
 {
 }
 
@@ -399,7 +408,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			/* Draw left border */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+			m_tmpbitmap.fill(pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 		}
 		break;
@@ -414,7 +423,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			/* Draw right border */
 			rec.min_x = LBORDER_START + LBORDER_WIDTH + 256;
 			rec.max_x = rec.min_x + RBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+			m_tmpbitmap.fill(pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 		}
 		break;
@@ -1623,7 +1632,7 @@ void sega315_5124_device::draw_scanline(int pixel_offset_x, int pixel_plot_y, in
 
 		rec.min_x = pixel_offset_x;
 		rec.max_x = pixel_offset_x + 255;
-		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+		m_tmpbitmap.fill(pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 	}
 	else
@@ -1644,7 +1653,7 @@ void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* Fill column 0 with overscan color from m_reg[0x07] */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while(++x < 8);
@@ -1652,7 +1661,7 @@ void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected
 
 	do
 	{
-		p_bitmap[x] = m_palette->pen(line_buffer[x]);
+		p_bitmap[x] = pen(line_buffer[x]);
 		p_y1[x] = (priority_selected[x] & 0x0f) ? 1 : 0;
 	}
 	while(++x < 256);
@@ -1674,7 +1683,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* border on left side of the GG active screen */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while (++x < 48);
@@ -1683,7 +1692,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		{
 			do
 			{
-				p_bitmap[x] = m_palette->pen(line_buffer[x]);
+				p_bitmap[x] = pen(line_buffer[x]);
 				p_y1[x] = (priority_selected[x] & 0x0f) ? 1 : 0;
 			}
 			while (++x < 208);
@@ -1693,7 +1702,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 			/* top/bottom GG border */
 			do
 			{
-				p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+				p_bitmap[x] = pen(m_current_palette[BACKDROP_COLOR]);
 				p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 			}
 			while (++x < 208);
@@ -1702,7 +1711,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* border on right side of the GG active screen */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while (++x < 256);
@@ -1752,6 +1761,27 @@ void sega315_5377_device::update_palette()
 	{
 		for (int i = 0; i < 32; i++)
 			m_current_palette[i] = (m_CRAM[2*i] | (m_CRAM[2*i+1] << 8)) & 0x0fff;
+	}
+}
+
+
+void sega315_5313_mode4_device::update_palette()
+{
+	/* Exit if palette has no changes */
+	if (!m_cram_dirty)
+	{
+		return;
+	}
+	m_cram_dirty = false;
+
+	if (m_vdp_mode != 4)
+	{
+		return;
+	}
+
+	for (int i = 0; i < 32; i++)
+	{
+		m_current_palette[i] = ((m_CRAM[i] & 0x30) << 3) | ((m_CRAM[i] & 0x0c ) << 2) | ((m_CRAM[i] & 0x03) << 1);
 	}
 }
 
@@ -1826,6 +1856,7 @@ void sega315_5124_device::vdp_postload()
 
 void sega315_5124_device::device_start()
 {
+	init_palette();
 	/* Resolve callbacks */
 	m_int_cb.resolve();
 	m_csync_cb.resolve();
@@ -1932,8 +1963,6 @@ void sega315_5124_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sega315_5124_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
 
 void sega315_5377_device::device_reset()
@@ -1947,6 +1976,4 @@ void sega315_5377_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sega315_5377_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", SEGA315_5377_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(sega315_5377_device, sega315_5377)
 MACHINE_CONFIG_END
