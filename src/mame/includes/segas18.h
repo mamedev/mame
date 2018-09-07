@@ -95,7 +95,7 @@ private:
 	DECLARE_WRITE16_MEMBER( wwally_custom_io_w );
 
 	// video rendering
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_s18);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
@@ -175,6 +175,7 @@ private:
 	int                 m_vdp_enable;
 	uint8_t               m_vdp_mixing;
 	bitmap_ind16        m_temp_bitmap;
+	bitmap_ind16        m_bitmap_buffer;
 
 	// game-specific state
 	uint8_t               m_lghost_value;

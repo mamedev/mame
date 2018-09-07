@@ -2721,7 +2721,8 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 				case 0x1a000: // (sprite)shadow set, highlight set - not possible
 				case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 				default:
-					lineptr[x] = m_render_line_raw[x] |= (machine().rand() & 0x3f);
+					lineptr[x] = pen(machine().rand() & 0x3f);
+					m_render_line_raw[x] |= (machine().rand() & 0x3f);
 					break;
 			}
 		}

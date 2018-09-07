@@ -29,6 +29,7 @@
 void segas18_state::video_start()
 {
 	m_temp_bitmap.allocate(m_screen->width(), m_screen->height());
+	m_bitmap_buffer.allocate(m_screen->width(), m_screen->height());
 	m_grayscale_enable = 0;
 	m_vdp_enable = 0;
 	m_vdp_mixing = 0;
@@ -40,6 +41,7 @@ void segas18_state::video_start()
 	save_item(NAME(m_vdp_enable));
 	save_item(NAME(m_vdp_mixing));
 	save_item(NAME(m_temp_bitmap));
+	save_item(NAME(m_bitmap_buffer));
 }
 
 
@@ -137,7 +139,7 @@ void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const 
  *
  *************************************/
 
-uint32_t segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas18_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 /*
     Current understanding of VDP mixing:
@@ -197,27 +199,28 @@ uint32_t segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_sprites->draw_async(cliprect);
 
 	// reset priorities
+	m_bitmap_buffer.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	// draw background opaquely first, not setting any priorities
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
-	if (m_vdp_enable && vdplayer == 0) draw_vdp(screen, bitmap, cliprect, vdppri);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
+	if (m_vdp_enable && vdplayer == 0) draw_vdp(screen, m_bitmap_buffer, cliprect, vdppri);
 
 	// draw background again to draw non-transparent pixels over the VDP and set the priority
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
-	if (m_vdp_enable && vdplayer == 1) draw_vdp(screen, bitmap, cliprect, vdppri);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
+	if (m_vdp_enable && vdplayer == 1) draw_vdp(screen, m_bitmap_buffer, cliprect, vdppri);
 
 	// draw foreground
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
-	if (m_vdp_enable && vdplayer == 2) draw_vdp(screen, bitmap, cliprect, vdppri);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
+	if (m_vdp_enable && vdplayer == 2) draw_vdp(screen, m_bitmap_buffer, cliprect, vdppri);
 
 	// text layer
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x04);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
-	if (m_vdp_enable && vdplayer == 3) draw_vdp(screen, bitmap, cliprect, vdppri);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x04);
+	m_segaic16vid->tilemap_draw( screen, m_bitmap_buffer, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
+	if (m_vdp_enable && vdplayer == 3) draw_vdp(screen, m_bitmap_buffer, cliprect, vdppri);
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
@@ -225,7 +228,7 @@ uint32_t segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *dest = &m_bitmap_buffer.pix(y);
 			uint16_t *src = &sprites.pix(y);
 			uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
@@ -254,15 +257,26 @@ uint32_t segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 #if DEBUG_VDP
 	if (m_vdp_enable && machine().input().code_pressed(KEYCODE_V))
 	{
-		bitmap.fill(m_palette->black_pen(), cliprect);
-		update_system18_vdp(bitmap, cliprect);
+		m_bitmap_buffer.fill(m_palette->black_pen(), cliprect);
+		update_system18_vdp(m_bitmap_buffer, cliprect);
 	}
-	if (vdp_enable && machine().input().code_pressed(KEYCODE_B))
+	if (m_vdp_enable && machine().input().code_pressed(KEYCODE_B))
 	{
 		FILE *f = fopen("vdp.bin", "w");
 		fwrite(m_temp_bitmap->base(), 1, m_temp_bitmap->rowpixels() * (m_temp_bitmap->bpp() / 8) * m_temp_bitmap->height(), f);
 		fclose(f);
 	}
 #endif
+
+	const pen_t *pal = m_palette->pens();
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++) // convert index to rgb32
+	{
+		uint32_t *dest = &bitmap.pix32(y);
+		uint16_t *src = &m_bitmap_buffer.pix16(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			dest[x] = pal[src[x]];
+		}
+	}
 	return 0;
 }
