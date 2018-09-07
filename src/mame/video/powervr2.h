@@ -501,7 +501,7 @@ private:
 	uint32_t tex_r_default(texinfo *t, float x, float y);
 	void tex_get_info(texinfo *t);
 
-	template <pix_sample_fn sample_fn>
+	template <pix_sample_fn sample_fn, int group_no>
 		inline void render_hline(bitmap_rgb32 &bitmap, texinfo *ti,
 									int y, float xl, float xr,
 									float ul, float ur, float vl, float vr,
@@ -509,7 +509,7 @@ private:
 									float const bl[4], float const br[4],
 									float const offl[4], float const offr[4]);
 
-	template <pix_sample_fn sample_fn>
+	template <pix_sample_fn sample_fn, int group_no>
 		inline void render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 								float y0, float y1,
 								float xl, float xr,
@@ -525,14 +525,18 @@ private:
 								float const dbldy[4], float const dbrdy[4],
 								float const doldy[4], float const dordy[4]);
 
-	template <pix_sample_fn sample_fn>
+	template <pix_sample_fn sample_fn, int group_no>
 		inline void render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti,
 										const vert *v0,
 										const vert *v1, const vert *v2);
 
+	template <int group_no>
+		void render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v);
+
+	template <int group_no>
+		void render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void sort_vertices(const vert *v, int *i0, int *i1, int *i2);
-	void render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v);
-	void render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int group_no);
 	void render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void pvr_accumulationbuffer_to_framebuffer(address_space &space, int x, int y);
 	void pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &cliprect);
