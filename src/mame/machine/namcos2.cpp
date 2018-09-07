@@ -111,10 +111,19 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 	{
 		m_c68->set_input_line(INPUT_LINE_RESET, state);
 	}
-	else
+	else if (m_mcu)
 	{
 		m_mcu->set_input_line(INPUT_LINE_RESET, state);
 	}
+	else if (m_c65)
+	{
+		m_c65->ext_reset(state);
+	}
+	else
+	{
+		logerror("no MCU to reset?\n");
+	}
+
 	switch( m_gametype )
 	{
 	case NAMCOS21_SOLVALOU:
@@ -143,10 +152,6 @@ MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
-
-	m_mcu_analog_ctrl = 0;
-	m_mcu_analog_data = 0xaa;
-	m_mcu_analog_complete = 0;
 
 	/* Initialise the bank select in the sound CPU */
 	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
@@ -437,117 +442,4 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
 	uint32_t max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max; /* 991104.CAB */
 	membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
-}
-
-/**************************************************************/
-/*                                                            */
-/*  68705 IO CPU Support functions                            */
-/*                                                            */
-/**************************************************************/
-
-WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
-{
-	m_mcu_analog_ctrl = data & 0xff;
-
-	/* Check if this is a start of conversion */
-	/* Input ports 2 through 9 are the analog channels */
-
-	if(data & 0x40)
-	{
-	/* Set the conversion complete flag */
-		m_mcu_analog_complete = 2;
-		/* We convert instantly, good eh! */
-		switch((data>>2) & 0x07)
-		{
-		case 0:
-			m_mcu_analog_data=ioport("AN0")->read();
-			break;
-		case 1:
-			m_mcu_analog_data=ioport("AN1")->read();
-			break;
-		case 2:
-			m_mcu_analog_data=ioport("AN2")->read();
-			break;
-		case 3:
-			m_mcu_analog_data=ioport("AN3")->read();
-			break;
-		case 4:
-			m_mcu_analog_data=ioport("AN4")->read();
-			break;
-		case 5:
-			m_mcu_analog_data=ioport("AN5")->read();
-			break;
-		case 6:
-			m_mcu_analog_data=ioport("AN6")->read();
-			break;
-		case 7:
-			m_mcu_analog_data=ioport("AN7")->read();
-			break;
-		default:
-			output().set_value("anunk",data);
-		}
-#if 0
-		/* Perform the offset handling on the input port */
-		/* this converts it to a twos complement number */
-		if( m_gametype == NAMCOS2_DIRT_FOX ||
-			m_gametype == NAMCOS2_DIRT_FOX_JP )
-		{
-			m_mcu_analog_data ^= 0x80;
-		}
-#endif
-		/* If the interrupt enable bit is set trigger an A/D IRQ */
-		if(data & 0x20)
-		{
-			m_mcu->pulse_input_line(HD63705_INT_ADCONV, m_mcu->minimum_quantum_time());
-		}
-	}
-}
-
-READ8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_r )
-{
-	int data=0;
-
-	/* ADEF flag is only cleared AFTER a read from control THEN a read from DATA */
-	if(m_mcu_analog_complete==2) m_mcu_analog_complete=1;
-	if(m_mcu_analog_complete) data|=0x80;
-
-	/* Mask on the lower 6 register bits, Irq EN/Channel/Clock */
-	data|=m_mcu_analog_ctrl&0x3f;
-	/* Return the value */
-	return data;
-}
-
-WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_port_w )
-{
-}
-
-READ8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_port_r )
-{
-	if(m_mcu_analog_complete==1) m_mcu_analog_complete=0;
-	return m_mcu_analog_data;
-}
-
-WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_port_d_w )
-{
-	/* Undefined operation on write */
-}
-
-READ8_MEMBER( namcos2_shared_state::namcos2_mcu_port_d_r )
-{
-	/* Provides a digital version of the analog ports */
-	int threshold = 0x7f;
-	int data = 0;
-
-	/* Read/convert the bits one at a time */
-	if(ioport("AN0")->read() > threshold) data |= 0x01;
-	if(ioport("AN1")->read() > threshold) data |= 0x02;
-	if(ioport("AN2")->read() > threshold) data |= 0x04;
-	if(ioport("AN3")->read() > threshold) data |= 0x08;
-	if(ioport("AN4")->read() > threshold) data |= 0x10;
-	if(ioport("AN5")->read() > threshold) data |= 0x20;
-	if(ioport("AN6")->read() > threshold) data |= 0x40;
-	if(ioport("AN7")->read() > threshold) data |= 0x80;
-
-	/* Return the result */
-	return data;
 }

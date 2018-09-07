@@ -18,6 +18,7 @@
 #include "sound/c140.h"
 #include "video/c45.h"
 #include "video/namco_c116.h"
+#include "machine/namco65.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -127,6 +128,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_slave(*this, "slave")
 		, m_mcu(*this, "mcu")
+		, m_c65(*this, "c65mcu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -149,9 +151,6 @@ protected:
 	// game type helpers
 	bool is_system21();
 
-	int m_mcu_analog_ctrl;
-	int m_mcu_analog_data;
-	int m_mcu_analog_complete;
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
@@ -266,18 +265,14 @@ protected:
 	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
 	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
 
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_port_d_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_port_d_r );
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_analog_ctrl_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_analog_ctrl_r );
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_analog_port_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_analog_port_r );
 	DECLARE_WRITE8_MEMBER( namcos2_sound_bankselect_w );
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
 	optional_device<cpu_device> m_mcu;
+	optional_device<namcoc65_device> m_c65;
+
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -297,6 +292,7 @@ public:
 
 	void configure_c116_standard(machine_config &config);
 	void configure_c148_standard(machine_config &config);
+	void configure_c65_standard(machine_config &config);
 	void metlhawk(machine_config &config);
 	void gollygho(machine_config &config);
 	void assaultp(machine_config &config);
