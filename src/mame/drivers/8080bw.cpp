@@ -419,7 +419,7 @@ MACHINE_CONFIG_START(_8080bw_state::invadpt2)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(_8080bw_state::spcewars)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	MCFG_DEVICE_PROGRAM_MAP(invrvnge_sound_map)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
@@ -1123,7 +1123,7 @@ MACHINE_CONFIG_START(_8080bw_state::lrescue)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1155,7 +1155,7 @@ MACHINE_CONFIG_START(_8080bw_state::escmars)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1256,7 +1256,7 @@ MACHINE_CONFIG_START(_8080bw_state::cosmicmo)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* sound hardware */
 	invaders_audio(config);
@@ -1404,7 +1404,7 @@ MACHINE_CONFIG_START(_8080bw_state::rollingc)
 	MCFG_DEVICE_IO_MAP(rollingc_io_map)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1553,7 +1553,7 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 	MCFG_TIMER_DRIVER_ADD("schaser_sh_555", _8080bw_state, schaser_effect_555_cb)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1683,7 +1683,7 @@ MACHINE_CONFIG_START(_8080bw_state::schasercv)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schasercv)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1782,7 +1782,7 @@ MACHINE_CONFIG_START(_8080bw_state::sflush)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1887,7 +1887,7 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2057,7 +2057,7 @@ MACHINE_CONFIG_START(_8080bw_state::polaris)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,polaris)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2184,7 +2184,7 @@ MACHINE_CONFIG_START(_8080bw_state::ballbomb)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2433,7 +2433,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbt)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2459,7 +2459,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbtbr)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2534,7 +2534,7 @@ MACHINE_CONFIG_START(_8080bw_state::steelwkr)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2962,7 +2962,7 @@ MACHINE_CONFIG_START(_8080bw_state::vortex)
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	invaders_audio(config);
@@ -3379,7 +3379,7 @@ MACHINE_CONFIG_START(_8080bw_state::attackfc)
 	MCFG_DEVICE_IO_MAP(attackfc_io_map)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* sound hardware */
 	// TODO: custom discrete

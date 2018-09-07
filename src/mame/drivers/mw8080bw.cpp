@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(mw8080bw_state::seawolf)
 	/* there is no watchdog */
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	seawolf_audio(config);
@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(mw8080bw_state::gunfight)
 	/* there is no watchdog */
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	gunfight_audio(config);
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(mw8080bw_state::tornbase)
 	/* there is no watchdog */
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	tornbase_audio(config);
@@ -858,7 +858,7 @@ MACHINE_CONFIG_START(mw8080bw_state::zzzap)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_M(1), CAP_U(1))); /* 1.1s */
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	/* zzzap_audio(config); */
@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(mw8080bw_state::boothill)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))); /* 2.97s */
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	boothill_audio(config);
@@ -1301,7 +1301,7 @@ MACHINE_CONFIG_START(mw8080bw_state::desertgu)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	desertgu_audio(config);
@@ -1503,7 +1503,7 @@ MACHINE_CONFIG_START(mw8080bw_state::dplay)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	dplay_audio(config);
@@ -1600,7 +1600,7 @@ MACHINE_CONFIG_START(mw8080bw_state::gmissile)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	gmissile_audio(config);
@@ -1695,7 +1695,7 @@ MACHINE_CONFIG_START(mw8080bw_state::m4)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	m4_audio(config);
@@ -1865,7 +1865,7 @@ MACHINE_CONFIG_START(mw8080bw_state::clowns)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	clowns_audio(config);
@@ -1962,7 +1962,7 @@ MACHINE_CONFIG_START(mw8080bw_state::spacwalk)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	spacwalk_audio(config);
@@ -2045,7 +2045,7 @@ MACHINE_CONFIG_START(mw8080bw_state::shuffle)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	shuffle_audio(config);
@@ -2133,7 +2133,7 @@ MACHINE_CONFIG_START(mw8080bw_state::dogpatch)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	dogpatch_audio(config);
@@ -2387,7 +2387,7 @@ MACHINE_CONFIG_START(mw8080bw_state::phantom2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mw8080bw_state, screen_vblank_phantom2))
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	phantom2_audio(config);
@@ -2523,7 +2523,7 @@ MACHINE_CONFIG_START(mw8080bw_state::bowler)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	bowler_audio(config);
@@ -2740,7 +2740,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invaders)
 	MCFG_SCREEN_UPDATE_DRIVER(mw8080bw_state, screen_update_invaders)
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	invaders_audio(config);
@@ -2821,7 +2821,7 @@ MACHINE_CONFIG_START(mw8080bw_state::blueshrk)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	blueshrk_audio(config);
@@ -2924,7 +2924,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invad2ct)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* audio hardware */
 	invad2ct_audio(config);
