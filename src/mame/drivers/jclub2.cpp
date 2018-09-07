@@ -1143,7 +1143,7 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_S29290_16BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1177,7 +1177,7 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1212,7 +1212,7 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)

@@ -358,8 +358,7 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	mainlatch.q_out_cb<4>().set(FUNC(circusc_state::coin_counter_2_w)); // COIN2
 	mainlatch.q_out_cb<5>().set(FUNC(circusc_state::spritebank_w)); // OBJ CHENG
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

@@ -2583,7 +2583,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2810,7 +2810,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

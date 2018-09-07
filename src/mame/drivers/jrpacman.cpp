@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	latch2.q_out_cb<4>().set(FUNC(jrpacman_state::jrpacman_charbank_w));
 	latch2.q_out_cb<5>().set(FUNC(jrpacman_state::jrpacman_spritebank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 	outlatch.q_out_cb<6>().set_output("led1").invert(); // START LED 2
 	outlatch.q_out_cb<7>().set_output("led0").invert(); // START LED 1
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

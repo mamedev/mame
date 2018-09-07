@@ -2270,7 +2270,7 @@ MACHINE_CONFIG_START(cave_state::gaia)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2446,8 +2446,7 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_DEVICE_PROGRAM_MAP(mazinger_sound_map)
 	MCFG_DEVICE_IO_MAP(mazinger_sound_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -2502,8 +2501,7 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_DEVICE_PROGRAM_MAP(metmqstr_sound_map)
 	MCFG_DEVICE_IO_MAP(metmqstr_sound_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)    /* start with the watchdog armed */
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -2557,8 +2555,7 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_DEVICE_PROGRAM_MAP(pacslot_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
@@ -2615,8 +2612,7 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_DEVICE_PROGRAM_MAP(ppsatan_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(1));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -2811,8 +2807,7 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_DEVICE_PROGRAM_MAP(tekkencw_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
@@ -2865,8 +2860,7 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_DEVICE_PROGRAM_MAP(tjumpman_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 

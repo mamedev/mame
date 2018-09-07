@@ -795,7 +795,7 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
 	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

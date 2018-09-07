@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_DEVICE_IO_MAP(espial_sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

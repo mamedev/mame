@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

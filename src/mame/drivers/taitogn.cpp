@@ -720,7 +720,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_DEVICE_ADD("pccard", PCCARD_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(slot_ataflash, nullptr, false)
 
-	MCFG_MB3773_ADD("mb3773")
+	MB3773(config, "mb3773");
 
 	INTEL_TE28F160(config, "biosflash");
 	INTEL_E28F400B(config, "pgmflash");

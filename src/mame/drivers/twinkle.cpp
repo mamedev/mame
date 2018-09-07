@@ -1087,8 +1087,7 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq1_line_assert, 60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq2_line_assert, 60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200)); /* check TD pin on LTC1232 */
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)

@@ -1552,26 +1552,27 @@ void namcos21_state::sound_map(address_map &map)
 /* I/O HD63705 MCU Memory declarations                       */
 /*************************************************************/
 
-void namcos21_state::mcu_map(address_map &map)
+void namcos21_state::configure_c65_namcos21(machine_config &config)
 {
-	map(0x0000, 0x003f).ram();
-	map(0x0000, 0x0000).nopr();
-	map(0x0001, 0x0001).portr("PORTB");          /* p1,p2 start */
-	map(0x0002, 0x0002).portr("PORTC");          /* coins */
-	map(0x0003, 0x0003).rw(FUNC(namcos21_state::namcos2_mcu_port_d_r), FUNC(namcos21_state::namcos2_mcu_port_d_w));
-	map(0x0007, 0x0007).portr("PORTH");          /* fire buttons */
-	map(0x0010, 0x0010).rw(FUNC(namcos21_state::namcos2_mcu_analog_ctrl_r), FUNC(namcos21_state::namcos2_mcu_analog_ctrl_w));
-	map(0x0011, 0x0011).rw(FUNC(namcos21_state::namcos2_mcu_analog_port_r), FUNC(namcos21_state::namcos2_mcu_analog_port_w));
-	map(0x0040, 0x01bf).ram();
-	map(0x01c0, 0x1fff).rom();
-	map(0x2000, 0x2000).portr("DSW");
-	map(0x3000, 0x3000).portr("DIAL0");
-	map(0x3001, 0x3001).portr("DIAL1");
-	map(0x3002, 0x3002).portr("DIAL2");
-	map(0x3003, 0x3003).portr("DIAL3");
-	map(0x5000, 0x57ff).rw(FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)).share("mpdualportram");
-	map(0x6000, 0x6fff).nopr();             /* watchdog */
-	map(0x8000, 0xffff).rom();
+	NAMCOC65(config, m_c65, 2048000);
+	m_c65->in_pb_callback().set_ioport("PORTB");
+	m_c65->in_pc_callback().set_ioport("PORTC");
+	m_c65->in_ph_callback().set_ioport("PORTH");
+	m_c65->in_pdsw_callback().set_ioport("DSW");
+	m_c65->di0_in_cb().set_ioport("DIAL0");
+	m_c65->di1_in_cb().set_ioport("DIAL1");
+	m_c65->di2_in_cb().set_ioport("DIAL2");
+	m_c65->di3_in_cb().set_ioport("DIAL3");
+	m_c65->an0_in_cb().set_ioport("AN0");
+	m_c65->an1_in_cb().set_ioport("AN1");
+	m_c65->an2_in_cb().set_ioport("AN2");
+	m_c65->an3_in_cb().set_ioport("AN3");
+	m_c65->an4_in_cb().set_ioport("AN4");
+	m_c65->an5_in_cb().set_ioport("AN5");
+	m_c65->an6_in_cb().set_ioport("AN6");
+	m_c65->an7_in_cb().set_ioport("AN7");
+	m_c65->dp_in_callback().set(FUNC(namcos21_state::namcos2_dualportram_byte_r));
+	m_c65->dp_out_callback().set(FUNC(namcos21_state::namcos2_dualportram_byte_w));
 }
 
 
@@ -1891,6 +1892,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 		m_slave_intc->vblank_irq_trigger();
 		if(m_gpu_intc)
 			m_gpu_intc->vblank_irq_trigger();
+
+		if (m_c65)
+			m_c65->ext_interrupt(HOLD_LINE);
 	}
 
 	if(m_gpu_intc != nullptr)
@@ -1924,9 +1928,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	configure_c65_namcos21(config);
 
 	MCFG_DEVICE_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
 	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
@@ -1991,9 +1993,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	configure_c65_namcos21(config);
 
 	MCFG_DEVICE_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
@@ -2052,9 +2052,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	configure_c65_namcos21(config);
 
 	MCFG_DEVICE_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
@@ -2116,9 +2114,8 @@ ROM_START( aircomb )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2177,9 +2174,8 @@ ROM_START( aircombj )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2238,9 +2234,8 @@ ROM_START( cybsled )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2297,9 +2292,8 @@ ROM_START( cybsledj )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2365,9 +2359,8 @@ We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* C67 - DSP */
 
@@ -2414,9 +2407,8 @@ ROM_START( starblad )
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2467,9 +2459,8 @@ ROM_START( starbladj )
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2520,9 +2511,8 @@ ROM_START( solvalou )
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2571,9 +2561,8 @@ ROM_START( winrun )
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
 
@@ -2637,9 +2626,8 @@ ROM_START( winrungp )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
 
@@ -2686,9 +2674,8 @@ ROM_START( winrun91 )
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
 

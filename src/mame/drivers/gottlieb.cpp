@@ -1776,8 +1776,7 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

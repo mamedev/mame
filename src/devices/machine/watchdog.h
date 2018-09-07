@@ -8,20 +8,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_WATCHDOG_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WATCHDOG_TIMER, 0)
-#define MCFG_WATCHDOG_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-#define MCFG_WATCHDOG_VBLANK_INIT(_screen, _count) \
-	downcast<watchdog_timer_device &>(*device).set_vblank_count(_screen, _count);
-#define MCFG_WATCHDOG_TIME_INIT(_time) \
-	downcast<watchdog_timer_device &>(*device).set_time(_time);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

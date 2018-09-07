@@ -1036,11 +1036,11 @@ MACHINE_CONFIG_START(next_state::next_base)
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
 
-	MCFG_DEVICE_ADD("net", MB8795, 0)
-	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_irq))
-	MCFG_MB8795_RX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_irq))
-	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_drq))
-	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_drq))
+	MB8795(config, net, 0);
+	net->tx_irq().set(FUNC(next_state::net_tx_irq));
+	net->rx_irq().set(FUNC(next_state::net_rx_irq));
+	net->tx_drq().set(FUNC(next_state::net_tx_drq));
+	net->rx_drq().set(FUNC(next_state::net_rx_drq));
 
 	MCFG_DEVICE_ADD("mo", NEXTMO, 0)
 	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(*this, next_state, mo_irq))

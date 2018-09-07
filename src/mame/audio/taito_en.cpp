@@ -210,8 +210,8 @@ MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, taito_en_device, duart_irq_handler))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, taito_en_device, duart_output))
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taito_en_device, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taito_en_device::mb87078_gain_changed));
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0) // host accesses this from the other side
 

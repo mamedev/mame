@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

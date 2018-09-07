@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(fgoal_state::fgoal)
 
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

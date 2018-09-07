@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

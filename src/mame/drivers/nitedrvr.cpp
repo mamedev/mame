@@ -147,8 +147,7 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 	MCFG_DEVICE_PROGRAM_MAP(nitedrvr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 3)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 3);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("crash_timer", nitedrvr_state, nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
 

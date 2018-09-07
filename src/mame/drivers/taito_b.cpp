@@ -2203,8 +2203,8 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
 	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2267,8 +2267,8 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
 	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2389,8 +2389,8 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
 	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

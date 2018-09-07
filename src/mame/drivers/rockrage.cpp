@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
 	MCFG_DEVICE_PROGRAM_MAP(rockrage_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

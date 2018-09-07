@@ -448,8 +448,7 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 
 	LS259(config, m_outlatch[1]); // 6P
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	X2212(config, "nvram_4b").set_auto_save(true);
 	X2212(config, "nvram_4a").set_auto_save(true);

@@ -1500,7 +1500,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 	// also set a timer to go off on scanline 240
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1758,7 +1758,7 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	// also set a timer to go off on scanline 254
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)

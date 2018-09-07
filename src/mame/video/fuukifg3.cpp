@@ -123,7 +123,7 @@ void fuuki32_state::video_start()
 /* Wrapper to handle bg and bg2 ttogether */
 void fuuki32_state::draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
-	int buffer = ((m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
+	int buffer = ((m_vregs[0x1e / 4] & 0x0000ffff) & 0x40) >> 6;
 
 	switch( i )
 	{

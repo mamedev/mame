@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	K056230(config, "k056230", "maincpu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -858,7 +858,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	K056230(config, "k056230", "maincpu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

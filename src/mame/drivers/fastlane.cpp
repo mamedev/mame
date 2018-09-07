@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(fastlane_state::fastlane)
 	MCFG_DEVICE_PROGRAM_MAP(fastlane_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastlane_state, fastlane_scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

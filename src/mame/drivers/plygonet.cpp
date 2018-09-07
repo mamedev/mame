@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plygonet)
 

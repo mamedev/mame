@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

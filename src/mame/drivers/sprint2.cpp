@@ -497,8 +497,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_DEVICE_PROGRAM_MAP(sprint2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -485,8 +485,7 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
 	MCFG_DEVICE_IO_MAP(sound_io)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096);
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	m58990_device &adc(M58990(config, "adc", 16_MHz_XTAL / 16));

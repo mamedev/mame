@@ -404,8 +404,7 @@ MACHINE_CONFIG_START(cloud9_state::cloud9)
 	outlatch.q_out_cb<2>().set_output("led0").invert();
 	outlatch.q_out_cb<3>().set_output("led1").invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	X2212(config, "nvram").set_auto_save(true);
 

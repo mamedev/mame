@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_DEVICE_IO_MAP(sspeedr_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

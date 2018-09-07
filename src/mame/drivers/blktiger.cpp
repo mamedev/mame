@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	// other ports unknown
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

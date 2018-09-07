@@ -229,8 +229,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_DEVICE_PROGRAM_MAP(skyraid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 4)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 4);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

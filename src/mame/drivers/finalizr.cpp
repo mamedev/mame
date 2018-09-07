@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(finalizr_state, i8039_T0_w)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, finalizr_state, i8039_T1_r))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 

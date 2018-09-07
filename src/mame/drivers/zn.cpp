@@ -1149,7 +1149,7 @@ MACHINE_CONFIG_START(zn_state::coh1000ta)
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	MCFG_MB3773_ADD("mb3773")
+	MB3773(config, "mb3773");
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -1198,7 +1198,7 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 	NVRAM(config, "fm1208s", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_MB3773_ADD("mb3773")
+	MB3773(config, "mb3773");
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")
@@ -1222,7 +1222,7 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 	NVRAM(config, "fm1208s", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_MB3773_ADD("mb3773")
+	MB3773(config, "mb3773");
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("spu")

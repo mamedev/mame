@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	mainlatch.q_out_cb<5>().set(FUNC(sbasketb_state::spriteram_select_w)); // OBJ CHE
 	mainlatch.q_out_cb<6>().set_nop(); // END - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

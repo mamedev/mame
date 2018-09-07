@@ -13300,6 +13300,7 @@ froggers1                       // (c) 1981 Sega
 froggers2                       // 834-0068 (c) 1981 Sega
 froggers3                       //
 froggrs                         //
+froggervd                       // Video Dens
 galap1                          // hack
 galap4                          // hack
 galapx                          // hack
@@ -33763,6 +33764,7 @@ scotrsht                        // GX545 (c) 1985
 
 @source:scramble.cpp
 800fath                         // (c) 1981 Amenip + U.S. Billiards license
+800fatha                        // (c) 1981 Amenip + U.S. Billiards license
 ad2083                          // (c) 1983 Midcoin
 cavelon                         // (c) 1983 Jetsoft
 ckongs                          // bootleg
@@ -36004,6 +36006,7 @@ brickzn11                       // (c) 1992 SunA
 brickznv4                       // (c) 1992 SunA
 brickznv5                       // (c) 1992 SunA
 hardhea2                        // (c) 1991 SunA
+hardhea2a                       // (c) 1991 SunA
 hardhea2b                       // bootleg
 hardhead                        // (c) 1988 SunA
 hardheadb                       // bootleg
@@ -36911,6 +36914,7 @@ tehkanwc                        // (c) 1985 Tehkan
 tehkanwcb                       // bootleg
 tehkanwcc                       // bootleg
 tehkanwcd                       // (c) 1985 Tehkan
+tehkanwch                       // (c) 1986 (hack)
 
 @source:tek405x.cpp
 tek4051                         //

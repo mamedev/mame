@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	// Q6 => high explosion
 	// Q7 => low explosion
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

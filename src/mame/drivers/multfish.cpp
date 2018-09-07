@@ -1032,7 +1032,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_DEVICE_IO_MAP(igrosoft_gamble_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

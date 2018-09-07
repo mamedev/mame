@@ -1332,8 +1332,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
 	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
@@ -1447,8 +1446,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 	mainlatch.q_out_cb<6>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
 	NAMCO_58XX(config, m_namcoio[0], 0);
@@ -1509,8 +1507,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
 	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
@@ -1557,12 +1554,11 @@ void mappy_state::mappy(machine_config &config)
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
 }
 
-MACHINE_CONFIG_START(mappy_state::digdug2)
-
+void mappy_state::digdug2(machine_config &config)
+{
 	mappy_common(config);
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
+	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 0);
 
 	NAMCO_58XX(config, m_namcoio[0], 0);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
@@ -1576,7 +1572,7 @@ MACHINE_CONFIG_START(mappy_state::digdug2)
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
 	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(mappy_state::todruaga)
 	digdug2(config);
