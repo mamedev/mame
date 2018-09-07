@@ -537,8 +537,8 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 1.0)
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4) // todo: should be fd1771
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80_state, intrq_w))
+	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
+	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

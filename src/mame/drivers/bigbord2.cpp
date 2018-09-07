@@ -588,8 +588,8 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	m_ctc2->zc_callback<1>().set(FUNC(bigbord2_state::ctc_z1_w));  // to SIO Ch A
 	m_ctc2->zc_callback<2>().set(m_ctc2, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 16_MHz_XTAL / 8) // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
-	//MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", ??)) // info missing from schematic
+	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
+	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)

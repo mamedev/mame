@@ -361,9 +361,9 @@ MACHINE_CONFIG_START(polydev_state::polydev)
 	poly(config);
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", FD1771, 12.0_MHz_XTAL / 12)
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, polydev_state, motor_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1771(config, m_fdc, 12.0_MHz_XTAL / 12);
+	m_fdc->hld_wr_callback().set(FUNC(polydev_state::motor_w));
+	m_fdc->set_force_ready(true);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

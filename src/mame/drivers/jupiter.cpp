@@ -288,7 +288,7 @@ MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	MCFG_DEVICE_PROGRAM_MAP(jupiter2_mem)
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
+	FD1771(config, INS1771N1_TAG, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
@@ -335,7 +335,7 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
+	FD1771(config, INS1771N1_TAG, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 

@@ -1519,7 +1519,7 @@ MACHINE_CONFIG_START(brno_state::brno)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// floppy
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
+	WD2797(config, m_fdc, 1_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats)

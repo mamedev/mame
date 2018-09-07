@@ -2246,9 +2246,9 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
-	MCFG_DEVICE_ADD("fdc", MB8877, MAIN_CLOCK / 16)
-	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
+	MB8877(config, m_fdc, MAIN_CLOCK / 16);
+	// TODO: guesswork, try to implicitly start the motor
+	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -2306,8 +2306,7 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	m_dma->in_iorq_callback().set(FUNC(x1_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(x1_state::io_write_byte));
 
-	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, x1_state, fdc_drq_w))
+	m_fdc->drq_wr_callback().set(FUNC(x1_state::fdc_drq_w));
 
 	MCFG_DEVICE_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)

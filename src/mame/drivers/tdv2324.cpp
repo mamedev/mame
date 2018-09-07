@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 
 	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
 
-	MCFG_DEVICE_ADD(FD1797PL02_TAG, FD1797, 8000000/4)
+	FD1797(config, FD1797PL02_TAG, 8000000/4);
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 

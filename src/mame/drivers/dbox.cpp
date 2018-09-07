@@ -628,9 +628,10 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
 	config.set_default_layout(layout_sda5708);
+
 	/* IP16 74256 8 bit latch */
-	MCFG_LATCH8_ADD("hct259.ip16")
-	MCFG_LATCH8_WRITE_4(WRITELINE("display", sda5708_device, reset_w))
+	LATCH8(config, m_ip16_74259);
+	m_ip16_74259->write_cb<4>().set("display", FUNC(sda5708_device::reset_w));
 MACHINE_CONFIG_END
 
 void dbox_state::init_dbox()

@@ -659,7 +659,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
 
 	// floppy
-	MCFG_DEVICE_ADD(IC_I042, WD1770, XTAL_X002)
+	WD1770(config, m_fdc, XTAL_X002);
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)

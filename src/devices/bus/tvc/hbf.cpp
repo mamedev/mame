@@ -84,11 +84,13 @@ void tvc_hbf_device::device_reset()
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tvc_hbf_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-MACHINE_CONFIG_END
+void tvc_hbf_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+
+	FLOPPY_CONNECTOR(config, "fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats);
+}
 
 
 //-------------------------------------------------

@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	m_ctc->zc_callback<1>().set(FUNC(xor100_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(FUNC(xor100_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(WD1795_TAG, FD1795, 8_MHz_XTAL / 4)
+	FD1795(config, m_fdc, 8_MHz_XTAL / 4);
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)

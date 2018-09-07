@@ -126,24 +126,21 @@ static void coco_fdc_floppies(device_slot_interface &device)
 	device.option_add("qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(coco_fdc_device_base::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD_TAG, WD1773, 8_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, coco_fdc_device_base, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, coco_fdc_device_base, fdc_drq_w))
+void coco_fdc_device_base::device_add_mconfig(machine_config &config)
+{
+	WD1773(config, m_wd17xx, 8_MHz_XTAL);
+	m_wd17xx->intrq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_intrq_w));
+	m_wd17xx->drq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":0", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":1", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, m_floppies[0], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, 32.768_kHz_XTAL)
+	MSM6242(config, m_disto_msm6242, 32.768_kHz_XTAL);
 
 	DS1315(config, CLOUD9_TAG, 0);
-MACHINE_CONFIG_END
+}
 
 
 //***************************************************************************
