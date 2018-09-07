@@ -171,7 +171,7 @@ void namcoc65_device::mcu_map(address_map &map)
 void namcoc65_device::device_add_mconfig(machine_config &config)
 {
 	HD63705(config, m_mcu, DERIVED_CLOCK(1, 1));
-	m_mcu->set_addrmap(AS_PROGRAM, &mcu_map);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcoc65_device::mcu_map);
 }
 
 void namcoc65_device::device_resolve_objects()
