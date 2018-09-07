@@ -9,14 +9,10 @@
 --
 ---------------------------------------------------------------------------
 
-function devicesProject(_target, _subtarget)
+function library_project(_libraryname, _libraryscript, _target, _subtarget)
 
-	disasm_files = { }
-	disasm_dependency = { }
-	disasm_custombuildtask = { }
-
-	project ("optional")
-	uuid (os.uuid("optional-" .. _target .."_" .. _subtarget))
+	project (_libraryname)
+	uuid (os.uuid(_libraryname .. "-" .. _target .."_" .. _subtarget))
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
 
@@ -44,15 +40,24 @@ function devicesProject(_target, _subtarget)
 		ext_includedir("flac"),
 	}
 
-	dofile(path.join("src", "cpu.lua"))
+	dofile(path.join("src", _libraryscript))
+end
 
-	dofile(path.join("src", "sound.lua"))
+function devicesProject(_target, _subtarget)
 
-	dofile(path.join("src", "video.lua"))
+	disasm_files = { }
+	disasm_dependency = { }
+	disasm_custombuildtask = { }
 
-	dofile(path.join("src", "machine.lua"))
+	library_project("devicescpu", "cpu.lua", _target, _subtarget)
 
-	dofile(path.join("src", "bus.lua"))
+	library_project("devicessound", "sound.lua", _target, _subtarget)
+
+	library_project("devicesvideo", "video.lua", _target, _subtarget)
+
+	library_project("devicesmachine", "machine.lua", _target, _subtarget)
+
+	library_project("devicesbus", "bus.lua", _target, _subtarget)
 
 if #disasm_files > 0 then
 	project ("dasm")

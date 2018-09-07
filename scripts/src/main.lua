@@ -238,7 +238,11 @@ if (MACHINES["NETLIST"]~=null) then
 	}
 end
 	links {
-		"optional",
+		"devicesbus",
+		"devicescpu",
+		"devicesmachine",
+		"devicessound",
+		"devicesvideo",
 		"emu",
 	}
 --if (STANDALONE~=true) then
