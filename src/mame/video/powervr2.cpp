@@ -1446,7 +1446,7 @@ WRITE32_MEMBER( powervr2_device::ta_list_init_w )
 		tafifo_pos=0;
 		tafifo_mask=7;
 		tafifo_vertexwords=8;
-		tafifo_listtype= -1;
+		tafifo_listtype= DISPLAY_LIST_NONE;
 #if DEBUG_PVRTA
 		logerror("%s: list init ol=(%08x, %08x) isp=(%08x, %08x), alloc=%08x obp=%08x\n",
 					tag(), ta_ol_base, ta_ol_limit, ta_isp_base, ta_isp_limit, ta_alloc_ctrl, ta_next_opb_init);
@@ -1492,7 +1492,9 @@ WRITE32_MEMBER( powervr2_device::ta_list_init_w )
 		grab[grabsel].busy=0;
 		grab[grabsel].valid=1;
 		grab[grabsel].verts_size=0;
-		grab[grabsel].strips_size=0;
+		for (int group = 0; group < DISPLAY_LIST_COUNT; group++) {
+			grab[grabsel].groups[group].strips_size=0;
+		}
 
 		g_profiler.stop();
 	}
@@ -1547,7 +1549,7 @@ WRITE32_MEMBER( powervr2_device::ta_yuv_tex_cnt_w )
 WRITE32_MEMBER( powervr2_device::ta_list_cont_w )
 {
 	if(data & 0x80000000) {
-		tafifo_listtype= -1; // no list being received
+		tafifo_listtype= DISPLAY_LIST_NONE; // no list being received
 		listtype_used |= (1+4);
 	}
 }
@@ -1801,8 +1803,12 @@ void powervr2_device::process_ta_fifo()
 		// decide number of words per vertex
 		if (paratype == 7)
 		{
-			if ((global_paratype == 5) || (tafifo_listtype == 1) || (tafifo_listtype == 3))
+			if ((global_paratype == 5) ||
+			    (tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
+			    (tafifo_listtype == DISPLAY_LIST_TRANS_MOD))
+			{
 				tafifo_vertexwords = 16;
+			}
 			if (tafifo_vertexwords == 16)
 			{
 				tafifo_mask = 15;
@@ -1873,13 +1879,13 @@ void powervr2_device::process_ta_fifo()
 		//printf("%d %d\n",tafifo_listtype,screen().vpos());
 		switch (tafifo_listtype)
 		{
-		case 0: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this)); break;
-		case 1: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this)); break;
-		case 2: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq), this)); break;
-		case 3: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this)); break;
-		case 4: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq), this)); break;
+		case DISPLAY_LIST_OPAQUE: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this)); break;
+		case DISPLAY_LIST_OPAQUE_MOD: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this)); break;
+		case DISPLAY_LIST_TRANS: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq), this)); break;
+		case DISPLAY_LIST_TRANS_MOD: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this)); break;
+		case DISPLAY_LIST_PUNCH_THROUGH: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq), this)); break;
 		}
-		tafifo_listtype= -1; // no list being received
+		tafifo_listtype= DISPLAY_LIST_NONE; // no list being received
 		listtype_used |= (2+8);
 	}
 	else if (paratype == 1)
@@ -1963,7 +1969,8 @@ void powervr2_device::process_ta_fifo()
 			}
 			if (paratype == 4)
 			{ // polygon or mv
-				if ((tafifo_listtype == 1) || (tafifo_listtype == 3))
+				if ((tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
+					(tafifo_listtype == DISPLAY_LIST_TRANS_MOD))
 				{
 				#if DEBUG_PVRDLIST
 					osd_printf_verbose(" Modifier Volume\n");
@@ -1986,7 +1993,13 @@ void powervr2_device::process_ta_fifo()
 
 		if (paratype == 7)
 		{ // vertex
-			if ((tafifo_listtype == 1) || (tafifo_listtype == 3))
+			if (tafifo_listtype < 0 || tafifo_listtype >= DISPLAY_LIST_COUNT) {
+				logerror("PowerVR2 unrecognized list type %d\n", tafifo_listtype);
+				return;
+			}
+			struct poly_group *grp = rd->groups + tafifo_listtype;
+			if ((tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
+				(tafifo_listtype == DISPLAY_LIST_TRANS_MOD))
 			{
 				#if DEBUG_PVRDLIST
 				osd_printf_verbose(" Vertex modifier volume");
@@ -2007,7 +2020,7 @@ void powervr2_device::process_ta_fifo()
 				#endif
 				if (texture == 1)
 				{
-					if (rd->verts_size <= 65530)
+					if (rd->verts_size <= (MAX_VERTS - 6) && grp->strips_size < MAX_STRIPS)
 					{
 						strip *ts;
 						vert *tv = &rd->verts[rd->verts_size];
@@ -2040,7 +2053,7 @@ void powervr2_device::process_ta_fifo()
 								   sizeof(tv[idx].o));
 						}
 
-						ts = &rd->strips[rd->strips_size++];
+						ts = &grp->strips[grp->strips_size++];
 						tex_get_info(&ts->ti);
 						ts->svert = rd->verts_size;
 						ts->evert = rd->verts_size + 3;
@@ -2056,7 +2069,7 @@ void powervr2_device::process_ta_fifo()
 				osd_printf_verbose(" V(%f,%f,%f) T(%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]));
 				osd_printf_verbose("\n");
 				#endif
-				if (rd->verts_size <= 65530)
+				if (rd->verts_size <= (MAX_VERTS - 6))
 				{
 					float vert_offset_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 					float vert_base_color[4];
@@ -2121,16 +2134,17 @@ void powervr2_device::process_ta_fifo()
 					memcpy(tv->b, vert_base_color, sizeof(tv->b));
 					memcpy(tv->o, vert_offset_color, sizeof(tv->o));
 
-					if((!rd->strips_size) ||
-						rd->strips[rd->strips_size-1].evert != -1)
+					if(grp->strips_size < MAX_STRIPS &&
+						((!grp->strips_size) ||
+						grp->strips[grp->strips_size-1].evert != -1))
 					{
-						strip *ts = &rd->strips[rd->strips_size++];
+						strip *ts = &grp->strips[grp->strips_size++];
 						tex_get_info(&ts->ti);
 						ts->svert = rd->verts_size;
 						ts->evert = -1;
 					}
 					if(endofstrip)
-						rd->strips[rd->strips_size-1].evert = rd->verts_size;
+						grp->strips[grp->strips_size-1].evert = rd->verts_size;
 					rd->verts_size++;
 				}
 			}
@@ -2787,10 +2801,8 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 	}
 }
 
-void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void powervr2_device::render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap,const rectangle &cliprect, int group_no)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 #if 0
 	int stride;
 	uint16_t *bmpaddr16;
@@ -2804,17 +2816,14 @@ void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap,const r
 	//printf("drawtest!\n");
 
 	int rs=renderselect;
-	uint32_t c=space.read_dword(0x05000000+((isp_backgnd_t & 0xfffff8)>>1)+(3+3)*4);
-	bitmap.fill(c, cliprect);
 
+	struct poly_group *grp = grab[rs].groups + group_no;
 
-	int ns=grab[rs].strips_size;
-	if(ns)
-		memset(wbuffer, 0x00, sizeof(wbuffer));
+	int ns=grp->strips_size;
 
 	for (int cs=0;cs < ns;cs++)
 	{
-		strip *ts = &grab[rs].strips[cs];
+		strip *ts = &grp->strips[cs];
 		int sv = ts->svert;
 		int ev = ts->evert;
 		int i;
@@ -2835,7 +2844,25 @@ void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap,const r
 
 		}
 	}
-	grab[rs].busy=0;
+}
+
+void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect) {
+	if (renderselect < 0)
+		return;
+
+	memset(wbuffer, 0x00, sizeof(wbuffer));
+
+	dc_state *state = machine().driver_data<dc_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	uint32_t c=space.read_dword(0x05000000+((isp_backgnd_t & 0xfffff8)>>1)+(3+3)*4);
+	bitmap.fill(c, cliprect);
+
+	// TODO: modifier volumes
+	render_group_to_accumulation_buffer(bitmap, cliprect, DISPLAY_LIST_OPAQUE);
+	render_group_to_accumulation_buffer(bitmap, cliprect, DISPLAY_LIST_TRANS);
+	render_group_to_accumulation_buffer(bitmap, cliprect, DISPLAY_LIST_PUNCH_THROUGH);
+
+	grab[renderselect].busy=0;
 }
 
 // copies the accumulation buffer into the framebuffer, converting to the specified format
@@ -4125,7 +4152,7 @@ void powervr2_device::device_reset()
 	tafifo_pos=0;
 	tafifo_mask=7;
 	tafifo_vertexwords=8;
-	tafifo_listtype= -1;
+	tafifo_listtype= DISPLAY_LIST_NONE;
 	start_render_received=0;
 	renderselect= -1;
 	grabsel=0;
