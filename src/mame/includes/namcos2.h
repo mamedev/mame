@@ -19,6 +19,7 @@
 #include "video/c45.h"
 #include "video/namco_c116.h"
 #include "machine/namco65.h"
+#include "machine/namco68.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -113,7 +114,6 @@ public:
 		, m_dspslave(*this, "dspslave")
 		, m_gametype(0)
 		, m_c140(*this, "c140")
-		, m_c68(*this, "c68")
 		, m_c116(*this, "c116")
 		, m_master_intc(*this, "master_intc")
 		, m_slave_intc(*this, "slave_intc")
@@ -129,6 +129,7 @@ public:
 		, m_slave(*this, "slave")
 		, m_mcu(*this, "mcu")
 		, m_c65(*this, "c65mcu")
+		, m_c68new(*this, "c68mcu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -141,7 +142,6 @@ public:
 
 protected:
 	optional_device<c140_device> m_c140;
-	optional_device<m37450_device> m_c68;
 	optional_device<namco_c116_device> m_c116;
 	optional_device<namco_c148_device> m_master_intc;
 	optional_device<namco_c148_device> m_slave_intc;
@@ -272,6 +272,7 @@ protected:
 	optional_device<cpu_device> m_slave;
 	optional_device<cpu_device> m_mcu;
 	optional_device<namcoc65_device> m_c65;
+	optional_device<namcoc68_device> m_c68new;
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
@@ -293,6 +294,7 @@ public:
 	void configure_c116_standard(machine_config &config);
 	void configure_c148_standard(machine_config &config);
 	void configure_c65_standard(machine_config &config);
+	void configure_c68_standard(machine_config &config);
 	void metlhawk(machine_config &config);
 	void gollygho(machine_config &config);
 	void assaultp(machine_config &config);
@@ -341,13 +343,10 @@ public:
 	void init_rthun2();
 
 private:
-	DECLARE_READ8_MEMBER(c68_p5_r);
-	DECLARE_WRITE8_MEMBER(c68_p3_w);
 	DECLARE_READ16_MEMBER(dpram_word_r);
 	DECLARE_WRITE16_MEMBER(dpram_word_w);
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
-	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
 
 	virtual void video_start() override;
 	void video_start_finallap();
@@ -403,7 +402,6 @@ private:
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
 	void RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which);
 
-	void c68_default_am(address_map &map);
 	void common_default_am(address_map &map);
 	void common_finallap_am(address_map &map);
 	void common_luckywld_am(address_map &map);
@@ -414,7 +412,7 @@ private:
 	void master_luckywld_am(address_map &map);
 	void master_metlhawk_am(address_map &map);
 	void master_sgunner_am(address_map &map);
-	void mcu_default_am(address_map &map);
+
 	void namcos2_68k_default_cpu_board_am(address_map &map);
 	void slave_default_am(address_map &map);
 	void slave_finallap_am(address_map &map);

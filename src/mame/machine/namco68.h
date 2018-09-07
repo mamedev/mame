@@ -1,23 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NAMCO65_H
-#define MAME_MACHINE_NAMCO65_H
+#ifndef MAME_MACHINE_NAMCO68_H
+#define MAME_MACHINE_NAMCO68_H
 
 #pragma once
 
 #include "machine/bankdev.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6502/m3745x.h"
 
-DECLARE_DEVICE_TYPE(NAMCOC65, namcoc65_device)
+DECLARE_DEVICE_TYPE(NAMCOC68, namcoc68_device)
 
 
-class namcoc65_device : public device_t
+class namcoc68_device : public device_t
 {
 public:
 	// construction/destruction
-	namcoc65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namcoc68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+	auto in_pb2_callback() { return m_in_pb2_cb.bind(); }
+
 	auto in_pc_callback() { return m_in_pc_cb.bind(); }
 	auto in_ph_callback() { return m_in_ph_cb.bind(); }
 	auto in_pdsw_callback() { return m_in_pdsw_cb.bind(); }
@@ -39,11 +41,11 @@ public:
 	auto dp_in_callback() { return m_dp_in.bind(); }
 	auto dp_out_callback() { return m_dp_out.bind(); }
 
-	void ext_interrupt(int state) { m_mcu->set_input_line(0, state); }
+	void ext_interrupt(int state) { m_mcu->set_input_line(0, state); }   // 37450 maps INT1 to irq0 as it's the first external interrupt on that chip
 	void ext_reset(int state) { m_mcu->set_input_line(INPUT_LINE_RESET, state); }
 
 protected:
-	void mcu_map(address_map &map);
+	void c68_default_am(address_map &map);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
@@ -52,9 +54,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<hd63705_device> m_mcu;
+	required_device<m37450_device> m_mcu;
 
 	devcb_read8        m_in_pb_cb;
+	devcb_read8        m_in_pb2_cb;
+
 	devcb_read8        m_in_pc_cb;
 	devcb_read8        m_in_ph_cb;
 	devcb_read8        m_in_pdsw_cb;
@@ -65,19 +69,17 @@ private:
 	devcb_read8        m_dp_in;
 	devcb_write8       m_dp_out;
 
-	DECLARE_READ8_MEMBER(namcos2_mcu_port_d_r);
-	DECLARE_WRITE8_MEMBER(namcos2_mcu_port_d_w);
-
-	DECLARE_READ8_MEMBER(namcos2_mcu_analog_port_r );
-	DECLARE_WRITE8_MEMBER(namcos2_mcu_analog_port_w);
-
-	DECLARE_READ8_MEMBER(namcos2_mcu_analog_ctrl_r);
-	DECLARE_WRITE8_MEMBER(namcos2_mcu_analog_ctrl_w);
+	DECLARE_READ8_MEMBER(c68_p5_r);
+	DECLARE_WRITE8_MEMBER(c68_p3_w);
+	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
 
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 
 	DECLARE_READ8_MEMBER(mcub_r) { return m_in_pb_cb(); }
+	DECLARE_READ8_MEMBER(mcub2_r) { return m_in_pb2_cb(); }
+
+
 	DECLARE_READ8_MEMBER(mcuc_r) { return m_in_pc_cb(); }
 	DECLARE_READ8_MEMBER(mcuh_r) { return m_in_ph_cb(); }
 	DECLARE_READ8_MEMBER(mcudsw_r) { return m_in_pdsw_cb(); }
@@ -87,9 +89,16 @@ private:
 	DECLARE_READ8_MEMBER(mcudi2_r) { return m_port_dial_in_cb[2](); }
 	DECLARE_READ8_MEMBER(mcudi3_r) { return m_port_dial_in_cb[3](); }
 
-	int m_mcu_analog_ctrl;
-	int m_mcu_analog_data;
-	int m_mcu_analog_complete;
+	DECLARE_READ8_MEMBER(mcuan0_r) { return m_port_analog_in_cb[0](); }
+	DECLARE_READ8_MEMBER(mcuan1_r) { return m_port_analog_in_cb[1](); }
+	DECLARE_READ8_MEMBER(mcuan2_r) { return m_port_analog_in_cb[2](); }
+	DECLARE_READ8_MEMBER(mcuan3_r) { return m_port_analog_in_cb[3](); }
+	DECLARE_READ8_MEMBER(mcuan4_r) { return m_port_analog_in_cb[4](); }
+	DECLARE_READ8_MEMBER(mcuan5_r) { return m_port_analog_in_cb[5](); }
+	DECLARE_READ8_MEMBER(mcuan6_r) { return m_port_analog_in_cb[6](); }
+	DECLARE_READ8_MEMBER(mcuan7_r) { return m_port_analog_in_cb[7](); }
+
+	uint8_t m_player_mux;
 };
 
-#endif // MAME_MACHINE_NAMCO65_H
+#endif // MAME_MACHINE_NAMCO68_H

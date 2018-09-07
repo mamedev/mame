@@ -27,8 +27,6 @@ namcoc65_device::namcoc65_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-
-
 ROM_START( namcoc65 )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )

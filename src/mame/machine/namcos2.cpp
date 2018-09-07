@@ -107,9 +107,9 @@ WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
 void namcos2_shared_state::reset_all_subcpus(int state)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state);
-	if (m_c68)
+	if (m_c68new)
 	{
-		m_c68->set_input_line(INPUT_LINE_RESET, state);
+		m_c68new->ext_reset(state);
 	}
 	else if (m_mcu)
 	{

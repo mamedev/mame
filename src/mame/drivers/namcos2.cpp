@@ -575,12 +575,6 @@ WRITE8_MEMBER(namcos2_state::dpram_byte_w)
 	m_dpram[offset] = data;
 }
 
-READ8_MEMBER(namcos2_state::ack_mcu_vbl_r)
-{
-	m_c68->set_input_line(m37450_device::M3745X_INT1_LINE, CLEAR_LINE);
-	return 0;
-}
-
 /*************************************************************/
 /* SHARED 68000 CPU Memory declarations                      */
 /*************************************************************/
@@ -772,32 +766,6 @@ void namcos2_state::sound_default_am(address_map &map)
 	map(0xd001, 0xd001).nopw(); /* Watchdog */
 	map(0xe000, 0xe000).nopw();
 	map(0xd000, 0xffff).rom();
-}
-
-/*************************************************************/
-/* 37450 (C68) IO CPU Memory declarations                    */
-/*************************************************************/
-READ8_MEMBER(namcos2_state::c68_p5_r)
-{
-	return (m_player_mux) ? ioport("MCUB2")->read() : ioport("MCUB")->read();
-}
-
-WRITE8_MEMBER(namcos2_state::c68_p3_w)
-{
-	m_player_mux = (data & 0x80) ? 1 : 0;
-}
-
-void namcos2_state::c68_default_am(address_map &map)
-{
-	/* input ports and dips are mapped here */
-	map(0x2000, 0x2000).portr("DSW");
-	map(0x3000, 0x3000).portr("MCUDI0");
-	map(0x3001, 0x3001).portr("MCUDI1");
-	map(0x3002, 0x3002).portr("MCUDI2");
-	map(0x3003, 0x3003).portr("MCUDI3");
-	map(0x5000, 0x57ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
-	map(0x6000, 0x6fff).r(FUNC(namcos2_state::ack_mcu_vbl_r)); // VBL ack
-	map(0x8000, 0xffff).rom().region("c68", 0);
 }
 
 /*************************************************************/
@@ -1718,6 +1686,30 @@ void namcos2_state::configure_c65_standard(machine_config &config)
 	m_c65->dp_out_callback().set(FUNC(namcos2_state::dpram_byte_w));
 }
 
+void namcos2_state::configure_c68_standard(machine_config &config)
+{
+	NAMCOC68(config, m_c68new, C68_CPU_CLOCK);
+	m_c68new->in_pb_callback().set_ioport("MCUB");
+	m_c68new->in_pb_callback().set_ioport("MCUB2");
+	m_c68new->in_pc_callback().set_ioport("MCUC");
+	m_c68new->in_ph_callback().set_ioport("MCUH");
+	m_c68new->in_pdsw_callback().set_ioport("DSW");
+	m_c68new->di0_in_cb().set_ioport("MCUDI0");
+	m_c68new->di1_in_cb().set_ioport("MCUDI1");
+	m_c68new->di2_in_cb().set_ioport("MCUDI2");
+	m_c68new->di3_in_cb().set_ioport("MCUDI3");
+	m_c68new->an0_in_cb().set_ioport("AN0");
+	m_c68new->an1_in_cb().set_ioport("AN1");
+	m_c68new->an2_in_cb().set_ioport("AN2");
+	m_c68new->an3_in_cb().set_ioport("AN3");
+	m_c68new->an4_in_cb().set_ioport("AN4");
+	m_c68new->an5_in_cb().set_ioport("AN5");
+	m_c68new->an6_in_cb().set_ioport("AN6");
+	m_c68new->an7_in_cb().set_ioport("AN7");
+	m_c68new->dp_in_callback().set(FUNC(namcos2_state::dpram_byte_r));
+	m_c68new->dp_out_callback().set(FUNC(namcos2_state::dpram_byte_w));
+}
+
 // TODO: temp
 TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 {
@@ -1731,6 +1723,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 
 		if (m_c65)
 			m_c65->ext_interrupt(HOLD_LINE);
+
+		if (m_c68new)
+			m_c68new->ext_interrupt(ASSERT_LINE);
 	}
 
 	if(scanline == cur_posirq)
@@ -1991,14 +1986,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold,  2*60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold,  120)
 
-	MCFG_DEVICE_ADD("c68", M37450, C68_CPU_CLOCK) /* C68 @ 8.192MHz (49.152MHz OSC/6) - I/O handling */
-	MCFG_M3745X_ADC14_CALLBACKS(IOPORT("AN0"), IOPORT("AN1"), IOPORT("AN2"), IOPORT("AN3"))
-	MCFG_M3745X_ADC58_CALLBACKS(IOPORT("AN4"), IOPORT("AN5"), IOPORT("AN6"), IOPORT("AN7"))
-	MCFG_M3745X_PORT3_CALLBACKS(IOPORT("MCUH"), WRITE8(*this, namcos2_state, c68_p3_w))    // coins/test/service
-	MCFG_M3745X_PORT5_CALLBACKS(READ8(*this, namcos2_state, c68_p5_r), NOOP) // muxed player 1/2
-	MCFG_M3745X_PORT6_CALLBACKS(IOPORT("MCUC"), NOOP) // unused in sgunner2
-	MCFG_DEVICE_PROGRAM_MAP(c68_default_am)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos2_shared_state, irq0_line_assert)    // 37450 maps INT1 to irq0 as it's the first external interrupt on that chip
+	configure_c68_standard(config);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
@@ -4549,8 +4537,8 @@ ROM_START( sgunner2 )
 	ROM_CONTINUE(              0x010000, 0x01c000 )
 	ROM_RELOAD(                0x010000, 0x020000 )
 
-	ROM_REGION( 0x8000, "c68", 0 ) /* C68 (M37450) I/O MCU program */
-	ROM_LOAD( "sys2_c68.3f",  0x000000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) ) // move to internal device ROM
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "sns_obj0.bin",  0x000000, 0x80000, CRC(c762445c) SHA1(108170c9a5c82c23c1ac09f91195137ca05989f4) )
@@ -4603,8 +4591,8 @@ ROM_START( sgunner2j )
 	ROM_CONTINUE(              0x010000, 0x01c000 )
 	ROM_RELOAD(                0x010000, 0x020000 )
 
-	ROM_REGION( 0x8000, "c68", 0 ) /* C68 (M37450) I/O MCU program */
-	ROM_LOAD( "sys2_c68.3f",  0x000000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) ) // move to internal device ROM
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "sns_obj0.bin",  0x000000, 0x80000, CRC(c762445c) SHA1(108170c9a5c82c23c1ac09f91195137ca05989f4) )
