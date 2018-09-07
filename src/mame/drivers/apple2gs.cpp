@@ -149,6 +149,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2GS_CPU_TAG),
 		m_screen(*this, "screen"),
+		m_scantimer(*this, "scantimer"),
 		m_adbmicro(*this, A2GS_ADBMCU_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
@@ -205,6 +206,7 @@ public:
 
 	required_device<g65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<timer_device> m_scantimer;
 	required_device<m5074x_device> m_adbmicro;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_rom;
@@ -4532,11 +4534,12 @@ static void apple2_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", G65816, A2GS_MASTER_CLOCK/10)
-	MCFG_DEVICE_PROGRAM_MAP(apple2gs_map)
-	MCFG_DEVICE_ADDRESS_MAP(g65816_device::AS_VECTORS, vectors_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2gs_state, apple2_interrupt, "screen", 0, 1)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
+	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
+	TIMER(config, m_scantimer, 0);
+	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_DEVICE_ADD(A2GS_ADBMCU_TAG, M50741, A2GS_MASTER_CLOCK/8)
 	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
@@ -4571,7 +4574,7 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD(A2GS_VIDEO_TAG, APPLE2_VIDEO, A2GS_14M)
+	APPLE2_VIDEO(config, m_video, A2GS_14M);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4579,13 +4582,12 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
+	palette_device &palette(PALETTE(config, "palette", 256));
+	palette.set_init(DEVICE_SELF, FUNC(apple2gs_state::palette_init_apple2gs));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(A2GS_SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, A2GS_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -4681,11 +4683,11 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, z80scc_device, ctsb_w))
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
-	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2gs_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2gs_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2gs_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_cputag("maincpu");
+	m_a2bus->irq_w().set(FUNC(apple2gs_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));
+	m_a2bus->inh_w().set(FUNC(apple2gs_state::a2bus_inh_w));
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);

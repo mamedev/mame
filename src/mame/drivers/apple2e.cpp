@@ -4060,11 +4060,11 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	timer.configure_periodic(timer_device::expired_delegate(FUNC(apple2e_state::ay3600_repeat), this), attotime::from_hz(15));
 
 	/* slot devices */
-	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
-	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2e_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2e_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_cputag("maincpu");
+	m_a2bus->irq_w().set(FUNC(apple2e_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
+	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4162,7 +4162,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	A2BUS_MOCKINGBOARD(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus); // Mockingboard 4C
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
+	config.device_remove("aux");
 	config.device_remove(A2_AUXSLOT_TAG);
 
 	m_ram->set_default_size("128K").set_extra_options("128K");
@@ -4369,7 +4369,7 @@ MACHINE_CONFIG_START(apple2e_state::ceci)
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
-	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
+	config.device_remove("aux");
 	config.device_remove(A2_AUXSLOT_TAG);
 
 	m_ram->set_default_size("64K");
