@@ -150,11 +150,10 @@ WRITE8_MEMBER(svision_state::svision_w)
 		}
 
 		case 0x23: /* delta hero irq routine write */
+			int delay = (data == 0) ? 0x100 : data;
+			delay *= (BIT(m_reg[BANK], 4)) ? 0x4000 : 0x100;
 			m_svision.timer1->enable(true);
-			if (BIT(m_reg[BANK], 4))
-				m_svision.timer1->reset(m_maincpu->cycles_to_attotime(0x100 * 0x4000));
-			else
-				m_svision.timer1->reset(m_maincpu->cycles_to_attotime(0x100 * 0x100));
+			m_svision.timer1->reset(m_maincpu->cycles_to_attotime(delay);
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
