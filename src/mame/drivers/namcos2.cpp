@@ -1690,7 +1690,7 @@ void namcos2_state::configure_c68_standard(machine_config &config)
 {
 	NAMCOC68(config, m_c68new, C68_CPU_CLOCK);
 	m_c68new->in_pb_callback().set_ioport("MCUB");
-	m_c68new->in_pb_callback().set_ioport("MCUB2");
+	m_c68new->in_pb2_callback().set_ioport("MCUB2");
 	m_c68new->in_pc_callback().set_ioport("MCUC");
 	m_c68new->in_ph_callback().set_ioport("MCUH");
 	m_c68new->in_pdsw_callback().set_ioport("DSW");
