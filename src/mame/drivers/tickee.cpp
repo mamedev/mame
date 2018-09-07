@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(tickee_state::rapidfir)
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,rapidfir)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

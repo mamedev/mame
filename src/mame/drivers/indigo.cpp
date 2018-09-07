@@ -609,9 +609,9 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_6)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
+	WD33C93(config, m_wd33c93);
+	m_wd33c93->set_scsi_port("scsi");
+	m_wd33c93->irq_cb().set(FUNC(indigo_state::scsi_irq));      /* command completion IRQ */
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 MACHINE_CONFIG_END

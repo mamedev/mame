@@ -267,17 +267,17 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 
 	//MCFG_DEVICE_ADD("reelmcu", TMS7041, XTAL(5'000'000))
 
-	MCFG_DEVICE_ADD("ppi8255_ic26", I8255, 0)
+	i8255_device &ic26(I8255(config, "ppi8255_ic26"));
 	// Port B 0 is coin lockout
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_meters_w))
+	ic26.out_pc_callback().set(FUNC(jpmmps_state::jpmmps_meters_w));
 
-	MCFG_DEVICE_ADD("ppi8255_ic21", I8255, 0)
+	I8255(config, "ppi8255_ic21");
 
-	MCFG_DEVICE_ADD("ppi8255_ic22", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jpmmps_state, jpmmps_psg_buf_w)) // SN chip data
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_ic22_portc_w))  // C3 is last meter, C2 latches in data
+	i8255_device &ic22(I8255(config, "ppi8255_ic22"));
+	ic22.out_pb_callback().set(FUNC(jpmmps_state::jpmmps_psg_buf_w)); // SN chip data
+	ic22.out_pc_callback().set(FUNC(jpmmps_state::jpmmps_ic22_portc_w));  // C3 is last meter, C2 latches in data
 
-	MCFG_DEVICE_ADD("ppi8255_ic25", I8255, 0)
+	I8255(config, "ppi8255_ic25");
 
 	TMS9902(config, m_uart_ic10, DUART_CLOCK); // Communication with Reel MCU
 	TMS9902(config, m_uart_ic5, DUART_CLOCK); // Communication with Security / Printer

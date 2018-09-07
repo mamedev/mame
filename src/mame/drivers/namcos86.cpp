@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000)) /* heavy interleaving needed to avoid hangs in rthunder */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -397,10 +397,10 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

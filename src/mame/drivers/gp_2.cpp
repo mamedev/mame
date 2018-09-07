@@ -598,13 +598,13 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_2_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_2_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_2_state, portc_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(gp_2_state::porta_w));
+	ppi.in_pb_callback().set(FUNC(gp_2_state::portb_r));
+	ppi.out_pc_callback().set(FUNC(gp_2_state::portc_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset
+	Z80CTC(config, m_ctc, 2457600);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_2_state, zero_timer, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 

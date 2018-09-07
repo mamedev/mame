@@ -43,49 +43,21 @@
 
 #include "diserial.h"
 
-
-
-/***************************************************************************
-    INTERFACE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_IM6402_ADD(_tag, _rrc, _trc) \
-	MCFG_DEVICE_ADD(_tag, IM6402, 0) \
-	downcast<im6402_device &>(*device).set_rrc(_rrc); \
-	downcast<im6402_device &>(*device).set_trc(_trc);
-
-#define MCFG_IM6402_TRO_CALLBACK(_write) \
-	downcast<im6402_device &>(*device).set_tro_wr_callback(DEVCB_##_write);
-
-#define MCFG_IM6402_DR_CALLBACK(_write) \
-	downcast<im6402_device &>(*device).set_dr_wr_callback(DEVCB_##_write);
-
-#define MCFG_IM6402_TBRE_CALLBACK(_write) \
-	downcast<im6402_device &>(*device).set_tbre_wr_callback(DEVCB_##_write);
-
-#define MCFG_IM6402_TRE_CALLBACK(_write) \
-	downcast<im6402_device &>(*device).set_tre_wr_callback(DEVCB_##_write);
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-// ======================> im6402_device
-
 class im6402_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
+	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t rrc, uint32_t trc)
+		: im6402_device(mconfig, tag, owner, 0)
+	{
+		set_rrc(rrc);
+		set_trc(trc);
+	}
+
 	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_rrc(int rrc) { m_rrc = rrc; }
 	void set_trc(int trc) { m_trc = trc; }
-	template <class Object> devcb_base &set_tro_wr_callback(Object &&cb) { return m_write_tro.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dr_wr_callback(Object &&cb) { return m_write_dr.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tbre_wr_callback(Object &&cb) { return m_write_tbre.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tre_wr_callback(Object &&cb) { return m_write_tre.set_callback(std::forward<Object>(cb)); }
 
 	auto tro_callback() { return m_write_tro.bind(); }
 	auto dr_callback() { return m_write_dr.bind(); }
@@ -164,8 +136,6 @@ private:
 	int m_trc_count;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(IM6402, im6402_device)
 
 #endif // MAME_MACHINE_IM6402_H

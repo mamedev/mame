@@ -954,8 +954,8 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
-	MCFG_K053252_OFFSETS(24, 16)
+	K053252(config, m_k053252, 6000000); // 6 MHz?
+	m_k053252->set_offsets(24, 16);
 
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
@@ -996,7 +996,7 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, mystwarr_k054539_map)
@@ -1015,8 +1015,8 @@ MACHINE_CONFIG_START(mystwarr_state::viostorm)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(40, 16)
+	m_k053252->set_clock(16000000/2);
+	m_k053252->set_offsets(40, 16);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1053,8 +1053,7 @@ MACHINE_CONFIG_START(mystwarr_state::metamrph)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 15)
+	m_k053252->set_offsets(24, 15);
 
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
 
@@ -1087,8 +1086,7 @@ MACHINE_CONFIG_START(mystwarr_state::dadandrn)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 16+1)
+	m_k053252->set_offsets(24, 16+1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dadandrn)
 
@@ -1121,8 +1119,7 @@ MACHINE_CONFIG_START(mystwarr_state::gaiapols)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(40, 16)
+	m_k053252->set_offsets(40, 16);
 
 	MCFG_K054000_ADD("k054000")
 
@@ -1161,8 +1158,8 @@ MACHINE_CONFIG_START(mystwarr_state::martchmp)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(martchmp_sound_map)
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(32, 24-1)
+	m_k053252->set_clock(16000000/2);
+	m_k053252->set_offsets(32, 24-1);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(XRGB)

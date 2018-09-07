@@ -303,11 +303,11 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz80_state, mz80k_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz80_state, mz80k_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz80_state, mz80k_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz80_state, mz80k_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(mz80_state::mz80k_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(mz80_state::mz80k_8255_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_w));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)

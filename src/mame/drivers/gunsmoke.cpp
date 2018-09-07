@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(gunsmoke_state, irq0_line_hold,  4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

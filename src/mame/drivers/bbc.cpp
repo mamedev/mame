@@ -1053,9 +1053,9 @@ MACHINE_CONFIG_START(bbc_state::bbcbp)
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
+	WD1770(config, m_wd1770, 16_MHz_XTAL / 2);
+	m_wd1770->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd1770->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -1252,7 +1252,7 @@ MACHINE_CONFIG_START(bbc_state::reutapm)
 	MCFG_DEVICE_REMOVE( "cassette" )
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770")
+	config.device_remove("wd1770");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
@@ -1272,25 +1272,26 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_START(bbc_state::econx25)
+void bbc_state::econx25(machine_config &config)
+{
 	bbcbp(config);
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("vsm")
-	MCFG_DEVICE_REMOVE("tms5220")
+	config.device_remove("vsm");
+	config.device_remove("tms5220");
 
 	/* fdc */
-	//MCFG_DEVICE_REMOVE("wd1770")
+	//config.device_remove("wd1770");
 
 	/* Add Econet X25 Gateway co-processor */
 	//MCFG_DEVICE_MODIFY("tube")
 	//MCFG_DEVICE_SLOT_INTERFACE(bbc_x25tube_devices, "x25", true)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-MACHINE_CONFIG_END
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+}
 
 
 /***************************************************************************
@@ -1418,9 +1419,9 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	m_via6522_1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
+	WD1770(config, m_wd1770, 16_MHz_XTAL / 2);
+	m_wd1770->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd1770->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -1508,7 +1509,7 @@ MACHINE_CONFIG_START(bbc_state::bbcmet)
 	MCFG_DEVICE_REMOVE("via6522_1")
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770")
+	config.device_remove("wd1770");
 
 	/* expansion ports */
 	MCFG_DEVICE_REMOVE("analogue")
@@ -1615,11 +1616,11 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	MCFG_DEVICE_REMOVE("cassette")
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770")
+	config.device_remove("wd1770");
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
+	wd1772_device& wd1772(WD1772(config, "wd1772", 16_MHz_XTAL / 2));
+	wd1772.intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	wd1772.drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("wd1772:0", bbc_floppies_35, "35dd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

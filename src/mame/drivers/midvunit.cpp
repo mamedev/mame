@@ -1074,7 +1074,7 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	MCFG_TIMER_ADD_NONE("timer0")
 	MCFG_TIMER_ADD_NONE("timer1")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)

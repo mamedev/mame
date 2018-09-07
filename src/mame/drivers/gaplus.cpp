@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_NAMCO_62XX_ADD("62xx", 24576000 / 6 / 2)  /* totally made up - TODO: fix */
 	//MCFG_NAMCO_62XX_INPUT_0_CB(IOPORT("IN0L"))

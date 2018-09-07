@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	adc.in_callback<6>().set_constant(0); // RPSNC
 	adc.in_callback<7>().set_constant(0); // LPSNC
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	I8255(config, "ppi");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -945,10 +945,10 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, roundup5_state, output_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.out_pc_callback().set(FUNC(roundup5_state::output_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

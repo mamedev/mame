@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 
 	X2212(config, "nvram"); // "137288-001" in parts list and schematic diagram
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

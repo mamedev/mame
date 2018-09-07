@@ -169,8 +169,8 @@ void tranz330_state::tranz330(machine_config &config)
 	m_dart->out_int_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
 	Z80CTC(config, m_ctc, XTAL(7'159'090)/2); //*
-	m_ctc->set_zc_callback<2>(DEVCB_WRITELINE(*this, tranz330_state, sound_w));
-	m_ctc->set_intr_callback(DEVCB_WRITELINE("irq", input_merger_device, in_w<2>));
+	m_ctc->zc_callback<2>().set(FUNC(tranz330_state::sound_w));
+	m_ctc->intr_callback().set("irq", FUNC(input_merger_device::in_w<2>));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));

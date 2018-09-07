@@ -22,6 +22,7 @@ public:
 	};
 	osd_netdev(class device_network_interface *ifdev, int rate);
 	virtual ~osd_netdev();
+	void start();
 	void stop();
 
 	virtual int send(uint8_t *buf, int len);
@@ -39,7 +40,6 @@ private:
 
 	class device_network_interface *m_dev;
 	emu_timer *m_timer;
-	bool m_stop;
 };
 
 class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);

@@ -403,10 +403,10 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(5'000'000) / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
+	Z80CTC(config, m_ctc, XTAL(5'000'000) / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
@@ -430,10 +430,10 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(7'000'000) / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
+	Z80CTC(config, m_ctc, XTAL(7'000'000) / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

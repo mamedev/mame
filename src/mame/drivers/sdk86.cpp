@@ -170,12 +170,12 @@ MACHINE_CONFIG_START(sdk86_state::sdk86)
 	usart_clock.signal_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 	usart_clock.signal_handler().append(I8251_TAG, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk86_state, scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk86_state, digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, sdk86_state, kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(CONSTANT(0))                                    // Shift key
-	MCFG_I8279_IN_CTRL_CB(CONSTANT(0))
+	i8279_device &kbdc(I8279(config, "i8279", 2500000));		// based on divider
+	kbdc.out_sl_callback().set(FUNC(sdk86_state::scanlines_w));	// scan SL lines
+	kbdc.out_disp_callback().set(FUNC(sdk86_state::digit_w));	// display A&B
+	kbdc.in_rl_callback().set(FUNC(sdk86_state::kbd_r));		// kbd RL lines
+	kbdc.in_shift_callback().set_constant(0);					// Shift key
+	kbdc.in_ctrl_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD("port1", I8255A, 0)
 	MCFG_DEVICE_ADD("port2", I8255A, 0)

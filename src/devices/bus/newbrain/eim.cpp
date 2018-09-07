@@ -69,10 +69,10 @@ const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 
 MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/8)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(MC6850_TAG, acia6850_device, write_rxc))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(MC6850_TAG, acia6850_device, write_txc))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, newbrain_eim_device, ctc_z2_w))
+	Z80CTC(config, m_ctc, XTAL(16'000'000)/8);
+	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_rxc));
+	m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_ctc->zc_callback<2>().set(FUNC(newbrain_eim_device::ctc_z2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_device, ctc_c2_tick, attotime::from_hz(XTAL(16'000'000)/4/13))
 

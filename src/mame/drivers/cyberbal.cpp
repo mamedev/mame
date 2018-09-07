@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyberbal)

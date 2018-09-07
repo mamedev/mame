@@ -994,9 +994,9 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// device never addressed by cpu
-	MCFG_DEVICE_ADD("ctc0", Z80CTC, CPU_CLOCK) // U27
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc0", z80ctc_device, trg1))
+	z80ctc_device& ctc(Z80CTC(config, "ctc0", CPU_CLOCK)); // U27
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("ctc0", FUNC(z80ctc_device::trg1));
 	// ZC1 not connected
 	// TRG2 to TP18; ZC2 to TP9; TRG3 to VSYNC; TRG0 to cpu_clock/4
 

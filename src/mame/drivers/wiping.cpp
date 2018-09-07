@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	mainlatch.q_out_cb<2>().set(FUNC(wiping_state::flipscreen_w)); // INV
 	mainlatch.q_out_cb<3>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert(); // CP2RE
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

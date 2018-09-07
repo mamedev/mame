@@ -620,15 +620,15 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 20_MHz_XTAL / 8));
 	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 20_MHz_XTAL / 8)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	Z80CTC(config, m_ctc, 20_MHz_XTAL / 8);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(20_MHz_XTAL / 8))
 
-	MCFG_DEVICE_ADD(FD1771_TAG, FD1771, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
+	FD1771(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 
@@ -709,15 +709,15 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	pio_rd.in_pb_callback().set("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
 	pio_rd.out_pb_callback().set(FUNC(xerox820ii_state::rdpio_pb_w));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(16_MHz_XTAL / 4))
 
-	MCFG_DEVICE_ADD(FD1797_TAG, FD1797, 16_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
+	FD1797(config, m_fdc, 16_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 

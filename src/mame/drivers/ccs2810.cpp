@@ -954,7 +954,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	rs232.dsr_handler().set(m_ins8250, FUNC(ins8250_device::dsr_w));
 	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 16_MHz_XTAL / 8) // UB1793 or MB8877
+	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

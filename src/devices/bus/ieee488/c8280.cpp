@@ -311,11 +311,11 @@ MACHINE_CONFIG_START(c8280_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(M6502_FDC_TAG, M6502, XTAL(12'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(c8280_fdc_mem)
 
-	MCFG_DEVICE_ADD(WD1797_TAG, FD1797, XTAL(12'000'000)/6)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_IRQ_LINE))
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_SET_OVERFLOW))
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":0", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":1", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
+	FD1797(config, m_fdc, XTAL(12'000'000)/6);
+	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, M6502_IRQ_LINE);
+	m_fdc->drq_wr_callback().set_inputline(m_fdccpu, M6502_SET_OVERFLOW);
+	FLOPPY_CONNECTOR(config, m_floppy0, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
 MACHINE_CONFIG_END
 
 

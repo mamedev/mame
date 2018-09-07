@@ -257,12 +257,12 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	// ch.3 -- timer?
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(32'000'000)) // XXX
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(32'000'000))); // XXX;
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 #ifdef notdef
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(m_sio, z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_sio, z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(m_sio, z80sio_device, rxtxcb_w))
+	ctc.zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
+	ctc.zc_callback<0>().append(m_sio, FUNC(z80sio_device::txca_w));
+	ctc.zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 #endif
 
 	Z80SIO(config, m_sio, 4800); // XXX

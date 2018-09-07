@@ -211,8 +211,7 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)

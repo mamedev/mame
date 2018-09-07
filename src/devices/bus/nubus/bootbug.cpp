@@ -47,17 +47,17 @@ DEFINE_DEVICE_TYPE(NUBUS_BOOTBUG, nubus_bootbug_device, "nb_btbug", "Brigent Boo
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(nubus_bootbug_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "uart_0", NS16450, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport0", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport0", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport0", rs232_port_device, write_rts))
+	ns16450_device &uart(NS16450(config, "uart_0", XTAL(1'843'200)));
+	uart.out_tx_callback().set("serport0", FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set("serport0", FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set("serport0", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD( "serport0", RS232_PORT, isa_com, "terminal" )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_0", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart_0", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_0", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("uart_0", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_0", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(uart, ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(uart, ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(uart, ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(uart, ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(uart, ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

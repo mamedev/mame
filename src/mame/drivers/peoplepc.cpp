@@ -282,17 +282,17 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(peoplepc_state, update_row)
 
-	MCFG_DEVICE_ADD("i8257", I8257, XTAL(14'745'600)/3)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, peoplepc_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, peoplepc_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, peoplepc_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, peoplepc_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8("upd765", upd765a_device, mdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8("upd765", upd765a_device, mdma_w))
+	I8257(config, m_dmac, XTAL(14'745'600)/3);
+	m_dmac->out_hrq_cb().set(FUNC(peoplepc_state::hrq_w));
+	m_dmac->out_tc_cb().set(FUNC(peoplepc_state::tc_w));
+	m_dmac->in_memr_cb().set(FUNC(peoplepc_state::memory_read_byte));
+	m_dmac->out_memw_cb().set(FUNC(peoplepc_state::memory_write_byte));
+	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::mdma_r));
+	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::mdma_w));
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_0", pic8259_device, ir2_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("i8257", i8257_device, dreq0_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 

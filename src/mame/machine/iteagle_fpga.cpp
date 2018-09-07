@@ -63,15 +63,15 @@ MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
 	m_scc1->out_txda_callback().set(COM2_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc1->out_txdb_callback().set(COM1_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(COM1_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, scc85c30_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, scc85c30_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, scc85c30_device, ctsb_w))
+	rs232_port_device &com1(RS232_PORT(config, COM1_TAG, default_rs232_devices, nullptr));
+	com1.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxb_w));
+	com1.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcdb_w));
+	com1.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(COM2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, scc85c30_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, scc85c30_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, scc85c30_device, ctsa_w))
+	rs232_port_device &com2(RS232_PORT(config, COM2_TAG, default_rs232_devices, nullptr));
+	com2.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxa_w));
+	com2.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcda_w));
+	com2.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsa_w));
 MACHINE_CONFIG_END
 
 void iteagle_fpga_device::device_start()

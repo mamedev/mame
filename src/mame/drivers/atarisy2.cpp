@@ -1208,7 +1208,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	EEPROM_2804(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy2)

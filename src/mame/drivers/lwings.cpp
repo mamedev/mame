@@ -942,7 +942,7 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	MCFG_DEVICE_PROGRAM_MAP(lwings_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -992,7 +992,7 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	MCFG_DEVICE_PROGRAM_MAP(fball_sound_map)
 //  MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)

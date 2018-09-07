@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1009,7 +1009,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

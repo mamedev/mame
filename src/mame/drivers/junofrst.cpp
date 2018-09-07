@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	mainlatch.q_out_cb<4>().set(FUNC(junofrst_state::flip_screen_x_w)); // HFF
 	mainlatch.q_out_cb<5>().set(FUNC(junofrst_state::flip_screen_y_w)); // VFLIP
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)

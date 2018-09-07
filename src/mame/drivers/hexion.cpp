@@ -259,12 +259,12 @@ MACHINE_CONFIG_START(hexion_state::hexion)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
 	MCFG_DEVICE_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, hexion_state, irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, hexion_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(*this, hexion_state, ccu_int_time_w))
+	K053252(config, m_k053252, XTAL(24'000'000)/2); /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
+	m_k053252->int1_ack().set(FUNC(hexion_state::irq_ack_w));
+	m_k053252->int2_ack().set(FUNC(hexion_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(hexion_state::ccu_int_time_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

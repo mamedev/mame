@@ -221,9 +221,9 @@ MACHINE_CONFIG_START(mk14_state::mk14)
 	MCFG_SOUND_ROUTE(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
-	MCFG_DEVICE_ADD("ic8", INS8154, 0)
-	MCFG_INS8154_OUT_A_CB(WRITE8(*this, mk14_state, port_a_w))
-	MCFG_INS8154_OUT_B_CB(WRITE8("dac8", dac_byte_interface, data_w))
+	ins8154_device &ic8(INS8154(config, "ic8"));
+	ic8.out_a().set(FUNC(mk14_state::port_a_w));
+	ic8.out_b().set("dac8", FUNC(dac_byte_interface::data_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

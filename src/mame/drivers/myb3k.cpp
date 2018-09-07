@@ -945,29 +945,29 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, myb3k_state, pic_int_w))
 
 	/* Parallel port */
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, myb3k_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, myb3k_state, ppi_portc_w))
+	I8255A(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255->in_pb_callback().set(FUNC(myb3k_state::ppi_portb_r));
+	m_ppi8255->out_pc_callback().set(FUNC(myb3k_state::ppi_portc_w));
 
 	/* DMA controller */
-	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'318'181) / 6)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, myb3k_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, myb3k_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, myb3k_state, dma_memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, myb3k_state, dma_memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(*this, myb3k_state, io_dack0_r))
-	MCFG_I8257_IN_IOR_1_CB(READ8(*this, myb3k_state, io_dack1_r))
-	MCFG_I8257_IN_IOR_2_CB(READ8(*this, myb3k_state, io_dack2_r))
-	MCFG_I8257_IN_IOR_3_CB(READ8(*this, myb3k_state, io_dack3_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, myb3k_state, io_dack0_w))
-	MCFG_I8257_OUT_IOW_1_CB(WRITE8(*this, myb3k_state, io_dack1_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, myb3k_state, io_dack2_w))
-	MCFG_I8257_OUT_IOW_3_CB(WRITE8(*this, myb3k_state, io_dack3_w))
-	MCFG_I8257_OUT_DACK_0_CB(WRITELINE(*this, myb3k_state, dack0_w))
-	MCFG_I8257_OUT_DACK_1_CB(WRITELINE(*this, myb3k_state, dack1_w))
-	MCFG_I8257_OUT_DACK_2_CB(WRITELINE(*this, myb3k_state, dack2_w))
-	MCFG_I8257_OUT_DACK_3_CB(WRITELINE(*this, myb3k_state, dack3_w))
+	I8257(config, m_dma8257, XTAL(14'318'181) / 6);
+	m_dma8257->out_hrq_cb().set(FUNC(myb3k_state::hrq_w));
+	m_dma8257->out_tc_cb().set(FUNC(myb3k_state::tc_w));
+	m_dma8257->in_memr_cb().set(FUNC(myb3k_state::dma_memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(myb3k_state::dma_memory_write_byte));
+	m_dma8257->in_ior_cb<0>().set(FUNC(myb3k_state::io_dack0_r));
+	m_dma8257->in_ior_cb<1>().set(FUNC(myb3k_state::io_dack1_r));
+	m_dma8257->in_ior_cb<2>().set(FUNC(myb3k_state::io_dack2_r));
+	m_dma8257->in_ior_cb<3>().set(FUNC(myb3k_state::io_dack3_r));
+	m_dma8257->out_iow_cb<0>().set(FUNC(myb3k_state::io_dack0_w));
+	m_dma8257->out_iow_cb<1>().set(FUNC(myb3k_state::io_dack1_w));
+	m_dma8257->out_iow_cb<2>().set(FUNC(myb3k_state::io_dack2_w));
+	m_dma8257->out_iow_cb<3>().set(FUNC(myb3k_state::io_dack3_w));
+	m_dma8257->out_dack_cb<0>().set(FUNC(myb3k_state::dack0_w));
+	m_dma8257->out_dack_cb<1>().set(FUNC(myb3k_state::dack1_w));
+	m_dma8257->out_dack_cb<2>().set(FUNC(myb3k_state::dack2_w));
+	m_dma8257->out_dack_cb<3>().set(FUNC(myb3k_state::dack3_w));
 
 	/* Timer */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)

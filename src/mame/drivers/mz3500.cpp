@@ -821,10 +821,10 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
-	MCFG_DEVICE_ADD("i8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz3500_state, mz3500_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz3500_state, mz3500_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz3500_state, mz3500_pc_w))
+	i8255_device &ppi(I8255A(config, "i8255"));
+	ppi.out_pa_callback().set(FUNC(mz3500_state::mz3500_pa_w));
+	ppi.out_pb_callback().set(FUNC(mz3500_state::mz3500_pb_w));
+	ppi.out_pc_callback().set(FUNC(mz3500_state::mz3500_pc_w));
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))

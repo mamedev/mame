@@ -377,8 +377,8 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
 	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/4)
-	MCFG_K053252_OFFSETS(13*8, 2*8)
+	K053252(config, m_k053252, XTAL(24'000'000)/4);
+	m_k053252->set_offsets(13*8, 2*8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

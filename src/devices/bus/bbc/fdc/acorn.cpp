@@ -121,26 +121,24 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_acorn8271_device::device_add_mconfig)
+void bbc_acorn8271_device::device_add_mconfig(machine_config & config)
+{
 	I8271(config, m_fdc, 0);
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_acorn8271_device::fdc_intrq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_acorn8271_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_acorn8271_device::side_w));
-	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(bbc_acorn1770_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("wd1770", WD1770, XTAL(16'000'000) / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_acorn1770_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_acorn1770_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_acorn1770_device::device_add_mconfig(machine_config & config)
+{
+	WD1770(config, m_fdc, XTAL(16'000'000) / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_acorn1770_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(bbc_acorn1770_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+}
 
 
 const tiny_rom_entry *bbc_acorn8271_device::device_rom_region() const

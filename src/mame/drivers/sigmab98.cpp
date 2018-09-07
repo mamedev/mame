@@ -3009,7 +3009,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

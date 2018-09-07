@@ -756,11 +756,11 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_DEVICE_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, avigo_state, com_interrupt))
+	NS16550(config, m_uart, XTAL(1'843'200));
+	m_uart->out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(FUNC(avigo_state::com_interrupt));
 
 	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
 	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
@@ -794,9 +794,9 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */
-	MCFG_AMD_29F080_ADD("flash0")
-	MCFG_AMD_29F080_ADD("flash1")
-	MCFG_AMD_29F080_ADD("flash2")
+	AMD_29F080(config, "flash0");
+	AMD_29F080(config, "flash1");
+	AMD_29F080(config, "flash2");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");

@@ -333,11 +333,11 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_DEVICE_PROGRAM_MAP(tiamc1_map)
 	MCFG_DEVICE_IO_MAP(tiamc1_io_map)
 
-	MCFG_DEVICE_ADD("kr580vv55a", I8255A, 0)  /* soviet clone of i8255 */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tiamc1_state, tiamc1_control_w))
+	i8255_device &ppi(I8255A(config, "kr580vv55a"));  /* soviet clone of i8255 */
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
+	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

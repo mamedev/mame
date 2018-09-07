@@ -324,10 +324,10 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms6102)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, ms6102_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, ms6102_state, memory_read_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, ms6102_state, vdack_w))
+	I8257(config, m_dma8257, XTAL(18'432'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(ms6102_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(ms6102_state::memory_read_byte));
+	m_dma8257->out_iow_cb<2>().set(FUNC(ms6102_state::vdack_w));
 
 	MCFG_DEVICE_ADD("i8275_1", I8275, XTAL(16'400'000) / 8) // XXX
 	MCFG_I8275_CHARACTER_WIDTH(8)

@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_DEVICE_ADD("sub", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(jchan_sub)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jchan)
 

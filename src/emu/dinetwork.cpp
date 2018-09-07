@@ -16,14 +16,56 @@ device_network_interface::~device_network_interface()
 {
 }
 
+void device_network_interface::interface_pre_start()
+{
+	m_send_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_network_interface::send_complete), this));
+	m_recv_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_network_interface::recv_complete), this));
+}
+
 int device_network_interface::send(u8 *buf, int len) const
 {
 	if(!m_dev) return 0;
-	return m_dev->send(buf, len);
+
+	// TODO: enable this check when other devices implement delayed transmit
+	//assert_always(!m_send_timer->enabled(), "attempted to transmit while transmit already in progress");
+
+	// send the data
+	int result = m_dev->send(buf, len);
+
+	// schedule transmit complete callback
+	m_send_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+
+	return result;
+}
+
+TIMER_CALLBACK_MEMBER(device_network_interface::send_complete)
+{
+	send_complete_cb(param);
 }
 
 void device_network_interface::recv_cb(u8 *buf, int len)
 {
+	assert_always(!m_recv_timer->enabled(), "attempted to receive while receive already in progress");
+
+	// process the received data
+	int result = recv_start_cb(buf, len);
+
+	if (result)
+	{
+		// stop receiving more data from the network
+		m_dev->stop();
+
+		// schedule receive complete callback
+		m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(device_network_interface::recv_complete)
+{
+	recv_complete_cb(param);
+
+	// start receiving data from the network again
+	m_dev->start();
 }
 
 void device_network_interface::set_promisc(bool promisc)

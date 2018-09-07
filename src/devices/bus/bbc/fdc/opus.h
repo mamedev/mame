@@ -71,11 +71,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
-	required_memory_region m_dfs_rom;
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
+
+private:
+	required_memory_region m_dfs_rom;
 
 	int m_drive_control;
 };

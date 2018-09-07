@@ -1611,25 +1611,25 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc88va)
 
-	MCFG_DEVICE_ADD("d8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2s", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2s", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, cpu_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, cpu_8255_c_w))
+	i8255_device &d8255_2(I8255(config, "d8255_2"));
+	d8255_2.in_pa_callback().set("d8255_2s", FUNC(i8255_device::pb_r));
+	d8255_2.in_pb_callback().set("d8255_2s", FUNC(i8255_device::pa_r));
+	d8255_2.in_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_r));
+	d8255_2.out_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_w));
 
-	MCFG_DEVICE_ADD("d8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pc88va_state, r232_ctrl_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc88va_state, r232_ctrl_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pc88va_state, r232_ctrl_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc88va_state, r232_ctrl_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, r232_ctrl_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, r232_ctrl_portc_w))
+	i8255_device &d8255_3(I8255(config, "d8255_3"));
+	d8255_3.in_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_r));
+	d8255_3.out_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_w));
+	d8255_3.in_pb_callback().set(FUNC(pc88va_state::r232_ctrl_portb_r));
+	d8255_3.out_pb_callback().set(FUNC(pc88va_state::r232_ctrl_portb_w));
+	d8255_3.in_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_r));
+	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
 
-	MCFG_DEVICE_ADD("d8255_2s", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, fdc_8255_c_w))
+	i8255_device &d8255_2s(I8255(config, "d8255_2s"));
+	d8255_2s.in_pa_callback().set("d8255_2", FUNC(i8255_device::pb_r));
+	d8255_2s.in_pb_callback().set("d8255_2", FUNC(i8255_device::pa_r));
+	d8255_2s.in_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_r));
+	d8255_2s.out_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_w));
 
 	PIC8259(config, m_pic1, 0);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);

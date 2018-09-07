@@ -1314,10 +1314,10 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_pit->set_clk<2>(500000);
 	m_pit->out_handler<2>().set(FUNC(wangpc_state::pit2_w));
 
-	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE("wangpckb", wangpc_keyboard_device, write_rxd))
-	MCFG_IM6402_DR_CALLBACK(WRITELINE(*this, wangpc_state, uart_dr_w))
-	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(*this, wangpc_state, uart_tbre_w))
+	IM6402(config, m_uart, 62500*16, 62500*16);
+	m_uart->tro_callback().set("wangpckb", FUNC(wangpc_keyboard_device::write_rxd));
+	m_uart->dr_callback().set(FUNC(wangpc_state::uart_dr_w));
+	m_uart->tbre_callback().set(FUNC(wangpc_state::uart_tbre_w));
 
 	MCFG_DEVICE_ADD(SCN2661_TAG, MC2661, 0)
 	MCFG_MC2661_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))

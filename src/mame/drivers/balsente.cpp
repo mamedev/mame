@@ -1333,7 +1333,7 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	X2212(config, "nov0").set_auto_save(true); // system NOVRAM
 	X2212(config, "nov1").set_auto_save(true); // cart NOVRAM
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, interrupt_timer)
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, clock_counter_0_ff)

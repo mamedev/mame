@@ -19,41 +19,6 @@
 #include "machine/ram.h"
 
 
-#define MCFG_WD7600_ADD(_tag, _clock, _cputag, _isatag, _biostag, _keybctag) \
-	MCFG_DEVICE_ADD(_tag, WD7600, _clock) \
-	downcast<wd7600_device &>(*device).set_cputag(_cputag); \
-	downcast<wd7600_device &>(*device).set_isatag(_isatag); \
-	downcast<wd7600_device &>(*device).set_biostag(_biostag); \
-	downcast<wd7600_device &>(*device).set_keybctag(_keybctag);
-
-#define MCFG_WD7600_IOR(_ior) \
-	downcast<wd7600_device *>(device)->set_ior_callback(DEVCB_##_ior);
-
-#define MCFG_WD7600_IOW(_iow) \
-	downcast<wd7600_device *>(device)->set_iow_callback(DEVCB_##_iow);
-
-#define MCFG_WD7600_TC(_tc) \
-	downcast<wd7600_device *>(device)->set_tc_callback(DEVCB_##_tc);
-
-#define MCFG_WD7600_HOLD(_hold) \
-	downcast<wd7600_device *>(device)->set_hold_callback(DEVCB_##_hold);
-
-#define MCFG_WD7600_NMI(_nmi) \
-	downcast<wd7600_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
-
-#define MCFG_WD7600_INTR(_intr) \
-	downcast<wd7600_device *>(device)->set_intr_callback(DEVCB_##_intr);
-
-#define MCFG_WD7600_CPURESET(_cpureset) \
-	downcast<wd7600_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
-
-#define MCFG_WD7600_A20M(_a20m) \
-	downcast<wd7600_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
-
-#define MCFG_WD7600_SPKR(_spkr) \
-	downcast<wd7600_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -67,21 +32,22 @@ public:
 	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_ior_callback(Object &&ior) { return m_read_ior.set_callback(std::forward<Object>(ior)); }
-	template <class Object> devcb_base &set_iow_callback(Object &&iow) { return m_write_iow.set_callback(std::forward<Object>(iow)); }
-	template <class Object> devcb_base &set_tc_callback(Object &&tc) { return m_write_tc.set_callback(std::forward<Object>(tc)); }
-	template <class Object> devcb_base &set_hold_callback(Object &&hold) { return m_write_hold.set_callback(std::forward<Object>(hold)); }
-	template <class Object> devcb_base &set_cpureset_callback(Object &&cpureset) { return m_write_cpureset.set_callback(std::forward<Object>(cpureset)); }
-	template <class Object> devcb_base &set_nmi_callback(Object &&nmi) { return m_write_nmi.set_callback(std::forward<Object>(nmi)); }
-	template <class Object> devcb_base &set_intr_callback(Object &&intr) { return m_write_intr.set_callback(std::forward<Object>(intr)); }
-	template <class Object> devcb_base &set_a20m_callback(Object &&a20m) { return m_write_a20m.set_callback(std::forward<Object>(a20m)); }
-	template <class Object> devcb_base &set_spkr_callback(Object &&spkr) { return m_write_spkr.set_callback(std::forward<Object>(spkr)); }
+	auto ior_callback() { return m_read_ior.bind(); }
+	auto iow_callback() { return m_write_iow.bind(); }
+	auto tc_callback() { return m_write_tc.bind(); }
+	auto hold_callback() { return m_write_hold.bind(); }
+	auto cpureset_callback() { return m_write_cpureset.bind(); }
+	auto nmi_callback() { return m_write_nmi.bind(); }
+	auto intr_callback() { return m_write_intr.bind(); }
+	auto a20m_callback() { return m_write_a20m.bind(); }
+	auto spkr_callback() { return m_write_spkr.bind(); }
 
 	// inline configuration
 	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	void set_isatag(const char *tag) { m_isatag = tag; }
+	template <typename T> void set_isatag(T &&tag) { m_isa.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_biostag(T &&tag) { m_bios.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_keybctag(T &&tag) { m_keybc.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_ramtag(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( irq01_w ) { m_pic1->ir1_w(state); }
@@ -197,7 +163,9 @@ private:
 
 	required_device<device_memory_interface> m_cpu;
 	required_device<at_keyboard_controller_device> m_keybc;
+	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_bios;
+	required_region_ptr<uint8_t> m_isa;
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);
@@ -206,7 +174,6 @@ private:
 	void a20m();
 
 	// internal state
-	const char *m_isatag;
 	uint8_t m_portb;
 	int m_iochck;
 	int m_nmi_mask;
@@ -228,8 +195,6 @@ private:
 
 	address_space *m_space;
 	address_space *m_space_io;
-	uint8_t *m_isa;
-	uint8_t *m_ram;
 };
 
 // device type definition

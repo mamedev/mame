@@ -738,7 +738,7 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 	MCFG_DEVICE_PROGRAM_MAP(asteroid_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	TTL153(config, m_dsw_sel);
 

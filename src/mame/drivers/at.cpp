@@ -634,18 +634,23 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_DEVICE_IO_MAP(megapc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
-	MCFG_WD7600_ADD("wd7600", 50_MHz_XTAL / 2, ":maincpu", ":isa", ":bios", ":keybc")
-	MCFG_WD7600_HOLD(WRITELINE(*this, megapc_state, wd7600_hold));
-	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
-	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
-	MCFG_WD7600_CPURESET(INPUTLINE("maincpu", INPUT_LINE_RESET));
-	MCFG_WD7600_A20M(INPUTLINE("maincpu", INPUT_LINE_A20));
+	WD7600(config, m_wd7600, 50_MHz_XTAL / 2);
+	m_wd7600->set_cputag(m_maincpu);
+	m_wd7600->set_isatag("isa");
+	m_wd7600->set_ramtag(m_ram);
+	m_wd7600->set_biostag("bios");
+	m_wd7600->set_keybctag("keybc");
+	m_wd7600->hold_callback().set(FUNC(megapc_state::wd7600_hold));
+	m_wd7600->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_wd7600->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_wd7600->cpureset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_wd7600->a20m_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	// isa dma
-	MCFG_WD7600_IOR(READ16(*this, megapc_state, wd7600_ior))
-	MCFG_WD7600_IOW(WRITE16(*this, megapc_state, wd7600_iow))
-	MCFG_WD7600_TC(WRITE8(*this, megapc_state, wd7600_tc))
+	m_wd7600->ior_callback().set(FUNC(megapc_state::wd7600_ior));
+	m_wd7600->iow_callback().set(FUNC(megapc_state::wd7600_iow));
+	m_wd7600->tc_callback().set(FUNC(megapc_state::wd7600_tc));
 	// speaker
-	MCFG_WD7600_SPKR(WRITELINE(*this, megapc_state, wd7600_spkr))
+	m_wd7600->spkr_callback().set(FUNC(megapc_state::wd7600_spkr));
 
 	// on board devices
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)

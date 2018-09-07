@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig1)

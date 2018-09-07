@@ -371,7 +371,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	m_pia_ivg->writepa_handler().set(FUNC(tavernie_state::pa_ivg_w));
 	m_pia_ivg->cb2_handler().set("beeper", FUNC(beep_device::set_state));
 
-	MCFG_DEVICE_ADD("fdc", FD1795, 8_MHz_XTAL / 8)
+	FD1795(config, m_fdc, 8_MHz_XTAL / 8);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

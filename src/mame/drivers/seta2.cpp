@@ -2583,7 +2583,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2733,7 +2733,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(staraudi_map)
 
-	MCFG_SHARP_LH28F016S_16BIT_ADD("flash")
+	SHARP_LH28F016S_16BIT(config, "flash");
 	MCFG_UPD4992_ADD("rtc")
 
 	// video hardware
@@ -2810,7 +2810,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

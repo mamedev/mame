@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(spy_state::spy)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(spy_sound_map) /* nmi by the sound chip */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

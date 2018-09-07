@@ -459,8 +459,7 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 400) // guess
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 400); // guess
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

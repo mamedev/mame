@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))

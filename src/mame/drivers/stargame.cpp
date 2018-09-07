@@ -119,9 +119,9 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 15000000 / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))    // SINT - turn on interrupt of the audiocpu
+	Z80CTC(config, m_ctc, 15000000 / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);    // SINT - turn on interrupt of the audiocpu
 
 	/* sound hardware */
 	genpin_audio(config);
@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 MACHINE_CONFIG_END
 
 ROM_START(spcship)

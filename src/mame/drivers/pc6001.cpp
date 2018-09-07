@@ -1507,13 +1507,13 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_PALETTE_ADD("palette", 16+4)
 	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pc6001_state, ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc6001_state, ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pc6001_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc6001_state, ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc6001_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc6001_state, ppi_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(pc6001_state::ppi_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(pc6001_state::ppi_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(pc6001_state::ppi_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(pc6001_state::ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)

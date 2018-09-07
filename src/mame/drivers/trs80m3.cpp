@@ -361,9 +361,9 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80m3_state, trs80_cmd, "cmd", 1.0)
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80m3_state, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, trs80m3_state, drq_w))
+	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(trs80m3_state::intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(trs80m3_state::drq_w));
 
 	// Internal drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80m3_state::floppy_formats)

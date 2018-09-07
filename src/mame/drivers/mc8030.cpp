@@ -210,8 +210,8 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	zve_pio.in_pb_callback().set(FUNC(mc8030_state::zve_port_b_r));
 	//zve_pio.out_pb_callback().set(FUNC(mc8030_state::zve_port_b_w));
 
-	MCFG_DEVICE_ADD("zve_ctc", Z80CTC, XTAL(2'457'600))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& zve_ctc(Z80CTC(config, "zve_ctc", XTAL(2'457'600)));
+	zve_ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// ZC0, ZC1, ZC2 for user
 
 	z80pio_device& asp_pio(Z80PIO(config, "asp_pio", XTAL(2'457'600)));
@@ -221,8 +221,8 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	asp_pio.in_pb_callback().set(FUNC(mc8030_state::asp_port_b_r));
 	//asp_pio.out_pb_callback().set(FUNC(mc8030_state::asp_port_b_w));
 
-	MCFG_DEVICE_ADD("asp_ctc", Z80CTC, XTAL(2'457'600))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& asp_ctc(Z80CTC(config, "asp_ctc", XTAL(2'457'600)));
+	asp_ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// ZC0: to SIO CLK CH A
 	// ZC1: to SIO CLK CH B
 	// ZC2: KMBG (??)

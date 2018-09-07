@@ -1987,12 +1987,12 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segas16a_state, misc_control_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segas16a_state, tilemap_sound_w))
+	I8255(config, m_i8255);
+	m_i8255->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_i8255->out_pb_callback().set(FUNC(segas16a_state::misc_control_w));
+	m_i8255->out_pc_callback().set(FUNC(segas16a_state::tilemap_sound_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

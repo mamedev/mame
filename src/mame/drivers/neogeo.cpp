@@ -1997,8 +1997,7 @@ MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 	m_systemlatch->q_out_cb<5>().set(FUNC(ngarcade_base_state::set_use_cart_audio));
 	m_systemlatch->q_out_cb<6>().set(FUNC(ngarcade_base_state::set_save_ram_unlock));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK));
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 
@@ -2252,10 +2251,20 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( x+13, "unibios10", "Universe Bios (Hack, Ver. 1.0)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( x+13, "uni-bios_1_0.rom",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
 
-/* the number shown in the top right corner (only displayed on the colour test in early versions) should be connected to the revision, the actual numbering / naming here is a mess, possibly due to upgrades where stickers weren't replaced
-   also is the colour of the outside of the test grid connected to the region? / cabinet type? (if so, why so many colours for US ones, but not other regions and are Asia + Europe really just the same thing?)
+/* The number shown in the top right corner (only displayed on the colour test in early versions) should be connected to the revision, the actual numbering / naming here is a mess, possibly due to upgrades where stickers weren't replaced
+   The colour of the outside of the test grid appears to be connected to the region / cabinet type (most regions have a single colour, but for the US there are multiple colours, which seem to indicate defaults / intended cabinet type)
 
-   these details have been added to the comments */
+   the Cyan US sets will default to
+   Game Select: Free
+   Game Start Compulsion: Without
+   while all others default to
+   Game Select: Only When Credited
+   Game Start Compulsion: 30 seconds
+   They also allow you to set the continue price, rather than the Coin 2 rate (Coin 2 rate doesn't show up, even if you set Dipswitch to 'VS mode')
+
+   The Yellow bios ROM does not show the 'Winners Don't Use Drugs' logo for several earlier games (eg. Metal Slug, Neo Bomberman) but does still show other US specific screens (Parental Advisory)
+   Later games seem to be unaffected by this and show all screens regardless
+*/
 
 #define NEOGEO_BIOS \
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 ) \
@@ -2274,27 +2283,29 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "sp-e.sp1",          0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* 5 Yellow - US, 6 Slot (V5?) */ \
 	ROM_SYSTEM_BIOS( 6, "us-v2", "US MVS (4 slot, Ver 2)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "sp1-u2",            0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* 3 Cyan - US, 4 slot - also seen with "v2" label*/ \
-	ROM_SYSTEM_BIOS( 7, "us-u3", "US MVS (U3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1-u3.bin",        0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 Green - 6 Slot */ \
+	ROM_SYSTEM_BIOS( 7, "us-u4", "US MVS (U4)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1-u4.bin",        0x00000, 0x020000, CRC(1179a30f) SHA1(866817f47aa84d903d0b819d61f6ef356893d16a) ) /* 3 Green - 4 Slot (MV-4F) */ \
+	ROM_SYSTEM_BIOS( 8, "us-u3", "US MVS (U3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "sp1-u3.bin",        0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 Green - 6 Slot */ \
 	\
-	ROM_SYSTEM_BIOS( 8, "japan", "Japan MVS (Ver. 3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "vs-bios.rom",       0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 Red - Japan, Ver 6 VS Bios */ \
-	ROM_SYSTEM_BIOS( 9, "japan-s2", "Japan MVS (Ver. 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "sp-j2.sp1",         0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* 5 Red - Japan, Older */ \
-	ROM_SYSTEM_BIOS( 10, "japan-s1", "Japan MVS (Ver. 1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10, "sp1.jipan.1024",   0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* 3 Red - Japan, Older */ \
-	ROM_SYSTEM_BIOS( 11, "japan-mv1b", "Japan MV1B" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11, "japan-j3.bin",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 Red - Latest Japan bios (MV1B) */ \
-	ROM_SYSTEM_BIOS( 12, "japan-j3a", "Japan MVS (J3, alt)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "sp1-j3.bin",       0x00000, 0x020000, CRC(fbc6d469) SHA1(46b2b409b5b68869e367b40c846373623edb632a) ) /* 2 Red - 6 Slot */ \
-	ROM_SYSTEM_BIOS( 13, "japan-mv1c", "Japan NEO-MVH MV1C" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13, "sp-j3.sp1",        0x00000, 0x080000, CRC(486cb450) SHA1(52c21ea817928904b80745a8c8d15cbad61e1dc1) ) /* 6 Red - Latest Japan bios (MV1C - mask ROM) */ \
+	ROM_SYSTEM_BIOS( 9, "japan", "Japan MVS (Ver. 3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "vs-bios.rom",       0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 Red - Japan, Ver 6 VS Bios */ \
+	ROM_SYSTEM_BIOS( 10, "japan-s2", "Japan MVS (Ver. 2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "sp-j2.sp1",        0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* 5 Red - Japan, Older */ \
+	ROM_SYSTEM_BIOS( 11, "japan-s1", "Japan MVS (Ver. 1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "sp1.jipan.1024",   0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* 3 Red - Japan, Older */ \
+	ROM_SYSTEM_BIOS( 12, "japan-mv1b", "Japan MV1B" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "japan-j3.bin",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 Red - Latest Japan bios (MV1B) */ \
+	ROM_SYSTEM_BIOS( 13, "japan-j3a", "Japan MVS (J3, alt)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "sp1-j3.bin",       0x00000, 0x020000, CRC(fbc6d469) SHA1(46b2b409b5b68869e367b40c846373623edb632a) ) /* 2 Red - 6 Slot */ \
+	ROM_SYSTEM_BIOS( 14, "japan-mv1c", "Japan NEO-MVH MV1C" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14, "sp-j3.sp1",        0x00000, 0x080000, CRC(486cb450) SHA1(52c21ea817928904b80745a8c8d15cbad61e1dc1) ) /* 6 Red - Latest Japan bios (MV1C - mask ROM) */ \
 	\
-	ROM_SYSTEM_BIOS( 14, "japan-hotel", "Custom Japanese Hotel" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 14, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
+	ROM_SYSTEM_BIOS( 15, "japan-hotel", "Custom Japanese Hotel" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 15, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
 	\
-	NEOGEO_UNIBIOS(15) \
-	NEOGEO_UNIBIOS_1_2_AND_OLDER(15)
+	NEOGEO_UNIBIOS(16) \
+	NEOGEO_UNIBIOS_1_2_AND_OLDER(16)
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) \

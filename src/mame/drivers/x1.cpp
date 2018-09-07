@@ -2208,21 +2208,21 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg2))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MAIN_CLOCK/4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("ctc", FUNC(z80ctc_device::trg3));
+	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
+	ppi.in_pb_callback().set(FUNC(x1_state::x1_portb_r));
+	ppi.in_pc_callback().set(FUNC(x1_state::x1_portc_r));
+	ppi.out_pa_callback().set(FUNC(x1_state::x1_porta_w));
+	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
+	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
@@ -2246,9 +2246,9 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
-	MCFG_DEVICE_ADD("fdc", MB8877, MAIN_CLOCK / 16)
-	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
+	MB8877(config, m_fdc, MAIN_CLOCK / 16);
+	// TODO: guesswork, try to implicitly start the motor
+	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -2306,8 +2306,7 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	m_dma->in_iorq_callback().set(FUNC(x1_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(x1_state::io_write_byte));
 
-	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, x1_state, fdc_drq_w))
+	m_fdc->drq_wr_callback().set(FUNC(x1_state::fdc_drq_w));
 
 	MCFG_DEVICE_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)

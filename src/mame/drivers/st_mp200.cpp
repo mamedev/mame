@@ -978,4 +978,4 @@ GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state, init_st_m
 // other manufacturer
 GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1978,  blkshpsq,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Astro",     "Black Sheep Squadron",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown pinball game",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown MP-200 pinball game", MACHINE_IS_SKELETON_MECHANICAL)

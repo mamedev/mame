@@ -958,9 +958,9 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_DEVICE_ADD("keyboard_clock_tx", CLOCK, 1200 * 64)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("keyboard",i8251_device,write_txc))
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic_master",pic8259_device, ir5_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma2",am9517a_device, dreq1_w))
+	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));
+	m_fdc->drq_wr_callback().set(m_dma2, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("fd_list","octopus")
@@ -978,7 +978,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	Z80SIO(config, m_serial, 16_MHz_XTAL / 4); // clock rate not mentioned in tech manual
-	m_serial->out_int_callback().set("pic_master", FUNC(pic8259_device::ir1_w));
+	m_serial->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
 	m_serial->out_txda_callback().set("serial_a", FUNC(rs232_port_device::write_txd));
 	m_serial->out_txdb_callback().set("serial_b", FUNC(rs232_port_device::write_txd));
 	m_serial->out_rtsa_callback().set("serial_a", FUNC(rs232_port_device::write_rts));

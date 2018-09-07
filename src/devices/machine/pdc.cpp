@@ -321,6 +321,10 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
+	/* Resolve callbacks */
+	m_m68k_r_cb.resolve_safe(0);
+	m_m68k_w_cb.resolve_safe();
+
 	/* Save States */
 	save_item(NAME(reg_p0));
 	save_item(NAME(reg_p1));
@@ -348,10 +352,6 @@ void pdc_device::device_reset()
 
 	/* Reset CPU */
 	m_pdccpu->reset();
-
-	/* Resolve callbacks */
-	m_m68k_r_cb.resolve_safe(0);
-	m_m68k_w_cb.resolve_safe();
 
 	m_fdc->set_rate(500000) ;
 }

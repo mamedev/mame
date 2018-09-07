@@ -184,14 +184,6 @@ If you calibrate the guns correctly the game runs as expected:
 2) Using P2 controls fire at the indicated spots.
 3) Using P3 controls fire at the indicated spots.
 
----
-
-Beast Busters notes (from Brian Hargrove)
-
-1. Stage 2 for example, has background sprites and enemies that float on the
-foreground and not behind the moving elevator layer.
-
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -1143,11 +1135,11 @@ ROM_END
 /******************************************************************************/
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
-GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mechatt,    0,        mechatt,  mechatt,  mechatt_state,  empty_init, ROT0, "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, mechatt_state,  empty_init, ROT0, "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )

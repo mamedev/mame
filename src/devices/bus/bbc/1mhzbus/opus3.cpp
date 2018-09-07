@@ -81,18 +81,17 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_opus3_device::device_add_mconfig)
+void bbc_opus3_device::device_add_mconfig(machine_config &config)
+{
 	/* fdc */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opus3_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies, nullptr, floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	m_fdc->drq_wr_callback().set(FUNC(bbc_opus3_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies, "525qd", floppy_formats).enable_sound(true);
 
 	/* ram disk */
-	RAM(config, "ramdisk").set_default_size("512K").set_extra_options("256K").set_default_value(0);
-MACHINE_CONFIG_END
+	RAM(config, m_ramdisk).set_default_size("512K").set_extra_options("256K").set_default_value(0);
+}
 
 const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 {

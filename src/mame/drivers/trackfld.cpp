@@ -919,7 +919,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -995,7 +995,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

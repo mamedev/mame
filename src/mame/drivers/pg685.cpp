@@ -412,8 +412,8 @@ MACHINE_CONFIG_START(pg685_state::pg685_backplane)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685_module)
-	MCFG_DEVICE_ADD("fdc", FD1797, XTAL(4'000'000) / 2) // divider guessed
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("mainpic", pic8259_device, ir4_w))
+	FD1797(config, m_fdc, XTAL(4'000'000) / 2); // divider guessed
+	m_fdc->intrq_wr_callback().set("mainpic", FUNC(pic8259_device::ir4_w));
 
 	MCFG_DEVICE_ADD("modppi1", I8255, 0)
 	MCFG_DEVICE_ADD("modppi2", I8255, 0)
@@ -458,14 +458,14 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", XTAL(12'288'000) / 6)); // divider guessed
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
 	// floppy
-	// MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_intrq_w))
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
+	// m_fdc->intrq_wr_callback(FUNC(zorba_state::fdc_intrq_w));
+	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -508,20 +508,20 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", XTAL(12'288'000) / 6)); // divider guessed
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
 	// floppy
 
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
+	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
+	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
+	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685oua12)
@@ -559,20 +559,19 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, 12288000 / 6) // wrong
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", 12288000 / 6)); // wrong
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
 	// floppy
-
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
+	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
+	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
+	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
 
 MACHINE_CONFIG_END
 

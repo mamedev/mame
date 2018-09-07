@@ -2860,7 +2860,7 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2)
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,f2)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

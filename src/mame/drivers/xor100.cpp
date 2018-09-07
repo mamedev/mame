@@ -511,18 +511,18 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	brg.ft_handler().set(m_uart_b, FUNC(i8251_device::write_txc));
 	brg.ft_handler().append(m_uart_b, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITELINE(m_centronics, centronics_device, write_strobe))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, xor100_state, i8255_pc_r))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pb_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
+	ppi.in_pc_callback().set(FUNC(xor100_state::i8255_pc_r));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, xor100_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, xor100_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, xor100_state, ctc_z2_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(xor100_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(xor100_state::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(FUNC(xor100_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(WD1795_TAG, FD1795, 8_MHz_XTAL / 4)
+	FD1795(config, m_fdc, 8_MHz_XTAL / 4);
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)

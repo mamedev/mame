@@ -436,19 +436,19 @@ MACHINE_CONFIG_START(amust_state::amust)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, amust_state, port04_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amust_state, port04_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, amust_state, port05_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, amust_state, port06_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amust_state, port06_w))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set(FUNC(amust_state::port04_r));
+	ppi1.out_pa_callback().set(FUNC(amust_state::port04_w));
+	ppi1.in_pb_callback().set(FUNC(amust_state::port05_r));
+	ppi1.in_pc_callback().set(FUNC(amust_state::port06_r));
+	ppi1.out_pc_callback().set(FUNC(amust_state::port06_w));
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, amust_state, port08_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amust_state, port08_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, amust_state, port09_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, amust_state, port0a_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amust_state, port0a_w))
+	i8255_device &ppi2(I8255A(config, "ppi2"));
+	ppi2.in_pa_callback().set(FUNC(amust_state::port08_r));
+	ppi2.out_pa_callback().set(FUNC(amust_state::port08_w));
+	ppi2.in_pb_callback().set(FUNC(amust_state::port09_r));
+	ppi2.in_pc_callback().set(FUNC(amust_state::port0a_r));
+	ppi2.out_pc_callback().set(FUNC(amust_state::port0a_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */

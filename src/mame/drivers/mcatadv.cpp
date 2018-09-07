@@ -460,8 +460,7 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 	MCFG_PALETTE_ADD("palette", 0x2000/2)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 
 	/* sound hardware */

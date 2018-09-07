@@ -1730,7 +1730,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 Mhz - confirmed */
 	MCFG_DEVICE_PROGRAM_MAP(snowbros_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6 MHz - confirmed */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1879,7 +1879,7 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12MHz like Honey Dolls ? */
 	MCFG_DEVICE_PROGRAM_MAP(twinadv_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
 	MCFG_DEVICE_PROGRAM_MAP(snowbros3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros3_irq, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1997,7 +1997,7 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_DEVICE_PROGRAM_MAP(yutnori_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
-//  MCFG_WATCHDOG_ADD("watchdog") // maybe
+//  WATCHDOG_TIMER(config, "watchdog"); // maybe
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

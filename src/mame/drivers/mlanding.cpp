@@ -950,8 +950,8 @@ MACHINE_CONFIG_START(mlanding_state::mlanding)
 	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, mlanding_state, dsp_hold_signal_r))
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, mlanding_state, z80ctc_to0))
+	Z80CTC(config, m_ctc, 4000000);
+	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")

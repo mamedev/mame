@@ -3261,7 +3261,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
-	MCFG_DEVICE_ADD(FD1793_TAG, FD1793, 24.0734_MHz_XTAL / 24) // no separate 1 Mhz quartz
+	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
@@ -3271,25 +3271,26 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
 
 	/// ********************************* HARD DISK CONTROLLER *****************************************
-	MCFG_DEVICE_ADD("hdc", WD2010, 5000000) // 10 Mhz quartz on controller (divided by 2 for WCLK)
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE(*this, rainbow_state, bundle_irq)) // FIRST IRQ SOURCE (OR'ed with DRQ)
-	MCFG_WD2010_OUT_BDRQ_CB(WRITELINE(*this, rainbow_state, hdc_bdrq))  // BUFFER DATA REQUEST
+	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)
+	m_hdc->out_intrq_callback().set(FUNC(rainbow_state::bundle_irq)); // FIRST IRQ SOURCE (OR'ed with DRQ)
+	m_hdc->out_bdrq_callback().set(FUNC(rainbow_state::hdc_bdrq));  // BUFFER DATA REQUEST
 
 	// SIGNALS -FROM- WD CONTROLLER:
-	MCFG_WD2010_OUT_BCS_CB(WRITELINE(*this, rainbow_state, hdc_read_sector)) // Problem: OUT_BCS_CB = WRITE8 ... (!)
-	MCFG_WD2010_OUT_BCR_CB(WRITELINE(*this, rainbow_state, hdc_bcr))         // BUFFER COUNTER RESET (pulses)
+	m_hdc->out_bcs_callback().set(FUNC(rainbow_state::hdc_read_sector)); // Problem: OUT_BCS_CB = WRITE8 ... (!)
+	m_hdc->out_bcr_callback().set(FUNC(rainbow_state::hdc_bcr));         // BUFFER COUNTER RESET (pulses)
 
-	MCFG_WD2010_OUT_WG_CB(WRITELINE(*this, rainbow_state, hdc_write_sector))   // WRITE GATE
-	MCFG_WD2010_OUT_STEP_CB(WRITELINE(*this, rainbow_state, hdc_step))         // STEP PULSE
-	MCFG_WD2010_OUT_DIRIN_CB(WRITELINE(*this, rainbow_state, hdc_direction))
+	m_hdc->out_wg_callback().set(FUNC(rainbow_state::hdc_write_sector));   // WRITE GATE
+	m_hdc->out_step_callback().set(FUNC(rainbow_state::hdc_step));         // STEP PULSE
+	m_hdc->out_dirin_callback().set(FUNC(rainbow_state::hdc_direction));
 
-	MCFG_WD2010_IN_WF_CB(READLINE(*this, rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
+	m_hdc->in_wf_callback().set(FUNC(rainbow_state::hdc_write_fault));   // WRITE FAULT  (set to GND if not serviced)
 
-	MCFG_WD2010_IN_DRDY_CB(READLINE(*this, rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
-	MCFG_WD2010_IN_SC_CB(CONSTANT(1))                                        // SEEK COMPLETE (set to VCC if not serviced)
+	m_hdc->in_drdy_callback().set(FUNC(rainbow_state::hdc_drive_ready)); // DRIVE_READY  (set to VCC if not serviced)
 
-	MCFG_WD2010_IN_TK000_CB(CONSTANT(1)) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
-	MCFG_WD2010_IN_INDEX_CB(CONSTANT(1)) //    "
+	m_hdc->in_sc_callback().set_constant(1);                                        // SEEK COMPLETE (set to VCC if not serviced)
+
+	m_hdc->in_tk000_callback().set_constant(1); // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
+	m_hdc->in_wf_callback().set_constant(1); //    "
 
 	MCFG_HARDDISK_ADD("decharddisk1")
 	/// ******************************** / HARD DISK CONTROLLER ****************************************

@@ -226,10 +226,11 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
 
-	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
+
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE(uart, ins8250_uart_device, rx_w))
 
 	MCFG_DEVICE_ADD("cs4231", AD1848, 0)
 	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
@@ -258,7 +259,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* Flash ROM */
-	MCFG_AMD_29F040_ADD("flash")
+	AMD_29F040(config, "flash");
 
 	/* Security key */
 	MCFG_DS1205_ADD("multikey")

@@ -307,10 +307,10 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, mtx_state, ctc_trg1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, mtx_state, ctc_trg2_w))
+	Z80CTC(config, m_z80ctc, XTAL(4'000'000));
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80ctc->zc_callback<1>().set(FUNC(mtx_state::ctc_trg1_w));
+	m_z80ctc->zc_callback<2>().set(FUNC(mtx_state::ctc_trg2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL(4'000'000)/13))
 

@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
 	MCFG_DEVICE_PROGRAM_MAP(battlnts_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

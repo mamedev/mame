@@ -107,13 +107,13 @@ MACHINE_CONFIG_START(ax80_state::ax80)
 	MCFG_DEVICE_ADD(PPI0_TAG, I8255A, 0)
 	MCFG_DEVICE_ADD(PPI1_TAG, I8255A, 0)
 
-	MCFG_DEVICE_ADD("kdc", I8279, 6554800 / 8) // Keyboard/Display Controller
-	//MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", UPD7810_INTF1))   // irq
-	//MCFG_I8279_OUT_SL_CB(WRITE8(*this, ax80_state, scanlines_w))          // scan SL lines
-	//MCFG_I8279_OUT_DISP_CB(WRITE8(*this, ax80_state, digit_w))            // display A&B
-	//MCFG_I8279_IN_RL_CB(READ8(*this, ax80_state, kbd_r))                  // kbd RL lines
-	//MCFG_I8279_IN_SHIFT_CB(VCC) // not connected
-	//MCFG_I8279_IN_CTRL_CB(VCC)  // not connected
+	I8279(config, "kdc", 6554800 / 8); // Keyboard/Display Controller
+	//kdc.out_irq_calback().set_inputline("maincpu", UPD7810_INTF1);	// irq
+	//kdc.out_sl_callback().set(FUNC(ax80_state::scanlines_w));			// scan SL lines
+	//kdc.out_disp_callback().set(FUNC(ax80_state::digit_w));			// display A&B
+	//kdc.in_rl_callback().set(FUNC(ax80_state::kbd_r))					// kbd RL lines
+	//kdc.in_shift_callback().set_constant(1);							// not connected
+	//kdc.in_ctrl_callback().set_constant(1);							// not connected
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ax80 )

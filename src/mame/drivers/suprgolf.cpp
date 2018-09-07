@@ -504,17 +504,17 @@ MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprgolf_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, suprgolf_state, p1_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, suprgolf_state, p2_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, suprgolf_state, pedal_extra_bits_r))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set(FUNC(suprgolf_state::p1_r));
+	ppi0.in_pb_callback().set(FUNC(suprgolf_state::p2_r));
+	ppi0.in_pc_callback().set(FUNC(suprgolf_state::pedal_extra_bits_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, suprgolf_state, rom_bank_select_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, suprgolf_state, rom_bank_select_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, suprgolf_state, vregs_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, suprgolf_state, vregs_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("SYSTEM");
+	ppi1.in_pb_callback().set(FUNC(suprgolf_state::rom_bank_select_r));
+	ppi1.out_pb_callback().set(FUNC(suprgolf_state::rom_bank_select_w));
+	ppi1.in_pc_callback().set(FUNC(suprgolf_state::vregs_r));
+	ppi1.out_pc_callback().set(FUNC(suprgolf_state::vregs_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

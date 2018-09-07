@@ -107,7 +107,14 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 WRITE8_MEMBER(yunsun16_state::sound_bank_w)
 {
-	membank("okibank")->set_entry(data & 3);
+	m_okibank->set_entry(data & 3);
+}
+
+template<int Layer>
+WRITE16_MEMBER(yunsun16_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
 void yunsun16_state::main_map(address_map &map)
@@ -129,8 +136,8 @@ void yunsun16_state::main_map(address_map &map)
 	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0x8001fe, 0x8001ff).nopw();    // ? 0 (during int)
 	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x908000, 0x90bfff).ram().w(FUNC(yunsun16_state::vram_1_w)).share("vram_1"); // Layer 1
-	map(0x90c000, 0x90ffff).ram().w(FUNC(yunsun16_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0x908000, 0x90bfff).ram().w(FUNC(yunsun16_state::vram_w<1>)).share("vram_1"); // Layer 1
+	map(0x90c000, 0x90ffff).ram().w(FUNC(yunsun16_state::vram_w<0>)).share("vram_0"); // Layer 0
 	map(0x910000, 0x910fff).ram().share("spriteram");   // Sprites
 	map(0xff0000, 0xffffff).ram();
 }
@@ -565,25 +572,20 @@ void yunsun16_state::machine_start()
 {
 	save_item(NAME(m_sprites_scrolldx));
 	save_item(NAME(m_sprites_scrolldy));
+	if (m_okibank)
+	{
+		m_okibank->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
+	}
 }
 
 void yunsun16_state::machine_reset()
 {
 	m_sprites_scrolldx = -0x40;
 	m_sprites_scrolldy = -0x0f;
-}
-
-MACHINE_START_MEMBER(yunsun16_state, shocking)
-{
-	machine_start();
-	membank("okibank")->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
-	membank("okibank")->set_entry(0);
-}
-
-MACHINE_RESET_MEMBER(yunsun16_state, shocking)
-{
-	machine_reset();
-	membank("okibank")->set_entry(0);
+	if (m_okibank)
+	{
+		m_okibank->set_entry(0);
+	}
 }
 
 /***************************************************************************
@@ -601,17 +603,15 @@ MACHINE_CONFIG_START(yunsun16_state::magicbub)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_port_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0) /* TODO: completely inaccurate */
-	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
+	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -641,13 +641,10 @@ MACHINE_CONFIG_START(yunsun16_state::shocking)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(yunsun16_state, shocking)
-	MCFG_MACHINE_RESET_OVERRIDE(yunsun16_state, shocking)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0) /* TODO: completely inaccurate */
-	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
+	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)

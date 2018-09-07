@@ -44,11 +44,12 @@ protected:
 
 	bool m_invert;
 
-private:
-	required_memory_region m_dfs_rom;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
+
+private:
+	required_memory_region m_dfs_rom;
 
 	int m_drive_control;
 	int m_fdc_ie;

@@ -609,10 +609,10 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sfkick_state, ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, sfkick_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sfkick_state, ppi_port_c_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(sfkick_state::ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(sfkick_state::ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(sfkick_state::ppi_port_c_w));
 
 	SPEAKER(config, "mono").front_center();
 

@@ -583,9 +583,9 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	/* devices */
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(pc8401a_state::ppi_pc_w));
 
 	i8251_device &uart(I8251(config, I8251_TAG, 0));
 	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -623,9 +623,9 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	/* devices */
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(pc8401a_state::ppi_pc_w));
 
 	i8251_device &uart(I8251(config, I8251_TAG, 0));
 	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

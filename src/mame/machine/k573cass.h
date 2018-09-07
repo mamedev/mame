@@ -107,7 +107,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	required_device<x76f041_device> m_x76f041;
 };
 
@@ -198,8 +197,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	required_device<x76f100_device> m_x76f100;
+
+private:
 	devcb_write_line m_d0_handler;
 	devcb_write_line m_d1_handler;
 	devcb_write_line m_d2_handler;

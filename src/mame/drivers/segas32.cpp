@@ -2365,10 +2365,10 @@ MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_4player_map)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
@@ -2663,10 +2663,10 @@ MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multi32_6player_map)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")

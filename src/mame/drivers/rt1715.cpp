@@ -309,9 +309,9 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rt1715_state, crtc_display_pixels)
 
-	MCFG_DEVICE_ADD("a30", Z80CTC, 9.832_MHz_XTAL / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("a29", z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("a29", z80sio_device, rxtxcb_w))
+	z80ctc_device& ctc(Z80CTC(config, "a30", 9.832_MHz_XTAL / 4));
+	ctc.zc_callback<0>().set("a29", FUNC(z80sio_device::txca_w));
+	ctc.zc_callback<2>().set("a29", FUNC(z80sio_device::rxtxcb_w));
 
 	Z80SIO(config, "a29", 9.832_MHz_XTAL / 4);
 

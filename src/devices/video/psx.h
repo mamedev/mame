@@ -61,6 +61,8 @@ public:
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void lightgun_set( int, int );
 
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 protected:
 	static constexpr unsigned MAX_LEVEL = 32;
 	static constexpr unsigned MID_LEVEL = (MAX_LEVEL / 2) << 8;
@@ -209,6 +211,12 @@ private:
 			PAIR n_bgr;
 			struct FLATVERTEX vertex;
 		} Dot;
+
+		struct
+		{
+			PAIR n_bgr;
+			struct FLATTEXTUREDVERTEX vertex;
+		} TexturedDot;
 	};
 
 	void updatevisiblearea();
@@ -227,6 +235,7 @@ private:
 	void Sprite8x8();
 	void Sprite16x16();
 	void Dot();
+	void TexturedDot();
 	void MoveImage();
 	void psx_gpu_init( int n_gputype );
 	void gpu_reset();

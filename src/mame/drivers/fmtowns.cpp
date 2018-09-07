@@ -2819,9 +2819,9 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8'000'000 / 4)  // clock unknown
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_drq_w))
+	MB8877(config, m_fdc, 8'000'000 / 4);  // clock unknown
+	m_fdc->intrq_wr_callback().set(FUNC(towns_state::mb8877a_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(towns_state::mb8877a_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("fd_list","fmtowns_flop")

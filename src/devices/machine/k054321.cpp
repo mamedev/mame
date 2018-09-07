@@ -63,12 +63,6 @@ k054321_device::k054321_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k054321_device::set_gain_devices(const char *_left, const char *_right)
-{
-	m_left.set_tag(_left);
-	m_right.set_tag(_right);
-}
-
 void k054321_device::device_start()
 {
 	save_item(NAME(m_main1));

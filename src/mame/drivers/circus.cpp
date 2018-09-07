@@ -517,7 +517,7 @@ ROM_END
 // see http://forum.arcadecontrols.com/index.php/topic,146323.msg1526542.html
 ROM_START( crasha )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "nsa7.a7",    0x1000, 0x0800, CRC(2e47c5ee) SHA1(4712ec3080ce3797420266d6efb26e7d146a965a) )
+	ROM_LOAD( "nsa7.a8",    0x1000, 0x0800, CRC(2e47c5ee) SHA1(4712ec3080ce3797420266d6efb26e7d146a965a) )
 	ROM_LOAD( "nsa3.a4",    0x1800, 0x0800, CRC(11c8c461) SHA1(197b903ad7626a4055530c8c9c99299ffd94cd37) )
 	ROM_RELOAD(             0xf800, 0x0800 ) /* for the reset and interrupt vectors */
 

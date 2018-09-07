@@ -34,51 +34,27 @@
 
 ***************************************************************************/
 
-#define TMAP_GFX            (0)
+/*
 #define TILES_PER_PAGE_X    (0x10)
 #define TILES_PER_PAGE_Y    (0x10)
 #define PAGES_PER_TMAP_X    (0x4)
 #define PAGES_PER_TMAP_Y    (0x4)
+*/
 
 TILEMAP_MAPPER_MEMBER(yunsun16_state::tilemap_scan_pages)
 {
-	return  (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
-			(row % TILES_PER_PAGE_Y) +
-
-			(col / TILES_PER_PAGE_X) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y +
-			(col % TILES_PER_PAGE_X) * TILES_PER_PAGE_Y;
+	return  ((row & 0x30) << 6) | ((col & 0x3f) << 4) | (row & 0xf);
 }
 
-TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
+template<int Layer>
+TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info)
 {
-	uint16_t code = m_vram_0[2 * tile_index + 0];
-	uint16_t attr = m_vram_0[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(TMAP_GFX,
+	uint16_t code = m_vram[Layer][2 * tile_index + 0];
+	uint16_t attr = m_vram[Layer][2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			attr & 0xf,
 			(attr & 0x20) ? TILE_FLIPX : 0);
-}
-
-TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_1)
-{
-	uint16_t code = m_vram_1[2 * tile_index + 0];
-	uint16_t attr = m_vram_1[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(TMAP_GFX,
-			code,
-			attr & 0xf,
-			(attr & 0x20) ? TILE_FLIPX : 0);
-}
-
-WRITE16_MEMBER(yunsun16_state::vram_0_w)
-{
-	COMBINE_DATA(&m_vram_0[offset]);
-	m_tilemap_0->mark_tile_dirty(offset / 2);
-}
-
-WRITE16_MEMBER(yunsun16_state::vram_1_w)
-{
-	COMBINE_DATA(&m_vram_1[offset]);
-	m_tilemap_1->mark_tile_dirty(offset / 2);
 }
 
 
@@ -92,21 +68,21 @@ WRITE16_MEMBER(yunsun16_state::vram_1_w)
 
 void yunsun16_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
-			16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	m_tilemap_1 = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
-			16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
+	m_tilemap[0] = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info<0>),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
+			16, 16, 0x40, 0x40);
+	m_tilemap[1] = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info<1>),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
+			16, 16, 0x40, 0x40);
 
-	m_tilemap_0->set_scrolldx(-0x34, 0);
-	m_tilemap_1->set_scrolldx(-0x38, 0);
+	m_tilemap[0]->set_scrolldx(-0x34, 0);
+	m_tilemap[1]->set_scrolldx(-0x38, 0);
 
-	m_tilemap_0->set_scrolldy(-0x10, 0);
-	m_tilemap_1->set_scrolldy(-0x10, 0);
+	m_tilemap[0]->set_scrolldy(-0x10, 0);
+	m_tilemap[1]->set_scrolldy(-0x10, 0);
 
-	m_tilemap_0->set_transparent_pen(0xff);
-	m_tilemap_1->set_transparent_pen(0xff);
+	m_tilemap[0]->set_transparent_pen(0xff);
+	m_tilemap[1]->set_transparent_pen(0xff);
 }
 
 
@@ -193,13 +169,13 @@ void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 ***************************************************************************/
 
 
-uint32_t yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t yunsun16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap_0->set_scrollx(0, m_scrollram_0[0]);
-	m_tilemap_0->set_scrolly(0, m_scrollram_0[1]);
+	m_tilemap[0]->set_scrollx(0, m_scrollram[0][0]);
+	m_tilemap[0]->set_scrolly(0, m_scrollram[0][1]);
 
-	m_tilemap_1->set_scrollx(0, m_scrollram_1[0]);
-	m_tilemap_1->set_scrolly(0, m_scrollram_1[1]);
+	m_tilemap[1]->set_scrollx(0, m_scrollram[1][0]);
+	m_tilemap[1]->set_scrolly(0, m_scrollram[1][1]);
 
 	//popmessage("%04X", *m_priorityram);
 
@@ -208,16 +184,16 @@ uint32_t yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_in
 	if ((*m_priorityram & 0x0c) == 4)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		m_tilemap_0->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_tilemap_0->draw(screen, bitmap, cliprect, 0, 1);
-		m_tilemap_1->draw(screen, bitmap, cliprect, 0, 2);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
 	}
 	else if ((*m_priorityram & 0x0c) == 8)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		m_tilemap_1->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_tilemap_1->draw(screen, bitmap, cliprect, 0, 1);
-		m_tilemap_0->draw(screen, bitmap, cliprect, 0, 2);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 2);
 	}
 
 	draw_sprites(screen, bitmap, cliprect);

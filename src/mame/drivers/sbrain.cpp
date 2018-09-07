@@ -565,13 +565,13 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sbrain_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sbrain_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, sbrain_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sbrain_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, sbrain_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sbrain_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(sbrain_state::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(sbrain_state::ppi_pa_w));
+	m_ppi->in_pb_callback().set(FUNC(sbrain_state::ppi_pb_r));
+	m_ppi->out_pb_callback().set(FUNC(sbrain_state::ppi_pb_w));
+	m_ppi->in_pc_callback().set(FUNC(sbrain_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(sbrain_state::ppi_pc_w));
 
 	I8251(config, m_u0, 0);
 
@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	brg.ft_handler().set(m_u1, FUNC(i8251_device::write_txc));
 	brg.ft_handler().append(m_u1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 16_MHz_XTAL / 16)
+	FD1791(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

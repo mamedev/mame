@@ -172,7 +172,7 @@ class ams40489_ppi_device : public i8255_device
 {
 public:
 	// construction/destruction
-	ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition

@@ -506,10 +506,10 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(16_MHz_XTAL / 24)) // adjusted to pass post
 
-	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
+	MCFG_DEVICE_ADD(m_pic1, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
 
-	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
+	MCFG_DEVICE_ADD(m_pic2, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int1_w))
 
 	MCFG_DEVICE_ADD("video", PCD_VIDEO, 0)
@@ -520,10 +520,10 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// floppy disk controller
-	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
-	MCFG_WD_FDC_ENMF_CALLBACK(CONSTANT(0))
+	WD2793(config, m_fdc, 16_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir6_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_fdc->enmf_rd_callback().set_constant(0);
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcd_floppies, "55f", pcd_state::floppy_formats)
@@ -531,16 +531,16 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 
 	// usart
 	MCFG_DEVICE_ADD("usart1", MC2661, 4.9152_MHz_XTAL)
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
-	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(m_pic1, pic8259_device, ir3_w))
+	MCFG_MC2661_TXRDY_HANDLER(WRITELINE(m_pic1, pic8259_device, ir3_w))
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_DEVICE_ADD("usart2", MC2661, 4.9152_MHz_XTAL)
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w))
-	//MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(m_pic1, pic8259_device, ir2_w))
+	//MCFG_MC2661_TXRDY_HANDLER(WRITELINE(m_pic1, pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
 	MCFG_DEVICE_ADD("usart3", MC2661, 4.9152_MHz_XTAL)
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
-	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(m_pic1, pic8259_device, ir4_w))
+	MCFG_MC2661_TXRDY_HANDLER(WRITELINE(m_pic1, pic8259_device, ir4_w))
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_2", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 
 	// rtc
 	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic1", pic8259_device, ir7_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(m_pic1, pic8259_device, ir7_w))
 	MCFG_MC146818_BINARY(true)
 	MCFG_MC146818_BINARY_YEAR(true)
 	MCFG_MC146818_EPOCH(1900)

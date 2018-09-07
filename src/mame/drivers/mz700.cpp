@@ -409,11 +409,11 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_PIT8253_CLK2(0)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz_state, pit_irq_2))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz_state, pio_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz_state, pio_port_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz_state, pio_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz_state, pio_port_c_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(mz_state::pio_port_a_w));
+	m_ppi->in_pb_callback().set(FUNC(mz_state::pio_port_b_r));
+	m_ppi->in_pc_callback().set(FUNC(mz_state::pio_port_c_r));
+	m_ppi->out_pc_callback().set(FUNC(mz_state::pio_port_c_w));
 
 	TTL74145(config, m_ls145);
 

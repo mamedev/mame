@@ -159,10 +159,10 @@ void dmv_k220_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(dmv_k220_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dmv_k220_device, porta_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dmv_k220_device, portc_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(dmv_k220_device::porta_w));
+	m_ppi->in_pb_callback().set_ioport("SWITCH");
+	m_ppi->out_pc_callback().set(FUNC(dmv_k220_device::portc_w));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(1'000'000))  // CLK1

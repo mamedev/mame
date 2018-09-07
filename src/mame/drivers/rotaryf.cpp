@@ -271,11 +271,11 @@ MACHINE_CONFIG_START(rotaryf_state::rotaryf)
 	MCFG_DEVICE_IO_MAP(rotaryf_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rotaryf_state, rotaryf_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, rotaryf_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, rotaryf_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, rotaryf_state, portc_w))
-	//MCFG_I8255_TRISTATE_PORTC_CB(CONSTANT(0))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(rotaryf_state::porta_w));
+	ppi.in_pb_callback().set(FUNC(rotaryf_state::portb_r));
+	ppi.out_pc_callback().set(FUNC(rotaryf_state::portc_w));
+	//ppi.tri_pc_callback().set_constant(0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

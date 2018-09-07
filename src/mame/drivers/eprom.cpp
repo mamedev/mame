@@ -399,7 +399,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_eprom)
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_guts)

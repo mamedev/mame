@@ -720,13 +720,13 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_DEVICE_ADD("pccard", PCCARD_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(slot_ataflash, nullptr, false)
 
-	MCFG_MB3773_ADD("mb3773")
+	MB3773(config, "mb3773");
 
-	MCFG_INTEL_TE28F160_ADD("biosflash")
-	MCFG_INTEL_E28F400B_ADD("pgmflash")
-	MCFG_INTEL_TE28F160_ADD("sndflash0")
-	MCFG_INTEL_TE28F160_ADD("sndflash1")
-	MCFG_INTEL_TE28F160_ADD("sndflash2")
+	INTEL_TE28F160(config, "biosflash");
+	INTEL_E28F400B(config, "pgmflash");
+	INTEL_TE28F160(config, "sndflash0");
+	INTEL_TE28F160(config, "sndflash1");
+	INTEL_TE28F160(config, "sndflash2");
 
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 
@@ -1204,7 +1204,7 @@ GAME( 2001, otenki,    coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, em
 GAME( 1999, mahjngoh,  coh3002t, coh3002t_t1_mp, coh3002t_mp,  taitogn_state, empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Mahjong Oh (V2.06J 1999/11/23 08:52:22)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, shanghss,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J 2000/05/26 12:45:28)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, soutenry,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Warashi", "Soutenryu (V2.07J 2000/12/14 11:13:02)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, usagi,     coh3002t, coh3002t_t2_mp, coh3002t_mp,  taitogn_state, empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J 2001/10/02 12:41:19)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // missing transparencies, see MT #06258
+GAME( 2001, usagi,     coh3002t, coh3002t_t2_mp, coh3002t_mp,  taitogn_state, empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J 2001/10/02 12:41:19)", MACHINE_IMPERFECT_SOUND ) // missing transparencies, see MT #06258
 GAME( 2002, shangtou,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Warashi / Sunsoft / Taito", "Shanghai Sangokuhai Tougi (Ver 2.01J 2002/01/18 18:26:58)", MACHINE_IMPERFECT_SOUND )
 
 /* Triangle Service */

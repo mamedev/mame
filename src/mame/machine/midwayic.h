@@ -158,9 +158,9 @@ public:
 	void set_shuffle(uint8_t shuffle) { m_shuffle_type = shuffle; }
 	void set_shuffle_default(uint8_t shuffle) { m_shuffle_default = shuffle; }
 	void set_auto_ack(uint8_t auto_ack) { m_auto_ack = auto_ack; }
-	template <class Object> devcb_base &set_irqhandler_callback(Object &&cb) { return m_irq_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_serial_tx_callback(Object &&cb) { return m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_aux_output_callback(Object &&cb) { return m_aux_output_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_callback.bind(); }
+	auto serial_tx_handler() { return m_serial_tx_cb.bind(); }
+	auto aux_output_handler() { return m_aux_output_cb.bind(); }
 
 	void set_shuffle_state(int state);
 	void fifo_w(uint16_t data);

@@ -648,15 +648,15 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, rtc_porta_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc100_state, rtc_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, rtc_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(pc100_state::rtc_porta_w));
+	ppi1.in_pc_callback().set(FUNC(pc100_state::rtc_portc_r));
+	ppi1.out_pc_callback().set(FUNC(pc100_state::rtc_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, lower_mask_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc100_state, upper_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, crtc_bank_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(pc100_state::lower_mask_w));
+	ppi2.out_pb_callback().set(FUNC(pc100_state::upper_mask_w));
+	ppi2.out_pc_callback().set(FUNC(pc100_state::crtc_bank_w));
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

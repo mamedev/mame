@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

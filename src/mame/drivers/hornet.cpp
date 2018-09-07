@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 //  PCB description at top doesn't mention any EEPROM on the base board...
 //  EEPROM_93C46_16BIT(config, "eeprom");
@@ -1091,8 +1091,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_VOODOO_CPU_TAG("dsp")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, hornet_state,voodoo_vblank_0))
 
-	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo0")
+	K033906(config, "k033906_1", 0, "voodoo0");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1157,8 +1156,7 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	MCFG_VOODOO_CPU_TAG("dsp2")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, hornet_state,voodoo_vblank_1))
 
-	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo1")
+	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

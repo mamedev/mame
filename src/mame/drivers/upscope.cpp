@@ -315,10 +315,10 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 
 	// i/o extension
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IO0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, upscope_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, upscope_state, coin_counter_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("IO0");
+	m_ppi->out_pb_callback().set(FUNC(upscope_state::lamps_w));
+	m_ppi->out_pc_callback().set(FUNC(upscope_state::coin_counter_w));
 MACHINE_CONFIG_END
 
 

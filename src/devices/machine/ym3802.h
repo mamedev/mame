@@ -23,12 +23,6 @@
 
 #include <queue>
 
-#define MCFG_YM3802_IRQ_HANDLER(_devcb) \
-	downcast<ym3802_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_YM3802_TXD_HANDLER(_devcb) \
-	downcast<ym3802_device &>(*device).set_txd_handler(DEVCB_##_devcb);
-
 class ym3802_device : public device_t, public device_serial_interface
 {
 public:
@@ -36,8 +30,8 @@ public:
 	ym3802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto txd_handler() { return m_txd_handler.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

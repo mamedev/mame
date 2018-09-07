@@ -182,10 +182,10 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_DEVICE_IO_MAP(maincpu_io_map)
 //        MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
-	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'745'600)) /* guessed xtal */
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("crtc", i8275_device, dack_w))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, sagitta180_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, sagitta180_state, memory_read_byte))
+	I8257(config, m_dma8257, XTAL(14'745'600)); /* guessed xtal */
+	m_dma8257->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dma8257->out_hrq_cb().set(FUNC(sagitta180_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(sagitta180_state::memory_read_byte));
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

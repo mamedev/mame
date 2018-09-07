@@ -65,25 +65,23 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_weddb2_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("wd1772", WD1772, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_weddb2_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_weddb2_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_weddb2_device::device_add_mconfig(machine_config &config)
+{
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_weddb2_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(bbc_weddb2_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(bbc_weddb3_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_weddb3_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_weddb3_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_weddb3_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_weddb3_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(bbc_weddb3_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+}
 
 const tiny_rom_entry *bbc_weddb2_device::device_rom_region() const
 {

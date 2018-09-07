@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 	m_latch->q_out_cb<7>().set_output("led2"); // START LAMP
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

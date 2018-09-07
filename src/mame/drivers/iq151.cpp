@@ -415,11 +415,11 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, iq151_state, keyboard_row_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, iq151_state, keyboard_column_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, iq151_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iq151_state, ppi_portc_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(iq151_state::keyboard_row_r));
+	ppi.in_pb_callback().set(FUNC(iq151_state::keyboard_column_r));
+	ppi.in_pc_callback().set(FUNC(iq151_state::ppi_portc_r));
+	ppi.out_pc_callback().set(FUNC(iq151_state::ppi_portc_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)

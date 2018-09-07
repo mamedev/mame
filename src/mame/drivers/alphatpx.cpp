@@ -1243,10 +1243,10 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_12_state, fdchld_w))
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatp_12_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(alphatp_12_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(alphatp_12_state::fdchld_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -1319,10 +1319,10 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_34_state, fdchld_w))
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatp_34_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(alphatp_34_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(alphatp_34_state::fdchld_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
