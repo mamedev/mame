@@ -674,8 +674,8 @@ MACHINE_CONFIG_START(taitoh_state::syvalion)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_syvalion)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_syvalion)
-	MCFG_PALETTE_ADD("palette", 33*16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_syvalion)
+	MCFG_PALETTE_ADD(m_palette, 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
@@ -730,8 +730,8 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_recordbr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_recordbr)
-	MCFG_PALETTE_ADD("palette", 32*16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_recordbr)
+	MCFG_PALETTE_ADD(m_palette, 32*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
@@ -762,6 +762,8 @@ MACHINE_CONFIG_START(taitoh_state::tetristh)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(tetristh_map)
+
+	m_palette->set_entries(0x800/2);
 MACHINE_CONFIG_END
 
 
@@ -795,8 +797,8 @@ MACHINE_CONFIG_START(taitoh_state::dleague)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_dleague)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dleague)
-	MCFG_PALETTE_ADD("palette", 33*16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dleague)
+	MCFG_PALETTE_ADD(m_palette, 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
