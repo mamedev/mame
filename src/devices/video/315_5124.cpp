@@ -1958,22 +1958,8 @@ void sega315_5124_device::device_reset()
 	std::fill(std::begin(m_CRAM), std::end(m_CRAM), 0);
 }
 
-//-------------------------------------------------
-//  device_add_mconfig - add machine configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(sega315_5124_device::device_add_mconfig)
-MACHINE_CONFIG_END
-
 void sega315_5377_device::device_reset()
 {
 	sega315_5124_device::device_reset();
 	m_draw_time = DRAW_TIME_GG;
 }
-
-//-------------------------------------------------
-//  device_add_mconfig - add machine configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(sega315_5377_device::device_add_mconfig)
-MACHINE_CONFIG_END

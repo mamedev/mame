@@ -199,7 +199,6 @@ uint32_t segas18_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_sprites->draw_async(cliprect);
 
 	// reset priorities
-	m_bitmap_buffer.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	// draw background opaquely first, not setting any priorities

@@ -88,7 +88,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -218,7 +217,6 @@ public:
 
 protected:
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const override { return 4096; }
