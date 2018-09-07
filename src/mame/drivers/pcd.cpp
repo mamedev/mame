@@ -554,12 +554,12 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// rtc
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(m_pic1, pic8259_device, ir7_w))
-	MCFG_MC146818_BINARY(true)
-	MCFG_MC146818_BINARY_YEAR(true)
-	MCFG_MC146818_EPOCH(1900)
-	MCFG_MC146818_24_12(true)
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_pic1, FUNC(pic8259_device::ir7_w));
+	m_rtc->set_binary(true);
+	m_rtc->set_binary_year(true);
+	m_rtc->set_epoch(1900);
+	m_rtc->set_24hrs(true);
 
 	MCFG_DEVICE_ADD("keyboard", PCD_KEYBOARD, 0)
 	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE("usart2", mc2661_device, rx_w))

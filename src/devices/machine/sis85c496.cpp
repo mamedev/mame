@@ -109,7 +109,7 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	DS12885(config, m_ds12885);
-	m_ds12885->irq_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
+	m_ds12885->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
 	m_ds12885->set_century_index(0x32);
 
 	/* sound hardware */

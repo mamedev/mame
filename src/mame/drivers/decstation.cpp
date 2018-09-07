@@ -224,9 +224,9 @@ MACHINE_CONFIG_START(decstation_state::kn02da)
 
 	MCFG_DEVICE_ADD("ioga", DECSTATION_IOGA, XTAL(12'500'000))
 
-	MCFG_DEVICE_ADD("rtc", MC146818, XTAL(32'768))
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("ioga", dec_ioga_device, rtc_irq_w))
-	MCFG_MC146818_BINARY(true)
+	MC146818(config, m_rtc, XTAL(32'768));
+	m_rtc->irq().set("ioga", FUNC(dec_ioga_device::rtc_irq_w));
+	m_rtc->set_binary(true);
 
 	SCC85C30(config, m_scc0, XTAL(14'745'600)/2);
 	//m_scc0->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc0_irq_w));

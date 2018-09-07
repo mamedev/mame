@@ -247,10 +247,9 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
 
-	MCFG_DEVICE_REMOVE("mb:rtc")
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 #endif
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32M"); // Early XL games had 8 MB RAM, 6000 and later require 32MB

@@ -524,10 +524,11 @@ MACHINE_CONFIG_START(at_state::neat)
 	atvga(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(neat_io)
-	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc")); // TODO: move this into the cs8221
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
+	rtc.set_century_index(0x32);
+
 	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "bios");
 MACHINE_CONFIG_END
 
@@ -758,10 +759,9 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
 
-	MCFG_DEVICE_REMOVE("mb:rtc")
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
+	rtc.set_century_index(0x32);
 
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M");
 

@@ -944,7 +944,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	m_ppi->out_pc_callback().set(FUNC(octopus_state::gpo_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq_callback().set(m_pic2, FUNC(pic8259_device::ir2_w));
+	m_rtc->irq().set(m_pic2, FUNC(pic8259_device::ir2_w));
 
 	// Keyboard UART
 	I8251(config, m_kb_uart, 0);
