@@ -477,7 +477,8 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(kenseim_state::kenseim)
+void kenseim_state::kenseim(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
@@ -493,18 +494,18 @@ MACHINE_CONFIG_START(kenseim_state::kenseim)
 	gamecpu.in_pc_callback().set_ioport("CAB-IN");
 	gamecpu.in_pd_callback().set(FUNC(kenseim_state::cpu_portd_r));
 
-	MCFG_MB89363B_ADD("mb89363b")
+	mb89363b_device &ppi_x2(MB89363B(config, "mb89363b"));
 	// a,b,c always $80: all ports set as output
 	// d,e,f always $92: port D and E as input, port F as output
-	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(*this, kenseim_state, mb8936_porta_w))
-	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(*this, kenseim_state, mb8936_portb_w))
-	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(*this, kenseim_state, mb8936_portc_w))
-	MCFG_MB89363B_IN_PORTD_CB(IOPORT("MOLEA"))
-	MCFG_MB89363B_IN_PORTE_CB(IOPORT("MOLEB"))
-	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(*this, kenseim_state, mb8936_portf_w))
+	ppi_x2.out_pa().set(FUNC(kenseim_state::mb8936_porta_w));
+	ppi_x2.out_pb().set(FUNC(kenseim_state::mb8936_portb_w));
+	ppi_x2.out_pc().set(FUNC(kenseim_state::mb8936_portc_w));
+	ppi_x2.in_pd().set_ioport("MOLEA");
+	ppi_x2.in_pe().set_ioport("MOLEB");
+	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-MACHINE_CONFIG_END
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+}
 
 static INPUT_PORTS_START( kenseim )
 	// the regular CPS1 input ports are used for comms with the extra board
