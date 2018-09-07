@@ -860,8 +860,7 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	MCFG_DEVICE_PROGRAM_MAP(firetrk_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", firetrk_state, firetrk_scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 5)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

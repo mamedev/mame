@@ -573,8 +573,7 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	// coin counter activity as stated in Atari bulletin B-0054 (which recommends tying it to the
 	// CPU reset line instead).
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbrkout)

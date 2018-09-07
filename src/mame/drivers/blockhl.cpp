@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

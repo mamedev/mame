@@ -1240,8 +1240,7 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_stereo_sound)
 	MCFG_DEVICE_ADD("astrocade2", ASTROCADE_IO, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024B on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024B on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 MACHINE_CONFIG_END
 
 
@@ -1310,8 +1309,7 @@ MACHINE_CONFIG_START(ebases_state::ebases)
 	MCFG_DEVICE_MODIFY("astrocade1")
 	MCFG_ASTROCADE_IO_SO1_STROBE_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 MACHINE_CONFIG_END
 
 
@@ -1332,8 +1330,7 @@ MACHINE_CONFIG_START(astrocde_state::spacezap)
 	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(astrocde_state::wow)
@@ -1399,8 +1396,7 @@ MACHINE_CONFIG_START(astrocde_state::gorf)
 	lamplatch.q_out_cb<6>().set_nop(); // n/c
 	lamplatch.q_out_cb<7>().set_output("lamp7");
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

@@ -784,7 +784,7 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 	MCFG_DEVICE_PROGRAM_MAP(ps3v1_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	EEPROM_93C56_8BIT(config, "eeprom").default_value(0);
 

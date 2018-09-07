@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(changela_state::changela)
 	outlatch.q_out_cb<4>().set(FUNC(changela_state::mcu_pc_0_w));
 	outlatch.q_out_cb<5>().set(FUNC(changela_state::collision_reset_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

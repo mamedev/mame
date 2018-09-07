@@ -1947,7 +1947,7 @@ MACHINE_CONFIG_START(suna8_state::rranger)
 	MCFG_DEVICE_PROGRAM_MAP(rranger_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* NMI = retn */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

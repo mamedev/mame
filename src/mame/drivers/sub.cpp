@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(sub_state::sub)
 	mainlatch.q_out_cb<3>().set_nop(); // same as Q0?
 	mainlatch.q_out_cb<5>().set_nop();
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

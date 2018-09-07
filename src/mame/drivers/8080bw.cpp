@@ -416,8 +416,7 @@ MACHINE_CONFIG_START(_8080bw_state::invadpt2)
 
 	/* 60 Hz signal clocks two LS161. Ripple carry will */
 	/* reset circuit, if LS161 not cleared before.      */
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -543,8 +542,7 @@ MACHINE_CONFIG_START(_8080bw_state::spcewarla)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(spcewarla_io_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 	MCFG_SCREEN_MODIFY("screen")
@@ -667,7 +665,7 @@ MACHINE_CONFIG_START(_8080bw_state::cosmo)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(cosmo_map)
 	MCFG_DEVICE_IO_MAP(cosmo_io_map)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* video hardware */
@@ -941,7 +939,7 @@ MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(invrvnge_io_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000)/2) // MC6808P
 	MCFG_DEVICE_PROGRAM_MAP(invrvnge_sound_map)
@@ -1255,8 +1253,7 @@ MACHINE_CONFIG_START(_8080bw_state::cosmicmo)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1549,8 +1546,7 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
 	MCFG_DEVICE_IO_MAP(schaser_io_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,schaser)
 
@@ -1887,7 +1883,7 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(lupin3_io_map)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -2056,8 +2052,7 @@ MACHINE_CONFIG_START(_8080bw_state::polaris)
 	MCFG_DEVICE_IO_MAP(polaris_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  polaris_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,polaris)
 
@@ -2434,7 +2429,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbt)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(indianbt_io_map)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -2460,7 +2455,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbtbr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
 	MCFG_DEVICE_IO_MAP(indianbtbr_io_map)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -2959,8 +2954,7 @@ MACHINE_CONFIG_START(_8080bw_state::vortex)
 	MCFG_DEVICE_IO_MAP(vortex_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)));
 
 	/* video hardware */
 	// TODO: replace with modified invaders color renderer code allowing midscanline color writes

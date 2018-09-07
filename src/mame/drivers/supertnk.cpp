@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 	m_maincpu->set_addrmap(AS_IO, &supertnk_state::supertnk_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(supertnk_state::supertnk_interrupt));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 

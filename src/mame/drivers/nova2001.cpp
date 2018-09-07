@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_DEVICE_PROGRAM_MAP(nova2001_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -335,7 +335,7 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	mainlatch.q_out_cb<6>().set(FUNC(pandoras_state::cpub_irq_enable_w)); // ENB
 	mainlatch.q_out_cb<7>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert(); // RESETB
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(dribling_state::dribling)
 	m_ppi8255_1->in_pc_callback().set_ioport("IN0");
 	m_ppi8255_1->out_pc_callback().set(FUNC(dribling_state::shr_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

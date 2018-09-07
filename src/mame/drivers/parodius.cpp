@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(parodius_state::parodius)
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&parodius_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 	ADDRESS_MAP_BANK(config, "bank2000").set_map(&parodius_state::bank2000_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

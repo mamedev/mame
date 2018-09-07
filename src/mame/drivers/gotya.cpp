@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(gotya_state::gotya)
 	MCFG_DEVICE_PROGRAM_MAP(gotya_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

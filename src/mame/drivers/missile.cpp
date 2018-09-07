@@ -1157,8 +1157,7 @@ MACHINE_CONFIG_START(missile_state::missile)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 8)

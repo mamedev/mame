@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(bwidow_state::bwidowp)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bwidowp_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bwidow_state::gravitar)

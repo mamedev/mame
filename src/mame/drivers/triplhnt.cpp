@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	m_latch->q_out_cb<7>().set([this] (int state) { m_sprite_bank = state; });
 	m_latch->q_out_cb<7>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_BEAR_EN>)); // bear
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

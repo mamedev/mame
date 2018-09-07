@@ -687,8 +687,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_DEVICE_PROGRAM_MAP(fortecar_map)
 	MCFG_DEVICE_IO_MAP(fortecar_ports)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* guess */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

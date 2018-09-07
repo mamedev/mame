@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&crimfght_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 11, 0x400);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -5935,8 +5935,7 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 	MCFG_DEVICE_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(galaxian_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)

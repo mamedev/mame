@@ -983,7 +983,7 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_GALGAMES_SLOT_ADD("slot")
 	MCFG_GALGAMES_BIOS_CART_ADD( "cart0", 0)

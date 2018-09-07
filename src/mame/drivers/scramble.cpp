@@ -1324,7 +1324,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,scramble)
 
@@ -1595,7 +1595,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 

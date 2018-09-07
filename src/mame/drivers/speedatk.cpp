@@ -313,8 +313,7 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_DEVICE_IO_MAP(speedatk_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

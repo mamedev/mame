@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 //  PCB description at top doesn't mention any EEPROM on the base board...
 //  EEPROM_93C46_16BIT(config, "eeprom");

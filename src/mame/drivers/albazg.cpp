@@ -369,8 +369,7 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.out_pa_callback().set(FUNC(albazg_state::mux_w));

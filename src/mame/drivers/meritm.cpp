@@ -1180,8 +1180,7 @@ MACHINE_CONFIG_START(meritm_state::crt260)
 
 	m_ppi->out_pb_callback().set_nop();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200));  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt260)
 
 	NS16550(config, m_uart, UART_CLK);

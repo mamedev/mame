@@ -1997,8 +1997,7 @@ MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 	m_systemlatch->q_out_cb<5>().set(FUNC(ngarcade_base_state::set_use_cart_audio));
 	m_systemlatch->q_out_cb<6>().set(FUNC(ngarcade_base_state::set_save_ram_unlock));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK));
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 
