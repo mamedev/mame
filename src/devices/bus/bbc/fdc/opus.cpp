@@ -118,7 +118,7 @@ void bbc_opus2793_device::device_add_mconfig(machine_config &config)
 
 void bbc_opus1770_device::device_add_mconfig(machine_config &config)
 {
-	WD1770(config, m_fdc, 16_MHz_XTAL / 16);
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->drq_wr_callback().set(FUNC(bbc_opusfdc_device::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);
