@@ -985,6 +985,11 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 		write_insn_data_4c(asi, space, offset, data, mem_mask);
 		return;
 
+	case 12: // Flush Cache (Segment)
+	case 13: // Flush Cache (Page)
+	case 14: // Flush Cache (Context)
+		// Ignored
+		return;
 	}
 
 	printf("sun4c: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
