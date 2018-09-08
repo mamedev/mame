@@ -2326,7 +2326,7 @@ READ8_MEMBER(apple2e_state::c300_r)  { return read_slot_rom(3, offset); }
 
 READ8_MEMBER(apple2e_state::c300_int_r)
 {
-	if (!m_slotc3rom)
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
@@ -2336,7 +2336,7 @@ READ8_MEMBER(apple2e_state::c300_int_r)
 
 READ8_MEMBER(apple2e_state::c300_int_bank_r)
 {
-	if (!m_slotc3rom)
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
@@ -2346,7 +2346,7 @@ READ8_MEMBER(apple2e_state::c300_int_bank_r)
 
 WRITE8_MEMBER(apple2e_state::c300_w)
 {
-	if (!m_slotc3rom)
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
@@ -2397,6 +2397,7 @@ READ8_MEMBER(apple2e_state::c800_r)
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
+		m_intc8rom = false;
 		update_slotrom_banks();
 		return 0xff;
 	}
