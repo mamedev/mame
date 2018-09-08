@@ -1770,7 +1770,6 @@ void drivedge_state::drivedge(machine_config &config)
 void itech32_state::sftm(machine_config &config)
 {
 	base_devices(config);
-	via(config);
 
 	M68EC020(config, m_maincpu, CPU020_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::itech020_map);
