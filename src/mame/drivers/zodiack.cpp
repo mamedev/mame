@@ -86,6 +86,13 @@ Notes:
       ALL ROMs 2732
       ALL PROMs MMI 6331
 
+Bounty2:
+- First 0x100 bytes of the first rom contains a screen that appears if the protection fails.
+- The PCB uses a large CPU epoxy module marked "CPU PACKII". A battery can be spotted through the epoxy.
+- If you copy the first 0x100 bytes from "bounty" then the game works.
+- Therefore, it can be surmised that the epoxy blob contains a static ram or similar with
+  the first 256 bytes of the real game's rom, for as long as the battery lasts.
+
 ***************************************************************************/
 
 #include "emu.h"
