@@ -118,15 +118,15 @@ MACHINE_CONFIG_START(qvt201_state::qvt201)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL-2 or uPD446C-2 + battery
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250)
-	//MCFG_SCREEN_RAW_PARAMS(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2672_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250);
+	//screen.set_raw(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250);
+	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", SCN2672, 48.654_MHz_XTAL / 30)
-	MCFG_SCN2672_CHARACTER_WIDTH(10) // 9 in 132-column mode
-	MCFG_SCN2672_INTR_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<0>))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	scn2672_device &crtc(SCN2672(config, "crtc", 48.654_MHz_XTAL / 30));
+	crtc.set_character_width(10); // 9 in 132-column mode
+	crtc.intr_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
+	crtc.set_screen("screen");
 MACHINE_CONFIG_END
 
 

@@ -1008,12 +1008,12 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 //  MCFG_SCREEN_PALETTE("palette")
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("crtc", SCN2674, 0)  // character clock can be selectable, either 16MHz or 17.6MHz
-	MCFG_SCN2674_INTR_CALLBACK(WRITELINE("pic_slave", pic8259_device, ir0_w))
-	MCFG_SCN2674_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(0, octopus_vram)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SCN2674(config, m_crtc, 0);  // character clock can be selectable, either 16MHz or 17.6MHz
+	m_crtc->intr_callback().set("pic_slave", FUNC(pic8259_device::ir0_w));
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(octopus_state::display_pixels));
+	m_crtc->set_addrmap(0, &octopus_state::octopus_vram);
+	m_crtc->set_screen("screen");
 
 	ADDRESS_MAP_BANK(config, "z80_bank").set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 
