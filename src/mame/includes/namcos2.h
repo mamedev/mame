@@ -228,6 +228,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_c169_roz_videoram;
 	int m_c169_roz_gfxbank;
 	uint8_t *m_c169_roz_mask;
+	uint32_t m_c169_roz_rammask;
 
 	// C355 Motion Object Emulation
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
@@ -300,12 +301,17 @@ public:
 	void assaultp(machine_config &config);
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
+	void finallap_noio(machine_config &config);
 	void finallap(machine_config &config);
+	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);
+	void finalap3(machine_config &config);
 	void luckywld(machine_config &config);
 	void base3(machine_config &config);
 	void sgunner(machine_config &config);
+	void base_noio(machine_config &config);
 	void base(machine_config &config);
+	void base_c68(machine_config &config);
 
 	void init_cosmogng();
 	void init_sgunner2();

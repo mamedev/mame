@@ -792,11 +792,12 @@ READ16_MEMBER( namcos2_shared_state::c355_obj_ram_r )
  * Graphics ROM addressing varies across games.
  */
 template<int Which>
-TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info )
+TILE_GET_INFO_MEMBER(namcos2_shared_state::c169_roz_get_info)
 {
-	int tile, mask;
-	m_c169_cb( m_c169_roz_videoram[tile_index] & 0x3fff, &tile, &mask, Which );
-	tileinfo.mask_data = m_c169_roz_mask + 32*mask;
+	int tile = 0, mask = 0;
+	m_c169_cb(m_c169_roz_videoram[tile_index&m_c169_roz_rammask] & 0x3fff, &tile, &mask, Which);
+
+	tileinfo.mask_data = m_c169_roz_mask + 32 * mask;
 	SET_TILE_INFO_MEMBER(m_c169_roz_gfxbank, tile, 0/*color*/, 0/*flag*/);
 }
 
@@ -809,19 +810,20 @@ void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion, c1
 {
 	m_c169_roz_gfxbank = gfxbank;
 	m_c169_roz_mask = memregion(maskregion)->base();
+	m_c169_roz_rammask = (m_c169_roz_videoram.bytes() / 2) - 1; // namcos2 has half as much RAM as the others, either needs to use this mask or have smaller tilemaps.
 	m_c169_cb = tilemap_cb;
 
 	m_c169_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info<0>), this),
-			tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
-			16,16,
-			256,256);
+		tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info<0>), this),
+		tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
+		16, 16,
+		256, 256);
 
 	m_c169_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info<1>), this),
-			tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
-			16,16,
-			256,256);
+		tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info<1>), this),
+		tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
+		16, 16,
+		256, 256);
 
 	save_item(NAME(m_c169_roz_control));
 }
