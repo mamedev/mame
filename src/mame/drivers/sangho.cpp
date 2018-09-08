@@ -59,7 +59,6 @@ class sangho_state : public driver_device
 public:
 	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_v9958(*this, "v9958")
 		, m_maincpu(*this, "maincpu")
 		, m_region_user1(*this, "user1")
 		, m_banks(*this, "bank%u", 1U)
@@ -71,7 +70,6 @@ protected:
 	void sangho_map(address_map &map);
 
 	std::unique_ptr<uint8_t[]> m_ram;
-	required_device<v9958_device> m_v9958;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_user1;
 	required_memory_bank_array<8> m_banks;
@@ -315,7 +313,7 @@ void pzlestar_state::pzlestar_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x91, 0x91).w(FUNC(pzlestar_state::pzlestar_bank_w));
-	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0x98, 0x9b).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xa0, 0xa0).portr("P1");
 	map(0xa1, 0xa1).portr("P2");
 	map(0xa8, 0xa8).rw(FUNC(pzlestar_state::pzlestar_mem_bank_r), FUNC(pzlestar_state::pzlestar_mem_bank_w));
@@ -330,7 +328,7 @@ void sexyboom_state::sexyboom_io_map(address_map &map)
 	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
 	map(0xa0, 0xa0).portr("P1");
 	map(0xa1, 0xa1).portr("P2");
-	map(0xf0, 0xf3).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0xf0, 0xf3).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xf7, 0xf7).portr("DSW");
 	map(0xf8, 0xff).w(FUNC(sexyboom_state::sexyboom_bank_w));
 }
@@ -484,9 +482,11 @@ MACHINE_CONFIG_START(pzlestar_state::pzlestar)
 	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
 	MCFG_DEVICE_IO_MAP(pzlestar_io_map)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
@@ -500,9 +500,11 @@ MACHINE_CONFIG_START(sexyboom_state::sexyboom)
 	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
 	MCFG_DEVICE_IO_MAP(sexyboom_io_map)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272))
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272)));
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_PALETTE_ADD("palette", 19780)
 

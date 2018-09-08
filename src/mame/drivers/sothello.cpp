@@ -54,7 +54,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_subcpu(*this, "subcpu"),
-		m_v9938(*this, "v9938"),
 		m_msm(*this, "msm"),
 		m_mainbank(*this, "mainbank")
 	{ }
@@ -96,7 +95,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<v9938_device> m_v9938;
 	required_device<msm5205_device> m_msm;
 	required_memory_bank m_mainbank;
 };
@@ -189,7 +187,7 @@ void sothello_state::maincpu_io_map(address_map &map)
 	map(0x50, 0x50).w(FUNC(sothello_state::bank_w));
 	map(0x60, 0x61).mirror(0x02).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 						/* not sure, but the A1 line is ignored, code @ $8b8 */
-	map(0x70, 0x73).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x70, 0x73).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
 
 /* sound Z80 */
@@ -373,9 +371,11 @@ MACHINE_CONFIG_START(sothello_state::sothello)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, XTAL(21'477'272))
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL(21'477'272))
+	v9938_device &v9938(V9938(config, "v9938", XTAL(21'477'272)));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(VDP_MEM);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

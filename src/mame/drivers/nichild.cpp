@@ -246,10 +246,12 @@ MACHINE_CONFIG_START(nichild_state::nichild)
 	m_maincpu->out_pe_callback().set(FUNC(nichild_state::gfxbank_w));
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x40000, MAIN_CLOCK)
-//  MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-//  MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, nichild_state, vdp_irq))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	V9938(config, m_v9938, MAIN_CLOCK);
+	m_v9938->set_screen_ntsc("screen");
+	m_v9938->set_vram_size(0x40000);
+//  m_v9938->int_cb().set_inputline("maincpu", 0);
+//  m_v9938->int_cb().set(FUNC(nichild_state::vdp_irq));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
