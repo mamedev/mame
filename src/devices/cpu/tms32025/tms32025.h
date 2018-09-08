@@ -90,6 +90,12 @@ public:
 	template<class Object> devcb_base &set_xf_out_cb(Object &&cb) { return m_xf_out.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_dr_in_cb(Object &&cb) { return m_dr_in.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_dx_out_cb(Object &&cb) { return m_dx_out.set_callback(std::forward<Object>(cb)); }
+	auto bio_in_cb() { return m_bio_in.bind(); }
+	auto hold_in_cb() { return m_hold_in.bind(); }
+	auto hold_ack_out_cb() { return m_hold_ack_out.bind(); }
+	auto xf_out_cb() { return m_xf_out.bind(); }
+	auto dr_in_cb() { return m_dr_in.bind(); }
+	auto dx_out_cb() { return m_dx_out.bind(); }
 
 	DECLARE_READ16_MEMBER( drr_r);
 	DECLARE_WRITE16_MEMBER(drr_w);

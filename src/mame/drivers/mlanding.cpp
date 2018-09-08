@@ -165,7 +165,7 @@ private:
 
 	DECLARE_READ8_MEMBER(motor_r);
 
-	uint32_t screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
@@ -232,7 +232,7 @@ void mlanding_state::machine_reset()
  *
  *************************************/
 
-uint32_t mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
 
@@ -933,70 +933,70 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mlanding_state::mlanding)
-
+void mlanding_state::mlanding(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 8000000) // 68000P8 in PCB photo
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mlanding_state, irq6_line_hold)
+	M68000(config, m_maincpu, 8000000); // 68000P8 in PCB photo
+	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mlanding_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD(m_subcpu, M68000, 8000000) // 68000P8 in PCB photo
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, 8000000); // 68000P8 in PCB photo
+	m_subcpu->set_addrmap(AS_PROGRAM, &mlanding_state::sub_map);
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, 4000000) // Z8040004
-	MCFG_DEVICE_PROGRAM_MAP(audio_map_prog)
-	MCFG_DEVICE_IO_MAP(audio_map_io)
+	Z80(config, m_audiocpu, 4000000); // Z8040004
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mlanding_state::audio_map_prog);
+	m_audiocpu->set_addrmap(AS_IO, &mlanding_state::audio_map_io);
 
-	MCFG_DEVICE_ADD(m_mechacpu, Z80, 4000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(mecha_map_prog)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mlanding_state, irq0_line_hold)
+	Z80(config, m_mechacpu, 4000000); // ?
+	m_mechacpu->set_addrmap(AS_PROGRAM, &mlanding_state::mecha_map_prog);
+	m_mechacpu->set_vblank_int("screen", FUNC(mlanding_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD(m_dsp, TMS32025, 32000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(dsp_map_prog)
-	MCFG_DEVICE_DATA_MAP(dsp_map_data)
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, mlanding_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
+	tms32025_device& dsp(TMS32025(config, m_dsp, 32000000)); // ?
+	dsp.set_addrmap(AS_PROGRAM, &mlanding_state::dsp_map_prog);
+	dsp.set_addrmap(AS_DATA, &mlanding_state::dsp_map_data);
+	dsp.hold_in_cb().set(FUNC(mlanding_state::dsp_hold_signal_r));
+	dsp.hold_ack_out_cb().set_nop();
 
 	Z80CTC(config, m_ctc, 4000000);
 	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag("maincpu");
+	ciu.set_slave_tag("audiocpu");
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TAITOIO_YOKE(config, m_yoke, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 
 	// Estimated
-	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(mlanding_state, screen_update_mlanding)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen.set_raw(216000000, 640, 0, 512, 462, 0, 400);
+	screen.set_screen_update(FUNC(mlanding_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD(m_palette, 32768)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, mlanding_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.port_write_handler().set(FUNC(mlanding_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD(m_msm1, MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mlanding_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MSM5205(config, m_msm1, 384000);
+	m_msm1->vck_callback().set(FUNC(mlanding_state::msm5205_1_vck)); // VCK function
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz, 4-bit
+	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD(m_msm2, MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm2, 384000);
+	m_msm2->set_prescaler_selector(msm5205_device::SEX_4B);      // Slave mode, 4-bit
+	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.10);
+}
 
 
 
