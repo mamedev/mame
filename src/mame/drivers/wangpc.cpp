@@ -1319,12 +1319,12 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_uart->dr_callback().set(FUNC(wangpc_state::uart_dr_w));
 	m_uart->tbre_callback().set(FUNC(wangpc_state::uart_tbre_w));
 
-	MCFG_DEVICE_ADD(SCN2661_TAG, MC2661, 0)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(*this, wangpc_state, epci_irq_w))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(WRITELINE(*this, wangpc_state, epci_irq_w))
+	MC2661(config, m_epci, 0);
+	m_epci->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_epci->rxrdy_handler().set(FUNC(wangpc_state::epci_irq_w));
+	m_epci->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_epci->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_epci->txemt_dschg_handler().set(FUNC(wangpc_state::epci_irq_w));
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, wangpc_state, fdc_irq))
