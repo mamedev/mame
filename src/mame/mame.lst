@@ -21470,7 +21470,8 @@ mkit09                          //
 mkit09a                         //
 
 @source:mlanding.cpp
-mlanding                        // ??? (c) 1987 Taito America Corporation (US)
+mlanding                        // B09 (c) 1987 Taito America Corporation (US)
+mlandingj                       // B09 (c) 1987 Taito Corporation (US)
 
 @source:mmagic.cpp
 mmagic                          // (c) 1979 Nintendo
