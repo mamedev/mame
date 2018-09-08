@@ -810,7 +810,7 @@ void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion, c1
 {
 	m_c169_roz_gfxbank = gfxbank;
 	m_c169_roz_mask = memregion(maskregion)->base();
-	m_c169_roz_rammask = (m_c169_roz_videoram.bytes() / 2) - 1; // namcos2 has half as much RAM as the others, either needs to use this mask or have smaller tilemaps.
+	m_c169_roz_rammask = (m_c169_roz_videoram.bytes() / 2) - 1; // are the tilemap sizes just too big? if we don't mask with this c169_roz_get_info reads out of bounds.
 	m_c169_cb = tilemap_cb;
 
 	m_c169_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
