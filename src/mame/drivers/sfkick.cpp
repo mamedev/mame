@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 	MCFG_DEVICE_PROGRAM_MAP(sfkick_sound_map)
 	MCFG_DEVICE_IO_MAP(sfkick_sound_io_map)
 
-	v9938_device &v9938(V9938(config, "screen", MASTER_CLOCK));
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(0x80000);
 	v9938.int_cb().set_inputline("maincpu", 0);
