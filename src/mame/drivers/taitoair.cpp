@@ -712,11 +712,11 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)   // Z8400AB1
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("dsp", TMS32025, XTAL(36'000'000)) // Unverified
-	MCFG_DEVICE_PROGRAM_MAP(DSP_map_program)
-	MCFG_DEVICE_DATA_MAP(DSP_map_data)
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, taitoair_state, dsp_HOLD_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, taitoair_state, dsp_HOLDA_signal_w))
+	tms32025_device& dsp(TMS32025(config, m_dsp, XTAL(36'000'000))); // Unverified
+	dsp.set_addrmap(AS_PROGRAM, &taitoair_state::DSP_map_program);
+	dsp.set_addrmap(AS_DATA, &taitoair_state::DSP_map_data);
+	dsp.hold_in_cb().set(FUNC(taitoair_state::dsp_HOLD_signal_r));
+	dsp.hold_ack_out_cb().set(FUNC(taitoair_state::dsp_HOLDA_signal_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

@@ -1930,21 +1930,21 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 
 	configure_c65_namcos21(config);
 
-	MCFG_DEVICE_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
-	MCFG_DEVICE_DATA_MAP(master_dsp_data)
-	MCFG_DEVICE_IO_MAP(master_dsp_io)
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, dsp_xf_w))
+	tms32025_device& dspmaster(TMS32025(config, m_dspmaster, 24000000)); /* 24 MHz? overclocked */
+	dspmaster.set_addrmap(AS_PROGRAM, &namcos21_state::master_dsp_program);
+	dspmaster.set_addrmap(AS_DATA, &namcos21_state::master_dsp_data);
+	dspmaster.set_addrmap(AS_IO, &namcos21_state::master_dsp_io);
+	dspmaster.hold_in_cb().set_constant(0);
+	dspmaster.hold_ack_out_cb().set_nop();
+	dspmaster.xf_out_cb().set(FUNC(namcos21_state::dsp_xf_w));
 
-	MCFG_DEVICE_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
-	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
-	MCFG_DEVICE_IO_MAP(slave_dsp_io)
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, slave_XF_output_w))
+	tms32025_device& dspslave(TMS32025(config, m_dspslave, 24000000*4)); /* 24 MHz? overclocked */
+	dspslave.set_addrmap(AS_PROGRAM, &namcos21_state::slave_dsp_program);
+	dspslave.set_addrmap(AS_DATA, &namcos21_state::slave_dsp_data);
+	dspslave.set_addrmap(AS_IO, &namcos21_state::slave_dsp_io);
+	dspslave.hold_in_cb().set_constant(0);
+	dspslave.hold_ack_out_cb().set_nop();
+	dspslave.xf_out_cb().set(FUNC(namcos21_state::slave_XF_output_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -1995,14 +1995,14 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 
 	configure_c65_namcos21(config);
 
-	MCFG_DEVICE_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
-	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(NOOP)
+	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000*2)); /* 24 MHz? overclocked */
+	dsp.set_addrmap(AS_PROGRAM, &namcos21_state::winrun_dsp_program);
+	dsp.set_addrmap(AS_DATA, &namcos21_state::winrun_dsp_data);
+	dsp.set_addrmap(AS_IO, &namcos21_state::winrun_dsp_io);
+	dsp.bio_in_cb().set(FUNC(namcos21_state::winrun_poly_reset_r));
+	dsp.hold_in_cb().set_constant(0);
+	dsp.hold_ack_out_cb().set_nop();
+	dsp.xf_out_cb().set_nop();
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
@@ -2054,14 +2054,14 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 
 	configure_c65_namcos21(config);
 
-	MCFG_DEVICE_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
-	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(NOOP)
+	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000)); /* 24 MHz? overclocked */
+	dsp.set_addrmap(AS_PROGRAM, &namcos21_state::winrun_dsp_program);
+	dsp.set_addrmap(AS_DATA, &namcos21_state::winrun_dsp_data);
+	dsp.set_addrmap(AS_IO, &namcos21_state::winrun_dsp_io);
+	dsp.bio_in_cb().set(FUNC(namcos21_state::winrun_poly_reset_r));
+	dsp.hold_in_cb().set_constant(0);
+	dsp.hold_ack_out_cb().set_nop();
+	dsp.xf_out_cb().set_nop();
 
 	MCFG_DEVICE_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
