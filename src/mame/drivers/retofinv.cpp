@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	m_mainlatch->q_out_cb<4>().set(FUNC(retofinv_state::irq1_ack_w));
 	m_mainlatch->q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

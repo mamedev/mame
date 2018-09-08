@@ -1425,9 +1425,11 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x20000, 21.477272_MHz_XTAL)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", 21.477272_MHz_XTAL)
+	V9938(config, m_v9938, 21.477272_MHz_XTAL);
+	m_v9938->set_screen_ntsc("screen");
+	m_v9938->set_vram_size(0x20000);
+	m_v9938->int_cb().set(FUNC(msx_state::msx_irq_source0));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1482,9 +1484,11 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, 21.477272_MHz_XTAL)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", 21.477272_MHz_XTAL)
+	V9958(config, m_v9958, 21.477272_MHz_XTAL);
+	m_v9958->set_screen_ntsc("screen");
+	m_v9958->set_vram_size(0x20000);
+	m_v9958->int_cb().set(FUNC(msx_state::msx_irq_source0));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1526,11 +1530,11 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(msx_state::msx2_pal)
+void msx_state::msx2_pal(machine_config &config)
+{
 	msx2(config);
-	MCFG_DEVICE_REMOVE("screen")
-	MCFG_V99X8_SCREEN_ADD_PAL("screen", "v9938", 21.477272_MHz_XTAL)
-MACHINE_CONFIG_END
+	m_v9938->set_screen_pal("screen");
+}
 
 
 /***************************************************************************
@@ -1606,7 +1610,7 @@ MACHINE_CONFIG_START(msx_state::canonv8)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 3, 1)   /* 8KB RAM */
 	MCFG_MSX_SLOT_RAM_8KB
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot12", 3, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
 	msx1_cartlist(config);
 MACHINE_CONFIG_END
@@ -1627,7 +1631,7 @@ MACHINE_CONFIG_START(msx_state::canonv10)
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 3, 1)   /* 16KB RAM */
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot12", 3, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
 	msx1_cartlist(config);
 MACHINE_CONFIG_END
@@ -4684,8 +4688,8 @@ MACHINE_CONFIG_START(msx_state::canonv30f)
 	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000) // BIOS
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartridge1", 1, 0)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartridge2", 2, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000) // EXT
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0xc000) // DISK
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 128KB Mapper RAM

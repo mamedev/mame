@@ -280,8 +280,8 @@ MACHINE_CONFIG_START(c1581_device::device_add_mconfig)
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c1581_device, cia_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1581_device, cia_pb_w))
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 16_MHz_XTAL / 2)
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true);
 MACHINE_CONFIG_END
 
 

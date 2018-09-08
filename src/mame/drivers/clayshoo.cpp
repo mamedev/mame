@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

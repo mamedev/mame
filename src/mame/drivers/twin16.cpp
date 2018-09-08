@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(twin16_state::twin16)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(fround_state::fround)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

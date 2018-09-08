@@ -163,7 +163,7 @@ MACHINE_CONFIG_START( olytext_state::olytext )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 8) // divisor guess
+	WD1772(config, "fdc", 16_MHz_XTAL / 8); // divisor guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)

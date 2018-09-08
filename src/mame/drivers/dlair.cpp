@@ -781,8 +781,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// TODO: hook up tx and rx callbacks
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)));
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)

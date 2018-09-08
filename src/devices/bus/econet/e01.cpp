@@ -245,7 +245,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &econet_e01_device::e01_mem);
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq_callback().set(FUNC(econet_e01_device::rtc_irq_w));
+	m_rtc->irq().set(FUNC(econet_e01_device::rtc_irq_w));
 
 	// devices
 	via6522_device &via(VIA6522(config, R6522_TAG, 8_MHz_XTAL / 4));

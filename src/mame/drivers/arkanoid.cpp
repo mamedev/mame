@@ -1351,8 +1351,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_DEVICE_PROGRAM_MAP(arkanoid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
 	m_mcuintf->portb_r_cb().set_ioport("MUX");
@@ -1429,7 +1428,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_DEVICE_PROGRAM_MAP(hexa_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -566,7 +566,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kyugo_state::gyrodine)
 	kyugo_base(config);
 	/* add watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gyrodine_main_map)
 MACHINE_CONFIG_END

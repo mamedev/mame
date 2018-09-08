@@ -596,9 +596,9 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 
 	// floppy disk controller
-	MCFG_DEVICE_ADD("fdc", WD2797, 1000000)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir0_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	WD2797(config, m_fdc, 1000000);
+//  m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
+//  m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats)

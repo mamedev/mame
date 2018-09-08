@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 MACHINE_CONFIG_END
 
 ROM_START(spcship)

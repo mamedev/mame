@@ -82,15 +82,17 @@ WRITE_LINE_MEMBER( sandy_super_disk_device::busy_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sandy_super_disk_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_super_disk_floppies, "35dd", sandy_super_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats)
+void sandy_super_disk_device::device_add_mconfig(machine_config &config)
+{
+	WD1772(config, m_fdc, 8000000);
+	FLOPPY_CONNECTOR(config, m_floppy0, sandy_super_disk_floppies, "35dd", sandy_super_disk_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sandy_super_disk_device, busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD(TTL74273_TAG, CENTRONICS_TAG)
-MACHINE_CONFIG_END
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(sandy_super_disk_device::busy_w));
+	OUTPUT_LATCH(config, m_latch);
+	m_centronics->set_output_latch(*m_latch);
+}
 
 
 

@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	brg.ft_handler().set(m_u1, FUNC(i8251_device::write_txc));
 	brg.ft_handler().append(m_u1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 16_MHz_XTAL / 16)
+	FD1791(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(onetwo_state::onetwo)
 	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 	MCFG_DEVICE_IO_MAP(sound_cpu_io)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

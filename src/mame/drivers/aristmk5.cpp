@@ -2039,8 +2039,7 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 	MCFG_DEVICE_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
 	MCFG_DEVICE_PROGRAM_MAP(aristmk5_drame_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2));  /* 1.6 - 2 seconds */
 
 	/* TODO: this isn't supposed to access a keyboard ... */
 	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
@@ -2113,7 +2112,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
 	aristmk5(config);
-	subdevice<ins8250_device>("uart_0a")
+	subdevice<ns16450_device>("uart_0a")
 			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
@@ -2127,7 +2126,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
 	aristmk5_usa(config);
-	subdevice<ins8250_device>("uart_0a")
+	subdevice<ns16450_device>("uart_0a")
 			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))

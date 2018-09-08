@@ -198,8 +198,8 @@ void swtpc09_state::swtpc09_base(machine_config &config)
 	m_acia->irq_handler().set(FUNC(swtpc09_state::acia_interrupt));
 
 	MC14411(config, m_brg, 1.8432_MHz_XTAL);
-	m_brg->out_f1_cb().set(m_acia, FUNC(acia6850_device::write_txc));
-	m_brg->out_f1_cb().append(m_acia, FUNC(acia6850_device::write_rxc));
+	m_brg->out_f<1>().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_brg->out_f<1>().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	FD1793(config, m_fdc, 1_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, "fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats);

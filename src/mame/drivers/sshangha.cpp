@@ -131,43 +131,6 @@ void sshangha_state::machine_reset()
 
 /******************************************************************************/
 
-inline void sshangha_state::sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, uint32_t data)
-{
-	m_palette->set_pen_color(color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
-}
-
-
-WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)
-{
-	COMBINE_DATA(&m_sprite_paletteram2[offset]);
-	sshangha_set_color_888((offset/2)+0x100, 0, 8, 16, m_sprite_paletteram2[(offset) | 1] | (m_sprite_paletteram2[(offset) & ~1] << 16) );
-}
-
-WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites_w)
-{
-	// hack??? we have to call this otherwise the sprite colours for some selected tiles are wrong (most noticeable on the 2nd level of quest mode)
-	// however if we simply mirror the memory both ways the how to play screen ends up with bad colours
-	// we use the 2nd copy of palette ram for low priority tiles only..
-	// is this related to the bootleg only, or does the original have this issue too?
-	// maybe related to sprite DMA on the original, or the apparent lack of a 2nd sprite controller on the bootleg.
-	paletteram16_xbgr_word_be_sprites2_w(space,offset,data,mem_mask);
-
-	COMBINE_DATA(&m_sprite_paletteram[offset]);
-	sshangha_set_color_888((offset/2)+0x000, 0, 8, 16, m_sprite_paletteram[(offset) | 1] | (m_sprite_paletteram[(offset) & ~1] << 16) );
-}
-
-WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)
-{
-	COMBINE_DATA(&m_tile_paletteram1[offset]);
-	sshangha_set_color_888((offset/2)+0x200, 0, 8, 16, m_tile_paletteram1[(offset) | 1] | (m_tile_paletteram1[(offset) & ~1] << 16) );
-}
-
-WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)
-{
-	COMBINE_DATA(&m_tile_paletteram2[offset]);
-	sshangha_set_color_888((offset/2)+0x300, 0, 8, 16, m_tile_paletteram2[(offset) | 1] | (m_tile_paletteram2[(offset) & ~1] << 16) );
-}
-
 READ16_MEMBER( sshangha_state::sshangha_protection_region_d_146_r )
 {
 	int real_address = 0x3f4000 + (offset *2);
@@ -202,6 +165,50 @@ WRITE16_MEMBER( sshangha_state::sshangha_protection_region_8_146_w )
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
+/*
+
+ Swizzzle palette writes a bit so that the 'tilemap_12_combine_draw' code in the tilemap device works with this game (used for girl, see attract mode)
+
+ Normal Palette layout
+
+ 0x000 - 0x3ff  Sprites 2
+ 0x400 - 0x7ff  Tilemap PF1
+ 0x800 - 0xbff  Sprites 1
+ 0xc00 - 0xfff  Tilemap PF2
+
+ rearranged to
+
+ 0x000 - 0x3ff  Sprites 1
+ 0x400 - 0x7ff  Sprites 2
+ 0x800 - 0xbff  Tilemap PF2
+ 0xc00 - 0xfff  Tilemap PF1
+
+*/
+
+WRITE16_MEMBER(sshangha_state::palette_w)
+{
+	switch (offset & 0x600)
+	{
+	case 0x000: offset = (offset & 0x1ff) | 0x200; break;
+	case 0x200: offset = (offset & 0x1ff) | 0x600; break;
+	case 0x400: offset = (offset & 0x1ff) | 0x000; break;
+	case 0x600: offset = (offset & 0x1ff) | 0x400; break;
+	}
+
+	m_palette->write16(space, offset, data, mem_mask);
+}
+
+READ16_MEMBER(sshangha_state::palette_r)
+{
+	switch (offset & 0x600)
+	{
+	case 0x000: offset = (offset & 0x1ff) | 0x200; break;
+	case 0x200: offset = (offset & 0x1ff) | 0x600; break;
+	case 0x400: offset = (offset & 0x1ff) | 0x000; break;
+	case 0x600: offset = (offset & 0x1ff) | 0x400; break;
+	}
+	return m_palette->read16(space, offset, mem_mask);
+}
 
 void sshangha_state::sshangha_map(address_map &map)
 {
@@ -219,17 +226,14 @@ void sshangha_state::sshangha_map(address_map &map)
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
 
-	map(0x340000, 0x340fff).ram().share("spriteram2");
+	map(0x340000, 0x3407ff).mirror(0x800).ram().share("spriteram2");
 	map(0x350000, 0x350001).r(FUNC(sshangha_state::deco_71_r));
 	map(0x350000, 0x350007).nopw();
-	map(0x360000, 0x360fff).ram().share("spriteram");
+	map(0x360000, 0x3607ff).mirror(0x800).ram().share("spriteram");
 	map(0x370000, 0x370001).r(FUNC(sshangha_state::deco_71_r));
 	map(0x370000, 0x370007).nopw();
 
-	map(0x380000, 0x3803ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
-	map(0x380400, 0x3807ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
-	map(0x380800, 0x380bff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
-	map(0x380c00, 0x380fff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x380000, 0x380fff).ram().rw(FUNC(sshangha_state::palette_r),FUNC(sshangha_state::palette_w)).share("palette");
 	map(0x381000, 0x383fff).ram(); // unused palette area
 	map(0x3e0000, 0x3e3fff).rw(FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
 	map(0x3ec000, 0x3f3fff).ram();
@@ -252,15 +256,14 @@ void sshangha_state::sshanghb_map(address_map &map)
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
 
-	map(0x340000, 0x340fff).ram(); // original spriteram
+	map(0x340000, 0x340fff).ram(); // original spriteram, used as a buffer here
 
-	map(0x380000, 0x3803ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
-	map(0x380400, 0x3807ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
-	map(0x380800, 0x380bff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
-	map(0x380c00, 0x380fff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x380000, 0x380fff).ram().rw(FUNC(sshangha_state::palette_r),FUNC(sshangha_state::palette_w)).share("palette");
 	map(0x381000, 0x383fff).ram(); // unused palette area
 
-	map(0x3c0000, 0x3c0fff).ram().share("spriteram"); // bootleg spriteram
+	map(0x3c0000, 0x3c07ff).ram().share("spriteram"); // bootleg spriteram
+	map(0x3c0800, 0x3c0fff).ram().share("spriteram2"); 
+
 	map(0xfec000, 0xff3fff).ram();
 	map(0xff4000, 0xff47ff).ram();
 }
@@ -404,9 +407,10 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_sshangha )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x200, 64 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0x200, 64 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 64 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x000, 64 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0x000, 64 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0x000, 64 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  0x000, 64 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -436,7 +440,9 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_SCREEN_UPDATE_DRIVER(sshangha_state, screen_update_sshangha)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sshangha)
+	
 	MCFG_PALETTE_ADD("palette", 0x4000)
+	MCFG_PALETTE_FORMAT(XBGR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -444,8 +450,8 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x10)
-	MCFG_DECO16IC_PF2_COL_BANK(0x00)
+	MCFG_DECO16IC_PF1_COL_BANK(0x30)
+	MCFG_DECO16IC_PF2_COL_BANK(0x20)
 	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
 	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
 	MCFG_DECO16IC_BANK1_CB(sshangha_state, bank_callback)
@@ -459,7 +465,7 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
@@ -476,7 +482,7 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL / 8, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.27)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END
@@ -503,8 +509,12 @@ ROM_START( sshangha )
 	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) ) /* Copy of rom at u47 */
-	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) ) /* Copy of rom at u46 */
+	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) // 2 sprite chips, 2 copies of sprite ROMs on PCB
+	ROM_LOAD( "ss003.u47", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u46", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
@@ -523,8 +533,12 @@ ROM_START( sshanghaj )
 	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) ) /* Copy of rom at u47 */
-	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) ) /* Copy of rom at u46 */
+	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) // 2 sprite chips, 2 copies of sprite ROMs on PCB
+	ROM_LOAD( "ss003.u47", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u46", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
@@ -535,6 +549,8 @@ ROM_START( sshanghab )
 	ROM_LOAD16_BYTE( "sshanb_2.010", 0x00000, 0x20000, CRC(bc7ed254) SHA1(aeee4b8a8265902bb41575cc143738ecf3aff57d) )
 	ROM_LOAD16_BYTE( "sshanb_1.010", 0x00001, 0x20000, CRC(7b049f49) SHA1(2570077c67dbd35053d475a18c3f10813bf914f7) )
 
+	// TODO: it's unlikely the bootleg used these exact ROMs, they were probably split, verify
+
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
 
@@ -543,8 +559,12 @@ ROM_START( sshanghab )
 	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) ) /* Copy of rom at u47 */
-	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) ) /* Copy of rom at u46 */
+	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) // 2 sprite chips, 2 copies of sprite ROMs on PCB
+	ROM_LOAD( "ss003.u47", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u46", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )

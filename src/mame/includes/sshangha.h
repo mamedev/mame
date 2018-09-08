@@ -17,10 +17,6 @@ public:
 		m_sound_shared_ram(*this, "sound_shared"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_sprite_paletteram(*this, "sprite_palram"),
-		m_tile_paletteram2(*this, "tile_palram2"),
-		m_sprite_paletteram2(*this, "sprite_palram2"),
-		m_tile_paletteram1(*this, "tile_palram1"),
 		m_prot_data(*this, "prot_data"),
 		m_sprgen1(*this, "spritegen1"),
 		m_sprgen2(*this, "spritegen2"),
@@ -44,11 +40,6 @@ private:
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 
-	required_shared_ptr<uint16_t> m_sprite_paletteram;
-	required_shared_ptr<uint16_t> m_tile_paletteram2;
-	required_shared_ptr<uint16_t> m_sprite_paletteram2;
-	required_shared_ptr<uint16_t> m_tile_paletteram1;
-
 	optional_shared_ptr<uint16_t> m_prot_data;
 
 	optional_device<decospr_device> m_sprgen1;
@@ -62,20 +53,20 @@ private:
 	DECLARE_READ16_MEMBER(sshangha_protection_region_d_146_r);
 	DECLARE_WRITE16_MEMBER(sshangha_protection_region_d_146_w);
 
+	DECLARE_READ16_MEMBER(palette_r);
+	DECLARE_WRITE16_MEMBER(palette_w);
+
 	DECLARE_READ16_MEMBER(sshanghb_protection16_r);
 	DECLARE_READ16_MEMBER(deco_71_r);
 	DECLARE_READ8_MEMBER(sshangha_sound_shared_r);
 	DECLARE_WRITE8_MEMBER(sshangha_sound_shared_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_sprites2_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_sprites_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilelow_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilehigh_w);
+
 	DECLARE_WRITE16_MEMBER(sshangha_video_w);
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, uint32_t data);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;

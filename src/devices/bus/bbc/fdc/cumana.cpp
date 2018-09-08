@@ -59,27 +59,25 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_cumana1_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mb8877a", MB8877, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_cumanafdc_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_cumanafdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_cumanafdc_device, motor_w))
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_cumana1_device::device_add_mconfig(machine_config &config)
+{
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
+	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+}
 
-MACHINE_CONFIG_START(bbc_cumana2_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mb8877a", MB8877, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_cumanafdc_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_cumanafdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_cumanafdc_device, motor_w))
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void bbc_cumana2_device::device_add_mconfig(machine_config &config)
+{
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
+	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
+}
 
 const tiny_rom_entry *bbc_cumana1_device::device_rom_region() const
 {
@@ -103,10 +101,10 @@ const tiny_rom_entry *bbc_cumana2_device::device_rom_region() const
 bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
-	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "mb8877a"),
 	m_floppy0(*this, "mb8877a:0"),
-	m_floppy1(*this, "mb8877a:1")
+	m_floppy1(*this, "mb8877a:1"),
+	m_dfs_rom(*this, "dfs_rom")
 {
 }
 

@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)

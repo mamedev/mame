@@ -178,10 +178,9 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 
 	pcat_common(config);
 
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	DS12885(config.replace(), m_mc146818);
+	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
+	m_mc146818->set_century_index(0x32);
 
 	MCFG_DEVICE_ADD("ad1848", AD1848, 0)
 	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("pic8259_1", pic8259_device, ir5_w))

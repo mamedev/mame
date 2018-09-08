@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	brg.ft_handler().set("dart", FUNC(z80dart_device::txcb_w));
 	brg.ft_handler().append("dart", FUNC(z80dart_device::rxcb_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1797, 4_MHz_XTAL / 2)
+	FD1797(config, m_fdc, 4_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)

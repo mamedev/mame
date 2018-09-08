@@ -302,8 +302,7 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	latch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_2>));
 	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_1>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

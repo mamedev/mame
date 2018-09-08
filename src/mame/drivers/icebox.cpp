@@ -308,8 +308,8 @@ MACHINE_CONFIG_START(icebox_state::icebox)
 	m_brg->ft_handler().set(m_uart1, FUNC(i8251_device::write_txc));
 	m_brg->ft_handler().append(m_uart1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD(m_fdc, FD1771, 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, icebox_state, drq_w))
+	FD1771(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->drq_wr_callback().set(FUNC(icebox_state::drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, floppies, "flop", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, floppies, "flop", floppy_image_device::default_floppy_formats)

@@ -152,6 +152,7 @@ public:
 	}
 
 	void to9(machine_config &config);
+	void to7_base(machine_config &config);
 	void to7(machine_config &config);
 	void mo5e(machine_config &config);
 	void to770a(machine_config &config);

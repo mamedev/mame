@@ -204,6 +204,7 @@ private:
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
 	void init(int game_type);
+	void configure_c65_namcos21(machine_config &config);
 	void common_map(address_map &map);
 	void driveyes_common_map(address_map &map);
 	void driveyes_master_map(address_map &map);

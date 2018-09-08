@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(rygar_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

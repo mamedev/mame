@@ -1146,9 +1146,9 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	pio.in_pb_callback().set(FUNC(bullet_state::pio_pb_r));
 
-	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_dart, z80dart_device, dcda_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bullet_state, fdc_drq_w))
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(m_dart, FUNC(z80dart_device::dcda_w));
+	m_fdc->drq_wr_callback().set(FUNC(bullet_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
@@ -1227,9 +1227,9 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	pio.out_ardy_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	pio.out_brdy_callback().set(FUNC(bulletf_state::cstrb_w));
 
-	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_dart, z80dart_device, rib_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bullet_state, fdc_drq_w))
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(m_dart, FUNC(z80dart_device::rib_w));
+	m_fdc->drq_wr_callback().set(FUNC(bullet_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)

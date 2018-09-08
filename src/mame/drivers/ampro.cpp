@@ -181,7 +181,7 @@ MACHINE_CONFIG_START(ampro_state::ampro)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ampro")

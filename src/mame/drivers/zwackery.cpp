@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 	MCFG_DEVICE_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
 	MCFG_DEVICE_PROGRAM_MAP(zwackery_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	PTM6840(config, m_ptm, 7652400 / 10);
 	m_ptm->irq_callback().set_inputline("maincpu", 6);

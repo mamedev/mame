@@ -941,16 +941,16 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
 
 	/*
-	Fujitsu 29DL16X have feature which is capability of reading data from one
+	Fujitsu 29DL16X has a feature which is capable of reading data from one
 	bank of memory while a program or erase operation is in progress in the
 	other bank of memory (simultaneous operation). This is not supported yet
-	by the flash emulation and I have splitted every bank into a separate
-	device for have a similar behavior.
+	by the flash emulation and I have split every bank into a separate
+	device in order to have similar behavior.
 	*/
-	MCFG_FUJITSU_29DL16X_ADD(m_flash0a) //bank 0 of first flash
-	MCFG_FUJITSU_29DL16X_ADD(m_flash0b) //bank 1 of first flash
-	MCFG_FUJITSU_29DL16X_ADD(m_flash1a) //bank 0 of second flash
-	MCFG_FUJITSU_29DL16X_ADD(m_flash1b) //bank 1 of second flash
+	FUJITSU_29DL16X(config, m_flash0a); //bank 0 of first flash
+	FUJITSU_29DL16X(config, m_flash0b); //bank 1 of first flash
+	FUJITSU_29DL16X(config, m_flash1a); //bank 0 of second flash
+	FUJITSU_29DL16X(config, m_flash1b); //bank 1 of second flash
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32K");
@@ -1005,8 +1005,8 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
 
-	MCFG_SHARP_LH28F016S_ADD(m_flash0a)
-	MCFG_SHARP_LH28F016S_ADD(m_flash1a)
+	SHARP_LH28F016S(config, m_flash0a);
+	SHARP_LH28F016S(config, m_flash1a);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K");

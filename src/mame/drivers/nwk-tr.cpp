@@ -854,11 +854,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	ADC12138(config, m_adc12138, 0);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo0")
-
-	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo1")
+	K033906(config, "k033906_1", 0, "voodoo0");
+	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)

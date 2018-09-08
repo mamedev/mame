@@ -93,8 +93,8 @@ public:
 		m_pic(*this,"pic"),
 		m_pit(*this,"pit"),
 		m_hdc(*this,"hdc"),
-		m_disk_rom(*this,"disk"),
 		m_fdc(*this,"fdc"),
+		m_disk_rom(*this,"disk"),
 		m_fd0(*this,"fdc:0"),
 		m_fdc_timer(*this,"fdc_timer"),
 		m_hdc_timer(*this,"hdc_timer"),
@@ -149,6 +149,7 @@ protected:
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
 	optional_device<wd2010_device> m_hdc;
+	optional_device<wd2797_device> m_fdc;
 
 private:
 	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
@@ -180,7 +181,6 @@ private:
 	optional_memory_region m_disk_rom;
 	memory_array m_vram;
 	memory_array m_fontram;
-	optional_device<wd2797_device> m_fdc;
 	optional_device<floppy_connector> m_fd0;
 	optional_device<pit8253_device> m_fdc_timer;
 	optional_device<pit8253_device> m_hdc_timer;
@@ -1023,10 +1023,10 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen_state,timer_clk_out))
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
-	MCFG_DEVICE_ADD("fdc", WD2797, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, ngen_state,fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu",i80186_cpu_device,drq1_w))
-	MCFG_WD_FDC_FORCE_READY
+	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(ngen_state::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_fdc->set_force_ready(true);
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_pic,pic8259_device,ir5_w))  // clocked on FDC data register access
@@ -1135,10 +1135,10 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen386_state,timer_clk_out))
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
-	MCFG_DEVICE_ADD("fdc", WD2797, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, ngen386_state,fdc_irq_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("i386cpu",i80186_cpu_device,drq1_w))
-	MCFG_WD_FDC_FORCE_READY
+	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(ngen386_state::fdc_irq_w));
+	//m_fdc->drq_wr_callback().set(m_i386cpu, FUNC(i80186_cpu_device_device::drq1_w));
+	m_fdc->set_force_ready(true);
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access

@@ -1078,8 +1078,7 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_DEVICE_PROGRAM_MAP(sc1_base)                      // setup read and write memorymap
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 
 	MCFG_BFMBD1_ADD("vfd0",0)

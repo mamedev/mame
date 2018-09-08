@@ -265,9 +265,10 @@ MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
 	pc_serial2_comdev->out_rts_callback().set(FUNC(fdc37c93x_device::rts_serial2_w));
 
 	// RTC
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_rtc_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config, "rtc"));
+	rtc.irq().set(FUNC(fdc37c93x_device::irq_rtc_w));
+	rtc.set_century_index(0x32);
+
 	// keyboard
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);

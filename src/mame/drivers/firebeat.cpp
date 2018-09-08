@@ -1187,9 +1187,9 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
-	MCFG_FUJITSU_29F016A_ADD("flash_main")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
+	FUJITSU_29F016A(config, "flash_main");
+	FUJITSU_29F016A(config, "flash_snd1");
+	FUJITSU_29F016A(config, "flash_snd2");
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
@@ -1245,9 +1245,9 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
-	MCFG_FUJITSU_29F016A_ADD("flash_main")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
+	FUJITSU_29F016A(config, "flash_main");
+	FUJITSU_29F016A(config, "flash_snd1");
+	FUJITSU_29F016A(config, "flash_snd2");
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));

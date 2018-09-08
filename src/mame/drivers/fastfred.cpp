@@ -651,7 +651,7 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	m_outlatch->q_out_cb<6>().set(FUNC(fastfred_state::flip_screen_x_w));
 	m_outlatch->q_out_cb<7>().set(FUNC(fastfred_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

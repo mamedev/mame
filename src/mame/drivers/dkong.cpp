@@ -1761,7 +1761,7 @@ MACHINE_CONFIG_START(dkong_state::dkong2b)
 	/* sound hardware */
 	dkong2b_audio(config);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 MACHINE_CONFIG_END
 
 void dkong_state::dk_braze(machine_config &config)
@@ -1834,7 +1834,7 @@ MACHINE_CONFIG_START(dkong_state::dkongjr)
 	/* sound hardware */
 	dkongjr_audio(config);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::pestplce)

@@ -334,9 +334,9 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	m_irqs->output_handler().append_inputline(m_z80, INPUT_LINE_IRQ0);
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", FD1771, 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, proteus_state, motor_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1771(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->hld_wr_callback().set(FUNC(proteus_state::motor_w));
+	m_fdc->set_force_ready(true);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", proteus_floppies, "8dssd", proteus_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

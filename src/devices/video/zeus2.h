@@ -112,8 +112,6 @@ public:
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(display_irq);
 
-	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq.set_callback(std::forward<Object>(cb)); }
 	auto vblank_callback() { return m_vblank.bind(); }
 	auto irq_callback() { return m_irq.bind(); }
 

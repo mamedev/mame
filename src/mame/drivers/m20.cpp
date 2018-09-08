@@ -809,8 +809,8 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("fd1797", FD1797, 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("i8259", pic8259_device, ir0_w))
+	FD1797(config, m_fd1797, 1000000);
+	m_fd1797->intrq_wr_callback().set(m_i8259, FUNC(pic8259_device::ir0_w));
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 
@@ -823,12 +823,12 @@ MACHINE_CONFIG_START(m20_state::m20)
 
 	I8251(config, m_kbdi8251, 0);
 	m_kbdi8251->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
-	m_kbdi8251->rxrdy_handler().set("i8259", FUNC(pic8259_device::ir4_w));
+	m_kbdi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir4_w));
 
 	I8251(config, m_ttyi8251, 0);
 	m_ttyi8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_ttyi8251->rxrdy_handler().set("i8259", FUNC(pic8259_device::ir3_w));
-	m_ttyi8251->txrdy_handler().set("i8259", FUNC(pic8259_device::ir5_w));
+	m_ttyi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir3_w));
+	m_ttyi8251->txrdy_handler().set(m_i8259, FUNC(pic8259_device::ir5_w));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(1230782)
@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_PIT8253_CLK2(1230782)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, m20_state, timer_tick_w))
 
-	MCFG_DEVICE_ADD("i8259", PIC8259, 0)
+	MCFG_DEVICE_ADD(m_i8259, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, m20_state, int_w))
 
 	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "m20")
@@ -847,7 +847,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", "i8259", RAM_TAG)
+	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", m_i8259, RAM_TAG)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
 MACHINE_CONFIG_END

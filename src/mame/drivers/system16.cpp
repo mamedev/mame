@@ -2290,6 +2290,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
 	goldnaxeb_base(config);
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+
 	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
@@ -2301,16 +2304,20 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb2)
 	MCFG_DEVICE_PROGRAM_MAP(goldnaxeb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+
 	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb1)
-	goldnaxeb1(config);
+	goldnaxeb_base(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bayrouteb1_map)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb2)

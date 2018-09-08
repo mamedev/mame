@@ -162,7 +162,7 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	m_ctc->zc_callback<1>().set(FUNC(cchasm_state::ctc_timer_1_w));
 	m_ctc->zc_callback<2>().set(FUNC(cchasm_state::ctc_timer_2_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

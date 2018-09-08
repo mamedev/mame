@@ -1092,8 +1092,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

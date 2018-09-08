@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* 3.5" ("mini") disc */
-	MCFG_DEVICE_ADD("wd179x", FD1793, 1_MHz_XTAL)
+	FD1793(config, m_minidisc_fdc, 1_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

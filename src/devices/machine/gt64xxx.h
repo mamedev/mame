@@ -20,16 +20,6 @@ DECLARE_DEVICE_TYPE(GT64111, gt64111_device)
  *************************************/
 class gt64xxx_device : public pci_host_device {
 public:
-	template <typename T>
-	gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
-		: gt64xxx_device(mconfig, type, tag, owner, clock)
-	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-		set_irq_num(irq_num);
-	}
-
-	gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -81,6 +71,8 @@ public:
 	virtual void device_post_load() override;
 
 protected:
+	gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	address_space *m_cpu_space;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_start() override;

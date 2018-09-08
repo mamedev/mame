@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 	MCFG_DEVICE_IO_MAP(epos_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(epos_state, epos)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -794,9 +794,9 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */
-	MCFG_AMD_29F080_ADD("flash0")
-	MCFG_AMD_29F080_ADD("flash1")
-	MCFG_AMD_29F080_ADD("flash2")
+	AMD_29F080(config, "flash0");
+	AMD_29F080(config, "flash1");
+	AMD_29F080(config, "flash2");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");

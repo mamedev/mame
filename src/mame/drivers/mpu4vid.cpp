@@ -1295,11 +1295,11 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))
-	MCFG_SCN2674_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
+	SCN2674(config, m_scn2674, 0);
+	m_scn2674->intr_callback().set_inputline("video", M68K_IRQ_3);
+	m_scn2674->set_character_width(8);
+	m_scn2674->set_display_callback(FUNC(mpu4vid_state::display_pixels));
+	m_scn2674->set_addrmap(0, &mpu4vid_state::mpu4_vram);
 
 
 	MCFG_DEVICE_ADD("video", M68000, VIDEO_MASTER_CLOCK )

@@ -745,7 +745,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	m_outlatch->q_out_cb<6>().set(FUNC(atarisy1_state::coin_counter_right_w));
 	m_outlatch->q_out_cb<7>().set(FUNC(atarisy1_state::coin_counter_left_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
 	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)

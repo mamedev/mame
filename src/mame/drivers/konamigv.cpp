@@ -509,10 +509,10 @@ MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( simpbowl_map )
 
-	MCFG_FUJITSU_29F016A_ADD("flash0")
-	MCFG_FUJITSU_29F016A_ADD("flash1")
-	MCFG_FUJITSU_29F016A_ADD("flash2")
-	MCFG_FUJITSU_29F016A_ADD("flash3")
+	FUJITSU_29F016A(config, "flash0");
+	FUJITSU_29F016A(config, "flash1");
+	FUJITSU_29F016A(config, "flash2");
+	FUJITSU_29F016A(config, "flash3");
 
 	MCFG_DEVICE_ADD("upd", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACK0_X")
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(konamigv_state::btchamp)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( btchamp_map )
 
-	MCFG_SHARP_LH28F400_ADD("flash")
+	SHARP_LH28F400(config, "flash");
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACK0_X")
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(konamigv_state::kdeadeye)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( kdeadeye_map )
 
-	MCFG_SHARP_LH28F400_ADD("flash")
+	SHARP_LH28F400(config, "flash");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kdeadeye )

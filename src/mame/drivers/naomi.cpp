@@ -3088,7 +3088,7 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(aw_map)
 	MCFG_DEVICE_IO_MAP(aw_port)
-	MCFG_MACRONIX_29L001MC_ADD("awflash")
+	MACRONIX_29L001MC(config, "awflash");
 	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)

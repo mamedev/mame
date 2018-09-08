@@ -813,7 +813,7 @@ void interpro_state::interpro(machine_config &config)
 	// real-time clock/non-volatile memory
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->set_use_utc(true);
-	m_rtc->irq_callback().set(m_ioga, FUNC(interpro_ioga_device::ir9_w));
+	m_rtc->irq().set(m_ioga, FUNC(interpro_ioga_device::ir9_w));
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus, 0);

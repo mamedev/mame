@@ -1087,8 +1087,7 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq1_line_assert, 60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq2_line_assert, 60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200)); /* check TD pin on LTC1232 */
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
@@ -1116,7 +1115,7 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_RS232_RI_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, cts_w))
 
-	ins8250_device &uart(*subdevice<ins8250_device>("fdc37c665gt:uart2"));
+	ns16550_device &uart(*subdevice<ns16550_device>("fdc37c665gt:uart2"));
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));

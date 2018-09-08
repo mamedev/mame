@@ -557,7 +557,7 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 
 	MCFG_CASSETTE_ADD("cassette")
 
-	MCFG_DEVICE_ADD("fdc", FD1771, 16_MHz_XTAL / 16)
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)

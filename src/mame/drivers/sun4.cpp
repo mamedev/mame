@@ -414,6 +414,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
 #include "cpu/sparc/sparc.h"
+#include "machine/am79c90.h"
 #include "machine/bankdev.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
@@ -434,7 +435,6 @@
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 
-
 #define SUN4_LOG_FCODES (0)
 
 #define TIMEKEEPER_TAG  "timekpr"
@@ -444,6 +444,7 @@
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define FDC_TAG         "fdc"
+#define LANCE_TAG       "lance"
 
 #define ENA_NOTBOOT     (0x80)
 #define ENA_SDVMA       (0x20)
@@ -540,8 +541,9 @@ public:
 		, m_scc1(*this, SCC1_TAG)
 		, m_scc2(*this, SCC2_TAG)
 		, m_fdc(*this, FDC_TAG)
+		, m_lance(*this, LANCE_TAG)
 		, m_scsibus(*this, "scsibus")
-		, m_scsi(*this, "scsibus:7:ncr5390")
+		, m_scsi(*this, "scsibus:7:ncr53c90a")
 		, m_type0space(*this, "type0")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
@@ -584,6 +586,8 @@ private:
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_READ32_MEMBER( dma_r );
 	DECLARE_WRITE32_MEMBER( dma_w );
+	DECLARE_READ32_MEMBER( lance_dma_r ); // TODO: Should be 16 bits
+	DECLARE_WRITE32_MEMBER( lance_dma_w );
 
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
 	DECLARE_WRITE_LINE_MEMBER( scsi_drq );
@@ -595,13 +599,19 @@ private:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ncr5390(device_t *device);
+	void ncr53c90a(device_t *device);
 
 	void sun4_mem(address_map &map);
 	void sun4c_mem(address_map &map);
 	void type0space_map(address_map &map);
 	void type1space_map(address_map &map);
 	void type1space_s4_map(address_map &map);
+
+	enum sun4_arch
+	{
+		SUN4 = 0,
+		SUN4C = 1
+	};
 
 	required_device<mb86901_device> m_maincpu;
 
@@ -611,8 +621,9 @@ private:
 	required_device<z80scc_device> m_scc2;
 
 	required_device<n82077aa_device> m_fdc;
+	required_device<am79c90_device> m_lance;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr5390_device> m_scsi;
+	required_device<ncr53c90a_device> m_scsi;
 
 	optional_device<address_map_bank_device> m_type0space, m_type1space;
 	required_device<ram_device> m_ram;
@@ -778,7 +789,7 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+		printf("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
 		//m_buserr[0] = 0x8;    // invalid PTE
 		//m_buserr[1] = offset<<2;
@@ -905,7 +916,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 				{
 					m_reset_timer->adjust(attotime::from_usec(1));
 					m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
-					printf("Asserting reset line\n");
+					logerror("%s: Asserting reset line\n", machine().describe_context());
 				}
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 				if (m_system_enable & ENA_RESET)
@@ -1061,7 +1072,7 @@ void sun4_state::write_insn_data(uint8_t asi, address_space &space, uint32_t off
 	}
 	else
 	{
-		printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+		printf("sun4: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
 		//m_buserr[0] = 0x8;    // invalid PTE
 		//m_buserr[1] = offset<<2;
@@ -1186,6 +1197,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				{
 					m_reset_timer->adjust(attotime::from_usec(1));
 					m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
+					logerror("%s: Asserting reset line\n", machine().describe_context());
 				}
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 				if (m_system_enable & ENA_RESET)
@@ -1347,7 +1359,6 @@ void sun4_state::sun4c_mem(address_map &map)
 static INPUT_PORTS_START( sun4 )
 INPUT_PORTS_END
 
-
 void sun4_state::machine_reset()
 {
 	m_context = 0;
@@ -1480,7 +1491,8 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x07200000, 0x07200003).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
 	map(0x08000000, 0x08000003).r(FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
 	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
-	map(0x08800000, 0x0880001f).m(m_scsi, FUNC(ncr5390_device::map)).umask32(0xff000000);
+	map(0x08800000, 0x0880001f).m(m_scsi, FUNC(ncr53c90a_device::map)).umask32(0xff000000);
+	map(0x08c00000, 0x08c00003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
 	map(0x0e000000, 0x0e000003).r(FUNC(sun4_state::ss1_sl3_id));    // slot 3 contains video board
 	map(0x0e800000, 0x0e8fffff).ram().share("bw2_vram");
 }
@@ -1546,7 +1558,6 @@ WRITE8_MEMBER( sun4_state::irq_w )
 
 WRITE_LINE_MEMBER( sun4_state::scc1_int )
 {
-	printf("scc1 int: %d\n", state);
 	m_scc1_int = state;
 
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1554,7 +1565,6 @@ WRITE_LINE_MEMBER( sun4_state::scc1_int )
 
 WRITE_LINE_MEMBER( sun4_state::scc2_int )
 {
-	printf("scc2 int: %d\n", state);
 	m_scc2_int = state;
 
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1708,16 +1718,16 @@ void sun4_state::dma_transfer_write()
 	{
 		int bit_index = (3 - pack_cnt) * 8;
 		uint8_t dma_value = m_scsi->dma_r();
-		logerror("Read from device: %02x\n", dma_value);
+		logerror("Read from device: %02x, pack count %d\n", dma_value, pack_cnt);
 		m_dma_pack_register |= dma_value << bit_index;
 
-		if ((m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
+		//if (m_dma[DMA_CTRL] & DMA_EN_CNT)
 			m_dma[DMA_BYTE_COUNT]--;
 
 		pack_cnt++;
 		if (pack_cnt == 4)
 		{
-			logerror("Writing pack register %08x\n", m_dma_pack_register);
+			logerror("Writing pack register %08x to %08x\n", m_dma_pack_register, m_dma[DMA_ADDR]);
 			if (m_arch == ARCH_SUN4C)
 			{
 				write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
@@ -1729,6 +1739,7 @@ void sun4_state::dma_transfer_write()
 
 			pack_cnt = 0;
 			m_dma_pack_register = 0;
+			m_dma[DMA_ADDR] += 4;
 		}
 	}
 
@@ -1756,6 +1767,7 @@ void sun4_state::dma_transfer_read()
 			{
 				current_word = read_insn_data(11, space, m_dma[DMA_ADDR] >> 2, ~0);
 			}
+			word_cached = true;
 			logerror("Current word: %08x\n", current_word);
 		}
 
@@ -1764,12 +1776,12 @@ void sun4_state::dma_transfer_read()
 		logerror("Write to device: %02x\n", dma_value);
 		m_scsi->dma_w(dma_value);
 
-		m_dma[DMA_ADDR]++;
-		if ((m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
-			m_dma[DMA_BYTE_COUNT]--;
-
 		if ((m_dma[DMA_ADDR] & 3) == 3)
 			word_cached = false;
+
+		m_dma[DMA_ADDR]++;
+		//if (m_dma[DMA_CTRL] & DMA_EN_CNT)
+			m_dma[DMA_BYTE_COUNT]--;
 	}
 }
 
@@ -1784,7 +1796,7 @@ void sun4_state::dma_transfer()
 		dma_transfer_read();
 	}
 
-	if (m_dma[DMA_BYTE_COUNT] == 0 && (m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
+	if (m_dma[DMA_BYTE_COUNT] == 0 && (m_dma[DMA_CTRL] & DMA_EN_CNT))
 	{
 		m_dma[DMA_CTRL] |= DMA_TC;
 		m_dma_tc_read = false;
@@ -1815,12 +1827,31 @@ WRITE32_MEMBER( sun4_state::dma_w )
 			COMBINE_DATA(&m_dma[DMA_CTRL]);
 
 			if (data & DMA_RESET)
+			{
+				logerror("dma_w: reset\n");
 				m_dma[DMA_CTRL] &= ~(DMA_ERR_PEND | DMA_PACK_CNT | DMA_INT_EN | DMA_FLUSH | DMA_DRAIN | DMA_WRITE | DMA_EN_DMA | DMA_REQ_PEND | DMA_EN_CNT | DMA_TC);
+			}
 			else if (data & DMA_FLUSH)
 			{
+				logerror("dma_w: flush\n");
 				m_dma[DMA_CTRL] &= ~(DMA_PACK_CNT | DMA_ERR_PEND | DMA_TC);
 
 				dma_check_interrupts();
+			}
+			else if (data & DMA_DRAIN)
+			{
+				m_dma[DMA_CTRL] &= ~DMA_DRAIN;
+				const uint8_t pack_cnt = (m_dma[DMA_CTRL] & DMA_PACK_CNT) >> DMA_PACK_CNT_SHIFT;
+				for (uint8_t i = 0; i < pack_cnt; i++)
+				{
+					const uint32_t bit_index = (3 - i) * 8;
+					const uint32_t value = m_dma_pack_register & (0xff << bit_index);
+					logerror("dma_w: draining %02x to RAM address %08x & %08x\n", value >> bit_index, m_dma[DMA_ADDR], 0xff << (24 - bit_index));
+					write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, m_dma_pack_register, 0xff << bit_index);
+					m_dma[DMA_ADDR]++;
+				}
+				m_dma_pack_register = 0;
+				m_dma[DMA_CTRL] &= ~DMA_PACK_CNT;
 			}
 			// TODO: DMA_DRAIN
 
@@ -1858,12 +1889,28 @@ WRITE_LINE_MEMBER( sun4_state::scsi_drq )
 	{
 		logerror("scsi_drq, DMA pending\n");
 		m_dma[DMA_CTRL] |= DMA_REQ_PEND;
-		if (m_dma[DMA_CTRL] & DMA_EN_DMA)
+		if (m_dma[DMA_CTRL] & DMA_EN_DMA && m_dma[DMA_BYTE_COUNT])
 		{
 			logerror("DMA enabled, starting dma\n");
 			dma_transfer();
 		}
 	}
+}
+
+READ32_MEMBER( sun4_state::lance_dma_r )
+{
+	if (m_arch == ARCH_SUN4)
+		return read_insn_data(11, m_maincpu->space(AS_PROGRAM), offset, mem_mask);
+	else
+		return read_insn_data_4c(11, m_maincpu->space(AS_PROGRAM), offset, mem_mask);
+}
+
+WRITE32_MEMBER( sun4_state::lance_dma_w )
+{
+	if (m_arch == ARCH_SUN4)
+		write_insn_data(11, m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
+	else
+		write_insn_data_4c(11, m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
 }
 
 // indicate 4/60 SCSI/DMA/Ethernet card exists
@@ -1891,10 +1938,10 @@ static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5390", NCR5390);
+	device.option_add_internal("ncr53c90a", NCR53C90A);
 }
 
-void sun4_state::ncr5390(device_t *device)
+void sun4_state::ncr53c90a(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
@@ -1921,6 +1968,11 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 
 	// MMU Type 1 device space
 	ADDRESS_MAP_BANK(config, "type1").set_map(&sun4_state::type1space_s4_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// Ethernet
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
+	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1954,8 +2006,8 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
+	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
@@ -1976,6 +2028,11 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 
 	// MMU Type 1 device space
 	ADDRESS_MAP_BANK(config, "type1").set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// Ethernet
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
+	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
@@ -2008,8 +2065,8 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
+	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun4_state, bw2_update)

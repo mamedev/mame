@@ -126,7 +126,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_ISA_OUT_DRQ7_CB(WRITELINE(m_dma8237_2, am9517a_device, dreq3_w))
 
 	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
-	m_mc146818->irq_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
+	m_mc146818->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
 	/* sound hardware */

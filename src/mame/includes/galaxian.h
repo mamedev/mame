@@ -310,6 +310,7 @@ public:
 	void gmgalax(machine_config &config);
 	void tenspot(machine_config &config);
 	void froggers(machine_config &config);
+	void froggervd(machine_config &config);
 	void mshuttle(machine_config &config);
 	void anteateruk(machine_config &config);
 	void monsterz(machine_config &config);
@@ -357,6 +358,7 @@ protected:
 	void frogf_map(address_map &map);
 	void frogg_map(address_map &map);
 	void frogger_map(address_map &map);
+	void froggervd_map(address_map &map);
 	void frogger_sound_map(address_map &map);
 	void frogger_sound_portmap(address_map &map);
 	void froggeram_map(address_map &map);

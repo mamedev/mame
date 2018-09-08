@@ -1073,8 +1073,8 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("2M");
 
-	MCFG_INTEL_E28F008SA_ADD("flash0")
-	MCFG_INTEL_E28F008SA_ADD("flash1")
+	INTEL_E28F008SA(config, "flash0");
+	INTEL_E28F008SA(config, "flash1");
 
 	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
 

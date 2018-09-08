@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
 
-	MCFG_DEVICE_ADD("vg93", KR1818VG93, 1000000)
+	KR1818VG93(config, m_fdc, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats)

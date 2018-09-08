@@ -528,6 +528,7 @@ void armedf_state::legionjb2_map(address_map &map)
 	map(0x000000, 0x00003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::armedf_text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::bootleg_io_w));
+	//also writes to 7c0010 / 70c020 / 70c030. These could possibly be the scroll registers on this bootleg and the writes to 000000 - 00003f could just be leftovers.
 }
 
 void armedf_state::armedf_map(address_map &map)

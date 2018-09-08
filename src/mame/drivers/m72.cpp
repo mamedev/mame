@@ -3484,6 +3484,13 @@ ROM_START( rtype2j )
 	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-A */
 	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
 	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+	
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "rt2-a-2h-.5",  0x0000, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-a-5l-.33", 0x0200, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-a-7d-.45", 0x0400, 0x0104, CRC(53c1e087) SHA1(b214ba4e7cc3d582ee85616923f38fd4873dacb1) ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-b-3a-.9",  0x0600, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
 ROM_END
 
 ROM_START( rtype2jc )

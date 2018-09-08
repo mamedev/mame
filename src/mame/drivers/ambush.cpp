@@ -730,7 +730,7 @@ MACHINE_CONFIG_START(ambush_state::ambush_base)
 	MCFG_DEVICE_IO_MAP(main_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, ambush)
 

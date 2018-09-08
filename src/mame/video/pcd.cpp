@@ -115,10 +115,11 @@ MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
 
-	MCFG_DEVICE_ADD("crtc", SCN2674, 0)
-	MCFG_SCN2674_CHARACTER_WIDTH(16)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcd_video_device, display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	scn2674_device &crtc(SCN2674(config, "crtc", 0));
+	crtc.set_character_width(16);
+	crtc.set_display_callback(FUNC(pcd_video_device::display_pixels));
+	crtc.set_screen("screen");
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
 MACHINE_CONFIG_END
 
@@ -158,12 +159,12 @@ MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("crtc", SCN2674, 0)
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("graphics", MCS51_INT0_LINE))
-	MCFG_SCN2674_CHARACTER_WIDTH(16)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcx_video_device, display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_DEVICE_ADDRESS_MAP(0, pcx_vram)
+	scn2674_device &crtc(SCN2674(config, "crtc", 0));
+	crtc.intr_callback().set_inputline("graphics", MCS51_INT0_LINE);
+	crtc.set_character_width(16);
+	crtc.set_display_callback(FUNC(pcx_video_device::display_pixels));
+	crtc.set_screen("screen");
+	crtc.set_addrmap(0, &pcx_video_device::pcx_vram);
 MACHINE_CONFIG_END
 
 

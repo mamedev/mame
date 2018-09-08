@@ -898,7 +898,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1067,7 +1067,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	I8255A(config, m_ppi8255_0);
 	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
