@@ -1665,16 +1665,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 	int scanline = param;
 	int cur_posirq = get_pos_irq_scanline();
 
-	if(scanline == 240)
+	if (scanline == 200) // triggering this a bit before Vblank allows the Assault Plus mode select screen to work without overclocking the IO MCU, exact timings unknown.
 	{
-		m_master_intc->vblank_irq_trigger();
-		m_slave_intc->vblank_irq_trigger();
-
 		if (m_c65)
 			m_c65->ext_interrupt(HOLD_LINE);
 
 		if (m_c68new)
 			m_c68new->ext_interrupt(ASSERT_LINE);
+	}
+
+	if(scanline == 240)
+	{
+		m_master_intc->vblank_irq_trigger();
+		m_slave_intc->vblank_irq_trigger();
+
 	}
 
 	if(scanline == cur_posirq)
@@ -5554,20 +5558,6 @@ void namcos2_state::init_assaultp()
 	m_gametype = NAMCOS2_ASSAULT_PLUS;
 }
 
-void namcos2_state::init_assaultp_hack()
-{
-	// HACK!
-	// boost the MCU speed to avoid a race condition which causes
-	// the mode select menu to vanish before you have a chance to use
-	// it.  It probably needs better RAM access timing etc.
-	//
-	// This is used in conjunction with the interleave increase in the
-	// MACHINE_DRIVER
-	m_mcu->set_clock_scale(4.0f);
-
-	init_assaultp();
-}
-
 void namcos2_state::init_burnforc()
 {
 	m_gametype = NAMCOS2_BURNING_FORCE;
@@ -5784,7 +5774,7 @@ GAMEL( 1987, finallapjb, finallap, finallap, finallap, namcos2_state, init_final
 
 GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assault,       ROT90, "Namco", "Assault (Rev B)", 0 )
 GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj,      ROT90, "Namco", "Assault (Japan)", 0 )
-GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state, init_assaultp_hack, ROT90, "Namco", "Assault Plus (Japan)", 0)
+GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state, init_assaultp,      ROT90, "Namco", "Assault Plus (Japan)", 0)
 
 GAME(  1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", 0 )
 GAME(  1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", 0 )

@@ -342,7 +342,6 @@ public:
 	void init_sws93();
 	void init_metlhawk();
 	void init_sws92g();
-	void init_assaultp_hack();
 	void init_assaultp();
 	void init_ordyne();
 	void init_marvland();
