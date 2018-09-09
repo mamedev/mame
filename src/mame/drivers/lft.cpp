@@ -2,9 +2,11 @@
 // copyright-holders:Robbbert
 /******************************************************************************************
 
-2013-09-09 Skeleton of LFT computer system. A search on the net produces no finds.
-Everything in here is a guess.
+2013-09-09 Skeleton of LFT computer system.
 
+These are the monitor programs for 80186-based "S100+" systems by L/F Technologies. Many
+of these boards were distributed under the IMS International name. Documentation available
+online is woefully inadequate.
 
 LFT1230 does extensive testing of devices at boot time. As they are mostly missing,
 it gets caught in a loop. There's unknown devices in the i/o 008x, 00Ax, 00Cx range.
@@ -27,6 +29,7 @@ Note: Backspace/delete performs oddly.
 #include "machine/mm58167.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 
 
 class lft_state : public driver_device
@@ -128,7 +131,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME    FLAGS
-COMP( 198?, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
-COMP( 198?, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1230", MACHINE_IS_SKELETON)
-
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME                      FLAGS
+COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_IS_SKELETON)
+COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_IS_SKELETON)
