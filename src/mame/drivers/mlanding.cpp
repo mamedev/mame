@@ -977,7 +977,7 @@ void mlanding_state::mlanding(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 
 	// Estimated
-	screen.set_raw(216000000, 640, 0, 512, 462, 0, 400);
+	screen.set_raw(16000000, 640, 0, 512, 462, 0, 400);
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);
 
