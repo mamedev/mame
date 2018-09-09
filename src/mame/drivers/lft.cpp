@@ -52,7 +52,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
-	required_device<scc85c30_device> m_scc;
+	required_device<scc8530_device> m_scc;
 };
 
 void lft_state::mem_map(address_map &map)
@@ -85,31 +85,31 @@ void lft_state::machine_reset()
 
 MACHINE_CONFIG_START(lft_state::lft)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80186, 4000000) // no idea
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	// Devices
-	MM58167(config, m_rtc, XTAL(32'768));
+	MM58167(config, m_rtc, 32.768_kHz_XTAL);
 
-	SCC85C30(config, m_scc, 4'915'200);   // required value for 9600 baud
+	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85c30_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85c30_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc85c30_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc8530_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc8530_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc8530_device, ctsa_w))
 
 	m_scc->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85c30_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85c30_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc85c30_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc8530_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc8530_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc8530_device, ctsb_w))
 MACHINE_CONFIG_END
 
 
