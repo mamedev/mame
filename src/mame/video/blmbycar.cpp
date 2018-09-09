@@ -54,10 +54,11 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #define DIM_NX      (0x40)
 #define DIM_NY      (0x20)
 
-TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_0)
+template<int Layer>
+TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info)
 {
-	uint16_t code = m_vram_0[tile_index * 2 + 0];
-	uint16_t attr = m_vram_0[tile_index * 2 + 1];
+	uint16_t code = m_vram[Layer][tile_index * 2 + 0];
+	uint16_t attr = m_vram[Layer][tile_index * 2 + 1];
 	SET_TILE_INFO_MEMBER(0,
 			code,
 			attr & 0x1f,
@@ -65,32 +66,6 @@ TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_0)
 
 	tileinfo.category = (attr >> 5) & 1;
 }
-
-TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_1)
-{
-	uint16_t code = m_vram_1[tile_index * 2 + 0];
-	uint16_t attr = m_vram_1[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0,
-			code,
-			attr & 0x1f,
-			TILE_FLIPYX((attr >> 6) & 3));
-
-	tileinfo.category = (attr >> 5) & 1;
-}
-
-
-WRITE16_MEMBER(blmbycar_state::vram_0_w)
-{
-	COMBINE_DATA(&m_vram_0[offset]);
-	m_tilemap_0->mark_tile_dirty(offset / 2);
-}
-
-WRITE16_MEMBER(blmbycar_state::vram_1_w)
-{
-	COMBINE_DATA(&m_vram_1[offset]);
-	m_tilemap_1->mark_tile_dirty(offset / 2);
-}
-
 
 /***************************************************************************
 
@@ -102,15 +77,15 @@ WRITE16_MEMBER(blmbycar_state::vram_1_w)
 
 void blmbycar_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 
-	m_tilemap_0->set_scroll_rows(1);
-	m_tilemap_0->set_scroll_cols(1);
+	m_tilemap[0]->set_scroll_rows(1);
+	m_tilemap[0]->set_scroll_cols(1);
 
-	m_tilemap_1->set_scroll_rows(1);
-	m_tilemap_1->set_scroll_cols(1);
-	m_tilemap_1->set_transparent_pen(0);
+	m_tilemap[1]->set_scroll_rows(1);
+	m_tilemap[1]->set_scroll_cols(1);
+	m_tilemap[1]->set_transparent_pen(0);
 }
 
 
@@ -197,11 +172,11 @@ uint32_t blmbycar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	int i, layers_ctrl = -1;
 
-	m_tilemap_0->set_scrolly(0, m_scroll_0[0]);
-	m_tilemap_0->set_scrollx(0, m_scroll_0[1]);
+	m_tilemap[0]->set_scrolly(0, m_scroll[0][0]);
+	m_tilemap[0]->set_scrollx(0, m_scroll[0][1]);
 
-	m_tilemap_1->set_scrolly(0, m_scroll_1[0] + 1);
-	m_tilemap_1->set_scrollx(0, m_scroll_1[1] + 5);
+	m_tilemap[1]->set_scrolly(0, m_scroll[1][0] + 1);
+	m_tilemap[1]->set_scrollx(0, m_scroll[1][1] + 5);
 
 #ifdef MAME_DEBUG
 if (machine().input().code_pressed(KEYCODE_Z))
@@ -220,13 +195,13 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 1)
 		for (i = 0; i <= 1; i++)
-			m_tilemap_0->draw(screen, bitmap, cliprect, i, i);
+			m_tilemap[0]->draw(screen, bitmap, cliprect, i, i);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
 		for (i = 0; i <= 1; i++)
-			m_tilemap_1->draw(screen, bitmap, cliprect, i, i);
+			m_tilemap[1]->draw(screen, bitmap, cliprect, i, i);
 
 	if (layers_ctrl & 8)
 		draw_sprites(screen, bitmap, cliprect);
