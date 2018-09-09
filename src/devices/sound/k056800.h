@@ -34,6 +34,7 @@ public:
 
 	// configuration helpers
 	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return m_int_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( host_r );
 	DECLARE_WRITE8_MEMBER( host_w );
