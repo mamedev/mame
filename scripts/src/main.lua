@@ -237,12 +237,34 @@ if (MACHINES["NETLIST"]~=null) then
 		"netlist",
 	}
 end
+--this part must be executed after the devices* projects have been configured
+	local projs = solution().projects
+if (projs["devicesbus"]~=null) then
 	links {
 		"devicesbus",
+	}
+end
+if (projs["devicescpu"]~=null) then
+	links {
 		"devicescpu",
+	}
+end
+if (projs["devicesmachine"]~=null) then
+	links {
 		"devicesmachine",
+	}
+end
+if (projs["devicessound"]~=null) then
+	links {
 		"devicessound",
+	}
+end
+if (projs["devicesvideo"]~=null) then
+	links {
 		"devicesvideo",
+	}
+end
+	links {
 		"emu",
 	}
 --if (STANDALONE~=true) then
