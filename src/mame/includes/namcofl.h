@@ -24,6 +24,7 @@ class namcofl_state : public namcos2_shared_state
 public:
 	namcofl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos2_shared_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -39,6 +40,7 @@ public:
 	void init_finalapr();
 
 private:
+    required_device<cpu_device> m_mcu;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_in2;

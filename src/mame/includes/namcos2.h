@@ -127,9 +127,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_slave(*this, "slave")
-		, m_mcu(*this, "mcu")
 		, m_c65(*this, "c65mcu")
-		, m_c68new(*this, "c68mcu")
+		, m_c68(*this, "c68mcu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -147,7 +146,7 @@ protected:
 	optional_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
-
+	
 	// game type helpers
 	bool is_system21();
 
@@ -228,6 +227,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_c169_roz_videoram;
 	int m_c169_roz_gfxbank;
 	uint8_t *m_c169_roz_mask;
+	uint32_t m_c169_roz_rammask;
 
 	// C355 Motion Object Emulation
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
@@ -270,9 +270,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
-	optional_device<cpu_device> m_mcu;
 	optional_device<namcoc65_device> m_c65;
-	optional_device<namcoc68_device> m_c68new;
+	optional_device<namcoc68_device> m_c68;
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
@@ -300,12 +299,17 @@ public:
 	void assaultp(machine_config &config);
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
+	void finallap_noio(machine_config &config);
 	void finallap(machine_config &config);
+	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);
+	void finalap3(machine_config &config);
 	void luckywld(machine_config &config);
 	void base3(machine_config &config);
 	void sgunner(machine_config &config);
+	void base_noio(machine_config &config);
 	void base(machine_config &config);
+	void base_c68(machine_config &config);
 
 	void init_cosmogng();
 	void init_sgunner2();
@@ -336,7 +340,6 @@ public:
 	void init_sws93();
 	void init_metlhawk();
 	void init_sws92g();
-	void init_assaultp_hack();
 	void init_assaultp();
 	void init_ordyne();
 	void init_marvland();

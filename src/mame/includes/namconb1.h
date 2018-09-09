@@ -30,6 +30,7 @@ class namconb1_state : public namcos2_shared_state
 public:
 	namconb1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos2_shared_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
 		m_eeprom(*this, "eeprom"),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
@@ -62,6 +63,7 @@ public:
 	void init_gslgr94u();
 
 private:
+    required_device<cpu_device> m_mcu;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_ioport m_p1;
 	required_ioport m_p2;
