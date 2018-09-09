@@ -127,9 +127,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_slave(*this, "slave")
-		, m_mcu(*this, "mcu")
 		, m_c65(*this, "c65mcu")
-		, m_c68new(*this, "c68mcu")
+		, m_c68(*this, "c68mcu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -147,7 +146,7 @@ protected:
 	optional_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
-
+	
 	// game type helpers
 	bool is_system21();
 
@@ -271,9 +270,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
-	optional_device<cpu_device> m_mcu;
 	optional_device<namcoc65_device> m_c65;
-	optional_device<namcoc68_device> m_c68new;
+	optional_device<namcoc68_device> m_c68;
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;

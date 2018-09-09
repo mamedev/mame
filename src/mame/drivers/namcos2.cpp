@@ -1638,25 +1638,25 @@ void namcos2_state::configure_c65_standard(machine_config &config)
 
 void namcos2_state::configure_c68_standard(machine_config &config)
 {
-	NAMCOC68(config, m_c68new, C68_CPU_CLOCK);
-	m_c68new->in_pb_callback().set_ioport("MCUB");
-	m_c68new->in_pc_callback().set_ioport("MCUC");
-	m_c68new->in_ph_callback().set_ioport("MCUH");
-	m_c68new->in_pdsw_callback().set_ioport("DSW");
-	m_c68new->di0_in_cb().set_ioport("MCUDI0");
-	m_c68new->di1_in_cb().set_ioport("MCUDI1");
-	m_c68new->di2_in_cb().set_ioport("MCUDI2");
-	m_c68new->di3_in_cb().set_ioport("MCUDI3");
-	m_c68new->an0_in_cb().set_ioport("AN0");
-	m_c68new->an1_in_cb().set_ioport("AN1");
-	m_c68new->an2_in_cb().set_ioport("AN2");
-	m_c68new->an3_in_cb().set_ioport("AN3");
-	m_c68new->an4_in_cb().set_ioport("AN4");
-	m_c68new->an5_in_cb().set_ioport("AN5");
-	m_c68new->an6_in_cb().set_ioport("AN6");
-	m_c68new->an7_in_cb().set_ioport("AN7");
-	m_c68new->dp_in_callback().set(FUNC(namcos2_state::dpram_byte_r));
-	m_c68new->dp_out_callback().set(FUNC(namcos2_state::dpram_byte_w));
+	NAMCOC68(config, m_c68, C68_CPU_CLOCK);
+	m_c68->in_pb_callback().set_ioport("MCUB");
+	m_c68->in_pc_callback().set_ioport("MCUC");
+	m_c68->in_ph_callback().set_ioport("MCUH");
+	m_c68->in_pdsw_callback().set_ioport("DSW");
+	m_c68->di0_in_cb().set_ioport("MCUDI0");
+	m_c68->di1_in_cb().set_ioport("MCUDI1");
+	m_c68->di2_in_cb().set_ioport("MCUDI2");
+	m_c68->di3_in_cb().set_ioport("MCUDI3");
+	m_c68->an0_in_cb().set_ioport("AN0");
+	m_c68->an1_in_cb().set_ioport("AN1");
+	m_c68->an2_in_cb().set_ioport("AN2");
+	m_c68->an3_in_cb().set_ioport("AN3");
+	m_c68->an4_in_cb().set_ioport("AN4");
+	m_c68->an5_in_cb().set_ioport("AN5");
+	m_c68->an6_in_cb().set_ioport("AN6");
+	m_c68->an7_in_cb().set_ioport("AN7");
+	m_c68->dp_in_callback().set(FUNC(namcos2_state::dpram_byte_r));
+	m_c68->dp_out_callback().set(FUNC(namcos2_state::dpram_byte_w));
 }
 
 // TODO: temp
@@ -1670,8 +1670,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 		if (m_c65)
 			m_c65->ext_interrupt(HOLD_LINE);
 
-		if (m_c68new)
-			m_c68new->ext_interrupt(ASSERT_LINE);
+		if (m_c68)
+			m_c68->ext_interrupt(ASSERT_LINE);
 	}
 
 	if(scanline == 240)
@@ -2981,7 +2981,7 @@ ROM_START( finalap2 )
 	ROM_RELOAD(         0x010000, 0x020000 )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
-	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) ) /* not sure */
+	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "fl2obj0",  0x000000, 0x80000, CRC(3657dd7a) SHA1(8f286ec0642b09ff42bf0dbd784ae257d4ab278a) )
@@ -3037,7 +3037,7 @@ ROM_START( finalap2j )
 	ROM_RELOAD(         0x010000, 0x020000 )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
-	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) ) /* not sure */
+	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "fl2obj0",  0x000000, 0x80000, CRC(3657dd7a) SHA1(8f286ec0642b09ff42bf0dbd784ae257d4ab278a) )
@@ -5829,8 +5829,8 @@ GAME(  1991, sgunner2j,  sgunner2, sgunner2, sgunner,  namcos2_state, init_sgunn
 GAME(  1991, cosmogng,   0,        base,     base,     namcos2_state, init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
 GAME(  1991, cosmogngj,  cosmogng, base,     base,     namcos2_state, init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
 
-GAME(  1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble (World, Rev B)", MACHINE_REQUIRES_ARTWORK )
-GAME(  1992, bubbletrj,  bubbletr, gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK )
+GAME(  1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly Ghost 2 (World, Rev B)", MACHINE_REQUIRES_ARTWORK )
+GAME(  1992, bubbletrj,  bubbletr, gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly Ghost 2 (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK )
 
 GAMEL( 1992, finalap3,   0,        finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
