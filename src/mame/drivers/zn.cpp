@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt83c461.h"
+#include "machine/watchdog.h"
 #include "machine/znmcu.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
@@ -1455,7 +1456,7 @@ void zn_state::coh1000w_map(address_map &map)
 {
 	zn_map(map);
 	map(0x1f000000, 0x1f1fffff).rom().region("roms", 0);
-	map(0x1f000000, 0x1f000003).nopw();
+	map(0x1f000000, 0x1f000003).w("watchdog", FUNC(watchdog_timer_device::reset16_w)).umask16(0xffff); // ds1232s
 	map(0x1f7e8000, 0x1f7e8003).noprw();
 	map(0x1f7e4000, 0x1f7e4fff).rw(FUNC(zn_state::vt83c461_16_r), FUNC(zn_state::vt83c461_16_w));
 	map(0x1f7f4000, 0x1f7f4fff).rw(FUNC(zn_state::vt83c461_32_r), FUNC(zn_state::vt83c461_32_w));
@@ -1467,6 +1468,8 @@ MACHINE_CONFIG_START(zn_state::coh1000w)
 	MCFG_DEVICE_PROGRAM_MAP(coh1000w_map)
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("8M");
+
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(600));   /* 600ms Ds1232 TD floating */
 
 	VT83C461(config, m_vt83c461).options(ata_devices, "hdd", nullptr, true);
 	m_vt83c461->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
