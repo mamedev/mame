@@ -9,10 +9,10 @@
 
     CPU Board quick layout:
     |----------------------------------------|
-    |    68000P8         PAL     DSW  DSW    |
+    |    68000CP8        PAL     DSW  DSW    |
     |    *   *                             J|--|
     |    22  23   5165              uPD4701 |--|
-    |   6264 6264 5165     TMS32025 uPD4701 |--|
+    |   6264 6264 5165     TMS32020 uPD4701 |--|
     |                                       |--|
     |                              PC050CM  |--|
     |A                          MB3731 x 3  |--|
@@ -28,7 +28,7 @@
     |                              36        |
     |                PAL           PC060HA   |
     |PAL             PAL     35    Z80 CTC   |
-    |    68000P8     PAL     Z80             |
+    |    68000CP8    PAL     Z80             |
     |----------------------------------------|
 
         A, B, R are flatcable connectors, and J is for Jamma
@@ -40,9 +40,10 @@
 
 
     To do:
-        * Determine correct CPU and video timings
+        * Determine correct video timing
         * Unknown sound writes (volume and body sonic control?)
         * Better document mecha drive CPU
+        * Use TMS32020(currently unemulated) device instead of TMS32025
 
 ****************************************************************************/
 
@@ -940,23 +941,23 @@ INPUT_PORTS_END
 void mlanding_state::mlanding(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // 68000P8 in PCB photo
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // TS68000CP8
 	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mlanding_state::irq6_line_hold));
 
-	M68000(config, m_subcpu, 16_MHz_XTAL / 2); // 68000P8 in PCB photo
+	M68000(config, m_subcpu, 16_MHz_XTAL / 2); // TS68000CP8
 	m_subcpu->set_addrmap(AS_PROGRAM, &mlanding_state::sub_map);
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // Z8040004
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // Z08040004PSC
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mlanding_state::audio_map_prog);
 	m_audiocpu->set_addrmap(AS_IO, &mlanding_state::audio_map_io);
 
-	Z80(config, m_mechacpu, 16_MHz_XTAL / 4); // ?
+	Z80(config, m_mechacpu, 4000000); // ?
 	m_mechacpu->set_addrmap(AS_PROGRAM, &mlanding_state::mecha_map_prog);
 	m_mechacpu->set_vblank_int("screen", FUNC(mlanding_state::irq0_line_hold));
 
-	tms32025_device& dsp(TMS32025(config, m_dsp, 16_MHz_XTAL)); // ?
+	tms32025_device& dsp(TMS32025(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
 	dsp.set_addrmap(AS_PROGRAM, &mlanding_state::dsp_map_prog);
 	dsp.set_addrmap(AS_DATA, &mlanding_state::dsp_map_data);
 	dsp.hold_in_cb().set(FUNC(mlanding_state::dsp_hold_signal_r));
@@ -975,9 +976,7 @@ void mlanding_state::mlanding(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-
-	// Estimated
-	screen.set_raw(16000000, 640, 0, 512, 462, 0, 400);
+	screen.set_raw(16000000, 640, 0, 512, 462, 0, 400); // Estimated
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -994,11 +993,11 @@ void mlanding_state::mlanding(machine_config &config)
 
 	MSM5205(config, m_msm1, 384_kHz_XTAL);
 	m_msm1->vck_callback().set(FUNC(mlanding_state::msm5205_1_vck)); // VCK function
-	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz, 4-bit
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B); // 8 kHz, 4-bit
 	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MSM5205(config, m_msm2, 384_kHz_XTAL);
-	m_msm2->set_prescaler_selector(msm5205_device::SEX_4B);      // Slave mode, 4-bit
+	m_msm2->set_prescaler_selector(msm5205_device::SEX_4B); // Slave mode, 4-bit
 	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
