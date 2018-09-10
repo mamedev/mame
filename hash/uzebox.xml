@@ -1206,4 +1206,77 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="bomber">
+		<description>Bomber</description>
+		<year>2015</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Kerby"/>
+		<info name="version" value="1.05"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="24304">
+				<rom name="bomber.bin" size="24304" crc="6ddbdadc" sha1="8b1b11706f329f4a386faf3774b0e1174f21bfce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugz">
+		<description>Bugz</description>
+		<year>2015</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Matt Pandina (Artcfox)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="57582">
+				<rom name="bugz.bin" size="57582" crc="f19e2b5b" sha1="4a1a9e8b3f3003fdbab9ac3e8081827bcb3d9515" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="15puzzle">
+		<description>Fifteen Puzzle</description>
+		<year>2013</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Kerby"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="30076">
+				<rom name="15puzzle.bin" size="30076" crc="f35f3f26" sha1="ea5ed0617b3e8a14842f140451f11448ee90b809" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="babtower">
+		<description>Babylon Tower</description>
+		<year>2015</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Kerby"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="31712">
+				<rom name="babtower.bin" size="31712" crc="44b0e83a" sha1="7c4a5d3a7e2bd03455d541f696783bfc44698fa0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holeymol">
+		<description>Holey Moley</description>
+		<year>2014</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Ellipsis"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="59512">
+				<rom name="holeymol.bin" size="59512" crc="1f9fd98c" sha1="67fd64691d33c77de8f6565e5cc8025987562788" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joyrider">
+		<description>Joyrider</description>
+		<year>2014</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="James Howard"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="58798">
+				<rom name="joyrider.bin" size="58798" crc="95d85abb" sha1="045bf63c7a4dca334104cb477d820542bee69eb8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
