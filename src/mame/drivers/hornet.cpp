@@ -1098,6 +1098,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	// Screeen size and timing is re-calculated later in voodoo card
 	screen.set_refresh_hz(60);
 	screen.set_size(64 * 8, 48 * 8);
+	screen.set_visarea(0, 64 * 8 - 1, 0, 48 * 8 - 1);
 	screen.set_screen_update(FUNC(hornet_state::screen_update));
 
 	PALETTE(config, "palette", 65536);
@@ -1158,12 +1159,14 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	// Screeen size and timing is re-calculated later in voodoo card
 	lscreen.set_refresh_hz(60);
 	lscreen.set_size(512, 384);
+	lscreen.set_visarea(0, 512 - 1, 0, 384 - 1);
 	lscreen.set_screen_update(FUNC(hornet_state::screen_update));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	// Screeen size and timing is re-calculated later in voodoo card
 	rscreen.set_refresh_hz(60);
 	rscreen.set_size(512, 384);
+	rscreen.set_visarea(0, 512 - 1, 0, 384 - 1);
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update_rscreen));
 
 	m_konppc->set_num_boards(2);

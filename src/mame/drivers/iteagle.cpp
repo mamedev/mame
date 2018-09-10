@@ -204,6 +204,7 @@ MACHINE_CONFIG_START(iteagle_state::iteagle)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(512, 384);
+	screen.set_visarea(0, 512 - 1, 0, 384 - 1);
 	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 MACHINE_CONFIG_END
 

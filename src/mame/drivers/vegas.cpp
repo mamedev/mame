@@ -1781,6 +1781,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	// Screeen size and timing is re-calculated later in voodoo card
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 MACHINE_CONFIG_END
 

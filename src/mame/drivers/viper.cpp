@@ -2411,6 +2411,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	// Screeen size and timing is re-calculated later in voodoo card
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 768);
+	screen.set_visarea(0, 1024 - 1, 0, 768 - 1);
 	screen.set_screen_update(FUNC(viper_state::screen_update_viper));
 
 	PALETTE(config, "palette", 65536);

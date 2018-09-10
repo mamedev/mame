@@ -1928,6 +1928,7 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	// Screeen size and timing is re-calculated later in voodoo card
 	m_screen->set_refresh_hz(57);
 	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 MACHINE_CONFIG_END
 
