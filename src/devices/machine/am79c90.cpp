@@ -378,7 +378,7 @@ void am79c90_device::poll_transmit()
 {
 	ring_descriptor &curr = m_curr_transmit_desc;
 	const uint32_t base_addr = (m_transmit_ring_addr >> 2) + (m_transmit_ring_pos << 1);
-	logerror("%s: LANCE polling for packets from %08x\n", machine().describe_context(), base_addr);
+	//logerror("%s: LANCE polling for packets from %08x\n", machine().describe_context(), base_addr);
 	curr.m_tmd01 = m_dma_in_cb(base_addr, ~0);
 
 	const uint16_t tmd1 = (uint16_t)curr.m_tmd01;
@@ -395,7 +395,7 @@ void am79c90_device::poll_transmit()
 		return;
 	}
 
-	logerror("%s: LANCE: Starting transmitting\n", machine().describe_context());
+	//logerror("%s: LANCE: Starting transmitting\n", machine().describe_context());
 
 	m_transmit_poll_timer->adjust(attotime::never);
 	m_transmitting = true;

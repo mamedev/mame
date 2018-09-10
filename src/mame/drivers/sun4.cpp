@@ -636,6 +636,7 @@ private:
 	uint32_t m_buserr[4];
 	uint32_t m_counter[4];
 	uint32_t m_dma[4];
+	bool m_dma_irq;
 	bool m_dma_tc_read;
 	uint32_t m_dma_pack_register;
 	int m_scsi_irq;
@@ -1371,6 +1372,7 @@ void sun4_state::machine_reset()
 	m_irq_reg = 0;
 	m_scc1_int = m_scc2_int = 0;
 	m_scsi_irq = 0;
+	m_dma_irq = false;
 	m_dma_tc_read = false;
 	m_dma_pack_register = 0;
 
@@ -1496,7 +1498,7 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x07200000, 0x07200003).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
 	map(0x08000000, 0x08000003).r(FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
 	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
-	map(0x08800000, 0x0880001f).m(m_scsi, FUNC(ncr53c90a_device::map)).umask32(0xff000000);
+	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr53c90a_device::map)).umask32(0xff000000);
 	map(0x08c00000, 0x08c00003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
 	map(0x0e000000, 0x0e000003).r(FUNC(sun4_state::ss1_sl3_id));    // slot 3 contains video board
 	map(0x0e800000, 0x0e8fffff).ram().share("bw2_vram");
@@ -1702,13 +1704,12 @@ void sun4_state::dma_check_interrupts()
 
 	int irq_or_err_pending = (m_dma[DMA_CTRL] & (DMA_INT_PEND | DMA_ERR_PEND)) ? 1 : 0;
 	int irq_enabled = (m_dma[DMA_CTRL] & DMA_INT_EN) ? 1 : 0;
-	if (irq_or_err_pending && irq_enabled)
+	bool old_irq = m_dma_irq;
+	m_dma_irq = irq_or_err_pending && irq_enabled;
+	if (old_irq != m_dma_irq)
 	{
-		m_maincpu->set_input_line(SPARC_IRQ3, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(SPARC_IRQ3, CLEAR_LINE);
+		logerror("m_dma_irq %d because irq_or_err_pending:%d and irq_enabled:%d\n", m_dma_irq ? 1 : 0, irq_or_err_pending, irq_enabled);
+		m_maincpu->set_input_line(SPARC_IRQ3, m_dma_irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1726,7 +1727,7 @@ void sun4_state::dma_transfer_write()
 		logerror("Read from device: %02x, pack count %d\n", dma_value, pack_cnt);
 		m_dma_pack_register |= dma_value << bit_index;
 
-		//if (m_dma[DMA_CTRL] & DMA_EN_CNT)
+		if (m_dma[DMA_CTRL] & DMA_EN_CNT)
 			m_dma[DMA_BYTE_COUNT]--;
 
 		pack_cnt++;
@@ -1785,7 +1786,7 @@ void sun4_state::dma_transfer_read()
 			word_cached = false;
 
 		m_dma[DMA_ADDR]++;
-		//if (m_dma[DMA_CTRL] & DMA_EN_CNT)
+		if (m_dma[DMA_CTRL] & DMA_EN_CNT)
 			m_dma[DMA_BYTE_COUNT]--;
 	}
 }
@@ -1882,8 +1883,13 @@ WRITE32_MEMBER( sun4_state::dma_w )
 
 WRITE_LINE_MEMBER( sun4_state::scsi_irq )
 {
+	int old_irq = m_scsi_irq;
 	m_scsi_irq = state;
-	dma_check_interrupts();
+	if (m_scsi_irq != old_irq)
+	{
+		logerror("scsi_irq %d, checking interrupts\n", state);
+		dma_check_interrupts();
+	}
 }
 
 WRITE_LINE_MEMBER( sun4_state::scsi_drq )
@@ -1894,7 +1900,7 @@ WRITE_LINE_MEMBER( sun4_state::scsi_drq )
 	{
 		logerror("scsi_drq, DMA pending\n");
 		m_dma[DMA_CTRL] |= DMA_REQ_PEND;
-		if (m_dma[DMA_CTRL] & DMA_EN_DMA && m_dma[DMA_BYTE_COUNT])
+		if (m_dma[DMA_CTRL] & DMA_EN_DMA/* && m_dma[DMA_BYTE_COUNT]*/)
 		{
 			logerror("DMA enabled, starting dma\n");
 			dma_transfer();
