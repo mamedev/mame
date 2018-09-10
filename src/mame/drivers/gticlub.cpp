@@ -1011,8 +1011,8 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(1)
 
-	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(33'868'800)/2);
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1130,8 +1130,8 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(33'868'800)/2);
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

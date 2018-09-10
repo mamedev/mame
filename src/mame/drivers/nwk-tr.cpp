@@ -896,8 +896,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(16'934'400));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

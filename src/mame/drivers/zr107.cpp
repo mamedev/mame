@@ -812,8 +812,8 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(0)
 
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -890,8 +890,8 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(0)
 
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

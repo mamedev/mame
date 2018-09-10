@@ -367,8 +367,8 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_soundcpu, M68K_IRQ_1);
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, konamigq_k054539_map)
