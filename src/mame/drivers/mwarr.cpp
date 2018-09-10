@@ -46,7 +46,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
+#include "video/edevices.h"
 
 #define MASTER_CLOCK     XTAL(12'000'000)
 #define SOUND_CLOCK      XTAL(45'000'000)
@@ -55,20 +55,12 @@ Notes:
 class mwarr_state : public driver_device
 {
 public:
-	mwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_mlow_videoram(*this, "mlow_videoram"),
-		m_mhigh_videoram(*this, "mhigh_videoram"),
-		m_tx_videoram(*this, "tx_videoram"),
-		m_bg_scrollram(*this, "bg_scrollram"),
-		m_mlow_scrollram(*this, "mlow_scrollram"),
-		m_mhigh_scrollram(*this, "mhigh_scrollram"),
-		m_vidattrram(*this, "vidattrram"),
-		m_spriteram(*this, "spriteram"),
+	mwarr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mwarr_ram(*this, "mwarr_ram"),
 		m_okibank(*this, "okibank"),
 		m_maincpu(*this, "maincpu"),
+		m_video(*this, "edevices_vid"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -76,52 +68,25 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_bg_videoram;
-	required_shared_ptr<uint16_t> m_mlow_videoram;
-	required_shared_ptr<uint16_t> m_mhigh_videoram;
-	required_shared_ptr<uint16_t> m_tx_videoram;
-	required_shared_ptr<uint16_t> m_bg_scrollram;
-	required_shared_ptr<uint16_t> m_mlow_scrollram;
-	required_shared_ptr<uint16_t> m_mhigh_scrollram;
-	required_shared_ptr<uint16_t> m_vidattrram;
-	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_mwarr_ram;
 
 	required_memory_bank m_okibank;
 
-	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_mlow_tilemap;
-	tilemap_t *m_mhigh_tilemap;
-	tilemap_t *m_tx_tilemap;
-
-	/* misc */
-	int m_which;
-
-	uint16_t m_sprites_buffer[0x800];
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
-	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
-	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(sprites_commands_w);
 	DECLARE_WRITE16_MEMBER(mwarr_brightness_w);
+
 	DECLARE_WRITE16_MEMBER(oki1_bank_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
-	TILE_GET_INFO_MEMBER(get_mhigh_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<edevices_device> m_video;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void mwarr_map(address_map &map);
 	void oki2_map(address_map &map);
 };
-
 
 /*************************************
  *
@@ -129,85 +94,10 @@ private:
  *
  *************************************/
 
-WRITE16_MEMBER(mwarr_state::bg_videoram_w)
-{
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(mwarr_state::mlow_videoram_w)
-{
-	COMBINE_DATA(&m_mlow_videoram[offset]);
-	m_mlow_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(mwarr_state::mhigh_videoram_w)
-{
-	COMBINE_DATA(&m_mhigh_videoram[offset]);
-	m_mhigh_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(mwarr_state::tx_videoram_w)
-{
-	COMBINE_DATA(&m_tx_videoram[offset]);
-	m_tx_tilemap->mark_tile_dirty(offset);
-}
-
 WRITE16_MEMBER(mwarr_state::oki1_bank_w)
 {
 	m_okibank->set_entry(data & 3);
 }
-
-WRITE16_MEMBER(mwarr_state::sprites_commands_w)
-{
-	if (m_which)
-	{
-		int i;
-
-		switch (data)
-		{
-		case 0:
-			/* clear sprites on screen */
-			for (i = 0; i < 0x800; i++)
-			{
-				m_sprites_buffer[i] = 0;
-			}
-			m_which = 0;
-			break;
-
-		default:
-			logerror("used unknown sprites command %02X\n",data);
-		case 0xf:
-			/* refresh sprites on screen */
-			for (i = 0; i < 0x800; i++)
-			{
-				m_sprites_buffer[i] = m_spriteram[i];
-			}
-			break;
-
-		case 0xd:
-			/* keep sprites on screen */
-			break;
-		}
-	}
-
-	m_which ^= 1;
-}
-
-WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
-{
-	int i;
-	double brightness;
-
-	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
-
-	brightness = (double)(data & 0xff);
-	for (i = 0; i < 0x800; i++)
-	{
-		m_palette->set_pen_contrast(i, brightness/255);
-	}
-}
-
 
 /*************************************
  *
@@ -218,10 +108,10 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 void mwarr_state::mwarr_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x1007ff).ram().w(FUNC(mwarr_state::bg_videoram_w)).share("bg_videoram");
-	map(0x100800, 0x100fff).ram().w(FUNC(mwarr_state::mlow_videoram_w)).share("mlow_videoram");
-	map(0x101000, 0x1017ff).ram().w(FUNC(mwarr_state::mhigh_videoram_w)).share("mhigh_videoram");
-	map(0x101800, 0x1027ff).ram().w(FUNC(mwarr_state::tx_videoram_w)).share("tx_videoram");
+	map(0x100000, 0x1007ff).ram().w(m_video, FUNC(edevices_device::bg_videoram_w)).share("bg_videoram");
+	map(0x100800, 0x100fff).ram().w(m_video, FUNC(edevices_device::mlow_videoram_w)).share("mlow_videoram");
+	map(0x101000, 0x1017ff).ram().w(m_video, FUNC(edevices_device::mhigh_videoram_w)).share("mhigh_videoram");
+	map(0x101800, 0x1027ff).ram().w(m_video, FUNC(edevices_device::tx_videoram_w)).share("tx_videoram");
 	map(0x103000, 0x1033ff).ram().share("bg_scrollram");
 	map(0x103400, 0x1037ff).ram().share("mlow_scrollram");
 	map(0x103800, 0x103bff).ram().share("mhigh_scrollram");
@@ -234,7 +124,7 @@ void mwarr_state::mwarr_map(address_map &map)
 	map(0x110004, 0x110005).portr("DSW");
 	map(0x110010, 0x110011).w(FUNC(mwarr_state::oki1_bank_w));
 	map(0x110014, 0x110015).w(FUNC(mwarr_state::mwarr_brightness_w));
-	map(0x110016, 0x110017).w(FUNC(mwarr_state::sprites_commands_w));
+	map(0x110016, 0x110017).w(m_video, FUNC(edevices_device::sprites_commands_w));
 	map(0x180001, 0x180001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x190001, 0x190001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -246,7 +136,6 @@ void mwarr_state::oki2_map(address_map &map)
 	map(0x00000, 0x1ffff).rom().region("oki2", 0);
 	map(0x20000, 0x3ffff).bankr("okibank");
 }
-
 
 /*************************************
  *
@@ -277,7 +166,7 @@ static INPUT_PORTS_START( mwarr )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) // otherwise it doesn't boot
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) // otherwise it doesn't boot (is service switch on stlforce)
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -381,175 +270,29 @@ GFXDECODE_END
  *  Video emulation
  *
  *************************************/
-
-TILE_GET_INFO_MEMBER(mwarr_state::get_bg_tile_info)
-{
-	int tileno = m_bg_videoram[tile_index] & 0x1fff;
-	int colour = (m_bg_videoram[tile_index] & 0xe000) >> 13;
-
-	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
-}
-
-TILE_GET_INFO_MEMBER(mwarr_state::get_mlow_tile_info)
-{
-	int tileno = m_mlow_videoram[tile_index] & 0x1fff;
-	int colour = (m_mlow_videoram[tile_index] & 0xe000) >> 13;
-
-	SET_TILE_INFO_MEMBER(3, tileno, colour, 0);
-}
-
-TILE_GET_INFO_MEMBER(mwarr_state::get_mhigh_tile_info)
-{
-	int tileno = m_mhigh_videoram[tile_index] & 0x1fff;
-	int colour = (m_mhigh_videoram[tile_index] & 0xe000) >> 13;
-
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
-}
-
-TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
-{
-	int tileno = m_tx_videoram[tile_index] & 0x1fff;
-	int colour = (m_tx_videoram[tile_index] & 0xe000) >> 13;
-
-	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
-}
-
+	
 void mwarr_state::video_start()
 {
-	m_bg_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_bg_tile_info),this),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_mlow_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_mlow_tile_info),this),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_mhigh_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_mhigh_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_tx_tile_info),this),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
-
-	m_mlow_tilemap->set_transparent_pen(0);
-	m_mhigh_tilemap->set_transparent_pen(0);
-	m_tx_tilemap->set_transparent_pen(0);
-
-	m_bg_tilemap->set_scroll_rows(256);
-	m_mlow_tilemap->set_scroll_rows(256);
-	m_mhigh_tilemap->set_scroll_rows(256);
-
-	save_item(NAME(m_sprites_buffer));
-}
-
-void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	const uint16_t *source = m_sprites_buffer + 0x800 - 4;
-	const uint16_t *finish = m_sprites_buffer;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int x, y, color, flipx, dy, pri, pri_mask, i;
-
-	while (source >= finish)
-	{
-		/* draw sprite */
-		if (source[0] & 0x0800)
-		{
-			y = 512 - (source[0] & 0x01ff);
-			x = (source[3] & 0x3ff) - 9;
-
-			color = source[1] & 0x000f;
-			flipx = source[1] & 0x0200;
-
-			dy = (source[0] & 0xf000) >> 12;
-
-			pri = ((source[1] & 0x3c00) >> 10); // Priority (1 = Low)
-			pri_mask = ~((1 << (pri + 1)) - 1);     // Above the first "pri" levels
-
-			for (i = 0; i <= dy; i++)
-			{
-				gfx->prio_transpen(bitmap,
-							cliprect,
-							source[2]+i,
-							color,
-							flipx,0,
-							x,y+i*16,
-							screen.priority(),pri_mask,0 );
-
-				/* wrap around x */
-				gfx->prio_transpen(bitmap,
-							cliprect,
-							source[2]+i,
-							color,
-							flipx,0,
-							x-1024,y+i*16,
-							screen.priority(),pri_mask,0 );
-
-				/* wrap around y */
-				gfx->prio_transpen(bitmap,
-							cliprect,
-							source[2]+i,
-							color,
-							flipx,0,
-							x,y-512+i*16,
-							screen.priority(),pri_mask,0 );
-
-				/* wrap around x & y */
-				gfx->prio_transpen(bitmap,
-							cliprect,
-							source[2]+i,
-							color,
-							flipx,0,
-							x-1024,y-512+i*16,
-							screen.priority(),pri_mask,0 );
-			}
-		}
-
-		source -= 0x4;
-	}
 }
 
 uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
-	screen.priority().fill(0, cliprect);
-
-	if (BIT(m_vidattrram[6], 0))
-	{
-		for (i = 0; i < 256; i++)
-			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[i] + 20);
-	}
-	else
-	{
-		for (i = 0; i < 256; i++)
-			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[0] + 19);
-	}
-
-	if (BIT(m_vidattrram[6], 2))
-	{
-		for (i = 0; i < 256; i++)
-			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[i] + 19);
-	}
-	else
-	{
-		for (i = 0; i < 256; i++)
-			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[0] + 19);
-	}
-
-	if (BIT(m_vidattrram[6], 4))
-	{
-		for (i = 0; i < 256; i++)
-			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[i] + 19);
-	}
-	else
-	{
-		for (i = 0; i < 256; i++)
-			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[0] + 19);
-	}
-
-	m_bg_tilemap->set_scrolly(0, m_vidattrram[1] + 1);
-	m_mlow_tilemap->set_scrolly(0, m_vidattrram[2] + 1);
-	m_mhigh_tilemap->set_scrolly(0, m_vidattrram[3] + 1);
-
-	m_tx_tilemap->set_scrollx(0, m_vidattrram[0] + 16);
-	m_tx_tilemap->set_scrolly(0, m_vidattrram[4] + 1);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0x01);
-	m_mlow_tilemap->draw(screen, bitmap, cliprect, 0, 0x02);
-	m_mhigh_tilemap->draw(screen, bitmap, cliprect, 0, 0x04);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0x10);
-	draw_sprites(screen, bitmap, cliprect);
+	m_video->draw(screen, bitmap, cliprect);
 	return 0;
+}
+
+WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
+{
+	int i;
+	double brightness;
+
+	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
+
+	brightness = (double)(data & 0xff);
+	for (i = 0; i < 0x800; i++)
+	{
+		m_palette->set_pen_contrast(i, brightness/255);
+	}
 }
 
 /*************************************
@@ -561,22 +304,17 @@ uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &b
 void mwarr_state::machine_start()
 {
 	m_okibank->configure_entries(0, 4, memregion("oki2")->base(), 0x20000);
-
-	save_item(NAME(m_which));
 }
 
 void mwarr_state::machine_reset()
 {
-	m_which = 0;
 }
 
 MACHINE_CONFIG_START(mwarr_state::mwarr)
-
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(mwarr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -590,6 +328,19 @@ MACHINE_CONFIG_START(mwarr_state::mwarr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mwarr)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	EDEVICES_VID(config, m_video, 0);
+	m_video->set_tags("bg_videoram",
+		              "mlow_videoram",
+		              "mhigh_videoram",
+		              "tx_videoram",
+		              "bg_scrollram",
+		              "mlow_scrollram",
+		              "mhigh_scrollram",
+		              "vidattrram",
+		              "spriteram",
+		              "gfxdecode",
+		              "palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
