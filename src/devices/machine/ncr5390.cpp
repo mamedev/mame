@@ -340,7 +340,7 @@ void ncr5390_device::step(bool timeout)
 
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
-		if (!fifo_pos || (dma_command && !(status & S_TC0)))
+		if (!fifo_pos && dma_command && !(status & S_TC0))
 			break;
 
 		command_length = derive_msg_size(fifo[0]);
