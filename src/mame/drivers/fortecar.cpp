@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	fcppi0.in_pc_callback().set(FUNC(fortecar_state::ppi0_portc_r));
 	fcppi0.out_pc_callback().set(FUNC(fortecar_state::ppi0_portc_w));
 
-	MCFG_V3021_ADD("rtc")
+	V3021(config, "rtc");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fortecar)
 	MCFG_PALETTE_ADD("palette", 0x200)

@@ -783,9 +783,10 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_VT82C496_ADD("chipset")
-	MCFG_VT82C496_CPU("maincpu")
-	MCFG_VT82C496_REGION("isa")
+	vt82c496_device &chipset(VT82C496(config, "chipset"));
+	chipset.set_cputag(m_maincpu);
+	chipset.set_ramtag(m_ram);
+	chipset.set_isatag("isa");
 MACHINE_CONFIG_END
 
 // Compaq Portable III
