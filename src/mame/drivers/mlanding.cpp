@@ -594,7 +594,8 @@ void mlanding_state::msm5205_update(int chip)
 
 WRITE_LINE_MEMBER(mlanding_state::msm5205_1_vck)
 {
-	msm5205_update(0);
+	if (state)
+		msm5205_update(0);
 }
 
 
@@ -943,7 +944,6 @@ void mlanding_state::mlanding(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // TS68000CP8
 	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mlanding_state::irq6_line_hold));
 
 	M68000(config, m_subcpu, 16_MHz_XTAL / 2); // TS68000CP8
@@ -976,7 +976,7 @@ void mlanding_state::mlanding(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16000000, 640, 0, 512, 462, 0, 400); // Estimated
+	screen.set_raw(16_MHz_XTAL, 640, 0, 512, 462, 0, 400); // Estimated
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);
 
