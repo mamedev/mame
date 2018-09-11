@@ -486,6 +486,13 @@ void m6500_1_device::toggle_cntr()
 
 void m6500_1_device::memory_map(address_map &map)
 {
+	// there's probably a lot more mirroring here
+	// it's likely RAM is mirrored at 0x0040-0x007f and the entire 0x0000-0x00ff repeats every 0x100 up to 0x07ff
+	// this would make the decoding simple:
+	// 0xxx 0xaa aaaa -> RAM
+	// 0xxx 1xxx aaaa -> peripheral
+	// 1aaa aaaa aaaa -> ROM
+
 	map.global_mask(0x0fff); // guessed
 	map.unmap_value_high(); // guessed
 

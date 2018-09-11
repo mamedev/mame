@@ -174,7 +174,7 @@ void goupil_g1_state::device_timer(emu_timer &timer, device_timer_id id, int par
 		m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 10));
 		break;
 	default:
-		assert_always(false, "Unknown id in goupil_g1_state::device_timer");
+		throw emu_fatalerror("Unknown id in goupil_g1_state::device_timer");
 	}
 }
 
