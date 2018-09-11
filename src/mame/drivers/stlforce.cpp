@@ -255,9 +255,7 @@ MACHINE_CONFIG_START(stlforce_state::twinbrat)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 44*8-1, 0*8, 30*8-1)
 
-	// how do you modify with new syntax?
-	MCFG_DEVICE_REMOVE("edevices_vid")
-	EDEVICES_SFORCE_VID(config, m_video, 0);
+	EDEVICES_SFORCE_VID(config.replace(), m_video, 0);
 	m_video->set_tags("bg_videoram",
 		              "mlow_videoram",
 		              "mhigh_videoram",
