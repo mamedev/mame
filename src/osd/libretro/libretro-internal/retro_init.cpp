@@ -59,6 +59,8 @@ bool auto_save_enable = false;
 bool throttle_enable = false;
 bool game_specific_saves_enable = false;
 bool buttons_profiles = true;
+bool mame_paths_enable = false;
+
 
 bool res_43 = false;
 bool video_changed = false;
@@ -467,7 +469,8 @@ static int execute_game(char* path)
 
    Set_Default_Option();
 
-   Set_Path_Option();
+   if(!mame_paths_enable)
+      Set_Path_Option();
 
    /* useless ? */
    if (tate)

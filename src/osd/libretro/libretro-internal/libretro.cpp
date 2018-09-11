@@ -55,6 +55,7 @@ static char option_throttle[50];
 static char option_nobuffer[50];
 static char option_saves[50];
 static char option_buttons_profiles[50];
+static char option_mame_paths[50];
 
 static char option_res[50];
 
@@ -153,6 +154,7 @@ void retro_set_environment(retro_environment_t cb)
    sprintf(option_nobuffer,"%s_%s",core,"nobuffer");
    sprintf(option_res,"%s_%s",core,"altres");
    sprintf(option_buttons_profiles, "%s_%s", core, "buttons_profiles");
+   sprintf(option_mame_paths, "%s_%s", core, "mame_paths_enable");
 
    static const struct retro_variable vars[] = {
     { option_read_config, "Read configuration; disabled|enabled" },
@@ -173,7 +175,7 @@ void retro_set_environment(retro_environment_t cb)
     { option_osd, "Boot to OSD; disabled|enabled" },
     { option_cli, "Boot from CLI; disabled|enabled" },
     { option_res, "Resolution; 640x480|640x360|800x600|800x450|960x720|960x540|1024x768|1024x576|1280x960|1280x720|1600x1200|1600x900|1440x1080|1920x1080|1920x1440|2560x1440|2880x2160|3840x2160" },
-
+    { option_mame_paths, "MAME INI Paths; disabled|enabled" },
     { NULL, NULL },
    };
 
@@ -396,6 +398,17 @@ video_changed=true;
          write_config_enable = false;
       if (!strcmp(var.value, "enabled"))
          write_config_enable = true;
+   }
+   
+   var.key   = option_mame_paths;
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (!strcmp(var.value, "enabled"))
+         mame_paths_enable = true;
+      if (!strcmp(var.value, "disabled"))
+         mame_paths_enable = false;
    }
 }
 
