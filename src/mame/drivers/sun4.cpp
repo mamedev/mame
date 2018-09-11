@@ -760,9 +760,10 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 		if ((!(m_pagemap[entry] & PM_WRITEMASK)) || ((m_pagemap[entry] & PM_SYSMASK) && !(asi & 1)))
 		{
 			printf("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
-			m_buserr[0] = 0x8040;   // write, protection error
+			m_buserr[0] |= 0x8040;   // write, protection error
 			m_buserr[1] = offset<<2;
-			m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
+			//m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
+			m_maincpu->set_mae();
 			return;
 		}
 
@@ -790,10 +791,12 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		printf("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
+		//printf("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-		//m_buserr[0] = 0x8;    // invalid PTE
-		//m_buserr[1] = offset<<2;
+        //m_maincpu->set_input_line(SPARC_NMI, ASSERT_LINE);
+        m_maincpu->set_mae();
+		m_buserr[0] |= 0x8080;    // write cycle, invalid PTE
+		m_buserr[1] = offset<<2;
 	}
 }
 
@@ -827,7 +830,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 
 			case 6: // bus error register
 				printf("sun4c: read buserror, PC=%x (mask %08x)\n", m_maincpu->pc(), mem_mask);
-				m_maincpu->set_input_line(SPARC_MAE, CLEAR_LINE);
+				//m_maincpu->set_input_line(SPARC_MAE, CLEAR_LINE);
 				retval = m_buserr[offset & 0xf];
 				m_buserr[offset & 0xf] = 0; // clear on reading
 				return retval;
@@ -1037,9 +1040,10 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 		if (!machine().side_effects_disabled())
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x88;   // read, invalid PTE
-			//m_buserr[1] = offset<<2;
+			m_maincpu->set_mae();
+			m_buserr[0] |= 0x80;    // invalid PTE
+			m_buserr[0] &= ~0x8000; // read
+			m_buserr[1] = offset<<2;
 		}
 		return 0;
 	}
