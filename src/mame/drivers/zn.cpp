@@ -52,7 +52,7 @@ public:
 	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
-		m_gpu_screen(*this, "gpu:screen"),
+		m_gpu_screen(*this, "screen"),
 		m_sio0(*this, "maincpu:sio0"),
 		m_cat702(*this, "cat702_%u", 1),
 		m_znmcu(*this, "znmcu"),
@@ -172,7 +172,7 @@ private:
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 	void atpsx_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void jdredd_vblank(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(jdredd_vblank);
 
 	void atlus_snd_map(address_map &map);
 	void bam2_map(address_map &map);
@@ -407,6 +407,9 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN(m_gpu_screen)
+
+	SCREEN(config, m_gpu_screen, SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -424,6 +427,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zn_state::zn1_2mb_vram)
 	zn1_1mb_vram(config);
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN(m_gpu_screen)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::zn2)
@@ -453,6 +457,9 @@ MACHINE_CONFIG_START(zn_state::zn2)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN(m_gpu_screen)
+
+	SCREEN(config, m_gpu_screen, SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2023,12 +2030,12 @@ CUSTOM_INPUT_MEMBER(zn_state::jdredd_gun_mux_read)
 	return m_jdredd_gun_mux;
 }
 
-void zn_state::jdredd_vblank(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(zn_state::jdredd_vblank)
 {
 	int x;
 	int y;
 
-	if( vblank_state )
+	if (state)
 	{
 		m_jdredd_gun_mux = !m_jdredd_gun_mux;
 
@@ -2214,8 +2221,7 @@ MACHINE_CONFIG_START(zn_state::jdredd)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(jdredd_map)
 
-	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
+	m_gpu_screen->screen_vblank().set(FUNC(zn_state::jdredd_vblank));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
 	ata.irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));

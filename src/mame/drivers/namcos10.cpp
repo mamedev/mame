@@ -398,6 +398,7 @@ earlier TK games, so it appears to be optional or is only used by the later TK51
 #include "cpu/psx/psx.h"
 #include "machine/ram.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -938,6 +939,9 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -962,6 +966,9 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

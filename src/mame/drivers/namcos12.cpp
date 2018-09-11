@@ -1207,7 +1207,7 @@ private:
 
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
+	DECLARE_WRITE_LINE_MEMBER(namcos12_sub_irq);
 };
 
 
@@ -1347,11 +1347,11 @@ void namcos12_state::namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address
 	}
 }
 
-void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state )
+WRITE_LINE_MEMBER(namcos12_state::namcos12_sub_irq)
 {
-	m_sub->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
-	m_adc->adtrg_w(vblank_state);
-	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
+	m_sub->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_adc->adtrg_w(state);
+	m_sub_portb = (m_sub_portb & 0x7f) | (state << 7);
 }
 
 void namcos12_state::namcos12_map(address_map &map)
@@ -1768,7 +1768,9 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 MACHINE_CONFIG_END
 
 // CPU PCB COH716
@@ -1784,7 +1786,9 @@ MACHINE_CONFIG_START(namcos12_state::coh716)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x400000, XTAL(53'693'175) )
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos12_boothack_state::ptblank2)

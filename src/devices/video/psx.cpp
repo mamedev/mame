@@ -37,6 +37,8 @@ void psxgpu_device::device_start()
 {
 	m_vblank_handler.resolve_safe();
 
+	screen().register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, this));
+
 	for( int n_colour = 0; n_colour < 0x10000; n_colour++ )
 	{
 		set_pen_color( n_colour, pal555(n_colour,0, 5, 10) );
@@ -608,8 +610,11 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	save_item(NAME(n_ix));
 	save_item(NAME(n_iy));
 	save_item(NAME(n_ti));
+}
 
-	machine().save().register_postload( save_prepost_delegate( FUNC( psxgpu_device::updatevisiblearea ), this ) );
+void psxgpu_device::device_post_load()
+{
+	updatevisiblearea();
 }
 
 uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -3884,15 +3889,24 @@ void psxgpu_device::lightgun_set( int n_x, int n_y )
 }
 
 //-------------------------------------------------
-//  device_add_mconfig - add device configuration
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(psxgpu_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE( 1024, 1024 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
-	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, this));
-MACHINE_CONFIG_END
+void psxgpu_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+	{
+		screen().set_refresh_hz(60);
+		screen().set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+		screen().set_size(1024, 1024);
+		screen().set_visarea(0, 639, 0, 479);
+	}
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(psxgpu_device::update_screen), this));
+}

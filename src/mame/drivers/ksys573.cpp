@@ -523,7 +523,7 @@ private:
 
 	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
-	void sys573_vblank( screen_device &screen, bool vblank_state );
+	DECLARE_WRITE_LINE_MEMBER( sys573_vblank );
 
 	void punchmania_cassette_install(device_t *device);
 	void salarymc_cassette_install(device_t *device);
@@ -823,7 +823,7 @@ MACHINE_RESET_MEMBER( ksys573_state,konami573 )
 	m_h8_clk = 0;
 }
 
-void ksys573_state::sys573_vblank( screen_device &screen, bool vblank_state )
+WRITE_LINE_MEMBER(ksys573_state::sys573_vblank)
 {
 	update_disc();
 
@@ -2128,7 +2128,9 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&ksys573_state::sys573_vblank, this ))
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(ksys573_state::sys573_vblank));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

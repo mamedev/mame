@@ -304,6 +304,7 @@ Pin 22 Solder Side - Gun 2 Trigger
 #include "machine/timer.h"
 #include "sound/c352.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
@@ -623,6 +624,9 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcos11_state, mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -644,6 +648,7 @@ MACHINE_CONFIG_START(namcos11_state::coh100)
 	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::tekken)

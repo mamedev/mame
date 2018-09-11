@@ -81,6 +81,7 @@
 #include "sound/k054539.h"
 #include "sound/k056800.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -362,6 +363,9 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175))
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
