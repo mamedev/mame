@@ -301,7 +301,10 @@ ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 
 @source:accomm.cpp
-accomm                          // 1986 Acorn Computer
+accomm                          // 1986 Acorn Commmunicator
+accommp                         // 1985 Acorn Commmunicator (prototype)
+accommb                         // 1987 Acorn Briefcase Communicator
+accommi                         // 1988 Acorn Communicator (Italian)
 
 @source:acd.cpp
 acd                             //
