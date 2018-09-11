@@ -70,6 +70,9 @@ public:
 	void system24_rom(machine_config &config);
 	void system24(machine_config &config);
 
+protected:
+	virtual void device_post_load() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -156,7 +159,6 @@ private:
 	WRITE8_MEMBER(hotrod_lamps_w);
 
 	void fdc_init();
-	void postload();
 	void reset_reset();
 	void reset_bank();
 	void irq_init();

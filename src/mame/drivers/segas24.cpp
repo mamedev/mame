@@ -388,7 +388,7 @@ void segas24_state::fdc_init()
 	m_fdc_index_count = 0;
 }
 
-void segas24_state::postload()
+void segas24_state::device_post_load()
 {
 	switch(m_fdc_mode) {
 	case 0x9:
@@ -1214,7 +1214,6 @@ void segas24_state::machine_start()
 	{
 		subdevice<nvram_device>("floppy_nvram")->set_base(&m_floppy[0], 2*m_track_size);
 
-		machine().save().register_postload(save_prepost_delegate(FUNC(segas24_state::postload), this));
 		save_item(NAME(m_fdc_track_side));
 		save_item(NAME(m_fdc_mode));
 		save_item(NAME(m_fdc_status));
