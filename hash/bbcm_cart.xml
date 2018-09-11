@@ -39,6 +39,17 @@
 		</part>
 	</software>
 
+	<software name="smart" supported="no">
+		<description>Smart Cartridge</description>
+		<year>1987</year>
+		<publisher>Care Electronics</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vfs">
 		<description>Video Filing System ROM Cartridge</description>
 		<year>1986</year>
