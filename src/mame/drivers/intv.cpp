@@ -556,10 +556,13 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
 	/* crt controller */
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(7'159'090)/8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_OVERSCAN(stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE, stic_device::OVERSCAN_RIGHT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
-						  stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE, stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE)
+	TMS9927(config, m_crtc, XTAL(7'159'090)/8);
+	m_crtc->set_char_width(8);
+	m_crtc->set_overscan(
+		stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
+		stic_device::OVERSCAN_RIGHT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
+		stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE,
+		stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intvkbd)

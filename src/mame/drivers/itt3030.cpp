@@ -724,8 +724,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	/* devices */
 	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
 
-	MCFG_DEVICE_ADD("crt5027", CRT5027, 6_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5027(config, m_crtc, 6_MHz_XTAL / 8).set_char_width(8);
 
 	FD1791(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(itt3030_state::fdcirq_w));

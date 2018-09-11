@@ -896,7 +896,7 @@ void tv912_state::tv912(machine_config &config)
 
 	TMS9927(config, m_crtc, 23.814_MHz_XTAL / CHAR_WIDTH);
 	m_crtc->set_char_width(CHAR_WIDTH);
-	m_crtc->vsyn_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_crtc->vsyn_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc->set_screen("screen");
 
 	AY51013(config, m_uart);

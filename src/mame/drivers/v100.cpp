@@ -371,8 +371,8 @@ MACHINE_CONFIG_START(v100_state::v100)
 	CRT5037(config, m_vtac, XTAL(47'736'000) / CHAR_WIDTH);
 	m_vtac->set_char_width(CHAR_WIDTH);
 	m_vtac->set_screen("screen");
-	m_vtac->hsyn_wr_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
-	m_vtac->vsyn_wr_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
+	m_vtac->hsyn_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
+	m_vtac->vsyn_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
 
 	I8214(config, m_picu, XTAL(47'736'000) / 12);
 	m_picu->int_wr_callback().set_inputline(m_maincpu, 0, ASSERT_LINE);

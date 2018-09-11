@@ -399,10 +399,10 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000 / 8)  // xtal freq unknown
-	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown
-	//MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(TMS5501_TAG, tms5501_device, sens_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5037(config, m_crtc, 4000000 / 8);  // xtal freq unknown
+	m_crtc->set_char_width(8);  // unknown
+	//m_crtc->vsyn_callback().set(TMS5501_TAG, FUNC(tms5501_device::sens_w));
+	m_crtc->set_screen("screen");
 
 	/* sound hardware */
 	//MCFG_SPEAKER_STANDARD_MONO("mono")

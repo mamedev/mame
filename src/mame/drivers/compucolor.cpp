@@ -409,12 +409,12 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2/6)
-	MCFG_TMS9927_CHAR_WIDTH(6)
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("blink", ripple_counter_device, clock_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5027(config, m_vtac, XTAL(17'971'200)/2/6);
+	m_vtac->set_char_width(6);
+	m_vtac->vsyn_callback().set("blink", FUNC(ripple_counter_device::clock_w));
+	m_vtac->set_screen("screen");
 
-	ripple_counter_device &blink(RIPPLE_COUNTER(config, "blink", 0)); // 74LS393 at UG10
+	ripple_counter_device &blink(RIPPLE_COUNTER(config, "blink")); // 74LS393 at UG10
 	blink.set_stages(8);
 	blink.count_out_cb().set(m_mioc, FUNC(tms5501_device::sens_w)).bit(4);
 

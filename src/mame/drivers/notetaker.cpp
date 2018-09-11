@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (36_MHz_XTAL / 4) / 8) // See below
+	CRT5027(config, m_crtc, (36_MHz_XTAL / 4) / 8); // See below
 	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
 	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
 	   means divide by 1; documentation at
@@ -841,17 +841,17 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	   on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is
 	   written with 101, changing the divider to (36mhz/4)/8 */
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
-	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
+	m_crtc->set_char_width(8); //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	m_crtc->vsyn_callback().set("iop_pic8259", FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
+	m_crtc->set_screen("screen");
 
-	AY31015(config, m_kbduart, 0); // HD6402, == AY-3-1015D
+	AY31015(config, m_kbduart); // HD6402, == AY-3-1015D
 	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 	m_kbduart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
 
-	AY31015(config, m_eiauart, 0); // HD6402, == AY-3-1015D
+	AY31015(config, m_eiauart); // HD6402, == AY-3-1015D
 	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 	m_eiauart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt

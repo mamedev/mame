@@ -1229,8 +1229,8 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 
 	CRT5027(config, m_crtc, 12.8544_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);
-	m_crtc->hsyn_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
-	m_crtc->vsyn_wr_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->hsyn_callback().set_inputline("maincpu", I8085_RST55_LINE);
+	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
@@ -1306,7 +1306,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 
 	CRT5037(config, m_crtc, 12.8544_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);
-	m_crtc->vsyn_wr_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)

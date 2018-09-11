@@ -1187,10 +1187,10 @@ MACHINE_CONFIG_START(attache_state::attache)
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000 / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("ctc", z80ctc_device, trg2))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS9927(config, m_crtc, 12.324_MHz_XTAL / 8);
+	m_crtc->set_char_width(8);
+	m_crtc->vsyn_callback().set(m_ctc, FUNC(z80ctc_device::trg2));
+	m_crtc->set_screen("screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1277,10 +1277,10 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("ctc", z80ctc_device, trg2))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS9927(config, m_crtc, 12.324_MHz_XTAL / 8);
+	m_crtc->set_char_width(8);
+	m_crtc->vsyn_callback().set(m_ctc, FUNC(z80ctc_device::trg2));
+	m_crtc->set_screen("screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
