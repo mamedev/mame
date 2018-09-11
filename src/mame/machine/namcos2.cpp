@@ -142,6 +142,15 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 	namcos2_kickstart = nullptr;
 	m_eeprom = std::make_unique<uint8_t[]>(m_eeprom_size);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
+
+	if (m_audiobank)
+	{
+		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+		for (int i = 0; i < 0x10; i++)
+			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
+
+		m_audiobank->set_entry(0);
+	}
 }
 
 MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
@@ -434,8 +443,5 @@ bool namcos2_shared_state::is_system21()
 
 WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
 {
-	uint8_t *RAM= memregion("audiocpu")->base();
-	uint32_t max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
-	int bank = ( data >> 4 ) % max; /* 991104.CAB */
-	membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
+	m_audiobank->set_entry(data>>4);
 }

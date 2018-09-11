@@ -1533,7 +1533,7 @@ void namcos21_state::winrun_gpu_map(address_map &map)
 
 void namcos21_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank6"); /* banked */
+	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
@@ -1544,7 +1544,7 @@ void namcos21_state::sound_map(address_map &map)
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
 	map(0xc000, 0xc001).w(FUNC(namcos21_state::namcos2_sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
-	map(0xd000, 0xffff).rom();
+	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
 }
 
 
@@ -2109,10 +2109,8 @@ ROM_START( aircomb )
 	ROM_LOAD16_BYTE( "ac2-spr-u.6c", 0x000000, 0x20000, CRC(42aca956) SHA1(10ea2400bb4d5b2d805e2de43ca0e0f54597f660) )
 	ROM_LOAD16_BYTE( "ac2-spr-l.4c", 0x000001, 0x20000, CRC(3e15fa19) SHA1(65dbb33ab6b3c06c793613348ebb7b110b8bba0d) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "ac1-snd0.8j", 0x00c000, 0x004000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "ac1-snd0.8j", 0x000000, 0x020000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2169,10 +2167,8 @@ ROM_START( aircombj )
 	ROM_LOAD16_BYTE( "ac1-spr-u.6c", 0x000000, 0x20000, CRC(5810e219) SHA1(c312ffd8324670897871b12d521779570dc0f580) )
 	ROM_LOAD16_BYTE( "ac1-spr-l.4c", 0x000001, 0x20000, CRC(175a7d6c) SHA1(9e31dde6646cd9b6dcdbdb3f2326177508559e56) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "ac1-snd0.8j", 0x00c000, 0x004000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "ac1-snd0.8j", 0x000000, 0x020000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2229,10 +2225,8 @@ ROM_START( cybsled )
 	ROM_LOAD16_BYTE( "cy2-spr-u.6c", 0x000000, 0x80000, CRC(575a422d) SHA1(cad97742da1e2baf47ac110fadef5544b3a30cc7) )
 	ROM_LOAD16_BYTE( "cy2-spr-l.4c", 0x000001, 0x80000, CRC(4066291a) SHA1(6ebbc11a68f66ec1e6d2e6ee857e8c599691e289) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "cy1-snd0.8j", 0x00c000, 0x004000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "cy1-snd0.8j", 0x000000, 0x020000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2287,10 +2281,8 @@ ROM_START( cybsledj )
 	ROM_LOAD16_BYTE( "cy1-spr-u.6c", 0x000000, 0x80000, CRC(28dd707b) SHA1(11297ceae4fe78d170785a5cf9ad77833bbe7fff) )
 	ROM_LOAD16_BYTE( "cy1-spr-l.4c", 0x000001, 0x80000, CRC(437029de) SHA1(3d275a2b0ce6909e77e657c371bd22597ea9d398) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "cy1-snd0.8j", 0x00c000, 0x004000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "cy1-snd0.8j", 0x000000, 0x020000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2345,19 +2337,15 @@ ROM_START( driveyes )
 	ROM_LOAD16_BYTE( "de1-sp-ub.6c", 0x000000, 0x20000, CRC(231b144f) SHA1(42518614cb083455dc5fec71e699403907ca784b) )
 	ROM_LOAD16_BYTE( "de1-sp-lb.4c", 0x000001, 0x20000, CRC(50cb9f59) SHA1(aec7fa080854f0297d9e90e3aaeb0f332fd579bd) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
 /*
 There are 3 separate complete boards used for this 3 screen version....
 "Set2" (center screen board?) has de1_snd0 while the other 2 sets have de1_snd0r (rear speakers??)
 Only "Set2" has voice roms present/dumped?
 We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom in the set
 */
-	ROM_LOAD( "de1-snd0r.8j", 0x00c000, 0x004000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) /* Sets 1 & 3 */
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-	ROM_LOAD( "de1-snd0.8j",  0x00c000, 0x004000, CRC(5474f203) SHA1(e0ae2f6978deb0c934d9311a334a6e36bb402aee) ) /* Set 2 */
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
+	ROM_LOAD( "de1-snd0r.8j", 0x000000, 0x020000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) /* Sets 1 & 3 */
+	ROM_LOAD( "de1-snd0.8j",  0x000000, 0x020000, CRC(5474f203) SHA1(e0ae2f6978deb0c934d9311a334a6e36bb402aee) ) /* Set 2 */
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2402,10 +2390,8 @@ ROM_START( starblad )
 	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
 	ROM_LOAD16_BYTE( "st1-sp-l.bin", 0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "st1-snd0.bin", 0x00c000, 0x004000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "st1-snd0.bin", 0x000000, 0x020000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2454,10 +2440,8 @@ ROM_START( starbladj )
 	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
 	ROM_LOAD16_BYTE( "st1-sp-l.bin", 0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "st1-snd0.bin", 0x00c000, 0x004000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "st1-snd0.bin", 0x000000, 0x020000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2506,10 +2490,8 @@ ROM_START( solvalou )
 	ROM_LOAD16_BYTE( "sv1-sp-u.bin", 0x000000, 0x20000, CRC(ebd4bf82) SHA1(67946360d680a675abcb3c131bac0502b2455573) )
 	ROM_LOAD16_BYTE( "sv1-sp-l.bin", 0x000001, 0x20000, CRC(7acab679) SHA1(764297c9601be99dbbffb75bbc6fe4a40ea38529) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "sv1-snd0.bin", 0x00c000, 0x004000, CRC(5e007864) SHA1(94da2d51544c6127056beaa251353038646da15f) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "sv1-snd0.bin", 0x000000, 0x020000, CRC(5e007864) SHA1(94da2d51544c6127056beaa251353038646da15f) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2556,10 +2538,8 @@ ROM_START( winrun )
 	ROM_LOAD16_BYTE( "wr1-spu.6b",  0x000000, 0x20000, CRC(d4915d44) SHA1(57056051138b259d021b3e7cc1c43a9f951b5cc1) )
 	ROM_LOAD16_BYTE( "wr1-spl.4b",  0x000001, 0x20000, CRC(0c336505) SHA1(edee073bf6fabe45c577b0b9375295183eb30c62) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "wr1-snd0.7c",  0x00c000, 0x004000, CRC(698bae12) SHA1(86d22c1c639a9489e3c95820e4e3f04c30407e41) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "wr1-snd0.7c",  0x000000, 0x020000, CRC(698bae12) SHA1(86d22c1c639a9489e3c95820e4e3f04c30407e41) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2621,10 +2601,8 @@ ROM_START( winrungp )
 	ROM_LOAD16_BYTE( "sg1-sp-u.6b", 0x000000, 0x20000, CRC(7c9c3a3f) SHA1(cacb45c9111ac66c6e60b7a0cacd8bf47fd00752) )
 	ROM_LOAD16_BYTE( "sg1-sp-l.4b", 0x000001, 0x20000, CRC(5068fc5d) SHA1(7f6e80f74985959509d824318a4a7ff2b11953da) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "sg1-snd0.7c", 0x00c000, 0x004000, CRC(de04b794) SHA1(191f4d79ac2375d7060f3d83ec753185e92f28ea) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "sg1-snd0.7c", 0x000000, 0x020000, CRC(de04b794) SHA1(191f4d79ac2375d7060f3d83ec753185e92f28ea) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -2669,10 +2647,8 @@ ROM_START( winrun91 )
 	ROM_LOAD16_BYTE( "r911-spu.6b", 0x000000, 0x20000, CRC(0221d4b2) SHA1(65fd38b1cfaa6693d71248561d764a9ea1098c56) )
 	ROM_LOAD16_BYTE( "r911-spl.4b", 0x000001, 0x20000, CRC(288799e2) SHA1(2c4bf0cf9c71458fff4dd77e426a76685d9e1bab) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "r911-snd0.7c", 0x00c000, 0x004000, CRC(6a321e1e) SHA1(b2e77cac4ed7609593fa5a462c9d78526451e477) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "r911-snd0.7c", 0x000000, 0x020000, CRC(6a321e1e) SHA1(b2e77cac4ed7609593fa5a462c9d78526451e477) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
