@@ -255,18 +255,7 @@ MACHINE_CONFIG_START(stlforce_state::twinbrat)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 44*8-1, 0*8, 30*8-1)
 
-	EDEVICES_SFORCE_VID(config.replace(), m_video, 0);
-	m_video->set_tags("bg_videoram",
-		              "mlow_videoram",
-		              "mhigh_videoram",
-		              "tx_videoram",
-		              "bg_scrollram",
-		              "mlow_scrollram",
-		              "mhigh_scrollram",
-		              "vidattrram",
-		              "spriteram",
-		              "gfxdecode",
-		              "palette");
+	/* modify m_video */
 	m_video->set_spritexoffset(10);
 
 	MCFG_DEVICE_MODIFY("oki")
