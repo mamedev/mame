@@ -132,6 +132,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_audiobank(*this, "audiobank")
 	{ }
 
 	optional_device<cpu_device> m_dspmaster;
@@ -276,6 +277,8 @@ protected:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	optional_memory_bank m_audiobank;
 };
 
 class namcos2_state : public namcos2_shared_state
@@ -462,14 +465,5 @@ extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 /**************************************************************/
 
 #define NAMCOS2_68K_SLAVE_RAM   "bank4"
-
-/**************************************************************/
-/*                                                            */
-/**************************************************************/
-#define BANKED_SOUND_ROM        "bank6"
-
-/**************************************************************/
-/* Sound CPU support handlers - 6809                          */
-/**************************************************************/
 
 #endif // MAME_INCLUDES_NAMCOS2_H
