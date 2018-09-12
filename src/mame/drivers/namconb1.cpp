@@ -722,8 +722,8 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
 	map(0x680000, 0x68ffff).rw(FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
 	map(0x6c0000, 0x6c003f).rw(FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
-	map(0x700000, 0x71ffff).rw(FUNC(namconb1_state::c169_roz_videoram_r), FUNC(namconb1_state::c169_roz_videoram_w)).share("rozvideoram");
-	map(0x740000, 0x74001f).rw(FUNC(namconb1_state::c169_roz_control_r), FUNC(namconb1_state::c169_roz_control_w));
+	map(0x700000, 0x71ffff).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_videoram_r), FUNC(namco_c169roz_device::c169_roz_videoram_w));//.share("rozvideoram").umask32(0x0000ffff); // 16-bit handler
+	map(0x740000, 0x74001f).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_control_r), FUNC(namco_c169roz_device::c169_roz_control_w)); // 16-bit handler
 	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
 	map(0x900008, 0x90000f).ram().share("spritebank32");
 	map(0x940000, 0x94000f).ram().share("tilebank32");
@@ -1119,6 +1119,13 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
 
 	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_namconb2)
+
+	NAMCO_C169ROZ(config, m_c169roz, 0);
+	m_c169roz->set_gfxdecode_tag("gfxdecode");
+	//m_c169roz->set_vram_tag("rozvideoram");
+	m_c169roz->set_is_namcofl(false);
+	m_c169roz->set_ram_words(0x20000/2/2);
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::machbrkr)

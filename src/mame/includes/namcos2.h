@@ -20,6 +20,7 @@
 #include "video/namco_c116.h"
 #include "machine/namco65.h"
 #include "machine/namco68.h"
+#include "video/namco_c169roz.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -119,9 +120,7 @@ public:
 		, m_slave_intc(*this, "slave_intc")
 		, m_sci(*this, "sci")
 		, m_gpu(*this, "gpu")
-		, m_c169_roz_videoram(*this, "rozvideoram", 0)
-		, m_c169_roz_gfxbank(0)
-		, m_c169_roz_mask(nullptr)
+		, m_c169roz(*this, "c169roz")
 		, m_c355_obj_gfxbank(0)
 		, m_c355_obj_palxor(0)
 		, m_maincpu(*this, "maincpu")
@@ -147,7 +146,8 @@ protected:
 	optional_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
-	
+	optional_device<namco_c169roz_device> m_c169roz; 
+
 	// game type helpers
 	bool is_system21();
 
@@ -197,38 +197,7 @@ protected:
 
 	c123_mTilemapInfo m_c123_TilemapInfo;
 
-	// C169 ROZ Layer Emulation
-	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
-	void c169_roz_init(int gfxbank, const char *maskregion, c169_tilemap_delegate tilemap_cb);
-	void c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	DECLARE_READ16_MEMBER( c169_roz_control_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_control_w );
-	DECLARE_READ16_MEMBER( c169_roz_videoram_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
 
-	c169_tilemap_delegate m_c169_cb;
-	struct roz_parameters
-	{
-		uint32_t left, top, size;
-		uint32_t startx, starty;
-		int incxx, incxy, incyx, incyy;
-		int color, priority;
-		int wrap;
-	};
-	void c169_roz_unpack_params(const uint16_t *source, roz_parameters &params);
-	void c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
-	void c169_roz_draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
-	void c169_roz_get_info(tile_data &tileinfo, int tile_index, int which);
-	template<int Which> TILE_GET_INFO_MEMBER( c169_roz_get_info );
-	TILEMAP_MAPPER_MEMBER( c169_roz_mapper );
-
-	static const int ROZ_TILEMAP_COUNT = 2;
-	tilemap_t *m_c169_roz_tilemap[ROZ_TILEMAP_COUNT];
-	uint16_t m_c169_roz_control[0x20/2];
-	optional_shared_ptr<uint16_t> m_c169_roz_videoram;
-	int m_c169_roz_gfxbank;
-	uint8_t *m_c169_roz_mask;
-	uint32_t m_c169_roz_rammask;
 
 	// C355 Motion Object Emulation
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
