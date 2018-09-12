@@ -769,6 +769,7 @@ BUSES["RS232"] = true
 BUSES["S100"] = true
 BUSES["SAT_CTRL"] = true
 BUSES["SATURN"] = true
+BUSES["SBUS"] = true
 BUSES["SCSI"] = true
 BUSES["SCV"] = true
 BUSES["SEGA8"] = true

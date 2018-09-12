@@ -413,6 +413,8 @@
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+#include "bus/sbus/sbus.h"
+#include "bus/sbus/bwtwo.h"
 #include "cpu/sparc/sparc.h"
 #include "machine/am79c90.h"
 #include "machine/bankdev.h"
@@ -422,7 +424,6 @@
 #include "machine/nscsi_hd.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "machine/timekpr.h"
 #include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
@@ -544,17 +545,19 @@ public:
 		, m_lance(*this, LANCE_TAG)
 		, m_scsibus(*this, "scsibus")
 		, m_scsi(*this, "scsibus:7:ncr53c90a")
+		, m_sbus(*this, "sbus")
 		, m_type0space(*this, "type0")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "user1")
-		, m_bw2_vram(*this, "bw2_vram")
 		, m_rom_ptr(nullptr)
 		, m_system_enable(0)
 	{
 	}
 
 	void sun4c(machine_config &config);
+	void sun4_40(machine_config &config);
+	void sun4_60(machine_config &config);
 	void sun4(machine_config &config);
 
 	void init_sun4();
@@ -590,6 +593,7 @@ private:
 	DECLARE_WRITE32_MEMBER( dma_w );
 	DECLARE_READ32_MEMBER( lance_dma_r ); // TODO: Should be 16 bits
 	DECLARE_WRITE32_MEMBER( lance_dma_w );
+	DECLARE_WRITE32_MEMBER( buserr_w );
 
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
 	DECLARE_WRITE_LINE_MEMBER( scsi_drq );
@@ -599,14 +603,13 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void ncr53c90a(device_t *device);
 
 	void sun4_mem(address_map &map);
 	void sun4c_mem(address_map &map);
 	void type0space_map(address_map &map);
 	void type1space_map(address_map &map);
+	void type1space_sbus_map(address_map &map);
 	void type1space_s4_map(address_map &map);
 
 	enum sun4_arch
@@ -627,10 +630,11 @@ private:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c90a_device> m_scsi;
 
-	optional_device<address_map_bank_device> m_type0space, m_type1space;
+	optional_device<sbus_device> m_sbus;
+	optional_device<address_map_bank_device> m_type0space;
+	optional_device<address_map_bank_device> m_type1space;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint32_t> m_bw2_vram;
 
 	uint32_t *m_rom_ptr;
 	uint32_t m_context;
@@ -674,35 +678,6 @@ private:
 	void l2p_command(int ref, const std::vector<std::string> &params);
 	void fcodes_command(int ref, const std::vector<std::string> &params);
 };
-
-uint32_t sun4_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-	static const uint32_t palette[2] = { 0xffffff, 0 };
-	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
-
-	for (y = 0; y < 900; y++)
-	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1152/8; x++)
-		{
-			pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
-
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
-		}
-	}
-
-	return 0;
-}
 
 uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32_t offset, uint32_t mem_mask)
 {
@@ -1548,10 +1523,12 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
 	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr53c90a_device::map)).umask32(0xff000000);
 	map(0x08c00000, 0x08c00003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
-	map(0x0a000000, 0x0a000003).r(FUNC(sun4_state::ss1_sl1_id));    // slot 1 contains nothing
-	map(0x0c000000, 0x0c000003).r(FUNC(sun4_state::ss1_sl2_id));    // slot 2 contains nothing
-	map(0x0e000000, 0x0e000003).r(FUNC(sun4_state::ss1_sl3_id));    // slot 3 contains video board
-	map(0x0e800000, 0x0e8fffff).ram().share("bw2_vram");
+}
+
+void sun4_state::type1space_sbus_map(address_map &map)
+{
+	type1space_map(map);
+	map(0x0a000000, 0x0fffffff).rw(m_sbus, FUNC(sbus_device::read), FUNC(sbus_device::write));
 }
 
 void sun4_state::type1space_s4_map(address_map &map)
@@ -1976,6 +1953,11 @@ WRITE32_MEMBER( sun4_state::lance_dma_w )
 		write_insn_data_4c(11, m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
 }
 
+WRITE32_MEMBER( sun4_state::buserr_w )
+{
+	COMBINE_DATA(&m_buserr[offset]);
+}
+
 // indicate 4/60 SCSI/DMA/Ethernet card exists
 READ32_MEMBER( sun4_state::ss1_sl0_id )
 {
@@ -2035,7 +2017,7 @@ void sun4_state::ncr53c90a(device_t *device)
 
 MACHINE_CONFIG_START(sun4_state::sun4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MB86901, 16670000)
+	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
 
@@ -2047,10 +2029,10 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
 
 	// MMU Type 0 device space
-	ADDRESS_MAP_BANK(config, "type0").set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	ADDRESS_MAP_BANK(config, m_type0space).set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	ADDRESS_MAP_BANK(config, "type1").set_map(&sun4_state::type1space_s4_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_s4_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
@@ -2095,7 +2077,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MB86901, 16670000)
+	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4c_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
 
@@ -2107,10 +2089,10 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
 
 	// MMU Type 0 device space
-	ADDRESS_MAP_BANK(config, "type0").set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	ADDRESS_MAP_BANK(config, m_type0space).set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	ADDRESS_MAP_BANK(config, "type1").set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
@@ -2150,13 +2132,39 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
-
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun4_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
+
+static void sbus_cards(device_slot_interface &device)
+{
+	device.option_add("bwtwo", SBUS_BWTWO);  /* Sun bwtwo monochrome display board */
+}
+
+MACHINE_CONFIG_START(sun4_state::sun4_40)
+	sun4c(config);
+
+	m_type1space->set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// SBus
+	SBUS(config, m_sbus, 16670000, "maincpu", "type1");
+	SBUS_SLOT(config, "slot1", 16'670'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot2", 16'670'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot3", 16'670'000, m_sbus, sbus_cards, "bwtwo");
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(sun4_state::sun4_60)
+	sun4c(config);
+
+	m_maincpu->set_clock(20'000'000);
+
+	m_type1space->set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// SBus
+	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
+	SBUS_SLOT(config, "slot1", 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot2", 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot3", 20'000'000, m_sbus, sbus_cards, nullptr);
+MACHINE_CONFIG_END
+
 
 /*
 Boot PROM
@@ -2270,9 +2278,6 @@ ROM_START( sun4_300 )
 	ROM_REGION( 0x10000, "devices", ROMREGION_ERASEFF )
 	// CG3 Color frame buffer (cgthree)
 	ROM_LOAD( "sunw,501-1415.bin", 0x0000, 0x0800, CRC(d1eb6f4d) SHA1(9bef98b2784b6e70167337bb27cd07952b348b5a))
-
-	// BW2 frame buffer (bwtwo)
-	ROM_LOAD( "sunw,501-1561.bin", 0x0800, 0x0800, CRC(e37a3314) SHA1(78761bd2369cb0c58ef1344c697a47d3a659d4bc))
 
 	// TurboGX 8-Bit Color Frame Buffer
 	ROM_LOAD( "sunw,501-2325.bin", 0x1000, 0x8000, CRC(bbdc45f8) SHA1(e4a51d78e199cd57f2fcb9d45b25dfae2bd537e4))
@@ -2435,10 +2440,10 @@ COMP( 1987, sun4_300, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  
 COMP( 198?, sun4_400, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  "Sun Microsystems", "Sun 4/4x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4c
-COMP( 1990, sun4_40,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_40,  sun4_300, 0,      sun4_40, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1991, sun4_50,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 199?, sun4_20,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1989, sun4_60,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, sun4_60,  sun4_300, 0,      sun4_60, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1990, sun4_65,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1990, sun4_75,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation 2 (Sun 4/75)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
