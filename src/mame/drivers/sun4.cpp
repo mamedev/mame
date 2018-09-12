@@ -2134,11 +2134,6 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
 MACHINE_CONFIG_END
 
-static void sbus_cards(device_slot_interface &device)
-{
-	device.option_add("bwtwo", SBUS_BWTWO);  /* Sun bwtwo monochrome display board */
-}
-
 MACHINE_CONFIG_START(sun4_state::sun4_40)
 	sun4c(config);
 
@@ -2276,8 +2271,6 @@ ROM_START( sun4_300 )
 	ROM_LOAD32_BYTE( "1038-09.rom", 0x00002, 0x10000, CRC(1e429d31) SHA1(498ce4d34a74ea6e3e369bb7eb9c2b87e12bd080))
 
 	ROM_REGION( 0x10000, "devices", ROMREGION_ERASEFF )
-	// CG3 Color frame buffer (cgthree)
-	ROM_LOAD( "sunw,501-1415.bin", 0x0000, 0x0800, CRC(d1eb6f4d) SHA1(9bef98b2784b6e70167337bb27cd07952b348b5a))
 
 	// TurboGX 8-Bit Color Frame Buffer
 	ROM_LOAD( "sunw,501-2325.bin", 0x1000, 0x8000, CRC(bbdc45f8) SHA1(e4a51d78e199cd57f2fcb9d45b25dfae2bd537e4))

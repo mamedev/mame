@@ -82,13 +82,13 @@ uint32_t sbus_bwtwo_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 
 READ8_MEMBER(sbus_bwtwo_device::regs_r)
 {
-	logerror("%s: regs_r (unimplemented): %08x\n", 0x400000 + offset);
+	logerror("%s: regs_r (unimplemented): %08x\n", machine().describe_context(), 0x400000 + offset);
 	return 0;
 }
 
 WRITE8_MEMBER(sbus_bwtwo_device::regs_w)
 {
-	logerror("%s: regs_w (unimplemented): %08x = %02x\n", 0x400000 + offset, data);
+	logerror("%s: regs_w (unimplemented): %08x = %02x\n", machine().describe_context(), 0x400000 + offset, data);
 }
 
 READ32_MEMBER(sbus_bwtwo_device::vram_r)

@@ -155,4 +155,6 @@ protected:
 	uint32_t m_base;
 };
 
+void sbus_cards(device_slot_interface &device);
+
 #endif  // MAME_BUS_SBUS_SBUS_H
