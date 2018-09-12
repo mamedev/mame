@@ -223,6 +223,7 @@ const double XTAL::known_xtals[] = {
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
 	 17'550'000, /* 17.55_MHz_XTAL         HP 264x display clock (50 Hz configuration) */
+	 17'600'000, /* 17.6_MHz_XTAL          LSI Octopus */
 	 17'734'470, /* 17.73447_MHz_XTAL      (~4x PAL subcarrier) */
 	 17'734'472, /* 17.734472_MHz_XTAL     actually ~4x PAL subcarrier */
 	 17'971'200, /* 17.9712_MHz_XTAL       - */
