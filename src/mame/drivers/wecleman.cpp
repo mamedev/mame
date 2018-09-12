@@ -1155,7 +1155,7 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotchase)
-	MCFG_PALETTE_ADD("palette", 2048*2)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 
