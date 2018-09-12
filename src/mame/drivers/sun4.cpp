@@ -740,10 +740,26 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	{
 		if (!machine().side_effects_disabled())
 		{
-			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x88;   // read, invalid PTE
-			//m_buserr[1] = offset<<2;
+			//printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			m_maincpu->set_mae();
+			m_buserr[0] |= 0x80;    // invalid PTE
+			m_buserr[0] &= ~0x8000; // read
+			m_buserr[1] = offset<<2;
+			if (mem_mask != ~0 && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+			{
+				if (mem_mask == 0x0000ffff || mem_mask == 0x0000ff00)
+				{
+					m_buserr[1] |= 2;
+				}
+				else if (mem_mask == 0x00ff0000)
+				{
+					m_buserr[1] |= 1;
+				}
+				else if (mem_mask == 0x000000ff)
+				{
+					m_buserr[1] |= 3;
+				}
+			}
 		}
 		return 0;
 	}
@@ -762,7 +778,6 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 			printf("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
 			m_buserr[0] |= 0x8040;   // write, protection error
 			m_buserr[1] = offset<<2;
-			//m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
 			m_maincpu->set_mae();
 			return;
 		}
@@ -792,11 +807,24 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 	else
 	{
 		//printf("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
-		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-        //m_maincpu->set_input_line(SPARC_NMI, ASSERT_LINE);
         m_maincpu->set_mae();
 		m_buserr[0] |= 0x8080;    // write cycle, invalid PTE
 		m_buserr[1] = offset<<2;
+		if (mem_mask != ~0 && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+		{
+			if (mem_mask == 0x0000ffff || mem_mask == 0x0000ff00)
+			{
+				m_buserr[1] |= 2;
+			}
+			else if (mem_mask == 0x00ff0000)
+			{
+				m_buserr[1] |= 1;
+			}
+			else if (mem_mask == 0x000000ff)
+			{
+				m_buserr[1] |= 3;
+			}
+		}
 	}
 }
 
@@ -829,8 +857,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 				return m_system_enable<<24;
 
 			case 6: // bus error register
-				printf("sun4c: read buserror, PC=%x (mask %08x)\n", m_maincpu->pc(), mem_mask);
-				//m_maincpu->set_input_line(SPARC_MAE, CLEAR_LINE);
+				//printf("sun4c: read buserror %08x, PC=%x (mask %08x)\n", 0x60000000 | (offset << 2), m_maincpu->pc(), mem_mask);
 				retval = m_buserr[offset & 0xf];
 				m_buserr[offset & 0xf] = 0; // clear on reading
 				return retval;
@@ -969,7 +996,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			else if (mem_mask == 0xff000000) segdata = (data >> 24) & 0xff;
 			else logerror("sun4c: writing segment map with unknown mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
 
-			//printf("sun4: %08x to segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, m_context, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
+			//printf("sun4c: %08x to segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, m_context, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
 			m_segmap[m_context & m_ctx_mask][(offset>>16) & 0xfff] = segdata;   // only 7 bits of the segment are necessary
 		}
 		return;
@@ -977,7 +1004,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 	case 4: // page map
 		page = (m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask) << 6;   // get the PMEG
 		page += (offset >> 10) & 0x3f;  // add the offset
-		//printf("sun4: %08x to page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", data, offset << 2, page, mem_mask, m_maincpu->pc());
+		//printf("sun4c: %08x to page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", data, offset << 2, page, mem_mask, m_maincpu->pc());
 		COMBINE_DATA(&m_pagemap[page]);
 		m_pagemap[page] &= 0xff00ffff;  // these 8 bits are cleared when written and tested as such
 		return;
@@ -1039,11 +1066,26 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	{
 		if (!machine().side_effects_disabled())
 		{
-			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			//printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			m_maincpu->set_mae();
 			m_buserr[0] |= 0x80;    // invalid PTE
 			m_buserr[0] &= ~0x8000; // read
 			m_buserr[1] = offset<<2;
+			if (mem_mask != ~0 && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+			{
+				if (mem_mask == 0x0000ffff || mem_mask == 0x0000ff00)
+				{
+					m_buserr[1] |= 2;
+				}
+				else if (mem_mask == 0x00ff0000)
+				{
+					m_buserr[1] |= 1;
+				}
+				else if (mem_mask == 0x000000ff)
+				{
+					m_buserr[1] |= 3;
+				}
+			}
 		}
 		return 0;
 	}
@@ -1565,6 +1607,8 @@ WRITE8_MEMBER( sun4_state::irq_w )
 	m_irq_reg = data;
 
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
+	if (!(m_irq_reg & 0x01))
+		m_maincpu->set_input_line(SPARC_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( sun4_state::scc1_int )
