@@ -448,7 +448,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 
 	if( (data & C_ALD) == 0 )
 	{
-		m_spo->ald_w(space, 0, m_tms7000_portd);
+		m_spo->ald_w(m_tms7000_portd);
 	}
 
 	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )

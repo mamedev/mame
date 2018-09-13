@@ -233,7 +233,7 @@ INPUT_PORTS_END
 // This came from pinmame, even though there's no spb640 chip
 READ8_MEMBER( idsa_state::portb0_r )
 {
-	uint16_t data = m_speech->spb640_r(space, offset / 2);
+	uint16_t data = m_speech->spb640_r(offset / 2);
 	return offset % 2 ? (uint8_t)(data >> 8) : (uint8_t)(data & 0xff);
 }
 
