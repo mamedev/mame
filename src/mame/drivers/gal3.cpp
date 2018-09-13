@@ -127,7 +127,6 @@ better notes (complete chip lists) for each board still needed
 */
 
 #include "emu.h"
-#include "includes/namcos2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
@@ -135,21 +134,28 @@ better notes (complete chip lists) for each board still needed
 #include "sound/c140.h"
 #include "rendlay.h"
 #include "speaker.h"
+#include "video/namco_c355spr.h"
 
+#define NAMCOS21_NUM_COLORS 0x8000
 
-class gal3_state : public namcos2_shared_state
+class gal3_state : public driver_device
 {
 public:
 	gal3_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcos2_shared_state(mconfig, type, tag) ,
+		driver_device(mconfig, type, tag),
+		m_c355spr(*this, "c355spr"),
+		m_palette(*this, "palette"),
 		m_rso_shared_ram(*this, "rso_shared_ram"),
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_c140_16a(*this, "c140_16a"),
-		m_c140_16g(*this, "c140_16g") { }
+		m_c140_16g(*this, "c140_16g")
+	{ }
 
 	void gal3(machine_config &config);
 
 private:
+	required_device<namco_c355spr_device> m_c355spr; 
+	required_device<palette_device> m_palette;
 	uint16_t m_namcos21_video_enable;
 	required_shared_ptr<uint16_t> m_rso_shared_ram;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
