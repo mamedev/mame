@@ -55,6 +55,7 @@ void sbus_cgthree_device::device_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_vram2 = std::make_unique<uint32_t[]>(0x100000/4);
+	entry = r = g = b = step = 0;
 }
 
 void sbus_cgthree_device::install_device()
@@ -98,7 +99,28 @@ READ32_MEMBER(sbus_cgthree_device::unknown_r)
 
 WRITE32_MEMBER(sbus_cgthree_device::unknown_w)
 {
-	logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
+	if (offset == 0x100000)
+	{
+		entry = data >> 24;
+		step = 0;
+	}
+	else if (offset == 0x100001)
+	{
+		switch (step)
+		{
+			case 0: r = data>>24; step++; break;
+			case 1: g = data>>24; step++; break;
+			case 2:
+				b = data>>24;
+				m_palette->set_pen_color(entry, rgb_t(r, g, b));
+				step = 0;
+				break;
+		}
+	}
+	else
+	{
+		logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
+	}
 }
 
 READ8_MEMBER(sbus_cgthree_device::regs_r)
