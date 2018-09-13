@@ -229,7 +229,7 @@ void namcofl_state::namcofl_mem(address_map &map)
 	map(0x30a00000, 0x30a0003f).rw(FUNC(namcofl_state::c123_tilemap_control_r), FUNC(namcofl_state::c123_tilemap_control_w));
 	map(0x30c00000, 0x30c1ffff).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_videoram_r), FUNC(namco_c169roz_device::c169_roz_videoram_w));
 	map(0x30d00000, 0x30d0001f).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_control_r), FUNC(namco_c169roz_device::c169_roz_control_w));
-	map(0x30e00000, 0x30e1ffff).rw(FUNC(namcofl_state::c355_obj_ram_r), FUNC(namcofl_state::c355_obj_ram_w)).share("objram");
+	map(0x30e00000, 0x30e1ffff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w)).share("objram");
 	map(0x30f00000, 0x30f0000f).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
 	map(0x40000000, 0x4000005f).rw(FUNC(namcofl_state::namcofl_sysreg_r), FUNC(namcofl_state::namcofl_sysreg_w));
 	map(0xfffffffc, 0xffffffff).r(FUNC(namcofl_state::fl_unk1_r));
@@ -611,6 +611,12 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	m_c169roz->set_gfxdecode_tag("gfxdecode");
 	m_c169roz->set_is_namcofl(true);
 	m_c169roz->set_ram_words(0x20000/2);
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(true);
+
 
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->set_palette(m_palette);

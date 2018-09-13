@@ -21,6 +21,7 @@
 #include "machine/namco65.h"
 #include "machine/namco68.h"
 #include "video/namco_c169roz.h"
+#include "video/namco_c355spr.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -121,8 +122,7 @@ public:
 		, m_sci(*this, "sci")
 		, m_gpu(*this, "gpu")
 		, m_c169roz(*this, "c169roz")
-		, m_c355_obj_gfxbank(0)
-		, m_c355_obj_palxor(0)
+		, m_c355spr(*this, "c355spr")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_slave(*this, "slave")
@@ -147,6 +147,7 @@ protected:
 	optional_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
 	optional_device<namco_c169roz_device> m_c169roz; 
+	optional_device<namco_c355spr_device> m_c355spr; 
 
 	// game type helpers
 	bool is_system21();
@@ -197,35 +198,16 @@ protected:
 
 	c123_mTilemapInfo m_c123_TilemapInfo;
 
-
-
-	// C355 Motion Object Emulation
-	typedef delegate<int (int)> c355_obj_code2tile_delegate;
-	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
-	void c355_obj_init(int gfxbank, int pal_xor, c355_obj_code2tile_delegate code2tile);
-	int c355_obj_default_code2tile(int code);
-	void c355_obj_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	void c355_obj_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-	DECLARE_READ16_MEMBER( c355_obj_ram_r );
-	DECLARE_WRITE16_MEMBER( c355_obj_ram_w );
-	DECLARE_READ16_MEMBER( c355_obj_position_r );
-	DECLARE_WRITE16_MEMBER( c355_obj_position_w );
 	DECLARE_MACHINE_START(namcos2);
 	DECLARE_MACHINE_RESET(namcos2);
 
-	// C355 Motion Object internals
-	template<class _BitmapClass>
-	void c355_obj_draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const uint16_t *pSource, int pri, int zpos);
-	template<class _BitmapClass>
-	void c355_obj_draw_list(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, const uint16_t *pSpriteList16, const uint16_t *pSpriteTable);
 
-	c355_obj_code2tile_delegate m_c355_obj_code2tile;
-	int m_c355_obj_gfxbank;
-	int m_c355_obj_palxor;
-	uint16_t m_c355_obj_position[4];
-	uint16_t m_c355_obj_ram[0x20000/2];
+
 
 	uint8_t m_player_mux;
+	//	save_item(NAME(m_player_mux));
+
+
 	inline void namcoic_get_tile_info(tile_data &tileinfo,int tile_index,uint16_t *vram);
 
 	// general

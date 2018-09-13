@@ -183,10 +183,10 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 {
 	m_generic_paletteram_16.allocate(0x10000);
 
-	c355_obj_init(
+	m_c355spr->c355_obj_init(
 		0,      /* gfx bank */
 		0xf,    /* reverse palette mapping */
-		namcos2_shared_state::c355_obj_code2tile_delegate() );
+		namco_c355spr_device::c355_obj_code2tile_delegate() );
 
 }
 
@@ -228,14 +228,14 @@ uint32_t gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bit
 
 	for( pri=0; pri<pivot; pri++ )
 	{
-		c355_obj_draw(screen, bitmap, cliprect, pri);
+		m_c355spr->c355_obj_draw(screen, bitmap, cliprect, pri);
 	}
 
 /*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
 
     for( pri=pivot; pri<15; pri++ )
     {
-        c355_obj_draw(screen, bitmap, cliprect, pri);
+       m_c355spr->c355_obj_draw(screen, bitmap, cliprect, pri);
     }*/
 
 	// CPU Diag LEDs
@@ -377,8 +377,8 @@ void gal3_state::cpu_slv_map(address_map &map)
 /// AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE(pointram_data_r,pointram_data_w)
 /// AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */
 /// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w)
-	map(0xf1700000, 0xf170ffff).rw(FUNC(gal3_state::c355_obj_ram_r), FUNC(gal3_state::c355_obj_ram_w)).share("objram");
-	map(0xf1720000, 0xf1720007).rw(FUNC(gal3_state::c355_obj_position_r), FUNC(gal3_state::c355_obj_position_w));
+	map(0xf1700000, 0xf170ffff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w)).share("objram");
+	map(0xf1720000, 0xf1720007).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_position_r), FUNC(namco_c355spr_device::c355_obj_position_w));
 	map(0xf1740000, 0xf175ffff).rw(FUNC(gal3_state::paletteram32_r), FUNC(gal3_state::paletteram32_w));
 	map(0xf1760000, 0xf1760003).rw(FUNC(gal3_state::namcos21_video_enable_r), FUNC(gal3_state::namcos21_video_enable_w));
 
@@ -653,6 +653,11 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
 
 	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 

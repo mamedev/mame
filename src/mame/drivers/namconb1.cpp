@@ -700,8 +700,8 @@ void namconb1_state::namconb1_am(address_map &map)
 	map(0x208000, 0x2fffff).ram();
 	map(0x400000, 0x40001f).rw(FUNC(namconb1_state::namconb1_cpureg_r), FUNC(namconb1_state::namconb1_cpureg_w));
 	map(0x580000, 0x5807ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x600000, 0x61ffff).rw(FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
-	map(0x620000, 0x620007).rw(FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
+	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w)).share("objram");
+	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_position_r), FUNC(namco_c355spr_device::c355_obj_position_w));
 	map(0x640000, 0x64ffff).rw(FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
 	map(0x660000, 0x66003f).rw(FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
 	map(0x680000, 0x68000f).ram().share("spritebank32");
@@ -717,8 +717,8 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
 	map(0x208000, 0x2fffff).ram();
 	map(0x400000, 0x4fffff).rom().region("data", 0);
-	map(0x600000, 0x61ffff).rw(FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
-	map(0x620000, 0x620007).rw(FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
+	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w)).share("objram");
+	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_position_r), FUNC(namco_c355spr_device::c355_obj_position_w));
 	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
 	map(0x680000, 0x68ffff).rw(FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
 	map(0x6c0000, 0x6c003f).rw(FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
@@ -1095,6 +1095,11 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namconb1)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
 
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->set_palette(m_palette);

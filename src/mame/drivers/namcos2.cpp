@@ -667,7 +667,7 @@ void namcos2_state::slave_finallap_am(address_map &map)
 void namcos2_state::common_sgunner_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0x800000, 0x8141ff).rw(FUNC(namcos2_state::c355_obj_ram_r), FUNC(namcos2_state::c355_obj_ram_w));
+	map(0x800000, 0x8141ff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w));
 	map(0x818000, 0x818001).nopw();
 	map(0xa00000, 0xa0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
@@ -722,11 +722,11 @@ void namcos2_state::slave_metlhawk_am(address_map &map)
 void namcos2_state::common_luckywld_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0x800000, 0x8141ff).rw(FUNC(namcos2_state::c355_obj_ram_r), FUNC(namcos2_state::c355_obj_ram_w));
+	map(0x800000, 0x8141ff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w));
 	map(0x818000, 0x818001).noprw(); /* enable? */
 	map(0x81a000, 0x81a001).nopw(); /* enable? */
 	map(0x840000, 0x840001).nopr();
-	map(0x900000, 0x900007).rw(FUNC(namcos2_state::c355_obj_position_r), FUNC(namcos2_state::c355_obj_position_w));
+	map(0x900000, 0x900007).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_position_r), FUNC(namco_c355spr_device::c355_obj_position_w));
 	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
 	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_videoram_r), FUNC(namco_c169roz_device::c169_roz_videoram_w));
 	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_control_r), FUNC(namco_c169roz_device::c169_roz_control_w));
@@ -1932,6 +1932,11 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
+
 	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
@@ -1982,6 +1987,11 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
+
 	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
@@ -2031,6 +2041,11 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_luckywld)
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_gfxdecode_tag("gfxdecode");
