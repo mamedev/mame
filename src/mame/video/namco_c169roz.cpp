@@ -32,7 +32,7 @@ namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const 
 void namco_c169roz_device::device_start()
 {
 	m_c169_roz_videoram.resize(m_c169_roz_ramsize);
-	memset(&m_c169_roz_videoram[0], 0xde, m_c169_roz_ramsize*2); // 16-bit vectors, so *2
+	std::fill(std::begin(m_c169_roz_videoram), std::end(m_c169_roz_videoram), 0x0000);
 	save_item(NAME(m_c169_roz_videoram));
 }
 
