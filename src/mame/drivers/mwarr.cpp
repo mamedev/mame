@@ -62,7 +62,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_video(*this, "edevices_vid"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void mwarr(machine_config &config);
 
@@ -325,17 +326,17 @@ MACHINE_CONFIG_START(mwarr_state::mwarr)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	EDEVICES_VID(config, m_video, 0);
-	m_video->set_tags("bg_videoram",
-		              "mlow_videoram",
-		              "mhigh_videoram",
-		              "tx_videoram",
-		              "bg_scrollram",
-		              "mlow_scrollram",
-		              "mhigh_scrollram",
-		              "vidattrram",
-		              "spriteram",
-		              "gfxdecode",
-		              "palette");
+	m_video->set_bg_videoram_tag("bg_videoram");
+	m_video->set_mlow_videoram_tag("mlow_videoram");
+	m_video->set_mhigh_videoram_tag("mhigh_videoram");
+	m_video->set_tx_videoram_tag("tx_videoram");
+	m_video->set_bg_scrollram_tag("bg_scrollram");
+	m_video->set_mlow_scrollram_tag("mlow_scrollram");
+	m_video->set_mhigh_scrollram_tag("mhigh_scrollram");
+	m_video->set_vidattrram_tag("vidattrram");
+	m_video->set_spriteram_tag("spriteram");
+	m_video->set_gfxdecode_tag("gfxdecode");
+	m_video->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

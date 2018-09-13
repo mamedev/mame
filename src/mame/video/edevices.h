@@ -14,21 +14,17 @@ public:
 	edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configuration
-	void set_tags(const char *bgram,const char *mlowram,const char *mhighram,const char *txram,const char *bgscrram,const char *mlowscrram,const char *mhighscrram,const char *attrram,const char *sprram,const char *gfx,const char *pal)
-	{
-		m_bg_videoram.set_tag(bgram);
-		m_mlow_videoram.set_tag(mlowram);
-		m_mhigh_videoram.set_tag(mhighram);
-		m_tx_videoram.set_tag(txram);
-		m_bg_scrollram.set_tag(bgscrram);
-		m_mlow_scrollram.set_tag(mlowscrram);
-		m_mhigh_scrollram.set_tag(mhighscrram);
-		m_vidattrram.set_tag(attrram);
-		m_spriteram.set_tag(sprram);
-		m_gfxdecode.set_tag(gfx);
-		m_palette.set_tag(pal);
-	};
+	template <typename T> void set_bg_videoram_tag(T &&tag) { m_bg_videoram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_mlow_videoram_tag(T &&tag) { m_mlow_videoram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_mhigh_videoram_tag(T &&tag) { m_mhigh_videoram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_tx_videoram_tag(T &&tag) { m_tx_videoram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_bg_scrollram_tag(T &&tag) { m_bg_scrollram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_mlow_scrollram_tag(T &&tag) { m_mlow_scrollram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_mhigh_scrollram_tag(T &&tag) { m_mhigh_scrollram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_vidattrram_tag(T &&tag) { m_vidattrram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_spriteram_tag(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	void set_spritexoffset(int offset)
 	{
