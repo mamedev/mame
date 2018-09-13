@@ -23,7 +23,6 @@ DEFINE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device, "namco_c169roz", "Namco 
 
 namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
-	//m_c169_roz_videoram(*this, finder_base::DUMMY_TAG),
 	m_c169_roz_gfx_region(0),
 	m_c169_roz_mask(nullptr),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG)
@@ -53,7 +52,7 @@ template<int Which>
 TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 {
 	int tile = 0, mask = 0;
-	m_c169_cb(m_c169_roz_videoram[tile_index&(m_c169_roz_ramsize-1)] & 0x3fff, &tile, &mask, Which);
+	m_c169_cb(m_c169_roz_videoram[tile_index&(m_c169_roz_ramsize-1)] & 0x3fff, &tile, &mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
 
 	tileinfo.mask_data = m_c169_roz_mask + 32 * mask;
 	SET_TILE_INFO_MEMBER(m_c169_roz_gfx_region, tile, 0/*color*/, 0/*flag*/);
@@ -68,7 +67,6 @@ void namco_c169roz_device::init(int region, const char *maskregion, c169_tilemap
 {
 	m_c169_roz_gfx_region = region;
 	m_c169_roz_mask = memregion(maskregion)->base();
-	//m_c169_roz_rammask = (m_c169_roz_videoram.bytes() / 2) - 1; // are the tilemap sizes just too big? if we don't mask with this get_info reads out of bounds.
 	m_c169_cb = tilemap_cb;
 
 	m_c169_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,

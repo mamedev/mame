@@ -14,7 +14,6 @@ public:
 	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	//void set_vram_tag(const char *tag) { m_c169_roz_videoram.set_tag(tag); }
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
 	void set_ram_words(uint32_t size) { m_c169_roz_ramsize = size; }
 
@@ -54,7 +53,6 @@ private:
 	tilemap_t *m_c169_roz_tilemap[ROZ_TILEMAP_COUNT];
 	uint16_t m_c169_roz_control[0x20/2];
 	std::vector<uint16_t> m_c169_roz_videoram;
-	//required_shared_ptr<uint16_t> m_c169_roz_videoram;
 	int m_c169_roz_gfx_region;
 	uint8_t *m_c169_roz_mask;
 	uint32_t m_c169_roz_ramsize;

@@ -2034,7 +2034,6 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_gfxdecode_tag("gfxdecode");
-	//m_c169roz->set_vram_tag("rozvideoram");
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x10000/2);
 
@@ -2093,7 +2092,6 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_gfxdecode_tag("gfxdecode");
-	//m_c169roz->set_vram_tag("rozvideoram");
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x10000/2);
 
