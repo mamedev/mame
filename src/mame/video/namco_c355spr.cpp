@@ -21,6 +21,7 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 	device_t(mconfig, NAMCO_C355SPR, tag, owner, clock),
 	m_c355_obj_gfxbank(0),
 	m_c355_obj_palxor(0),
+	m_is_namcofl(false),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
 	m_palette(*this, finder_base::DUMMY_TAG)
 {

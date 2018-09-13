@@ -13,7 +13,7 @@ public:
 	// construction/destruction
 	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
 	void set_ram_words(uint32_t size) { m_c169_roz_ramsize = size; }
 

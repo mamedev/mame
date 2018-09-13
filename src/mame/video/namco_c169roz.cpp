@@ -25,6 +25,7 @@ namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const 
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
 	m_c169_roz_gfx_region(0),
 	m_c169_roz_mask(nullptr),
+	m_is_namcofl(false),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
