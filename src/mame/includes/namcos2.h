@@ -103,10 +103,6 @@ enum
 	/* Namco NB2 */
 	NAMCONB2_OUTFOXIES,
 	NAMCONB2_MACH_BREAKERS,
-
-	/* Namco System FL */
-	NAMCOFL_SPEED_RACER,
-	NAMCOFL_FINAL_LAP_R
 };
 
 // fix me -- most of this should be devices eventually

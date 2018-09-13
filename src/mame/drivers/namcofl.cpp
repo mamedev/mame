@@ -816,13 +816,11 @@ void namcofl_state::common_init()
 void namcofl_state::init_speedrcr()
 {
 	common_init();
-	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
 void namcofl_state::init_finalapr()
 {
 	common_init();
-	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
 GAME(  1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, init_speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
