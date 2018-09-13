@@ -93,19 +93,19 @@
 #include "speaker.h"
 
 // CPU oscillator of IPC board: 8 MHz
-#define IPC_XTAL_Y2     XTAL(8'000'000)
+#define IPC_XTAL_Y2     8_MHz_XTAL
 
 // Y1 oscillator of IPC board: 19.6608 MHz
-#define IPC_XTAL_Y1     XTAL(19'660'800)
+#define IPC_XTAL_Y1     19.6608_MHz_XTAL
 
 // Main oscillator of IOC board: 22.032 MHz
-#define IOC_XTAL_Y2     22032000
+#define IOC_XTAL_Y2     22.032_MHz_XTAL
 
 // FDC oscillator of IOC board: 8 MHz
-#define IOC_XTAL_Y1     XTAL(8'000'000)
+#define IOC_XTAL_Y1     8_MHz_XTAL
 
 // PIO oscillator: 6 MHz
-#define IOC_XTAL_Y3     XTAL(6'000'000)
+#define IOC_XTAL_Y3     6_MHz_XTAL
 
 // Frequency of beeper
 #define IOC_BEEP_FREQ   3300
@@ -121,10 +121,10 @@ void imds2_state::ipc_io_map(address_map &map)
 	map(0xc0, 0xc0).rw(FUNC(imds2_state::imds2_ipc_dbbout_r), FUNC(imds2_state::imds2_ipc_dbbin_data_w));
 	map(0xc1, 0xc1).rw(FUNC(imds2_state::imds2_ipc_status_r), FUNC(imds2_state::imds2_ipc_dbbin_cmd_w));
 	map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xf4, 0xf4).rw(m_ipcusart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf5, 0xf5).rw(m_ipcusart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf6, 0xf6).rw(m_ipcusart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf7, 0xf7).rw(m_ipcusart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf4, 0xf4).rw(m_ipcusart[0], FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf5, 0xf5).rw(m_ipcusart[0], FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf6, 0xf6).rw(m_ipcusart[1], FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf7, 0xf7).rw(m_ipcusart[1], FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf8, 0xf9).rw(m_iocpio, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 	map(0xfa, 0xfb).rw(FUNC(imds2_state::imds2_ipclocpic_r), FUNC(imds2_state::imds2_ipclocpic_w));
 	map(0xfc, 0xfd).rw(FUNC(imds2_state::imds2_ipcsyspic_r), FUNC(imds2_state::imds2_ipcsyspic_w));
@@ -165,10 +165,9 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipcsyspic(*this , "ipcsyspic"),
 	m_ipclocpic(*this , "ipclocpic"),
 	m_ipctimer(*this , "ipctimer"),
-	m_ipcusart0(*this , "ipcusart0"),
-	m_ipcusart1(*this , "ipcusart1"),
-	m_serial0(*this , "serial0"),
-	m_serial1(*this , "serial1"),
+	m_ipcusart(*this, "ipcusart%u", 0U),
+	m_ipcctrl(*this, "ipcctrl"),
+	m_serial(*this, "serial%u", 0U),
 	m_ioccpu(*this , "ioccpu"),
 	m_iocdma(*this , "iocdma"),
 	m_ioccrtc(*this , "ioccrtc"),
@@ -215,18 +214,12 @@ WRITE8_MEMBER(imds2_state::imds2_ipc_control_w)
 	// See A84, pg 28 of [1]
 	// b3 is ~(bit to be written)
 	// b2-b0 is ~(no. of bit to be written)
-	uint8_t mask = (1U << (~data & 0x07));
-
-	if (BIT(data , 3)) {
-		m_ipc_control &= ~mask;
-	} else {
-		m_ipc_control |= mask;
-	}
+	m_ipcctrl->write_bit(~data & 7, BIT(~data, 3));
 }
 
 WRITE_LINE_MEMBER(imds2_state::imds2_ipc_intr)
 {
-	m_ipccpu->set_input_line(I8085_INTR_LINE , (state != 0) && BIT(m_ipc_control , 2));
+	m_ipccpu->set_input_line(I8085_INTR_LINE , (state != 0) && m_ipcctrl->q2_r());
 }
 
 READ8_MEMBER(imds2_state::imds2_ipcsyspic_r)
@@ -247,18 +240,6 @@ WRITE8_MEMBER(imds2_state::imds2_ipcsyspic_w)
 WRITE8_MEMBER(imds2_state::imds2_ipclocpic_w)
 {
 	m_ipclocpic->write(space , offset == 0 , data);
-}
-
-WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_0_w)
-{
-		m_ipcusart0->write_txc(state);
-		m_ipcusart0->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_1_w)
-{
-		m_ipcusart1->write_txc(state);
-		m_ipcusart1->write_rxc(state);
 }
 
 WRITE8_MEMBER(imds2_state::imds2_miscout_w)
@@ -592,7 +573,6 @@ void imds2_state::video_start()
 
 void imds2_state::machine_reset()
 {
-	m_ipc_control = 0x00;
 	m_ipc_ioc_status = 0x0f;
 
 	m_iocfdc->set_rate(500000); // The IMD images show a rate of 500kbps
@@ -601,14 +581,16 @@ void imds2_state::machine_reset()
 bool imds2_state::imds2_in_ipc_rom(offs_t offset) const
 {
 	offs_t masked_offset = offset & 0xf800;
+	bool start_up = m_ipcctrl->q5_r();
+	bool sel_boot = m_ipcctrl->q3_r();
 
 	// Region 0000-07ff is in ROM when START_UP/ == 0 && SEL_BOOT/ == 0
-	if (masked_offset == 0x0000 && (m_ipc_control & 0x28) == 0) {
+	if (masked_offset == 0x0000 && !start_up && !sel_boot) {
 		return true;
 	}
 
 	// Region e800-efff is in ROM when SEL_BOOT/ == 0
-	if (masked_offset == 0xe800 && (m_ipc_control & 0x08) == 0) {
+	if (masked_offset == 0xe800 && !sel_boot) {
 		return true;
 	}
 
@@ -759,10 +741,10 @@ static void imds2_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(imds2_state::imds2)
-		MCFG_DEVICE_ADD("ipccpu" , I8085A , IPC_XTAL_Y2 / 2)  // 4 MHz
+		MCFG_DEVICE_ADD("ipccpu", I8085A, IPC_XTAL_Y2)  // CLK OUT = 4 MHz
 		MCFG_DEVICE_PROGRAM_MAP(ipc_mem_map)
 		MCFG_DEVICE_IO_MAP(ipc_io_map)
-		MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ipcsyspic" , pic8259_device , inta_cb)
+		MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ipcsyspic", pic8259_device, inta_cb)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
 		MCFG_DEVICE_ADD("ipcsyspic", PIC8259, 0)
@@ -771,37 +753,41 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 
 		MCFG_DEVICE_ADD("ipclocpic", PIC8259, 0)
 		MCFG_PIC8259_OUT_INT_CB(WRITELINE("ipcsyspic", pic8259_device, ir7_w))
-		MCFG_PIC8259_IN_SP_CB(CONSTANT(1)) // ???
+		MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 
-		MCFG_DEVICE_ADD("ipctimer" , PIT8253 , 0)
-		MCFG_PIT8253_CLK0(IPC_XTAL_Y1 / 16)
-		MCFG_PIT8253_CLK1(IPC_XTAL_Y1 / 16)
-		MCFG_PIT8253_CLK2(IPC_XTAL_Y1 / 16)
-		MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, imds2_state , imds2_baud_clk_0_w))
-		MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, imds2_state , imds2_baud_clk_1_w))
-		MCFG_PIT8253_OUT2_HANDLER(WRITELINE("ipclocpic" , pic8259_device , ir4_w))
+		PIT8253(config, m_ipctimer, 0);
+		m_ipctimer->set_clk<0>(IPC_XTAL_Y1 / 16);
+		m_ipctimer->set_clk<1>(IPC_XTAL_Y1 / 16);
+		m_ipctimer->set_clk<2>(IPC_XTAL_Y1 / 16);
+		m_ipctimer->out_handler<0>().set(m_ipcusart[0], FUNC(i8251_device::write_txc));
+		m_ipctimer->out_handler<0>().append(m_ipcusart[0], FUNC(i8251_device::write_rxc));
+		m_ipctimer->out_handler<1>().set(m_ipcusart[1], FUNC(i8251_device::write_txc));
+		m_ipctimer->out_handler<1>().append(m_ipcusart[1], FUNC(i8251_device::write_rxc));
+		m_ipctimer->out_handler<2>().set("ipclocpic", FUNC(pic8259_device::ir4_w));
 
-		I8251(config , m_ipcusart0 , 0);
-		m_ipcusart0->rts_handler().set("ipcusart0" , FUNC(i8251_device::write_cts));
-		m_ipcusart0->rxrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir0_w));
-		m_ipcusart0->txrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir1_w));
-		m_ipcusart0->txd_handler().set("serial0" , FUNC(rs232_port_device::write_txd));
+		I8251(config, m_ipcusart[0], IPC_XTAL_Y1 / 9);
+		m_ipcusart[0]->rts_handler().set(m_ipcusart[0], FUNC(i8251_device::write_cts));
+		m_ipcusart[0]->rxrdy_handler().set("ipclocpic", FUNC(pic8259_device::ir0_w));
+		m_ipcusart[0]->txrdy_handler().set("ipclocpic", FUNC(pic8259_device::ir1_w));
+		m_ipcusart[0]->txd_handler().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 
-		I8251(config , m_ipcusart1 , 0);
-		m_ipcusart1->rxrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir2_w));
-		m_ipcusart1->txrdy_handler().set("ipclocpic" , FUNC(pic8259_device::ir3_w));
-		m_ipcusart1->txd_handler().set("serial1" , FUNC(rs232_port_device::write_txd));
-		m_ipcusart1->rts_handler().set("serial1" , FUNC(rs232_port_device::write_rts));
-		m_ipcusart1->dtr_handler().set("serial1" , FUNC(rs232_port_device::write_dtr));
+		I8251(config, m_ipcusart[1], IPC_XTAL_Y1 / 9);
+		m_ipcusart[1]->rxrdy_handler().set("ipclocpic", FUNC(pic8259_device::ir2_w));
+		m_ipcusart[1]->txrdy_handler().set("ipclocpic", FUNC(pic8259_device::ir3_w));
+		m_ipcusart[1]->txd_handler().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+		m_ipcusart[1]->rts_handler().set(m_serial[1], FUNC(rs232_port_device::write_rts));
+		m_ipcusart[1]->dtr_handler().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 
-		MCFG_DEVICE_ADD("serial0" , RS232_PORT, default_rs232_devices , nullptr)
-		MCFG_RS232_RXD_HANDLER(WRITELINE("ipcusart0" , i8251_device , write_rxd))
-		MCFG_RS232_DSR_HANDLER(WRITELINE("ipcusart0" , i8251_device , write_dsr))
+		LS259(config, m_ipcctrl); // A84
 
-		MCFG_DEVICE_ADD("serial1" , RS232_PORT, default_rs232_devices , nullptr)
-		MCFG_RS232_RXD_HANDLER(WRITELINE("ipcusart1" , i8251_device , write_rxd))
-		MCFG_RS232_CTS_HANDLER(WRITELINE("ipcusart1" , i8251_device , write_cts))
-		MCFG_RS232_DSR_HANDLER(WRITELINE("ipcusart1" , i8251_device , write_dsr))
+		MCFG_DEVICE_ADD(m_serial[0], RS232_PORT, default_rs232_devices , nullptr)
+		MCFG_RS232_RXD_HANDLER(WRITELINE(m_ipcusart[0], i8251_device , write_rxd))
+		MCFG_RS232_DSR_HANDLER(WRITELINE(m_ipcusart[0], i8251_device , write_dsr))
+
+		MCFG_DEVICE_ADD(m_serial[1], RS232_PORT, default_rs232_devices , nullptr)
+		MCFG_RS232_RXD_HANDLER(WRITELINE(m_ipcusart[1], i8251_device , write_rxd))
+		MCFG_RS232_CTS_HANDLER(WRITELINE(m_ipcusart[1], i8251_device , write_cts))
+		MCFG_RS232_DSR_HANDLER(WRITELINE(m_ipcusart[1], i8251_device , write_dsr))
 
 		MCFG_DEVICE_ADD("ioccpu" , I8080A , IOC_XTAL_Y2 / 18)     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
 		MCFG_DEVICE_PROGRAM_MAP(ioc_mem_map)

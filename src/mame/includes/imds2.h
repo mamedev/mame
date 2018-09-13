@@ -7,6 +7,7 @@
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/74259.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
 #include "sound/beep.h"
@@ -35,8 +36,6 @@ private:
 	DECLARE_READ8_MEMBER(imds2_ipclocpic_r);
 	DECLARE_WRITE8_MEMBER(imds2_ipcsyspic_w);
 	DECLARE_WRITE8_MEMBER(imds2_ipclocpic_w);
-	DECLARE_WRITE_LINE_MEMBER(imds2_baud_clk_0_w);
-	DECLARE_WRITE_LINE_MEMBER(imds2_baud_clk_1_w);
 
 	DECLARE_WRITE8_MEMBER(imds2_miscout_w);
 	DECLARE_READ8_MEMBER(imds2_miscin_r);
@@ -85,10 +84,9 @@ private:
 	required_device<pic8259_device> m_ipcsyspic;
 	required_device<pic8259_device> m_ipclocpic;
 	required_device<pit8253_device> m_ipctimer;
-	required_device<i8251_device> m_ipcusart0;
-	required_device<i8251_device> m_ipcusart1;
-	required_device<rs232_port_device> m_serial0;
-	required_device<rs232_port_device> m_serial1;
+	required_device_array<i8251_device, 2> m_ipcusart;
+	required_device<ls259_device> m_ipcctrl;
+	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<i8080a_cpu_device> m_ioccpu;
 	required_device<i8257_device> m_iocdma;
 	required_device<i8275_device> m_ioccrtc;
@@ -117,9 +115,6 @@ private:
 
 	void imds2_update_beeper(void);
 	void imds2_update_printer(void);
-
-	// IPC control port
-	uint8_t m_ipc_control;
 
 	// IPC ROM content
 	const uint8_t *m_ipc_rom;

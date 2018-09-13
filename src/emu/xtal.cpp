@@ -252,6 +252,7 @@ const double XTAL::known_xtals[] = {
 	 21'300'000, /* 21.3_MHz_XTAL          - */
 	 21'477'272, /* 21.477272_MHz_XTAL     BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	 22'000'000, /* 22_MHz_XTAL            - */
+	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
 	 22'118'400, /* 22.1184_MHz_XTAL       Amusco Poker */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
