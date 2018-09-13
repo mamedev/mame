@@ -460,6 +460,8 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::mix_w )
 	if (m_oki2_banklo != nullptr)
 		m_oki2_banklo->set_entry((data >> 6) & 3);
 
+	// TODO: emulate the low pass filter!
+
 	// update the (left) OKI bank (JSA III/IIIs only)
 	if (m_oki1_banklo != nullptr)
 		m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 1) | ((data >> 3) & 2));

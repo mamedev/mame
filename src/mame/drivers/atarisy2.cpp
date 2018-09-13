@@ -1300,7 +1300,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( paperboy )
+ROM_START( paperboy ) // ALL of these roms should be 136034-xxx but the correct labels aren't known per game rev!
 	ROM_REGION( 0x90000, "maincpu", 0 ) /* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "cpu_l07.rv3", 0x008000, 0x004000, CRC(4024bb9b) SHA1(9030ce5a6a1a3d769c699a92b32a55013f9766aa) )
 	ROM_LOAD16_BYTE( "cpu_n07.rv3", 0x008001, 0x004000, CRC(0260901a) SHA1(39d786f5c440ca1fd529ee73e2a4d2406cd1db8f) )

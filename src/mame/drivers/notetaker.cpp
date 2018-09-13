@@ -681,7 +681,7 @@ WRITE16_MEMBER(notetaker_state::EPConReg_w)
 	m_EP_LED3 = (data&0x20)?1:0;
 	m_EP_LED4 = (data&0x10)?1:0;
 	m_EP_LED_SelROM_q = (data&0x08)?1:0; // this doesn't appear to be hooked anywhere, andjust drives an LED
-	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision
+	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision in favor of having the IOP write the boot vectors for the EP to the shared ram instead. See below for how the top two address bits are disconnected to allow this to work with the way the shared ram is mapped.
 	m_EP_ProcLock = (data&0x04)?1:0; // bus lock for this processor (hold other processor in wait state)
 	m_EP_SetParity_q = (data&0x02)?1:0; // enable parity checking on local ram if low
 	m_EP_DisLMem_q = (data&0x01)?1:0; // if low, the low 8k of local memory is disabled and accesses the shared memory instead.
@@ -690,7 +690,7 @@ WRITE16_MEMBER(notetaker_state::EPConReg_w)
 
 /*
 Emulator cpu mem map:
-(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the processor when /reset is de-asserted by the iop)
+(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the ep processor when /reset is de-asserted by the iop)
 a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   DisLMem_q
 x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
 x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
