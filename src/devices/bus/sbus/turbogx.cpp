@@ -70,6 +70,8 @@ void sbus_turbogx_device::device_reset()
 	m_palette_g = 0;
 	m_palette_b = 0;
 	m_palette_step = 0;
+
+	memset(&m_fbc, 0, sizeof(m_fbc));
 }
 
 void sbus_turbogx_device::install_device()
@@ -163,6 +165,122 @@ WRITE32_MEMBER(sbus_turbogx_device::palette_w)
 	}
 }
 
+uint8_t sbus_turbogx_device::perform_rasterop(uint8_t src, uint8_t dst)
+{
+	const uint32_t rops[4] = { fbc_rasterop_rop00(), fbc_rasterop_rop01(), fbc_rasterop_rop10(), fbc_rasterop_rop11() };
+
+	uint8_t result = 0;
+	//logerror("src:%02x dst:%02x\n", src, dst);
+	for (int bit = 0; bit < 8; bit++)
+	{
+		const uint8_t mask = (1 << bit);
+		const uint8_t f = BIT(m_fbc.m_fcolor, bit) << 1;
+		const uint8_t b = BIT(m_fbc.m_bcolor, bit);
+		const uint8_t s = src & mask;
+		const uint8_t d = dst & mask;
+		const uint32_t rop = rops[f | b];
+		//logerror("f:%d b:%d s:%02x d:%02x rop:%d\n", f >> 1, b, s, d, rop);
+
+		uint8_t value = 0;
+		switch (rop)
+		{
+			case ROP_CLR:								break;
+			case ROP_SRC_NOR_DST:	value = ~(s | d);	break;
+			case ROP_NSRC_AND_DST:	value = ~s & d;		break;
+			case ROP_NOT_SRC:		value = ~s;			break;
+			case ROP_SRC_AND_NDST:	value = s & ~d;		break;
+			case ROP_NOT_DST:		value = ~d;			break;
+			case ROP_SRC_XOR_DST:	value = s ^ d;		break;
+			case ROP_SRC_NAND_DST:	value = ~(s & d);	break;
+			case ROP_SRC_AND_DST:	value = s & d;		break;
+			case ROP_SRC_XNOR_DST:	value = ~(s ^ d);	break;
+			case ROP_DST:			value = d;			break;
+			case ROP_NSRC_OR_DST:	value = ~s | d;		break;
+			case ROP_SRC:			value = s;			break;
+			case ROP_SRC_OR_NDST:	value = s | ~d;		break;
+			case ROP_SRC_OR_DST:	value = s | d;		break;
+			case ROP_SET:			value = 0xff;		break;
+			default:				value = 0;			break;
+		}
+		result |= value & mask;
+	}
+	return result;
+}
+
+// NOTE: This is basically untested, and probably full of bugs!
+void sbus_turbogx_device::handle_draw_command()
+{
+	if (fbc_misc_draw() != FBC_MISC_DRAW_RENDER)
+	{
+		logerror("handle_draw_command: Unsupported draw mode %d, abandoning draw\n", fbc_misc_draw());
+		return;
+	}
+
+	if (m_fbc.m_curr_prim_type != PRIM_RECT)
+	{
+		logerror("handle_draw_command: Unsupported prim type %d, abandoning draw\n", m_fbc.m_curr_prim_type);
+		return;
+	}
+
+	if (m_fbc.m_vertex_count < 2)
+	{
+		logerror("handle_draw_command: Insufficient number of vertices queued, abandoning draw\n");
+		return;
+	}
+
+	uint8_t *vram = (uint8_t*)&m_vram[0];
+
+	uint32_t vindex = 0;
+	while (vindex < m_fbc.m_vertex_count)
+	{
+		vertex_t &v0 = m_fbc.m_prim_buf[vindex++];
+		vertex_t &v1 = m_fbc.m_prim_buf[vindex++];
+
+		for (uint32_t y = v0.m_absy; y < v1.m_absy; y++)
+		{
+			const uint32_t line = y * (m_fbc.m_clip_maxx + 1);
+			for (uint32_t x = v0.m_absx; x < v1.m_absx; x++)
+			{
+				const uint8_t src = vram[line + x];
+				const uint8_t dst = src;
+				const uint8_t result = perform_rasterop(src, dst);
+				vram[line + x] = result;
+			}
+		}
+	}
+	m_fbc.m_vertex_count = 0;
+}
+
+// NOTE: This is basically untested, and probably full of bugs!
+void sbus_turbogx_device::handle_blit_command()
+{
+	uint8_t *vram = (uint8_t*)&m_vram[0];
+	const uint32_t fbw = (m_fbc.m_clip_maxx + 1);
+	logerror("Copying from %d,%d-%d,%d to %d,%d-%d,%d, width %d, height %d\n"
+		, m_fbc.m_x0, m_fbc.m_y0
+		, m_fbc.m_x1, m_fbc.m_y1
+		, m_fbc.m_x2, m_fbc.m_y2
+		, m_fbc.m_x3, m_fbc.m_y3
+		, m_fbc.m_clip_maxx, m_fbc.m_clip_maxy);
+	uint32_t srcy = m_fbc.m_y0;
+	uint32_t dsty = m_fbc.m_y2;
+	for (; srcy < m_fbc.m_y1; srcy++, dsty++)
+	{
+		uint32_t srcy_index = srcy * fbw;
+		uint32_t dsty_index = dsty * fbw;
+		uint32_t srcx = m_fbc.m_x0;
+		uint32_t dstx = m_fbc.m_x2;
+		for (; srcx < m_fbc.m_x1; srcx++, dstx++)
+		{
+			const uint8_t src = vram[srcy_index + srcx];
+			const uint8_t dst = vram[dsty_index + dstx];
+			const uint8_t result = perform_rasterop(src, dst);
+			//logerror("vram[%d] = %02x\n", result);
+			vram[dsty_index + dstx] = result;
+		}
+	}
+}
+
 READ32_MEMBER(sbus_turbogx_device::fbc_r)
 {
 	uint32_t ret = 0;
@@ -180,9 +298,11 @@ READ32_MEMBER(sbus_turbogx_device::fbc_r)
 			return m_fbc.m_status;
 		case FBC_DRAW_STATUS:
 			logerror("fbc_r: DRAW_STATUS (%08x & %08x)\n", m_fbc.m_draw_status, mem_mask);
+			handle_draw_command();
 			return m_fbc.m_draw_status;
 		case FBC_BLIT_STATUS:
 			logerror("fbc_r: BLIT_STATUS (%08x & %08x)\n", m_fbc.m_blit_status, mem_mask);
+			handle_blit_command();
 			return m_fbc.m_blit_status;
 		case FBC_FONT:
 			logerror("fbc_r: FONT (%08x & %08x)\n", m_fbc.m_font, mem_mask);
@@ -470,20 +590,40 @@ READ32_MEMBER(sbus_turbogx_device::fbc_r)
 
 WRITE32_MEMBER(sbus_turbogx_device::fbc_w)
 {
+	static const char* misc_bdisp_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
+	static const char* misc_bread_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
+	static const char* misc_bwrite1_name[4] = { "IGNORE", "ENABLE", "DISABLE", "ILLEGAL" };
+	static const char* misc_bwrite0_name[4] = { "IGNORE", "ENABLE", "DISABLE", "ILLEGAL" };
+	static const char* misc_draw_name[4] = { "IGNORE", "RENDER", "PICK", "ILLEGAL" };
+	static const char* misc_data_name[4] = { "IGNORE", "COLOR8", "COLOR1", "HRMONO" };
+	static const char* misc_blit_name[4] = { "IGNORE", "NOSRC", "SRC", "ILLEGAL" };
+	static const char* rasterop_rop_name[16] =
+	{
+		"CLR", "SRC_NOR_DST", "NSRC_AND_DST", "NOT_SRC", "SRC_AND_NDST", "NOT_DST", "SRC_XOR_DST", "SRC_NAND_DST",
+		"SRC_AND_DST", "SRC_XNOR_DST", "DST", "NSRC_OR_DST", "SRC", "SRC_OR_NDST", "SRC_OR_DST", "SET"
+	};
+	static const char* rasterop_plot_name[2] = { "PLOT", "UNPLOT" };
+	static const char* rasterop_rast_name[2] = { "BOOL", "LINEAR" };
+	static const char* rasterop_attr_name[4] = { "IGNORE", "UNSUPP", "SUPP", "ILLEGAL" };
+	static const char* rasterop_polyg_name[4] = { "IGNORE", "OVERLAP", "NONOVERLAP", "ILLEGAL" };
+	static const char* rasterop_pattern_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
+	static const char* rasterop_pixel_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
+	static const char* rasterop_plane_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
+
 	switch (offset)
 	{
 		case FBC_MISC:
+			COMBINE_DATA(&m_fbc.m_misc);
 			logerror("fbc_w: MISC = %08x & %08x\n", data, mem_mask);
 			logerror("       MISC_INDEX     = %d\n", fbc_misc_index());
 			logerror("       MISC_INDEX_MOD = %d\n", fbc_misc_index_mod());
-			logerror("       MISC_BDISP     = %d\n", fbc_misc_bdisp());
-			logerror("       MISC_BREAD     = %d\n", fbc_misc_bread());
-			logerror("       MISC_BWRITE1   = %d\n", fbc_misc_bwrite1());
-			logerror("       MISC_BWRITE0   = %d\n", fbc_misc_bwrite0());
-			logerror("       MISC_DRAW      = %d\n", fbc_misc_draw());
-			logerror("       MISC_DATA      = %d\n", fbc_misc_data());
-			logerror("       MISC_BLIT      = %d\n", fbc_misc_blit());
-			COMBINE_DATA(&m_fbc.m_misc);
+			logerror("       MISC_BDISP     = %d (%s)\n", fbc_misc_bdisp(), misc_bdisp_name[fbc_misc_bdisp()]);
+			logerror("       MISC_BREAD     = %d (%s)\n", fbc_misc_bread(), misc_bread_name[fbc_misc_bread()]);
+			logerror("       MISC_BWRITE1   = %d (%s)\n", fbc_misc_bwrite1(), misc_bwrite1_name[fbc_misc_bwrite1()]);
+			logerror("       MISC_BWRITE0   = %d (%s)\n", fbc_misc_bwrite0(), misc_bwrite0_name[fbc_misc_bwrite0()]);
+			logerror("       MISC_DRAW      = %d (%s)\n", fbc_misc_draw(), misc_draw_name[fbc_misc_draw()]);
+			logerror("       MISC_DATA      = %d (%s)\n", fbc_misc_data(), misc_data_name[fbc_misc_data()]);
+			logerror("       MISC_BLIT      = %d (%s)\n", fbc_misc_blit(), misc_blit_name[fbc_misc_blit()]);
 			break;
 		case FBC_CLIP_CHECK:
 			logerror("fbc_w: CLIP_CHECK = %08x & %08x\n", data, mem_mask);
@@ -614,18 +754,19 @@ WRITE32_MEMBER(sbus_turbogx_device::fbc_w)
 			COMBINE_DATA(&m_fbc.m_bcolor);
 			break;
 		case FBC_RASTEROP:
-			logerror("fbc_w: RASTEROP = %08x & %08x\n", data, mem_mask);
-			logerror("       RASTEROP_ROP00 = %d\n", fbc_rasterop_rop00());
-			logerror("       RASTEROP_ROP01 = %d\n", fbc_rasterop_rop01());
-			logerror("       RASTEROP_ROP10 = %d\n", fbc_rasterop_rop10());
-			logerror("       RASTEROP_ROP11 = %d\n", fbc_rasterop_rop11());
-			logerror("       RASTEROP_PLOT  = %d\n", fbc_rasterop_plot());
-			logerror("       RASTEROP_RAST  = %d\n", fbc_rasterop_rast());
-			logerror("       RASTEROP_POLYG = %d\n", fbc_rasterop_polyg());
-			logerror("       RASTEROP_PATT  = %d\n", fbc_rasterop_patt());
-			logerror("       RASTEROP_PIXEL = %d\n", fbc_rasterop_pixel());
-			logerror("       RASTEROP_PLANE = %d\n", fbc_rasterop_plane());
 			COMBINE_DATA(&m_fbc.m_rasterop);
+			logerror("fbc_w: RASTEROP = %08x & %08x\n", data, mem_mask);
+			logerror("       RASTEROP_ROP00 = %d (%s)\n", fbc_rasterop_rop00(), rasterop_rop_name[fbc_rasterop_rop00()]);
+			logerror("       RASTEROP_ROP01 = %d (%s)\n", fbc_rasterop_rop01(), rasterop_rop_name[fbc_rasterop_rop01()]);
+			logerror("       RASTEROP_ROP10 = %d (%s)\n", fbc_rasterop_rop10(), rasterop_rop_name[fbc_rasterop_rop10()]);
+			logerror("       RASTEROP_ROP11 = %d (%s)\n", fbc_rasterop_rop11(), rasterop_rop_name[fbc_rasterop_rop11()]);
+			logerror("       RASTEROP_PLOT  = %d (%s)\n", fbc_rasterop_plot(), rasterop_plot_name[fbc_rasterop_plot()]);
+			logerror("       RASTEROP_RAST  = %d (%s)\n", fbc_rasterop_rast(), rasterop_rast_name[fbc_rasterop_rast()]);
+			logerror("       RASTEROP_ATTR  = %d (%s)\n", fbc_rasterop_attr(), rasterop_attr_name[fbc_rasterop_attr()]);
+			logerror("       RASTEROP_POLYG = %d (%s)\n", fbc_rasterop_polyg(), rasterop_polyg_name[fbc_rasterop_polyg()]);
+			logerror("       RASTEROP_PATT  = %d (%s)\n", fbc_rasterop_pattern(), rasterop_pattern_name[fbc_rasterop_pattern()]);
+			logerror("       RASTEROP_PIXEL = %d (%s)\n", fbc_rasterop_pixel(), rasterop_pixel_name[fbc_rasterop_pixel()]);
+			logerror("       RASTEROP_PLANE = %d (%s)\n", fbc_rasterop_plane(), rasterop_plane_name[fbc_rasterop_plane()]);
 			break;
 		case FBC_PLANE_MASK:
 			logerror("fbc_w: PLANE_MASK = %08x & %08x\n", data, mem_mask);
@@ -839,43 +980,45 @@ WRITE32_MEMBER(sbus_turbogx_device::fbc_w)
 
 		case FBC_IRECT_ABSX:
 			logerror("fbc_w: IRECT_ABSX = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_absx);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_absx = data;
+			m_fbc.m_vertex_count++;
+			m_fbc.m_curr_prim_type = PRIM_RECT;
 			break;
 		case FBC_IRECT_ABSY:
 			logerror("fbc_w: IRECT_ABSY = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_absy);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_absy = data;
 			break;
 		case FBC_IRECT_ABSZ:
 			logerror("fbc_w: IRECT_ABSZ = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_absz);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_absz = data;
 			break;
 		case FBC_IRECT_RELX:
 			logerror("fbc_w: IRECT_RELX = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_relx);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_relx = data;
 			break;
 		case FBC_IRECT_RELY:
 			logerror("fbc_w: IRECT_RELY = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_rely);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_rely = data;
 			break;
 		case FBC_IRECT_RELZ:
 			logerror("fbc_w: IRECT_RELZ = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_relz);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_relz = data;
 			break;
 		case FBC_IRECT_R:
 			logerror("fbc_w: IRECT_R = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_r);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_r = data;
 			break;
 		case FBC_IRECT_G:
 			logerror("fbc_w: IRECT_G = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_g);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_g = data;
 			break;
 		case FBC_IRECT_B:
 			logerror("fbc_w: IRECT_B = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_b);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_b = data;
 			break;
 		case FBC_IRECT_A:
 			logerror("fbc_w: IRECT_A = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_fbc.m_irect_a);
+			m_fbc.m_prim_buf[m_fbc.m_vertex_count].m_a = data;
 			break;
 
 		default:

@@ -43,6 +43,9 @@ protected:
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint8_t perform_rasterop(uint8_t src, uint8_t dst);
+	void handle_blit_command();
+	void handle_draw_command();
 
 	void mem_map(address_map &map) override;
 
@@ -214,7 +217,7 @@ private:
 	inline uint32_t fbc_rasterop_rast()		{ return (m_fbc.m_rasterop >> FBC_RASTEROP_RAST_SHIFT)  & FBC_RASTEROP_RAST_MASK;  }
 	inline uint32_t fbc_rasterop_attr()		{ return (m_fbc.m_rasterop >> FBC_RASTEROP_ATTR_SHIFT)  & FBC_RASTEROP_ATTR_MASK;  }
 	inline uint32_t fbc_rasterop_polyg()	{ return (m_fbc.m_rasterop >> FBC_RASTEROP_POLYG_SHIFT) & FBC_RASTEROP_POLYG_MASK; }
-	inline uint32_t fbc_rasterop_patt()		{ return (m_fbc.m_rasterop >> FBC_RASTEROP_PATT_SHIFT)  & FBC_RASTEROP_PATT_MASK;  }
+	inline uint32_t fbc_rasterop_pattern()	{ return (m_fbc.m_rasterop >> FBC_RASTEROP_PATT_SHIFT)  & FBC_RASTEROP_PATT_MASK;  }
 	inline uint32_t fbc_rasterop_pixel()	{ return (m_fbc.m_rasterop >> FBC_RASTEROP_PIXEL_SHIFT) & FBC_RASTEROP_PIXEL_MASK; }
 	inline uint32_t fbc_rasterop_plane()	{ return (m_fbc.m_rasterop >> FBC_RASTEROP_PLANE_SHIFT) & FBC_RASTEROP_PLANE_MASK; }
 
@@ -326,6 +329,31 @@ private:
 		FBC_IRECT_A		= 0x93c/4,
 	};
 
+	struct vertex_t
+	{
+		uint32_t m_absx;
+		uint32_t m_absy;
+		uint32_t m_absz;
+		uint32_t m_relx;
+		uint32_t m_rely;
+		uint32_t m_relz;
+		uint32_t m_r;
+		uint32_t m_g;
+		uint32_t m_b;
+		uint32_t m_a;
+	};
+
+	enum prim_type
+	{
+		PRIM_POINT = 0,
+		PRIM_LINE,
+		PRIM_TRI,
+		PRIM_QUAD,
+		PRIM_RECT,
+
+		PRIM_COUNT
+	};
+
 	struct fbc_t
 	{
 		uint32_t m_misc;
@@ -429,6 +457,10 @@ private:
 		uint32_t m_irect_g;
 		uint32_t m_irect_b;
 		uint32_t m_irect_a;
+
+		vertex_t m_prim_buf[0x1000]; // unknown size
+		uint32_t m_vertex_count;
+		prim_type m_curr_prim_type;
 	};
 
 	required_memory_region m_rom;
@@ -441,6 +473,7 @@ private:
 	uint8_t m_palette_g;
 	uint8_t m_palette_b;
 	uint8_t m_palette_step;
+
 	fbc_t m_fbc;
 };
 
