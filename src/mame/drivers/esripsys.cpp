@@ -512,7 +512,7 @@ READ8_MEMBER(esripsys_state::tms5220_r)
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		uint8_t status = m_tms->status_r(space, 0);
+		uint8_t status = m_tms->status_r();
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
 		return (m_tms->readyq_r() << 7) | (m_tms->intq_r() << 6) | status;
@@ -527,7 +527,7 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 	if (offset == 0)
 	{
 		m_tms_data = data;
-		m_tms->data_w(space, 0, m_tms_data);
+		m_tms->data_w(m_tms_data);
 	}
 #if 0
 	if (offset == 1)

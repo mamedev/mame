@@ -749,7 +749,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// Speech
 		if (m_vaquerro->sprd_out()==ASSERT_LINE)
 		{
-			value = m_speech->status_r(space, 0) & 0xff;
+			value = m_speech->status_r() & 0xff;
 			what = "speech";
 			goto readdone;
 		}
@@ -947,7 +947,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	if (m_vaquerro->spwt_out()==ASSERT_LINE)
 	{
 		LOGMASKED(LOG_MEM, "Write %04x (speech) <- %02x\n", m_logical_address, data);
-		m_speech->data_w(space, 0, data);
+		m_speech->data_w(data);
 		m_pending_write = false;
 	}
 

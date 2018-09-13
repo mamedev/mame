@@ -77,10 +77,10 @@ bool a2bus_ssb_device::take_c800()
 
 uint8_t a2bus_ssb_device::read_cnxx(uint8_t offset)
 {
-	return 0x1f | m_tms->read_status();
+	return 0x1f | m_tms->status_r();
 }
 
 void a2bus_ssb_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	m_tms->write_data(data);
+	m_tms->data_w(data);
 }

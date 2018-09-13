@@ -369,13 +369,13 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
-	m_tms->data_w(space, 0, data);
+	m_tms->data_w(data);
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pa_r)
 {
-	return m_tms->status_r(space, 0);
+	return m_tms->status_r();
 }
 
 

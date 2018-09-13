@@ -61,7 +61,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 
 	if (m_sbe)
 	{
-		*value = m_vsp->status_r(space, 0, 0xff) & 0xff;
+		*value = m_vsp->status_r() & 0xff;
 		LOGMASKED(LOG_MEM, "read value = %02x\n", *value);
 		// We should clear the lines at this point. The TI-99/4A clears the
 		// lines by setting the address bus to a different value, but the
@@ -81,7 +81,7 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 	if (m_sbe)
 	{
 		LOGMASKED(LOG_MEM, "write value = %02x\n", data);
-		m_vsp->data_w(space, 0, data);
+		m_vsp->data_w(data);
 		// Note that we must NOT clear the lines here. Find the lines in the
 		// READY callback below.
 	}

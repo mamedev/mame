@@ -133,7 +133,7 @@ uint8_t a2bus_echoii_device::read_c0nx(uint8_t offset)
 	// upon the falling edge of /DEVREAD, the active part of the read...
 	if (m_readlatch_flag == false) // /RS was low, so we need to return a value from the tms5220
 	{
-		retval = 0x1f | m_tms->status_r(machine().dummy_space(), 0, 0xff);
+		retval = 0x1f | m_tms->status_r();
 		LOGMASKED(LOG_READ,"Returning status of speech chip, which is %02x\n", retval);
 	}
 	else
@@ -157,7 +157,7 @@ void a2bus_echoii_device::write_c0nx(uint8_t offset, uint8_t data)
 
 	m_writelatch_flag = false; // /DEVWRITE clears the latch on its falling edge
 	m_tms->wsq_w(m_writelatch_flag);
-	m_tms->data_w(machine().dummy_space(), 0, m_writelatch_data);
+	m_tms->data_w(m_writelatch_data);
 }
 
 bool a2bus_echoii_device::take_c800()

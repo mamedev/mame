@@ -131,14 +131,14 @@ WRITE8_MEMBER( pes_state::port1_w )
 #ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
 #endif
-	m_speech->data_w(space, 0, data);
+	m_speech->data_w(data);
 
 }
 
 READ8_MEMBER( pes_state::port1_r )
 {
 	uint8_t data = 0xFF;
-	data = m_speech->status_r(space, 0);
+	data = m_speech->status_r();
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
 #endif

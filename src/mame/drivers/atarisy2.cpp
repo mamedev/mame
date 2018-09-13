@@ -700,7 +700,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_w)
 {
 	if (m_tms5220.found())
 	{
-		m_tms5220->data_w(space, 0, data);
+		m_tms5220->data_w(data);
 	}
 }
 

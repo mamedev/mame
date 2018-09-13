@@ -414,7 +414,7 @@ uint8_t a2bus_echoplus_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			return 0x1f | m_tms->status_r(machine().dummy_space(), 0, 0xff);
+			return 0x1f | m_tms->status_r();
 	}
 
 	return 0;
@@ -425,7 +425,7 @@ void a2bus_echoplus_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-			m_tms->write_data(data);
+			m_tms->data_w(data);
 			break;
 	}
 }

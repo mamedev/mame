@@ -662,7 +662,7 @@ WRITE8_MEMBER( atari_jsa_i_device::mix_w )
 WRITE8_MEMBER( atari_jsa_i_device::tms5220_voice )
 {
 	if (m_tms5220 != nullptr)
-		m_tms5220->data_w(space, 0, data);
+		m_tms5220->data_w(data);
 }
 
 
