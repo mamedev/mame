@@ -19,8 +19,8 @@ DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c355spr", "Namco 
 
 namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C355SPR, tag, owner, clock),
-	m_c355_obj_gfxbank(0),
-	m_c355_obj_palxor(0),
+	m_gfx_region(0),
+	m_palxor(0),
 	m_is_namcofl(false),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
 	m_palette(*this, finder_base::DUMMY_TAG)
@@ -113,7 +113,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 							uint16_t *dest = &dest_bmp.pix16(y);
 							uint8_t *pri = &priority_bitmap.pix8(y);
 							int x, x_index = x_index_base;
-							if( m_c355_obj_palxor )
+							if( m_palxor )
 							{
 								for( x=sx; x<ex; x++ )
 								{
@@ -184,21 +184,21 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 void namco_c355spr_device::device_start()
 {
-	//m_c355_obj_ram.resize(m_c355spr_ramsize);
-	std::fill(std::begin(m_c355_obj_ram), std::end(m_c355_obj_ram), 0x0000);  // needed for Nebulas Ray
-	save_item(NAME(m_c355_obj_ram));
+	//m_spriteram.resize(m_ramsize);
+	std::fill(std::begin(m_spriteram), std::end(m_spriteram), 0x0000);  // needed for Nebulas Ray
+	save_item(NAME(m_spriteram));
 }
 
 
 /**************************************************************************************/
 
-WRITE16_MEMBER( namco_c355spr_device::c355_obj_position_w )
+WRITE16_MEMBER( namco_c355spr_device::position_w )
 {
-	COMBINE_DATA(&m_c355_obj_position[offset]);
+	COMBINE_DATA(&m_position[offset]);
 }
-READ16_MEMBER( namco_c355spr_device::c355_obj_position_r )
+READ16_MEMBER( namco_c355spr_device::position_r )
 {
-	return m_c355_obj_position[offset];
+	return m_position[offset];
 }
 
 /**************************************************************************************************************/
@@ -214,9 +214,9 @@ READ16_MEMBER( namco_c355spr_device::c355_obj_position_r )
  * 0x14000 sprite list (page1)
  */
 template<class _BitmapClass>
-void namco_c355spr_device::c355_obj_draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const uint16_t *pSource, int pri, int zpos )
+void namco_c355spr_device::draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const uint16_t *pSource, int pri, int zpos )
 {
-	uint16_t *spriteram16 = m_c355_obj_ram;
+	uint16_t *spriteram16 = m_spriteram;
 	unsigned screen_height_remaining, screen_width_remaining;
 	unsigned source_height_remaining, source_width_remaining;
 	int hpos,vpos;
@@ -263,8 +263,8 @@ void namco_c355spr_device::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 
 	if( linkno*4>=0x4000/2 ) return; /* avoid garbage memory reads */
 
-	xscroll = (int16_t)m_c355_obj_position[1];
-	yscroll = (int16_t)m_c355_obj_position[0];
+	xscroll = (int16_t)m_position[1];
+	yscroll = (int16_t)m_position[0];
 
 //  xscroll &= 0x3ff; if( xscroll & 0x200 ) xscroll |= ~0x3ff;
 	xscroll &= 0x1ff; if( xscroll & 0x100 ) xscroll |= ~0x1ff;
@@ -272,7 +272,7 @@ void namco_c355spr_device::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 
 	if( bitmap.width() > 384 )
 	{ /* Medium Resolution: System21 adjust */
-			xscroll = (int16_t)m_c355_obj_position[1];
+			xscroll = (int16_t)m_position[1];
 			xscroll &= 0x3ff; if( xscroll & 0x200 ) xscroll |= ~0x3ff;
 			if( yscroll<0 )
 			{ /* solvalou */
@@ -337,7 +337,7 @@ void namco_c355spr_device::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 		vpos -= dy;
 	}
 
-	color = (palette&0xf)^m_c355_obj_palxor;
+	color = (palette&0xf)^m_palxor;
 
 	source_height_remaining = num_rows*16;
 	screen_height_remaining = vsize;
@@ -368,8 +368,8 @@ void namco_c355spr_device::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 					screen,
 					bitmap,
 					clip,
-					m_gfxdecode->gfx(m_c355_obj_gfxbank),
-					m_c355_obj_code2tile(tile) + offset,
+					m_gfxdecode->gfx(m_gfx_region),
+					m_code2tile(tile) + offset,
 					color,
 					flipx,flipy,
 					sx,sy,
@@ -392,39 +392,39 @@ void namco_c355spr_device::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 }
 
 
-int namco_c355spr_device::c355_obj_default_code2tile(int code)
+int namco_c355spr_device::default_code2tile(int code)
 {
 	return code;
 }
 
-void namco_c355spr_device::c355_obj_init(int gfxbank, int pal_xor, c355_obj_code2tile_delegate code2tile)
+void namco_c355spr_device::init(int gfxbank, int pal_xor, c355_obj_code2tile_delegate code2tile)
 {
-	m_c355_obj_gfxbank = gfxbank;
-	m_c355_obj_palxor = pal_xor;
+	m_gfx_region = gfxbank;
+	m_palxor = pal_xor;
 	if (!code2tile.isnull())
-		m_c355_obj_code2tile = code2tile;
+		m_code2tile = code2tile;
 	else
-		m_c355_obj_code2tile = c355_obj_code2tile_delegate(&namco_c355spr_device::c355_obj_default_code2tile, this);
+		m_code2tile = c355_obj_code2tile_delegate(&namco_c355spr_device::default_code2tile, this);
 
-	memset(m_c355_obj_position, 0, sizeof(m_c355_obj_position));
+	memset(m_position, 0, sizeof(m_position));
 
-	save_item(NAME(m_c355_obj_position));
+	save_item(NAME(m_position));
 }
 
 template<class _BitmapClass>
-void namco_c355spr_device::c355_obj_draw_list(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, const uint16_t *pSpriteList16, const uint16_t *pSpriteTable)
+void namco_c355spr_device::draw_list(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, const uint16_t *pSpriteList16, const uint16_t *pSpriteTable)
 {
 	int i;
 	/* draw the sprites */
 	for( i=0; i<256; i++ )
 	{
 		uint16_t which = pSpriteList16[i];
-		c355_obj_draw_sprite(screen, bitmap, cliprect, &pSpriteTable[(which&0xff)*8], pri, i );
+		draw_sprite(screen, bitmap, cliprect, &pSpriteTable[(which&0xff)*8], pri, i );
 		if( which&0x100 ) break;
 	}
 }
 
-void namco_c355spr_device::c355_obj_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if (pri == 0)
@@ -432,30 +432,30 @@ void namco_c355spr_device::c355_obj_draw(screen_device &screen, bitmap_ind16 &bi
 
 //  if (offs == 0)  // boot
 	// TODO: solvalou service mode wants 0x14000/2 & 0x00000/2
-		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x02000/2], &m_spriteram[0x00000/2]);
 //  else
-		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x14000/2], &m_spriteram[0x10000/2]);
 }
 
-void namco_c355spr_device::c355_obj_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
+void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if (pri == 0)
 		screen.priority().fill(0, cliprect);
 
 //  if (offs == 0)  // boot
-		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x02000/2], &m_spriteram[0x00000/2]);
 //  else
-		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
+		draw_list(screen, bitmap, cliprect, pri, &m_spriteram[0x14000/2], &m_spriteram[0x10000/2]);
 }
 
-WRITE16_MEMBER( namco_c355spr_device::c355_obj_ram_w )
+WRITE16_MEMBER( namco_c355spr_device::spriteram_w )
 {
-	COMBINE_DATA(&m_c355_obj_ram[offset]);
+	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-READ16_MEMBER( namco_c355spr_device::c355_obj_ram_r )
+READ16_MEMBER( namco_c355spr_device::spriteram_r )
 {
-	return m_c355_obj_ram[offset];
+	return m_spriteram[offset];
 }
 

@@ -188,7 +188,7 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 {
 	m_generic_paletteram_16.allocate(0x10000);
 
-	m_c355spr->c355_obj_init(
+	m_c355spr->init(
 		0,      /* gfx bank */
 		0xf,    /* reverse palette mapping */
 		namco_c355spr_device::c355_obj_code2tile_delegate() );
@@ -233,14 +233,14 @@ uint32_t gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bit
 
 	for( pri=0; pri<pivot; pri++ )
 	{
-		m_c355spr->c355_obj_draw(screen, bitmap, cliprect, pri);
+		m_c355spr->draw(screen, bitmap, cliprect, pri);
 	}
 
 /*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
 
     for( pri=pivot; pri<15; pri++ )
     {
-       m_c355spr->c355_obj_draw(screen, bitmap, cliprect, pri);
+       m_c355spr->draw(screen, bitmap, cliprect, pri);
     }*/
 
 	// CPU Diag LEDs
@@ -382,14 +382,14 @@ void gal3_state::cpu_slv_map(address_map &map)
 /// AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE(pointram_data_r,pointram_data_w)
 /// AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */
 /// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w)
-	map(0xf1700000, 0xf170ffff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w)).share("objram");
-	map(0xf1720000, 0xf1720007).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_position_r), FUNC(namco_c355spr_device::c355_obj_position_w));
+	map(0xf1700000, 0xf170ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
+	map(0xf1720000, 0xf1720007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xf1740000, 0xf175ffff).rw(FUNC(gal3_state::paletteram32_r), FUNC(gal3_state::paletteram32_w));
 	map(0xf1760000, 0xf1760003).rw(FUNC(gal3_state::namcos21_video_enable_r), FUNC(gal3_state::namcos21_video_enable_w));
 
 	map(0xf2200000, 0xf220ffff).ram();
-	map(0xf2700000, 0xf270ffff).ram(); //AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
-	map(0xf2720000, 0xf2720007).ram(); //AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
+	map(0xf2700000, 0xf270ffff).ram(); //AM_READWRITE16(spriteram_r,spriteram_w,0xffffffff) AM_SHARE("objram")
+	map(0xf2720000, 0xf2720007).ram(); //AM_READWRITE16(position_r,position_w,0xffffffff)
 	map(0xf2740000, 0xf275ffff).ram(); //AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram")
 	map(0xf2760000, 0xf2760003).ram(); //AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 }

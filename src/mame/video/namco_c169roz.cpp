@@ -23,8 +23,8 @@ DEFINE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device, "namco_c169roz", "Namco 
 
 namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
-	m_c169_roz_gfx_region(0),
-	m_c169_roz_mask(nullptr),
+	m_gfx_region(0),
+	m_mask(nullptr),
 	m_is_namcofl(false),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -32,16 +32,16 @@ namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const 
 
 void namco_c169roz_device::device_start()
 {
-	m_c169_roz_videoram.resize(m_c169_roz_ramsize);
-	std::fill(std::begin(m_c169_roz_videoram), std::end(m_c169_roz_videoram), 0x0000);
-	save_item(NAME(m_c169_roz_videoram));
+	m_videoram.resize(m_ramsize);
+	std::fill(std::begin(m_videoram), std::end(m_videoram), 0x0000);
+	save_item(NAME(m_videoram));
 }
 
 
 // for bank changes
 void namco_c169roz_device::mark_all_dirty()
 {
-	for (auto & elem : m_c169_roz_tilemap)
+	for (auto & elem : m_tilemap)
 		elem->mark_all_dirty();
 }
 
@@ -53,10 +53,10 @@ template<int Which>
 TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 {
 	int tile = 0, mask = 0;
-	m_c169_cb(m_c169_roz_videoram[tile_index&(m_c169_roz_ramsize-1)] & 0x3fff, &tile, &mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
+	m_c169_cb(m_videoram[tile_index&(m_ramsize-1)] & 0x3fff, &tile, &mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
 
-	tileinfo.mask_data = m_c169_roz_mask + 32 * mask;
-	SET_TILE_INFO_MEMBER(m_c169_roz_gfx_region, tile, 0/*color*/, 0/*flag*/);
+	tileinfo.mask_data = m_mask + 32 * mask;
+	SET_TILE_INFO_MEMBER(m_gfx_region, tile, 0/*color*/, 0/*flag*/);
 }
 
 TILEMAP_MAPPER_MEMBER( namco_c169roz_device::mapper )
@@ -66,23 +66,23 @@ TILEMAP_MAPPER_MEMBER( namco_c169roz_device::mapper )
 
 void namco_c169roz_device::init(int region, const char *maskregion, c169_tilemap_delegate tilemap_cb)
 {
-	m_c169_roz_gfx_region = region;
-	m_c169_roz_mask = memregion(maskregion)->base();
+	m_gfx_region = region;
+	m_mask = memregion(maskregion)->base();
 	m_c169_cb = tilemap_cb;
 
-	m_c169_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
 		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<0>), this),
 		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
 		16, 16,
 		256, 256);
 
-	m_c169_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
 		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<1>), this),
 		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
 		16, 16,
 		256, 256);
 
-	save_item(NAME(m_c169_roz_control));
+	save_item(NAME(m_control));
 }
 
 void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters &params)
@@ -195,7 +195,7 @@ void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bi
 	{
 		int row = line / 8;
 		int offs = row * 0x100 + (line & 7) * 0x10 + 0xe080;
-		uint16_t *source = &m_c169_roz_videoram[offs / 2];
+		uint16_t *source = &m_videoram[offs / 2];
 
 		// if enabled
 		if ((source[1] & 0x8000) == 0)
@@ -208,7 +208,7 @@ void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bi
 			{
 				rectangle clip(0, bitmap.width() - 1, line, line);
 				clip &= cliprect;
-				draw_helper(screen, bitmap, *m_c169_roz_tilemap[which], clip, params);
+				draw_helper(screen, bitmap, *m_tilemap[which], clip, params);
 			}
 		}
 	}
@@ -217,11 +217,11 @@ void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bi
 void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
 	int special = (m_is_namcofl) ? 0 : 1;
-	int mode = m_c169_roz_control[0]; // 0x8000 or 0x1000
+	int mode = m_control[0]; // 0x8000 or 0x1000
 
 	for (int which = 1; which >= 0; which--)
 	{
-		const uint16_t *source = &m_c169_roz_control[which * 8];
+		const uint16_t *source = &m_control[which * 8];
 		uint16_t attrs = source[1];
 
 		// if enabled
@@ -238,31 +238,31 @@ void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, con
 				roz_parameters params;
 				unpack_params(source, params);
 				if (params.priority == pri)
-					draw_helper(screen, bitmap, *m_c169_roz_tilemap[which], cliprect, params);
+					draw_helper(screen, bitmap, *m_tilemap[which], cliprect, params);
 			}
 		}
 	}
 }
 
-READ16_MEMBER( namco_c169roz_device::c169_roz_control_r )
+READ16_MEMBER( namco_c169roz_device::control_r )
 {
-	return m_c169_roz_control[offset];
+	return m_control[offset];
 }
 
-WRITE16_MEMBER( namco_c169roz_device::c169_roz_control_w )
+WRITE16_MEMBER( namco_c169roz_device::control_w )
 {
-	COMBINE_DATA(&m_c169_roz_control[offset]);
+	COMBINE_DATA(&m_control[offset]);
 }
 
-READ16_MEMBER( namco_c169roz_device::c169_roz_videoram_r )
+READ16_MEMBER( namco_c169roz_device::videoram_r )
 {
-	return m_c169_roz_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE16_MEMBER( namco_c169roz_device::c169_roz_videoram_w )
+WRITE16_MEMBER( namco_c169roz_device::videoram_w )
 {
-	COMBINE_DATA(&m_c169_roz_videoram[offset]);
-	for (auto & elem : m_c169_roz_tilemap)
+	COMBINE_DATA(&m_videoram[offset]);
+	for (auto & elem : m_tilemap)
 		elem->mark_tile_dirty(offset);
 }
 

@@ -123,7 +123,7 @@ void namcos2_sprite_device::zdrawgfxzoom(
 							uint8_t *pri = &priority_bitmap.pix8(y);
 							int x, x_index = x_index_base;
 							/* this code was previously shared with the c355 where this was needed
-							if( m_c355_obj_palxor )
+							if( m_palxor )
 							{
 								for( x=sx; x<ex; x++ )
 								{

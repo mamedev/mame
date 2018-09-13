@@ -367,7 +367,7 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 	allocate_poly_framebuffer();
 
 	if (m_c355spr)
-		m_c355spr->c355_obj_init(		0,      /* gfx bank */		0xf,    /* reverse palette mapping */		namco_c355spr_device::c355_obj_code2tile_delegate() );
+		m_c355spr->init(		0,      /* gfx bank */		0xf,    /* reverse palette mapping */		namco_c355spr_device::c355_obj_code2tile_delegate() );
 }
 
 uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -377,22 +377,22 @@ uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_in
 	int pri;
 	bitmap.fill(0xff, cliprect );
 
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 2 );
-	//c355_obj_draw(screen, bitmap, cliprect, 14 );   //driver's eyes
+	m_c355spr->draw(screen, bitmap, cliprect, 2 );
+	//draw(screen, bitmap, cliprect, 14 );   //driver's eyes
 
 	copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
 
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 0 );
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 1 );
+	m_c355spr->draw(screen, bitmap, cliprect, 0 );
+	m_c355spr->draw(screen, bitmap, cliprect, 1 );
 
 	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
 
 	/* draw high priority 2d sprites */
 	for( pri=pivot; pri<8; pri++ )
 	{
-		m_c355spr->c355_obj_draw(screen, bitmap, cliprect, pri );
+		m_c355spr->draw(screen, bitmap, cliprect, pri );
 	}
-	// c355_obj_draw(screen, bitmap, cliprect, 15 );   //driver's eyes
+	// draw(screen, bitmap, cliprect, 15 );   //driver's eyes
 	return 0;
 }
 
@@ -403,22 +403,22 @@ uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_in
 	int pri;
 	bitmap.fill(0xff, cliprect );
 
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 2 );
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 14 );   //driver's eyes
+	m_c355spr->draw(screen, bitmap, cliprect, 2 );
+	m_c355spr->draw(screen, bitmap, cliprect, 14 );   //driver's eyes
 
 	copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
 
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 0 );
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 1 );
+	m_c355spr->draw(screen, bitmap, cliprect, 0 );
+	m_c355spr->draw(screen, bitmap, cliprect, 1 );
 
 	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
 
 	for (pri = pivot; pri < 8; pri++)
 	{
-		m_c355spr->c355_obj_draw(screen, bitmap, cliprect, pri);
+		m_c355spr->draw(screen, bitmap, cliprect, pri);
 	}
 
-	m_c355spr->c355_obj_draw(screen, bitmap, cliprect, 15 );   //driver's eyes
+	m_c355spr->draw(screen, bitmap, cliprect, 15 );   //driver's eyes
 
 	return 0;
 

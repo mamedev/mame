@@ -1247,8 +1247,8 @@ void namcos21_state::common_map(address_map &map)
 	map(0x440000, 0x440001).rw(FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
 	map(0x440002, 0x47ffff).nopw(); /* (?) Air Combat */
 	map(0x480000, 0x4807ff).rw(FUNC(namcos21_state::namcos21_depthcue_r), FUNC(namcos21_state::namcos21_depthcue_w)); /* Air Combat */
-	map(0x700000, 0x71ffff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w));
-	map(0x720000, 0x720007).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_position_r), FUNC(namco_c355spr_device::c355_obj_position_w));
+	map(0x700000, 0x71ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w));
+	map(0x720000, 0x720007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x740000, 0x74ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x750000, 0x75ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x760000, 0x760001).rw(FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));
@@ -1604,8 +1604,8 @@ void namcos21_state::configure_c68_namcos21(machine_config &config)
 
 void namcos21_state::driveyes_common_map(address_map &map)
 {
-	map(0x700000, 0x71ffff).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_ram_r), FUNC(namco_c355spr_device::c355_obj_ram_w));
-	map(0x720000, 0x720007).rw(m_c355spr, FUNC(namco_c355spr_device::c355_obj_position_r), FUNC(namco_c355spr_device::c355_obj_position_w));
+	map(0x700000, 0x71ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w));
+	map(0x720000, 0x720007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x740000, 0x74ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x750000, 0x75ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x760000, 0x760001).rw(FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));

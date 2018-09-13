@@ -17,16 +17,16 @@ public:
 
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_WRITE16_MEMBER(c123_tilemap_videoram_w);
-	DECLARE_READ16_MEMBER(c123_tilemap_videoram_r);
-	DECLARE_WRITE16_MEMBER(c123_tilemap_control_w);
-	DECLARE_READ16_MEMBER(c123_tilemap_control_r);
+	DECLARE_WRITE16_MEMBER(videoram_w);
+	DECLARE_READ16_MEMBER(videoram_r);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_READ16_MEMBER(control_r);
 
 	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
 
-	void c123_tilemap_init(int gfxbank, void *pMaskROM, c123_tilemap_delegate tilemap_cb);
-	void c123_tilemap_invalidate(void);
-	void c123_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void init(int gfxbank, void *pMaskROM, c123_tilemap_delegate tilemap_cb);
+	void mark_all_dirty(void);
+	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 
 protected:
 	// device-level overrides
@@ -34,10 +34,10 @@ protected:
 
 private:
 	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
-	void c123_SetTilemapVideoram(int offset, uint16_t newword);
-	void c123_SetTilemapControl(int offset, uint16_t newword);
+	void set_tilemap_videoram(int offset, uint16_t newword);
+	void set_tilemap_control(int offset, uint16_t newword);
 
-	struct c123_mTilemapInfo
+	struct info
 	{
 		uint16_t control[0x40 / 2];
 		/**
@@ -59,7 +59,7 @@ private:
 		c123_tilemap_delegate cb;
 	};
 
-	c123_mTilemapInfo m_c123_TilemapInfo;
+	info m_tilemapinfo;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 };

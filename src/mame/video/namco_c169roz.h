@@ -15,12 +15,12 @@ public:
 
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
-	void set_ram_words(uint32_t size) { m_c169_roz_ramsize = size; }
+	void set_ram_words(uint32_t size) { m_ramsize = size; }
 
-	DECLARE_READ16_MEMBER( c169_roz_control_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_control_w );
-	DECLARE_READ16_MEMBER( c169_roz_videoram_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
+	DECLARE_READ16_MEMBER( control_r );
+	DECLARE_WRITE16_MEMBER( control_w );
+	DECLARE_READ16_MEMBER( videoram_r );
+	DECLARE_WRITE16_MEMBER( videoram_w );
 
 	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
 	void init(int region, const char *maskregion, c169_tilemap_delegate tilemap_cb);
@@ -50,12 +50,12 @@ private:
 	TILEMAP_MAPPER_MEMBER( mapper );
 
 	static const int ROZ_TILEMAP_COUNT = 2;
-	tilemap_t *m_c169_roz_tilemap[ROZ_TILEMAP_COUNT];
-	uint16_t m_c169_roz_control[0x20/2];
-	std::vector<uint16_t> m_c169_roz_videoram;
-	int m_c169_roz_gfx_region;
-	uint8_t *m_c169_roz_mask;
-	uint32_t m_c169_roz_ramsize;
+	tilemap_t *m_tilemap[ROZ_TILEMAP_COUNT];
+	uint16_t m_control[0x20/2];
+	std::vector<uint16_t> m_videoram;
+	int m_gfx_region;
+	uint8_t *m_mask;
+	uint32_t m_ramsize;
 
 	// per-game hacks
 	bool m_is_namcofl;
