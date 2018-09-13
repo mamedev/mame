@@ -16,6 +16,7 @@ void sbus_cgthree_device::mem_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).rw(FUNC(sbus_cgthree_device::unknown_r), FUNC(sbus_cgthree_device::unknown_w));
 	map(0x00000000, 0x000007ff).r(FUNC(sbus_cgthree_device::rom_r));
+	map(0x00400000, 0x00400007).w(FUNC(sbus_cgthree_device::palette_w));
 	map(0x007ff800, 0x007ff81f).rw(FUNC(sbus_cgthree_device::regs_r), FUNC(sbus_cgthree_device::regs_w));
 	map(0x00800000, 0x008fd1ff).rw(FUNC(sbus_cgthree_device::vram2_r), FUNC(sbus_cgthree_device::vram2_w));
 	map(0x00bff800, 0x00cfcbff).rw(FUNC(sbus_cgthree_device::vram_r), FUNC(sbus_cgthree_device::vram_w));
@@ -55,7 +56,21 @@ void sbus_cgthree_device::device_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_vram2 = std::make_unique<uint32_t[]>(0x100000/4);
-	entry = r = g = b = step = 0;
+
+	save_item(NAME(m_palette_entry));
+	save_item(NAME(m_palette_r));
+	save_item(NAME(m_palette_g));
+	save_item(NAME(m_palette_b));
+	save_item(NAME(m_palette_step));
+}
+
+void sbus_cgthree_device::device_reset()
+{
+	m_palette_entry = 0;
+	m_palette_r = 0;
+	m_palette_g = 0;
+	m_palette_b = 0;
+	m_palette_step = 0;
 }
 
 void sbus_cgthree_device::install_device()
@@ -70,7 +85,6 @@ void sbus_cgthree_device::palette_init(palette_device &palette)
 		const uint8_t reversed = 255 - i;
 		palette.set_pen_color(i, rgb_t(reversed, reversed, reversed));
 	}
-	printf("\n");
 }
 
 uint32_t sbus_cgthree_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -83,7 +97,7 @@ uint32_t sbus_cgthree_device::screen_update(screen_device &screen, bitmap_rgb32 
 		uint32_t *scanline = &bitmap.pix32(y);
 		for (int x = 0; x < 1152; x++)
 		{
-			const uint8_t pixel = vram[(y * 1152) + (BYTE4_XOR_BE(x))];
+			const uint8_t pixel = vram[y * 1152 + BYTE4_XOR_BE(x)];
 			*scanline++ = pens[pixel];
 		}
 	}
@@ -99,27 +113,35 @@ READ32_MEMBER(sbus_cgthree_device::unknown_r)
 
 WRITE32_MEMBER(sbus_cgthree_device::unknown_w)
 {
-	if (offset == 0x100000)
+	logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
+}
+
+WRITE32_MEMBER(sbus_cgthree_device::palette_w)
+{
+	if (offset == 0)
 	{
-		entry = data >> 24;
-		step = 0;
-	}
-	else if (offset == 0x100001)
-	{
-		switch (step)
-		{
-			case 0: r = data>>24; step++; break;
-			case 1: g = data>>24; step++; break;
-			case 2:
-				b = data>>24;
-				m_palette->set_pen_color(entry, rgb_t(r, g, b));
-				step = 0;
-				break;
-		}
+		m_palette_entry = data >> 24;
+		m_palette_step = 0;
 	}
 	else
 	{
-		logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
+		switch (m_palette_step)
+		{
+			case 0:
+				m_palette_r = data >> 24;
+				m_palette_step++;
+				break;
+			case 1:
+				m_palette_g = data >> 24;
+				m_palette_step++;
+				break;
+			case 2:
+				m_palette_b = data >> 24;
+				m_palette->set_pen_color(m_palette_entry, rgb_t(m_palette_r, m_palette_g, m_palette_b));
+				m_palette_step = 0;
+				m_palette_entry++;
+				break;
+		}
 	}
 }
 

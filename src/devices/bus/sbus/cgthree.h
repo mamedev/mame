@@ -25,6 +25,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_sbus_slot_interface overrides
 	virtual void install_device() override;
@@ -33,6 +34,7 @@ protected:
 
 	DECLARE_READ32_MEMBER(unknown_r);
 	DECLARE_WRITE32_MEMBER(unknown_w);
+	DECLARE_WRITE32_MEMBER(palette_w);
 	DECLARE_READ8_MEMBER(regs_r);
 	DECLARE_WRITE8_MEMBER(regs_w);
 	DECLARE_READ32_MEMBER(rom_r);
@@ -51,7 +53,11 @@ private:
 	std::unique_ptr<uint32_t[]> m_vram2; // ???
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	int entry, r, g, b, step;
+	uint8_t m_palette_entry;
+	uint8_t m_palette_r;
+	uint8_t m_palette_g;
+	uint8_t m_palette_b;
+	uint8_t m_palette_step;
 };
 
 // device type definition
