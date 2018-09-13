@@ -122,7 +122,7 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 		int palentry;
 
 		/* start with no transparency */
-		m_transmask[0][i] = m_transmask[1][i] =  m_transmask[2][i] = 0;
+		m_transmask[0][i] = m_transmask[1][i] = m_transmask[2][i] = 0;
 
 		/* iterate over all palette entries except the last one */
 		for (palentry = 0; palentry < 0x100; palentry++)
@@ -189,8 +189,7 @@ TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
 
 void pacland_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_sprite1_bitmap);
-	m_screen->register_screen_bitmap(m_sprite2_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_screen->register_screen_bitmap(m_fg_bitmap);
 	m_fg_bitmap.fill(0xffff);
@@ -352,7 +351,16 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 			{
 				src[x] = 0xffff;
 				if (pri[x] == 0)
-					dst[x] = pix;
+				{
+					if (priority == 0)
+						dst[x] = pix;
+					else
+					{
+						const uint16_t sp_pix = m_sprite_bitmap.pix16(y, x);
+						if (sp_pix == 0 || sp_pix != dst[x])
+							dst[x] = pix;
+					}
+				}
 			}
 		}
 	}
@@ -380,32 +388,13 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	draw_fg(screen, bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	m_sprite1_bitmap.fill(0, cliprect);
-	draw_sprites(screen, m_sprite1_bitmap, cliprect, flip, 1);
-	copybitmap_trans(bitmap, m_sprite1_bitmap, 0, 0, 0, 0, cliprect, 0);
+	draw_sprites(screen, bitmap, cliprect, flip, 1);
 
-	/* draw high priority fg tiles */
+	/* draw high priority fg tiles
+	   (keep sprite pixels with colortable values >= 0xf0, which have priority over all fg tiles) */
+	m_sprite_bitmap.fill(0, cliprect);
+	draw_sprites(screen, m_sprite_bitmap, cliprect, flip, 2);
 	draw_fg(screen, bitmap, cliprect, 1);
-
-	/* draw sprite pixels with colortable values >= 0xf0, which have priority over all fg tiles */
-	m_sprite2_bitmap.fill(0, cliprect);
-	draw_sprites(screen, m_sprite2_bitmap, cliprect, flip, 2);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		uint16_t *src1 = &m_sprite1_bitmap.pix16(y);
-		uint16_t *src2 = &m_sprite2_bitmap.pix16(y);
-		uint16_t *dst = &bitmap.pix16(y);
-
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			/* only copy if "m_sprite1_bitmap" and "m_sprite2_bitmap" are same value,
-			   because not redraw pixels that are not visible in "m_sprite1_bitmap" */
-			uint16_t pix1 = src1[x];
-			uint16_t pix2 = src2[x];
-			if (pix2 != 0 && dst[x] < 0x800 && pix1 == pix2)
-				dst[x] = pix2;
-		}
-	}
 
 	return 0;
 }
