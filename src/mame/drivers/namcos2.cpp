@@ -695,7 +695,7 @@ void namcos2_state::common_metlhawk_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0xc00000, 0xc03fff).ram().share("spriteram");
-	map(0xc40000, 0xc4ffff).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_videoram_r), FUNC(namco_c169roz_device::c169_roz_videoram_w));//.share("rozvideoram");
+	map(0xc40000, 0xc4ffff).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_videoram_r), FUNC(namco_c169roz_device::c169_roz_videoram_w));
 	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_control_r), FUNC(namco_c169roz_device::c169_roz_control_w));
 	map(0xe00000, 0xe00001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w)); /* ??? */
 }
@@ -728,7 +728,7 @@ void namcos2_state::common_luckywld_am(address_map &map)
 	map(0x840000, 0x840001).nopr();
 	map(0x900000, 0x900007).rw(FUNC(namcos2_state::c355_obj_position_r), FUNC(namcos2_state::c355_obj_position_w));
 	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
-	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_videoram_r), FUNC(namco_c169roz_device::c169_roz_videoram_w));//.share("rozvideoram");
+	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_videoram_r), FUNC(namco_c169roz_device::c169_roz_videoram_w));
 	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::c169_roz_control_r), FUNC(namco_c169roz_device::c169_roz_control_w));
 	map(0xf00000, 0xf00007).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
