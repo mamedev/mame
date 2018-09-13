@@ -1,15 +1,45 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Stroffolino
+// copyright-holders:David Haywood, Phil Stroffolino
+
+/*
+	Namco System 2 Sprites - found on Namco System 2 video board (standard type)
+	
+	based on namcoic.txt this probably consists of the following
+	C106 - Generates memory output clocks to generate X-Axis Zoom for Line Buffer Writes
+	C134 - Object Memory Address Generator. Sequences the sprite memory contents to the hardware.
+	C135 - Checks is object is displayed on Current output line.
+	C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
+
+	Metal Hawk requires a different draw function, so might use a different chip unless the hookup is just scrambled (needs checking)
+
+	used by the following drivers
+	namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp)
+
+
+*/
+
 #include "emu.h"
-#include "machine/namcoic.h"
+#include "namcos2_sprite.h"
 
-#include "includes/namcos2.h" /* for game-specific hacks */
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Namco Sysem 2 Sprites (C106,C134,C135,C146)")
 
+namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, finder_base::DUMMY_TAG),
+	m_spriteram(*this, finder_base::DUMMY_TAG)
+{
+}
 
+void namcos2_sprite_device::device_start()
+{
+}
 
 /**************************************************************************************/
 
-void namcos2_shared_state::zdrawgfxzoom(
+/**************************************************************************************/
+
+void namcos2_sprite_device::zdrawgfxzoom(
 		screen_device &screen,
 		bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
@@ -154,7 +184,7 @@ void namcos2_shared_state::zdrawgfxzoom(
 	}
 } /* zdrawgfxzoom */
 
-void namcos2_shared_state::zdrawgfxzoom(
+void namcos2_sprite_device::zdrawgfxzoom(
 		screen_device &screen,
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
@@ -163,7 +193,7 @@ void namcos2_shared_state::zdrawgfxzoom(
 	/* nop */
 }
 
-void namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
+void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
 {
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
@@ -243,7 +273,7 @@ void namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 } /* namcos2_draw_sprites */
 
-void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void namcos2_sprite_device::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	/**
 	 * word#0

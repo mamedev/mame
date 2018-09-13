@@ -451,7 +451,6 @@ $a00000 checks have been seen on the Final Lap boards.
 
 #include "emu.h"
 #include "includes/namcos2.h"
-#include "machine/namcoic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
@@ -1722,6 +1721,11 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_gfxdecode_tag("gfxdecode");
 
+	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
+	m_ns2sprite->set_palette_tag("palette");
+	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	m_ns2sprite->set_spriteram_tag("spriteram");
+
 	configure_c116_standard(config);
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
@@ -1814,6 +1818,11 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_gfxdecode_tag("gfxdecode");
 
+	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
+	m_ns2sprite->set_palette_tag("palette");
+	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	m_ns2sprite->set_spriteram_tag("spriteram");
+
 	configure_c116_standard(config);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -1864,6 +1873,11 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+
+	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
+	m_ns2sprite->set_palette_tag("palette");
+	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	m_ns2sprite->set_spriteram_tag("spriteram");
 
 	configure_c116_standard(config);
 
@@ -2130,6 +2144,11 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+
+	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
+	m_ns2sprite->set_palette_tag("palette");
+	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	m_ns2sprite->set_spriteram_tag("spriteram");
 
 	configure_c116_standard(config);
 
@@ -5785,4 +5804,4 @@ GAME(  1992, sws92g,     sws92,    base_c68, base,     namcos2_state, init_sws92
 GAME(  1993, suzuk8h2,   0,        luckywld, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME(  1993, suzuk8h2j,  suzuk8h2, luckywld, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 
-GAME(  1993, sws93,      0,        base_c68, base,     namcos2_state, init_sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 )
+GAME(  1993, sws93,      0,        base_c68, base,     namcos2_state, init_sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 ) // this appears to have a subtitle, what is it?

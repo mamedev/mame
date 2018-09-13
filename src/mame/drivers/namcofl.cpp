@@ -159,7 +159,6 @@ OSC3: 48.384MHz
 
 #include "emu.h"
 #include "includes/namcofl.h"
-#include "machine/namcoic.h"
 
 #include "cpu/i960/i960.h"
 #include "sound/c352.h"

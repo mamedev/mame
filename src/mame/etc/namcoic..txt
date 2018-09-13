@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-/* namcoic.h
+
+System 21 here presumably refers to the Winning Run PCB, not the later games?
 
 Custom Chips:                       Final Lap   Assault     LuckyWld    System21    NA1/2       NB1/2
     C45     Land Generator            *                       *
-    C65     I/O Controller            *           *
-    C68                                                       *           *
+    C65     I/O Controller (older)    *           *
+    C67     TMS320C25 (DSP int rom)
+	C68     I/O Controller (newer)                            *           *
     C70                                                                               *
     C95                               *           *
     C102    ROZ:Memory Access Control             *
@@ -86,17 +88,3 @@ C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
 ROZ
 ---
 C102 - Controls CPU access to ROZ Memory Area.
-*/
-
-/***********************************************************************************/
-
-#ifndef MAME_MACHINE_NAMCOIC_H
-#define MAME_MACHINE_NAMCOIC_H
-
-#pragma once
-
-
-
-/***********************************************************************************/
-
-#endif // MAME_MACHINE_NAMCOIC_H

@@ -8,7 +8,7 @@
 	namconb1.cpp (all games)
 	gal3.cpp (all games)
 	namcos21.cpp (Driver's Eyes, Solvalou, Starblade, Air Combat, Cyber Sled) (everything except Winning Run series)
-	namcos2.cpp (Steel Gunner, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2)
+	namcos2.cpp (Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2)
 
 */
 

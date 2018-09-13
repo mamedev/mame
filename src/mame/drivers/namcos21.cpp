@@ -520,7 +520,6 @@ Filter Board
 */
 #include "emu.h"
 #include "includes/namcos21.h"
-#include "machine/namcoic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"

@@ -5,9 +5,6 @@
 #include "emu.h"
 #include "includes/namconb1.h"
 
-#include "machine/namcoic.h"
-
-
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */

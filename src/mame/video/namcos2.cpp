@@ -29,27 +29,27 @@ void namcos2_state::TilemapCB_finalap2(uint16_t code, int *tile, int *mask)
  * ---- ---- xxxx ---- always zero?
  * ---- ---- ---- xxxx sprite bank
  */
-READ16_MEMBER( namcos2_state::gfx_ctrl_r )
+READ16_MEMBER(namcos2_state::gfx_ctrl_r)
 {
 	return m_gfx_ctrl;
 }
 
-WRITE16_MEMBER( namcos2_state::gfx_ctrl_w )
+WRITE16_MEMBER(namcos2_state::gfx_ctrl_w)
 {
 	COMBINE_DATA(&m_gfx_ctrl);
 }
 
-TILE_GET_INFO_MEMBER( namcos2_state::roz_tile_info )
+TILE_GET_INFO_MEMBER(namcos2_state::roz_tile_info)
 {
 	int tile = m_rozram[tile_index];
-	SET_TILE_INFO_MEMBER(3,tile,0/*color*/,0);
+	SET_TILE_INFO_MEMBER(3, tile, 0/*color*/, 0);
 }
 
 struct roz_param
 {
 	uint32_t size;
-	uint32_t startx,starty;
-	int incxx,incxy,incyx,incyy;
+	uint32_t startx, starty;
+	int incxx, incxy, incyx, incyy;
 	int color;
 	int wrap;
 };
@@ -110,37 +110,37 @@ draw_roz_helper(
 	bitmap_ind16 &bitmap,
 	tilemap_t *tmap,
 	const rectangle &clip,
-	const struct roz_param *rozInfo )
+	const struct roz_param *rozInfo)
 {
-	tmap->set_palette_offset(rozInfo->color );
+	tmap->set_palette_offset(rozInfo->color);
 
-	if( bitmap.bpp() == 16 )
+	if (bitmap.bpp() == 16)
 	{
 		/* On many processors, the simple approach of an outer loop over the
-		    rows of the destination bitmap with an inner loop over the columns
-		    of the destination bitmap has poor performance due to the order
-		    that memory in the source bitmap is referenced when rotation
-		    approaches 90 or 270 degrees.  The reason is that the inner loop
-		    ends up reading pixels not sequentially in the source bitmap, but
-		    instead at rozInfo->incxx increments, which is at its maximum at 90
-		    degrees of rotation.  This means that only a few (or as few as
-		    one) source pixels are in each cache line at a time.
+			rows of the destination bitmap with an inner loop over the columns
+			of the destination bitmap has poor performance due to the order
+			that memory in the source bitmap is referenced when rotation
+			approaches 90 or 270 degrees.  The reason is that the inner loop
+			ends up reading pixels not sequentially in the source bitmap, but
+			instead at rozInfo->incxx increments, which is at its maximum at 90
+			degrees of rotation.  This means that only a few (or as few as
+			one) source pixels are in each cache line at a time.
 
-		    Instead of the above, this code iterates in NxN blocks through the
-		    destination bitmap.  This has more overhead when there is little or
-		    no rotation, but much better performance when there is closer to 90
-		    degrees of rotation (as long as the chunk of the source bitmap that
-		    corresponds to an NxN destination block fits in cache!).
+			Instead of the above, this code iterates in NxN blocks through the
+			destination bitmap.  This has more overhead when there is little or
+			no rotation, but much better performance when there is closer to 90
+			degrees of rotation (as long as the chunk of the source bitmap that
+			corresponds to an NxN destination block fits in cache!).
 
-		    N is defined by ROZ_BLOCK_SIZE below; the best N is one that is as
-		    big as possible but at the same time not too big to prevent all of
-		    the source bitmap pixels from fitting into cache at the same time.
-		    Keep in mind that the block of source pixels used can be somewhat
-		    scattered in memory.  8x8 works well on the few processors that
-		    were tested; 16x16 seems to work even better for more modern
-		    processors with larger caches, but since 8x8 works well enough and
-		    is less likely to result in cache misses on processors with smaller
-		    caches, it is used.
+			N is defined by ROZ_BLOCK_SIZE below; the best N is one that is as
+			big as possible but at the same time not too big to prevent all of
+			the source bitmap pixels from fitting into cache at the same time.
+			Keep in mind that the block of source pixels used can be somewhat
+			scattered in memory.  8x8 works well on the few processors that
+			were tested; 16x16 seems to work even better for more modern
+			processors with larger caches, but since 8x8 works well enough and
+			is less likely to result in cache misses on processors with smaller
+			caches, it is used.
 		*/
 
 #define ROZ_BLOCK_SIZE 8
@@ -168,7 +168,7 @@ draw_roz_helper(
 		int row_block_size_incyx = ROZ_BLOCK_SIZE * rozInfo->incyx;
 		int row_block_size_incyy = ROZ_BLOCK_SIZE * rozInfo->incyy;
 
-		int i,j;
+		int i, j;
 
 		// Do the block rows
 		for (i = 0; i < row_block_count; i++)
@@ -224,27 +224,27 @@ draw_roz_helper(
 			rozInfo->startx, rozInfo->starty,
 			rozInfo->incxx, rozInfo->incxy,
 			rozInfo->incyx, rozInfo->incyy,
-			rozInfo->wrap,0,0); // wrap, flags, pri
+			rozInfo->wrap, 0, 0); // wrap, flags, pri
 	}
 }
 
 void namcos2_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const int xoffset = 38,yoffset = 0;
+	const int xoffset = 38, yoffset = 0;
 	struct roz_param rozParam;
 
 	rozParam.color = (m_gfx_ctrl & 0x0f00);
-	rozParam.incxx  = (int16_t)m_roz_ctrl[0];
-	rozParam.incxy  = (int16_t)m_roz_ctrl[1];
-	rozParam.incyx  = (int16_t)m_roz_ctrl[2];
-	rozParam.incyy  = (int16_t)m_roz_ctrl[3];
+	rozParam.incxx = (int16_t)m_roz_ctrl[0];
+	rozParam.incxy = (int16_t)m_roz_ctrl[1];
+	rozParam.incyx = (int16_t)m_roz_ctrl[2];
+	rozParam.incyy = (int16_t)m_roz_ctrl[3];
 	rozParam.startx = (int16_t)m_roz_ctrl[4];
 	rozParam.starty = (int16_t)m_roz_ctrl[5];
 	rozParam.size = 2048;
 	rozParam.wrap = 1;
 
 
-	switch( m_roz_ctrl[7] )
+	switch (m_roz_ctrl[7])
 	{
 	case 0x4400: /* (2048x2048) */
 		break;
@@ -268,17 +268,17 @@ void namcos2_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const 
 	rozParam.startx += xoffset * rozParam.incxx + yoffset * rozParam.incyx;
 	rozParam.starty += xoffset * rozParam.incxy + yoffset * rozParam.incyy;
 
-	rozParam.startx<<=8;
-	rozParam.starty<<=8;
-	rozParam.incxx<<=8;
-	rozParam.incxy<<=8;
-	rozParam.incyx<<=8;
-	rozParam.incyy<<=8;
+	rozParam.startx <<= 8;
+	rozParam.starty <<= 8;
+	rozParam.incxx <<= 8;
+	rozParam.incxy <<= 8;
+	rozParam.incyx <<= 8;
+	rozParam.incyy <<= 8;
 
-	draw_roz_helper( screen, bitmap, m_tilemap_roz, cliprect, &rozParam );
+	draw_roz_helper(screen, bitmap, m_tilemap_roz, cliprect, &rozParam);
 }
 
-WRITE16_MEMBER( namcos2_state::rozram_word_w )
+WRITE16_MEMBER(namcos2_state::rozram_word_w)
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_tilemap_roz->mark_tile_dirty(offset);
@@ -290,9 +290,9 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 
 /**************************************************************************/
 
-READ8_MEMBER( namcos2_state::c116_r )
+READ8_MEMBER(namcos2_state::c116_r)
 {
-	if( (offset&0x1800) == 0x1800 )
+	if ((offset & 0x1800) == 0x1800)
 	{
 		/* palette register */
 		offset &= 0x180f;
@@ -300,17 +300,17 @@ READ8_MEMBER( namcos2_state::c116_r )
 		/* registers 6,7: unmapped? */
 		if (offset > 0x180b) return 0xff; // fix for finallap boot
 	}
-	return m_c116->read(space,offset,mem_mask);
+	return m_c116->read(space, offset, mem_mask);
 }
 
 /**************************************************************************/
 
-void namcos2_state::draw_sprite_init()
+void namcos2_state::create_shadow_table()
 {
 	/* set table for sprite color == 0x0f */
-	for( int i = 0; i<16*256; i++ )
+	for (int i = 0; i < 16 * 256; i++)
 	{
-		m_palette->shadow_table()[i] = i+0x2000;
+		m_palette->shadow_table()[i] = i + 0x2000;
 	}
 }
 
@@ -319,12 +319,12 @@ void namcos2_state::draw_sprite_init()
 void namcos2_state::video_start()
 {
 	m_c123tmap->c123_tilemap_init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
-	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
+	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
 	m_tilemap_roz->set_transparent_pen(0xff);
-	draw_sprite_init();
+	create_shadow_table();
 }
 
-void namcos2_state::apply_clip( rectangle &clip, const rectangle &cliprect )
+void namcos2_state::apply_clip(rectangle &clip, const rectangle &cliprect)
 {
 	clip.min_x = m_c116->get_reg(0) - 0x4a;
 	clip.max_x = m_c116->get_reg(1) - 0x4a - 1;
@@ -339,23 +339,23 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	rectangle clip;
 	int pri;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
-	apply_clip( clip, cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	apply_clip(clip, cliprect);
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
 	m_tilemap_roz->enable((m_gfx_ctrl & 0x7000) ? 1 : 0);
 
-	for( pri=0; pri<16; pri++ )
+	for (pri = 0; pri < 16; pri++)
 	{
-		if( (pri&1)==0 )
+		if ((pri & 1) == 0)
 		{
-			m_c123tmap->c123_tilemap_draw( screen, bitmap, clip, pri/2 );
+			m_c123tmap->c123_tilemap_draw(screen, bitmap, clip, pri / 2);
 
-			if( ((m_gfx_ctrl & 0x7000) >> 12)==pri/2 )
+			if (((m_gfx_ctrl & 0x7000) >> 12) == pri / 2)
 			{
-				draw_roz(screen, bitmap,clip);
+				draw_roz(screen, bitmap, clip);
 			}
-			draw_sprites(screen, bitmap, clip, pri/2, m_gfx_ctrl );
+			m_ns2sprite->draw_sprites(screen, bitmap, clip, pri / 2, m_gfx_ctrl);
 		}
 	}
 	return 0;
@@ -365,14 +365,14 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void namcos2_state::video_start_finallap()
 {
-	m_c123tmap->c123_tilemap_init(2,memregion("gfx4")->base(),namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
-	draw_sprite_init();
+	m_c123tmap->c123_tilemap_init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	create_shadow_table();
 }
 
 void namcos2_state::video_start_finalap2()
 {
-	m_c123tmap->c123_tilemap_init(2,memregion("gfx4")->base(),namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
-	draw_sprite_init();
+	m_c123tmap->c123_tilemap_init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+	create_shadow_table();
 }
 
 uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -380,17 +380,17 @@ uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
-	apply_clip( clip, cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	apply_clip(clip, cliprect);
 
-	for( pri=0; pri<16; pri++ )
+	for (pri = 0; pri < 16; pri++)
 	{
-		if( (pri&1)==0 )
+		if ((pri & 1) == 0)
 		{
-			m_c123tmap->c123_tilemap_draw( screen, bitmap, clip, pri/2 );
+			m_c123tmap->c123_tilemap_draw(screen, bitmap, clip, pri / 2);
 		}
-		m_c45_road->draw(bitmap,clip,pri);
-		draw_sprites(screen,bitmap,clip,pri,m_gfx_ctrl );
+		m_c45_road->draw(bitmap, clip, pri);
+		m_ns2sprite->draw_sprites(screen, bitmap, clip, pri, m_gfx_ctrl);
 	}
 	return 0;
 }
@@ -404,10 +404,10 @@ void namcos2_state::RozCB_luckywld(uint16_t code, int *tile, int *mask, int whic
 	uint16_t mangle = bitswap<11>(code & 0x31ff, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 	switch ((code >> 9) & 7)
 	{
-		case 0x00: mangle += 0x1c00; break; // Plus, NOT OR
-		case 0x01: mangle |= 0x0800; break;
-		case 0x02: mangle |= 0x0000; break;
-		default: break;
+	case 0x00: mangle += 0x1c00; break; // Plus, NOT OR
+	case 0x01: mangle |= 0x0800; break;
+	case 0x02: mangle |= 0x0000; break;
+	default: break;
 	}
 
 	*tile = mangle;
@@ -415,9 +415,9 @@ void namcos2_state::RozCB_luckywld(uint16_t code, int *tile, int *mask, int whic
 
 void namcos2_state::video_start_luckywld()
 {
-	m_c123tmap->c123_tilemap_init(2,memregion("gfx4")->base(),namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
-	m_c355spr->c355_obj_init( 0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate() );
-	if( m_gametype==NAMCOS2_LUCKY_AND_WILD ) // suzuka8h is using the same machine config, is it the same PCB just without the ROZ populated, or should it be split?
+	m_c123tmap->c123_tilemap_init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	m_c355spr->c355_obj_init(0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate());
+	if (m_gametype == NAMCOS2_LUCKY_AND_WILD) // suzuka8h is using the same machine config, is it the same PCB just without the ROZ populated, or should it be split?
 	{
 		m_c169roz->init(1, "^gfx5", namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
 	}
@@ -428,21 +428,21 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
-	apply_clip( clip, cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	apply_clip(clip, cliprect);
 
-	for( pri=0; pri<16; pri++ )
+	for (pri = 0; pri < 16; pri++)
 	{
-		if( (pri&1)==0 )
+		if ((pri & 1) == 0)
 		{
-			m_c123tmap->c123_tilemap_draw( screen, bitmap, clip, pri/2 );
+			m_c123tmap->c123_tilemap_draw(screen, bitmap, clip, pri / 2);
 		}
-		m_c45_road->draw(bitmap,clip,pri);
-		if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
+		m_c45_road->draw(bitmap, clip, pri);
+		if (m_gametype == NAMCOS2_LUCKY_AND_WILD)
 		{
 			m_c169roz->draw(screen, bitmap, clip, pri);
 		}
-		m_c355spr->c355_obj_draw(screen, bitmap, clip, pri );
+		m_c355spr->c355_obj_draw(screen, bitmap, clip, pri);
 	}
 	return 0;
 }
@@ -451,8 +451,8 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 
 void namcos2_state::video_start_sgunner()
 {
-	m_c123tmap->c123_tilemap_init(2,memregion("gfx4")->base(),namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
-	m_c355spr->c355_obj_init( 0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate() );
+	m_c123tmap->c123_tilemap_init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	m_c355spr->c355_obj_init(0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate());
 }
 
 uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -460,13 +460,13 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 	rectangle clip;
 	int pri;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
-	apply_clip( clip, cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	apply_clip(clip, cliprect);
 
-	for( pri=0; pri<8; pri++ )
+	for (pri = 0; pri < 8; pri++)
 	{
-		m_c123tmap->c123_tilemap_draw( screen, bitmap, clip, pri );
-		m_c355spr->c355_obj_draw(screen, bitmap, clip, pri );
+		m_c123tmap->c123_tilemap_draw(screen, bitmap, clip, pri);
+		m_c355spr->c355_obj_draw(screen, bitmap, clip, pri);
 	}
 	return 0;
 }
@@ -482,7 +482,7 @@ void namcos2_state::RozCB_metlhawk(uint16_t code, int *tile, int *mask, int whic
 
 void namcos2_state::video_start_metlhawk()
 {
-	m_c123tmap->c123_tilemap_init(2,memregion("gfx4")->base(),namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	m_c123tmap->c123_tilemap_init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	m_c169roz->init(1, "^gfx5", namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
 }
 
@@ -491,17 +491,17 @@ uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
-	apply_clip( clip, cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	apply_clip(clip, cliprect);
 
-	for( pri=0; pri<16; pri++ )
+	for (pri = 0; pri < 16; pri++)
 	{
-		if( (pri&1)==0 )
+		if ((pri & 1) == 0)
 		{
-			m_c123tmap->c123_tilemap_draw( screen, bitmap, clip, pri/2 );
+			m_c123tmap->c123_tilemap_draw(screen, bitmap, clip, pri / 2);
 		}
 		m_c169roz->draw(screen, bitmap, clip, pri);
-		draw_sprites_metalhawk(screen,bitmap,clip,pri );
+		m_ns2sprite->draw_sprites_metalhawk(screen, bitmap, clip, pri);
 	}
 	return 0;
 }

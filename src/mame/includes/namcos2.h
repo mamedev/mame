@@ -23,6 +23,7 @@
 #include "video/namco_c169roz.h"
 #include "video/namco_c355spr.h"
 #include "video/namco_c123tmap.h"
+#include "video/namcos2_sprite.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -166,9 +167,6 @@ protected:
 	DECLARE_MACHINE_START(namcos2);
 	DECLARE_MACHINE_RESET(namcos2);
 
-	// general
-	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 
 	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
 	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
@@ -197,7 +195,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_rozram(*this, "rozram"),
 		m_roz_ctrl(*this, "rozctrl"),
-		m_c45_road(*this, "c45_road")
+		m_c45_road(*this, "c45_road"),
+		m_ns2sprite(*this, "s2sprite")
 	{ }
 
 	void configure_c116_standard(machine_config &config);
@@ -281,11 +280,9 @@ private:
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
 
-	void draw_sprite_init();
+	void create_shadow_table();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
-	void draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 
 	int get_pos_irq_scanline() { return (m_c116->get_reg(5) - 32) & 0xff; }
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
@@ -301,6 +298,7 @@ private:
 	int m_sendval;
 
 	optional_device<namco_c45_road_device> m_c45_road;
+	optional_device<namcos2_sprite_device> m_ns2sprite; 
 
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
