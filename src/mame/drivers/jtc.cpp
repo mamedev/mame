@@ -605,7 +605,7 @@ uint32_t jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 			for (x = 0; x < 8; x++)
 			{
-				int color = BIT(data, x);
+				int color = BIT(data, 7-x);
 				bitmap.pix16(y, (sx * 8) + x) = color;
 			}
 		}
