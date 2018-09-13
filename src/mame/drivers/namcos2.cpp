@@ -1699,8 +1699,8 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold,  120)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* CPU slices per frame */
 
@@ -1798,8 +1798,8 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold,  120)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
 
 	configure_c65_standard(config);
 
@@ -1862,8 +1862,8 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold,  120)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
@@ -1944,8 +1944,8 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold,  120)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
 
 	configure_c65_standard(config);
 
@@ -2002,8 +2002,8 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold,  2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold,  120)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold,  2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold,  120)
 
 	configure_c68_standard(config);
 
@@ -2060,8 +2060,8 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold, 120)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold, 120)
 
 	configure_c68_standard(config);
 
@@ -2126,8 +2126,8 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold, 120)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos2_state, irq1_line_hold, 120)
 
 	configure_c65_standard(config);
 

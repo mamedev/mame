@@ -69,42 +69,40 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 /* Perform basic machine initialisation                      */
 /*************************************************************/
 
-#define m_eeprom_size 0x2000
 
-WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
+// S2 copy
+
+MACHINE_START_MEMBER(namcos2_state,namcos2)
 {
-	if (data & 0x01)
-	{
-		/* Resume execution */
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_maincpu->yield();
-	}
-	else
-	{
-		/* Suspend execution */
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
+	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
 
-	if (namcos2_kickstart != nullptr)
+	if (m_audiobank)
 	{
-		//printf( "dspkick=0x%x\n", data );
-		if (data & 0x04)
-		{
-			(*namcos2_kickstart)(machine(), 1);
-		}
+		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+		for (int i = 0; i < 0x10; i++)
+			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
+
+		m_audiobank->set_entry(0);
 	}
 }
 
-// TODO:
-WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
+MACHINE_RESET_MEMBER(namcos2_state, namcos2)
 {
-	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
+	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
 
-	if (data & 0x01)
-		m_maincpu->yield();
+	/* Initialise the bank select in the sound CPU */
+	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
+
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+
+	/* Place CPU2 & CPU3 into the reset condition */
+	reset_all_subcpus(ASSERT_LINE);
 }
 
-void namcos2_shared_state::reset_all_subcpus(int state)
+
+void namcos2_state::reset_all_subcpus(int state)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state);
 	if (m_c68)
@@ -119,64 +117,41 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 	{
 		logerror("no MCU to reset?\n");
 	}
+}
 
-	switch( m_gametype )
+WRITE8_MEMBER(namcos2_state::sound_reset_w)
+{
+	if (data & 0x01)
 	{
-	case NAMCOS21_SOLVALOU:
-	case NAMCOS21_STARBLADE:
-	case NAMCOS21_AIRCOMBAT:
-	case NAMCOS21_CYBERSLED:
-		m_dspmaster->set_input_line(INPUT_LINE_RESET, state);
-		m_dspslave->set_input_line(INPUT_LINE_RESET, state);
-		break;
-
-//  case NAMCOS21_WINRUN91:
-//  case NAMCOS21_DRIVERS_EYES:
-	default:
-		break;
+		/* Resume execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->yield();
+	}
+	else
+	{
+		/* Suspend execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
-MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
+WRITE8_MEMBER(namcos2_state::system_reset_w)
 {
-	namcos2_kickstart = nullptr;
-	m_eeprom = std::make_unique<uint8_t[]>(m_eeprom_size);
-	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
+	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
-	if (m_audiobank)
-	{
-		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
-		for (int i = 0; i < 0x10; i++)
-			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
-
-		m_audiobank->set_entry(0);
-	}
-}
-
-MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
-{
-//  address_space &space = m_maincpu->space(AS_PROGRAM);
-	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
-
-	/* Initialise the bank select in the sound CPU */
-	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
-
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
-
-	/* Place CPU2 & CPU3 into the reset condition */
-	reset_all_subcpus(ASSERT_LINE);
+	if (data & 0x01)
+		m_maincpu->yield();
 }
 
 /*************************************************************/
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_w )
+WRITE8_MEMBER( namcos2_state::namcos2_68k_eeprom_w )
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_r )
+READ8_MEMBER( namcos2_state::namcos2_68k_eeprom_r )
 {
 	return m_eeprom[offset];
 }
@@ -418,28 +393,12 @@ WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
 #define LINE_LENGTH     (FRAME_TIME/NO_OF_LINES)
 
 
-bool namcos2_shared_state::is_system21()
-{
-	switch (m_gametype)
-	{
-		case NAMCOS21_AIRCOMBAT:
-		case NAMCOS21_STARBLADE:
-		case NAMCOS21_CYBERSLED:
-		case NAMCOS21_SOLVALOU:
-		case NAMCOS21_WINRUN91:
-		case NAMCOS21_DRIVERS_EYES:
-			return 1;
-		default:
-			return 0;
-	}
-}
-
 
 /**************************************************************/
 /*  Sound sub-system                                          */
 /**************************************************************/
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
+WRITE8_MEMBER( namcos2_state::namcos2_sound_bankselect_w )
 {
 	m_audiobank->set_entry(data>>4);
 }

@@ -1874,6 +1874,139 @@ static GFXDECODE_START( gfx_namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
+
+WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
+{
+	m_audiobank->set_entry(data>>4);
+}
+
+WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
+{
+	if (data & 0x01)
+	{
+		/* Resume execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->yield();
+	}
+	else
+	{
+		/* Suspend execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+
+	if (namcos2_kickstart != nullptr)
+	{
+		//printf( "dspkick=0x%x\n", data );
+		if (data & 0x04)
+		{
+			(*namcos2_kickstart)(machine(), 1);
+		}
+	}
+}
+
+// TODO:
+WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
+{
+	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+
+	if (data & 0x01)
+		m_maincpu->yield();
+}
+
+void namcos2_shared_state::reset_all_subcpus(int state)
+{
+	m_slave->set_input_line(INPUT_LINE_RESET, state);
+	if (m_c68)
+	{
+		m_c68->ext_reset(state);
+	}
+	else if (m_c65)
+	{
+		m_c65->ext_reset(state);
+	}
+	else
+	{
+		logerror("no MCU to reset?\n");
+	}
+
+	switch( m_gametype )
+	{
+	case NAMCOS21_SOLVALOU:
+	case NAMCOS21_STARBLADE:
+	case NAMCOS21_AIRCOMBAT:
+	case NAMCOS21_CYBERSLED:
+		m_dspmaster->set_input_line(INPUT_LINE_RESET, state);
+		m_dspslave->set_input_line(INPUT_LINE_RESET, state);
+		break;
+
+//  case NAMCOS21_WINRUN91:
+//  case NAMCOS21_DRIVERS_EYES:
+	default:
+		break;
+	}
+}
+
+
+bool namcos2_shared_state::is_system21()
+{
+	switch (m_gametype)
+	{
+		case NAMCOS21_AIRCOMBAT:
+		case NAMCOS21_STARBLADE:
+		case NAMCOS21_CYBERSLED:
+		case NAMCOS21_SOLVALOU:
+		case NAMCOS21_WINRUN91:
+		case NAMCOS21_DRIVERS_EYES:
+			return 1;
+		default:
+			return 0;
+	}
+}
+
+
+WRITE8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_w )
+{
+	m_eeprom[offset] = data;
+}
+
+READ8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_r )
+{
+	return m_eeprom[offset];
+}
+
+
+MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
+{
+	namcos2_kickstart = nullptr;
+	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
+
+	if (m_audiobank)
+	{
+		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+		for (int i = 0; i < 0x10; i++)
+			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
+
+		m_audiobank->set_entry(0);
+	}
+}
+
+MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
+{
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
+	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
+
+	/* Initialise the bank select in the sound CPU */
+	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
+
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+
+	/* Place CPU2 & CPU3 into the reset condition */
+	reset_all_subcpus(ASSERT_LINE);
+}
+
+
+
 MACHINE_START_MEMBER(namcos21_state,namcos21)
 {
 	MACHINE_START_CALL_MEMBER( namcos2 );
