@@ -9,7 +9,7 @@
 --
 ---------------------------------------------------------------------------
 
-files {
+addfiles {
 	MAME_DIR .. "src/devices/video/poly.h",
 	MAME_DIR .. "src/devices/video/sprite.cpp",
 	MAME_DIR .. "src/devices/video/sprite.h",
@@ -23,7 +23,7 @@ files {
 --------------------------------------------------
 
 if (VIDEOS["SEGA315_5124"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/315_5124.cpp",
 		MAME_DIR .. "src/devices/video/315_5124.h",
 	}
@@ -35,7 +35,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["SEGA315_5313"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/315_5313.cpp",
 		MAME_DIR .. "src/devices/video/315_5313.h",
 	}
@@ -47,7 +47,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["BUFSPRITE"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/bufsprite.cpp",
 		MAME_DIR .. "src/devices/video/bufsprite.h",
 	}
@@ -59,7 +59,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["CDP1861"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/cdp1861.cpp",
 		MAME_DIR .. "src/devices/video/cdp1861.h",
 	}
@@ -71,7 +71,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["CDP1862"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/cdp1862.cpp",
 		MAME_DIR .. "src/devices/video/cdp1862.h",
 	}
@@ -83,7 +83,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["CESBLIT"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/cesblit.cpp",
 		MAME_DIR .. "src/devices/video/cesblit.h",
 	}
@@ -95,7 +95,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["CRT9007"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/crt9007.cpp",
 		MAME_DIR .. "src/devices/video/crt9007.h",
 	}
@@ -107,7 +107,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["CRT9021"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/crt9021.cpp",
 		MAME_DIR .. "src/devices/video/crt9021.h",
 	}
@@ -119,7 +119,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["CRT9212"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/crt9212.cpp",
 		MAME_DIR .. "src/devices/video/crt9212.h",
 	}
@@ -131,7 +131,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["DL1416"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/dl1416.cpp",
 		MAME_DIR .. "src/devices/video/dl1416.h",
 	}
@@ -143,7 +143,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["DM9368"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/dm9368.cpp",
 		MAME_DIR .. "src/devices/video/dm9368.h",
 	}
@@ -155,7 +155,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["EF9340_1"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ef9340_1.cpp",
 		MAME_DIR .. "src/devices/video/ef9340_1.h",
 	}
@@ -167,7 +167,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["EF9345"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ef9345.cpp",
 		MAME_DIR .. "src/devices/video/ef9345.h",
 	}
@@ -179,7 +179,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["EF9364"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ef9364.cpp",
 		MAME_DIR .. "src/devices/video/ef9364.h",
 	}
@@ -191,7 +191,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["EF9365"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ef9365.cpp",
 		MAME_DIR .. "src/devices/video/ef9365.h",
 	}
@@ -202,7 +202,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["EPIC12"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/epic12.cpp",
 		MAME_DIR .. "src/devices/video/epic12.h",
 		MAME_DIR .. "src/devices/video/epic12_blit0.cpp",
@@ -225,7 +225,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["FIXFREQ"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/fixfreq.cpp",
 		MAME_DIR .. "src/devices/video/fixfreq.h",
 	}
@@ -237,7 +237,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["GF4500"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/gf4500.cpp",
 		MAME_DIR .. "src/devices/video/gf4500.h",
 	}
@@ -249,7 +249,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["GF7600GS"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/gf7600gs.cpp",
 		MAME_DIR .. "src/devices/video/gf7600gs.h",
 	}
@@ -261,7 +261,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MGA2064W"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/mga2064w.cpp",
 		MAME_DIR .. "src/devices/video/mga2064w.h",
 	}
@@ -273,7 +273,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["NT7534"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/nt7534.cpp",
 		MAME_DIR .. "src/devices/video/nt7534.h",
 	}
@@ -285,7 +285,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HD44102"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hd44102.cpp",
 		MAME_DIR .. "src/devices/video/hd44102.h",
 	}
@@ -297,7 +297,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HD44352"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hd44352.cpp",
 		MAME_DIR .. "src/devices/video/hd44352.h",
 	}
@@ -309,7 +309,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HD44780"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hd44780.cpp",
 		MAME_DIR .. "src/devices/video/hd44780.h",
 	}
@@ -321,7 +321,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HD61830"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hd61830.cpp",
 		MAME_DIR .. "src/devices/video/hd61830.h",
 	}
@@ -333,7 +333,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HD63484"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hd63484.cpp",
 		MAME_DIR .. "src/devices/video/hd63484.h",
 	}
@@ -345,7 +345,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HD66421"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hd66421.cpp",
 		MAME_DIR .. "src/devices/video/hd66421.h",
 	}
@@ -357,7 +357,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HLCD0515"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hlcd0515.cpp",
 		MAME_DIR .. "src/devices/video/hlcd0515.h",
 	}
@@ -369,7 +369,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HLCD0538"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hlcd0538.cpp",
 		MAME_DIR .. "src/devices/video/hlcd0538.h",
 	}
@@ -381,7 +381,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HP1LL3"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/hp1ll3.cpp",
 		MAME_DIR .. "src/devices/video/hp1ll3.h",
 	}
@@ -393,7 +393,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HUC6202"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/huc6202.cpp",
 		MAME_DIR .. "src/devices/video/huc6202.h",
 	}
@@ -405,7 +405,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HUC6260"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/huc6260.cpp",
 		MAME_DIR .. "src/devices/video/huc6260.h",
 	}
@@ -417,7 +417,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HUC6261"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/huc6261.cpp",
 		MAME_DIR .. "src/devices/video/huc6261.h",
 	}
@@ -429,7 +429,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HUC6270"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/huc6270.cpp",
 		MAME_DIR .. "src/devices/video/huc6270.h",
 	}
@@ -441,7 +441,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HUC6271"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/huc6271.cpp",
 		MAME_DIR .. "src/devices/video/huc6271.h",
 	}
@@ -453,7 +453,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["HUC6272"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/huc6272.cpp",
 		MAME_DIR .. "src/devices/video/huc6272.h",
 	}
@@ -465,7 +465,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["I8244"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/i8244.cpp",
 		MAME_DIR .. "src/devices/video/i8244.h",
 	}
@@ -477,7 +477,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["I82730"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/i82730.cpp",
 		MAME_DIR .. "src/devices/video/i82730.h",
 	}
@@ -489,7 +489,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["I8275"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/i8275.cpp",
 		MAME_DIR .. "src/devices/video/i8275.h",
 	}
@@ -501,7 +501,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["M50458"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/m50458.cpp",
 		MAME_DIR .. "src/devices/video/m50458.h",
 	}
@@ -513,7 +513,7 @@ end
 ---------------------------------------------------
 
 if (VIDEOS["MB88303"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/mb88303.cpp",
 		MAME_DIR .. "src/devices/video/mb88303.h",
 	}
@@ -525,7 +525,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MB90082"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/mb90082.cpp",
 		MAME_DIR .. "src/devices/video/mb90082.h",
 	}
@@ -537,7 +537,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MB_VCU"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/mb_vcu.cpp",
 		MAME_DIR .. "src/devices/video/mb_vcu.h",
 	}
@@ -549,7 +549,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MC6845"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/mc6845.cpp",
 		MAME_DIR .. "src/devices/video/mc6845.h",
 	}
@@ -561,7 +561,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MC6847"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/mc6847.cpp",
 		MAME_DIR .. "src/devices/video/mc6847.h",
 	}
@@ -573,7 +573,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MSM6222B"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/msm6222b.cpp",
 		MAME_DIR .. "src/devices/video/msm6222b.h",
 	}
@@ -585,7 +585,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MSM6255"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/msm6255.cpp",
 		MAME_DIR .. "src/devices/video/msm6255.h",
 	}
@@ -597,14 +597,14 @@ end
 --------------------------------------------------
 
 if (VIDEOS["MOS6566"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/mos6566.cpp",
 		MAME_DIR .. "src/devices/video/mos6566.h",
 	}
 end
 
 
-files {
+addfiles {
 	MAME_DIR .. "src/devices/video/cgapal.cpp",
 	MAME_DIR .. "src/devices/video/cgapal.h",
 }
@@ -615,7 +615,7 @@ files {
 --------------------------------------------------
 
 if (VIDEOS["PC_VGA"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/pc_vga.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga.h",
 		MAME_DIR .. "src/devices/bus/isa/trident.cpp",
@@ -631,7 +631,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["PCD8544"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/pcd8544.cpp",
 		MAME_DIR .. "src/devices/video/pcd8544.h",
 	}
@@ -643,7 +643,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["POLY"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/polylgcy.cpp",
 		MAME_DIR .. "src/devices/video/polylgcy.h",
 	}
@@ -655,7 +655,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["PSX"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/psx.cpp",
 		MAME_DIR .. "src/devices/video/psx.h",
 	}
@@ -667,7 +667,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["RAMDAC"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ramdac.cpp",
 		MAME_DIR .. "src/devices/video/ramdac.h",
 	}
@@ -679,7 +679,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["SAA5050"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/saa5050.cpp",
 		MAME_DIR .. "src/devices/video/saa5050.h",
 	}
@@ -690,7 +690,7 @@ end
 --@src/devices/video/sed1200.h,VIDEOS["SED1200"] = true
 --------------------------------------------------
 if (VIDEOS["SED1200"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/sed1200.cpp",
 		MAME_DIR .. "src/devices/video/sed1200.h",
 	}
@@ -701,7 +701,7 @@ end
 --@src/devices/video/sed1330.h,VIDEOS["SED1330"] = true
 --------------------------------------------------
 if (VIDEOS["SED1330"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/sed1330.cpp",
 		MAME_DIR .. "src/devices/video/sed1330.h",
 	}
@@ -712,7 +712,7 @@ end
 --@src/devices/video/sed1520.h,VIDEOS["SED1520"] = true
 --------------------------------------------------
 if (VIDEOS["SED1520"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/sed1520.cpp",
 		MAME_DIR .. "src/devices/video/sed1520.h",
 	}
@@ -723,7 +723,7 @@ end
 --@src/devices/video/scn2674.h,VIDEOS["SCN2674"] = true
 --------------------------------------------------
 if (VIDEOS["SCN2674"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/scn2674.cpp",
 		MAME_DIR .. "src/devices/video/scn2674.h",
 	}
@@ -734,7 +734,7 @@ end
 --@src/devices/video/sda5708.h,VIDEOS["SDA5708"] = true
 --------------------------------------------------
 if (VIDEOS["SDA5708"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/sda5708.cpp",
 		MAME_DIR .. "src/devices/video/sda5708.h",
 	}
@@ -745,7 +745,7 @@ end
 --@src/devices/video/snes_ppu.h,VIDEOS["SNES_PPU"] = true
 --------------------------------------------------
 if (VIDEOS["SNES_PPU"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/snes_ppu.cpp",
 		MAME_DIR .. "src/devices/video/snes_ppu.h",
 	}
@@ -758,7 +758,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["STVVDP"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/stvvdp1.cpp",
 		MAME_DIR .. "src/devices/video/stvvdp1.h",
 		MAME_DIR .. "src/devices/video/stvvdp2.cpp",
@@ -772,7 +772,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["T6A04"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/t6a04.cpp",
 		MAME_DIR .. "src/devices/video/t6a04.h",
 	}
@@ -784,7 +784,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["TEA1002"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/tea1002.cpp",
 		MAME_DIR .. "src/devices/video/tea1002.h",
 	}
@@ -796,7 +796,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["TLC34076"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/tlc34076.cpp",
 		MAME_DIR .. "src/devices/video/tlc34076.h",
 	}
@@ -808,7 +808,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["TMS34061"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/tms34061.cpp",
 		MAME_DIR .. "src/devices/video/tms34061.h",
 	}
@@ -820,7 +820,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["TMS3556"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/tms3556.cpp",
 		MAME_DIR .. "src/devices/video/tms3556.h",
 	}
@@ -832,7 +832,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["TMS9927"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/tms9927.cpp",
 		MAME_DIR .. "src/devices/video/tms9927.h",
 	}
@@ -844,7 +844,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["TMS9928A"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/tms9928a.cpp",
 		MAME_DIR .. "src/devices/video/tms9928a.h",
 	}
@@ -856,7 +856,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["UPD3301"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/upd3301.cpp",
 		MAME_DIR .. "src/devices/video/upd3301.h",
 	}
@@ -868,7 +868,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["UPD7220"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/upd7220.cpp",
 		MAME_DIR .. "src/devices/video/upd7220.h",
 	}
@@ -880,7 +880,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["UPD7227"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/upd7227.cpp",
 		MAME_DIR .. "src/devices/video/upd7227.h",
 	}
@@ -892,7 +892,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["VIC4567"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/vic4567.cpp",
 		MAME_DIR .. "src/devices/video/vic4567.h",
 	}
@@ -904,7 +904,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["V9938"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/v9938.cpp",
 		MAME_DIR .. "src/devices/video/v9938.h",
 	}
@@ -916,7 +916,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["ZEUS2"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/zeus2.cpp",
 		MAME_DIR .. "src/devices/video/zeus2.h",
 	}
@@ -928,7 +928,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["VOODOO"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/voodoo.cpp",
 		MAME_DIR .. "src/devices/video/voodoo.h",
 		MAME_DIR .. "src/devices/video/vooddefs.h",
@@ -941,7 +941,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["VOODOO_PCI"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/voodoo_pci.cpp",
 		MAME_DIR .. "src/devices/video/voodoo_pci.h",
 	}
@@ -953,7 +953,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["CRTC_EGA"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/crtc_ega.cpp",
 		MAME_DIR .. "src/devices/video/crtc_ega.h",
 	}
@@ -965,7 +965,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["JANGOU_BLITTER"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/jangou_blitter.cpp",
 		MAME_DIR .. "src/devices/video/jangou_blitter.h",
 	}
@@ -977,7 +977,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["GB_LCD"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/gb_lcd.cpp",
 		MAME_DIR .. "src/devices/video/gb_lcd.h",
 	}
@@ -989,7 +989,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["GBA_LCD"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/gba_lcd.cpp",
 		MAME_DIR .. "src/devices/video/gba_lcd.h",
 	}
@@ -1001,7 +1001,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["EF9369"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ef9369.cpp",
 		MAME_DIR .. "src/devices/video/ef9369.h",
 	}
@@ -1013,7 +1013,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["PPU2C0X"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ppu2c0x.cpp",
 		MAME_DIR .. "src/devices/video/ppu2c0x.h",
 		MAME_DIR .. "src/devices/video/ppu2c0x_vt.cpp",
@@ -1027,7 +1027,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["BT459"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/bt459.cpp",
 		MAME_DIR .. "src/devices/video/bt459.h",
 	}
@@ -1039,7 +1039,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["I4100"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/imagetek_i4100.cpp",
 		MAME_DIR .. "src/devices/video/imagetek_i4100.h",
 	}
@@ -1051,7 +1051,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["DP8510"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/dp8510.cpp",
 		MAME_DIR .. "src/devices/video/dp8510.h",
 	}
@@ -1063,7 +1063,7 @@ end
 --------------------------------------------------
 
 if (VIDEOS["BT45X"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/bt45x.cpp",
 		MAME_DIR .. "src/devices/video/bt45x.h",
 	}
@@ -1074,7 +1074,7 @@ end
 --@src/devices/video/topcat.h,VIDEOS["TOPCAT"] = true
 --------------------------------------------------
 if (VIDEOS["TOPCAT"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/topcat.cpp",
 		MAME_DIR .. "src/devices/video/topcat.h",
 	}
@@ -1085,7 +1085,7 @@ end
 --@src/devices/video/nereid.h,VIDEOS["NEREID"] = true
 --------------------------------------------------
 if (VIDEOS["NEREID"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/nereid.cpp",
 		MAME_DIR .. "src/devices/video/nereid.h",
 	}
@@ -1096,7 +1096,7 @@ end
 --@src/devices/video/ps2gif.h,VIDEOS["PS2GIF"] = true
 --------------------------------------------------
 if (VIDEOS["PS2GIF"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ps2gif.cpp",
 		MAME_DIR .. "src/devices/video/ps2gif.h",
 	}
@@ -1107,7 +1107,7 @@ end
 --@src/devices/video/ps2gs.h,VIDEOS["PS2GS"] = true
 --------------------------------------------------
 if (VIDEOS["PS2GS"]~=null) then
-	files {
+	addfiles {
 		MAME_DIR .. "src/devices/video/ps2gs.cpp",
 		MAME_DIR .. "src/devices/video/ps2gs.h",
 	}
