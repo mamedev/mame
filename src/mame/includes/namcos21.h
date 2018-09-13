@@ -279,6 +279,7 @@ private:
 	void winrun_flush_poly();
 	void init(int game_type);
 	void configure_c65_namcos21(machine_config &config);
+	void configure_c68_namcos21(machine_config &config);
 	void common_map(address_map &map);
 	void driveyes_common_map(address_map &map);
 	void driveyes_master_map(address_map &map);
