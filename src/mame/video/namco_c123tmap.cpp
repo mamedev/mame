@@ -21,39 +21,15 @@ DEFINE_DEVICE_TYPE(NAMCO_C123TMAP, namco_c123tmap_device, "namco_c123tmap", "Nam
 
 namco_c123tmap_device::namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C123TMAP, tag, owner, clock),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_maskregion(*this, finder_base::DUMMY_TAG)
 {
 }
 
 void namco_c123tmap_device::device_start()
 {
-}
+	m_tilemapinfo.maskBaseAddr = m_maskregion->base();
 
-/**************************************************************************************/
-
-void namco_c123tmap_device::mark_all_dirty(void)
-{
-	for (int i = 0; i < 6; i++)
-	{
-		m_tilemapinfo.tmap[i]->mark_all_dirty();
-	}
-} /* namco_tilemap_invalidate */
-
-template<int Offset>
-TILE_GET_INFO_MEMBER(namco_c123tmap_device::get_tile_info)
-{
-	const uint16_t *vram = &m_tilemapinfo.videoram[Offset];
-	int tile, mask;
-	m_tilemapinfo.cb(vram[tile_index], &tile, &mask);
-	tileinfo.mask_data = m_tilemapinfo.maskBaseAddr + mask * 8;
-	SET_TILE_INFO_MEMBER(m_tilemapinfo.gfxbank, tile, 0, 0);
-} /* get_tile_info */
-
-void namco_c123tmap_device::init(int gfxbank, void *maskBaseAddr, c123_tilemap_delegate tilemap_cb)
-{
-	m_tilemapinfo.gfxbank = gfxbank;
-	m_tilemapinfo.maskBaseAddr = (uint8_t *)maskBaseAddr;
-	m_tilemapinfo.cb = tilemap_cb;
 	m_tilemapinfo.videoram = std::make_unique<uint16_t[]>(0x10000);
 
 	/* four scrolling tilemaps */
@@ -75,9 +51,30 @@ void namco_c123tmap_device::init(int gfxbank, void *maskBaseAddr, c123_tilemap_d
 		m_tilemapinfo.tmap[i]->set_scrolldy(-24, 224 + 24);
 	}
 
+
 	save_item(NAME(m_tilemapinfo.control));
 	save_pointer(NAME(m_tilemapinfo.videoram), 0x10000);
 }
+
+/**************************************************************************************/
+
+void namco_c123tmap_device::mark_all_dirty(void)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		m_tilemapinfo.tmap[i]->mark_all_dirty();
+	}
+} /* namco_tilemap_invalidate */
+
+template<int Offset>
+TILE_GET_INFO_MEMBER(namco_c123tmap_device::get_tile_info)
+{
+	const uint16_t *vram = &m_tilemapinfo.videoram[Offset];
+	int tile, mask;
+	m_tilemapinfo.cb(vram[tile_index], &tile, &mask);
+	tileinfo.mask_data = m_tilemapinfo.maskBaseAddr + mask * 8;
+	SET_TILE_INFO_MEMBER(m_tilemapinfo.gfxbank, tile, 0, 0);
+} /* get_tile_info */
 
 void namco_c123tmap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {

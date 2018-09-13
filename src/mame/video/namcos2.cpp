@@ -69,7 +69,6 @@ void namcos2_state::create_shadow_table()
 
 void namcos2_state::video_start()
 {
-	m_c123tmap->init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	create_shadow_table();
 }
 
@@ -117,13 +116,11 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void namcos2_state::video_start_finallap()
 {
-	m_c123tmap->init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	create_shadow_table();
 }
 
 void namcos2_state::video_start_finalap2()
 {
-	m_c123tmap->init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
 	create_shadow_table();
 }
 
@@ -167,7 +164,6 @@ void namcos2_state::RozCB_luckywld(uint16_t code, int *tile, int *mask, int whic
 
 void namcos2_state::video_start_luckywld()
 {
-	m_c123tmap->init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	m_c355spr->init(0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate());
 	if (m_gametype == NAMCOS2_LUCKY_AND_WILD) // suzuka8h is using the same machine config, is it the same PCB just without the ROZ populated, or should it be split?
 	{
@@ -203,7 +199,6 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 
 void namcos2_state::video_start_sgunner()
 {
-	m_c123tmap->init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	m_c355spr->init(0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate());
 }
 
@@ -234,7 +229,6 @@ void namcos2_state::RozCB_metlhawk(uint16_t code, int *tile, int *mask, int whic
 
 void namcos2_state::video_start_metlhawk()
 {
-	m_c123tmap->init(2, memregion("gfx4")->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	m_c169roz->init(1, "^gfx5", namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
 }
 

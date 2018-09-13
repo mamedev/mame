@@ -96,7 +96,6 @@ int namcofl_state::FLobjcode2tile(int code)
 
 VIDEO_START_MEMBER(namcofl_state,namcofl)
 {
-	m_c123tmap->init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), namco_c123tmap_device::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
 	m_c355spr->init(NAMCOFL_SPRITEGFX,0x0,namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
 	m_c169roz->init(NAMCOFL_ROTGFX,"^" NAMCOFL_ROTMASKREGION,namco_c169roz_device::c169_tilemap_delegate(&namcofl_state::RozCB, this));
 }

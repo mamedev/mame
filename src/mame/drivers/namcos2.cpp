@@ -1689,6 +1689,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 	}
 }
 
+void namcos2_state::configure_c123tmap_standard(machine_config &config)
+{
+	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	m_c123tmap->set_maskregion_tag("gfx4");
+	m_c123tmap->set_gfxregion(2);
+}
+
 MACHINE_CONFIG_START(namcos2_state::base_noio)
 	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MCFG_DEVICE_PROGRAM_MAP(master_default_am)
@@ -1718,8 +1727,7 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
-	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	configure_c123tmap_standard(config);
 
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
 	m_ns2sprite->set_palette_tag("palette");
@@ -1821,8 +1829,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
-	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	configure_c123tmap_standard(config);
 
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
 	m_ns2sprite->set_palette_tag("palette");
@@ -1883,8 +1890,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_finallap)
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
-	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	configure_c123tmap_standard(config);
 
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
 	m_ns2sprite->set_palette_tag("palette");
@@ -1925,6 +1931,9 @@ MACHINE_CONFIG_END
 // finalap2 has different mangle
 MACHINE_CONFIG_START(namcos2_state::finalap2)
 	finallap(config);
+
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finalap2)
 MACHINE_CONFIG_END
 
@@ -1972,8 +1981,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
-	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	configure_c123tmap_standard(config);
 
 	configure_c116_standard(config);
 
@@ -2030,8 +2038,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
-	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	configure_c123tmap_standard(config);
 
 	configure_c116_standard(config);
 
@@ -2093,8 +2100,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x10000/2);
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
-	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	configure_c123tmap_standard(config);
 
 	configure_c116_standard(config);
 
@@ -2154,8 +2160,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x10000/2);
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
-	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	configure_c123tmap_standard(config);
 
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
 	m_ns2sprite->set_palette_tag("palette");

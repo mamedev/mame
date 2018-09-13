@@ -16,15 +16,17 @@ public:
 	namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_maskregion_tag(T &&tag) { m_maskregion.set_tag(std::forward<T>(tag)); }
+	void set_gfxregion(int region) { m_tilemapinfo.gfxbank = region; }
+
+	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
+	void set_tile_callback(c123_tilemap_delegate tilemap_cb) { m_tilemapinfo.cb = tilemap_cb; }
 
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_READ16_MEMBER(videoram_r);
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
 
-	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
-
-	void init(int gfxbank, void *pMaskROM, c123_tilemap_delegate tilemap_cb);
 	void mark_all_dirty(void);
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 
@@ -62,6 +64,7 @@ private:
 	info m_tilemapinfo;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_memory_region m_maskregion;
 };
 
 // device type definition

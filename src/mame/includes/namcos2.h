@@ -68,6 +68,7 @@ public:
 	void configure_c148_standard(machine_config &config);
 	void configure_c65_standard(machine_config &config);
 	void configure_c68_standard(machine_config &config);
+	void configure_c123tmap_standard(machine_config &config);
 	void metlhawk(machine_config &config);
 	void gollygho(machine_config &config);
 	void assaultp(machine_config &config);
