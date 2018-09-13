@@ -3132,35 +3132,59 @@ void funcube_state::init_funcube3()
 Guardians
 Banpresto, 1995
 
-This hardware is not common Banpresto hardware. Possibly licensed
-to them from another manufacturer? Or an early design that they decided
-not to use for future games? Either way, this game is _extremely_ rare :-)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x2, @ U28 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz
+ Other: 8 Position Dipswitch x 2
+        GAL 16V8 at U38
 
-PCB Layout
-----------
+Memory:
+M1 are HM628128LFP-10L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9
+M4 are CXK58257AM-10L at U6, U7, U13 & U14
 
-P-FG01-1
-------------------------------------------------------
-|        X1-010 6264          U32 CXK581000          |
-|                                 CXK581000      U16 |
-|                                                    |
-|                                                U20 |
-|    U3 U5 U2 U4 62256 CXK58257                      |
-|                62256 CXK58257                  U15 |
-|                                                    |
-|J                                               U19 |
-|A    TMP68301AF-16                                  |
-|M                                               U18 |
-|M                           NEC                     |
-|A          NEC              DX-101              U22 |
-|           DX-102                                   |
-|                                                U17 |
-|                   PAL   50MHz                      |
-|                                                U21 |
-|           DSW1(8)                                  |
-|           DSW2(8)                   CXK58257 NEC   |
-|                                     CXK58257 DX-102|
-------------------------------------------------------
+PCB Number: P-FG01-1
++-----------------------------------------------------------+
+|             +------+      U  U             CN4*           |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  |      U16     ||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|     +--------------+|
+  |  +-++-++-++-+                   |3|     |      U20     ||
++-+  | || || || |      M            |2|  M  +--------------+|
+|    |U| U||U||U| M M  4            | |  1  +--------------+|
+|J   |3||5||2||4| 3 3               +-+     |      U15     ||
+|A   | || || || |      M                    +--------------+|
+|M   +-++-++-++-+      4                    +--------------+|
+|M                                          |      U19     ||
+|A                                          +--------------+|
+|                                           +--------------+|
+|C                                          |      U18     ||
+|o                           +----------+   +--------------+|
+|n          +-------+        |          |   +--------------+|
+|n          |Toshiba|        |   NEC    |   |      U22     ||
+|e          |  TMP  |        |  DX-101  |   +--------------+|
+|c          | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   |      U17     ||
+|e        5                  +----------+   +--------------+|
+|r        6                                 +--------------+|
+|         *                                 |      U21     ||
++-+            +---+       U                +--------------+|
+  |            |DX |       3  50MHz 32MHz*                  |
+  |            |102|       8                                |
++-+            +---+                    M  M   +---+        |
+|              D D                      4  4   |DX |        |
+|              S S                             |102|        |
+|              W W                             +---+        |
+|              2 1                                          |
++-----------------------------------------------------------+
+
+CN4 - 96 pin connector (3 rows by 32 pins)
+
+* Denotes not populated. U56 is unpopulated 93C45 EEPROM
 
 Notes:
       HSync: 15.23kHz
