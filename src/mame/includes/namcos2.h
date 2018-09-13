@@ -24,6 +24,7 @@
 #include "video/namco_c355spr.h"
 #include "video/namco_c123tmap.h"
 #include "video/namcos2_sprite.h"
+#include "video/namcos2_roz.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -193,10 +194,9 @@ public:
 		namcos2_shared_state(mconfig, type, tag),
 		m_dpram(*this, "dpram"),
 		m_spriteram(*this, "spriteram"),
-		m_rozram(*this, "rozram"),
-		m_roz_ctrl(*this, "rozctrl"),
 		m_c45_road(*this, "c45_road"),
-		m_ns2sprite(*this, "s2sprite")
+		m_ns2sprite(*this, "s2sprite"),
+		m_ns2roz(*this, "s2roz")
 	{ }
 
 	void configure_c116_standard(machine_config &config);
@@ -273,25 +273,19 @@ private:
 	uint32_t screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER( roz_tile_info );
-
 	DECLARE_READ8_MEMBER( c116_r );
-	DECLARE_WRITE16_MEMBER( rozram_word_w );
+
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
 
 	void create_shadow_table();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
-	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	int get_pos_irq_scanline() { return (m_c116->get_reg(5) - 32) & 0xff; }
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	optional_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_rozram;
-	optional_shared_ptr<uint16_t> m_roz_ctrl;
-	tilemap_t *m_tilemap_roz;
 	uint16_t m_gfx_ctrl;
 	uint16_t m_serial_comms_ctrl[0x8];
 	unsigned m_finallap_prot_count;
@@ -299,6 +293,7 @@ private:
 
 	optional_device<namco_c45_road_device> m_c45_road;
 	optional_device<namcos2_sprite_device> m_ns2sprite; 
+	optional_device<namcos2_roz_device> m_ns2roz; 
 
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );

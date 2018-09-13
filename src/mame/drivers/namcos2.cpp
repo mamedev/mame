@@ -609,7 +609,7 @@ void namcos2_state::common_default_am(address_map &map)
 	namcos2_68k_default_cpu_board_am(map);
 	map(0xc00000, 0xc03fff).ram().share("spriteram");
 	map(0xc40000, 0xc40001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
-	map(0xc80000, 0xc9ffff).ram().w(FUNC(namcos2_state::rozram_word_w)).share("rozram");
+	map(0xc80000, 0xc9ffff).ram().w(m_ns2roz, FUNC(namcos2_roz_device::rozram_word_w)).share("rozram");
 	map(0xcc0000, 0xcc000f).ram().share("rozctrl");
 	map(0xd00000, 0xd0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
@@ -1726,6 +1726,12 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
 	m_ns2sprite->set_spriteram_tag("spriteram");
 
+	NAMCOS2_ROZ(config, m_ns2roz, 0);
+	m_ns2roz->set_palette_tag("palette");
+	m_ns2roz->set_gfxdecode_tag("gfxdecode");
+	m_ns2roz->set_rozram_tag("rozram");
+	m_ns2roz->set_rozctrl_tag("rozctrl");
+
 	configure_c116_standard(config);
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
@@ -1822,6 +1828,12 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	m_ns2sprite->set_palette_tag("palette");
 	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
 	m_ns2sprite->set_spriteram_tag("spriteram");
+
+	NAMCOS2_ROZ(config, m_ns2roz, 0);
+	m_ns2roz->set_palette_tag("palette");
+	m_ns2roz->set_gfxdecode_tag("gfxdecode");
+	m_ns2roz->set_rozram_tag("rozram");
+	m_ns2roz->set_rozctrl_tag("rozctrl");
 
 	configure_c116_standard(config);
 

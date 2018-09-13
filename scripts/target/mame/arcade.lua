@@ -2781,6 +2781,8 @@ files {
 	MAME_DIR .. "src/mame/video/namco_c123tmap.h",
 	MAME_DIR .. "src/mame/video/namcos2_sprite.cpp",
 	MAME_DIR .. "src/mame/video/namcos2_sprite.h",
+	MAME_DIR .. "src/mame/video/namcos2_roz.cpp",
+	MAME_DIR .. "src/mame/video/namcos2_roz.h",
 	MAME_DIR .. "src/mame/drivers/namcos21.cpp",
 	MAME_DIR .. "src/mame/includes/namcos21.h",
 	MAME_DIR .. "src/mame/video/namcos21.cpp",
