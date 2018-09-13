@@ -165,8 +165,6 @@ MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 
 	/* Place CPU2 & CPU3 into the reset condition */
 	reset_all_subcpus(ASSERT_LINE);
-
-	m_player_mux = 0;
 }
 
 /*************************************************************/

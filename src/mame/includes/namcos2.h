@@ -201,13 +201,6 @@ protected:
 	DECLARE_MACHINE_START(namcos2);
 	DECLARE_MACHINE_RESET(namcos2);
 
-
-
-
-	uint8_t m_player_mux;
-	//	save_item(NAME(m_player_mux));
-
-
 	inline void namcoic_get_tile_info(tile_data &tileinfo,int tile_index,uint16_t *vram);
 
 	// general
