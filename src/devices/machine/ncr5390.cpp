@@ -825,6 +825,7 @@ void ncr5390_device::start_command()
 	case CI_COMPLETE:
 		LOGMASKED(LOG_COMMAND, "Initiator command complete sequence\n");
 		state = INIT_CPT_RECV_BYTE_ACK;
+		dma_set(dma_command ? DMA_IN : DMA_NONE);
 		recv_byte();
 		break;
 
