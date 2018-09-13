@@ -26,14 +26,31 @@ namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const 
 	m_gfx_region(0),
 	m_mask(nullptr),
 	m_is_namcofl(false),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_maskregion(*this, finder_base::DUMMY_TAG)
 {
 }
 
 void namco_c169roz_device::device_start()
 {
+	m_mask = m_maskregion->base();
+
 	m_videoram.resize(m_ramsize);
 	std::fill(std::begin(m_videoram), std::end(m_videoram), 0x0000);
+
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
+		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<0>), this),
+		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
+		16, 16,
+		256, 256);
+
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
+		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<1>), this),
+		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
+		16, 16,
+		256, 256);
+
+	save_item(NAME(m_control));
 	save_item(NAME(m_videoram));
 }
 
@@ -62,27 +79,6 @@ TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 TILEMAP_MAPPER_MEMBER( namco_c169roz_device::mapper )
 {
 	return ((col & 0x80) << 8) | ((row & 0xff) << 7) | (col & 0x7f);
-}
-
-void namco_c169roz_device::init(int region, const char *maskregion, c169_tilemap_delegate tilemap_cb)
-{
-	m_gfx_region = region;
-	m_mask = memregion(maskregion)->base();
-	m_c169_cb = tilemap_cb;
-
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode,
-		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<0>), this),
-		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
-		16, 16,
-		256, 256);
-
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode,
-		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<1>), this),
-		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
-		16, 16,
-		256, 256);
-
-	save_item(NAME(m_control));
 }
 
 void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters &params)

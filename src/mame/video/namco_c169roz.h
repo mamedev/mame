@@ -16,6 +16,8 @@ public:
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
 	void set_ram_words(uint32_t size) { m_ramsize = size; }
+	template <typename T> void set_maskregion_tag(T &&tag) { m_maskregion.set_tag(std::forward<T>(tag)); }
+	void set_gfxregion(int region) { m_gfx_region = region; }
 
 	DECLARE_READ16_MEMBER( control_r );
 	DECLARE_WRITE16_MEMBER( control_w );
@@ -23,7 +25,8 @@ public:
 	DECLARE_WRITE16_MEMBER( videoram_w );
 
 	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
-	void init(int region, const char *maskregion, c169_tilemap_delegate tilemap_cb);
+	void set_tile_callback(c169_tilemap_delegate tilemap_cb) { m_c169_cb = tilemap_cb; }
+
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void mark_all_dirty();
 
@@ -61,6 +64,7 @@ private:
 	bool m_is_namcofl;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_memory_region m_maskregion;
 };
 
 // device type definition

@@ -79,6 +79,7 @@ public:
 	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);
 	void finalap3(machine_config &config);
+	void suzuka8h(machine_config &config);
 	void luckywld(machine_config &config);
 	void base3(machine_config &config);
 	void sgunner(machine_config &config);
@@ -248,11 +249,12 @@ enum
 
 	void common_default_am(address_map &map);
 	void common_finallap_am(address_map &map);
-	void common_luckywld_am(address_map &map);
+	void common_suzuka8h_am(address_map &map);
 	void common_metlhawk_am(address_map &map);
 	void common_sgunner_am(address_map &map);
 	void master_default_am(address_map &map);
 	void master_finallap_am(address_map &map);
+	void master_suzuka8h_am(address_map &map);
 	void master_luckywld_am(address_map &map);
 	void master_metlhawk_am(address_map &map);
 	void master_sgunner_am(address_map &map);
@@ -260,6 +262,7 @@ enum
 	void namcos2_68k_default_cpu_board_am(address_map &map);
 	void slave_default_am(address_map &map);
 	void slave_finallap_am(address_map &map);
+	void slave_suzuka8h_am(address_map &map);
 	void slave_luckywld_am(address_map &map);
 	void slave_metlhawk_am(address_map &map);
 	void slave_sgunner_am(address_map &map);

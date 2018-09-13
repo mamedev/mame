@@ -610,6 +610,9 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	m_c169roz->set_gfxdecode_tag("gfxdecode");
 	m_c169roz->set_is_namcofl(true);
 	m_c169roz->set_ram_words(0x20000/2);
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcofl_state::RozCB, this));
+	m_c169roz->set_maskregion_tag(NAMCOFL_ROTMASKREGION);
+	m_c169roz->set_gfxregion(NAMCOFL_ROTGFX);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_palette_tag("palette");
