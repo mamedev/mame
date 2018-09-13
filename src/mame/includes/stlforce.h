@@ -1,8 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "video/edevices.h"
 #include "machine/eepromser.h"
 #include "emupal.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 class stlforce_state : public driver_device
 {

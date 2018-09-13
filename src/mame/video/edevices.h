@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "screen.h"
+#include "emupal.h"
 
 class edevices_device : public device_t
 {

@@ -70,15 +70,8 @@ TO DO :
 */
 
 #include "emu.h"
-
-#include "emupal.h"
-#include "video/edevices.h"
 #include "includes/stlforce.h"
 
-#include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "screen.h"
-#include "speaker.h"
 
 WRITE8_MEMBER(stlforce_state::eeprom_w)
 {

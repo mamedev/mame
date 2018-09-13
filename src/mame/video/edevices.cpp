@@ -15,10 +15,7 @@
 
 
 #include "emu.h"
-#include "screen.h"
-#include "emupal.h"
 #include "edevices.h"
-
 
 DEFINE_DEVICE_TYPE(EDEVICES_VID, edevices_device, "edevices_vid", "Electronic Devices Video (Mighty Warriors)")
 DEFINE_DEVICE_TYPE(EDEVICES_SFORCE_VID, edevices_sforce_device, "edevices_sforce_vid", "Electronic Devices Video (Steel Forces)")
