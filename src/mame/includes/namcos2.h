@@ -22,6 +22,7 @@
 #include "machine/namco68.h"
 #include "video/namco_c169roz.h"
 #include "video/namco_c355spr.h"
+#include "video/namco_c123tmap.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -123,6 +124,7 @@ public:
 		, m_gpu(*this, "gpu")
 		, m_c169roz(*this, "c169roz")
 		, m_c355spr(*this, "c355spr")
+		, m_c123tmap(*this, "c123tmap")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_slave(*this, "slave")
@@ -148,6 +150,7 @@ protected:
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
 	optional_device<namco_c169roz_device> m_c169roz; 
 	optional_device<namco_c355spr_device> m_c355spr; 
+	optional_device<namco_c123tmap_device> m_c123tmap; 
 
 	// game type helpers
 	bool is_system21();
@@ -159,44 +162,6 @@ protected:
 	void reset_all_subcpus(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
-
-	// C123 Tilemap Emulation
-	// TODO: merge with namcos1.cpp implementation and convert to device
-	DECLARE_WRITE16_MEMBER( c123_tilemap_videoram_w );
-	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );
-	DECLARE_WRITE16_MEMBER( c123_tilemap_control_w );
-	DECLARE_READ16_MEMBER( c123_tilemap_control_r );
-	template<int Offset> TILE_GET_INFO_MEMBER( get_tile_info );
-	typedef delegate<void (uint16_t, int*, int*)> c123_tilemap_delegate;
-	void c123_tilemap_init(int gfxbank, void *pMaskROM, c123_tilemap_delegate tilemap_cb);
-	void c123_tilemap_invalidate(void);
-	void c123_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	void c123_SetTilemapVideoram(int offset, uint16_t newword);
-	void c123_SetTilemapControl(int offset, uint16_t newword);
-
-	struct c123_mTilemapInfo
-	{
-		uint16_t control[0x40/2];
-		/**
-		 * [0x1] 0x02/2 tilemap#0.scrollx
-		 * [0x3] 0x06/2 tilemap#0.scrolly
-		 * [0x5] 0x0a/2 tilemap#1.scrollx
-		 * [0x7] 0x0e/2 tilemap#1.scrolly
-		 * [0x9] 0x12/2 tilemap#2.scrollx
-		 * [0xb] 0x16/2 tilemap#2.scrolly
-		 * [0xd] 0x1a/2 tilemap#3.scrollx
-		 * [0xf] 0x1e/2 tilemap#3.scrolly
-		 * 0x20/2 priority
-		 * 0x30/2 color
-		 */
-		tilemap_t *tmap[6];
-		std::unique_ptr<uint16_t[]> videoram;
-		int gfxbank;
-		uint8_t *maskBaseAddr;
-		c123_tilemap_delegate cb;
-	};
-
-	c123_mTilemapInfo m_c123_TilemapInfo;
 
 	DECLARE_MACHINE_START(namcos2);
 	DECLARE_MACHINE_RESET(namcos2);

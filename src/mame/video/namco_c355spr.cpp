@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "namco_c355spr.h"
 
-DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c169roz", "Namco C355 (Sprites)")
+DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c355spr", "Namco C355 (Sprites)")
 
 namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C355SPR, tag, owner, clock),
