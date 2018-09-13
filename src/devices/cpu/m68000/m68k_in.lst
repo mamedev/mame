@@ -261,8 +261,6 @@ M68KMAKE_TABLE_FOOTER
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 M68KMAKE_OPCODE_HANDLER_HEADER
 
-#include "emu.h"
-#include "m68000.h"
 
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */
