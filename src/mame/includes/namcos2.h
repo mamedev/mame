@@ -25,72 +25,14 @@
 #include "video/namco_c123tmap.h"
 #include "video/namcos2_sprite.h"
 #include "video/namcos2_roz.h"
-
-#include "cpu/m6502/m3745x.h"
 #include "emupal.h"
 #include "screen.h"
-
-/* CPU reference numbers */
-
-#define CPU_MASTER  0
-#define CPU_SLAVE   1
-#define CPU_SOUND   2
-#define CPU_MCU     3
-#define CPU_GPU     5
-
 
 /*********************************************/
 /* IF GAME SPECIFIC HACKS ARE REQUIRED THEN  */
 /* USE THE m_gametype MEMBER TO FIND */
 /* OUT WHAT GAME IS RUNNING                  */
 /*********************************************/
-
-enum
-{
-	/* Namco System 2 */
-	NAMCOS2_ASSAULT = 0x1000,
-	NAMCOS2_ASSAULT_JP,
-	NAMCOS2_ASSAULT_PLUS,
-	NAMCOS2_BUBBLE_TROUBLE,
-	NAMCOS2_BURNING_FORCE,
-	NAMCOS2_COSMO_GANG,
-	NAMCOS2_COSMO_GANG_US,
-	NAMCOS2_DIRT_FOX,
-	NAMCOS2_DIRT_FOX_JP,
-	NAMCOS2_DRAGON_SABER,
-	NAMCOS2_FINAL_LAP,
-	NAMCOS2_FINAL_LAP_2,
-	NAMCOS2_FINAL_LAP_3,
-	NAMCOS2_FINEST_HOUR,
-	NAMCOS2_FOUR_TRAX,
-	NAMCOS2_GOLLY_GHOST,
-	NAMCOS2_LUCKY_AND_WILD,
-	NAMCOS2_MARVEL_LAND,
-	NAMCOS2_METAL_HAWK,
-	NAMCOS2_MIRAI_NINJA,
-	NAMCOS2_ORDYNE,
-	NAMCOS2_PHELIOS,
-	NAMCOS2_ROLLING_THUNDER_2,
-	NAMCOS2_STEEL_GUNNER,
-	NAMCOS2_STEEL_GUNNER_2,
-	NAMCOS2_SUPER_WSTADIUM,
-	NAMCOS2_SUPER_WSTADIUM_92,
-	NAMCOS2_SUPER_WSTADIUM_92T,
-	NAMCOS2_SUPER_WSTADIUM_93,
-	NAMCOS2_SUZUKA_8_HOURS,
-	NAMCOS2_SUZUKA_8_HOURS_2,
-	NAMCOS2_VALKYRIE,
-	NAMCOS2_KYUUKAI_DOUCHUUKI,
-
-	/* Namco System21 */
-	NAMCOS21_AIRCOMBAT,
-	NAMCOS21_STARBLADE,
-	NAMCOS21_CYBERSLED,
-	NAMCOS21_SOLVALOU,
-	NAMCOS21_WINRUN91,
-	NAMCOS21_DRIVERS_EYES,
-};
-
 
 class namcos2_state : public driver_device
 {
@@ -178,6 +120,44 @@ public:
 	void init_rthun2();
 
 private:
+
+enum
+	{
+		/* Namco System 2 */
+		NAMCOS2_ASSAULT = 0x1000,
+		NAMCOS2_ASSAULT_JP,
+		NAMCOS2_ASSAULT_PLUS,
+		NAMCOS2_BUBBLE_TROUBLE,
+		NAMCOS2_BURNING_FORCE,
+		NAMCOS2_COSMO_GANG,
+		NAMCOS2_COSMO_GANG_US,
+		NAMCOS2_DIRT_FOX,
+		NAMCOS2_DIRT_FOX_JP,
+		NAMCOS2_DRAGON_SABER,
+		NAMCOS2_FINAL_LAP,
+		NAMCOS2_FINAL_LAP_2,
+		NAMCOS2_FINAL_LAP_3,
+		NAMCOS2_FINEST_HOUR,
+		NAMCOS2_FOUR_TRAX,
+		NAMCOS2_GOLLY_GHOST,
+		NAMCOS2_LUCKY_AND_WILD,
+		NAMCOS2_MARVEL_LAND,
+		NAMCOS2_METAL_HAWK,
+		NAMCOS2_MIRAI_NINJA,
+		NAMCOS2_ORDYNE,
+		NAMCOS2_PHELIOS,
+		NAMCOS2_ROLLING_THUNDER_2,
+		NAMCOS2_STEEL_GUNNER,
+		NAMCOS2_STEEL_GUNNER_2,
+		NAMCOS2_SUPER_WSTADIUM,
+		NAMCOS2_SUPER_WSTADIUM_92,
+		NAMCOS2_SUPER_WSTADIUM_92T,
+		NAMCOS2_SUPER_WSTADIUM_93,
+		NAMCOS2_SUZUKA_8_HOURS,
+		NAMCOS2_SUZUKA_8_HOURS_2,
+		NAMCOS2_VALKYRIE,
+		NAMCOS2_KYUUKAI_DOUCHUUKI,
+	};
 
 	int m_gametype;
 	required_device<cpu_device> m_maincpu;
@@ -284,19 +264,6 @@ private:
 	void slave_sgunner_am(address_map &map);
 	void sound_default_am(address_map &map);
 };
-
-/*----------- defined in video/namcos2.c -----------*/
-
-#define NAMCOS21_NUM_COLORS 0x8000
-
-/**************************************************************/
-/*  ROZ - Rotate & Zoom memory function handlers              */
-/**************************************************************/
-
-/*----------- defined in machine/namcos2.c -----------*/
-
-extern void (*namcos2_kickstart)(running_machine &machine, int internal);
-
 
 /**************************************************************/
 /* Non-shared memory custom IO device - IRQ/Inputs/Outputs   */

@@ -18,7 +18,6 @@ Namco System II
 #include "machine/nvram.h"
 
 
-void (*namcos2_kickstart)(running_machine &machine, int internal);
 
 
 READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )

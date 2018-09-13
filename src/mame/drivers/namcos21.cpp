@@ -722,22 +722,22 @@ void namcos21_kickstart(running_machine &machine, int internal)
 	namcos21_state *state = machine.driver_data<namcos21_state>();
 
 	/* patch dsp watchdog */
-	switch( state->m_gametype )
+	switch (state->m_gametype)
 	{
-		case NAMCOS21_AIRCOMBAT:
-			state->m_master_dsp_code[0x008e] = 0x808f;
-			break;
-		case NAMCOS21_SOLVALOU:
-			state->m_master_dsp_code[0x008b] = 0x808c;
-			break;
-		default:
-			break;
+	case namcos21_state::NAMCOS21_AIRCOMBAT:
+		state->m_master_dsp_code[0x008e] = 0x808f;
+		break;
+	case namcos21_state::NAMCOS21_SOLVALOU:
+		state->m_master_dsp_code[0x008b] = 0x808c;
+		break;
+	default:
+		break;
 	}
-	if( internal )
+	if (internal)
 	{
-		if( state->m_mbNeedsKickstart==0 ) return;
-			state->m_mbNeedsKickstart--;
-		if( state->m_mbNeedsKickstart ) return;
+		if (state->m_mbNeedsKickstart == 0) return;
+		state->m_mbNeedsKickstart--;
+		if (state->m_mbNeedsKickstart) return;
 	}
 
 	state->clear_poly_framebuffer();
@@ -1875,12 +1875,14 @@ static GFXDECODE_START( gfx_namcos21 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
+WRITE8_MEMBER( namcos21_state::namcos2_sound_bankselect_w )
 {
 	m_audiobank->set_entry(data>>4);
 }
 
-WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
+void (*namcos2_kickstart)(running_machine &machine, int internal);
+
+WRITE8_MEMBER(namcos21_state::sound_reset_w)
 {
 	if (data & 0x01)
 	{
@@ -1904,8 +1906,7 @@ WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
 	}
 }
 
-// TODO:
-WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
+WRITE8_MEMBER(namcos21_state::system_reset_w)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -1913,7 +1914,7 @@ WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
 		m_maincpu->yield();
 }
 
-void namcos2_shared_state::reset_all_subcpus(int state)
+void namcos21_state::reset_all_subcpus(int state)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state);
 	if (m_c68)
@@ -1929,69 +1930,52 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 		logerror("no MCU to reset?\n");
 	}
 
-	switch( m_gametype )
+	switch (m_gametype)
 	{
-	case NAMCOS21_SOLVALOU:
-	case NAMCOS21_STARBLADE:
-	case NAMCOS21_AIRCOMBAT:
-	case NAMCOS21_CYBERSLED:
+	case namcos21_state::NAMCOS21_SOLVALOU:
+	case namcos21_state::NAMCOS21_STARBLADE:
+	case namcos21_state::NAMCOS21_AIRCOMBAT:
+	case namcos21_state::NAMCOS21_CYBERSLED:
 		m_dspmaster->set_input_line(INPUT_LINE_RESET, state);
 		m_dspslave->set_input_line(INPUT_LINE_RESET, state);
 		break;
 
-//  case NAMCOS21_WINRUN91:
-//  case NAMCOS21_DRIVERS_EYES:
+	//case namcos21_state::NAMCOS21_WINRUN91:
+	//case namcos21_state::NAMCOS21_DRIVERS_EYES:
 	default:
 		break;
 	}
 }
 
 
-bool namcos2_shared_state::is_system21()
+bool namcos21_state::is_system21()
 {
 	switch (m_gametype)
 	{
-		case NAMCOS21_AIRCOMBAT:
-		case NAMCOS21_STARBLADE:
-		case NAMCOS21_CYBERSLED:
-		case NAMCOS21_SOLVALOU:
-		case NAMCOS21_WINRUN91:
-		case NAMCOS21_DRIVERS_EYES:
-			return 1;
-		default:
-			return 0;
+	case namcos21_state::NAMCOS21_AIRCOMBAT:
+	case namcos21_state::NAMCOS21_STARBLADE:
+	case namcos21_state::NAMCOS21_CYBERSLED:
+	case namcos21_state::NAMCOS21_SOLVALOU:
+	case namcos21_state::NAMCOS21_WINRUN91:
+	case namcos21_state::NAMCOS21_DRIVERS_EYES:
+		return 1;
+	default:
+		return 0;
 	}
 }
 
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_w )
+WRITE8_MEMBER(namcos21_state::namcos2_68k_eeprom_w)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_r )
+READ8_MEMBER(namcos21_state::namcos2_68k_eeprom_r)
 {
 	return m_eeprom[offset];
 }
 
-
-MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
-{
-	namcos2_kickstart = nullptr;
-	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
-	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
-
-	if (m_audiobank)
-	{
-		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
-		for (int i = 0; i < 0x10; i++)
-			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
-
-		m_audiobank->set_entry(0);
-	}
-}
-
-MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
+MACHINE_RESET_MEMBER(namcos21_state, namcos21)
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
@@ -2009,7 +1993,19 @@ MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 
 MACHINE_START_MEMBER(namcos21_state,namcos21)
 {
-	MACHINE_START_CALL_MEMBER( namcos2 );
+	namcos2_kickstart = nullptr;
+	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
+
+	if (m_audiobank)
+	{
+		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+		for (int i = 0; i < 0x10; i++)
+			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
+
+		m_audiobank->set_entry(0);
+	}
+
 	namcos2_kickstart = namcos21_kickstart;
 }
 
@@ -2081,7 +2077,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos21)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2144,7 +2140,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos21)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
@@ -2215,7 +2211,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos21)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
