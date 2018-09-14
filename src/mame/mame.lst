@@ -15504,9 +15504,6 @@ stellecu                        // (c) 1998
 farmer                          // TVG17 (c) 1985 Sun Electronics
 ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 
-@source:imds.cpp
-imds                            // intel
-
 @source:imds2.cpp
 imds2                           // Intellec MDS series-II
 
