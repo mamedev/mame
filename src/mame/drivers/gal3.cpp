@@ -165,8 +165,6 @@ private:
 	DECLARE_WRITE32_MEMBER(led_mst_w);
 	DECLARE_READ32_MEMBER(led_slv_r);
 	DECLARE_WRITE32_MEMBER(led_slv_w);
-	DECLARE_READ16_MEMBER(paletteram_r);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
 	template<int Screen> DECLARE_READ16_MEMBER(video_enable_r);
 	template<int Screen> DECLARE_WRITE16_MEMBER(video_enable_w);
 	DECLARE_READ16_MEMBER(rso_r);
