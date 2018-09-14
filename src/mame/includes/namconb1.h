@@ -6,9 +6,13 @@
 
 ***************************************************************************/
 
-#include "namcos2.h"
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
+#include "screen.h"
+#include "video/namco_c116.h"
+#include "video/namco_c355spr.h"
+#include "video/namco_c123tmap.h"
+#include "video/namco_c169roz.h"
 
 #define NAMCONB1_HTOTAL     (288)   /* wrong */
 #define NAMCONB1_HBSTART    (288)
@@ -25,11 +29,21 @@
 #define NAMCONB1_SPRITEGFX      1
 #define NAMCONB1_ROTGFX         2
 
-class namconb1_state : public namcos2_shared_state
+
+
+class namconb1_state : public driver_device
 {
 public:
 	namconb1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcos2_shared_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_gametype(0),
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
+		m_c116(*this, "c116"),
+		m_c123tmap(*this, "c123tmap"),
+		m_c355spr(*this, "c355spr"),
+		m_c169roz(*this, "c169roz"),
+		m_screen(*this, "screen"),
 		m_mcu(*this, "mcu"),
 		m_eeprom(*this, "eeprom"),
 		m_p1(*this, "P1"),
@@ -63,6 +77,31 @@ public:
 	void init_gslgr94u();
 
 private:
+	int m_gametype;
+	enum
+	{
+		/* Namco NB1 */
+		NAMCONB1_NEBULRAY = 0x2000,
+		NAMCONB1_GUNBULET,
+		NAMCONB1_GSLGR94U,
+		NAMCONB1_GSLGR94J,
+		NAMCONB1_SWS95,
+		NAMCONB1_SWS96,
+		NAMCONB1_SWS97,
+		NAMCONB1_VSHOOT,
+
+		/* Namco NB2 */
+		NAMCONB2_OUTFOXIES,
+		NAMCONB2_MACH_BREAKERS,
+	};
+
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_device<namco_c116_device> m_c116;
+	required_device<namco_c123tmap_device> m_c123tmap; 
+	required_device<namco_c355spr_device> m_c355spr; 
+	optional_device<namco_c169roz_device> m_c169roz; // NB1 only, not NA1
+	required_device<screen_device> m_screen;
     required_device<cpu_device> m_mcu;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_ioport m_p1;

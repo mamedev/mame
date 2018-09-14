@@ -5,9 +5,6 @@
 #include "emu.h"
 #include "includes/namconb1.h"
 
-#include "machine/namcoic.h"
-
-
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
@@ -94,20 +91,20 @@ void namconb1_state::video_update_common(screen_device &screen, bitmap_ind16 &bi
 	{
 		for( pri=0; pri<16; pri++ )
 		{
-			c169_roz_draw(screen, bitmap, cliprect, pri);
-			if( (pri&1)==0 )
+			m_c169roz->draw(screen, bitmap, cliprect, pri);
+			if ((pri & 1) == 0)
 			{
-				c123_tilemap_draw( screen, bitmap, cliprect, pri/2 );
+				m_c123tmap->draw( screen, bitmap, cliprect, pri/2 );
 			}
-			c355_obj_draw(screen, bitmap, cliprect, pri );
+			m_c355spr->draw(screen, bitmap, cliprect, pri );
 		}
 	}
 	else
 	{
 		for( pri=0; pri<8; pri++ )
 		{
-			c123_tilemap_draw( screen, bitmap, cliprect, pri );
-			c355_obj_draw(screen, bitmap, cliprect, pri );
+			m_c123tmap->draw( screen, bitmap, cliprect, pri );
+			m_c355spr->draw(screen, bitmap, cliprect, pri );
 		}
 	}
 } /* video_update_common */
@@ -141,9 +138,6 @@ int namconb1_state::NB1objcode2tile( int code )
 
 VIDEO_START_MEMBER(namconb1_state,namconb1)
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
-
 	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb1 */
 
@@ -154,8 +148,7 @@ WRITE32_MEMBER(namconb1_state::rozbank32_w)
 	uint32_t old_data = m_rozbank32[offset];
 	COMBINE_DATA(&m_rozbank32[offset]);
 	if (m_rozbank32[offset] != old_data)
-		for (auto & elem : m_c169_roz_tilemap)
-			elem->mark_all_dirty();
+		m_c169roz->mark_all_dirty();
 }
 
 uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -174,7 +167,7 @@ uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_in
 
 	if( memcmp(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank))!=0 )
 	{
-		c123_tilemap_invalidate();
+		m_c123tmap->mark_all_dirty();
 		memcpy(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank));
 	}
 	video_update_common( screen, bitmap, clip, 1 );
@@ -199,18 +192,12 @@ int namconb1_state::NB2objcode2tile_outfxies( int code )
 
 VIDEO_START_MEMBER(namconb1_state,machbrkr)
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_machbrkr, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
-	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION,namcos2_shared_state::c169_tilemap_delegate(&namconb1_state::NB2RozCB_machbrkr, this));
-
 	save_item(NAME(m_tilemap_tile_bank));
 } /* machbrkr */
 
 VIDEO_START_MEMBER(namconb1_state,outfxies)
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_outfxies, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
-	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION,namcos2_shared_state::c169_tilemap_delegate(&namconb1_state::NB2RozCB_outfxies, this));
-
 	save_item(NAME(m_tilemap_tile_bank));
 } /* outfxies */
+
+
