@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "namcos2_roz.h"
 
-DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_sprite", "Namco Sysem 2 ROZ (C102)")
+DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco Sysem 2 ROZ (C102)")
 
 namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_ROZ, tag, owner, clock),
