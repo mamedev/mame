@@ -4231,8 +4231,8 @@ ROM_END
 
 ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* checksum 421E printed on label */
-	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* checksum A48F printed on label */
+	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* also commonly labeled as: WSC U6 Ver. 2.00 421E */
+	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* also commonly labeled as: WSC U7 Ver. 2.00 A48F */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
