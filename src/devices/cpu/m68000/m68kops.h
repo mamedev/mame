@@ -1,33 +1,5 @@
 // Generated source, edits will be lost.  Run m68kmake.py instead
 
-// license:BSD-3-Clause
-// copyright-holders:Karl Stenerud
-
-static constexpr int NUM_CPU_TYPES = 7;
-
-typedef void (m68000_base_device::*opcode_handler_ptr)();
-static opcode_handler_ptr m68ki_instruction_jump_table[NUM_CPU_TYPES][0x10000]; /* opcode handler jump table */
-static unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
-
-/* This is used to generate the opcode handler jump table */
-struct opcode_handler_struct
-{
-	opcode_handler_ptr opcode_handler;   /* handler function */
-	unsigned int  mask;                  /* mask on opcode */
-	unsigned int  match;                 /* what to match after masking */
-	unsigned char cycles[NUM_CPU_TYPES]; /* cycles each cpu type takes */
-};
-
-/* Build the opcode handler table */
-static void m68ki_set_one(unsigned short opcode, const opcode_handler_struct *s);
-static void m68ki_build_opcode_table(void);
-
-/* ======================================================================== */
-/* ============================ OPCODE HANDLERS =========================== */
-/* ======================================================================== */
-
-
-
 void m68k_op_1010();
 void m68k_op_1111();
 void m68k_op_040fpu0_32();
@@ -2000,10 +1972,3 @@ void m68k_op_unpk_16_mm_axy7();
 void m68k_op_unpk_16_mm();
 void m68k_op_cinv_32();
 void m68k_op_cpush_32();
-/* ======================================================================== */
-/* ============================== END OF FILE ============================= */
-/* ======================================================================== */
-
-
-
-

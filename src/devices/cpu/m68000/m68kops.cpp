@@ -3,13 +3,6 @@
 #include "emu.h"
 #include "m68000.h"
 
-
-/* ======================================================================== */
-/* ========================= INSTRUCTION HANDLERS ========================= */
-/* ======================================================================== */
-
-
-
 void m68000_base_device::m68k_op_1010()
 {
 	m68ki_exception_1010();
@@ -32732,39 +32725,8 @@ void m68000_base_device::m68k_op_cpush_32()
 	m68ki_exception_1111();
 }
 
-/* ======================================================================== */
-/* ============================== END OF FILE ============================= */
-/* ======================================================================== */
-
-
-
-/* ======================================================================== */
-/* ========================= OPCODE TABLE BUILDER ========================= */
-/* ======================================================================== */
-
-m68000_base_device::opcode_handler_ptr m68000_base_device::m68ki_instruction_jump_table[NUM_CPU_TYPES][0x10000]; /* opcode handler jump table */
-unsigned char m68000_base_device::m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
-
-/* Build the opcode handler jump table */
-
-void m68000_base_device::m68ki_set_one(unsigned short opcode, const opcode_handler_struct *s)
+const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_handler_table[] =
 {
-	for(int i=0; i<NUM_CPU_TYPES; i++)
-		if(s->cycles[i] != 0xff) {
-			m68ki_cycles[i][opcode] = s->cycles[i];
-			m68ki_instruction_jump_table[i][opcode] = s->opcode_handler;
-		}
-}
-
-void m68000_base_device::m68ki_build_opcode_table(void)
-{
-/* Opcode handler table */
-static const opcode_handler_struct m68k_opcode_handler_table[] =
-{
-/*   function                      mask    match    000  010  020  040 */
-
-
-
 	{&m68000_base_device::m68k_op_1010, 0xf000, 0xa000, {  4,   4,   4,   4,   4,   4,   4}},
 	{&m68000_base_device::m68k_op_1111, 0xf000, 0xf000, {  4,   4,   4,   4,   4,   4,   4}},
 	{&m68000_base_device::m68k_op_moveq_32, 0xf100, 0x7000, {  4,   4,   2,   2,   2,   2,   2}},
@@ -34739,105 +34701,3 @@ static const opcode_handler_struct m68k_opcode_handler_table[] =
 	{&m68000_base_device::m68k_op_bfins_32_al, 0xffff, 0xeff9, {255, 255,  21,  21,  21,  21,  17}},
 	{nullptr, 0, 0, {0, 0, 0, 0, 0}}
 };
-
-
-	const opcode_handler_struct *ostruct;
-	int i;
-	int j;
-	int k;
-
-	for(i = 0; i < 0x10000; i++)
-	{
-		/* default to illegal */
-		for(k=0;k<NUM_CPU_TYPES;k++)
-		{
-			m68ki_instruction_jump_table[k][i] = &m68000_base_device::m68k_op_illegal;
-			m68ki_cycles[k][i] = 0;
-		}
-	}
-
-	ostruct = m68k_opcode_handler_table;
-	while(ostruct->mask != 0xff00)
-	{
-		for(i = 0;i < 0x10000;i++)
-		{
-			if((i & ostruct->mask) == ostruct->match)
-				m68ki_set_one(i, ostruct);
-		}
-		ostruct++;
-	}
-	while(ostruct->mask == 0xff00)
-	{
-		for(i = 0;i <= 0xff;i++)
-			m68ki_set_one(ostruct->match | i, ostruct);
-		ostruct++;
-	}
-	while(ostruct->mask == 0xff20)
-	{
-		for(i = 0;i < 4;i++)
-		{
-			for(j = 0;j < 32;j++)
-			{
-				m68ki_set_one(ostruct->match | (i << 6) | j, ostruct);
-			}
-		}
-		ostruct++;
-	}
-	while(ostruct->mask == 0xf1f8)
-	{
-		for(i = 0;i < 8;i++)
-		{
-			for(j = 0;j < 8;j++)
-				m68ki_set_one(ostruct->match | (i << 9) | j, ostruct);
-		}
-		ostruct++;
-	}
-	while(ostruct->mask == 0xffd8)
-	{
-		for(i = 0;i < 2;i++)
-		{
-			for(j = 0;j < 8;j++)
-			{
-				m68ki_set_one(ostruct->match | (i << 5) | j, ostruct);
-			}
-		}
-		ostruct++;
-	}
-	while(ostruct->mask == 0xfff0)
-	{
-		for(i = 0;i <= 0x0f;i++)
-			m68ki_set_one(ostruct->match | i, ostruct);
-		ostruct++;
-	}
-	while(ostruct->mask == 0xf1ff)
-	{
-		for(i = 0;i <= 0x07;i++)
-			m68ki_set_one(ostruct->match | (i << 9), ostruct);
-		ostruct++;
-	}
-	while(ostruct->mask == 0xfff8)
-	{
-		for(i = 0;i <= 0x07;i++)
-			m68ki_set_one(ostruct->match | i, ostruct);
-		ostruct++;
-	}
-	while(ostruct->mask == 0xffff)
-	{
-		m68ki_set_one(ostruct->match, ostruct);
-		ostruct++;
-	}
-
-	// if we fell all the way through with a non-zero mask, the opcode table wasn't built properly
-	if (ostruct->mask != 0)
-	{
-		fatalerror("m68ki_build_opcode_table: unhandled opcode mask %x (match %x), m68k core will not function!\n", ostruct->mask, ostruct->match);
-	}
-}
-
-
-/* ======================================================================== */
-/* ============================== END OF FILE ============================= */
-/* ======================================================================== */
-
-
-
