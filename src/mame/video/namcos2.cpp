@@ -164,7 +164,6 @@ void namcos2_state::RozCB_luckywld(uint16_t code, int *tile, int *mask, int whic
 
 void namcos2_state::video_start_luckywld()
 {
-	m_c355spr->init(0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate());
 }
 
 uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -195,7 +194,6 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 
 void namcos2_state::video_start_sgunner()
 {
-	m_c355spr->init(0, 0x0, namco_c355spr_device::c355_obj_code2tile_delegate());
 }
 
 uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

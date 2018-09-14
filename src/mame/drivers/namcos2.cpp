@@ -2004,6 +2004,9 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	m_c355spr->set_palette_tag("palette");
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_gfxregion(0);
 
 	configure_c123tmap_standard(config);
 
@@ -2061,6 +2064,9 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	m_c355spr->set_palette_tag("palette");
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_gfxregion(0);
 
 	configure_c123tmap_standard(config);
 
@@ -2118,6 +2124,9 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	m_c355spr->set_palette_tag("palette");
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_gfxregion(0);
 
 	configure_c123tmap_standard(config);
 

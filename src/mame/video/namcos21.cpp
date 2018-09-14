@@ -365,9 +365,6 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 		m_maskram = std::make_unique<uint8_t[]>(0x80000);
 	}
 	allocate_poly_framebuffer();
-
-	if (m_c355spr)
-		m_c355spr->init(		0,      /* gfx bank */		0xf,    /* reverse palette mapping */		namco_c355spr_device::c355_obj_code2tile_delegate() );
 }
 
 uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

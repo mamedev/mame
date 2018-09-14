@@ -186,7 +186,10 @@ void namco_c355spr_device::device_start()
 {
 	//m_spriteram.resize(m_ramsize);
 	std::fill(std::begin(m_spriteram), std::end(m_spriteram), 0x0000);  // needed for Nebulas Ray
+	std::fill(std::begin(m_position), std::end(m_position), 0x0000);
+
 	save_item(NAME(m_spriteram));
+	save_item(NAME(m_position));
 }
 
 
@@ -395,20 +398,6 @@ void namco_c355spr_device::draw_sprite(screen_device &screen, _BitmapClass &bitm
 int namco_c355spr_device::default_code2tile(int code)
 {
 	return code;
-}
-
-void namco_c355spr_device::init(int gfxbank, int pal_xor, c355_obj_code2tile_delegate code2tile)
-{
-	m_gfx_region = gfxbank;
-	m_palxor = pal_xor;
-	if (!code2tile.isnull())
-		m_code2tile = code2tile;
-	else
-		m_code2tile = c355_obj_code2tile_delegate(&namco_c355spr_device::default_code2tile, this);
-
-	memset(m_position, 0, sizeof(m_position));
-
-	save_item(NAME(m_position));
 }
 
 template<class _BitmapClass>

@@ -2188,6 +2188,9 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	m_c355spr->set_palette_tag("palette");
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0xf); // reverse mapping
+	m_c355spr->set_gfxregion(0);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
@@ -2258,6 +2261,9 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	m_c355spr->set_palette_tag("palette");
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0xf); // reverse mapping
+	m_c355spr->set_gfxregion(0);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 

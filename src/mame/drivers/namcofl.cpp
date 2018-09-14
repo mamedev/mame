@@ -618,6 +618,9 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	m_c355spr->set_palette_tag("palette");
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(true);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
+	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_gfxregion(NAMCOFL_SPRITEGFX);
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_gfxdecode_tag("gfxdecode");

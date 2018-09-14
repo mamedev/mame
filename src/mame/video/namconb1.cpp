@@ -138,8 +138,6 @@ int namconb1_state::NB1objcode2tile( int code )
 
 VIDEO_START_MEMBER(namconb1_state,namconb1)
 {
-	m_c355spr->init(NAMCONB1_SPRITEGFX,0x0,namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
-
 	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb1 */
 
@@ -194,15 +192,11 @@ int namconb1_state::NB2objcode2tile_outfxies( int code )
 
 VIDEO_START_MEMBER(namconb1_state,machbrkr)
 {
-	m_c355spr->init(NAMCONB1_SPRITEGFX,0x0,namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
-
 	save_item(NAME(m_tilemap_tile_bank));
 } /* machbrkr */
 
 VIDEO_START_MEMBER(namconb1_state,outfxies)
 {
-	m_c355spr->init(NAMCONB1_SPRITEGFX,0x0,namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
-
 	save_item(NAME(m_tilemap_tile_bank));
 } /* outfxies */
 

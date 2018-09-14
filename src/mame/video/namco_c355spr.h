@@ -19,6 +19,8 @@ public:
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
 	//void set_ram_words(uint32_t size) { m_ramsize = size; }
+	void set_palxor(int palxor) { m_palxor = palxor; }
+	void set_gfxregion(int region) { m_gfx_region = region; }
 
 	DECLARE_READ16_MEMBER( spriteram_r );
 	DECLARE_WRITE16_MEMBER( spriteram_w );
@@ -26,7 +28,13 @@ public:
 	DECLARE_WRITE16_MEMBER( position_w );
 
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
-	void init(int gfxbank, int pal_xor, c355_obj_code2tile_delegate code2tile);
+	void set_tile_callback(c355_obj_code2tile_delegate cb)
+	{
+		if (!cb.isnull())
+			m_code2tile = cb;
+		else
+			m_code2tile = c355_obj_code2tile_delegate(&namco_c355spr_device::default_code2tile, this);
+	}
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);

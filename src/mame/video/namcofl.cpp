@@ -96,5 +96,5 @@ int namcofl_state::FLobjcode2tile(int code)
 
 VIDEO_START_MEMBER(namcofl_state,namcofl)
 {
-	m_c355spr->init(NAMCOFL_SPRITEGFX,0x0,namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
 }
+

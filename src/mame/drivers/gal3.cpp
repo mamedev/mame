@@ -187,12 +187,6 @@ private:
 VIDEO_START_MEMBER(gal3_state,gal3)
 {
 	m_generic_paletteram_16.allocate(0x10000);
-
-	m_c355spr->init(
-		0,      /* gfx bank */
-		0xf,    /* reverse palette mapping */
-		namco_c355spr_device::c355_obj_code2tile_delegate() );
-
 }
 
 /* FIXME: this code has simply been copypasted from namcos21.c
@@ -663,6 +657,9 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	m_c355spr->set_palette_tag("palette");
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
 	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate()); 
+	m_c355spr->set_palxor(0xf); // reverse mapping
+	m_c355spr->set_gfxregion(0);
 
 	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 
