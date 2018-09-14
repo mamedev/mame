@@ -233,7 +233,7 @@ protected:
 	uint32_t m_cyc_reset;
 
 	int  m_initial_cycles;
-	int  m_remaining_cycles;                     /* Number of clocks remaining */
+	int  m_icount;                     /* Number of clocks remaining */
 	int  m_reset_cycles;
 	uint32_t m_tracing;
 

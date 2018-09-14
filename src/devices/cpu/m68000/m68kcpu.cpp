@@ -762,15 +762,15 @@ bool m68000_base_device::memory_translate(int space, int intention, offs_t &addr
 
 void m68000_base_device::execute_run()
 {
-	m_initial_cycles = m_remaining_cycles;
+	m_initial_cycles = m_icount;
 
 	/* eat up any reset cycles */
 	if (m_reset_cycles) {
 		int rc = m_reset_cycles;
 		m_reset_cycles = 0;
-		m_remaining_cycles -= rc;
+		m_icount -= rc;
 
-		if (m_remaining_cycles <= 0) return;
+		if (m_icount <= 0) return;
 	}
 
 	/* See if interrupts came in */
@@ -800,15 +800,15 @@ void m68000_base_device::execute_run()
 			}
 			if(m_stopped)
 			{
-				if (m_remaining_cycles > 0)
-					m_remaining_cycles = 0;
+				if (m_icount > 0)
+					m_icount = 0;
 				return;
 			}
 		}
 
 
 		/* Main loop.  Keep going until we run out of clock cycles */
-		while (m_remaining_cycles > 0)
+		while (m_icount > 0)
 		{
 			/* Set tracing accodring to T1. (T0 is done inside instruction) */
 			m68ki_trace_t1(); /* auto-disable (see m68kcpu.h) */
@@ -827,7 +827,7 @@ void m68000_base_device::execute_run()
 				/* Read an instruction and call its handler */
 				m_ir = m68ki_read_imm_16();
 				(this->*m_jump_table[m_ir])();
-				m_remaining_cycles -= m_cyc_instruction[m_ir];
+				m_icount -= m_cyc_instruction[m_ir];
 			}
 			else
 			{
@@ -849,7 +849,7 @@ void m68000_base_device::execute_run()
 				if (!m_mmu_tmp_buserror_occurred)
 				{
 					(this->*m_jump_table[m_ir])();
-					m_remaining_cycles -= m_cyc_instruction[m_ir];
+					m_icount -= m_cyc_instruction[m_ir];
 				}
 
 				if (m_mmu_tmp_buserror_occurred)
@@ -897,7 +897,7 @@ void m68000_base_device::execute_run()
 
 					// TODO:
 					/* Use up some clock cycles and undo the instruction's cycles */
-					// m_remaining_cycles -= m_cyc_exception[EXCEPTION_BUS_ERROR] - m_cyc_instruction[m_ir];
+					// m_icount -= m_cyc_exception[EXCEPTION_BUS_ERROR] - m_cyc_instruction[m_ir];
 				}
 			}
 			}
@@ -920,8 +920,8 @@ void m68000_base_device::execute_run()
 		/* set previous PC to current PC for the next entry into the loop */
 		m_ppc = m_pc;
 	}
-	else if (m_remaining_cycles > 0)
-		m_remaining_cycles = 0;
+	else if (m_icount > 0)
+		m_icount = 0;
 }
 
 
@@ -1004,8 +1004,8 @@ void m68000_base_device::init_cpu_common(void)
 	machine().save().register_presave(save_prepost_delegate(FUNC(m68000_base_device::presave), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(m68000_base_device::postload), this));
 
-	set_icountptr(m_remaining_cycles);
-	m_remaining_cycles = 0;
+	set_icountptr(m_icount);
+	m_icount = 0;
 
 }
 
@@ -1021,8 +1021,8 @@ void m68000_base_device::device_reset()
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	m_stopped = 0;
-	if (m_remaining_cycles > 0)
-		m_remaining_cycles = 0;
+	if (m_icount > 0)
+		m_icount = 0;
 
 	m_run_mode = RUN_MODE_BERR_AERR_RESET;
 
@@ -2197,7 +2197,7 @@ void m68000_base_device::m68ki_exception_interrupt(uint32_t int_level)
 	m68ki_jump(new_pc);
 
 	/* Defer cycle counting until later */
-	m_remaining_cycles -= m_cyc_exception[vector];
+	m_icount -= m_cyc_exception[vector];
 }
 
 
@@ -2286,7 +2286,7 @@ void m68000_base_device::clear_all()
 	m_cyc_reset = 0;
 
 	m_initial_cycles = 0;
-	m_remaining_cycles = 0;
+	m_icount = 0;
 	m_reset_cycles = 0;
 	m_tracing = 0;
 
