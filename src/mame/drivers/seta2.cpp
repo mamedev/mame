@@ -3190,9 +3190,106 @@ Notes:
       HSync: 15.23kHz
       VSync: 58.5Hz
 
+**********************************************************
+
+There is known to exist an undumped version of Guardians on the
+ P0-113A PCB with P1-106-1 & P1-107-1 duaghtercards
+
+ It's assumed the programs (at least) are different to cope with
+ the different hardware configuration.
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 (208 Pin PQFP)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz, 32.530MHz
+ Other: 8 Position Dipswitch x 2
+
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  CY7C185-25PC at U27
+M3 are N341256P-20
+
+PCB Number: P0-113A  BP49KA
++---------------------------------------------------------------+
+|             +------+            +---+                         |
+| VOL         |Seta  |          M |   |        +---------------+|
+|             |X1-010|          2 | U |     M  |KA2-001-014 U19||
+|             +------+            | 2 |     1  +---------------+|
++-+                               | 8 |        +---------------+|
+  |  +-++-+   +-++-+              |   |        |KA2-001-013 U17||
++-+  | || |   | || |              +---+     M  +---------------+|
+|    |U| U| M |U||U| M                      1  +---------------+|
+|J   |3||5| 3 |2||4| 3                         |      U15      ||
+|A   | || |   | || |                           +---------------+|
+|M   +-++-+   +-++-+                           +---------------+|
+|M                                             |KA2-001-011 U20||
+|A                              +----------+   +---------------+|
+|                               |          |   +---------------+|
+|C                              | ALLUMER  |   |KA2-001-010 U18||
+|o     +---+                    | X1-020   |   +---------------+|
+|n     |   |  +-------+         |          |   +---------------+|
+|n     | U |  |Toshiba|         | 9426HK003|   |       U16*    ||
+|e C   | 7 |  |  TMP  |         +----------+   +---------------+|
+|c N   | 7 |  | 68301 |                        +---------------+|
+|t 2   |   |  +-------+                        |KA2-001-008 U23||
+|e     +---+                                   +---------------+|
+|r          93C46                              +---------------+|
+|                                              |KA2-001-007 U22||
++-+                           50MHz 32.530MHz  +---------------+|
+  |                                            +---------------+|
+  |                    P P                     |      U21*     ||
++-+  C                 A A       M M           +---------------+|
+|    N    DSW1         L L       3 3                            |
+|    1    DSW2                                                  |
++---------------------------------------------------------------+
+
+U2 is KA2 001 001 EPROM
+U4 is KA2 001 002 EPROM
+U5 is KA2 001 003 EPROM
+U3 is KA2 001 004 EPROM
+U28 is KA-001-015 mask ROM (silkscreened SOUND ROM)
+U15 is socketted to recieve P1-106-1 daughtercard
+U77 is socketted to recieve P1-107-1 daughtercard
+CN2 - 5 Pin header
+CN1 - 10 Pin header
+* Denotes not populated.
+
+The daughtercards below are NOT to scale with the above main board.
+
+P1-107-1  (additional RAM)
++-------------------------------+
+| LOGIC              JP5 JP6 JP7|
+| CXK58257AM-10L CXK58257AM-10L |
+|   +-----------------------+   |
+|   |U7 42 pin header to U77|   |
+|   +-----------------------+   |
++-------------------------------+
+
+Unknown LOGIC chip
+JP5 - JP7 single wire connections for power
+
+
+P1-106-1
++-------------------------------+
+|  HD74HC373P       HD74HC373P  |
+|   +-----------------------+   |
+|   |U3 42 pin header to U15|   |
+|   +-----------------------+   |
+|   +-----------------------+   |
+|   |    KA2-001-017  U2    |   |
+|   +-----------------------+   |
+|   +-----------------------+   |
+|   |    KA2-001-016  U1    |   |
+|   +-----------------------+   |
+|JP1 JP2 JP3 JP4          LOGIC |
++-------------------------------+
+
+Unknown LOGIC chip
+JP1 - JP4 single wire connections for power
+
 ***************************************************************************/
 
-ROM_START( grdians )
+ROM_START( grdians ) /* P-FG01-1 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "u2.bin", 0x000000, 0x080000, CRC(36adc6f2) SHA1(544e87f88179fe1342e7a06a8948ac1828e85108) )
 	ROM_LOAD16_BYTE( "u3.bin", 0x000001, 0x080000, CRC(2704f416) SHA1(9081a12cbb9927d36e1c50b52aa2c6003810ee42) )
@@ -3227,30 +3324,56 @@ Banpresto, 1994
 
 This game runs on Seta/Allumer hardware
 
-PCB Layout
-----------
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 (208 Pin PQFP)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz, 32.530MHz
+ Other: 8 Position Dipswitch x 2
 
-P0-113A   BP949KA
-|----------------------------------|
-|  X1-010  6264  U28               |
-|                     581001   U19 |
-|     U3  U5  U2  U4  581001   U17 |
-|      62256   62256           U15 |
-|J                             U20 |
-|A    U77  68301               U18 |
-|M                     *       U16 |
-|M    93C46                    U23 |
-|A                             U22 |
-|                              U21 |
-|  DSW1            50MHz           |
-|  DSW2       PAL  32.5304MHz      |
-|       20MHz PAL                  |
-|----------------------------------|
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  CY7C185-25PC at U27
+M3 are N341256P-20
 
-Notes:
-      *: unknown QFP208 (has large heatsink on it). Should be similar to other known
-         graphics chips used on Seta hardware of this era.
-      68301 clock: 16.000MHz (?? From what OSC + divider??)
+PCB Number: P0-113A  BP49KA
++--------------------------------------------------------------+
+|             +------+            +---+                        |
+| VOL         |Seta  |          M |   |        +--------------+|
+|             |X1-010|          2 | U |     M  |KA-001-014 U19||
+|             +------+            | 2 |     1  +--------------+|
++-+                               | 8 |        +--------------+|
+  |  +-++-+   +-++-+              |   |        |KA-001-013 U17||
++-+  | || |   | || |              +---+     M  +--------------+|
+|    |U| U| M |U||U| M                      1  +--------------+|
+|J   |3||5| 3 |2||4| 3                         |KA-001-012 U15||
+|A   | || |   | || |                           +--------------+|
+|M   +-++-+   +-++-+                           +--------------+|
+|M                                             |KA-001-011 U20||
+|A                              +----------+   +--------------+|
+|                               |          |   +--------------+|
+|C                              | ALLUMER  |   |KA-001-010 U18||
+|o     +---+                    | X1-020   |   +--------------+|
+|n     |   |  +-------+         |          |   +--------------+|
+|n     | U |  |Toshiba|         | 9426HK003|   |KA-001-009 U16||
+|e C   | 7 |  |  TMP  |         +----------+   +--------------+|
+|c N   | 7 |  | 68301 |                        +--------------+|
+|t 2   |   |  +-------+                        |KA-001-008 U23||
+|e     +---+                                   +--------------+|
+|r          93C46                              +--------------+|
+|                                              |KA-001-007 U22||
++-+                           50MHz 32.530MHz  +--------------+|
+  |                                            +--------------+|
+  |                    P P                     |KA-001-006 U21||
++-+  C                 A A       M M           +--------------+|
+|    N    DSW1         L L       3 3                           |
+|    1    DSW2                                                 |
++--------------------------------------------------------------+
+
+U28 is KA-001-015 mask ROM (silkscreened SOUND ROM)
+U77 is KA-001-005 mask ROM
+CN2 - 5 Pin header
+CN1 - 10 Pin header
+
       VSync: 60Hz
 
 ***************************************************************************/
