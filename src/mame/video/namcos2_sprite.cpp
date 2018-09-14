@@ -21,7 +21,7 @@
 #include "emu.h"
 #include "namcos2_sprite.h"
 
-DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Namco Sysem 2 Sprites (C106,C134,C135,C146)")
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Namco System 2 Sprites (C106,C134,C135,C146)")
 
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
