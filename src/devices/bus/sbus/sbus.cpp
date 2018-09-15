@@ -16,6 +16,9 @@
 // Accelerator boards
 #include "sunpc.h"
 
+// Peripheral boards
+#include "hme.h"
+
 #include "sbus.h"
 
 void sbus_cards(device_slot_interface &device)
@@ -24,6 +27,7 @@ void sbus_cards(device_slot_interface &device)
 	device.option_add("cgthree", SBUS_CGTHREE); /* Sun cgthree color display board */
 	device.option_add("turbogx", SBUS_TURBOGX); /* Sun TurboGX 8-bit color display board */
 	device.option_add("sunpc",   SBUS_SUNPC);   /* Sun SunPC 5x86 Accelerator board */
+	device.option_add("hme",     SBUS_HME);     /* Sun SunSwift 10/100 + Fast Wide SCSI "Colossus" board */
 }
 
 DEFINE_DEVICE_TYPE(SBUS_SLOT, sbus_slot_device, "sbus_slot", "Sun SBus Slot")
