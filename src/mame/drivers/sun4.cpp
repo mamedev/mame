@@ -1999,11 +1999,17 @@ static void sun_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
+static void sun4_cdrom(device_t *device)
+{
+	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
+}
+
 static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add_internal("ncr53c90a", NCR53C90A);
+	device.set_option_machine_config("cdrom", sun4_cdrom);
 }
 
 void sun4_state::ncr53c90a(device_t *device)

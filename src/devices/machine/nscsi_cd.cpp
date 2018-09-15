@@ -49,6 +49,7 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 	if(id != 2)
 		return nscsi_full_device::scsi_get_data(id, pos);
 	const int sector = (lba * bytes_per_block + pos) / bytes_per_sector;
+	const int extra_pos = (lba * bytes_per_block) % bytes_per_sector;
 	if(sector != cur_sector) {
 		cur_sector = sector;
 		if(!cdrom_read_data(cdrom, sector, sector_buffer, CD_TRACK_MODE1)) {
@@ -56,7 +57,7 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 			std::fill_n(sector_buffer, sizeof(sector_buffer), 0);
 		}
 	}
-	return sector_buffer[pos & (bytes_per_sector - 1)];
+	return sector_buffer[(pos + extra_pos) & (bytes_per_sector - 1)];
 }
 
 void nscsi_cdrom_device::return_no_cd()
