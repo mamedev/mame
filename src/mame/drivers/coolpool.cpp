@@ -764,12 +764,12 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
 
-	MCFG_DEVICE_ADD("dsp", TMS32026,XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(coolpool_dsp_pgm_map)
-	MCFG_DEVICE_IO_MAP(coolpool_dsp_io_map)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, coolpool_state, dsp_bio_line_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, coolpool_state, dsp_hold_line_r))
-//  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, coolpool_state, dsp_HOLDA_signal_w))
+	tms32026_device& dsp(TMS32026(config, m_dsp, XTAL(40'000'000)));
+	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_dsp_pgm_map);
+	dsp.set_addrmap(AS_IO, &coolpool_state::coolpool_dsp_io_map);
+	dsp.bio_in_cb().set(FUNC(coolpool_state::dsp_bio_line_r));
+	dsp.hold_in_cb().set(FUNC(coolpool_state::dsp_hold_line_r));
+//  dsp.hold_ack_out_cb().set(FUNC(coolpool_state::dsp_HOLDA_signal_w));
 
 	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("dsp", 0)) /* ???  I have no idea who should generate this! */
@@ -805,8 +805,7 @@ MACHINE_CONFIG_START(coolpool_state::_9ballsht)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nballsht_map)
 
-	MCFG_DEVICE_MODIFY("dsp")
-	MCFG_DEVICE_IO_MAP(nballsht_dsp_io_map)
+	subdevice<tms32026_device>("dsp")->set_addrmap(AS_IO, &coolpool_state::nballsht_dsp_io_map);
 MACHINE_CONFIG_END
 
 

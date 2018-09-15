@@ -502,7 +502,7 @@ void z8_device::call(uint16_t dst)
 	m_pc = dst;
 }
 
-INSTRUCTION( call_IRR1 )        { uint16_t dst = register_pair_read(get_intermediate_register(get_register(fetch()))); call(dst); }
+INSTRUCTION( call_IRR1 )        { uint16_t dst = register_pair_read(get_register(fetch())); call(dst); }
 INSTRUCTION( call_DA )          { uint16_t dst = fetch_word(); call(dst); }
 
 INSTRUCTION( djnz_r1_RA )
@@ -549,7 +549,7 @@ void z8_device::jump(uint16_t dst)
 	m_pc = dst;
 }
 
-INSTRUCTION( jp_IRR1 )          { jump(register_pair_read(IR)); }
+INSTRUCTION( jp_IRR1 )          { jump(register_pair_read(get_register(IM))); }
 
 int z8_device::check_condition_code(int cc)
 {

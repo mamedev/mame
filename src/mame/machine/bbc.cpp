@@ -718,13 +718,13 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
 	}
 	if (m_b1_speech_read == 0)
 	{
-		if (m_tms) m_via_system_porta = m_tms->status_r(space, 0);
+		if (m_tms) m_via_system_porta = m_tms->status_r();
 		//logerror("Doing an unsafe read to the speech chip %d \n",m_via_system_porta);
 	}
 	if (m_b2_speech_write == 0)
 	{
 		//logerror("Doing an unsafe write to the speech chip %d \n",data);
-		if (m_tms) m_tms->data_w(space, 0, m_via_system_porta);
+		if (m_tms) m_tms->data_w(m_via_system_porta);
 	}
 	if (m_b3_keyboard == 0)
 	{

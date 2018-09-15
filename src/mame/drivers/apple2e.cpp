@@ -1443,6 +1443,13 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 		return;
 	}
 
+	if ((offset & 0xf0) == 0x30) // speaker, $C030 is really 30-3f
+	{
+		m_speaker_state ^= 1;
+		m_speaker->level_w(m_speaker_state);
+		return;
+	}
+
 	switch (offset)
 	{
 		case 0x20:
@@ -1480,11 +1487,6 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 					}
 				}
 			}
-			break;
-
-		case 0x30:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
 			break;
 
 		case 0x48:  // (IIc only) clear mouse X/Y interrupt flags
@@ -1599,11 +1601,13 @@ READ8_MEMBER(apple2e_state::c000_r)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 
+	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
+	{
+		return m_transchar | m_strobe;
+	}
+
 	switch (offset)
 	{
-		case 0x00:  // keyboard latch
-			return m_transchar | m_strobe;
-
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
 				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
@@ -1611,50 +1615,50 @@ READ8_MEMBER(apple2e_state::c000_r)
 				return rv;
 			}
 
-		case 0x11:  // read LCRAM2 (LC Dxxx bank)
-			return m_lcram2 ? 0x80 : 0x00;
+		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
+			return (m_lcram2 ? 0x80 : 0x00) | m_strobe | m_transchar;
 
 		case 0x12:  // read LCRAM (is LC readable?)
-			return m_lcram ? 0x80 : 0x00;
+			return (m_lcram ? 0x80 : 0x00) | m_transchar;
 
 		case 0x13:  // read RAMRD
-			return m_ramrd ? 0x80 : 0x00;
+			return (m_ramrd ? 0x80 : 0x00) | m_transchar;
 
 		case 0x14:  // read RAMWRT
-			return m_ramwrt ? 0x80 : 0x00;
+			return (m_ramwrt ? 0x80 : 0x00) | m_transchar;
 
 		case 0x15:  // read INTCXROM
-			return m_intcxrom ? 0x80 : 0x00;
+			return (m_intcxrom ? 0x80 : 0x00) | m_transchar;
 
 		case 0x16:  // read ALTZP
-			return m_altzp ? 0x80 : 0x00;
+			return (m_altzp ? 0x80 : 0x00) | m_transchar;
 
 		case 0x17:  // read SLOTC3ROM
-			return m_slotc3rom ? 0x80 : 0x00;
+			return (m_slotc3rom ? 0x80 : 0x00) | m_transchar;
 
 		case 0x18:  // read 80STORE
-			return m_80store ? 0x80 : 0x00;
+			return (m_80store ? 0x80 : 0x00) | m_transchar;
 
 		case 0x19:  // read VBLBAR
-			return m_screen->vblank() ? 0x00 : 0x80;
+			return (m_screen->vblank() ? 0x00 : 0x80) | m_transchar;
 
 		case 0x1a:  // read TEXT
-			return m_video->m_graphics ? 0x00 : 0x80;
+			return (m_video->m_graphics ? 0x00 : 0x80) | m_transchar;
 
 		case 0x1b:  // read MIXED
-			return m_video->m_mix ? 0x80 : 0x00;
+			return (m_video->m_mix ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1c:  // read PAGE2
-			return m_page2 ? 0x80 : 0x00;
+			return (m_page2 ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1d:  // read HIRES
-			return m_video->m_hires ? 0x80 : 0x00;
+			return (m_video->m_hires ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1e:  // read ALTCHARSET
-			return m_video->m_altcharset ? 0x80 : 0x00;
+			return (m_video->m_altcharset ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1f:  // read 80COL
-			return m_video->m_80col ? 0x80 : 0x00;
+			return (m_video->m_80col ? 0x80 : 0x00) | m_transchar;
 
 		case 0x60: // cassette in
 		case 0x68:
@@ -1709,6 +1713,12 @@ READ8_MEMBER(apple2e_state::c000_r)
 WRITE8_MEMBER(apple2e_state::c000_w)
 {
 	if(machine().side_effects_disabled()) return;
+
+	if ((offset & 0xf0) == 0x10) // clear keyboard latch, $C010 is really 10-1F
+	{
+		m_strobe = 0;
+		return;
+	}
 
 	switch (offset)
 	{
@@ -1796,10 +1806,6 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 			m_video->m_altcharset = true;
 			break;
 
-		case 0x10:  // clear keyboard latch
-			m_strobe = 0;
-			break;
-
 		case 0x20:  // cassette output
 			if (m_cassette)
 			{
@@ -1836,31 +1842,13 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 
+	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
+	{
+		return m_transchar | m_strobe;
+	}
+
 	switch (offset)
 	{
-		case 0x00:  // keyboard latch
-			return m_transchar | m_strobe;
-
-		case 0x02:  // RAMRDOFF
-			m_ramrd = false;
-			auxbank_update();
-			break;
-
-		case 0x03:  // RAMRDON
-			m_ramrd = true;
-			auxbank_update();
-			break;
-
-		case 0x04:  // RAMWRTOFF
-			m_ramwrt = false;
-			auxbank_update();
-			break;
-
-		case 0x05:  // RAMWRTON
-			m_ramwrt = true;
-			auxbank_update();
-			break;
-
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
 				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
@@ -1868,54 +1856,52 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 				return rv;
 			}
 
-		case 0x11:  // read LCRAM2 (LC Dxxx bank)
-			return m_lcram2 ? 0x80 : 0x00;
-			break;
+		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
+			return (m_lcram2 ? 0x80 : 0x00) | m_strobe | m_transchar;
 
 		case 0x12:  // read LCRAM (is LC readable?)
-			return m_lcram ? 0x80 : 0x00;
-			break;
+			return (m_lcram ? 0x80 : 0x00) | m_transchar;
 
 		case 0x13:  // read RAMRD
-			return m_ramrd ? 0x80 : 0x00;
+			return (m_ramrd ? 0x80 : 0x00) | m_transchar;
 
 		case 0x14:  // read RAMWRT
-			return m_ramwrt ? 0x80 : 0x00;
+			return (m_ramwrt ? 0x80 : 0x00) | m_transchar;
 
 		case 0x15:  // read & reset mouse X0 interrupt flag
 			lower_irq(IRQ_MOUSEXY);
-			return m_xirq ? 0x80 : 0x00;
+			return (m_xirq ? 0x80 : 0x00) | m_transchar;
 
 		case 0x16:  // read ALTZP
-			return m_altzp ? 0x80 : 0x00;
+			return (m_altzp ? 0x80 : 0x00) | m_transchar;
 
 		case 0x17:  // read & reset mouse Y0 interrupt flag
 			lower_irq(IRQ_MOUSEXY);
-			return m_yirq ? 0x80 : 0x00;
+			return (m_yirq ? 0x80 : 0x00) | m_transchar;
 
 		case 0x18:  // read 80STORE
-			return m_80store ? 0x80 : 0x00;
+			return (m_80store ? 0x80 : 0x00) | m_transchar;
 
 		case 0x19:  // read VBL
-			return m_vbl ? 0x80 : 0x00;
+			return (m_vbl ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1a:  // read TEXT
-			return m_video->m_graphics ? 0x00 : 0x80;
+			return (m_video->m_graphics ? 0x00 : 0x80) | m_transchar;
 
 		case 0x1b:  // read MIXED
-			return m_video->m_mix ? 0x80 : 0x00;
+			return (m_video->m_mix ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1c:  // read PAGE2
-			return m_page2 ? 0x80 : 0x00;
+			return (m_page2 ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1d:  // read HIRES
-			return m_video->m_hires ? 0x80 : 0x00;
+			return (m_video->m_hires ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1e:  // read ALTCHARSET
-			return m_video->m_altcharset ? 0x80 : 0x00;
+			return (m_video->m_altcharset ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1f:  // read 80COL
-			return m_video->m_80col ? 0x80 : 0x00;
+			return (m_video->m_80col ? 0x80 : 0x00) | m_transchar;
 
 		case 0x40:  // read XYMask (IIc only)
 			return m_xy ? 0x80 : 0x00;
@@ -1980,6 +1966,12 @@ WRITE8_MEMBER(apple2e_state::c000_iic_w)
 {
 	if(machine().side_effects_disabled()) return;
 
+	if ((offset & 0xf0) == 0x10) // clear keyboard latch, $C010 is really 10-1F
+	{
+		m_strobe = 0;
+		return;
+	}
+
 	switch (offset)
 	{
 		case 0x00:  // 80STOREOFF
@@ -2056,10 +2048,6 @@ WRITE8_MEMBER(apple2e_state::c000_iic_w)
 
 		case 0x0f:  // ALTCHARSETON
 			m_video->m_altcharset = true;
-			break;
-
-		case 0x10:  // clear keyboard latch
-			m_strobe = 0;
 			break;
 
 		case 0x5a:  // IIC+ accelerator unlock
@@ -2338,7 +2326,7 @@ READ8_MEMBER(apple2e_state::c300_r)  { return read_slot_rom(3, offset); }
 
 READ8_MEMBER(apple2e_state::c300_int_r)
 {
-	if (!m_slotc3rom)
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
@@ -2348,7 +2336,7 @@ READ8_MEMBER(apple2e_state::c300_int_r)
 
 READ8_MEMBER(apple2e_state::c300_int_bank_r)
 {
-	if (!m_slotc3rom)
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
@@ -2358,7 +2346,7 @@ READ8_MEMBER(apple2e_state::c300_int_bank_r)
 
 WRITE8_MEMBER(apple2e_state::c300_w)
 {
-	if (!m_slotc3rom)
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
@@ -2409,6 +2397,7 @@ READ8_MEMBER(apple2e_state::c800_r)
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
+		m_intc8rom = false;
 		update_slotrom_banks();
 		return 0xff;
 	}

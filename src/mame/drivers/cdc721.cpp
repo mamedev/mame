@@ -31,6 +31,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bank_16k(*this, {"block0", "block4", "block8", "blockc"})
+		, m_crtc(*this, "crtc")
 		, m_rom_chargen(*this, "chargen")
 		, m_ram_chargen(*this, "chargen")
 		, m_videoram(*this, "videoram")
@@ -72,6 +73,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_bank_16k;
+	required_device<crt5037_device> m_crtc;
 	required_region_ptr<u8> m_rom_chargen;
 	required_shared_ptr<u8> m_ram_chargen;
 	required_shared_ptr<u8> m_videoram;
@@ -326,8 +328,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, 12.936_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5037(config, m_crtc, 12.936_MHz_XTAL / 8).set_char_width(8);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", 6_MHz_XTAL)); // Zilog Z8430B (M1 pulled up)
 	ctc.intr_callback().set(FUNC(cdc721_state::int_w<6>));

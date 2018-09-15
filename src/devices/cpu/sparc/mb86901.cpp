@@ -11,7 +11,6 @@
 //  To-Do:
 //      - Ops: FBFcc, LDF, STF
 //      - Test: SPARCv8 ops are untested
-//      - Test: Traps are untested
 //      - FPU support
 //      - Coprocessor support
 //
@@ -1337,6 +1336,7 @@ void mb86901_device::execute_saverestore(uint32_t op)
 			result = rs1 + operand2;
 			PSR &= ~PSR_CWP_MASK;
 			PSR |= new_cwp;
+			BREAK_PSR;
 		}
 	}
 	else if (RESTORE)
@@ -1352,6 +1352,7 @@ void mb86901_device::execute_saverestore(uint32_t op)
 			result = rs1 + operand2;
 			PSR &= ~PSR_CWP_MASK;
 			PSR |= new_cwp;
+			BREAK_PSR;
 		}
 	}
 
@@ -2588,7 +2589,7 @@ void mb86901_device::select_trap()
 	else if (m_interrupt_level > 0)
 		m_tt = 0x10 | m_interrupt_level;
 
-	TBR |= m_tt << 4;
+	TBR = (TBR & 0xfffff000) | (m_tt << 4);
 	m_trap = 0;
 	m_instruction_access_exception = 0;
 	m_illegal_instruction = 0;

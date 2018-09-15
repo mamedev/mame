@@ -2955,7 +2955,7 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
-//  map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));   // Protection (not in wits)
+	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
 	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
 	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
@@ -6068,17 +6068,6 @@ static INPUT_PORTS_START( thunderl )
 	PORT_START("P4") //Player 4
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( thunderlbl )
-	PORT_INCLUDE(thunderl)
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
 
 /***************************************************************************
                                 Thundercade (US)
@@ -12131,7 +12120,7 @@ GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_ini
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
 GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderlbl,seta_state,     empty_init,     ROT90,  "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
@@ -12171,9 +12160,9 @@ GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_ini
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawko, jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
 

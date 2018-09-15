@@ -31,6 +31,7 @@ public:
 	ampex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_vtac(*this, "vtac")
 		, m_uart(*this, "uart")
 		, m_dbrg(*this, "dbrg")
 		, m_p_chargen(*this, "chargen")
@@ -68,6 +69,7 @@ private:
 	std::unique_ptr<u16[]> m_paged_ram;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<crt5037_device> m_vtac;
 	required_device<ay31015_device> m_uart;
 	required_device<com8116_device> m_dbrg;
 	required_region_ptr<u8> m_p_chargen;
@@ -170,7 +172,7 @@ void ampex_state::mem_map(address_map &map)
 	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(FUNC(ampex_state::write_5843));
 	map(0x5846, 0x5846).r(FUNC(ampex_state::read_5846));
 	map(0x5847, 0x5847).r(FUNC(ampex_state::read_5847));
-	map(0x5c00, 0x5c0f).rw("vtac", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
+	map(0x5c00, 0x5c0f).rw(m_vtac, FUNC(crt5037_device::read), FUNC(crt5037_device::write));
 	map(0x8000, 0x97ff).rw(FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
 	map(0xc000, 0xcfff).ram(); // video RAM
 }
@@ -207,18 +209,19 @@ void ampex_state::machine_start()
 	save_pointer(NAME(m_paged_ram), 0x1800 * 4);
 }
 
-MACHINE_CONFIG_START(ampex_state::ampex)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(23'814'000) / 9) // clocked by 8224?
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void ampex_state::ampex(machine_config &config)
+{
+	Z80(config, m_maincpu, 23.814_MHz_XTAL / 9); // clocked by 8224?
+	m_maincpu->set_addrmap(AS_PROGRAM, &ampex_state::mem_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(23.814_MHz_XTAL / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250);
 	screen.set_screen_update(FUNC(ampex_state::screen_update));
 
-	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2 / CHAR_WIDTH)
-	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(*this, ampex_state, vsyn_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5037(config, m_vtac, 23.814_MHz_XTAL / 2 / CHAR_WIDTH);
+	m_vtac->set_char_width(CHAR_WIDTH);
+	m_vtac->vsyn_callback().set(FUNC(ampex_state::vsyn_w));
+	m_vtac->set_screen("screen");
 
 	AY31015(config, m_uart, 0); // COM8017, actually
 	m_uart->write_so_callback().set(FUNC(ampex_state::so_w));
@@ -228,7 +231,7 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 	COM5016_5(config, m_dbrg, 4.9152_MHz_XTAL);
 	m_dbrg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_dbrg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
-MACHINE_CONFIG_END
+}
 
 ROM_START( dialog80 )
 	ROM_REGION( 0x3000, "roms", 0 )

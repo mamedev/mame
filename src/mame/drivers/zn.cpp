@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt83c461.h"
+#include "machine/watchdog.h"
 #include "machine/znmcu.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
@@ -51,7 +52,7 @@ public:
 	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
-		m_gpu_screen(*this, "gpu:screen"),
+		m_gpu_screen(*this, "screen"),
 		m_sio0(*this, "maincpu:sio0"),
 		m_cat702(*this, "cat702_%u", 1),
 		m_znmcu(*this, "znmcu"),
@@ -171,7 +172,7 @@ private:
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 	void atpsx_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void jdredd_vblank(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(jdredd_vblank);
 
 	void atlus_snd_map(address_map &map);
 	void bam2_map(address_map &map);
@@ -406,6 +407,9 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN(m_gpu_screen)
+
+	SCREEN(config, m_gpu_screen, SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -423,6 +427,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zn_state::zn1_2mb_vram)
 	zn1_1mb_vram(config);
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN(m_gpu_screen)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::zn2)
@@ -452,6 +457,9 @@ MACHINE_CONFIG_START(zn_state::zn2)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN(m_gpu_screen)
+
+	SCREEN(config, m_gpu_screen, SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1455,7 +1463,7 @@ void zn_state::coh1000w_map(address_map &map)
 {
 	zn_map(map);
 	map(0x1f000000, 0x1f1fffff).rom().region("roms", 0);
-	map(0x1f000000, 0x1f000003).nopw();
+	map(0x1f000000, 0x1f000003).w("watchdog", FUNC(watchdog_timer_device::reset16_w)).umask16(0xffff); // ds1232s
 	map(0x1f7e8000, 0x1f7e8003).noprw();
 	map(0x1f7e4000, 0x1f7e4fff).rw(FUNC(zn_state::vt83c461_16_r), FUNC(zn_state::vt83c461_16_w));
 	map(0x1f7f4000, 0x1f7f4fff).rw(FUNC(zn_state::vt83c461_32_r), FUNC(zn_state::vt83c461_32_w));
@@ -1467,6 +1475,8 @@ MACHINE_CONFIG_START(zn_state::coh1000w)
 	MCFG_DEVICE_PROGRAM_MAP(coh1000w_map)
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("8M");
+
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(600));   /* 600ms Ds1232 TD floating */
 
 	VT83C461(config, m_vt83c461).options(ata_devices, "hdd", nullptr, true);
 	m_vt83c461->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
@@ -2020,12 +2030,12 @@ CUSTOM_INPUT_MEMBER(zn_state::jdredd_gun_mux_read)
 	return m_jdredd_gun_mux;
 }
 
-void zn_state::jdredd_vblank(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(zn_state::jdredd_vblank)
 {
 	int x;
 	int y;
 
-	if( vblank_state )
+	if (state)
 	{
 		m_jdredd_gun_mux = !m_jdredd_gun_mux;
 
@@ -2211,8 +2221,7 @@ MACHINE_CONFIG_START(zn_state::jdredd)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(jdredd_map)
 
-	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
+	m_gpu_screen->screen_vblank().set(FUNC(zn_state::jdredd_vblank));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
 	ata.irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));

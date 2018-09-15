@@ -23,6 +23,7 @@
 #include "video/psx.h"
 
 #include "debugger.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -536,6 +537,9 @@ MACHINE_CONFIG_START(psx1_state::psj)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -587,6 +591,9 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	/* video hardware */
 	/* TODO: visible area and refresh rate */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

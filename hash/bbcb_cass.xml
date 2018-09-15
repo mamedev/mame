@@ -6052,7 +6052,7 @@
 	</software>
 
 	<software name="hitchhik">
-		<description>Hitch Hiker</description>
+		<description>Hitch-Hiker</description>
 		<year>1982</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -9637,7 +9637,7 @@
 	</software>
 
 	<software name="progsrev">
-		<description>Programmer's Revenge</description>
+		<description>Programmer's Revenge!</description>
 		<year>1984</year>
 		<publisher>Colisoft</publisher>
 		<part name="cass" interface="bbc_cass">

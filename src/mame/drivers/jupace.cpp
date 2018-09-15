@@ -666,7 +666,7 @@ WRITE8_MEMBER(ace_state::ald_w)
 
 	if (!BIT(data, 6))
 	{
-		m_sp0256->ald_w(space, 0, data & 0x3f);
+		m_sp0256->ald_w(data & 0x3f);
 	}
 }
 

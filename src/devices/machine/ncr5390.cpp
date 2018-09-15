@@ -340,7 +340,7 @@ void ncr5390_device::step(bool timeout)
 
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
-		if (!fifo_pos || (dma_command && !(status & S_TC0)))
+		if (!fifo_pos && dma_command && !(status & S_TC0))
 			break;
 
 		command_length = derive_msg_size(fifo[0]);
@@ -375,7 +375,7 @@ void ncr5390_device::step(bool timeout)
 	case DISC_SEL_ATN_SEND_BYTE:
 		if(c == CD_SELECT_ATN_STOP) {
 			seq = 1;
-			function_complete();
+			function_bus_complete();
 		} else {
 			command_length = derive_msg_size(fifo[0]);
 			state = DISC_SEL_WAIT_REQ;
@@ -825,6 +825,7 @@ void ncr5390_device::start_command()
 	case CI_COMPLETE:
 		LOGMASKED(LOG_COMMAND, "Initiator command complete sequence\n");
 		state = INIT_CPT_RECV_BYTE_ACK;
+		dma_set(dma_command ? DMA_IN : DMA_NONE);
 		recv_byte();
 		break;
 

@@ -27,9 +27,8 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 	virtual void device_reset() override;
-
-	void postload(void);
 
 private:
 	void map(address_map &map);

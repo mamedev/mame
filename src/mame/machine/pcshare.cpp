@@ -217,7 +217,7 @@ void pcat_base_state::pcat_common(machine_config &config)
 	m_pit8254->out_handler<2>().set(FUNC(pcat_base_state::at_pit8254_out2_changed));
 
 	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
-	m_mc146818->irq_callback().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
+	m_mc146818->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
 	KBDC8042(config, m_kbdc, 0);

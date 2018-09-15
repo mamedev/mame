@@ -281,6 +281,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
 		m_galileo(*this, PCI_ID_GALILEO),
+		m_voodoo(*this, PCI_ID_VIDEO),
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
 		m_screen(*this, "screen"),
@@ -337,6 +338,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
 	required_device<gt64010_device> m_galileo;
+	required_device<voodoo_1_pci_device> m_voodoo;
 	optional_device<atari_cage_seattle_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;
 	required_device<screen_device> m_screen;
@@ -1911,23 +1913,23 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
 	ide.set_legacy_top(0x0a0);
 
-	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, m_screen));
-	voodoo.set_fbmem(2);
-	voodoo.set_tmumem(4, 0);
+	/* video hardware */
+	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 0);
 
-	voodoo_device *voodoo_base = static_cast<voodoo_device*>(config.device_find(this, PCI_ID_VIDEO":voodoo"));
-	voodoo_base->vblank_callback().set(FUNC(seattle_state::vblank_assert));
-	voodoo_base->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(seattle_state::vblank_assert));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
-	/* sound hardware */
+	/* screen */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// Screeen size and timing is re-calculated later in voodoo card
+	m_screen->set_refresh_hz(57);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
+	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 MACHINE_CONFIG_END
 
 
@@ -1980,9 +1982,8 @@ MACHINE_CONFIG_START(seattle_state::flagstaff)
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 
-	voodoo_1_pci_device *voodoo = static_cast<voodoo_1_pci_device*>(config.device_find(this, PCI_ID_VIDEO));
-	voodoo->set_fbmem(2);
-	voodoo->set_tmumem(4, 4);
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 4);
 MACHINE_CONFIG_END
 
 // Per game configurations

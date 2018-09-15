@@ -1425,9 +1425,11 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x20000, 21.477272_MHz_XTAL)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", 21.477272_MHz_XTAL)
+	V9938(config, m_v9938, 21.477272_MHz_XTAL);
+	m_v9938->set_screen_ntsc("screen");
+	m_v9938->set_vram_size(0x20000);
+	m_v9938->int_cb().set(FUNC(msx_state::msx_irq_source0));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1482,9 +1484,11 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, 21.477272_MHz_XTAL)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", 21.477272_MHz_XTAL)
+	V9958(config, m_v9958, 21.477272_MHz_XTAL);
+	m_v9958->set_screen_ntsc("screen");
+	m_v9958->set_vram_size(0x20000);
+	m_v9958->int_cb().set(FUNC(msx_state::msx_irq_source0));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1526,11 +1530,11 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(msx_state::msx2_pal)
+void msx_state::msx2_pal(machine_config &config)
+{
 	msx2(config);
-	MCFG_DEVICE_REMOVE("screen")
-	MCFG_V99X8_SCREEN_ADD_PAL("screen", "v9938", 21.477272_MHz_XTAL)
-MACHINE_CONFIG_END
+	m_v9938->set_screen_pal("screen");
+}
 
 
 /***************************************************************************

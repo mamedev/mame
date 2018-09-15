@@ -135,6 +135,7 @@ Notes:
 #include "sound/cdda.h"
 #include "sound/spu.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 #include "cdrom.h"
 
@@ -376,6 +377,9 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

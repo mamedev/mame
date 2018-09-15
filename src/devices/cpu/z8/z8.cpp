@@ -523,7 +523,7 @@ uint8_t z8_device::get_intermediate_register(int offset)
 
 void z8_device::stack_push_byte(uint8_t src)
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 1 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 1;
@@ -545,7 +545,7 @@ void z8_device::stack_push_byte(uint8_t src)
 
 void z8_device::stack_push_word(uint16_t src)
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 2 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 2;
@@ -567,7 +567,7 @@ void z8_device::stack_push_word(uint16_t src)
 
 uint8_t z8_device::stack_pop_byte()
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
 		uint8_t sp = register_read(Z8_REGISTER_SPL);
@@ -593,7 +593,7 @@ uint8_t z8_device::stack_pop_byte()
 
 uint16_t z8_device::stack_pop_word()
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
 		uint8_t sp = register_read(Z8_REGISTER_SPL);

@@ -396,6 +396,7 @@ MACHINES["ADC1213X"] = true
 MACHINES["AICARTC"] = true
 MACHINES["AM2847"] = true
 MACHINES["AM53CF96"] = true
+MACHINES["AM79C90"] = true
 MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AM9519"] = true
@@ -768,6 +769,7 @@ BUSES["RS232"] = true
 BUSES["S100"] = true
 BUSES["SAT_CTRL"] = true
 BUSES["SATURN"] = true
+BUSES["SBUS"] = true
 BUSES["SCSI"] = true
 BUSES["SCV"] = true
 BUSES["SEGA8"] = true
@@ -2270,7 +2272,7 @@ files {
 createMESSProjects(_target, _subtarget, "intel")
 files {
 	MAME_DIR .. "src/mame/drivers/basic52.cpp",
-	MAME_DIR .. "src/mame/drivers/imds.cpp",
+	MAME_DIR .. "src/mame/drivers/imds2.cpp",
 	MAME_DIR .. "src/mame/drivers/intellec4.cpp",
 	MAME_DIR .. "src/mame/drivers/ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/ipds.cpp",
@@ -2287,8 +2289,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/sdk80.cpp",
 	MAME_DIR .. "src/mame/drivers/sdk85.cpp",
 	MAME_DIR .. "src/mame/drivers/sdk86.cpp",
-	MAME_DIR .. "src/mame/drivers/imds2.cpp",
-	MAME_DIR .. "src/mame/includes/imds2.h",
+	MAME_DIR .. "src/mame/machine/imds2ioc.cpp",
+	MAME_DIR .. "src/mame/machine/imds2ioc.h",
 }
 
 createMESSProjects(_target, _subtarget, "imp")

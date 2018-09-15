@@ -358,8 +358,8 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("uart", MC2661, 40_MHz_XTAL / 8) // actually SCN2651
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("monitor_vgb", rs232_port_device, write_txd))
+	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
+	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &monitor_host(RS232_PORT(config, "monitor_host", default_rs232_devices, nullptr)); // J2 (4-pin molex)
 	monitor_host.rxd_handler().set("duart", FUNC(mc68681_device::rx_a_w));

@@ -91,9 +91,7 @@ void tms9927_device::device_start()
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);
 	m_hsync_timer = timer_alloc(TIMER_HSYNC);
 
-	/* register for state saving */
-	machine().save().register_postload(save_prepost_delegate(FUNC(tms9927_device::state_postload), this));
-
+	// register for state saving
 	save_item(NAME(m_reg));
 	save_item(NAME(m_start_datarow));
 	save_item(NAME(m_reset));
@@ -181,7 +179,7 @@ void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-void tms9927_device::state_postload()
+void tms9927_device::device_post_load()
 {
 	recompute_parameters(true);
 }

@@ -3132,43 +3132,174 @@ void funcube_state::init_funcube3()
 Guardians
 Banpresto, 1995
 
-This hardware is not common Banpresto hardware. Possibly licensed
-to them from another manufacturer? Or an early design that they decided
-not to use for future games? Either way, this game is _extremely_ rare :-)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x2, @ U28 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz
+ Other: 8 Position Dipswitch x 2
+        GAL 16V8 at U38
 
-PCB Layout
-----------
+Memory:
+M1 are HM628128LFP-10L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9
+M4 are CXK58257AM-10L at U6, U7, U13 & U14
 
-P-FG01-1
-------------------------------------------------------
-|        X1-010 6264          U32 CXK581000          |
-|                                 CXK581000      U16 |
-|                                                    |
-|                                                U20 |
-|    U3 U5 U2 U4 62256 CXK58257                      |
-|                62256 CXK58257                  U15 |
-|                                                    |
-|J                                               U19 |
-|A    TMP68301AF-16                                  |
-|M                                               U18 |
-|M                           NEC                     |
-|A          NEC              DX-101              U22 |
-|           DX-102                                   |
-|                                                U17 |
-|                   PAL   50MHz                      |
-|                                                U21 |
-|           DSW1(8)                                  |
-|           DSW2(8)                   CXK58257 NEC   |
-|                                     CXK58257 DX-102|
-------------------------------------------------------
+PCB Number: P-FG01-1
++-----------------------------------------------------------+
+|             +------+      U  U             CN4*           |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  |      U16     ||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|     +--------------+|
+  |  +-++-++-++-+                   |3|     |      U20     ||
++-+  | || || || |      M            |2|  M  +--------------+|
+|    |U||U||U||U| M M  4            | |  1  +--------------+|
+|J   |3||5||2||4| 3 3               +-+     |      U15     ||
+|A   | || || || |      M                    +--------------+|
+|M   +-++-++-++-+      4                    +--------------+|
+|M                                          |      U19     ||
+|A                                          +--------------+|
+|                                           +--------------+|
+|C                                          |      U18     ||
+|o                           +----------+   +--------------+|
+|n          +-------+        |          |   +--------------+|
+|n          |Toshiba|        |   NEC    |   |      U22     ||
+|e          |  TMP  |        |  DX-101  |   +--------------+|
+|c          | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   |      U17     ||
+|e        5                  +----------+   +--------------+|
+|r        6                                 +--------------+|
+|         *                                 |      U21     ||
++-+            +---+       U                +--------------+|
+  |            |DX |       3  50MHz 32MHz*                  |
+  |            |102|       8                                |
++-+            +---+                    M  M   +---+        |
+|              D D                      4  4   |DX |        |
+|              S S                             |102|        |
+|              W W                             +---+        |
+|              2 1                                          |
++-----------------------------------------------------------+
+
+U56 is unpopulated 93C45 EEPROM
+CN4 - 96 pin connector (3 rows by 32 pins)
+* Denotes not populated.
 
 Notes:
       HSync: 15.23kHz
       VSync: 58.5Hz
 
+NOTE:  There is known to exist an undumped version of Guardians on the
+       P-FG01-1 PCB half as many but larger ROMs.
+
+  The following sockets have double size ROMS:
+   U4 & U5 - program ROMs
+   U15, U16, U17 & U18 - graphics ROMS
+  The following sockets are unpopulated:
+   U2 & U3 - program ROMs
+   U19, U20, U21 & U22 - graphics ROMS
+**********************************************************
+
+There is known to exist an undumped version of Guardians on the
+ P0-113A PCB with P1-106-1 & P1-107-1 duaghtercards
+
+ It's assumed the programs roms (at least) are different to cope
+ with the different hardware configuration.
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 (208 Pin PQFP)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz, 32.530MHz
+ Other: 8 Position Dipswitch x 2
+        93C46 EEPROM
+
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  CY7C185-25PC at U27
+M3 are N341256P-20
+
+PCB Number: P0-113A  BP49KA
++---------------------------------------------------------------+
+|             +------+            +---+                         |
+| VOL         |Seta  |          M |   |        +---------------+|
+|             |X1-010|          2 | U |     M  |KA2-001-014 U19||
+|             +------+            | 2 |     1  +---------------+|
++-+                               | 8 |        +---------------+|
+  |  +-++-+   +-++-+              |   |        |KA2-001-013 U17||
++-+  | || |   | || |              +---+     M  +---------------+|
+|    |U||U| M |U||U| M                      1  +---------------+|
+|J   |3||5| 3 |2||4| 3                         |      U15      ||
+|A   | || |   | || |                           +---------------+|
+|M   +-++-+   +-++-+                           +---------------+|
+|M                                             |KA2-001-011 U20||
+|A                              +----------+   +---------------+|
+|                               |          |   +---------------+|
+|C                              | ALLUMER  |   |KA2-001-010 U18||
+|o     +---+                    | X1-020   |   +---------------+|
+|n     |   |  +-------+         |          |   +---------------+|
+|n     | U |  |Toshiba|         | 9426HK003|   |       U16*    ||
+|e C   | 7 |  |  TMP  |         +----------+   +---------------+|
+|c N   | 7 |  | 68301 |                        +---------------+|
+|t 2   |   |  +-------+                        |KA2-001-008 U23||
+|e     +---+                                   +---------------+|
+|r          93C46                              +---------------+|
+|                                              |KA2-001-007 U22||
++-+                           50MHz 32.530MHz  +---------------+|
+  |                                            +---------------+|
+  |                    P P                     |      U21*     ||
++-+  C                 A A       M M           +---------------+|
+|    N    DSW1         L L       3 3                            |
+|    1    DSW2                                                  |
++---------------------------------------------------------------+
+
+U2 is KA2 001 001 EPROM
+U4 is KA2 001 002 EPROM
+U5 is KA2 001 003 EPROM
+U3 is KA2 001 004 EPROM
+U28 is KA2-001-015 mask ROM (silkscreened SOUND ROM)
+U15 is socketted to receive P1-106-1 daughtercard
+U77 is socketted to receive P1-107-1 daughtercard
+CN2 - 5 Pin header
+CN1 - 10 Pin header
+* Denotes not populated.
+
+The daughtercards below are NOT to scale with the above main board.
+
+P1-107-1  (additional RAM)
++-------------------------------+
+| LOGIC              JP5 JP6 JP7|
+| CXK58257AM-10L CXK58257AM-10L |
+|   +-----------------------+   |
+|   |U7 42 pin header to U77|   |
+|   +-----------------------+   |
++-------------------------------+
+
+Unknown LOGIC chip
+JP5 - JP7 single wire connections for power
+
+
+P1-106-1
++-------------------------------+
+|  HD74HC373P       HD74HC373P  |
+|   +-----------------------+   |
+|   |U3 42 pin header to U15|   |
+|   +-----------------------+   |
+|   +-----------------------+   |
+|   |    KA2-001-017  U2    |   |
+|   +-----------------------+   |
+|   +-----------------------+   |
+|   |    KA2-001-016  U1    |   |
+|   +-----------------------+   |
+|JP1 JP2 JP3 JP4          LOGIC |
++-------------------------------+
+
+Unknown LOGIC chip
+JP1 - JP4 single wire connections for power
+
 ***************************************************************************/
 
-ROM_START( grdians )
+ROM_START( grdians ) /* P-FG01-1 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "u2.bin", 0x000000, 0x080000, CRC(36adc6f2) SHA1(544e87f88179fe1342e7a06a8948ac1828e85108) )
 	ROM_LOAD16_BYTE( "u3.bin", 0x000001, 0x080000, CRC(2704f416) SHA1(9081a12cbb9927d36e1c50b52aa2c6003810ee42) )
@@ -3203,56 +3334,83 @@ Banpresto, 1994
 
 This game runs on Seta/Allumer hardware
 
-PCB Layout
-----------
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 (208 Pin PQFP)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz, 32.530MHz
+ Other: 8 Position Dipswitch x 2
+        93C46 EEPROM
 
-P0-113A   BP949KA
-|----------------------------------|
-|  X1-010  6264  U28               |
-|                     581001   U19 |
-|     U3  U5  U2  U4  581001   U17 |
-|      62256   62256           U15 |
-|J                             U20 |
-|A    U77  68301               U18 |
-|M                     *       U16 |
-|M    93C46                    U23 |
-|A                             U22 |
-|                              U21 |
-|  DSW1            50MHz           |
-|  DSW2       PAL  32.5304MHz      |
-|       20MHz PAL                  |
-|----------------------------------|
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  CY7C185-25PC at U27
+M3 are N341256P-20
 
-Notes:
-      *: unknown QFP208 (has large heatsink on it). Should be similar to other known
-         graphics chips used on Seta hardware of this era.
-      68301 clock: 16.000MHz (?? From what OSC + divider??)
+PCB Number: P0-113A  BP49KA
++--------------------------------------------------------------+
+|             +------+            +---+                        |
+| VOL         |Seta  |          M |   |        +--------------+|
+|             |X1-010|          2 | U |     M  |KA-001-014 U19||
+|             +------+            | 2 |     1  +--------------+|
++-+                               | 8 |        +--------------+|
+  |  +-++-+   +-++-+              |   |        |KA-001-013 U17||
++-+  | || |   | || |              +---+     M  +--------------+|
+|    |U||U| M |U||U| M                      1  +--------------+|
+|J   |3||5| 3 |2||4| 3                         |KA-001-012 U15||
+|A   | || |   | || |                           +--------------+|
+|M   +-++-+   +-++-+                           +--------------+|
+|M                                             |KA-001-011 U20||
+|A                              +----------+   +--------------+|
+|                               |          |   +--------------+|
+|C                              | ALLUMER  |   |KA-001-010 U18||
+|o     +---+                    | X1-020   |   +--------------+|
+|n     |   |  +-------+         |          |   +--------------+|
+|n     | U |  |Toshiba|         | 9426HK003|   |KA-001-009 U16||
+|e C   | 7 |  |  TMP  |         +----------+   +--------------+|
+|c N   | 7 |  | 68301 |                        +--------------+|
+|t 2   |   |  +-------+                        |KA-001-008 U23||
+|e     +---+                                   +--------------+|
+|r          93C46                              +--------------+|
+|                                              |KA-001-007 U22||
++-+                           50MHz 32.530MHz  +--------------+|
+  |                                            +--------------+|
+  |                    P P                     |KA-001-006 U21||
++-+  C                 A A       M M           +--------------+|
+|    N    DSW1         L L       3 3                           |
+|    1    DSW2                                                 |
++--------------------------------------------------------------+
+
+U28 is KA-001-015 mask ROM (silkscreened SOUND ROM)
+U77 is KA-001-005 mask ROM
+CN2 - 5 Pin header
+CN1 - 10 Pin header
+
       VSync: 60Hz
 
 ***************************************************************************/
 
 ROM_START( gundamex )
 	ROM_REGION( 0x600000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE(      "ka002002.u2",  0x000000, 0x080000, CRC(e850f6d8) SHA1(026325e305676b1f8d3d9e7573920f8b70d7bccb) )
-	ROM_LOAD16_BYTE(      "ka002004.u3",  0x000001, 0x080000, CRC(c0fb1208) SHA1(84b25e4c73cb8e023ee5dbf69f588be98700b43f) )
-	ROM_LOAD16_BYTE(      "ka002001.u4",  0x100000, 0x080000, CRC(553ebe6b) SHA1(7fb8a159513d31a1d60520ff14e4c4d133fd3e19) )
-	ROM_LOAD16_BYTE(      "ka002003.u5",  0x100001, 0x080000, CRC(946185aa) SHA1(524911c4c510d6c3e17a7ab42c7077c2fffbf06b) )
-	ROM_LOAD16_WORD_SWAP( "ka001005.u77", 0x500000, 0x080000, CRC(f01d3d00) SHA1(ff12834e99a76261d619f10d186f4b329fb9cb7a) )
+	ROM_LOAD16_BYTE(      "ka_002_002.u2",  0x000000, 0x080000, CRC(e850f6d8) SHA1(026325e305676b1f8d3d9e7573920f8b70d7bccb) )
+	ROM_LOAD16_BYTE(      "ka_002_004.u3",  0x000001, 0x080000, CRC(c0fb1208) SHA1(84b25e4c73cb8e023ee5dbf69f588be98700b43f) )
+	ROM_LOAD16_BYTE(      "ka_002_001.u4",  0x100000, 0x080000, CRC(553ebe6b) SHA1(7fb8a159513d31a1d60520ff14e4c4d133fd3e19) )
+	ROM_LOAD16_BYTE(      "ka_002_003.u5",  0x100001, 0x080000, CRC(946185aa) SHA1(524911c4c510d6c3e17a7ab42c7077c2fffbf06b) )
+	ROM_LOAD16_WORD_SWAP( "ka-001-005.u77", 0x500000, 0x080000, CRC(f01d3d00) SHA1(ff12834e99a76261d619f10d186f4b329fb9cb7a) )
 
 	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE)  // Sprites
-	ROM_LOAD( "ka001009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
-	ROM_LOAD( "ka001010.u18",  0x0200000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
-	ROM_LOAD( "ka001011.u20",  0x0400000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
-	ROM_LOAD( "ka001012.u15",  0x0800000, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
-	ROM_LOAD( "ka001013.u17",  0x0a00000, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
-	ROM_LOAD( "ka001014.u19",  0x0c00000, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
-	ROM_LOAD( "ka001006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
-	ROM_LOAD( "ka001007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
-	ROM_LOAD( "ka001008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
+	ROM_LOAD( "ka-001-009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
+	ROM_LOAD( "ka-001-010.u18",  0x0200000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
+	ROM_LOAD( "ka-001-011.u20",  0x0400000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
+	ROM_LOAD( "ka-001-012.u15",  0x0800000, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
+	ROM_LOAD( "ka-001-013.u17",  0x0a00000, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
+	ROM_LOAD( "ka-001-014.u19",  0x0c00000, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
+	ROM_LOAD( "ka-001-006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
+	ROM_LOAD( "ka-001-007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
+	ROM_LOAD( "ka-001-008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
 	ROM_FILL(                  0x1800000, 0x600000, 0x00 ) // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "ka001015.u28", 0x000000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
+	ROM_LOAD( "ka-001-015.u28", 0x000000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom.bin", 0x0000, 0x0080, CRC(80f8e248) SHA1(1a9787811e56d95f7acbedfb00225b6e7df265eb) )
@@ -4207,8 +4365,8 @@ ROM_END
 
 ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* checksum 421E printed on label */
-	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* checksum A48F printed on label */
+	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* also commonly labeled as: WSC U6 Ver. 2.00 421E */
+	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* also commonly labeled as: WSC U7 Ver. 2.00 A48F */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )

@@ -42,7 +42,7 @@ MP/M 80 o 86
 Concurrent CP/M
 LSI ELSIE
 MS-DOS
-Text display: SCN2674 CRTC, SCB2675 for attributes
+Text display: SCN2674B CRTC, SCB2675C for attributes
 Graphics: ?? (option board, ROM is dumped)
 
 Media:  Two internal 5.25" floppy disk drives, DS DD, 96tpi.
@@ -620,9 +620,24 @@ READ8_MEMBER(octopus_state::vidcontrol_r)
 
 WRITE8_MEMBER(octopus_state::vidcontrol_w)
 {
+	m_fdc->dden_w(BIT(data, 2));
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / (BIT(data, 3) ? 16 : 8));
+
+	if (((m_vidctrl ^ data) & 0x31) != 0)
+	{
+		unsigned dots = 4 + ((data & 0x30) >> 3);
+		if ((data & 0x30) == 0)
+			dots = 10;
+		else if ((data & 0x30) == 0x30)
+			dots = 9;
+
+		auto dotclk = BIT(data, 0) ? 16_MHz_XTAL : 17.6_MHz_XTAL;
+
+		m_crtc->set_character_width(dots);
+		m_crtc->set_unscaled_clock(dotclk / dots);
+	}
+
 	m_vidctrl = data;
-	m_fdc->dden_w(data & 0x04);
-	m_fdc->set_unscaled_clock(16_MHz_XTAL / ((data & 0x08) ? 16 : 8));
 }
 
 // Sound hardware
@@ -743,6 +758,7 @@ IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
 void octopus_state::machine_start()
 {
 	m_timer_beep = timer_alloc(BEEP_TIMER);
+	m_vidctrl = 0xff;
 
 	// install RAM
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000,m_ram->size()-1,"main_ram_bank");
@@ -944,7 +960,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	m_ppi->out_pc_callback().set(FUNC(octopus_state::gpo_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq_callback().set(m_pic2, FUNC(pic8259_device::ir2_w));
+	m_rtc->irq().set(m_pic2, FUNC(pic8259_device::ir2_w));
 
 	// Keyboard UART
 	I8251(config, m_kb_uart, 0);
@@ -966,11 +982,11 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_SOFTWARE_LIST_ADD("fd_list","octopus")
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(2457500)  // DART channel A
+	MCFG_PIT8253_CLK0(4.9152_MHz_XTAL / 2)  // DART channel A
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, octopus_state,serial_clock_w))  // being able to write both Rx and Tx clocks at one time would be nice
-	MCFG_PIT8253_CLK1(2457500)  // DART channel B
+	MCFG_PIT8253_CLK1(4.9152_MHz_XTAL / 2)  // DART channel B
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_serial,z80sio_device,rxtxcb_w))
-	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
+	MCFG_PIT8253_CLK2(4.9152_MHz_XTAL / 2)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, octopus_state,spk_freq_w))
 
 	SPEAKER(config, "mono").front_center();
@@ -999,21 +1015,17 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	// TODO: Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(720, 360)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc",scn2674_device, screen_update)
-//  MCFG_SCREEN_PALETTE("palette")
-//  MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(16_MHz_XTAL, 918, 0, 729, 350, 0, 325);
+	//screen.set_raw(17.6_MHz_XTAL, 1008, 0, 792, 348, 0, 319);
+	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", SCN2674, 0)  // character clock can be selectable, either 16MHz or 17.6MHz
-	MCFG_SCN2674_INTR_CALLBACK(WRITELINE("pic_slave", pic8259_device, ir0_w))
-	MCFG_SCN2674_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(octopus_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(0, octopus_vram)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SCN2674(config, m_crtc, 16_MHz_XTAL / 9); // dot clock and character width are both selectable
+	m_crtc->intr_callback().set("pic_slave", FUNC(pic8259_device::ir0_w));
+	m_crtc->set_character_width(9);
+	m_crtc->set_display_callback(FUNC(octopus_state::display_pixels));
+	m_crtc->set_addrmap(0, &octopus_state::octopus_vram);
+	m_crtc->set_screen("screen");
 
 	ADDRESS_MAP_BANK(config, "z80_bank").set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 

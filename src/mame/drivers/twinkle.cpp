@@ -245,6 +245,7 @@ Notes:
 #include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include "bmiidx.lh"
@@ -1122,6 +1123,9 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speakerleft").front_left();

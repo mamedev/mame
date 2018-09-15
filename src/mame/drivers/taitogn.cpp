@@ -344,6 +344,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "machine/znmcu.h"
 #include "sound/spu.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include <algorithm>
@@ -735,6 +736,9 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

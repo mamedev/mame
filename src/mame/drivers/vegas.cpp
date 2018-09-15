@@ -1763,6 +1763,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
 	//ide.set_pif(0x8f);
 
+	/* video hardware */
 	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 4);
@@ -1775,15 +1776,13 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(vegas_state::ethernet_interrupt));
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	/* screen */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// Screeen size and timing is re-calculated later in voodoo card
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
-
-	/* sound hardware */
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 MACHINE_CONFIG_END
 
 
@@ -2457,7 +2456,7 @@ void vegas_state::init_cartfury()
 
 /* Vegas + Vegas SIO + Voodoo 2 */
 GAME( 1998, gauntleg,   0,        gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",   "Gauntlet Legends (version 1.6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, gauntleg12, gauntleg, gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",   "Gauntlet Legends (version 1.2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gauntleg12, gauntleg, gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",   "Gauntlet Legends (version 1.2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tenthdeg,   0,        tenthdeg, tenthdeg, vegas_state, init_tenthdeg, ROT0, "Atari Games",   "Tenth Degree (prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Durango + Vegas SIO + Voodoo 2 */
@@ -2474,16 +2473,16 @@ GAME( 1999, roadburn,   0,        roadburn, roadburn, vegas_state, init_roadburn
 GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, init_roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.0)", MACHINE_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
-GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // random freezes on the 3d parts
+GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) //attempting to run blitz on either v2.1 or v3.0 wlil reset the machine
+GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 
 /* Durango + Denver SIO + Voodoo 3 */
-GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2003, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2000, sf2049te,   sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2001, sf2049tea,  sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",   "San Francisco Rush 2049", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2003, sf2049se,   sf2049,   sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",   "San Francisco Rush 2049: Special Edition", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2000, sf2049te,   sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL( 2001, sf2049tea,  sf2049,   sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",   "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 
 /* Durango + Vegas SIO + Voodoo 3 */
-GAME( 2000, cartfury,   0,        cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games",  "Cart Fury", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, cartfury,   0,        cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games",  "Cart Fury", MACHINE_SUPPORTS_SAVE )

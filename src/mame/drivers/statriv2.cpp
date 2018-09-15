@@ -630,8 +630,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2/8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	TMS9927(config, m_tms, MASTER_CLOCK/2/8).set_char_width(8);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)

@@ -775,8 +775,8 @@ MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee56)
@@ -803,8 +803,8 @@ MACHINE_CONFIG_START(mbee_state::mbee128)
 	MCFG_DEVICE_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee128p)

@@ -619,7 +619,7 @@ static void cd90_640_floppies(device_slot_interface &device)
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to7)
+MACHINE_CONFIG_START(thomson_state::to7_base)
 
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
@@ -665,14 +665,6 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_CASSETTE_FORMATS(to7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("to_cass")
-
-/* timer */
-	MCFG_DEVICE_ADD("mc6846", MC6846, 16_MHz_XTAL / 16)
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to7_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE("buzzer", dac_bit_interface, write))
-	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to7_timer_port_in))
-	MCFG_MC6846_OUT_CTO_CB(WRITELINE(*this, thomson_state, to7_set_cassette))
-	MCFG_MC6846_IRQ_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 16_MHz_XTAL / 16 / 2)
@@ -761,9 +753,23 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thomson_state::t9000)
+void thomson_state::to7(machine_config &config)
+{
+	to7_base(config);
+
+	/* timer */
+	MC6846(config, m_mc6846, 16_MHz_XTAL / 16);
+	m_mc6846->out_port().set(FUNC(thomson_state::to7_timer_port_out));
+	m_mc6846->in_port().set(FUNC(thomson_state::to7_timer_port_in));
+	m_mc6846->cp2().set("buzzer", FUNC(dac_bit_interface::write));
+	m_mc6846->cto().set(FUNC(thomson_state::to7_set_cassette));
+	m_mc6846->irq().set("mainirq", FUNC(input_merger_device::in_w<0>));
+}
+
+void thomson_state::t9000(machine_config &config)
+{
 	to7(config);
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1982, to7, 0, 0, to7, to7, thomson_state, empty_init, "Thomson", "TO7", 0 )
@@ -938,8 +944,7 @@ MACHINE_CONFIG_START(thomson_state::to770)
 	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to770_sys_portb_out));
 	m_pia_sys->cb2_handler().set(FUNC(thomson_state::to770_sys_cb2_out));
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to770_timer_port_out))
+	m_mc6846->out_port().set(FUNC(thomson_state::to770_timer_port_out));
 
 	/* internal ram */
 	m_ram->set_default_size("128K").set_extra_options("64K");
@@ -1116,7 +1121,7 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 MACHINE_CONFIG_START(thomson_state::mo5)
-	to7(config);
+	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
@@ -1126,8 +1131,6 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 	MCFG_CASSETTE_INTERFACE("mo_cass")
-
-	MCFG_DEVICE_REMOVE( "mc6846" )
 
 	MCFG_PALETTE_MODIFY( "palette" )
 	MCFG_PALETTE_INIT_OWNER(thomson_state, mo5)
@@ -1492,8 +1495,7 @@ MACHINE_CONFIG_START(thomson_state::to9)
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqa_handler().set_nop();
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9_timer_port_out))
+	m_mc6846->out_port().set(FUNC(thomson_state::to9_timer_port_out));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
@@ -1718,10 +1720,9 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to8_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE(*this, thomson_state, to8_timer_cp2_out))
-	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to8_timer_port_in))
+	m_mc6846->out_port().set(FUNC(thomson_state::to8_timer_port_out));
+	m_mc6846->in_port().set(FUNC(thomson_state::to8_timer_port_in));
+	m_mc6846->cp2().set(FUNC(thomson_state::to8_timer_cp2_out));
 
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options("256K");
@@ -1882,10 +1883,9 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(thomson_state::write_centronics_busy));
 
-	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9p_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE(*this, thomson_state, to8_timer_cp2_out))
-	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to9p_timer_port_in))
+	m_mc6846->out_port().set(FUNC(thomson_state::to9p_timer_port_out));
+	m_mc6846->in_port().set(FUNC(thomson_state::to9p_timer_port_in));
+	m_mc6846->cp2().set(FUNC(thomson_state::to8_timer_cp2_out));
 
 	/* internal ram */
 	m_ram->set_default_size("512K");
@@ -2211,7 +2211,7 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 MACHINE_CONFIG_START(thomson_state::mo6)
-	to7(config);
+	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
@@ -2221,8 +2221,6 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 	MCFG_CASSETTE_INTERFACE("mo_cass")
-
-	MCFG_DEVICE_REMOVE( "mc6846" )
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
 	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo6_sys_portb_in));
@@ -2478,7 +2476,7 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 MACHINE_CONFIG_START(thomson_state::mo5nr)
-	to7(config);
+	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
@@ -2488,8 +2486,6 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 	MCFG_CASSETTE_INTERFACE("mo_cass")
-
-	MCFG_DEVICE_REMOVE( "mc6846" )
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo6_sys_porta_in));
 	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo5nr_sys_portb_in));

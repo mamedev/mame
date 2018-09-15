@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq_callback().set(m_pic_s, FUNC(pic8259_device::ir2_w));
+	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));

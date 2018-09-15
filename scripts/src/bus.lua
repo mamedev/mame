@@ -3033,6 +3033,24 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/sbus/sbus.h,BUSES["SBUS"] = true
+---------------------------------------------------
+
+if (BUSES["SBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sbus/bwtwo.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/bwtwo.h",
+		MAME_DIR .. "src/devices/bus/sbus/cgthree.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/cgthree.h",
+		MAME_DIR .. "src/devices/bus/sbus/turbogx.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/turbogx.h",
+		MAME_DIR .. "src/devices/bus/sbus/sbus.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/sbus.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/ql/exp.h,BUSES["QL"] = true
 ---------------------------------------------------
 

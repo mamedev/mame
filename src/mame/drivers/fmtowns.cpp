@@ -2842,22 +2842,22 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_FMSCSI_IRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_irq))
 	MCFG_FMSCSI_DRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_drq))
 
-	MCFG_DEVICE_ADD("dma_1", UPD71071, 0)
-	MCFG_UPD71071_CPU("maincpu")
-	MCFG_UPD71071_CLOCK(4000000)
-	MCFG_UPD71071_DMA_READ_0_CB(READ16(*this, towns_state, towns_fdc_dma_r))
-	MCFG_UPD71071_DMA_READ_1_CB(READ16(*this, towns_state, towns_scsi_dma_r))
-	MCFG_UPD71071_DMA_READ_3_CB(READ16(*this, towns_state, towns_cdrom_dma_r))
-	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
-	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
-	MCFG_DEVICE_ADD("dma_2", UPD71071, 0)
-	MCFG_UPD71071_CPU("maincpu")
-	MCFG_UPD71071_CLOCK(4000000)
-	MCFG_UPD71071_DMA_READ_0_CB(READ16(*this, towns_state, towns_fdc_dma_r))
-	MCFG_UPD71071_DMA_READ_1_CB(READ16(*this, towns_state, towns_scsi_dma_r))
-	MCFG_UPD71071_DMA_READ_3_CB(READ16(*this, towns_state, towns_cdrom_dma_r))
-	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
-	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
+	UPD71071(config, m_dma[0], 0);
+	m_dma[0]->set_cpu_tag("maincpu");
+	m_dma[0]->set_clock(4000000);
+	m_dma[0]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
+	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[0]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
+	m_dma[0]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
+	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	UPD71071(config, m_dma[1], 0);
+	m_dma[1]->set_cpu_tag("maincpu");
+	m_dma[1]->set_clock(4000000);
+	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
+	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
+	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
+	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 

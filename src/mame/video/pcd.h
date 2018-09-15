@@ -30,7 +30,6 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
-	required_device<scn2674_device> m_crtc;
 	required_device<pic8259_device> m_pic2;
 };
 
@@ -52,6 +51,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	required_device<scn2674_device> m_crtc;
 	required_ioport m_mouse_btn;
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
@@ -113,6 +113,8 @@ protected:
 	void rcv_complete() override;
 
 private:
+	required_device<scn2672_device> m_crtc;
+
 	std::vector<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_charrom;
 	devcb_write_line m_txd_handler;
@@ -121,7 +123,7 @@ private:
 	DECLARE_READ8_MEMBER(rx_callback);
 	DECLARE_WRITE8_MEMBER(tx_callback);
 
-	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
+	SCN2672_DRAW_CHARACTER_MEMBER(display_pixels);
 };
 
 DECLARE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device)

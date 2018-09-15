@@ -35,6 +35,14 @@ Hardware                Main    Sub             Sound   Sound Chips
 ----------------------------------------------------------------------
 [WEC Le Mans 24]        68000   68000   Z-80    YM2151 YM3012 1x007232
 
+[CPU PCB GX602 201020A]
+    007640  007641  007232  007452
+
+[VID PCB GX602 201023]
+    003634  003635  007557  007558  007559
+(note: 003634 and 003635 chips locations are marked 007634 and 007635 on PCB)
+
+
 [Hot Chase]             68000   68000   68B09E                3x007232
 
 [CPU PCB GX763 350861B]
@@ -1147,7 +1155,7 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotchase)
-	MCFG_PALETTE_ADD("palette", 2048*2)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 

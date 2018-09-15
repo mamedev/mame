@@ -1267,12 +1267,12 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette", 32768);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(midzeus_state, screen_update_midzeus)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
+	m_screen->set_screen_update(FUNC(midzeus_state::screen_update_midzeus));
+	m_screen->set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus)
 
@@ -1307,9 +1307,9 @@ MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 4, 666, 0, 512, 438, 0, 400);
+	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	ZEUS2(config, m_zeus, ZEUS2_VIDEO_CLOCK);
 	m_zeus->vblank_callback().set(FUNC(midzeus2_state::zeus_irq));

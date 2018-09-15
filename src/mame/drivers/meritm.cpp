@@ -1133,14 +1133,17 @@ MACHINE_CONFIG_START(meritm_state::crt250)
 
 	MCFG_DS1204_ADD(m_ds1204)
 
-	MCFG_V9938_ADD(m_v9938[0], "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state, vdp0_interrupt))
+	V9938(config, m_v9938[0], SYSTEM_CLK);
+	m_v9938[0]->set_screen_ntsc("screen");
+	m_v9938[0]->set_vram_size(0x20000);
+	m_v9938[0]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
-	MCFG_V9938_ADD(m_v9938[1], "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state, vdp1_interrupt))
+	V9938(config, m_v9938[1], SYSTEM_CLK);
+	m_v9938[1]->set_screen_ntsc("screen");
+	m_v9938[1]->set_vram_size(0x20000);
+	m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938_0", SYSTEM_CLK)
-	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

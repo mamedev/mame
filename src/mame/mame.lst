@@ -301,7 +301,10 @@ ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 
 @source:accomm.cpp
-accomm                          // 1986 Acorn Computer
+accomm                          // 1986 Acorn Commmunicator
+accommp                         // 1985 Acorn Commmunicator (prototype)
+accommb                         // 1987 Acorn Briefcase Communicator
+accommi                         // 1988 Acorn Communicator (Italian)
 
 @source:acd.cpp
 acd                             //
@@ -12298,6 +12301,7 @@ avenger                         // (c) 1975 Electra
 
 @source:electron.cpp
 electron                        // 1983 Acorn Electron
+electront                       // 1983 Acorn Electron (Trial)
 btm2105                         // 1985 BT Merlin M2105
 electron64                      // 1987 Acorn Electron (64K Master RAM Board)
 
@@ -15499,9 +15503,6 @@ stellecu                        // (c) 1998
 @source:ikki.cpp
 farmer                          // TVG17 (c) 1985 Sun Electronics
 ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
-
-@source:imds.cpp
-imds                            // intel
 
 @source:imds2.cpp
 imds2                           // Intellec MDS series-II
@@ -21470,7 +21471,8 @@ mkit09                          //
 mkit09a                         //
 
 @source:mlanding.cpp
-mlanding                        // ??? (c) 1987 Taito America Corporation (US)
+mlanding                        // B09 (c) 1987 Taito America Corporation (US)
+mlandingj                       // B09 (c) 1987 Taito Corporation (US)
 
 @source:mmagic.cpp
 mmagic                          // (c) 1979 Nintendo
@@ -29135,6 +29137,7 @@ finallapjb                      // 87.12 Final Lap
 finallapjc                      // 87.12 Final Lap
 finehour                        // (c) 1989 (Japan)
 fourtrax                        // 89.11
+fourtraxj						// 89.11
 fourtraxa                       // 89.11
 gollygho                        // 91.7  Golly Ghost
 kyukaidk                        // (c) 1990 (Japan, new version)
@@ -33306,6 +33309,7 @@ bbnny_l2                        //
 bbnny_lu                        //
 dd_l2                           //
 dd_p6                           //
+diner_f2                        //
 diner_l1                        //
 diner_l2                        //
 diner_l3                        //
@@ -38209,6 +38213,9 @@ victory                         // (c) 1982
 
 @source:vidbrain.cpp
 vidbrain                        //
+
+@source:videolich.cpp
+videolich                       // Videogames gmbh (unnamed)
 
 @source:videopin.cpp
 solarwar                        // 036154-036169    1979    [6502]

@@ -841,11 +841,11 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	m_zeus->set_float_mode(1);
 	m_zeus->irq_callback().set(FUNC(atlantis_state::zeus_irq));
 	m_zeus->vblank_callback().set(FUNC(atlantis_state::vblank_irq));
-	m_zeus->set_screen("screen");
+	m_zeus->set_screen(m_screen);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
+	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	/* sound hardware */
 	DCS2_AUDIO_DENVER_2CH(config, m_dcs, 0);
