@@ -18,8 +18,8 @@ void sbus_cgthree_device::mem_map(address_map &map)
 	map(0x00000000, 0x000007ff).r(FUNC(sbus_cgthree_device::rom_r));
 	map(0x00400000, 0x00400007).w(FUNC(sbus_cgthree_device::palette_w));
 	map(0x007ff800, 0x007ff81f).rw(FUNC(sbus_cgthree_device::regs_r), FUNC(sbus_cgthree_device::regs_w));
-	map(0x00800000, 0x008fd1ff).rw(FUNC(sbus_cgthree_device::vram2_r), FUNC(sbus_cgthree_device::vram2_w));
-	map(0x00bff800, 0x00cfcbff).rw(FUNC(sbus_cgthree_device::vram_r), FUNC(sbus_cgthree_device::vram_w));
+	map(0x00800000, 0x008fffff).rw(FUNC(sbus_cgthree_device::vram_r), FUNC(sbus_cgthree_device::vram_w));
+	map(0x00bff800, 0x00cff7ff).rw(FUNC(sbus_cgthree_device::vram_r), FUNC(sbus_cgthree_device::vram_w));
 }
 
 ROM_START( sbus_cgthree )
@@ -55,7 +55,6 @@ sbus_cgthree_device::sbus_cgthree_device(const machine_config &mconfig, const ch
 void sbus_cgthree_device::device_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x100000/4);
-	m_vram2 = std::make_unique<uint32_t[]>(0x100000/4);
 
 	save_item(NAME(m_palette_entry));
 	save_item(NAME(m_palette_r));
@@ -90,7 +89,7 @@ void sbus_cgthree_device::palette_init(palette_device &palette)
 uint32_t sbus_cgthree_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
-	uint8_t *vram = (uint8_t *)&m_vram2[0];
+	uint8_t *vram = (uint8_t *)&m_vram[0];
 
 	for (int y = 0; y < 900; y++)
 	{
@@ -169,14 +168,4 @@ READ32_MEMBER(sbus_cgthree_device::vram_r)
 WRITE32_MEMBER(sbus_cgthree_device::vram_w)
 {
 	COMBINE_DATA(&m_vram[offset]);
-}
-
-READ32_MEMBER(sbus_cgthree_device::vram2_r)
-{
-	return m_vram2[offset];
-}
-
-WRITE32_MEMBER(sbus_cgthree_device::vram2_w)
-{
-	COMBINE_DATA(&m_vram2[offset]);
 }

@@ -40,8 +40,6 @@ protected:
 	DECLARE_READ32_MEMBER(rom_r);
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);
-	DECLARE_READ32_MEMBER(vram2_r);
-	DECLARE_WRITE32_MEMBER(vram2_w);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -50,7 +48,6 @@ private:
 
 	required_memory_region m_rom;
 	std::unique_ptr<uint32_t[]> m_vram;
-	std::unique_ptr<uint32_t[]> m_vram2; // ???
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	uint8_t m_palette_entry;
