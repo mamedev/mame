@@ -2,33 +2,37 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-    Sun TurboGX accelerated 8-bit color video controller
+    Sun cgsix-series accelerated 8-bit color video controller
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_SBUS_TURBOGX_H
-#define MAME_BUS_SBUS_TURBOGX_H
+#ifndef MAME_BUS_SBUS_CGSIX_H
+#define MAME_BUS_SBUS_CGSIX_H
 
 #pragma once
 
 #include "sbus.h"
 #include "video/bt45x.h"
+#include "screen.h"
 
-class sbus_turbogx_device : public device_t, public device_sbus_card_interface
+class sbus_cgsix_device : public device_t, public device_sbus_card_interface
 {
-public:
-	// construction/destruction
-	sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 protected:
+	// construction/destruction
+	sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t vram_size)
+		: sbus_cgsix_device(mconfig, type, tag, owner, clock)
+	{
+		set_vram_size(vram_size);
+	}
+
+	sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// configuration
+	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
+
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// device_sbus_slot_interface overrides
-	virtual void install_device() override;
 
 	DECLARE_READ32_MEMBER(rom_r);
 	DECLARE_READ32_MEMBER(unknown_r);
@@ -38,13 +42,13 @@ protected:
 	DECLARE_READ32_MEMBER(fbc_r);
 	DECLARE_WRITE32_MEMBER(fbc_w);
 
-private:
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint8_t perform_rasterop(uint8_t src, uint8_t dst);
 	void handle_blit_command();
 	void handle_draw_command();
 
-	void mem_map(address_map &map) override;
+	void base_map(address_map &map);
 
 	enum
 	{
@@ -466,9 +470,43 @@ private:
 	required_device<bt458_device> m_ramdac;
 
 	fbc_t m_fbc;
+
+	uint32_t m_vram_size;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(SBUS_TURBOGX, sbus_turbogx_device)
+class sbus_turbogx_device : public sbus_cgsix_device
+{
+public:
+	sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-#endif // MAME_BUS_SBUS_TURBOGX_H
+protected:
+	// device_t overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override;
+
+	// device_sbus_slot_interface overrides
+	virtual void install_device() override;
+
+	void mem_map(address_map &map) override;
+};
+
+class sbus_turbogxp_device : public sbus_cgsix_device
+{
+public:
+	sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override;
+
+	// device_sbus_slot_interface overrides
+	virtual void install_device() override;
+
+	void mem_map(address_map &map) override;
+};
+
+DECLARE_DEVICE_TYPE(SBUS_TURBOGX, sbus_turbogx_device)
+DECLARE_DEVICE_TYPE(SBUS_TURBOGXP, sbus_turbogxp_device)
+
+#endif // MAME_BUS_SBUS_CGSIX_H

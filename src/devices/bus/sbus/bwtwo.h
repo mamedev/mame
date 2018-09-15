@@ -45,7 +45,7 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-// device type definition
+
 DECLARE_DEVICE_TYPE(SBUS_BWTWO, sbus_bwtwo_device)
 
 #endif // MAME_BUS_SBUS_BWTWO_H

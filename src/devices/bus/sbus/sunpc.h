@@ -39,7 +39,7 @@ private:
 	required_memory_region m_rom;
 };
 
-// device type definition
+
 DECLARE_DEVICE_TYPE(SBUS_SUNPC, sbus_sunpc_device)
 
 #endif // MAME_BUS_SBUS_SUNPC_H

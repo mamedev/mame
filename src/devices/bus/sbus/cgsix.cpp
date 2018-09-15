@@ -2,49 +2,30 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-    Sun TurboGX accelerated 8-bit color video controller
+    Sun cgsix-series accelerated 8-bit color video controller
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "turbogx.h"
-#include "screen.h"
+#include "cgsix.h"
 
 DEFINE_DEVICE_TYPE(SBUS_TURBOGX, sbus_turbogx_device, "turbogx", "Sun TurboGX SBus Video")
+DEFINE_DEVICE_TYPE(SBUS_TURBOGXP, sbus_turbogxp_device, "turbogxp", "Sun TurboGX+ SBus Video")
 
-void sbus_turbogx_device::mem_map(address_map &map)
+//-------------------------------------------------
+//  base cgsix device
+//-------------------------------------------------
+
+void sbus_cgsix_device::base_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).rw(FUNC(sbus_turbogx_device::unknown_r), FUNC(sbus_turbogx_device::unknown_w));
-	map(0x00000000, 0x00007fff).r(FUNC(sbus_turbogx_device::rom_r));
+	map(0x00000000, 0x01ffffff).rw(FUNC(sbus_cgsix_device::unknown_r), FUNC(sbus_cgsix_device::unknown_w));
+	map(0x00000000, 0x00007fff).r(FUNC(sbus_cgsix_device::rom_r));
 	map(0x00200000, 0x0020000f).m(m_ramdac, FUNC(bt458_device::map)).umask32(0xff000000);
-	map(0x00700000, 0x00700fff).rw(FUNC(sbus_turbogx_device::fbc_r), FUNC(sbus_turbogx_device::fbc_w));
-	map(0x00800000, 0x008fffff).rw(FUNC(sbus_turbogx_device::vram_r), FUNC(sbus_turbogx_device::vram_w));
+	map(0x00700000, 0x00700fff).rw(FUNC(sbus_cgsix_device::fbc_r), FUNC(sbus_cgsix_device::fbc_w));
 }
 
-ROM_START( sbus_turbogx )
-	ROM_REGION32_BE(0x8000, "prom", ROMREGION_ERASEFF)
-	ROM_LOAD( "sunw,501-2325.bin", 0x0000, 0x8000, CRC(bbdc45f8) SHA1(e4a51d78e199cd57f2fcb9d45b25dfae2bd537e4))
-ROM_END
-
-const tiny_rom_entry *sbus_turbogx_device::device_rom_region() const
-{
-	return ROM_NAME( sbus_turbogx );
-}
-
-void sbus_turbogx_device::device_add_mconfig(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(sbus_turbogx_device::screen_update));
-	m_screen->set_size(1152, 900);
-	m_screen->set_visarea(0, 1152-1, 0, 900-1);
-	m_screen->set_refresh_hz(72);
-
-	BT458(config, m_ramdac, 0);
-}
-
-
-sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SBUS_TURBOGX, tag, owner, clock)
+sbus_cgsix_device::sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sbus_card_interface(mconfig, *this)
 	, m_rom(*this, "prom")
 	, m_screen(*this, "screen")
@@ -52,22 +33,17 @@ sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const ch
 {
 }
 
-void sbus_turbogx_device::device_start()
+void sbus_cgsix_device::device_start()
 {
-	m_vram = std::make_unique<uint32_t[]>(0x100000/4);
+	m_vram = std::make_unique<uint32_t[]>(m_vram_size / 4);
 }
 
-void sbus_turbogx_device::device_reset()
+void sbus_cgsix_device::device_reset()
 {
 	memset(&m_fbc, 0, sizeof(m_fbc));
 }
 
-void sbus_turbogx_device::install_device()
-{
-	m_sbus->install_device(m_base, m_base + 0x1ffffff, *this, &sbus_turbogx_device::mem_map);
-}
-
-uint32_t sbus_turbogx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sbus_cgsix_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_ramdac->pens();
 	uint8_t *vram = (uint8_t *)&m_vram[0];
@@ -85,33 +61,33 @@ uint32_t sbus_turbogx_device::screen_update(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-READ32_MEMBER(sbus_turbogx_device::rom_r)
+READ32_MEMBER(sbus_cgsix_device::rom_r)
 {
 	return ((uint32_t*)m_rom->base())[offset];
 }
 
-READ32_MEMBER(sbus_turbogx_device::unknown_r)
+READ32_MEMBER(sbus_cgsix_device::unknown_r)
 {
 	logerror("%s: unknown_r: %08x & %08x\n", machine().describe_context(), offset << 2, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(sbus_turbogx_device::unknown_w)
+WRITE32_MEMBER(sbus_cgsix_device::unknown_w)
 {
 	logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-READ32_MEMBER(sbus_turbogx_device::vram_r)
+READ32_MEMBER(sbus_cgsix_device::vram_r)
 {
 	return m_vram[offset];
 }
 
-WRITE32_MEMBER(sbus_turbogx_device::vram_w)
+WRITE32_MEMBER(sbus_cgsix_device::vram_w)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-uint8_t sbus_turbogx_device::perform_rasterop(uint8_t src, uint8_t dst)
+uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst)
 {
 	const uint32_t rops[4] = { fbc_rasterop_rop00(), fbc_rasterop_rop01(), fbc_rasterop_rop10(), fbc_rasterop_rop11() };
 
@@ -154,7 +130,7 @@ uint8_t sbus_turbogx_device::perform_rasterop(uint8_t src, uint8_t dst)
 }
 
 // NOTE: This is basically untested, and probably full of bugs!
-void sbus_turbogx_device::handle_draw_command()
+void sbus_cgsix_device::handle_draw_command()
 {
 	if (fbc_misc_draw() != FBC_MISC_DRAW_RENDER)
 	{
@@ -198,7 +174,7 @@ void sbus_turbogx_device::handle_draw_command()
 }
 
 // NOTE: This is basically untested, and probably full of bugs!
-void sbus_turbogx_device::handle_blit_command()
+void sbus_cgsix_device::handle_blit_command()
 {
 	uint8_t *vram = (uint8_t*)&m_vram[0];
 	const uint32_t fbw = (m_fbc.m_clip_maxx + 1);
@@ -227,7 +203,7 @@ void sbus_turbogx_device::handle_blit_command()
 	}
 }
 
-READ32_MEMBER(sbus_turbogx_device::fbc_r)
+READ32_MEMBER(sbus_cgsix_device::fbc_r)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -534,7 +510,7 @@ READ32_MEMBER(sbus_turbogx_device::fbc_r)
 	return ret;
 }
 
-WRITE32_MEMBER(sbus_turbogx_device::fbc_w)
+WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 {
 	static const char* misc_bdisp_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
 	static const char* misc_bread_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
@@ -972,3 +948,86 @@ WRITE32_MEMBER(sbus_turbogx_device::fbc_w)
 			break;
 	}
 }
+
+//-------------------------------------------------
+//  TurboGX implementation
+//-------------------------------------------------
+
+void sbus_turbogx_device::mem_map(address_map &map)
+{
+	base_map(map);
+	map(0x00800000, 0x008fffff).rw(FUNC(sbus_turbogx_device::vram_r), FUNC(sbus_turbogx_device::vram_w));
+}
+
+ROM_START( sbus_turbogx )
+	ROM_REGION32_BE(0x8000, "prom", ROMREGION_ERASEFF)
+	ROM_LOAD( "sunw,501-2325.bin", 0x0000, 0x8000, CRC(bbdc45f8) SHA1(e4a51d78e199cd57f2fcb9d45b25dfae2bd537e4))
+ROM_END
+
+const tiny_rom_entry *sbus_turbogx_device::device_rom_region() const
+{
+	return ROM_NAME( sbus_turbogx );
+}
+
+void sbus_turbogx_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(sbus_turbogx_device::screen_update));
+	m_screen->set_size(1152, 900);
+	m_screen->set_visarea(0, 1152-1, 0, 900-1);
+	m_screen->set_refresh_hz(72);
+
+	BT458(config, m_ramdac, 0);
+}
+
+sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sbus_cgsix_device(mconfig, SBUS_TURBOGX, tag, owner, clock, 0x100000)
+{
+}
+
+void sbus_turbogx_device::install_device()
+{
+	m_sbus->install_device(m_base, m_base + 0x1ffffff, *this, &sbus_turbogx_device::mem_map);
+}
+
+//-------------------------------------------------
+//  TurboGX+ implementation
+//-------------------------------------------------
+
+void sbus_turbogxp_device::mem_map(address_map &map)
+{
+	base_map(map);
+	map(0x00800000, 0x00bfffff).rw(FUNC(sbus_turbogxp_device::vram_r), FUNC(sbus_turbogxp_device::vram_w));
+}
+
+ROM_START( sbus_turbogxp )
+	ROM_REGION32_BE(0x8000, "prom", ROMREGION_ERASEFF)
+	ROM_LOAD( "sunw,501-2253.bin", 0x0000, 0x8000, CRC(525a58db) SHA1(721fc378d4b952b5cbb271e16bd67bc02439efdc))
+ROM_END
+
+const tiny_rom_entry *sbus_turbogxp_device::device_rom_region() const
+{
+	return ROM_NAME( sbus_turbogxp );
+}
+
+void sbus_turbogxp_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(sbus_turbogxp_device::screen_update));
+	m_screen->set_size(1152, 900);
+	m_screen->set_visarea(0, 1152-1, 0, 900-1);
+	m_screen->set_refresh_hz(72);
+
+	BT467(config, m_ramdac, 0);
+}
+
+sbus_turbogxp_device::sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sbus_cgsix_device(mconfig, SBUS_TURBOGXP, tag, owner, clock, 0x400000)
+{
+}
+
+void sbus_turbogxp_device::install_device()
+{
+	m_sbus->install_device(m_base, m_base + 0x1ffffff, *this, &sbus_turbogxp_device::mem_map);
+}
+

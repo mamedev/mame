@@ -11,7 +11,7 @@
 // Display boards
 #include "bwtwo.h"
 #include "cgthree.h"
-#include "turbogx.h"
+#include "cgsix.h"
 
 // Accelerator boards
 #include "sunpc.h"
@@ -23,11 +23,12 @@
 
 void sbus_cards(device_slot_interface &device)
 {
-	device.option_add("bwtwo",   SBUS_BWTWO);   /* Sun bwtwo monochrome display board */
-	device.option_add("cgthree", SBUS_CGTHREE); /* Sun cgthree color display board */
-	device.option_add("turbogx", SBUS_TURBOGX); /* Sun TurboGX 8-bit color display board */
-	device.option_add("sunpc",   SBUS_SUNPC);   /* Sun SunPC 5x86 Accelerator board */
-	device.option_add("hme",     SBUS_HME);     /* Sun SunSwift 10/100 + Fast Wide SCSI "Colossus" board */
+	device.option_add("bwtwo",    SBUS_BWTWO);    /* Sun bwtwo monochrome display board */
+	device.option_add("cgthree",  SBUS_CGTHREE);  /* Sun cgthree color display board */
+	device.option_add("turbogx",  SBUS_TURBOGX);  /* Sun TurboGX 8-bit color display board */
+	device.option_add("turbogxp", SBUS_TURBOGXP); /* Sun TurboGX+ 8-bit color display board */
+	device.option_add("sunpc",    SBUS_SUNPC);    /* Sun SunPC 5x86 Accelerator board */
+	device.option_add("hme",      SBUS_HME);      /* Sun SunSwift 10/100 + Fast Wide SCSI "Colossus" board */
 }
 
 DEFINE_DEVICE_TYPE(SBUS_SLOT, sbus_slot_device, "sbus_slot", "Sun SBus Slot")

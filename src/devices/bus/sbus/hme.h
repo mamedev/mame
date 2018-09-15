@@ -39,7 +39,7 @@ private:
 	required_memory_region m_rom;
 };
 
-// device type definition
+
 DECLARE_DEVICE_TYPE(SBUS_HME, sbus_hme_device)
 
 #endif // MAME_BUS_SBUS_HME_H

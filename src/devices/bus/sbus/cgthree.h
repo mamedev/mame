@@ -50,7 +50,7 @@ private:
 	required_device<bt458_device> m_ramdac;
 };
 
-// device type definition
+
 DECLARE_DEVICE_TYPE(SBUS_CGTHREE, sbus_cgthree_device)
 
 #endif // MAME_BUS_SBUS_CGTHREE_H
