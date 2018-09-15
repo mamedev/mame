@@ -12,7 +12,6 @@
 
     - strobed I/O
     - expose register file to disassembler
-    - decimal adjust instruction
     - timer Tin/Tout modes
     - serial
     - instruction pipeline
