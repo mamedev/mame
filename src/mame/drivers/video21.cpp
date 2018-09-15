@@ -4,7 +4,7 @@
 
 2018-09-15
 
-Video 21 poker. Thanks to hap who figured out the inputs and the name of the game.
+Video 21 blackjack game. Thanks to hap who figured out the inputs and the name of the game.
 
 VIDEO-GAMES - LICH/GERMANY 1017a
 
@@ -16,6 +16,8 @@ involved, and a 555.
 To Do:
 - Sound
 - CPU clock
+- unknown status bits? eg. hopper
+- color overlay as seen on flyer upright cabinet
 
 When booted, press W to get it going.
 
@@ -28,17 +30,17 @@ When booted, press W to get it going.
 #include "emupal.h"
 
 
-class videolich_state : public driver_device
+class video21_state : public driver_device
 {
 public:
-	videolich_state(const machine_config &mconfig, device_type type, const char *tag)
+	video21_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this,"maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	void videolich(machine_config &config);
+	void video21(machine_config &config);
 
 private:
 
@@ -51,7 +53,7 @@ private:
 };
 
 
-uint32_t videolich_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y,ra,chr,gfx;
 	uint16_t sy=0,ma=0,x;
@@ -83,13 +85,13 @@ uint32_t videolich_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-void videolich_state::mem_map(address_map &map) {
+void video21_state::mem_map(address_map &map) {
 	map(0x0000,0x0fff).rom().mirror(0x3000);
 	map(0xe000,0xe3ff).ram().share("videoram");
 	map(0xff00,0xffff).ram();
 }
 
-void videolich_state::io_map(address_map &map) {
+void video21_state::io_map(address_map &map) {
 	map(0x02,0x02).nopw();  // lots of unknown writes, might be some kind of dac
 	map(0x04,0x04);  //.w unknown write
 	map(0x08,0x08);  //.w unknown write
@@ -99,7 +101,7 @@ void videolich_state::io_map(address_map &map) {
 }
 
 
-static INPUT_PORTS_START( videolich )
+static INPUT_PORTS_START( video21 )
 	PORT_START("IN41") // dips and tilt
 	PORT_DIPNAME( 0x01, 0x01, "41b0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -160,7 +162,7 @@ static INPUT_PORTS_START( videolich )
 INPUT_PORTS_END
 
 
-static const gfx_layout videolich_charlayout =
+static const gfx_layout video21_charlayout =
 {
 	8, 8,                   // 8 x 8 characters
 	128,                    // 128 characters, but only the first 76 look useful
@@ -173,11 +175,11 @@ static const gfx_layout videolich_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( gfx_videolich )
-	GFXDECODE_ENTRY( "chargen", 0x0000, videolich_charlayout, 0, 1 )
+static GFXDECODE_START( gfx_video21 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, video21_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START( videolich_state::videolich )
+MACHINE_CONFIG_START( video21_state::video21 )
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080, 20.79_MHz_XTAL / 8)   // crystal confirmed but divisor unknown
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
@@ -187,12 +189,12 @@ MACHINE_CONFIG_START( videolich_state::videolich )
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(videolich_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(video21_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videolich)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_video21)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -216,5 +218,5 @@ ROM_START( video21 )
 	ROM_LOAD_NIB_LOW ( "lich_gfx.43", 0x0000, 0x0400, CRC(0ecb0aab) SHA1(7f3f1b93a5d38828ae3e97e5f8ef1a6a96dc798b) )
 ROM_END
 
-GAME(1980, video21, 0, videolich, videolich, videolich_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NO_SOUND)
+GAME(1980, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NO_SOUND)
 
