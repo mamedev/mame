@@ -30,6 +30,7 @@
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "sound/beep.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
@@ -304,7 +305,19 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	mculatch.int_wr_callback().set(m_uart, FUNC(z80sio_device::ctsb_w)).invert();
 	mculatch.int_wr_callback().append(FUNC(m79152pc_state::latch_full_w));
 
-	I8255A(config, "ppi"); // NEC D8255AD-2
+	i8255_device &ppi(I8255A(config, "ppi")); // NEC D8255AD-2
+	ppi.out_pb_callback().set("printer", FUNC(centronics_device::write_data0)).bit(0);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data1)).bit(1);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data2)).bit(2);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data3)).bit(3);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data4)).bit(4);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data5)).bit(5);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data6)).bit(6);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data7)).bit(7);
+	ppi.out_pc_callback().set("printer", FUNC(centronics_device::write_strobe)).bit(1);
+
+	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
+	printer.ack_handler().set("ppi", FUNC(i8255_device::pc2_w));
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4'000'000));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
