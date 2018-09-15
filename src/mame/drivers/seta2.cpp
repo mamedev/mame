@@ -3155,7 +3155,7 @@ PCB Number: P-FG01-1
 +-+                                 |U|     +--------------+|
   |  +-++-++-++-+                   |3|     |      U20     ||
 +-+  | || || || |      M            |2|  M  +--------------+|
-|    |U| U||U||U| M M  4            | |  1  +--------------+|
+|    |U||U||U||U| M M  4            | |  1  +--------------+|
 |J   |3||5||2||4| 3 3               +-+     |      U15     ||
 |A   | || || || |      M                    +--------------+|
 |M   +-++-++-++-+      4                    +--------------+|
@@ -3182,27 +3182,37 @@ PCB Number: P-FG01-1
 |              2 1                                          |
 +-----------------------------------------------------------+
 
+U56 is unpopulated 93C45 EEPROM
 CN4 - 96 pin connector (3 rows by 32 pins)
-
-* Denotes not populated. U56 is unpopulated 93C45 EEPROM
+* Denotes not populated.
 
 Notes:
       HSync: 15.23kHz
       VSync: 58.5Hz
 
+NOTE:  There is known to exist an undumped version of Guardians on the
+       P-FG01-1 PCB half as many but larger ROMs.
+
+  The following sockets have double size ROMS:
+   U4 & U5 - program ROMs
+   U15, U16, U17 & U18 - graphics ROMS
+  The following sockets are unpopulated:
+   U2 & U3 - program ROMs
+   U19, U20, U21 & U22 - graphics ROMS
 **********************************************************
 
 There is known to exist an undumped version of Guardians on the
  P0-113A PCB with P1-106-1 & P1-107-1 duaghtercards
 
- It's assumed the programs (at least) are different to cope with
- the different hardware configuration.
+ It's assumed the programs roms (at least) are different to cope
+ with the different hardware configuration.
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: Allumer X1-020 (208 Pin PQFP)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz, 32.530MHz
  Other: 8 Position Dipswitch x 2
+        93C46 EEPROM
 
 Memory:
 M1 are TC551001BFL-70L at U56 & U57
@@ -3218,7 +3228,7 @@ PCB Number: P0-113A  BP49KA
 +-+                               | 8 |        +---------------+|
   |  +-++-+   +-++-+              |   |        |KA2-001-013 U17||
 +-+  | || |   | || |              +---+     M  +---------------+|
-|    |U| U| M |U||U| M                      1  +---------------+|
+|    |U||U| M |U||U| M                      1  +---------------+|
 |J   |3||5| 3 |2||4| 3                         |      U15      ||
 |A   | || |   | || |                           +---------------+|
 |M   +-++-+   +-++-+                           +---------------+|
@@ -3247,9 +3257,9 @@ U2 is KA2 001 001 EPROM
 U4 is KA2 001 002 EPROM
 U5 is KA2 001 003 EPROM
 U3 is KA2 001 004 EPROM
-U28 is KA-001-015 mask ROM (silkscreened SOUND ROM)
-U15 is socketted to recieve P1-106-1 daughtercard
-U77 is socketted to recieve P1-107-1 daughtercard
+U28 is KA2-001-015 mask ROM (silkscreened SOUND ROM)
+U15 is socketted to receive P1-106-1 daughtercard
+U77 is socketted to receive P1-107-1 daughtercard
 CN2 - 5 Pin header
 CN1 - 10 Pin header
 * Denotes not populated.
@@ -3329,6 +3339,7 @@ This game runs on Seta/Allumer hardware
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz, 32.530MHz
  Other: 8 Position Dipswitch x 2
+        93C46 EEPROM
 
 Memory:
 M1 are TC551001BFL-70L at U56 & U57
@@ -3344,7 +3355,7 @@ PCB Number: P0-113A  BP49KA
 +-+                               | 8 |        +--------------+|
   |  +-++-+   +-++-+              |   |        |KA-001-013 U17||
 +-+  | || |   | || |              +---+     M  +--------------+|
-|    |U| U| M |U||U| M                      1  +--------------+|
+|    |U||U| M |U||U| M                      1  +--------------+|
 |J   |3||5| 3 |2||4| 3                         |KA-001-012 U15||
 |A   | || |   | || |                           +--------------+|
 |M   +-++-+   +-++-+                           +--------------+|
@@ -3380,26 +3391,26 @@ CN1 - 10 Pin header
 
 ROM_START( gundamex )
 	ROM_REGION( 0x600000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE(      "ka002002.u2",  0x000000, 0x080000, CRC(e850f6d8) SHA1(026325e305676b1f8d3d9e7573920f8b70d7bccb) )
-	ROM_LOAD16_BYTE(      "ka002004.u3",  0x000001, 0x080000, CRC(c0fb1208) SHA1(84b25e4c73cb8e023ee5dbf69f588be98700b43f) )
-	ROM_LOAD16_BYTE(      "ka002001.u4",  0x100000, 0x080000, CRC(553ebe6b) SHA1(7fb8a159513d31a1d60520ff14e4c4d133fd3e19) )
-	ROM_LOAD16_BYTE(      "ka002003.u5",  0x100001, 0x080000, CRC(946185aa) SHA1(524911c4c510d6c3e17a7ab42c7077c2fffbf06b) )
-	ROM_LOAD16_WORD_SWAP( "ka001005.u77", 0x500000, 0x080000, CRC(f01d3d00) SHA1(ff12834e99a76261d619f10d186f4b329fb9cb7a) )
+	ROM_LOAD16_BYTE(      "ka_002_002.u2",  0x000000, 0x080000, CRC(e850f6d8) SHA1(026325e305676b1f8d3d9e7573920f8b70d7bccb) )
+	ROM_LOAD16_BYTE(      "ka_002_004.u3",  0x000001, 0x080000, CRC(c0fb1208) SHA1(84b25e4c73cb8e023ee5dbf69f588be98700b43f) )
+	ROM_LOAD16_BYTE(      "ka_002_001.u4",  0x100000, 0x080000, CRC(553ebe6b) SHA1(7fb8a159513d31a1d60520ff14e4c4d133fd3e19) )
+	ROM_LOAD16_BYTE(      "ka_002_003.u5",  0x100001, 0x080000, CRC(946185aa) SHA1(524911c4c510d6c3e17a7ab42c7077c2fffbf06b) )
+	ROM_LOAD16_WORD_SWAP( "ka-001-005.u77", 0x500000, 0x080000, CRC(f01d3d00) SHA1(ff12834e99a76261d619f10d186f4b329fb9cb7a) )
 
 	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE)  // Sprites
-	ROM_LOAD( "ka001009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
-	ROM_LOAD( "ka001010.u18",  0x0200000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
-	ROM_LOAD( "ka001011.u20",  0x0400000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
-	ROM_LOAD( "ka001012.u15",  0x0800000, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
-	ROM_LOAD( "ka001013.u17",  0x0a00000, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
-	ROM_LOAD( "ka001014.u19",  0x0c00000, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
-	ROM_LOAD( "ka001006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
-	ROM_LOAD( "ka001007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
-	ROM_LOAD( "ka001008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
+	ROM_LOAD( "ka-001-009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
+	ROM_LOAD( "ka-001-010.u18",  0x0200000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
+	ROM_LOAD( "ka-001-011.u20",  0x0400000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
+	ROM_LOAD( "ka-001-012.u15",  0x0800000, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
+	ROM_LOAD( "ka-001-013.u17",  0x0a00000, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
+	ROM_LOAD( "ka-001-014.u19",  0x0c00000, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
+	ROM_LOAD( "ka-001-006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
+	ROM_LOAD( "ka-001-007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
+	ROM_LOAD( "ka-001-008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
 	ROM_FILL(                  0x1800000, 0x600000, 0x00 ) // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "ka001015.u28", 0x000000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
+	ROM_LOAD( "ka-001-015.u28", 0x000000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "eeprom.bin", 0x0000, 0x0080, CRC(80f8e248) SHA1(1a9787811e56d95f7acbedfb00225b6e7df265eb) )
