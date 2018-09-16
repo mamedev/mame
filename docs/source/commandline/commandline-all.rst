@@ -133,7 +133,7 @@ Example:
 
 .. _mame-commandline-listroms:
 
-**-listroms** [<*pattern*>]
+**-listroms** / **-lr** [<*pattern*>]
 
 	Displays a list of ROM images referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
 
@@ -174,7 +174,7 @@ Example:
 
 .. _mame-commandline-listslots:
 
-**-listslots** [<*pattern*>]
+**-listslots** / **-lslot** [<*pattern*>]
 
         Show available slots and options for each slot (if available). Primarily used for MAME to allow control over internal plug-in cards, much like PCs needing video, sound and other expansion cards.
 		
@@ -190,25 +190,25 @@ Example:
 
 .. _mame-commandline-listsoftware:
 
-**-listsoftware** [<*pattern*>]
+**-listsoftware** / **-lsoft** [<*pattern*>]
 
         Posts to screen all software lists which can be used by the entered *pattern* or system. Note that this is simply a copy/paste of the .XML file which reside in the HASH folder which are allowed to be used.
 
 .. _mame-commandline-verifysoftware:
 
-**-verifysoftware** [<*pattern*>]
+**-verifysoftware** / **-vsoft** [<*pattern*>]
 
 	Checks for invalid or missing ROM images in your software lists. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific driver name or *pattern* after the -verifysoftware command.
 
 .. _mame-commandline-getsoftlist:
 
-**-getsoftlist** [<*pattern*>]
+**-getsoftlist** / **-glist** [<*pattern*>]
 
         Posts to screen a specific software list which matches with the system name provided.
 
 .. _mame-commandline-verifysoftlist:
 
-**-verifysoftlist** [softwarelistname]
+**-verifysoftlist** / **-vlist** [softwarelistname]
 
 	Checks a specified software list for missing ROM images if files exist for issued softwarelistname. By default, all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific softwarelistname (without .XML) after the -verifysoftlist command.
 
