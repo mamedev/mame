@@ -250,6 +250,9 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                            "0.04",              OPTION_FLOAT,      "Bloom level 6 weight (1/4 smaller that level 5 target)" },
 	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                            "0.02",              OPTION_FLOAT,      "Bloom level 7 weight (1/4 smaller that level 6 target)" },
 	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                            "0.01",              OPTION_FLOAT,      "Bloom level 8 weight (1/4 smaller that level 7 target)" },
+	{ WINOPTION_LUT_TEXTURE,                                    "",                  OPTION_STRING,  "LUT texture filename" },
+	{ WINOPTION_LUT_ENABLE,                                     "0",                 OPTION_BOOLEAN,    "Enables 3D LUT to be applied after post-processing" },
+
 
 	// full screen options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "FULL SCREEN OPTIONS" },

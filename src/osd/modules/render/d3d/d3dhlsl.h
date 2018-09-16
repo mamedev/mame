@@ -101,6 +101,7 @@ public:
 		CU_POST_SCANLINE_BRIGHT_OFFSET,
 		CU_POST_POWER,
 		CU_POST_FLOOR,
+		CU_LUT_ENABLE,
 
 		CU_COUNT
 	};
@@ -241,6 +242,10 @@ struct hlsl_options
 	float                   bloom_level6_weight;
 	float                   bloom_level7_weight;
 	float                   bloom_level8_weight;
+
+	// Final
+	char lut_texture[1024];
+	int lut_enable;
 };
 
 struct slider_desc
@@ -357,6 +362,8 @@ private:
 	double                  delta_t;                    // data for delta_time
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
+	bitmap_argb32           lut_bitmap;
+	texture_info *          lut_texture;
 	hlsl_options *          options;                    // current options
 
 	IDirect3DSurface9 *     black_surface;              // black dummy surface

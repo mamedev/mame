@@ -1,8 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz, W. M. Martinez
 //-----------------------------------------------------------------------------
 // Primary Effect
 //-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Macros
+//-----------------------------------------------------------------------------
+
+#define LUT_TEXTURE_WIDTH 4096
+#define LUT_SIZE 64
+#define LUT_SCALE float2(1.0 / LUT_TEXTURE_WIDTH, 1.0 / LUT_SIZE)
 
 //-----------------------------------------------------------------------------
 // Sampler Definitions
@@ -20,6 +28,35 @@ sampler DiffuseSampler = sampler_state
 	AddressV = CLAMP;
 	AddressW = CLAMP;
 };
+
+texture LutTexture;
+
+sampler2D LutSampler = sampler_state
+{
+	Texture = <LutTexture>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+//-----------------------------------------------------------------------------
+// Utilities
+//-----------------------------------------------------------------------------
+
+float3 apply_lut(float3 color)
+{
+	float3 lutcoord = float3((color.rg * (LUT_SIZE - 1) + 0.5) *
+		LUT_SCALE, color.b * (LUT_SIZE - 1));
+	float shift = floor(lutcoord.z);
+	lutcoord.x += shift * LUT_SCALE.y;
+	color.rgb = lerp(tex2D(LutSampler, lutcoord.xy).rgb, tex2D(LutSampler,
+		float2(lutcoord.x + LUT_SCALE.y, lutcoord.y)).rgb,
+		lutcoord.z - shift);
+	return color;
+}
 
 //-----------------------------------------------------------------------------
 // Vertex Definitions
@@ -49,7 +86,7 @@ struct PS_INPUT
 // Primary Vertex Shaders
 //-----------------------------------------------------------------------------
 
-static const float Epsilon = 1.0e-7f;
+//static const float Epsilon = 1.0e-7f;
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
@@ -112,10 +149,14 @@ VS_OUTPUT vs_ui_main(VS_INPUT Input)
 // Primary Pixel Shaders
 //-----------------------------------------------------------------------------
 
+uniform bool LutEnable;
+
 float4 ps_screen_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 
+	if (LutEnable)
+		BaseTexel.rgb = apply_lut(BaseTexel.rgb);
 	return BaseTexel;
 }
 
@@ -123,6 +164,8 @@ float4 ps_vector_buffer_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 
+	if (LutEnable)
+		BaseTexel.rgb = apply_lut(BaseTexel.rgb);
 	return BaseTexel;
 }
 
@@ -131,6 +174,8 @@ float4 ps_ui_main(PS_INPUT Input) : COLOR
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 	BaseTexel *= Input.Color;
 
+	if (LutEnable)
+		BaseTexel.rgb = apply_lut(BaseTexel.rgb);
 	return BaseTexel;
 }
 
