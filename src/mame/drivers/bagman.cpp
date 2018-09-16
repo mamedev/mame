@@ -829,7 +829,7 @@ ROM_START( bagmanj )
 	ROM_LOAD( "bf8_13.t9",    0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) ) // 2732
 ROM_END
 
-ROM_START( botanic2 ) // PCB has Valadon logo with 'bajo licencia Itisa (Palamos)'. Most likely just a bootleg Bagman PCB conversion.
+ROM_START( botanic2 ) // PCB has Valadon logo with 'bajo licencia Itisa (Palamos)'.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.9e",    0x0000, 0x1000, CRC(c5170449) SHA1(3f85f254f1a318a0b4d6e12d4df756c880751327) ) // 2732
 	ROM_LOAD( "6.9f",    0x1000, 0x1000, CRC(33b2df44) SHA1(9d3697bdf0d906b27374a1460cdac715ef10565d) ) // 2732
@@ -1120,8 +1120,8 @@ GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,
 
 GAME( 1983, pickin,    0,       pickin,   pickin,    bagman_state,   empty_init, ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init, ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init, ROT90,  "Itisa",                              "Botanic (English / Spanish, bootleg conversion)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, ok from the second on. Colors likely wrong, too. Has a leftover 5110.
+GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init, ROT90,  "Itisa", "Botanic (English / Spanish, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init, ROT90,  "Itisa", "Botanic (English / Spanish, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, ok from the second on. Colors likely wrong, too. Has a leftover 5110.
 GAME( 1984, botanicf,  botanic, botanic,  botanicf,  bagman_state,   empty_init, ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init, ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )
