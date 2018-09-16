@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(v100_state::v100)
 	ppi.out_pc_callback().set(m_earom, FUNC(er1400_device::data_w)).bit(6).invert();
 	ppi.out_pc_callback().append(m_earom, FUNC(er1400_device::clock_w)).bit(0).invert();
 
-	ER1400(config, m_earom, 0);
+	ER1400(config, m_earom);
 MACHINE_CONFIG_END
 
 

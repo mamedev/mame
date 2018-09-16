@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	dbrg.fr_handler().set(m_pusart, FUNC(i8251_device::write_rxc));
 	dbrg.ft_handler().set(m_pusart, FUNC(i8251_device::write_txc));
 
-	ER1400(config, m_nvr, 0);
+	ER1400(config, m_nvr);
 
 	VT100_KEYBOARD(config, m_keyboard, 0).signal_out_callback().set(m_kbduart, FUNC(ay31015_device::write_si));
 

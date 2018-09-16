@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
 	*/
 
-	MCFG_DEVICE_ADD("nvm", ER1400, 0)
+	ER1400(config, m_nvm);
 MACHINE_CONFIG_END
 
 
