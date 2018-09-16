@@ -208,6 +208,7 @@
 #define OP3_JMPL    56
 #define OP3_RETT    57
 #define OP3_TICC    58
+#define OP3_IFLUSH  59
 #define OP3_SAVE    60
 #define OP3_RESTORE 61
 

@@ -6,8 +6,9 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_STATE   (1U << 1)
 #define LOG_CONTROL (1U << 2)
+#define LOG_DATA    (1U << 3)
 
-//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL)
+//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
 #define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
@@ -465,6 +466,7 @@ uint8_t nscsi_full_device::scsi_get_data(int id, int pos)
 {
 	switch(id) {
 	case SBUF_MAIN:
+		LOGMASKED(LOG_DATA, "scsi_get_data MAIN, id:%d pos:%d data:%02x %c\n", id, pos, scsi_cmdbuf[pos], scsi_cmdbuf[pos] >= 0x20 && scsi_cmdbuf[pos] < 0x7f ? (char)scsi_cmdbuf[pos] : ' ');
 		return scsi_cmdbuf[pos];
 	case SBUF_SENSE:
 		return scsi_sense_buffer[pos];
@@ -477,6 +479,7 @@ void nscsi_full_device::scsi_put_data(int id, int pos, uint8_t data)
 {
 	switch(id) {
 	case SBUF_MAIN:
+		LOGMASKED(LOG_DATA, "nscsi_bus: scsi_put_data MAIN, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 		scsi_cmdbuf[pos] = data;
 		break;
 	case SBUF_SENSE:
