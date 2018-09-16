@@ -403,13 +403,13 @@ WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_porta_w)
 
 READ8_MEMBER(exidy_sh8253_sound_device::r6532_porta_r)
 {
+	uint8_t status = 0xff;
 	if (m_tms.found())
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", machine().time().as_double(), machine().describe_context(), m_tms->status_r());
-		return m_tms->status_r();
+		status = m_tms->status_r();
+		logerror("(%f)%s:TMS5220 status read = %02X\n", machine().time().as_double(), machine().describe_context(), status);
 	}
-	else
-		return 0xff;
+	return status;
 }
 
 WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_portb_w)
