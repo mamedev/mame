@@ -196,7 +196,7 @@ class OpcodeHandler:
                 self.cycles[i] = op.cycles[i] + moves_cycle_table[ea_mode][size_order]
             elif i == CPU_010 and op.name == 'clr':
                 self.cycles[i] = op.cycles[i] + clr_cycle_table[ea_mode][size_order]
-            elif i == CPU_000 and (ea_mode == 'i' or ea_mode == 'none') and op.size == 32 and ((op.spec_proc == 'er' and (op.name == 'add' or op.name == 'and' or op.name == 'or' or op.name == 'sub')) or op.name == 'adda' or op.name == 'suba'):
+            elif i == CPU_000 and (ea_mode == 'i' or ea_mode == 'none') and op.size == 32 and ((op.cycles[i] == 6 and (op.name == 'add' or op.name == 'and' or op.name == 'or' or op.name == 'sub')) or op.name == 'adda' or op.name == 'suba'):
                 self.cycles[i] = op.cycles[i] + ea_cycle_table[ea_mode][i][size_order] + 2
             elif i < CPU_020 and (op.name == 'jmp' or op.name == 'jsr'):
                 self.cycles[i] = op.cycles[i] + jmp_jsr_cycle_table[ea_mode]
