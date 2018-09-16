@@ -580,9 +580,6 @@ private:
 	DECLARE_READ32_MEMBER( ram_r );
 	DECLARE_WRITE32_MEMBER( ram_w );
 	DECLARE_READ32_MEMBER( ss1_sl0_id );
-	DECLARE_READ32_MEMBER( ss1_sl1_id );
-	DECLARE_READ32_MEMBER( ss1_sl2_id );
-	DECLARE_READ32_MEMBER( ss1_sl3_id );
 	DECLARE_READ32_MEMBER( timer_r );
 	DECLARE_WRITE32_MEMBER( timer_w );
 	DECLARE_READ8_MEMBER( irq_r );
@@ -620,7 +617,7 @@ private:
 
 	required_device<mb86901_device> m_maincpu;
 
-	required_device<mk48t12_device> m_timekpr;
+	required_device<m48t02_device> m_timekpr;
 
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
@@ -720,7 +717,7 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	{
 		if (!machine().side_effects_disabled())
 		{
-			//printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			m_maincpu->set_mae();
 			m_buserr[0] |= 0x80;    // invalid PTE
 			m_buserr[0] &= ~0x8000; // read
@@ -780,7 +777,7 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 			m_type1space->write32(space, tmp, data, mem_mask);
 			return;
 		default:
-			//printf("sun4c: access to memory type not defined\n");
+			printf("sun4c: access to memory type not defined\n");
 			m_maincpu->set_mae();
 			m_buserr[0] = 0x8020;
 			m_buserr[1] = offset << 2;
@@ -789,7 +786,7 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		//printf("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
+		printf("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
         m_maincpu->set_mae();
 		m_buserr[0] |= 0x8080;    // write cycle, invalid PTE
 		m_buserr[1] = offset<<2;
@@ -1049,7 +1046,7 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	{
 		if (!machine().side_effects_disabled())
 		{
-			//printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			m_maincpu->set_mae();
 			m_buserr[0] |= 0x80;    // invalid PTE
 			m_buserr[0] &= ~0x8000; // read
@@ -1589,7 +1586,7 @@ READ8_MEMBER( sun4_state::irq_r )
 
 WRITE8_MEMBER( sun4_state::irq_w )
 {
-	//printf("%02x to IRQ\n", data);
+	printf("%02x to IRQ\n", data);
 
 	m_irq_reg = data;
 
@@ -1600,6 +1597,7 @@ WRITE8_MEMBER( sun4_state::irq_w )
 
 WRITE_LINE_MEMBER( sun4_state::scc1_int )
 {
+	logerror("scc1\n");
 	m_scc1_int = state;
 
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1607,6 +1605,7 @@ WRITE_LINE_MEMBER( sun4_state::scc1_int )
 
 WRITE_LINE_MEMBER( sun4_state::scc2_int )
 {
+	logerror("scc2\n");
 	m_scc2_int = state;
 
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1624,6 +1623,7 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			start_timer(0);
 			if ((m_irq_reg & 0x21) == 0x21)
 			{
+				logerror("t0\n");
 				m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
 				//printf("Taking INT10\n");
 			}
@@ -1637,6 +1637,7 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			//m_c1_timer->adjust(attotime::never);
 			if ((m_irq_reg & 0x81) == 0x81)
 			{
+				logerror("t1\n");
 				m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
 				//printf("Taking INT14\n");
 			}
@@ -1664,6 +1665,7 @@ READ32_MEMBER( sun4_state::timer_r )
 		//printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[0] &= ~0x80000000;
 		m_counter[1] &= ~0x80000000;
+		logerror("tc0\n");
 		m_maincpu->set_input_line(SPARC_IRQ10, CLEAR_LINE);
 	}
 
@@ -1676,6 +1678,7 @@ READ32_MEMBER( sun4_state::timer_r )
 		//printf("Read timer limit 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[2] &= ~0x80000000;
 		m_counter[3] &= ~0x80000000;
+		logerror("tc1\n");
 		m_maincpu->set_input_line(SPARC_IRQ14, CLEAR_LINE);
 	}
 	return ret;
@@ -1744,6 +1747,7 @@ void sun4_state::dma_check_interrupts()
 	if (old_irq != m_dma_irq)
 	{
 		//logerror("m_dma_irq %d because irq_or_err_pending:%d and irq_enabled:%d\n", m_dma_irq ? 1 : 0, irq_or_err_pending, irq_enabled);
+		logerror("dma\n");
 		m_maincpu->set_input_line(SPARC_IRQ3, m_dma_irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -1970,32 +1974,6 @@ READ32_MEMBER( sun4_state::ss1_sl0_id )
 	return 0xfe810101;
 }
 
-// indicate 4/60 color video card exists
-READ32_MEMBER( sun4_state::ss1_sl3_id )
-{
-	return 0xfe010101;
-}
-
-// indicate no card exists
-READ32_MEMBER( sun4_state::ss1_sl1_id )
-{
-	m_maincpu->set_mae();
-	m_buserr[0] |= 0x20;    // timeout
-	m_buserr[0] &= ~0x8000; // read
-	m_buserr[1] = 0xffa00000;
-	return 0;
-}
-
-// indicate no card exists
-READ32_MEMBER( sun4_state::ss1_sl2_id )
-{
-	m_maincpu->set_mae();
-	m_buserr[0] |= 0x20;    // timeout
-	m_buserr[0] &= ~0x8000; // read
-	m_buserr[1] = 0xffc00000;
-	return 0;
-}
-
 FLOPPY_FORMATS_MEMBER( sun4_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
@@ -2035,7 +2013,7 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 
 	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
 
-	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
+	M48T02(config, TIMEKEEPER_TAG, 0);
 
 	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
@@ -2095,7 +2073,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 
 	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
 
-	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
+	M48T02(config, TIMEKEEPER_TAG, 0);
 
 	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
