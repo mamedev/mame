@@ -194,7 +194,7 @@ void m79152pc_state::screen_draw_line(bitmap_ind16 &bitmap, unsigned y)
 	for (u16 x = ma; x < ma + 80; x++)
 	{
 		// BIT(attr, 3) should probably be blinking
-		// BIT(attr, 1) may be used for high-intensity text (
+		// BIT(attr, 1) may be used for high-intensity text
 		u8 chr = m_videoram[x];
 		u8 attr = m_attributes[x];
 		u8 gfx = m_chargen[(chr << 4) | (BIT(attr, 2) && ra == 15 ? 3 : ra)];

@@ -416,8 +416,8 @@ WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_portb_w)
 {
 	if (m_tms.found())
 	{
-		m_tms->rsq_w(data & 0x01);
-		m_tms->wsq_w((data >> 1) & 0x01);
+		m_tms->rsq_w(BIT(data, 0));
+		m_tms->wsq_w(BIT(data, 1));
 	}
 }
 

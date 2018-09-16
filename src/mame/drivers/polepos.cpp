@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_NAMCO_06XX_WRITE_2_CB(WRITE8("52xx", namco_52xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
 	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 

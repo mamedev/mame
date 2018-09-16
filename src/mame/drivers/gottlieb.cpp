@@ -1776,10 +1776,10 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
 	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update_gottlieb)
 

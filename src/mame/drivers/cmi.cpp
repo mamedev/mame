@@ -1365,10 +1365,10 @@ READ8_MEMBER( cmi_state::fdc_r )
 	{
 		switch (m_fdc_addr)
 		{
-			case 0xc: { return m_wd1791->status_r() ^ 0xff; }
-			case 0xd: { return m_wd1791->track_r() ^ 0xff; }
-			case 0xe: { return m_wd1791->sector_r() ^ 0xff; }
-			case 0xf: { return m_wd1791->data_r() ^ 0xff; }
+			case 0xc: return m_wd1791->status_r() ^ 0xff;
+			case 0xd: return m_wd1791->track_r() ^ 0xff;
+			case 0xe: return m_wd1791->sector_r() ^ 0xff;
+			case 0xf: return m_wd1791->data_r() ^ 0xff;
 			default:  return 0;
 		}
 	}
