@@ -3038,6 +3038,8 @@ end
 
 if (BUSES["SBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/sbus/artecon.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/artecon.h",
 		MAME_DIR .. "src/devices/bus/sbus/bwtwo.cpp",
 		MAME_DIR .. "src/devices/bus/sbus/bwtwo.h",
 		MAME_DIR .. "src/devices/bus/sbus/cgsix.cpp",
