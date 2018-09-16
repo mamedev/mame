@@ -26,6 +26,7 @@ When booted, press W to get it going.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/nvram.h"
 #include "screen.h"
 #include "emupal.h"
 
@@ -88,7 +89,7 @@ uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void video21_state::mem_map(address_map &map) {
 	map(0x0000,0x0fff).rom().mirror(0x3000);
 	map(0xe000,0xe3ff).ram().share("videoram");
-	map(0xff00,0xffff).ram();
+	map(0xff00,0xffff).ram().share("nvram");
 }
 
 void video21_state::io_map(address_map &map) {
@@ -179,26 +180,27 @@ static GFXDECODE_START( gfx_video21 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, video21_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START( video21_state::video21 )
+void video21_state::video21(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, 20.79_MHz_XTAL / 16) // crystal confirmed but divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I8080A(config, m_maincpu, 20.79_MHz_XTAL / 10); // crystal confirmed but divisor unknown (divider appears to be 74LS160)
+	m_maincpu->set_addrmap(AS_PROGRAM, &video21_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &video21_state::io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(video21_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::white());
+	screen.set_raw(20.79_MHz_XTAL / 4, 330, 0, 32*8, 315, 0, 28*8); // parameters guessed
+	screen.set_screen_update(FUNC(video21_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_video21)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_video21);
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 
