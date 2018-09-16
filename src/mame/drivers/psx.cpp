@@ -519,8 +519,8 @@ void psx1_state::subcpu_map(address_map &map)
 
 MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map )
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
@@ -572,8 +572,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psx1_state::pse)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map)
+	CXD8530AQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
