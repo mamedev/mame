@@ -181,7 +181,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START( video21_state::video21 )
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 20.79_MHz_XTAL / 8)   // crystal confirmed but divisor unknown
+	MCFG_DEVICE_ADD("maincpu", I8080, 20.79_MHz_XTAL / 16) // crystal confirmed but divisor unknown
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
