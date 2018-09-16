@@ -2846,7 +2846,7 @@ void mb86901_device::dispatch_instruction(uint32_t op)
 
 	if (illegal_IU_instr)
 	{
-		printf("illegal instruction at %08x\n", PC);
+		printf("illegal instruction at %08x: %08x\n", PC, op);
 		m_trap = 1;
 		m_illegal_instruction = 1;
 	}

@@ -2,23 +2,23 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-    Sun bwtwo monochrome video controller
+    Sun SunSwift 10/100 + Fast Wide SCSI "Colossus" skeleton
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_SBUS_BWTWO_H
-#define MAME_BUS_SBUS_BWTWO_H
+#ifndef MAME_BUS_SBUS_HME_H
+#define MAME_BUS_SBUS_HME_H
 
 #pragma once
 
 #include "sbus.h"
 
 
-class sbus_bwtwo_device : public device_t, public device_sbus_card_interface
+class sbus_hme_device : public device_t, public device_sbus_card_interface
 {
 public:
 	// construction/destruction
-	sbus_bwtwo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sbus_hme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device_t overrides
@@ -29,23 +29,17 @@ protected:
 	// device_sbus_slot_interface overrides
 	virtual void install_device() override;
 
-	DECLARE_READ8_MEMBER(regs_r);
-	DECLARE_WRITE8_MEMBER(regs_w);
+	DECLARE_READ32_MEMBER(unknown_r);
+	DECLARE_WRITE32_MEMBER(unknown_w);
 	DECLARE_READ32_MEMBER(rom_r);
-	DECLARE_READ32_MEMBER(vram_r);
-	DECLARE_WRITE32_MEMBER(vram_w);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void mem_map(address_map &map) override;
 
 	required_memory_region m_rom;
-	std::unique_ptr<uint32_t[]> m_vram;
-	required_device<screen_device> m_screen;
 };
 
 
-DECLARE_DEVICE_TYPE(SBUS_BWTWO, sbus_bwtwo_device)
+DECLARE_DEVICE_TYPE(SBUS_HME, sbus_hme_device)
 
-#endif // MAME_BUS_SBUS_BWTWO_H
+#endif // MAME_BUS_SBUS_HME_H

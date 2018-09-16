@@ -563,11 +563,13 @@ void nscsi_full_device::scsi_data_out(int buf, int size)
 	c->param2 = size;
 }
 
-void nscsi_full_device::sense(bool deferred, uint8_t key)
+void nscsi_full_device::sense(bool deferred, uint8_t key, uint8_t asc, uint8_t ascq)
 {
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 	scsi_sense_buffer[0] = deferred ? 0x71 : 0x70;
 	scsi_sense_buffer[2] = key;
+	scsi_sense_buffer[12] = asc;
+	scsi_sense_buffer[13] = ascq;
 }
 
 void nscsi_full_device::scsi_unknown_command()
@@ -586,7 +588,11 @@ void nscsi_full_device::scsi_command()
 	switch(scsi_cmdbuf[0]) {
 	case SC_REQUEST_SENSE:
 		LOG("command REQUEST SENSE\n");
-		scsi_data_in(SBUF_SENSE, 8);
+		/*
+		 * Targets shall be capable of returning eighteen bytes of data in
+		 * response to a REQUEST SENSE command.
+		 */
+		scsi_data_in(SBUF_SENSE, 18);
 		scsi_status_complete(SS_GOOD);
 		break;
 	default:
@@ -619,7 +625,9 @@ int nscsi_full_device::get_lun(int def)
 void nscsi_full_device::bad_lun()
 {
 	scsi_status_complete(SS_CHECK_CONDITION);
-	sense(false, 2);
+
+	// key:illegal request, asc:logical unit not supported
+	sense(false, 5, 0x25);
 }
 
 // Arbitration delay (2.4us)
