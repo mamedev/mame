@@ -163,8 +163,8 @@ private:
 	inline void load_to_memory_autoinc(address_space &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
-	inline void add_carry(uint8_t dst, int8_t src);
-	inline void add(uint8_t dst, int8_t src);
+	inline void add_carry(uint8_t dst, uint8_t src);
+	inline void add(uint8_t dst, uint8_t src);
 	inline void compare(uint8_t dst, uint8_t src);
 	inline void decimal_adjust(uint8_t dst);
 	inline void decrement(uint8_t dst);
@@ -179,7 +179,7 @@ private:
 	inline void _xor(uint8_t dst, uint8_t src);
 	inline void call(uint16_t dst);
 	inline void jump(uint16_t dst);
-	inline int check_condition_code(int cc);
+	inline bool check_condition_code(int cc);
 	inline void test_complement_under_mask(uint8_t dst, uint8_t src);
 	inline void test_under_mask(uint8_t dst, uint8_t src);
 	inline void rotate_left(uint8_t dst);
