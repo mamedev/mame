@@ -890,12 +890,12 @@ triothep                        // (c) 1989 Data East Corporation (World)
 triothepj                       // (c) 1989 Data East Corporation (Japan)
 
 @source:acvirus.cpp
-virusa                          // (c) 1997 Access Gmbh
-virusb                          // (c) 1999 Access Gmbh
-virusc                          // (c) 2002 Access Gmbh
-virusrck                        // (c) 2001 Access Gmbh
-virusrckxl                      // (c) 2002 Access Gmbh
-viruscl                         // (c) 2004 Access Gmbh
+virusa                          // (c) 1997 Access GmbH
+virusb                          // (c) 1999 Access GmbH
+virusc                          // (c) 2002 Access GmbH
+virusrck                        // (c) 2001 Access GmbH
+virusrckxl                      // (c) 2002 Access GmbH
+viruscl                         // (c) 2004 Access GmbH
 
 @source:adam.cpp
 adam                            // Coleco Adam
@@ -38220,7 +38220,7 @@ victory                         // (c) 1982
 vidbrain                        //
 
 @source:video21.cpp
-video21                         // Videogames gmbh 1980
+video21                         // Videogames GmbH 1980
 
 @source:videopin.cpp
 solarwar                        // 036154-036169    1979    [6502]

@@ -19,7 +19,7 @@ To Do:
 - unknown status bits? eg. hopper
 - color overlay as seen on flyer upright cabinet
 
-When booted, press W to get it going.
+When booted, press Key out (mapped to W by default) to get it going.
 
 
 *******************************************************************************************/
@@ -132,8 +132,8 @@ static INPUT_PORTS_START( video21 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Stay")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_DIPNAME( 0x40, 0x40, "42b6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -221,4 +221,3 @@ ROM_START( video21 )
 ROM_END
 
 GAME(1980, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NO_SOUND)
-
