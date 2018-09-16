@@ -710,6 +710,9 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 
 		default:
 			printf("sun4c: access to memory type not defined in sun4c\n");
+			m_maincpu->set_mae();
+			m_buserr[0] = 0x20;
+			m_buserr[1] = offset << 2;
 			return 0;
 		}
 	}
@@ -777,7 +780,10 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 			m_type1space->write32(space, tmp, data, mem_mask);
 			return;
 		default:
-			printf("sun4c: access to memory type not defined\n");
+			//printf("sun4c: access to memory type not defined\n");
+			m_maincpu->set_mae();
+			m_buserr[0] = 0x8020;
+			m_buserr[1] = offset << 2;
 			return;
 		}
 	}
