@@ -12639,6 +12639,9 @@ f1gpb                           // bootleg
 mosaicf2                        // (c) 1999 F2 System
 royalpk2                        //
 
+@source:facit.cpp
+facit4440                       // 1984
+
 @source:famibox.cpp
 famibox                         // 1986
 
@@ -36955,7 +36958,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 7951om                          //
 alcat258                        //
 alcat7100                       //
-facit4440                       //
 feap90                          //
 ikt5a                           //
 itt9216                         //
