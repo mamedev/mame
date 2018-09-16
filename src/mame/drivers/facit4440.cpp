@@ -137,7 +137,7 @@ u8 facit4440_state::misc_status_r()
 
 WRITE_LINE_MEMBER(facit4440_state::vsync_w)
 {
-	if (BIT(m_control_latch[0], 5))
+	if (state && BIT(m_control_latch[0], 5))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
