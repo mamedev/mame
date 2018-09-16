@@ -468,6 +468,7 @@ nes.cpp
 nes_vt.cpp
 newbrain.cpp
 next.cpp
+nforcepc.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp

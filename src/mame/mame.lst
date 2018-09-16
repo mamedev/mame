@@ -30147,6 +30147,9 @@ neocd                           // NeoGeo CD
 neocdz                          // NeoGeo CDZ
 neocdzj                         //
 
+@source:nforcepc.cpp
+nforcepc                        //
+
 @source:ngen.cpp
 386i                            // 199?
 ngen                            // 1983
