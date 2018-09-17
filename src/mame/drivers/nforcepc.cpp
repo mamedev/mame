@@ -24,6 +24,83 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+#include "includes/nforcepc.h"
+
+/*
+  Pci devices
+*/
+
+DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "CRUSH11", "NVIDIA Corporation nForce CPU bridge")
+
+void crush11_host_device::config_map(address_map &map)
+{
+	pci_host_device::config_map(map);
+	map(0x50, 0x50).rw(FUNC(crush11_host_device::test_r), FUNC(crush11_host_device::test_w));
+}
+
+crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, CRUSH11, tag, owner, clock)
+	, cpu(*this, finder_base::DUMMY_TAG)
+{
+}
+
+void crush11_host_device::set_ram_size(int ram_size)
+{
+	ddr_ram_size = ram_size;
+}
+
+void crush11_host_device::device_start()
+{
+	pci_host_device::device_start();
+	memory_space = &cpu->space(AS_PROGRAM);
+	io_space = &cpu->space(AS_IO);
+
+	memory_window_start = 0;
+	memory_window_end = 0xffffffff;
+	memory_offset = 0;
+	io_window_start = 0;
+	io_window_end = 0xffff;
+	io_offset = 0;
+	status = 0x0010;
+
+	ram.resize(ddr_ram_size / 4);
+}
+
+void crush11_host_device::reset_all_mappings()
+{
+	pci_host_device::reset_all_mappings();
+}
+
+void crush11_host_device::device_reset()
+{
+	pci_host_device::device_reset();
+}
+
+void crush11_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
+
+	memory_space->install_ram(0x00000000, 0x0009ffff, &ram[0x00000000 / 4]);
+	memory_space->install_ram(0x00100000, ddr_ram_size - 1, &ram[0x00100000 / 4]);
+	uint32_t mask = m_region->bytes() - 1;
+	memory_space->install_rom(0x000c0000, 0x000fffff, m_region->base() + (0x000c0000 & mask));
+	memory_space->install_rom(0xfffc0000, 0xffffffff, m_region->base() + (0x000c0000 & mask));
+}
+
+READ8_MEMBER(crush11_host_device::test_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(crush11_host_device::test_w)
+{
+	logerror("test = %02x\n", data);
+}
+
+/*
+  Machine state
+*/
 
 class nforcepc_state : public driver_device
 {
@@ -79,8 +156,6 @@ WRITE8_MEMBER(nforcepc_state::boot_state_award_w)
 void nforcepc_state::nforce_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
-	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
 void nforcepc_state::nforce_map_io(address_map &map)
@@ -88,15 +163,18 @@ void nforcepc_state::nforce_map_io(address_map &map)
 	map.unmap_value_high();
 }
 
+/*
+  Machine configuration
+*/
+
 MACHINE_CONFIG_START(nforcepc_state::nforcepc)
 	MCFG_DEVICE_ADD("maincpu", ATHLONXP, 90000000)
 	MCFG_DEVICE_PROGRAM_MAP(nforce_map)
 	MCFG_DEVICE_IO_MAP(nforce_map_io)
-/*	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
+	MCFG_DEVICE_ADD(":pci:00.0", CRUSH11, 0, "maincpu", 2 * 1024 * 1024)
+	/*	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 	MCFG_I386_SMIACT(WRITELINE("pci:00.0", i82439hx_host_device, smi_act_w))
-
-	MCFG_DEVICE_ADD(      ":pci",      PCI_ROOT, 0)
-	MCFG_DEVICE_ADD(      ":pci:00.0", I82439HX, 0, "maincpu", 256*1024*1024)
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_phoenix_ver40_rev6_w));
@@ -108,7 +186,7 @@ MACHINE_CONFIG_START(nforcepc_state::nforcepc)
 MACHINE_CONFIG_END
 
 ROM_START(nforcepc)
-	ROM_REGION32_LE(0x40000, "bios", 0) /* PC bios */
+	ROM_REGION32_LE(0x40000, ":pci:00.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "a7n266c", "a7n266c") // Motherboard dump. Chip: SST49LF020 Package: PLCC32 Label had 3 lines of text: "A7NC3" "1001.D" "GSQ98"
 	ROMX_LOAD("a7n266c.bin", 0, 0x40000, CRC(F4F0E4FC), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "a7n266c1001d", "a7n266c1001d") // bios version 1001.D dwonloaded from Asus website
