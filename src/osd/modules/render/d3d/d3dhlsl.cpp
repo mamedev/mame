@@ -780,7 +780,7 @@ int shaders::create_resources()
 		vector_effect
 	};
 
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < EFFECT_COUNT; i++)
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
