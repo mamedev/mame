@@ -413,6 +413,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+#include "bus/sunmouse/sunmouse.h"
 #include "bus/sbus/sbus.h"
 #include "bus/sbus/bwtwo.h"
 #include "cpu/sparc/sparc.h"
@@ -442,6 +443,7 @@
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
 #define KEYBOARD_TAG    "keyboard"
+#define MOUSE_TAG       "mouseport"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define FDC_TAG         "fdc"
@@ -2124,8 +2126,10 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_int_callback().set(FUNC(sun4_state::scc1_int));
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
 	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type4hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	// RS232 serial ports
 	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
@@ -2186,8 +2190,10 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_int_callback().set(FUNC(sun4_state::scc1_int));
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	// no mouse TxD connection - replaced with soft power request input
 
 	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type5hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	// RS232 serial ports
 	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);

@@ -3033,6 +3033,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/sunmouse/sunmouse.h,BUSES["SUNMOUSE"] = true
+---------------------------------------------------
+
+if (BUSES["SUNMOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sunmouse/hlemouse.cpp",
+		MAME_DIR .. "src/devices/bus/sunmouse/hlemouse.h",
+		MAME_DIR .. "src/devices/bus/sunmouse/sunmouse.cpp",
+		MAME_DIR .. "src/devices/bus/sunmouse/sunmouse.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/sbus/sbus.h,BUSES["SBUS"] = true
 ---------------------------------------------------
 

@@ -21,7 +21,7 @@
     0000 0011               bell off
     0000 1010               enable keyclick (5ms duration 480us period on make)
     0000 1011               disable keyclick
-    0000 1110  ---k lscn    LED (1 = on, k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
+    0000 1110  ---k lscn    LED (1 = on: k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
     0000 1111               layout request (keyboard responds with layout response)
 
     message from keyboad to host:
@@ -128,7 +128,7 @@
     yen/pipe replaces backtick/tilde at top left corner of main area
     linefeed scancode repurposed for backslash/underscore
     kana replaces alt graph (with LED window)
-    extra kakutei, henkan and nihongo on-off keys
+    extra kakutei (確定), henkan (変換) and nihongo on-off keys
 */
 
 
@@ -148,6 +148,7 @@ DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_devic
 namespace bus { namespace sunkbd {
 
 namespace {
+
 /***************************************************************************
     INPUT PORT DEFINITIONS
 ***************************************************************************/
