@@ -114,10 +114,10 @@ WRITE8_MEMBER(bbc_fdc_slot_device::write)
 
 // slot devices
 #include "acorn.h"
-//#include "ams.h"
+#include "ams.h"
 #include "cumana.h"
 #include "cv1797.h"
-//#include "microware.h"
+#include "microware.h"
 #include "opus.h"
 //#include "solidisk.h"
 #include "watford.h"
@@ -128,11 +128,11 @@ void bbc_fdc_devices(device_slot_interface &device)
 {
 	device.option_add("acorn8271", BBC_ACORN8271);
 	device.option_add("acorn1770", BBC_ACORN1770);
-	//device.option_add("ams3",      BBC_AMS3);
+	device.option_add("ams3",      BBC_AMS3);
 	device.option_add("cumana1",   BBC_CUMANA1);
 	device.option_add("cumana2",   BBC_CUMANA2);
 	device.option_add("cv1797",    BBC_CV1797);
-	//device.option_add("microware", BBC_MICROWARE);
+	device.option_add("microware", BBC_MICROWARE);
 	device.option_add("opus8272",  BBC_OPUS8272);
 	device.option_add("opus2791",  BBC_OPUS2791);
 	device.option_add("opus2793",  BBC_OPUS2793);
