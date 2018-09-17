@@ -100,15 +100,15 @@ ROM_START( acorn1770 )
 	ROM_DEFAULT_BIOS("dfs223")
 	// Acorn
 	ROM_SYSTEM_BIOS(0, "dfs210", "Acorn DFS 2.10")
-	ROMX_LOAD("dfs v2.10,1985,acorn.bin", 0x0000, 0x4000, CRC(4f828787) SHA1(112a315e1598cb4db2abcfe9d89fcd97444b276d), ROM_BIOS(0))
+	ROMX_LOAD("dfs v2.10,acorn.rom", 0x0000, 0x4000, CRC(4f828787) SHA1(112a315e1598cb4db2abcfe9d89fcd97444b276d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "dfs220", "Acorn DFS 2.20")
-	ROMX_LOAD("dfs v2.20,1986,acorn.bin", 0x0000, 0x4000, CRC(2844001e) SHA1(d72f11af35756ac648095ba1992211cf6741dd80), ROM_BIOS(1))
+	ROMX_LOAD("dfs v2.20,acorn.rom", 0x0000, 0x4000, CRC(2844001e) SHA1(d72f11af35756ac648095ba1992211cf6741dd80), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "dfs223", "Acorn DFS 2.23")
-	ROMX_LOAD("dfs v2.23,1986,acorn.bin", 0x0000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa), ROM_BIOS(2))
+	ROMX_LOAD("dfs v2.23,acorn.rom", 0x0000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "dfs225", "Acorn DFS 2.25")
-	ROMX_LOAD("dfs v2.25,1986,acorn.bin", 0x0000, 0x4000, CRC(f855a75b) SHA1(f11271748e6303c60182955e5fa478624b616fcf), ROM_BIOS(3))
+	ROMX_LOAD("dfs v2.25,acorn.rom", 0x0000, 0x4000, CRC(f855a75b) SHA1(f11271748e6303c60182955e5fa478624b616fcf), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "dfs226", "Acorn DFS 2.26")
-	ROMX_LOAD("dfs v2.26,1986,acorn.bin", 0x0000, 0x4000, CRC(5ae33e94) SHA1(cf2ebc422a8d24ec6f1a0320520c38a0e704109a), ROM_BIOS(4))
+	ROMX_LOAD("dfs v2.26,acorn.rom", 0x0000, 0x4000, CRC(5ae33e94) SHA1(cf2ebc422a8d24ec6f1a0320520c38a0e704109a), ROM_BIOS(4))
 	// Advanced Computer Products
 	ROM_SYSTEM_BIOS(5, "acp108", "Advanced 1770 DFS 1.08")
 	ROMX_LOAD("advanced 1770 dfs 1.08,acp.rom", 0x0000, 0x4000, CRC(eb0eaa34) SHA1(d16ba3c8ed5e5ab6af62aad13a8e567b1c3639c2), ROM_BIOS(5))
@@ -121,21 +121,23 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void bbc_acorn8271_device::device_add_mconfig(machine_config & config)
+void bbc_acorn8271_device::device_add_mconfig(machine_config &config)
 {
-	I8271(config, m_fdc, 0);
+	I8271(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_acorn8271_device::fdc_intrq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_acorn8271_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_acorn8271_device::side_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
 }
 
-void bbc_acorn1770_device::device_add_mconfig(machine_config & config)
+void bbc_acorn1770_device::device_add_mconfig(machine_config &config)
 {
-	WD1770(config, m_fdc, XTAL(16'000'000) / 2);
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_acorn1770_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_acorn1770_device::fdc_drq_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
 }
@@ -160,22 +162,23 @@ const tiny_rom_entry *bbc_acorn1770_device::device_rom_region() const
 //-------------------------------------------------
 
 bbc_acorn8271_device::bbc_acorn8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_ACORN8271, tag, owner, clock),
-	device_bbc_fdc_interface(mconfig, *this),
-	m_dfs_rom(*this, "dfs_rom"),
-	m_fdc(*this, "i8271"),
-	m_floppy0(*this, "i8271:0"),
-	m_floppy1(*this, "i8271:1")
+	: device_t(mconfig, BBC_ACORN8271, tag, owner, clock)
+	, device_bbc_fdc_interface(mconfig, *this)
+	, m_dfs_rom(*this, "dfs_rom")
+	, m_fdc(*this, "i8271")
+	, m_floppy0(*this, "i8271:0")
+	, m_floppy1(*this, "i8271:1")
 {
 }
 
 bbc_acorn1770_device::bbc_acorn1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_ACORN1770, tag, owner, clock),
-	device_bbc_fdc_interface(mconfig, *this),
-	m_dfs_rom(*this, "dfs_rom"),
-	m_fdc(*this, "wd1770"),
-	m_floppy0(*this, "wd1770:0"),
-	m_floppy1(*this, "wd1770:1")
+	: device_t(mconfig, BBC_ACORN1770, tag, owner, clock)
+	, device_bbc_fdc_interface(mconfig, *this)
+	, m_dfs_rom(*this, "dfs_rom")
+	, m_fdc(*this, "wd1770")
+	, m_floppy0(*this, "wd1770:0")
+	, m_floppy1(*this, "wd1770:1")
+	, m_drive_control(0)
 {
 }
 
@@ -186,24 +189,11 @@ bbc_acorn1770_device::bbc_acorn1770_device(const machine_config &mconfig, const 
 
 void bbc_acorn8271_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
-
-	space.install_device(0xfe80, 0xfe83, *m_fdc, &i8271_device::map);
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, i8271_device, data_r), WRITE8_DEVICE_DELEGATE(m_fdc, i8271_device, data_w));
 }
 
 void bbc_acorn1770_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_acorn1770_device, wd1770l_read), WRITE8_DELEGATE(bbc_acorn1770_device, wd1770l_write));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, read8sm_delegate(FUNC(wd1770_device::read), m_fdc.target()), write8sm_delegate(FUNC(wd1770_device::write), m_fdc.target()));
-
-	m_drive_control = 0xfe;
+	save_item(NAME(m_drive_control));
 }
 
 //-------------------------------------------------
@@ -213,13 +203,13 @@ void bbc_acorn1770_device::device_start()
 void bbc_acorn8271_device::device_reset()
 {
 	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
-
-	m_fdc->soft_reset();
 }
 
 void bbc_acorn1770_device::device_reset()
 {
 	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
+
+	m_drive_control = 0xfe;
 }
 
 
@@ -227,10 +217,38 @@ void bbc_acorn1770_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
+READ8_MEMBER(bbc_acorn8271_device::read)
+{
+	uint8_t data;
+
+	if (offset & 0x04)
+	{
+		data = m_fdc->data_r(space , 0);
+	}
+	else
+	{
+		data = m_fdc->read(space, offset & 0x03);
+	}
+	return data;
+}
+
+WRITE8_MEMBER(bbc_acorn8271_device::write)
+{
+	if (offset & 0x04)
+	{
+		m_fdc->data_w(space, 0, data);
+	}
+	else
+	{
+		m_fdc->write(space, offset & 0x03, data);
+	}
+}
+
 WRITE_LINE_MEMBER(bbc_acorn8271_device::motor_w)
 {
 	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
 	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
+	m_fdc->ready_w(!state);
 }
 
 WRITE_LINE_MEMBER(bbc_acorn8271_device::side_w)
@@ -245,39 +263,59 @@ WRITE_LINE_MEMBER(bbc_acorn8271_device::fdc_intrq_w)
 }
 
 
-READ8_MEMBER(bbc_acorn1770_device::wd1770l_read)
+READ8_MEMBER(bbc_acorn1770_device::read)
 {
-	return m_drive_control;
+	uint8_t data = 0xff;
+
+	if (offset & 0x04)
+	{
+		data = m_fdc->read(offset & 0x03);
+	}
+	else
+	{
+		data = m_drive_control;
+	}
+	return data;
 }
 
-WRITE8_MEMBER(bbc_acorn1770_device::wd1770l_write)
+WRITE8_MEMBER(bbc_acorn1770_device::write)
 {
-	floppy_image_device *floppy = nullptr;
+	if (offset & 0x04)
+	{
+		m_fdc->write(offset & 0x03, data);
+	}
+	else
+	{
+		floppy_image_device *floppy = nullptr;
 
-	m_drive_control = data;
+		m_drive_control = data;
 
-	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	m_fdc->set_floppy(floppy);
+		// bit 0, 1: drive select
+		if (BIT(data, 0)) floppy = m_floppy0->get_device();
+		if (BIT(data, 1)) floppy = m_floppy1->get_device();
+		m_fdc->set_floppy(floppy);
 
-	// bit 2: side select
-	if (floppy)
-		floppy->ss_w(BIT(data, 2));
+		// bit 2: side select
+		if (floppy)
+			floppy->ss_w(BIT(data, 2));
 
-	// bit 3: density
-	m_fdc->dden_w(BIT(data, 3));
+		// bit 3: density
+		m_fdc->dden_w(BIT(data, 3));
 
-	// bit 5: reset
-	if (!BIT(data, 5)) m_fdc->soft_reset();
+		// bit 4: interrupt enabled
+		m_fdc_ie = !BIT(data, 4);
+
+		// bit 5: reset
+		if (!BIT(data, 5)) m_fdc->soft_reset();
+	}
 }
 
 WRITE_LINE_MEMBER(bbc_acorn1770_device::fdc_intrq_w)
 {
-	m_slot->intrq_w(state);
+	m_slot->intrq_w((state && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(bbc_acorn1770_device::fdc_drq_w)
 {
-	m_slot->drq_w(state);
+	m_slot->drq_w((state && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }

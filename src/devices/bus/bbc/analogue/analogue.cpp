@@ -33,15 +33,6 @@ device_bbc_analogue_interface::device_bbc_analogue_interface(const machine_confi
 }
 
 
-//-------------------------------------------------
-//  ~device_bbc_analogue_interface - destructor
-//-------------------------------------------------
-
-device_bbc_analogue_interface::~device_bbc_analogue_interface()
-{
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -52,7 +43,9 @@ device_bbc_analogue_interface::~device_bbc_analogue_interface()
 
 bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_ANALOGUE_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	m_card(nullptr),
+	m_lpstb_handler(*this)
 {
 }
 
@@ -71,8 +64,12 @@ void bbc_analogue_slot_device::device_validity_check(validity_checker &valid) co
 void bbc_analogue_slot_device::device_start()
 {
 	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_bbc_analogue_interface *>(carddev))
+	m_card = dynamic_cast<device_bbc_analogue_interface *>(get_card_device());
+	if (carddev && !m_card)
 		osd_printf_error("Card device %s (%s) does not implement device_bbc_analogue_interface\n", carddev->tag(), carddev->name());
+
+	// resolve callbacks
+	m_lpstb_handler.resolve_safe();
 }
 
 uint8_t bbc_analogue_slot_device::ch_r(int channel)
@@ -107,6 +104,9 @@ void bbc_analogue_slot_device::device_reset()
 
 // slot devices
 #include "joystick.h"
+//#include "bitstik.h"
+//#include "lightpen.h"
+//#include "micromike.h"
 //#include "quinkey.h"
 #include "cfa3000a.h"
 
@@ -114,7 +114,11 @@ void bbc_analogue_slot_device::device_reset()
 void bbc_analogue_devices(device_slot_interface &device)
 {
 	device.option_add("acornjoy",    BBC_ACORNJOY);         /* Acorn ANH01 Joysticks */
+	//device.option_add("bitstik1",    BBC_BITSTIK1);         /* Acorn ANF04 Bitstik */
+	//device.option_add("bitstik2",    BBC_BITSTIK2);         /* Robocom Bitstik 2 */
+	//device.option_add("lightpen",    BBC_LIGHTPEN);         /* RH Electronics Lightpen */
+	//device.option_add("micromike",   BBC_MICROMIKE);        /* Micro Mike */
 	device.option_add("voltmace3b",  BBC_VOLTMACE3B);       /* Voltmace Delta 3b "Twin" Joysticks */
-//  device.option_add("quinkey",     BBC_QUINKEY);          /* Microwriter Quinkey */
+	//device.option_add("quinkey",     BBC_QUINKEY);          /* Microwriter Quinkey */
 	device.option_add("cfa3000a",    CFA3000_ANLG);         /* Hanson CFA 3000 Analogue */
 }
