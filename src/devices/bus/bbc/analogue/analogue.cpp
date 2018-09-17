@@ -104,7 +104,7 @@ void bbc_analogue_slot_device::device_reset()
 
 // slot devices
 #include "joystick.h"
-//#include "bitstik.h"
+#include "bitstik.h"
 //#include "lightpen.h"
 //#include "micromike.h"
 //#include "quinkey.h"
@@ -114,8 +114,8 @@ void bbc_analogue_slot_device::device_reset()
 void bbc_analogue_devices(device_slot_interface &device)
 {
 	device.option_add("acornjoy",    BBC_ACORNJOY);         /* Acorn ANH01 Joysticks */
-	//device.option_add("bitstik1",    BBC_BITSTIK1);         /* Acorn ANF04 Bitstik */
-	//device.option_add("bitstik2",    BBC_BITSTIK2);         /* Robocom Bitstik 2 */
+	device.option_add("bitstik1",    BBC_BITSTIK1);         /* Acorn ANF04 Bitstik */
+	device.option_add("bitstik2",    BBC_BITSTIK2);         /* Robocom Bitstik 2 */
 	//device.option_add("lightpen",    BBC_LIGHTPEN);         /* RH Electronics Lightpen */
 	//device.option_add("micromike",   BBC_MICROMIKE);        /* Micro Mike */
 	device.option_add("voltmace3b",  BBC_VOLTMACE3B);       /* Voltmace Delta 3b "Twin" Joysticks */
