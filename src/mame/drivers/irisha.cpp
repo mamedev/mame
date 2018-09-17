@@ -83,8 +83,7 @@ void irisha_state::irisha_mem(address_map &map)
 void irisha_state::irisha_io(address_map &map)
 {
 	map(0x04, 0x05).r(FUNC(irisha_state::irisha_keyboard_r));
-	map(0x06, 0x06).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x07, 0x07).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x06, 0x07).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x0B).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0C, 0x0F).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).mask(0x01);
 	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));

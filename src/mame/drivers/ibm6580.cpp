@@ -701,10 +701,8 @@ void ibm6580_state::ibm6580_io(address_map &map)
 	map(0x0040, 0x005f).rw(FUNC(ibm6580_state::p40_r), FUNC(ibm6580_state::p40_w)).umask16(0x00ff);
 	map(0x0070, 0x007f).unmaprw();
 	map(0x0120, 0x0127).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0140, 0x0140).rw("upd8251a", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0142, 0x0142).rw("upd8251a", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x0160, 0x0160).rw("upd8251b", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0162, 0x0162).rw("upd8251b", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0140, 0x0143).rw("upd8251a", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x0160, 0x0163).rw("upd8251b", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x4000, 0x400f).unmaprw();
 	map(0x5000, 0x500f).unmaprw();
 	map(0x6000, 0x601f).unmaprw();

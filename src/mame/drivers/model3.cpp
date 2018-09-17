@@ -1729,7 +1729,7 @@ READ8_MEMBER(model3_state::model3_sound_r)
 		case 0:
 		{
 			if (m_uart.found())
-				return m_uart->data_r(space, 0);
+				return m_uart->data_r();
 
 			break;
 		}
@@ -1737,7 +1737,7 @@ READ8_MEMBER(model3_state::model3_sound_r)
 		case 4:
 		{
 			if (m_uart.found())
-				return m_uart->status_r(space, 0);
+				return m_uart->status_r();
 
 			uint8_t res = 0;
 			res |= 1;
@@ -1757,7 +1757,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			set_irq_line(0x40, CLEAR_LINE);
 
 			if (m_uart.found())
-				m_uart->data_w(space, 0, data);
+				m_uart->data_w(data);
 
 			// send to the sound board
 			m_scsp1->midi_in(data);
@@ -1771,7 +1771,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 		case 4:
 			if (m_uart.found())
-				m_uart->control_w(space, 0, data);
+				m_uart->control_w(data);
 
 			if (data == 0x27)
 			{

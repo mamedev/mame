@@ -212,10 +212,8 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x0020, 0x0031).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0048, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0054, 0x0054).rw(m_8251key, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0056, 0x0056).rw(m_8251key, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x005c, 0x005c).rw(m_8251ser, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x005e, 0x005e).rw(m_8251ser, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0054, 0x0057).rw(m_8251key, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x005c, 0x005f).rw(m_8251ser, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x0064, 0x0067).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x006c, 0x006c).w("h46505", FUNC(mc6845_device::address_w));
 	map(0x006e, 0x006e).rw("h46505", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));

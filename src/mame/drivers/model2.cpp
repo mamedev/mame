@@ -990,9 +990,9 @@ READ32_MEMBER(model2_state::model2_serial_r)
 	{
 		u32 result = 0;
 		if (ACCESSING_BITS_0_7 && (offset == 0))
-			result |= m_uart->data_r(space, 0);
+			result |= m_uart->data_r();
 		if (ACCESSING_BITS_16_23 && (offset == 0))
-			result |= m_uart->status_r(space, 0) << 16;
+			result |= m_uart->status_r() << 16;
 		return result;
 	}
 
@@ -1004,7 +1004,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		m_uart->data_w(space, 0, data & 0xff);
+		m_uart->data_w(data & 0xff);
 
 		if (m_scsp.found())
 		{
@@ -1017,7 +1017,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 	}
 	if (ACCESSING_BITS_16_23 && (offset == 0))
 	{
-		m_uart->control_w(space, 0, (data >> 16) & 0xff);
+		m_uart->control_w((data >> 16) & 0xff);
 	}
 }
 

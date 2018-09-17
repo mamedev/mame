@@ -126,8 +126,7 @@ void softbox_state::softbox_mem(address_map &map)
 void softbox_state::softbox_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x08, 0x08).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x09, 0x09).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x09).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0c, 0x0c).w(COM8116_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));

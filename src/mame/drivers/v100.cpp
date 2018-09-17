@@ -218,10 +218,8 @@ void v100_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x0f).w(m_vtac, FUNC(crt5037_device::write));
 	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
-	map(0x12, 0x12).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x13, 0x13).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x14, 0x14).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x15, 0x15).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x12, 0x13).rw("usart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x14, 0x15).rw("usart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x16, 0x16).w("brg2", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x20).r(FUNC(v100_state::earom_r));
 	map(0x30, 0x30).w(FUNC(v100_state::port30_w));

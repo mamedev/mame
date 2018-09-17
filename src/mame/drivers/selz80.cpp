@@ -95,8 +95,7 @@ void selz80_state::selz80_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */

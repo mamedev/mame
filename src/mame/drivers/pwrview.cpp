@@ -392,8 +392,7 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
-	map(0xc2c0, 0xc2c0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc2c2, 0xc2c2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc2c0, 0xc2c3).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xc2e4, 0xc2e5).ram();
 	map(0xc2e6, 0xc2e6).r(FUNC(pwrview_state::pitclock_r));

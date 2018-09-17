@@ -257,10 +257,8 @@ void xor100_state::xor100_mem(address_map &map)
 void xor100_state::xor100_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_uart_a, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_uart_a, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x02, 0x02).rw(m_uart_b, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x03, 0x03).rw(m_uart_b, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_uart_a, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x02, 0x03).rw(m_uart_b, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x04, 0x07).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x08).w(FUNC(xor100_state::mmu_w));
 	map(0x09, 0x09).w(FUNC(xor100_state::prom_toggle_w));

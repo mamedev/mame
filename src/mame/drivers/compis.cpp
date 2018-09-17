@@ -203,14 +203,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			return m_uart->status_r(space, 0) << 8;
-		}
-		else
-		{
-			return m_uart->data_r(space, 0) << 8;
-		}
+		return m_uart->read(offset & 1) << 8;
 	}
 }
 
@@ -221,14 +214,7 @@ WRITE16_MEMBER( compis_state::pcs6_2_3_w )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			m_uart->control_w(space, 0, data >> 8);
-		}
-		else
-		{
-			m_uart->data_w(space, 0, data >> 8);
-		}
+		m_uart->write(offset & 1, data >> 8);
 	}
 }
 

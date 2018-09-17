@@ -957,8 +957,7 @@ void rainbow_state::rainbow8088_io(address_map &map)
 
 	map(0x0e, 0x0e).w(FUNC(rainbow_state::printer_bitrate_w));
 
-	map(0x10, 0x10).rw(m_kbd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).rw(m_kbd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw(m_kbd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	// ===========================================================
 	// There are 4 select lines for Option Select 1 to 4

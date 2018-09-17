@@ -219,8 +219,7 @@ void mc1502_state::mc1502_map(address_map &map)
 void mc1502_state::mc1502_io(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0028, 0x0028).rw(m_upd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0029, 0x0029).rw(m_upd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0028, 0x0029).rw(m_upd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw(m_ppi8255n1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0068, 0x006B).rw(m_ppi8255n2, FUNC(i8255_device::read), FUNC(i8255_device::write));    // keyboard poll

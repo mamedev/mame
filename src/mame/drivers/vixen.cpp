@@ -292,8 +292,7 @@ void vixen_state::vixen_io(address_map &map)
 	map(0x18, 0x18).mirror(0x07).r(FUNC(vixen_state::ieee488_r));
 	map(0x20, 0x21).mirror(0x04).w(m_io_i8155, FUNC(i8155_device::ale_w));
 	map(0x28, 0x28).mirror(0x05).rw(m_io_i8155, FUNC(i8155_device::read), FUNC(i8155_device::write));
-	map(0x30, 0x30).mirror(0x06).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x31, 0x31).mirror(0x06).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x31).mirror(0x06).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x38, 0x38).mirror(0x07).r(FUNC(vixen_state::port3_r));
 //  AM_RANGE(0xf0, 0xff) Hard Disk?
 }

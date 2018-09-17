@@ -347,10 +347,8 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 //  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
 //  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
 //  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
-	map(0xff8001, 0xff8001).rw(m_i8251_0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff8003, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xff8041, 0xff8041).rw(m_i8251_1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff8043, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xff8000, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xff8040, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xff8080, 0xff8081).rw(FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis

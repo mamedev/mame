@@ -122,14 +122,7 @@ uint8_t a2bus_agat7_ports_device::read_c0nx(uint8_t offset)
 		break;
 
 	case 8:
-		if (offset & 1)
-		{
-			data = m_d10->status_r(machine().dummy_space(), 0);
-		}
-		else
-		{
-			data = m_d10->data_r(machine().dummy_space(), 0);
-		}
+		data = m_d10->read(offset & 1);
 		break;
 	}
 
@@ -150,14 +143,7 @@ void a2bus_agat7_ports_device::write_c0nx(uint8_t offset, uint8_t data)
 		break;
 
 	case 8:
-		if (offset & 1)
-		{
-			m_d10->control_w(machine().dummy_space(), 0, data);
-		}
-		else
-		{
-			m_d10->data_w(machine().dummy_space(), 0, data);
-		}
+		m_d10->write(offset & 1, data);
 		break;
 	}
 }

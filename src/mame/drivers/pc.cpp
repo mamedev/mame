@@ -454,8 +454,7 @@ void pc_state::epc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x0070, 0x0070).rw("i8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0071, 0x0071).rw("i8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0070, 0x0071).rw("i8251", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)

@@ -314,16 +314,16 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::data_r), (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::data_w), (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::status_r),  (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::command_w),  (v53_scu_device*)m_v53scu), 0xff00);
-			space(AS_IO).install_write_handler(base+0x02, base+0x03, write8_delegate(FUNC(v53_scu_device::mode_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::data_r), m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::data_w), m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::status_r),  m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::command_w),  m_v53scu.target()), 0xff00);
+			space(AS_IO).install_write_handler(base+0x02, base+0x03, write8smo_delegate(FUNC(v53_scu_device::mode_w), m_v53scu.target()), 0x00ff);
 			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0xff00);
 		}
 		else
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::data_r), (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::data_w), (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_scu_device::status_r),  (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::command_w),  (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8_delegate(FUNC(v53_scu_device::mode_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::data_r), m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::data_w), m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8smo_delegate(FUNC(v53_scu_device::status_r),  m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::command_w),  m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8smo_delegate(FUNC(v53_scu_device::mode_w), m_v53scu.target()), 0x00ff);
 			space(AS_IO).install_readwrite_handler(base+0x06, base+0x07, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0x00ff);
 
 		}

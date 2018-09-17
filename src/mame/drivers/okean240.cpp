@@ -255,8 +255,7 @@ void okean240_state::okean240a_io(address_map &map)
 	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x80, 0x80).r(FUNC(okean240_state::okean240a_kbd_status_r));
-	map(0xa0, 0xa0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xa1, 0xa1).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// AM_RANGE(0x00, 0x1f)=ppa00.data
@@ -279,8 +278,7 @@ void okean240_state::okean240t_io(address_map &map)
 	map(0x60, 0x63).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x80, 0x81).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x80, 0x80).r(FUNC(okean240_state::okean240_kbd_status_r));
-	map(0xa0, 0xa0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xa1, 0xa1).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }

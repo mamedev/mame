@@ -305,8 +305,7 @@ void octopus_state::octopus_io(address_map &map)
 	map(0x20, 0x20).portr("DSWA");
 	map(0x21, 0x2f).rw(FUNC(octopus_state::system_r), FUNC(octopus_state::system_w));
 	map(0x31, 0x33).rw(FUNC(octopus_state::bank_sel_r), FUNC(octopus_state::bank_sel_w));
-	map(0x50, 0x50).rw(m_kb_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x51, 0x51).rw(m_kb_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x50, 0x51).rw(m_kb_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// 0x70-73: HD controller
 	map(0x80, 0x83).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xa0, 0xa0).rw(m_serial, FUNC(z80sio_device::da_r), FUNC(z80sio_device::da_w));
