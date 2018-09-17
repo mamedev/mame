@@ -17,6 +17,8 @@ CPU_FSCPU32 = 5
 CPU_COLDFIRE = 6
 CPU_COUNT = 7
 
+cpu_names = '01234fc'
+
 cc_table_up = [ "T", "F", "HI", "LS", "CC", "CS", "NE", "EQ", "VC", "VS", "PL", "MI", "GE", "LT", "GT", "LE" ]
 cc_table_dn = [ "t", "f", "hi", "ls", "cc", "cs", "ne", "eq", "vc", "vs", "pl", "mi", "ge", "lt", "gt", "le" ]
 
@@ -100,95 +102,93 @@ ea_info_table = {
 
 
 class Opcode:
-    def __init__(self, line):
+    def __init__(self, line, counters):
         entries = line.split()
-        self.name = entries[0]
-        self.size = int(entries[1])
-        self.spec_proc = entries[2]
-        self.spec_ea = entries[3]
-        self.key = '%s %d %s %s' % (self.name, self.size, self.spec_proc, self.spec_ea)
-        self.op_mask = 0
-        self.op_value = 0
-        for bit in range(0, 16):
-            if entries[4][15-bit] != '.':
-                self.op_mask |= 1 << bit
-            if entries[4][15-bit] == '1':
-                self.op_value |= 1 << bit
-        self.ea_allowed = entries[5]
-        self.cpu_modes = [None] * CPU_COUNT
-        for i in range(0, CPU_COUNT):
-            self.cpu_modes[i] = entries[6+i]
+        self.op_value = int(entries[0], 16)
+        self.op_mask = int(entries[1], 16)
+        self.name = entries[2]
+        if self.name in counters:
+            self.id = counters[self.name]
+            counters[self.name] += 1
+        else:
+            self.id = 0
+            counters[self.name] = 1
+        self.size = entries[3]
+        self.ea_allowed = entries[4]
+        self.priv = [None] * CPU_COUNT
         self.cycles = [None] * CPU_COUNT
-        for i in range(0, CPU_COUNT):
-            if entries[6+CPU_COUNT+i] != '.':
-                self.cycles[i] = int(entries[6+CPU_COUNT+i])
-        
-class OpcodeGenericHandler:
-    def __init__(self, block, opcodes):
-        parts = block.split('\n', 1)
-        head = parts[0]
-        head = head[head.find('(')+1:head.rfind(')')].split(',')
-        self.name = head[0].split()[0]
-        self.size = int(head[1].split()[0])
-        self.spec_proc = head[2].split()[0]
-        self.spec_ea = head[3].split()[0]
-        self.body = parts[1]
-        key = '%s %d %s %s' % (self.name, self.size, self.spec_proc, self.spec_ea)
-        self.opcode = opcodes[key]
+        for i in range(5, len(entries)):
+            parts = entries[i].split(':')
+            ci = parts[1]
+            priv = ci[len(ci)-1:] == 'p'
+            if priv:
+                ci = ci[:len(ci)-1]
+            cycles = int(ci)
+            for c in parts[0]:
+                cpu = cpu_names.index(c)
+                self.cycles[cpu] = cycles
+                self.priv[cpu] = priv
+        self.body = ''
 
-    def generate(self, handlers):
+    def append(self, line):
+        self.body += line + '\n'
+
+    def generate(self, counters, handlers):
         if self.name == 'bcc' or self.name == 'scc' or self.name == 'dbcc' or self.name == 'trapcc':
-            self.cc_variants(handlers)
+            self.cc_variants(counters, handlers)
         else:
             self.ea_variants(handlers)
 
     def ea_variants(self, handlers):
-        ea_allowed = self.opcode.ea_allowed
-        if ea_allowed == '..........':
+        ea_allowed = self.ea_allowed
+        if ea_allowed == '.':
             handlers.append(OpcodeHandler(self, 'none'))
             return
-        if ea_allowed[0] == 'A':
+        if 'A' in ea_allowed[0]:
             handlers.append(OpcodeHandler(self, 'ai'))
-        if ea_allowed[1] == '+':
+        if '+' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'pi'))
-            if self.opcode.size == 8:
+            if self.size == 'b':
                 handlers.append(OpcodeHandler(self, 'pi7'))
-        if ea_allowed[2] == '-':
+        if '-' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'pd'))
-            if self.opcode.size == 8:
+            if self.size == 'b':
                 handlers.append(OpcodeHandler(self, 'pd7'))
-        if ea_allowed[3] == 'D':
+        if 'D' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'di'))
-        if ea_allowed[4] == 'X':
+        if 'X' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'ix'))
-        if ea_allowed[5] == 'W':
+        if 'W' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'aw'))
-        if ea_allowed[6] == 'L':
+        if 'L' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'al'))
-        if ea_allowed[7] == 'd':
+        if 'd' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'pcdi'))
-        if ea_allowed[8] == 'x':
+        if 'x' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'pcix'))
-        if ea_allowed[9] == 'I':
+        if 'I' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'i'))
 
-    def cc_variants(self, handlers):
+    def cc_variants(self, counters, handlers):
         bname = self.name[:-2]
         for cc in range(2, 16):
-            opc1 = copy.copy(self.opcode)
-            opc = copy.copy(self)
-            opc.opcode = opc1
-            opc1.name = bname + cc_table_dn[cc]
-            opc.body = self.body.replace('M68KMAKE_CC', 'COND_%s()' % cc_table_up[cc]).replace('M68KMAKE_NOT_CC', 'COND_NOT_%s()' % cc_table_up[cc])
-            opc1.op_mask |= 0x0f00
-            opc1.op_value = (opc1.op_value & 0xf0ff) | (cc << 8)
-            opc.ea_variants(handlers)
+            op = copy.copy(self)
+            op.name = bname + cc_table_dn[cc]
+            if op.name in counters:
+                op.id = counters[op.name]
+                counters[op.name] += 1
+            else:
+                op.id = 0
+                counters[op.name] = 1
+            op.body = self.body.replace('M68KMAKE_CC', 'COND_%s()' % cc_table_up[cc]).replace('M68KMAKE_NOT_CC', 'COND_NOT_%s()' % cc_table_up[cc])
+            op.op_mask |= 0x0f00
+            op.op_value = (op.op_value & 0xf0ff) | (cc << 8)
+            op.ea_variants(handlers)
 
 class OpcodeHandler:
-    def __init__(self, ogh, ea_mode):
-        op = ogh.opcode
+    def __init__(self, op, ea_mode):
         self.cycles = [None]*CPU_COUNT
-        size_order = 0 if op.size == 0 else 1 if op.size == 8 or op.size == 16 else 2
+        size_order = 0 if op.size == '.' else 1 if op.size == 'b' or op.size == 'w' else 2
         for i in range(0, CPU_COUNT):
             if op.cycles[i] == None:
                 continue
@@ -196,7 +196,7 @@ class OpcodeHandler:
                 self.cycles[i] = op.cycles[i] + moves_cycle_table[ea_mode][size_order]
             elif i == CPU_010 and op.name == 'clr':
                 self.cycles[i] = op.cycles[i] + clr_cycle_table[ea_mode][size_order]
-            elif i == CPU_000 and (ea_mode == 'i' or ea_mode == 'none') and op.size == 32 and ((op.cycles[i] == 6 and (op.name == 'add' or op.name == 'and' or op.name == 'or' or op.name == 'sub')) or op.name == 'adda' or op.name == 'suba'):
+            elif i == CPU_000 and (ea_mode == 'i' or ea_mode == 'none') and op.size == 'l' and ((op.cycles[i] == 6 and (op.name == 'add' or op.name == 'and' or op.name == 'or' or op.name == 'sub')) or op.name == 'adda' or op.name == 'suba'):
                 self.cycles[i] = op.cycles[i] + ea_cycle_table[ea_mode][i][size_order] + 2
             elif i < CPU_020 and (op.name == 'jmp' or op.name == 'jsr'):
                 self.cycles[i] = op.cycles[i] + jmp_jsr_cycle_table[ea_mode]
@@ -208,23 +208,16 @@ class OpcodeHandler:
                 self.cycles[i] = op.cycles[i] + movem_cycle_table[ea_mode]
             else:
                 self.cycles[i] = op.cycles[i] + ea_cycle_table[ea_mode][i][size_order]
-        self.spec_ea = ea_mode if ea_mode != 'none' and op.spec_ea == '.' else op.spec_ea
         self.op_value = op.op_value | ea_info_table[ea_mode][2]
         self.op_mask  = op.op_mask  | ea_info_table[ea_mode][1]
-        self.function_name = 'm68k_op_' + op.name
-        if op.size > 0:
-            self.function_name += '_%d' % op.size
-        if op.spec_proc != '.':
-            self.function_name += '_' + op.spec_proc
-        if self.spec_ea != '.':
-            self.function_name += '_' + self.spec_ea
+        self.function_name = 'm68k_op_%s%s_%d%s' % (op.name, '' if op.size == '.' else '_' + op.size, op.id, '' if ea_mode == 'none' else '_' + ea_mode)
         self.bits = 0
         for i in range(0, 16):
             if (self.op_mask & (1 << i)) != 0:
                 self.bits += 1
         if ea_mode != 'none':
             n = ea_info_table[ea_mode][0]
-            body = ogh.body
+            body = op.body
             body = body.replace('M68KMAKE_GET_EA_AY_8', 'EA_%s_8()' % n)
             body = body.replace('M68KMAKE_GET_EA_AY_16', 'EA_%s_16()' % n)
             body = body.replace('M68KMAKE_GET_EA_AY_32', 'EA_%s_32()' % n)
@@ -233,7 +226,7 @@ class OpcodeHandler:
             body = body.replace('M68KMAKE_GET_OPER_AY_32', 'OPER_%s_32()' % n)
             self.body = body
         else:
-            self.body = ogh.body
+            self.body = op.body
 
 class Info:
     def __init__(self, path):
@@ -244,33 +237,21 @@ class Info:
             sys.stderr.write('cannot read file %s [%s]\n' % (path, err))
             sys.exit(1)
 
-        itext = f.read()
-        blocks = itext.split('X'*79 + '\n')
-        # first block skipped
-        for i in range(1, len(blocks)):
-            b = blocks[i]
-            if b.startswith('M68KMAKE_TABLE\n'):
-                self.handle_table_body(b[20:])
-            elif b.startswith('M68KMAKE_OPCODE_HANDLER\n\n'):
-                self.handle_opcode_handler_body(b[30:])
+        self.counters = {}
+        self.opcodes = []
+        cur_opcode = None
+        for line in f:
+            line = line.rstrip()
+            if line == '' or line[0] == ' ' or line[0] == '\t':
+                if cur_opcode != None:
+                    cur_opcode.append(line)
+            elif line[0] != '#':
+                cur_opcode = Opcode(line, self.counters)
+                self.opcodes.append(cur_opcode)
 
-    def handle_table_body(self, b):
-        s1 = b[b.index('M68KMAKE_TABLE_START\n')+21:]
-        lines = s1.split('\n')
-        self.opcodes = {}
-        for line in lines:
-            if line == '':
-                continue
-            opc = Opcode(line)
-            self.opcodes[opc.key] = opc
-            
-    def handle_opcode_handler_body(self, b):
-        blocks = b.split('M68KMAKE_OP')
         self.opcode_handlers = []
-        for block in blocks:
-            if block != '':
-                opc = OpcodeGenericHandler(block, self.opcodes)
-                opc.generate(self.opcode_handlers)
+        for op in self.opcodes:
+            op.generate(self.counters, self.opcode_handlers)
 
     def save_header(self, f):
         f.write("// Generated source, edits will be lost.  Run m68kmake.py instead\n")
@@ -285,8 +266,8 @@ class Info:
         f.write("#include \"m68000.h\"\n")
         f.write("\n")
         for h in self.opcode_handlers:
-            f.write('void m68000_base_device::%s()\n%s' % (h.function_name, h.body))
-        f.write("const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_handler_table[] =\n{\n")
+            f.write('void m68000_base_device::%s()\n{\n%s}\n' % (h.function_name, h.body))
+        f.write("const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_handler_table[] =\n{\n\n")
         order = list(range(len(self.opcode_handlers)))
         order.sort(key = lambda id: "%02d %04x %04x" % (self.opcode_handlers[id].bits, self.opcode_handlers[id].op_mask, self.opcode_handlers[id].op_value))
         for id in order:

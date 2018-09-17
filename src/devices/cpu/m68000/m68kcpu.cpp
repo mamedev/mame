@@ -2699,7 +2699,7 @@ void m68000_base_device::m68ki_build_opcode_table()
 		/* default to illegal */
 		for(k=0;k<NUM_CPU_TYPES;k++)
 		{
-			m68ki_instruction_jump_table[k][i] = &m68000_base_device::m68k_op_illegal;
+			m68ki_instruction_jump_table[k][i] = &m68000_base_device::m68k_op_illegal_0;
 			m68ki_cycles[k][i] = 0;
 		}
 	}
