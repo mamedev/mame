@@ -168,10 +168,8 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 		case 0x00: m_pit8253->write(space, offset & 3, data); break;
 		case 0x08: m_ppi8255_3->write(space,offset & 3,data); break;
 		case 0x10: m_rs232->write(offset & 1, data); break;
-		case 0x18:
-			m_wd1793->write(offset & 0x03, data);
-			break;
-		case 0x20: m_lan->write(offset & 1, data);
+		case 0x18: m_wd1793->write(offset & 0x03, data); break;
+		case 0x20: m_lan->write(offset & 1, data); break;
 		case 0x28: m_pic8259->write(space, offset & 1,data);break;
 		case 0x30: m_ppi8255_2->write(space,offset & 3,data); break;
 		case 0x38: m_ppi8255_1->write(space,offset & 3,data); break;
