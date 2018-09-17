@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: 
+// copyright-holders: Samuele Zannoli
 #ifndef NFORCEPC_H
 #define NFORCEPC_H
 
