@@ -110,21 +110,22 @@ protected:
 	static constexpr int NUM_CPU_TYPES = 7;
 
 	typedef void (m68000_base_device::*opcode_handler_ptr)();
-	static opcode_handler_ptr m68ki_instruction_jump_table[NUM_CPU_TYPES][0x10000]; /* opcode handler jump table */
+	static u16 m68ki_instruction_state_table[NUM_CPU_TYPES][0x10000]; /* opcode handler state numbers */
 	static unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
-	/* This is used to generate the opcode handler jump table */
+	/* This is used to generate the opcode handler state table */
 	struct opcode_handler_struct
 	{
-		opcode_handler_ptr opcode_handler;   /* handler function */
-		unsigned int  mask;                  /* mask on opcode */
 		unsigned int  match;                 /* what to match after masking */
+		unsigned int  mask;                  /* mask on opcode */
 		unsigned char cycles[NUM_CPU_TYPES]; /* cycles each cpu type takes */
 	};
 
-	static const opcode_handler_struct m68k_opcode_handler_table[];
+	static const opcode_handler_ptr m68k_handler_table[];
+	static const opcode_handler_struct m68k_opcode_table[];
+	static const u16 m68k_state_illegal;
 
-	static void m68ki_set_one(unsigned short opcode, const opcode_handler_struct *s);
+	static void m68ki_set_one(unsigned short opcode, u16 state, const opcode_handler_struct &s);
 	static void m68ki_build_opcode_table(void);
 
 	void presave();
@@ -247,7 +248,7 @@ protected:
 	uint32_t m_virq_state;
 	uint32_t m_nmi_pending;
 
-	void (m68000_base_device::**m_jump_table)();
+	const u16 *m_state_table;
 	const uint8_t* m_cyc_instruction;
 	const uint8_t* m_cyc_exception;
 
