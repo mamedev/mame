@@ -561,7 +561,7 @@ void i8251_device::mode_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(i8251_device::control_w)
+void i8251_device::control_w(uint8_t data)
 {
 	if (m_flags & I8251_EXPECTING_MODE)
 	{
@@ -599,7 +599,7 @@ WRITE8_MEMBER(i8251_device::control_w)
     status_r
 -------------------------------------------------*/
 
-READ8_MEMBER(i8251_device::status_r)
+uint8_t i8251_device::status_r()
 {
 	uint8_t status = (m_dsr << 7) | m_status;
 
@@ -613,7 +613,7 @@ READ8_MEMBER(i8251_device::status_r)
     data_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8251_device::data_w)
+void i8251_device::data_w(uint8_t data)
 {
 	m_tx_data = data;
 
@@ -666,7 +666,7 @@ void i8251_device::receive_character(uint8_t ch)
     data_r - read data
 -------------------------------------------------*/
 
-READ8_MEMBER(i8251_device::data_r)
+uint8_t i8251_device::data_r()
 {
 	LOG("read data: %02x, STATUS=%02x\n",m_rx_data,m_status);
 	/* reading clears */
@@ -674,6 +674,23 @@ READ8_MEMBER(i8251_device::data_r)
 
 	update_rx_ready();
 	return m_rx_data;
+}
+
+
+uint8_t i8251_device::read(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return status_r();
+	else
+		return data_r();
+}
+
+void i8251_device::write(offs_t offset, uint8_t data)
+{
+	if (BIT(offset, 0))
+		control_w(data);
+	else
+		data_w(data);
 }
 
 
@@ -722,14 +739,4 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 READ_LINE_MEMBER(i8251_device::txrdy_r)
 {
 	return is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
-}
-
-WRITE8_MEMBER(v53_scu_device::command_w)
-{
-	i8251_device::command_w(data);
-}
-
-WRITE8_MEMBER(v53_scu_device::mode_w)
-{
-	i8251_device::mode_w(data);
 }

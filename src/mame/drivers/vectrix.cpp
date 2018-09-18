@@ -44,8 +44,7 @@ void vectrix_state::mem_map(address_map &map)
 
 void vectrix_state::io_map(address_map &map)
 {
-	map(0x3000, 0x3000).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x3001, 0x3001).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x3000, 0x3001).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 static INPUT_PORTS_START( vectrix )

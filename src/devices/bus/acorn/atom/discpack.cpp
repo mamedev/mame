@@ -34,7 +34,7 @@ static void atom_floppies(device_slot_interface &device)
 
 ROM_START( discpack )
 	ROM_REGION(0x1000, "dos_rom", 0)
-	ROM_LOAD("dosrom.ic18", 0x0000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c))
+	ROM_LOAD("dosrom.ic15", 0x0000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c))
 ROM_END
 
 //-------------------------------------------------
@@ -43,14 +43,12 @@ ROM_END
 
 void atom_discpack_device::device_add_mconfig(machine_config &config)
 {
-	I8271(config, m_fdc, 0);
+	I8271(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(atom_discpack_device::fdc_intrq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(atom_discpack_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(atom_discpack_device::side_w));
-	FLOPPY_CONNECTOR(config, m_floppy[0], atom_floppies, "525sssd", atom_discpack_device::floppy_formats);
-	m_floppy[0]->enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], atom_floppies, nullptr, atom_discpack_device::floppy_formats);
-	m_floppy[1]->enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], atom_floppies, "525sssd", atom_discpack_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], atom_floppies, nullptr, atom_discpack_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -102,6 +100,7 @@ WRITE_LINE_MEMBER(atom_discpack_device::motor_w)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
+	m_fdc->ready_w(!state);
 }
 
 WRITE_LINE_MEMBER(atom_discpack_device::side_w)

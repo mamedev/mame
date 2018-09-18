@@ -675,8 +675,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
 	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
-	map(0x0091, 0x0091).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0093, 0x0093).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00);
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 

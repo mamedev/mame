@@ -50,6 +50,8 @@ public:
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 private:
+	void pcipc_map(address_map &map);
+	void pcipc_map_io(address_map &map);
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_w);
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_ver40_rev6_w);
 	DECLARE_WRITE8_MEMBER(boot_state_award_w);
@@ -501,8 +503,20 @@ void pcipc_state::superio_config(device_t *device)
 	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
+void pcipc_state::pcipc_map(address_map &map)
+{
+	map.unmap_value_high();
+}
+
+void pcipc_state::pcipc_map_io(address_map &map)
+{
+	map.unmap_value_high();
+}
+
 MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_DEVICE_ADD("maincpu", PENTIUM, 90000000)
+	MCFG_DEVICE_PROGRAM_MAP(pcipc_map)
+	MCFG_DEVICE_IO_MAP(pcipc_map_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 	MCFG_I386_SMIACT(WRITELINE("pci:00.0", i82439hx_host_device, smi_act_w))
 

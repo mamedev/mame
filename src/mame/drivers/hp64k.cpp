@@ -961,13 +961,7 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 
 READ16_MEMBER(hp64k_state::hp64k_usart_r)
 {
-		uint16_t tmp;
-
-		if ((offset & 1) == 0) {
-				tmp = m_uart->status_r(space , 0);
-		} else {
-				tmp = m_uart->data_r(space , 0);
-		}
+		uint16_t tmp = m_uart->read(~offset & 1);
 
 		// bit 8 == bit 7 rear panel switches (modem/terminal) ???
 
@@ -982,11 +976,7 @@ READ16_MEMBER(hp64k_state::hp64k_usart_r)
 
 WRITE16_MEMBER(hp64k_state::hp64k_usart_w)
 {
-		if ((offset & 1) == 0) {
-				m_uart->control_w(space , 0 , (uint8_t)(data & 0xff));
-		} else {
-				m_uart->data_w(space , 0 , (uint8_t)(data & 0xff));
-		}
+		m_uart->write(~offset & 1, data & 0xff);
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_rxrdy_w)

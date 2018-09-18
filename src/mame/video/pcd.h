@@ -93,16 +93,13 @@ public:
 	DECLARE_WRITE8_MEMBER(term_w);
 	DECLARE_READ8_MEMBER(term_mcu_r);
 	DECLARE_WRITE8_MEMBER(term_mcu_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_latch_r);
-	DECLARE_WRITE8_MEMBER(vram_latch_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 
 	void pcx_vid_io(address_map &map);
 	void pcx_vid_map(address_map &map);
-	void pcx_vram(address_map &map);
+	void pcx_char_ram(address_map &map);
+	void pcx_attr_ram(address_map &map);
 protected:
 	void device_start() override;
 	void device_reset() override;
@@ -115,10 +112,9 @@ protected:
 private:
 	required_device<scn2672_device> m_crtc;
 
-	std::vector<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_charrom;
 	devcb_write_line m_txd_handler;
-	uint8_t m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2], m_p1;
+	uint8_t m_term_key, m_term_char, m_term_stat, m_p1;
 
 	DECLARE_READ8_MEMBER(rx_callback);
 	DECLARE_WRITE8_MEMBER(tx_callback);

@@ -438,8 +438,7 @@ void alphatro_state::alphatro_io(address_map &map)
 	map(0x2b, 0x2b).portr("XB");
 	map(0x30, 0x30).rw(FUNC(alphatro_state::port30_r), FUNC(alphatro_state::port30_w));
 	// USART for cassette reading and writing
-	map(0x40, 0x40).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// CRTC - HD46505 / HD6845SP
 	map(0x50, 0x50).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x51, 0x51).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));

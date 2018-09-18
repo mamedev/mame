@@ -220,6 +220,7 @@ evmbug.cpp
 excali64.cpp
 exelv.cpp
 exp85.cpp
+facit4440.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -468,6 +469,7 @@ nes.cpp
 nes_vt.cpp
 newbrain.cpp
 next.cpp
+nforcepc.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp

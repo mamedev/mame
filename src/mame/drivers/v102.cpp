@@ -63,8 +63,7 @@ void v102_state::io_map(address_map &map)
 	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
 	map(0x18, 0x19).nopw();
 	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w));
-	map(0x60, 0x60).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x61, 0x61).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x60, 0x61).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
 	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0xbf, 0xbf) ???

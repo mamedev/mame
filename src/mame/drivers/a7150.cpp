@@ -327,8 +327,7 @@ void a7150_state::a7150_io(address_map &map)
 	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x0200, 0x0203).rw(FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
 	map(0x0300, 0x031f).unmaprw(); // ASP board #1
 	map(0x0320, 0x033f).unmaprw(); // ASP board #2

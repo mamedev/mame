@@ -66,11 +66,9 @@ void sys9002_state::sys9002_io(address_map &map)
 	map.global_mask(0xff);
 	//AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)  // left commented out as mame freezes after about 2 seconds
 	//AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	map(0x08, 0x08).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x09, 0x09).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)); // 7 bits even parity, x64
+	map(0x08, 0x09).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x11, 0x11).nopr();  // continuous read
-	map(0x1c, 0x1c).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x1d, 0x1d).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)); // enabled for transmit only, 8 bits odd parity, x64
+	map(0x1c, 0x1d).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -151,7 +149,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1", 0)); // 7 bits even parity, x64
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -162,7 +160,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", uart1)
 
-	i8251_device &uart2(I8251(config, "uart2", 0));
+	i8251_device &uart2(I8251(config, "uart2", 0)); // enabled for transmit only, 8 bits odd parity, x64
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));

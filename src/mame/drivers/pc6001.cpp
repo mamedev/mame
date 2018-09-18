@@ -240,8 +240,7 @@ void pc6001_state::pc6001_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x80, 0x80).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x81, 0x81).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001_state::nec_ppi8255_r), FUNC(pc6001_state::nec_ppi8255_w));
 	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
@@ -696,8 +695,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x80, 0x80).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x81, 0x81).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2_state::nec_ppi8255_r), FUNC(pc6001mk2_state::necmk2_ppi8255_w));
 
@@ -933,8 +931,7 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 //  0x40-0x43 palette indexes
 	map(0x60, 0x67).rw(FUNC(pc6001sr_state::sr_bank_rn_r), FUNC(pc6001sr_state::sr_bank_rn_w));
 	map(0x68, 0x6f).rw(FUNC(pc6001sr_state::sr_bank_wn_r), FUNC(pc6001sr_state::sr_bank_wn_w));
-	map(0x80, 0x80).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x81, 0x81).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001sr_state::nec_ppi8255_r), FUNC(pc6001sr_state::necsr_ppi8255_w));
 

@@ -728,14 +728,10 @@ void fanucspmg_state::maincpu_mem(address_map &map)
 	map(0xf0000, 0xf0003).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0xf0004, 0xf0007).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xf0008, 0xf000f).rw(m_pit0, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xf0010, 0xf0010).rw(m_usart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf0012, 0xf0012).rw(m_usart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf0014, 0xf0014).rw(m_usart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf0016, 0xf0016).rw(m_usart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf0018, 0xf0018).rw(m_usart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf001a, 0xf001a).rw(m_usart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf001c, 0xf001c).rw(m_usart3, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf001e, 0xf001e).rw(m_usart3, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf0010, 0xf0013).rw(m_usart0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0014, 0xf0017).rw(m_usart1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0018, 0xf001b).rw(m_usart2, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf001c, 0xf001f).rw(m_usart3, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xf0020, 0xf0029).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0xf0042, 0xf0043).r(FUNC(fanucspmg_state::magic_r));
 	map(0xf0046, 0xf0046).w(FUNC(fanucspmg_state::dma_page_w));

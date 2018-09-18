@@ -150,10 +150,8 @@ READ8_MEMBER(qtsbc_state::io_r)
 			return 0xff;
 
 		case 6:
-			return m_usart->data_r(space, 0);
-
 		case 7:
-			return m_usart->status_r(space, 0);
+			return m_usart->read(offset & 1);
 		}
 	}
 	else
@@ -192,11 +190,8 @@ WRITE8_MEMBER(qtsbc_state::io_w)
 			break;
 
 		case 6:
-			m_usart->data_w(space, 0, data);
-			break;
-
 		case 7:
-			m_usart->control_w(space, 0, data);
+			m_usart->write(offset & 1, data);
 			break;
 		}
 	}

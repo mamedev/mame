@@ -228,8 +228,7 @@ void sf7000_state::sf7000_io_map(address_map &map)
 	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
 	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe8, 0xe8).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe9, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe8, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /***************************************************************************

@@ -135,10 +135,8 @@ void isbc_state::rpc86_io(address_map &map)
 	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x00dc, 0x00dc).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00de, 0x00de).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void isbc_state::isbc8605_io(address_map &map)
@@ -169,10 +167,8 @@ void isbc_state::isbc_io(address_map &map)
 	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x00dc, 0x00dc).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00de, 0x00de).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void isbc_state::isbc286_io(address_map &map)

@@ -73,8 +73,7 @@ void sdk86_state::sdk86_mem(address_map &map)
 void sdk86_state::sdk86_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xfff0, 0xfff0).mirror(4).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfff2, 0xfff2).mirror(4).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfff0, 0xfff3).mirror(4).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xffe8, 0xffeb).mirror(4).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
 	map(0xfff8, 0xffff).rw("port1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0xfff8, 0xffff).rw("port2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);

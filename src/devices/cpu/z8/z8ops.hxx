@@ -241,20 +241,21 @@ INSTRUCTION( push_IR2 )         { mode_IR1(push) }
     ARITHMETIC INSTRUCTIONS
 ***************************************************************************/
 
-void z8_device::add_carry(uint8_t dst, int8_t src)
+void z8_device::add_carry(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst + src + C */
 	uint8_t data = register_read(dst);
 	uint16_t new_data = data + src + flag(C);
 
 	set_flag_c(new_data & 0x100);
+	new_data &= 0xff;
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) == (src & 0x80)) && ((new_data & 0x80) != (src & 0x80)));
 	set_flag_d(0);
 	set_flag_h(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10));
 
-	register_write(dst, new_data & 0xff);
+	register_write(dst, new_data);
 }
 
 INSTRUCTION( adc_r1_r2 )        { mode_r1_r2(add_carry) }
@@ -264,20 +265,21 @@ INSTRUCTION( adc_IR2_R1 )       { mode_IR2_R1(add_carry) }
 INSTRUCTION( adc_R1_IM )        { mode_R1_IM(add_carry) }
 INSTRUCTION( adc_IR1_IM )       { mode_IR1_IM(add_carry) }
 
-void z8_device::add(uint8_t dst, int8_t src)
+void z8_device::add(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst + src */
 	uint8_t data = register_read(dst);
 	uint16_t new_data = data + src;
 
 	set_flag_c(new_data & 0x100);
+	new_data &= 0xff;
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) == (src & 0x80)) && ((new_data & 0x80) != (src & 0x80)));
 	set_flag_d(0);
 	set_flag_h(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10));
 
-	register_write(dst, new_data & 0xff);
+	register_write(dst, new_data);
 }
 
 INSTRUCTION( add_r1_r2 )        { mode_r1_r2(add) }
@@ -294,6 +296,7 @@ void z8_device::compare(uint8_t dst, uint8_t src)
 	uint16_t new_data = data - src;
 
 	set_flag_c(new_data & 0x100);
+	new_data &= 0xff;
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
@@ -400,13 +403,14 @@ void z8_device::subtract_carry(uint8_t dst, uint8_t src)
 	uint16_t new_data = data - src - flag(C);
 
 	set_flag_c(new_data & 0x100);
+	new_data &= 0xff;
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
 	set_flag_d(1);
 	set_flag_h(!(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10)));
 
-	register_write(dst, new_data & 0xff);
+	register_write(dst, new_data);
 }
 
 INSTRUCTION( sbc_r1_r2 )        { mode_r1_r2(subtract_carry) }
@@ -423,13 +427,14 @@ void z8_device::subtract(uint8_t dst, uint8_t src)
 	uint16_t new_data = data - src;
 
 	set_flag_c(new_data & 0x100);
+	new_data &= 0xff;
 	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
 	set_flag_d(1);
 	set_flag_h(!(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10)));
 
-	register_write(dst, new_data & 0xff);
+	register_write(dst, new_data);
 }
 
 INSTRUCTION( sub_r1_r2 )        { mode_r1_r2(subtract) }
@@ -570,9 +575,9 @@ void z8_device::jump(uint16_t dst)
 
 INSTRUCTION( jp_IRR1 )          { jump(register_pair_read(get_register(IM))); }
 
-int z8_device::check_condition_code(int cc)
+bool z8_device::check_condition_code(int cc)
 {
-	int truth = 0;
+	bool truth = 0;
 
 	switch (cc)
 	{
@@ -671,7 +676,7 @@ void z8_device::rotate_left(uint8_t dst)
 	uint8_t new_data = (data << 1) | BIT(data, 7);
 
 	set_flag_c(data & 0x80);
-	set_flag_z(data == 0);
+	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v((data & 0x80) != (new_data & 0x80));
 
@@ -688,7 +693,7 @@ void z8_device::rotate_left_carry(uint8_t dst)
 	uint8_t new_data = (data << 1) | flag(C);
 
 	set_flag_c(data & 0x80);
-	set_flag_z(data == 0);
+	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v((data & 0x80) != (new_data & 0x80));
 
@@ -705,7 +710,7 @@ void z8_device::rotate_right(uint8_t dst)
 	uint8_t new_data = ((data & 0x01) << 7) | (data >> 1);
 
 	set_flag_c(data & 0x01);
-	set_flag_z(data == 0);
+	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v((data & 0x80) != (new_data & 0x80));
 
@@ -722,7 +727,7 @@ void z8_device::rotate_right_carry(uint8_t dst)
 	uint8_t new_data = (flag(C) << 7) | (data >> 1);
 
 	set_flag_c(data & 0x01);
-	set_flag_z(data == 0);
+	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v((data & 0x80) != (new_data & 0x80));
 
@@ -739,7 +744,7 @@ void z8_device::shift_right_arithmetic(uint8_t dst)
 	uint8_t new_data = (data & 0x80) | ((data >> 1) & 0x7f);
 
 	set_flag_c(data & 0x01);
-	set_flag_z(data == 0);
+	set_flag_z(new_data == 0);
 	set_flag_s(new_data & 0x80);
 	set_flag_v(0);
 

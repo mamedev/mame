@@ -169,10 +169,8 @@ void icebox_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xe0, 0xe0).rw(m_uart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe1, 0xe1).rw(m_uart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xe2, 0xe2).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe3, 0xe3).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe0, 0xe1).rw(m_uart0, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xe2, 0xe3).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe4, 0xe7).lrw8("fdc_usage",
 					[this](offs_t offset) { return m_fdc->read(offset^3); },
 					[this](offs_t offset, u8 data) { m_fdc->write(offset^3, data); });

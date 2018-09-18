@@ -890,12 +890,12 @@ triothep                        // (c) 1989 Data East Corporation (World)
 triothepj                       // (c) 1989 Data East Corporation (Japan)
 
 @source:acvirus.cpp
-virusa                          // (c) 1997 Access Gmbh
-virusb                          // (c) 1999 Access Gmbh
-virusc                          // (c) 2002 Access Gmbh
-virusrck                        // (c) 2001 Access Gmbh
-virusrckxl                      // (c) 2002 Access Gmbh
-viruscl                         // (c) 2004 Access Gmbh
+virusa                          // (c) 1997 Access GmbH
+virusb                          // (c) 1999 Access GmbH
+virusc                          // (c) 2002 Access GmbH
+virusrck                        // (c) 2001 Access GmbH
+virusrckxl                      // (c) 2002 Access GmbH
+viruscl                         // (c) 2004 Access GmbH
 
 @source:adam.cpp
 adam                            // Coleco Adam
@@ -12638,6 +12638,9 @@ f1gpb                           // bootleg
 @source:f-32.cpp
 mosaicf2                        // (c) 1999 F2 System
 royalpk2                        //
+
+@source:facit4440.cpp
+facit4440                       // 1984
 
 @source:famibox.cpp
 famibox                         // 1986
@@ -30147,6 +30150,9 @@ neocd                           // NeoGeo CD
 neocdz                          // NeoGeo CDZ
 neocdzj                         //
 
+@source:nforcepc.cpp
+nforcepc                        //
+
 @source:ngen.cpp
 386i                            // 199?
 ngen                            // 1983
@@ -36952,7 +36958,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 7951om                          //
 alcat258                        //
 alcat7100                       //
-facit4440                       //
 feap90                          //
 ikt5a                           //
 itt9216                         //
@@ -38215,7 +38220,7 @@ victory                         // (c) 1982
 vidbrain                        //
 
 @source:video21.cpp
-video21                         // Videogames gmbh 1980
+video21                         // Videogames GmbH 1980
 
 @source:videopin.cpp
 solarwar                        // 036154-036169    1979    [6502]

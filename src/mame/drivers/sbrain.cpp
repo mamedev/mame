@@ -138,12 +138,10 @@ void sbrain_state::sbrain_mem(address_map &map)
 void sbrain_state::sbrain_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(6).rw(m_u0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x48, 0x4f).r(FUNC(sbrain_state::port48_r)); //chr_int_latch
 	map(0x50, 0x57).r(FUNC(sbrain_state::port50_r));
-	map(0x58, 0x58).mirror(6).rw(m_u1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x59, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x58, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x60).mirror(7).w("brg", FUNC(com8116_device::stt_str_w));
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }

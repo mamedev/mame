@@ -184,9 +184,12 @@ void mb86901_device::device_start()
 	m_alu_op3_assigned[OP3_WRTBR] = true;
 	m_alu_op3_assigned[OP3_FPOP1] = true;
 	m_alu_op3_assigned[OP3_FPOP2] = true;
+	m_alu_op3_assigned[OP3_CPOP1] = true;
+	m_alu_op3_assigned[OP3_CPOP2] = true;
 	m_alu_op3_assigned[OP3_JMPL] = true;
 	m_alu_op3_assigned[OP3_RETT] = true;
 	m_alu_op3_assigned[OP3_TICC] = true;
+	m_alu_op3_assigned[OP3_IFLUSH] = true;
 	m_alu_op3_assigned[OP3_SAVE] = true;
 	m_alu_op3_assigned[OP3_RESTORE] = true;
 #if SPARCV8
@@ -198,8 +201,6 @@ void mb86901_device::device_start()
 	m_alu_op3_assigned[OP3_SMULCC] = true;
 	m_alu_op3_assigned[OP3_UDIVCC] = true;
 	m_alu_op3_assigned[OP3_SDIVCC] = true;
-	m_alu_op3_assigned[OP3_CPOP1] = true;
-	m_alu_op3_assigned[OP3_CPOP2] = true;
 #endif
 	m_program = &space(AS_PROGRAM);
 
@@ -1487,6 +1488,10 @@ void mb86901_device::execute_group2(uint32_t op)
 
 		case OP3_TICC:
 			execute_ticc(op);
+			break;
+
+		case OP3_IFLUSH:
+			// Ignored
 			break;
 
 		case OP3_SAVE:
@@ -2941,7 +2946,7 @@ void mb86901_device::execute_step()
 		m_execute_mode = 0;
 		m_error_mode = 0;
 		m_reset_mode = 1;
-		printf("Entering reset mode\n");
+		//printf("Entering reset mode\n");
 		return;
 	}
 	else if ((PSR & PSR_ET_MASK) && (m_bp_irl == 15 || m_bp_irl > ((PSR & PSR_PIL_MASK) >> PSR_PIL_SHIFT)))
@@ -3028,7 +3033,7 @@ void mb86901_device::reset_step()
 		m_execute_mode = 1;
 		m_trap = 1;
 		m_reset_trap = 1;
-		printf("m_bp_reset_in is false, resetting\n");
+		//printf("m_bp_reset_in is false, resetting\n");
 	}
 }
 

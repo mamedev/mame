@@ -193,10 +193,8 @@ void amust_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x02, 0x02).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x03, 0x03).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x02, 0x03).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0d, 0x0d).nopr().w(FUNC(amust_state::port0d_w));

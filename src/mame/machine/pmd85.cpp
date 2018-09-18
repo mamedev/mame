@@ -498,12 +498,7 @@ READ8_MEMBER(pmd85_state::pmd85_io_r)
 							switch (offset & 0x70)
 							{
 								case 0x10:  /* 8251 (casette recorder, V24) */
-										switch (offset & 0x01)
-										{
-											case 0x00: return m_uart->data_r(space, offset & 0x01);
-											case 0x01: return m_uart->status_r(space, offset & 0x01);
-										}
-										break;
+										return m_uart->read(offset & 0x01);
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
 										return m_ppi8255_1->read(space, offset & 0x03);
 								case 0x50:  /* 8253 */
@@ -573,11 +568,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 							switch (offset & 0x70)
 							{
 								case 0x10:  /* 8251 (casette recorder, V24) */
-										switch (offset & 0x01)
-										{
-											case 0x00: m_uart->data_w(space, offset & 0x01, data); break;
-											case 0x01: m_uart->control_w(space, offset & 0x01, data); break;
-										}
+										m_uart->write(offset & 0x01, data);
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
 										m_ppi8255_1->write(space, offset & 0x03, data);

@@ -65,6 +65,7 @@ void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
@@ -75,6 +76,7 @@ void bbc_cumana2_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
@@ -104,7 +106,8 @@ bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device
 	m_fdc(*this, "mb8877a"),
 	m_floppy0(*this, "mb8877a:0"),
 	m_floppy1(*this, "mb8877a:1"),
-	m_dfs_rom(*this, "dfs_rom")
+	m_dfs_rom(*this, "dfs_rom"),
+	m_drive_control(0)
 {
 }
 
@@ -127,12 +130,7 @@ bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char
 
 void bbc_cumanafdc_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_cumanafdc_device, ctrl_r), WRITE8_DELEGATE(bbc_cumanafdc_device, ctrl_w));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, read8sm_delegate(FUNC(mb8877_device::read), m_fdc.target()), write8sm_delegate(FUNC(mb8877_device::write), m_fdc.target()));
+	save_item(NAME(m_drive_control));
 }
 
 //-------------------------------------------------
@@ -142,8 +140,6 @@ void bbc_cumanafdc_device::device_start()
 void bbc_cumanafdc_device::device_reset()
 {
 	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
-
-	m_fdc->soft_reset();
 }
 
 
@@ -151,47 +147,66 @@ void bbc_cumanafdc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_cumanafdc_device::ctrl_r)
+READ8_MEMBER(bbc_cumanafdc_device::read)
 {
-	return m_drive_control;
-}
+	uint8_t data;
 
-WRITE8_MEMBER(bbc_cumanafdc_device::ctrl_w)
-{
-	floppy_image_device *floppy = nullptr;
-
-	m_drive_control = data;
-
-	// bit 0: drive select
-	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
-	floppy = (BIT(data, 0) ? floppy1 : floppy0);
-	m_fdc->set_floppy(floppy);
-
-	// Not sure why QFS 1.02 inverts these two bits, need to see an original board to verify
-	if (m_invert)
+	if (offset & 0x04)
 	{
-		// bit 1: side select
-		if (floppy)
-			floppy->ss_w(!BIT(data, 1));
-
-		// bit 2: density
-		m_fdc->dden_w(!BIT(data, 2));
+		data = m_fdc->read(offset & 0x03);
 	}
 	else
 	{
-		// bit 1: side select
-		if (floppy)
-			floppy->ss_w(BIT(data, 1));
-
-		// bit 2: density
-		m_fdc->dden_w(BIT(data, 2));
+		data = m_drive_control;
 	}
-	// bit 3: reset
-	if (BIT(data, 3)) m_fdc->soft_reset();
+	return data;
+}
 
-	// bit 4: interrupt enable
-	m_fdc_ie = BIT(data, 4);
+WRITE8_MEMBER(bbc_cumanafdc_device::write)
+{
+	if (offset & 0x04)
+	{
+		m_fdc->write(offset & 0x03, data);
+	}
+	else
+	{
+		floppy_image_device *floppy = nullptr;
+
+		m_drive_control = data;
+
+		// bit 0: drive select
+		switch (BIT(data, 0))
+		{
+		case 0: floppy = m_floppy0->get_device(); break;
+		case 1: floppy = m_floppy1->get_device(); break;
+		}
+		m_fdc->set_floppy(floppy);
+
+		// Not sure why QFS 1.02 inverts these two bits, need to see an original board to verify
+		if (m_invert)
+		{
+			// bit 1: side select
+			if (floppy)
+				floppy->ss_w(!BIT(data, 1));
+
+			// bit 2: density
+			m_fdc->dden_w(!BIT(data, 2));
+		}
+		else
+		{
+			// bit 1: side select
+			if (floppy)
+				floppy->ss_w(BIT(data, 1));
+
+			// bit 2: density
+			m_fdc->dden_w(BIT(data, 2));
+		}
+		// bit 3: reset
+		if (BIT(data, 3)) m_fdc->soft_reset();
+
+		// bit 4: interrupt enable
+		m_fdc_ie = BIT(data, 4);
+	}
 }
 
 WRITE_LINE_MEMBER(bbc_cumanafdc_device::fdc_intrq_w)
@@ -208,12 +223,6 @@ WRITE_LINE_MEMBER(bbc_cumanafdc_device::fdc_drq_w)
 
 WRITE_LINE_MEMBER(bbc_cumanafdc_device::motor_w)
 {
-	for (int i = 0; i != 2; i++) {
-		char devname[8];
-		sprintf(devname, "%d", i);
-		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
-		if (con) {
-			con->get_device()->mon_w(!state);
-		}
-	}
+	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
 }

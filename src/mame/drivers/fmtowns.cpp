@@ -2122,10 +2122,8 @@ WRITE8_MEMBER( towns_state::towns_serial_w )
 	switch(offset)
 	{
 		case 0:
-			m_i8251->data_w(space,0,data);
-			break;
 		case 1:
-			m_i8251->control_w(space,0,data);
+			m_i8251->write(offset, data);
 			break;
 		case 4:
 			m_serial_irq_enable = data;
@@ -2140,9 +2138,8 @@ READ8_MEMBER( towns_state::towns_serial_r )
 	switch(offset)
 	{
 		case 0:
-			return m_i8251->data_r(space,0);
 		case 1:
-			return m_i8251->status_r(space,0);
+			return m_i8251->read(offset);
 		case 3:
 			return m_serial_irq_source;
 		default:

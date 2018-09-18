@@ -61,8 +61,7 @@ void vp122_state::io_map(address_map &map)
 {
 	map(0x00, 0x07).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
 	map(0x10, 0x1f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0x20, 0x20).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x50, 0x50).rw("avdc", FUNC(scn2674_device::buffer_r), FUNC(scn2674_device::buffer_w));
 	map(0x60, 0x60).rw("avdc", FUNC(scn2674_device::attr_buffer_r), FUNC(scn2674_device::attr_buffer_w));
 	map(0x70, 0x73).w("pit", FUNC(pit8253_device::write));

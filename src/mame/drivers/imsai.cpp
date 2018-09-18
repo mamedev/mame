@@ -68,10 +68,8 @@ void imsai_state::imsai_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x02, 0x02).r(FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x03, 0x03).r(FUNC(imsai_state::status_r));
-	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x12, 0x12).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x13, 0x13).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x12, 0x13).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x14, 0x14).r(FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x15, 0x15).r(FUNC(imsai_state::status_r));
 	map(0xf3, 0xf3).w(FUNC(imsai_state::control_w));

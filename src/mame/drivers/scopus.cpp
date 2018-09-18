@@ -133,8 +133,7 @@ void sagitta180_state::maincpu_map(address_map &map)
 void sagitta180_state::maincpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("DSW");
-	map(0x20, 0x20).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x31).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x40, 0x48).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 }

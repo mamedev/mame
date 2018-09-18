@@ -143,10 +143,8 @@ void imds2_state::ipc_io_map(address_map &map)
 	map.unmap_value_low();
 	map(0xc0, 0xc1).rw(m_ioc, FUNC(imds2ioc_device::dbb_master_r), FUNC(imds2ioc_device::dbb_master_w));
 	map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xf4, 0xf4).rw(m_ipcusart[0], FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf5, 0xf5).rw(m_ipcusart[0], FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf6, 0xf6).rw(m_ipcusart[1], FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf7, 0xf7).rw(m_ipcusart[1], FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf4, 0xf5).rw(m_ipcusart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xf6, 0xf7).rw(m_ipcusart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xf8, 0xf9).rw(m_ioc, FUNC(imds2ioc_device::pio_master_r), FUNC(imds2ioc_device::pio_master_w));
 	map(0xfa, 0xfb).rw(FUNC(imds2_state::ipclocpic_r), FUNC(imds2_state::ipclocpic_w));
 	map(0xfc, 0xfd).rw(FUNC(imds2_state::ipcsyspic_r), FUNC(imds2_state::ipcsyspic_w));

@@ -106,8 +106,7 @@ void isbc8010_state::isbc8010_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xe4, 0xe7).rw(m_ppi_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe8, 0xeb).rw(m_ppi_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xec, 0xec).mirror(0x02).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xed, 0xed).mirror(0x02).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xec, 0xed).mirror(0x02).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	//AM_RANGE(0xf0, 0xf7) MCS0 - iSBX Multimodule
 	//AM_RANGE(0xf8, 0xff) MCS1 - iSBX Multimodule
 }

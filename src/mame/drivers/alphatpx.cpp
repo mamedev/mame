@@ -269,8 +269,7 @@ void alphatp_12_state::alphatp2_map(address_map &map)
 void alphatp_12_state::alphatp2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_12_state::beep_w));
 	map(0x50, 0x53).rw(FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
@@ -309,8 +308,7 @@ void alphatp_34_state::alphatp3_io(address_map &map)
 {
 	map.unmap_value_high();
 	//AM_RANGE(0x00, 0x00) AM_READ // unknown
-	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));

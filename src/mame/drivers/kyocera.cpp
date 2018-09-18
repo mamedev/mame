@@ -628,8 +628,7 @@ void tandy200_state::tandy200_io(address_map &map)
 	map(0x90, 0x9f).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xc0, 0xc0).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(tandy200_state::bank_r), FUNC(tandy200_state::bank_w));
 	map(0xe0, 0xe0).mirror(0x0f).rw(FUNC(tandy200_state::stbk_r), FUNC(tandy200_state::stbk_w));
 	map(0xf0, 0xf0).mirror(0x0e).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w));
