@@ -1464,7 +1464,7 @@ wing War (US)
 
         Sega game ID# 833-10844-91-01
    Sega ROM board ID# 834-10845-91-01
-Driver/Control BD ID# 837-10859 with EPR-16891 (not dumped)
+Driver/Control BD ID# 837-10859 with EPR-16891
 837-8679 MODEL-1 SOUND BD + 837-8680 SOUND BD OPTION daughterboard with ID# 837-10858
 838-10141-04 Sound AMP board
 */
