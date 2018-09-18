@@ -76,7 +76,7 @@
 		<part name="disc1" interface="cdrom">
 			<feature name="part_id" value="MDEM Software" />
 			<diskarea name="cdrom">
-				<disk name="mech_170897_1" sha1="a03f9a9b08d6220b49f1be8a50a2032323f69fb8" writeable="no" />
+				<disk name="mech_081797_1" sha1="a03f9a9b08d6220b49f1be8a50a2032323f69fb8" writeable="no" />
 			</diskarea>
 		</part>
 
@@ -84,7 +84,7 @@
 		<part name="disc2" interface="cdrom">
 			<feature name="part_id" value="MDEM Disc II" />
 			<diskarea name="cdrom">
-				<disk name="mech_170897_2" sha1="a269113a742c8dbf081855bcf2135b70c42738ef" writeable="no" />
+				<disk name="mech_081797_2" sha1="a269113a742c8dbf081855bcf2135b70c42738ef" writeable="no" />
 			</diskarea>
 		</part>
 	</software>
