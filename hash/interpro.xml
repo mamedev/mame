@@ -65,6 +65,30 @@
 		</part>
 	</software>
 
+	<software name="mech">
+		<description>Intergraph Mechanical Software</description>
+		<year>1997</year>
+		<publisher>Intergraph</publisher>
+
+		<info name="date" value="17-AUG-1997"/>
+
+		<!-- MDEM Software #17-AUG-1997#081797#FMDA0320N (disc label: MMDA6680B) -->
+		<part name="disc1" interface="cdrom">
+			<feature name="part_id" value="MDEM Software" />
+			<diskarea name="cdrom">
+				<disk name="mech_170897_1" sha1="a03f9a9b08d6220b49f1be8a50a2032323f69fb8" writeable="no" />
+			</diskarea>
+		</part>
+
+		<!-- MDEM Disc II#17-AUG-1997#081797#FMDA0310J (disc label: MMDA67107) -->
+		<part name="disc2" interface="cdrom">
+			<feature name="part_id" value="MDEM Disc II" />
+			<diskarea name="cdrom">
+				<disk name="mech_170897_2" sha1="a269113a742c8dbf081855bcf2135b70c42738ef" writeable="no" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!--
 	The REBUILD product allows a set of system rebuild floppy disks to be
 	created from source binary data. When using the software, the user is
