@@ -338,7 +338,7 @@ void nscsi_harddisk_device::scsi_command()
 	}
 
 	case SC_START_STOP_UNIT:
-		LOG("command START STOP UNIT\n");
+		LOG("command %s UNIT\n", (scsi_cmdbuf[4] & 0x1) ? "START" : "STOP");
 		scsi_status_complete(SS_GOOD);
 		break;
 
