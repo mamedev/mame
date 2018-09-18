@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Samuele Zannoli
-#ifndef NFORCEPC_H
-#define NFORCEPC_H
+#ifndef MAME_MACHINE_NFORCEPC_H
+#define MAME_MACHINE_NFORCEPC_H
 
 #pragma once
 
