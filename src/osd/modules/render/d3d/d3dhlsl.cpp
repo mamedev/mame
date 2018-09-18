@@ -25,6 +25,7 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
+#include <array>
 #include <utility>
 
 //============================================================
@@ -172,6 +173,7 @@ shaders::shaders() :
 	delta_t(0),
 	shadow_texture(nullptr),
 	lut_texture(nullptr),
+	ui_lut_texture(nullptr),
 	options(nullptr),
 	black_surface(nullptr),
 	black_texture(nullptr),
@@ -577,8 +579,8 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
 		strncpy(options->lut_texture, winoptions.screen_lut_texture(), sizeof(options->lut_texture));
 		options->lut_enable = winoptions.screen_lut_enable();
-
-
+		strncpy(options->ui_lut_texture, winoptions.ui_lut_texture(), sizeof(options->ui_lut_texture));
+		options->ui_lut_enable = winoptions.ui_lut_enable();
 
 		options->params_init = true;
 
@@ -752,6 +754,25 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
+	render_load_png(ui_lut_bitmap, file, nullptr, options->ui_lut_texture);
+	if (ui_lut_bitmap.valid())
+	{
+		render_texinfo texture;
+
+		// fake in the basic data so it looks like it came from render.c
+		texture.base = ui_lut_bitmap.raw_pixptr(0);
+		texture.rowpixels = ui_lut_bitmap.rowpixels();
+		texture.width = ui_lut_bitmap.width();
+		texture.height = ui_lut_bitmap.height();
+		texture.palette = nullptr;
+		texture.seqid = 0;
+
+		// now create it (no prescale, no wrap)
+		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		ui_lut_texture = tex.get();
+		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
+	}
+
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
 
 	default_effect = new effect(this, d3d->get_device(), "primary.fx", fx_dir);
@@ -785,9 +806,7 @@ int shaders::create_resources()
 		return 1;
 	}
 
-	const int EFFECT_COUNT = 14;
-
-	effect *effects[EFFECT_COUNT] = {
+	std::array<effect*, 14> effects = {
 		default_effect,
 		post_effect,
 		distortion_effect,
@@ -804,7 +823,7 @@ int shaders::create_resources()
 		vector_effect
 	};
 
-	for (int i = 0; i < EFFECT_COUNT; i++)
+	for (int i = 0; i < effects.size(); i++)
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
@@ -867,6 +886,7 @@ int shaders::create_resources()
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
 
 	default_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
+	default_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
 
 	return 0;
 }
@@ -1410,7 +1430,7 @@ void shaders::ui_pass(poly_info *poly, int vertnum)
 	curr_effect->update_uniforms();
 	curr_effect->set_technique("UiTechnique");
 
-	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : ui_lut_texture->get_finaltex());
 
 	blit(nullptr, false, poly->type(), vertnum, poly->count());
 }
@@ -1875,6 +1895,8 @@ void shaders::delete_resources()
 	}
 
 	shadow_bitmap.reset();
+	lut_bitmap.reset();
+	ui_lut_bitmap.reset();
 }
 
 
@@ -2010,7 +2032,8 @@ hlsl_options shaders::last_options = { false };
 
 enum slider_option
 {
-	SLIDER_VECTOR_BEAM_SMOOTH = 0,
+	SLIDER_UI_LUT_ENABLE = 0,
+	SLIDER_VECTOR_BEAM_SMOOTH,
 	SLIDER_VECTOR_ATT_MAX,
 	SLIDER_VECTOR_ATT_LEN_MIN,
 	SLIDER_SHADOW_MASK_TILE_MODE,
@@ -2074,7 +2097,7 @@ enum slider_option
 	SLIDER_NTSC_I_VALUE,
 	SLIDER_NTSC_Q_VALUE,
 	SLIDER_NTSC_SCAN_TIME,
-	SLIDER_LUT_ENABLE
+	SLIDER_LUT_ENABLE,
 };
 
 enum slider_screen_type
@@ -2089,6 +2112,7 @@ enum slider_screen_type
 
 slider_desc shaders::s_sliders[] =
 {
+	{ "3D LUT (UI/Artwork)",                0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_UI_LUT_ENABLE,           0,        "%s",    { "Off", "On" } },
 	{ "Vector Beam Smooth Amount",          0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_BEAM_SMOOTH,      0.01f,    "%1.2f", {} },
 	{ "Vector Attenuation Maximum",         0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_MAX,          0.01f,    "%1.2f", {} },
 	{ "Vector Attenuation Length Minimum",  1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_LEN_MIN,      0.001f,   "%1.3f", {} },
@@ -2153,7 +2177,7 @@ slider_desc shaders::s_sliders[] =
 	{ "NTSC I Signal Bandwidth (Hz)",       0,   120,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_I_VALUE,            0.01f,    "%1.4f", {} },
 	{ "NTSC Q Signal Bandwidth (Hz)",       0,    60,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Q_VALUE,            0.01f,    "%1.4f", {} },
 	{ "NTSC Scanline Duration (uSec)",      0,  5260, 10000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_SCAN_TIME,          0.01f,    "%1.2f", {} },
-	{ "3D LUT",                             0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_LUT_ENABLE,              0,        "%s", { "Off", "On" } },
+	{ "3D LUT (Screen)",                    0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_LUT_ENABLE,              0,        "%s",    { "Off", "On" } },
 	{ nullptr, 0, 0, 0, 0, 0, 0, -1, 0, nullptr, {} }
 };
 
@@ -2227,6 +2251,7 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_NTSC_Q_VALUE: return &(options->yiq_q);
 		case SLIDER_NTSC_SCAN_TIME: return &(options->yiq_scan_time);
 		case SLIDER_LUT_ENABLE: return &(options->lut_enable);
+		case SLIDER_UI_LUT_ENABLE: return &(options->ui_lut_enable);
 	}
 	return nullptr;
 }
@@ -2581,6 +2606,8 @@ void uniform::update()
 		case CU_LUT_ENABLE:
 			m_shader->set_bool("LutEnable", options->lut_enable ? true : false);
 			break;
+		case CU_UI_LUT_ENABLE:
+			m_shader->set_bool("UiLutEnable", options->ui_lut_enable ? true : false);
 	}
 }
 

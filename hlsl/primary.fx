@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
+texture LutTexture;
 
 sampler DiffuseSampler = sampler_state
 {
@@ -28,8 +29,6 @@ sampler DiffuseSampler = sampler_state
 	AddressV = CLAMP;
 	AddressW = CLAMP;
 };
-
-texture LutTexture;
 
 sampler2D LutSampler = sampler_state
 {
@@ -150,6 +149,7 @@ VS_OUTPUT vs_ui_main(VS_INPUT Input)
 //-----------------------------------------------------------------------------
 
 uniform bool LutEnable;
+uniform bool UiLutEnable;
 
 float4 ps_screen_main(PS_INPUT Input) : COLOR
 {
@@ -174,7 +174,7 @@ float4 ps_ui_main(PS_INPUT Input) : COLOR
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 	BaseTexel *= Input.Color;
 
-	if (LutEnable)
+	if (UiLutEnable)
 		BaseTexel.rgb = apply_lut(BaseTexel.rgb);
 	return BaseTexel;
 }

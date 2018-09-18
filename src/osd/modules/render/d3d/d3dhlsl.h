@@ -102,6 +102,7 @@ public:
 		CU_POST_POWER,
 		CU_POST_FLOOR,
 		CU_LUT_ENABLE,
+		CU_UI_LUT_ENABLE,
 
 		CU_COUNT
 	};
@@ -246,6 +247,8 @@ struct hlsl_options
 	// Final
 	char lut_texture[1024];
 	int lut_enable;
+	char ui_lut_texture[1024];
+	int ui_lut_enable;
 };
 
 struct slider_desc
@@ -364,6 +367,8 @@ private:
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	bitmap_argb32           lut_bitmap;
 	texture_info *          lut_texture;
+	bitmap_argb32           ui_lut_bitmap;
+	texture_info *          ui_lut_texture;
 	hlsl_options *          options;                    // current options
 
 	IDirect3DSurface9 *     black_surface;              // black dummy surface
