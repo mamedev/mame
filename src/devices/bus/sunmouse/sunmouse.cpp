@@ -3,7 +3,7 @@
 /*
     Sun mouse port
 
-    Pre-USB Sun keyboards use an asynchronous serial protocol.  Data is
+    Before USB, Sun used an asynchronous serial mouse protocol.  Data is
     transmitted at TTL levels using an asynchronous serial protocol.
     The mouse RxD line is pulled up by the host and driven low by an
     open collector driver in the mouse for the mark (1) condition.  This
@@ -13,7 +13,7 @@
 
     Most Sun mouse port devices transmit data at 1,200 Baud.  However,
     some devices transmit at 4,800 Baud, and it's possible to modify any
-    Type 5 mouse for 4,800 Baud operation.  Solaris 2.3 or later is
+    Sun Type 5 mouse for 4,800 Baud operation.  Solaris 2.3 or later is
     required to support a 4,800 Baud mouse.
 
     From the Sun 2/50 onwards, the keyboard and mouse share a single
@@ -42,7 +42,7 @@
 
     Type 5 and later sacrifice the TxD line from the host to the mouse
     in favour of a dedicated line for the soft power key.  It was never
-    used for anything useful with standard Sun components anyway.
+    used for anything useful with standard Sun peripherals anyway.
 
     Sun 2 and Sun 3 used an optical mouse made by Mouse Systems.  The
     colour varied (usually black for Sun 2 and white for Sun 3).  They

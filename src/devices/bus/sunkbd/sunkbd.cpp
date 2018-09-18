@@ -68,7 +68,7 @@
     1e: 1               3e: O               5e: KP 0            7e:
     1f: 2               3f: P               5f: L9/Find         7f:
 
-    00, 7e, and 7f are reserved for special messages.
+    7e and 7f are reserved for special messages.
     L function group and R function group repurposed on Type 4 keyboard.
     F10, F11, F12, Alt Graph, Compose, and Help added on Type 4 keyboard.
     Num Lock, KP -, KP +, KP 0, KP ., and Enter added on Type 4 keyboard.
@@ -79,8 +79,8 @@
     KP = repurposed for Mute on Type 5 keyboard.
     Blank key only present on Type 5 UNIX keyboard.
     < > only present on Type 5 International (ISO) keyboard.
-    Line Feed repurposed for backslash/underscore on Japanese Type 5 keyboard.
-    Kakutei, Henkan, and Nihongo On-Off only present on Japanese Type 5 keyboard.
+    Line Feed repurposed for backslash/underscore on Type 5 Japanese (JIS) keyboard.
+    Kakutei, Henkan, and Nihongo On-Off only present on Type 5 Japanese (JIS) keyboard.
 
     TODO:
     * Add power key line for soft power sun4c and later systems.
