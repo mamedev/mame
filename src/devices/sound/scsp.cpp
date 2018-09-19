@@ -52,8 +52,8 @@
 */
 
 //SLOT PARAMETERS
-#define KEYONEX(slot)       ((slot->udata.data[0x0]>>0x0)&0x1000)
-#define KEYONB(slot)        ((slot->udata.data[0x0]>>0x0)&0x0800)
+#define KEYONEX(slot)   ((slot->udata.data[0x0]>>0x0)&0x1000)
+#define KEYONB(slot)    ((slot->udata.data[0x0]>>0x0)&0x0800)
 #define SBCTL(slot)     ((slot->udata.data[0x0]>>0x9)&0x0003)
 #define SSCTL(slot)     ((slot->udata.data[0x0]>>0x7)&0x0003)
 #define LPCTL(slot)     ((slot->udata.data[0x0]>>0x5)&0x0003)
@@ -67,15 +67,15 @@
 
 #define D2R(slot)       ((slot->udata.data[0x4]>>0xB)&0x001F)
 #define D1R(slot)       ((slot->udata.data[0x4]>>0x6)&0x001F)
-#define EGHOLD(slot)        ((slot->udata.data[0x4]>>0x0)&0x0020)
+#define EGHOLD(slot)    ((slot->udata.data[0x4]>>0x0)&0x0020)
 #define AR(slot)        ((slot->udata.data[0x4]>>0x0)&0x001F)
 
-#define LPSLNK(slot)        ((slot->udata.data[0x5]>>0x0)&0x4000)
+#define LPSLNK(slot)    ((slot->udata.data[0x5]>>0x0)&0x4000)
 #define KRS(slot)       ((slot->udata.data[0x5]>>0xA)&0x000F)
 #define DL(slot)        ((slot->udata.data[0x5]>>0x5)&0x001F)
 #define RR(slot)        ((slot->udata.data[0x5]>>0x0)&0x001F)
 
-#define STWINH(slot)        ((slot->udata.data[0x6]>>0x0)&0x0200)
+#define STWINH(slot)    ((slot->udata.data[0x6]>>0x0)&0x0200)
 #define SDIR(slot)      ((slot->udata.data[0x6]>>0x0)&0x0100)
 #define TL(slot)        ((slot->udata.data[0x6]>>0x0)&0x00FF)
 
@@ -88,9 +88,9 @@
 
 #define LFORE(slot)     ((slot->udata.data[0x9]>>0x0)&0x8000)
 #define LFOF(slot)      ((slot->udata.data[0x9]>>0xA)&0x001F)
-#define PLFOWS(slot)        ((slot->udata.data[0x9]>>0x8)&0x0003)
+#define PLFOWS(slot)    ((slot->udata.data[0x9]>>0x8)&0x0003)
 #define PLFOS(slot)     ((slot->udata.data[0x9]>>0x5)&0x0007)
-#define ALFOWS(slot)        ((slot->udata.data[0x9]>>0x3)&0x0003)
+#define ALFOWS(slot)    ((slot->udata.data[0x9]>>0x3)&0x0003)
 #define ALFOS(slot)     ((slot->udata.data[0x9]>>0x0)&0x0007)
 
 #define ISEL(slot)      ((slot->udata.data[0xA]>>0x3)&0x000F)
@@ -147,8 +147,8 @@ DEFINE_DEVICE_TYPE(SCSP, scsp_device, "scsp", "YMF292-F SCSP")
 scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_rate(44100.0),
 		device_rom_interface(mconfig, *this, 20, ENDIANNESS_BIG, 16),
+		m_rate(44100.0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
 		m_BUFPTR(0),
