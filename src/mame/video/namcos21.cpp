@@ -73,11 +73,6 @@ READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
 
 VIDEO_START_MEMBER(namcos21_state,namcos21)
 {
-	if( m_gametype == NAMCOS21_WINRUN91 )
-	{
-		m_videoram = std::make_unique<uint8_t[]>(0x80000);
-		m_maskram = std::make_unique<uint8_t[]>(0x80000);
-	}
 }
 
 uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -1752,21 +1752,11 @@ void namcos21_state::reset_all_subcpus(int state)
 		logerror("no MCU to reset?\n");
 	}
 
-	switch (m_gametype)
-	{
-	case namcos21_state::NAMCOS21_SOLVALOU:
-	case namcos21_state::NAMCOS21_STARBLADE:
-	case namcos21_state::NAMCOS21_AIRCOMBAT:
-	case namcos21_state::NAMCOS21_CYBERSLED:
+	if (m_c67master)
 		m_c67master->set_input_line(INPUT_LINE_RESET, state);
-		m_c67slave[0]->set_input_line(INPUT_LINE_RESET, state);
-		break;
 
-	//case namcos21_state::NAMCOS21_WINRUN91:
-	//case namcos21_state::NAMCOS21_DRIVERS_EYES:
-	default:
-		break;
-	}
+	if (m_c67slave[0])
+		m_c67slave[0]->set_input_line(INPUT_LINE_RESET, state);
 }
 
 
@@ -2681,12 +2671,13 @@ void namcos21_state::init_solvalou()
 
 void namcos21_state::init_driveyes()
 {
-
 	m_mbNeedsKickstart = 0;
 }
 
 void namcos21_state::init_winrun()
 {
+	m_videoram = std::make_unique<uint8_t[]>(0x80000);
+	m_maskram = std::make_unique<uint8_t[]>(0x80000);
 
 	m_mbNeedsKickstart = 0;
 }
