@@ -279,7 +279,13 @@ void smioc_device::SendCommand(u16 command)
 	// Additionally send command bits to clear status and parameters for previous commands
 	//m_requestFlags_11D |= 0x12;
 	
+	// Invalidate status if we hit a command.
+	m_status = 0;
+	m_statusvalid = false;
+
+
 	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
+	m_smioccpu->int2_w(CLEAR_LINE);
 	m_smioccpu->int2_w(HOLD_LINE);
 	
 }
@@ -303,11 +309,10 @@ void smioc_device::SendCommand2(u16 command)
 
 void smioc_device::ClearStatus()
 {
-	// Indicate to SMIOC that status has been read.
-	m_requestFlags_11D |= 0x10; // bit 4 - E2E 0x200
-	m_smioccpu->int2_w(HOLD_LINE);
-
 	m_status = 0;
+	m_statusvalid = false;
+	if (m_statusrequest)
+		AdvanceStatus();
 }
 void smioc_device::ClearStatus2()
 {
@@ -445,21 +450,18 @@ WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 		return;
 
 	case 0xB84:
-		update_and_log(m_status2, (m_status2 & 0xFF00) | (data), "Status2[40B84]");
+		update_and_log(m_shadowstatus2, (m_shadowstatus2 & 0xFF00) | (data), "Status2[40B84]");
 		return;
 	case 0xB85:
-		update_and_log(m_status2, (m_status2 & 0xFF) | (data << 8), "Status2[40B85]");
+		update_and_log(m_shadowstatus2, (m_shadowstatus2 & 0xFF) | (data << 8), "Status2[40B85]");
 		m_status2 |= 0x40;
 		return;
 
 	case 0xCC4:
-		update_and_log(m_status, (m_status & 0xFF00) | (data), "Status[40CC4]");
-		//update_and_log(m_status2, (m_status2 & 0xFF) | (data << 8), "Status2[40CC4]");
+		update_and_log(m_shadowstatus, (m_shadowstatus & 0xFF00) | (data), "Status[40CC4]");
 		return;
 	case 0xCC5:
-		update_and_log(m_status, (m_status & 0xFF) | (data << 8), "Status[40CC5]");
-		//update_and_log(m_status2, (m_status2 & 0xFF00) | (data), "Status2[40CC5]");
-		m_status |= 0x40;
+		update_and_log(m_shadowstatus, (m_shadowstatus & 0xFF) | (data << 8), "Status[40CC5]");
 		return;
 
 	case 0xCC8:
@@ -558,6 +560,18 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 		// Hypothesis: Status needs to be acknowledged before we trigger the interrupt - so moving the following code to clear status callback.
 		//m_requestFlags_11D |= 0x10; // bit 4
 		//m_smioccpu->int2_w(HOLD_LINE);
+
+		m_statusrequest = true;
+		if (!m_statusvalid)
+		{
+			// Immediately complete status write.
+			AdvanceStatus();
+		}
+		else
+		{
+			// Wait until host clears status to proceed.
+		}
+
 		logerror("%s C0111 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
@@ -576,7 +590,18 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 	LOG_REGISTER_ACCESS("logic[%04X] <= %02X\n", offset, data);
 }
 
-
+void smioc_device::AdvanceStatus()
+{
+	m_status = m_shadowstatus | 0x0040;
+	m_statusvalid = true;
+	if (m_statusrequest)
+	{
+		m_requestFlags_11D |= 0x10; // bit 4
+		m_smioccpu->int2_w(CLEAR_LINE);
+		m_smioccpu->int2_w(HOLD_LINE);
+	}
+	m_statusrequest = false;
+}
 
 
 READ8_MEMBER(smioc_device::dma8237_2_dmaread)

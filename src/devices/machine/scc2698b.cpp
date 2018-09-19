@@ -329,7 +329,7 @@ void scc2698b_channel::recompute_pin_output(bool force)
 		}
 		if (new_mpp2 != mpp2_value || force)
 		{
-			if(TRACE_ENABLE) logerror("Channel %d MPP2 => %d\n", channel_port, new_mpp1);
+			if(TRACE_ENABLE) logerror("Channel %d MPP2 => %d\n", channel_port, new_mpp2);
 			parent->write_line_mpp2(channel_port, new_mpp2);
 			mpp2_value = new_mpp2;
 		}

@@ -741,7 +741,16 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			break;
 
 		case 0x0198: // SMIOC soft reset?
-			m_smioc->SoftReset();
+			// It's not clear what exactly this register write does.
+			//   It isn't a soft reset of the SMIOC because the 68k does not wait long enough for the SMIOC to finish rebooting.
+			//	 Also the 68k does this twice in succession, with a status clear in between.
+			// The theory now is that a write to this register causes the status registers on the SMIOC to be
+			//   set to the magic value 0x0100 (which is set after initialization is complete) - which serves as a trigger
+			//   for the disktool software to reinitialize the SMIOC and proceed into a working state.
+			// This probably isn't correct, but hopefully we will determine the correct approach in the future.
+
+			m_smioc->m_status = 0x0140;
+			m_smioc->m_status2 = 0x0140;
 			break;
 
 		case 0x4090: // Command to device 0x90/4

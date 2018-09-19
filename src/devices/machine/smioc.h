@@ -53,6 +53,13 @@ public:
 
 	u16 m_status;
 	u16 m_status2;
+	u16 m_shadowstatus; // RAM backing for SMIOC's status writes
+	u16 m_shadowstatus2;
+	bool m_statusvalid; // Status field has a valid value in it
+	bool m_statusvalid2;
+	bool m_statusrequest; // SMIOC has requested to queue a new status value
+	bool m_statusrequest2;
+
 	u16 m_wordcount;
 	u16 m_wordcount2;
 
@@ -75,6 +82,9 @@ public:
 	void ClearStatus2();
 	void ClearParameter();
 	void ClearParameter2();
+
+	void AdvanceStatus();
+
 
 protected:
 	/* Device-level overrides */
