@@ -22,6 +22,7 @@
 #include "video/namco_c355spr.h"
 #include "video/namcos2_sprite.h"
 #include "video/namcos2_roz.h"
+#include "video/namcos21_3d.h"
 
 
 #define NAMCOS21_POLY_FRAME_WIDTH 496
@@ -47,18 +48,6 @@ struct dsp_state
 	int slaveActive;
 };
 
-struct n21_vertex
-{
-	double x,y;
-	double z;
-};
-
-struct edge
-{
-	double x;
-	double z;
-};
-
 
 class namcos21_state : public driver_device
 {
@@ -79,6 +68,7 @@ public:
 		m_gametype(0),
 		m_c67master(*this, "dspmaster"),
 		m_c67slave(*this, "dspslave%u", 0U),
+		m_namcos21_3d(*this, "namcos21_3d"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_slave(*this, "slave"),
@@ -117,13 +107,13 @@ public:
 
 	optional_shared_ptr<uint16_t> m_master_dsp_code;
 	int m_mbNeedsKickstart;
-	void clear_poly_framebuffer();
 	std::unique_ptr<dsp_state> m_mpDspState;
 
 	int m_gametype;
 
 	optional_device<cpu_device> m_c67master;
 	optional_device_array<cpu_device,4> m_c67slave;
+	optional_device<namcos21_3d_device> m_namcos21_3d;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -170,10 +160,7 @@ private:
 	int m_mbPointRomDataAvailable;
 	int m_irq_enable;
 	uint8_t m_depthcue[2][0x400];
-	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferPens;
-	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferZ;
-	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferPens2;
-	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferZ2;
+
 	uint16_t m_winrun_color;
 	uint16_t m_winrun_gpu_register[0x10/2];
 	DECLARE_READ16_MEMBER(namcos21_video_enable_r);
@@ -261,12 +248,9 @@ private:
 	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_driveyes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void allocate_poly_framebuffer();
-	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
+
 	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void renderscanline_flat(const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable);
-	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, int depthcueenable);
-	void draw_quad(int sx[4], int sy[4], int zcode[4], int color);
+
 	int32_t read_pointrom_data(unsigned offset);
 	void transmit_word_to_slave(uint16_t data);
 	void transfer_dsp_data();

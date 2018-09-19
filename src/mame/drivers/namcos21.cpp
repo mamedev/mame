@@ -740,7 +740,7 @@ void namcos21_kickstart(running_machine &machine, int internal)
 		if (state->m_mbNeedsKickstart) return;
 	}
 
-	state->clear_poly_framebuffer();
+	state->m_namcos21_3d->clear_poly_framebuffer();
 	state->m_mpDspState->masterSourceAddr = 0;
 	state->m_mpDspState->slaveOutputSize = 0;
 	state->m_mpDspState->masterFinished = 0;
@@ -944,7 +944,7 @@ WRITE16_MEMBER(namcos21_state::dsp_portb_w)
 		}
 		if( color&0x8000 )
 		{
-			draw_quad(sx, sy, zcode, color);
+			m_namcos21_3d->draw_quad(sx, sy, zcode, color);
 		}
 		else
 		{
@@ -1035,7 +1035,7 @@ void namcos21_state::render_slave_output(uint16_t data)
 					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[3*j+1];
 					zcode[j] = pSource[3*j+2];
 				}
-				draw_quad(sx, sy, zcode, color&0x7fff);
+				m_namcos21_3d->draw_quad(sx, sy, zcode, color&0x7fff);
 			}
 			else
 			{
@@ -1051,7 +1051,7 @@ void namcos21_state::render_slave_output(uint16_t data)
 						sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[vi*3+1];
 						zcode[j] = pSource[vi*3+2];
 					}
-					draw_quad(sx, sy, zcode, color&0x7fff);
+					m_namcos21_3d->draw_quad(sx, sy, zcode, color&0x7fff);
 					if( code&0x80 )
 					{ /* end-of-quadlist marker */
 						break;
@@ -1337,7 +1337,7 @@ void namcos21_state::winrun_flush_poly()
 				sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)*pSource++;
 				zcode[j] = *pSource++;
 			}
-			draw_quad(sx, sy, zcode, color&0x7fff);
+			m_namcos21_3d->draw_quad(sx, sy, zcode, color&0x7fff);
 		}
 		else
 		{
@@ -1353,7 +1353,7 @@ void namcos21_state::winrun_flush_poly()
 					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[vi*3+1];
 					zcode[j] = pSource[vi*3+2];
 				}
-				draw_quad(sx, sy, zcode, color&0x7fff);
+				m_namcos21_3d->draw_quad(sx, sy, zcode, color&0x7fff);
 				if( code&0x80 )
 				{ /* end-of-quadlist marker */
 					break;
@@ -1405,7 +1405,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dsp_complete_w)
 	{
 		winrun_flush_poly();
 		m_dsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		clear_poly_framebuffer();
+		m_namcos21_3d->clear_poly_framebuffer();
 	}
 }
 
@@ -2107,6 +2107,11 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
+	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	m_namcos21_3d->set_fixed_palbase(0x4000);
+	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
+	m_namcos21_3d->set_depth_reverse(true);
+
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -2167,6 +2172,11 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
+
+	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	m_namcos21_3d->set_fixed_palbase(0x3f00);
+	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
+	m_namcos21_3d->set_depth_reverse(false);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_palette_tag("palette");
@@ -2242,6 +2252,10 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 	MCFG_SCREEN_PALETTE("palette")
+
+	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	m_namcos21_3d->set_zz_shift_mult(11, 0x200);
+	m_namcos21_3d->set_depth_reverse(false);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
