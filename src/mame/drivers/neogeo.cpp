@@ -560,30 +560,7 @@
 #include "neogeo.lh"
 
 
-#define VERBOSE     (0)
-
-
 #define LOG_VIDEO_SYSTEM         (0)
-#define LOG_MAIN_CPU_BANKING     (0)
-#define LOG_AUDIO_CPU_BANKING    (0)
-
-
-/*************************************
- *
- *  Main CPU interrupt generation
- *
- *************************************/
-
-
-
-// The display counter is automatically reloaded with the load register contents on scanline 224,
-// 1146 mclks from the rising edge of /HSYNC.
-#define NEOGEO_VBLANK_RELOAD_HTIM (attotime::from_ticks(1146, NEOGEO_MASTER_CLOCK))
-
-#define IRQ2CTRL_ENABLE             (0x10)
-#define IRQ2CTRL_LOAD_RELATIVE      (0x20)
-#define IRQ2CTRL_AUTOLOAD_VBLANK    (0x40)
-#define IRQ2CTRL_AUTOLOAD_REPEAT    (0x80)
 
 
 class mvs_state : public ngarcade_base_state
@@ -756,6 +733,22 @@ protected:
 	void aes_main_map(address_map &map);
 };
 
+
+
+/*************************************
+ *
+ *  Main CPU interrupt generation
+ *
+ *************************************/
+
+// The display counter is automatically reloaded with the load register contents on scanline 224,
+// 1146 mclks from the rising edge of /HSYNC.
+#define NEOGEO_VBLANK_RELOAD_HTIM (attotime::from_ticks(1146, NEOGEO_MASTER_CLOCK))
+
+#define IRQ2CTRL_ENABLE             (0x10)
+#define IRQ2CTRL_LOAD_RELATIVE      (0x20)
+#define IRQ2CTRL_AUTOLOAD_VBLANK    (0x40)
+#define IRQ2CTRL_AUTOLOAD_REPEAT    (0x80)
 
 void neogeo_base_state::adjust_display_position_interrupt_timer()
 {
