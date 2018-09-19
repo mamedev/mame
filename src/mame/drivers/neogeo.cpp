@@ -604,7 +604,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual void neogeo_postload() override;
+	virtual void device_post_load() override;
 	virtual void output_strobe(uint8_t bits, uint8_t data) { }
 	virtual void set_outputs() { }
 
@@ -751,7 +751,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual void neogeo_postload() override;
+	virtual void device_post_load() override;
 
 	void aes_main_map(address_map &map);
 };
@@ -1559,8 +1559,6 @@ void neogeo_base_state::machine_start()
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_use_cart_vectors));
 	save_item(NAME(m_use_cart_audio));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_base_state::neogeo_postload), this));
 }
 
 void ngarcade_base_state::machine_start()
@@ -1629,14 +1627,15 @@ void mvs_led_el_state::machine_start()
 }
 
 
-void neogeo_base_state::neogeo_postload()
+void neogeo_base_state::device_post_load()
 {
 	m_bank_audio_main->set_entry(m_use_cart_audio);
+	set_pens();
 }
 
-void mvs_state::neogeo_postload()
+void mvs_state::device_post_load()
 {
-	ngarcade_base_state::neogeo_postload();
+	ngarcade_base_state::device_post_load();
 
 	set_outputs();
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0)
@@ -1919,11 +1918,11 @@ INPUT_CHANGED_MEMBER(aes_base_state::aes_jp1)
 MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, NEOGEO_MAIN_CPU_CLOCK)
+	M68000(config, m_maincpu, NEOGEO_MAIN_CPU_CLOCK);
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, NEOGEO_AUDIO_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_IO_MAP(audio_io_map)
+	Z80(config, m_audiocpu, NEOGEO_AUDIO_CPU_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &neogeo_base_state::audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &neogeo_base_state::audio_io_map);
 
 	HC259(config, m_systemlatch);
 	m_systemlatch->q_out_cb<0>().set(FUNC(neogeo_base_state::set_screen_shadow));
@@ -1938,7 +1937,7 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(neogeo_base_state, screen_update_neogeo)
+	MCFG_SCREEN_UPDATE_DRIVER(neogeo_base_state, screen_update)
 
 	/* 4096 colors * two banks * normal and shadow */
 	MCFG_PALETTE_ADD_INIT_BLACK(m_palette, 4096*2*2)
@@ -1974,8 +1973,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 	neogeo_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(neogeo_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngarcade_base_state::neogeo_main_map);
 
 	m_systemlatch->q_out_cb<5>().set(FUNC(ngarcade_base_state::set_use_cart_audio));
 	m_systemlatch->q_out_cb<6>().set(FUNC(ngarcade_base_state::set_save_ram_unlock));
@@ -2138,9 +2136,9 @@ void aes_state::machine_start()
 	m_sprgen->neogeo_set_fixed_layer_source(1);
 }
 
-void aes_state::neogeo_postload()
+void aes_state::device_post_load()
 {
-	aes_base_state::neogeo_postload();
+	aes_base_state::device_post_load();
 
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0)
 		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
@@ -2151,8 +2149,7 @@ MACHINE_CONFIG_START(aes_state::aes)
 	neogeo_base(config);
 	neogeo_stereo(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aes_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &aes_state::aes_main_map);
 
 	NG_MEMCARD(config, m_memcard, 0);
 
