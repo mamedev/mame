@@ -264,11 +264,11 @@ void hle_device_base::check_inputs()
 	// deal with wraparound
 	if (0x0800 <= x_delta)
 		x_delta -= 0x1000;
-	else if (-0x8000 >= x_delta)
+	else if (-0x0800 >= x_delta)
 		x_delta += 0x1000;
 	if (0x0800 <= y_delta)
 		y_delta -= 0x1000;
-	else if (-0x8000 >= y_delta)
+	else if (-0x0800 >= y_delta)
 		x_delta += 0x1000;
 
 	// update state

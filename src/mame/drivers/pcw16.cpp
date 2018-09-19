@@ -91,8 +91,8 @@ TODO:
 
 #include "emu.h"
 #include "includes/pcw16.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1007,7 +1007,7 @@ INPUT_PORTS_END
 
 static void pcw16_com(device_slot_interface &device)
 {
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 }
 
 MACHINE_CONFIG_START(pcw16_state::pcw16)

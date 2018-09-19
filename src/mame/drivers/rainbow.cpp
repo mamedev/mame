@@ -356,8 +356,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "bus/rs232/rs232.h"
 #include "imagedev/bitbngr.h"
 #include "machine/com8116.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/terminal.h"
-#include "bus/rs232/ser_mouse.h"
 
 #include "machine/i8251.h"
 #include "machine/dec_lk201.h"
@@ -3326,9 +3326,10 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, ctsb_w)) // actually DTR
 
 	MCFG_DEVICE_MODIFY("comm")
-	MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
-	MCFG_SLOT_OPTION_ADD("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
-	MCFG_SLOT_DEFAULT_OPTION("microsoft_mouse")
+	MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE)
+	MCFG_SLOT_OPTION_ADD("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE)
+	MCFG_SLOT_OPTION_ADD("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE)
+	MCFG_SLOT_DEFAULT_OPTION("logitech_mouse")
 
 	MCFG_DEVICE_MODIFY("printer")
 	MCFG_SLOT_DEFAULT_OPTION("printer")

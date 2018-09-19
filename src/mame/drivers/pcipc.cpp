@@ -26,10 +26,11 @@
 #include "machine/i82371sb.h"
 #include "video/mga2064w.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
-#include "bus/rs232/terminal.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "machine/fdc37c93x.h"
 
 class pcipc_state : public driver_device
@@ -481,10 +482,14 @@ static void isa_internal_devices(device_slot_interface &device)
 
 static void isa_com(device_slot_interface &device)
 {
-	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
 void pcipc_state::superio_config(device_t *device)
@@ -539,7 +544,7 @@ MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "microsoft_mouse")
+	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "logitech_mouse")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd1_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd1_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr1_w))
