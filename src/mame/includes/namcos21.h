@@ -18,6 +18,7 @@
 #include "video/c45.h"
 #include "machine/namco65.h"
 #include "machine/namco68.h"
+#include "machine/namco_c67.h"
 #include "video/namco_c355spr.h"
 #include "video/namcos2_sprite.h"
 #include "video/namcos2_roz.h"
@@ -76,8 +77,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_master_dsp_code(*this,"master_dsp_code"),
 		m_gametype(0),
-		m_dspmaster(*this, "dspmaster"),
-		m_dspslave(*this, "dspslave"),
+		m_c67master(*this, "dspmaster"),
+		m_c67slave(*this, "dspslave%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_slave(*this, "slave"),
@@ -121,8 +122,8 @@ public:
 
 	int m_gametype;
 
-	optional_device<cpu_device> m_dspmaster;
-	optional_device<cpu_device> m_dspslave;
+	optional_device<cpu_device> m_c67master;
+	optional_device_array<cpu_device,4> m_c67slave;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -246,9 +247,6 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(system_reset_w);
 	void reset_all_subcpus(int state);
-
-	// game type helpers
-	bool is_system21();
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
 

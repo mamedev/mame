@@ -30,13 +30,14 @@ Driver's Eyes
 
     Questions? pstroffo@yahoo.com (Phil Stroffolino)
 
-    There are at least four hardware variations, all of which are based on Namco System2:
+    There are at three major hardware variations
 
-                          | Winning Run | Driver's Eyes | Starblade | Cyber Sled
---------------------------+-------------+---------------+-----------+------------
-GPU+bitmap layer          | yes         | no            | no        | no
-Namco System NB1 Sprites  | no          | yes           | yes       | yes
-Number of DSPs            | 1           | 1             | 5         | 1x Ma, 4x Sl
+                          | Winning Run  |Driver's Eyes | Cyber Sled, Star Blade etc.
+--------------------------+--------------+--------------+--------------------------
+GPU+bitmap layer          | yes          | no           | no
+Namco System NB1 Sprites  | no           | yes          | yes
+Number of DSPs            | 1x TMS320C25 | 1x TMS320C25 | 1x Master C67 (TMS320C25)
+                          |              |              | 4x Slave C67
 
 The main 68k CPUs populate a chunk of shared RAM with an display list describing a scene to be rendered.
 The main CPUs also specify attributes for a master camera which provides additional global transformations.
@@ -170,8 +171,7 @@ quad primitives (n x 5 words) - color code and four vertex indices
 
 -----------------------------------------------------------------------
 Board 1 : DSP Board - 1st PCB. (Uppermost)
-DSP Type 1 : 1 x Master TMS320C25 (C67) 4 x Slave TMS320C25 (C67) each connected to a Namco Custom chip 342 
-DSP Type 2 : 5 x TMS320C20 (Starblade) (verify this information)
+DSP : 1 x Master TMS320C25 (C67) 4 x Slave TMS320C25 (C67) each connected to a Namco Custom chip 342 
 OSC: 40.000MHz
 RAM: HM62832 x 2, M5M5189 x 4, ISSI IS61C68 x 16
 ROMS: TMS27C040
@@ -568,20 +568,20 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	uint16_t result = 0;
 	if( m_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( m_dspmaster->pc() )
+		switch( m_c67master->pc() )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", m_dspmaster->pc() );
+			logerror( "unk cuskey_r; pc=0x%x\n", m_c67master->pc() );
 			break;
 		}
 	}
 	else if( m_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( m_dspmaster->pc() )
+		switch( m_c67master->pc() )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -592,7 +592,7 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	}
 	else if( m_gametype == NAMCOS21_AIRCOMBAT )
 	{
-		switch( m_dspmaster->pc() )
+		switch( m_c67master->pc() )
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -745,8 +745,8 @@ void namcos21_kickstart(running_machine &machine, int internal)
 	state->m_mpDspState->slaveOutputSize = 0;
 	state->m_mpDspState->masterFinished = 0;
 	state->m_mpDspState->slaveActive = 0;
-	state->m_dspmaster->set_input_line(0, HOLD_LINE);
-	state->m_dspslave->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	state->m_c67master->set_input_line(0, HOLD_LINE);
+	state->m_c67slave[0]->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 uint16_t namcos21_state::read_word_from_slave_input()
@@ -809,8 +809,9 @@ template<bool maincpu> WRITE16_MEMBER(namcos21_state::dspram16_w)
 
 int namcos21_state::init_dsp()
 {
+#if 0
 	// TODO: what actually tests this?
-	uint16_t *pMem = (uint16_t *)memregion("dspmaster")->base();
+	uint16_t *pMem = (uint16_t *)memregion("c67master:internal")->base();
 	/**
 	 * DSP BIOS tests "CPU ID" on startup
 	 * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -818,7 +819,7 @@ int namcos21_state::init_dsp()
 	memcpy( &pMem[0xbff0], &pMem[0x0008], 0x20 );
 	pMem[0x8000] = 0xFF80;
 	pMem[0x8001] = 0x0000;
-
+#endif
 	m_mpDspState = make_unique_clear<dsp_state>();
 
 	return 0;
@@ -981,7 +982,6 @@ WRITE16_MEMBER(namcos21_state::dsp_xf_w)
 
 void namcos21_state::master_dsp_program(address_map &map)
 {
-	map(0x0000, 0x0fff).rom(); /* BIOS */
 	map(0x8000, 0xbfff).ram().share("master_dsp_code");
 }
 
@@ -1106,7 +1106,6 @@ READ16_MEMBER(namcos21_state::slave_portf_r)
 
 void namcos21_state::slave_dsp_program(address_map &map)
 {
-	map(0x0000, 0x0fff).rom(); /* BIOS */
 	map(0x8000, 0x8fff).ram();
 }
 
@@ -1966,8 +1965,8 @@ void namcos21_state::reset_all_subcpus(int state)
 	case namcos21_state::NAMCOS21_STARBLADE:
 	case namcos21_state::NAMCOS21_AIRCOMBAT:
 	case namcos21_state::NAMCOS21_CYBERSLED:
-		m_dspmaster->set_input_line(INPUT_LINE_RESET, state);
-		m_dspslave->set_input_line(INPUT_LINE_RESET, state);
+		m_c67master->set_input_line(INPUT_LINE_RESET, state);
+		m_c67slave[0]->set_input_line(INPUT_LINE_RESET, state);
 		break;
 
 	//case namcos21_state::NAMCOS21_WINRUN91:
@@ -1978,21 +1977,6 @@ void namcos21_state::reset_all_subcpus(int state)
 }
 
 
-bool namcos21_state::is_system21()
-{
-	switch (m_gametype)
-	{
-	case namcos21_state::NAMCOS21_AIRCOMBAT:
-	case namcos21_state::NAMCOS21_STARBLADE:
-	case namcos21_state::NAMCOS21_CYBERSLED:
-	case namcos21_state::NAMCOS21_SOLVALOU:
-	case namcos21_state::NAMCOS21_WINRUN91:
-	case namcos21_state::NAMCOS21_DRIVERS_EYES:
-		return 1;
-	default:
-		return 0;
-	}
-}
 
 
 WRITE8_MEMBER(namcos21_state::namcos2_68k_eeprom_w)
@@ -2223,7 +2207,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 
 	configure_c68_namcos21(config);
 
-	tms32025_device& dspmaster(TMS32025(config, m_dspmaster, 24000000)); /* 24 MHz? overclocked */
+	namco_c67_device& dspmaster(NAMCO_C67(config, m_c67master, 24000000)); /* 24 MHz? overclocked */
 	dspmaster.set_addrmap(AS_PROGRAM, &namcos21_state::master_dsp_program);
 	dspmaster.set_addrmap(AS_DATA, &namcos21_state::master_dsp_data);
 	dspmaster.set_addrmap(AS_IO, &namcos21_state::master_dsp_io);
@@ -2231,13 +2215,22 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	dspmaster.hold_ack_out_cb().set_nop();
 	dspmaster.xf_out_cb().set(FUNC(namcos21_state::dsp_xf_w));
 
-	tms32025_device& dspslave(TMS32025(config, m_dspslave, 24000000*4)); /* 24 MHz? overclocked */
-	dspslave.set_addrmap(AS_PROGRAM, &namcos21_state::slave_dsp_program);
-	dspslave.set_addrmap(AS_DATA, &namcos21_state::slave_dsp_data);
-	dspslave.set_addrmap(AS_IO, &namcos21_state::slave_dsp_io);
-	dspslave.hold_in_cb().set_constant(0);
-	dspslave.hold_ack_out_cb().set_nop();
-	dspslave.xf_out_cb().set(FUNC(namcos21_state::slave_XF_output_w));
+	for (int i = 0; i < 4; i++)
+	{
+		namco_c67_device& dspslave(NAMCO_C67(config, m_c67slave[i], 24000000)); /* 24 MHz? overclocked */
+		dspslave.set_addrmap(AS_PROGRAM, &namcos21_state::slave_dsp_program);
+		dspslave.set_addrmap(AS_DATA, &namcos21_state::slave_dsp_data);
+		dspslave.set_addrmap(AS_IO, &namcos21_state::slave_dsp_io);
+		dspslave.hold_in_cb().set_constant(0);
+		dspslave.hold_ack_out_cb().set_nop();
+		dspslave.xf_out_cb().set(FUNC(namcos21_state::slave_XF_output_w));
+
+		// the emulation currently only uses one slave DSP clocked at 4x the normal rate instead of the master splitting the workload across the 4 slaves
+		if (i!=0)
+			dspslave.set_disable();
+		else
+			dspslave.set_clock(24000000*4);
+	}
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -2524,11 +2517,6 @@ ROM_START( starblad )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
 	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
@@ -2573,11 +2561,6 @@ ROM_START( starbladj )
 
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
-
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
@@ -2624,11 +2607,6 @@ ROM_START( solvalou )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "sv1-obj0.bin", 0x000000, 0x80000, CRC(773798bb) SHA1(51ab76c95030bab834f1a74ae677b2f0afc18c52) )
 	ROM_LOAD( "sv1-obj4.bin", 0x080000, 0x80000, CRC(33a008a7) SHA1(4959a0ac24ad64f1367e2d8d63d39a0273c60f3e) )
@@ -2672,11 +2650,6 @@ ROM_START( aircomb )
 
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
-
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "ac2-obj0.5s", 0x000000, 0x80000, CRC(8327ff22) SHA1(16f6022dedb7a74590898bc8ed3e8a97993c4635) )
@@ -2731,11 +2704,6 @@ ROM_START( aircombj )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "ac1-obj0.5s", 0x000000, 0x80000, CRC(d2310c6a) SHA1(9bb8fdfc2c232574777248f4959975f9a20e3105) )
 	ROM_LOAD( "ac1-obj4.4s", 0x080000, 0x80000, CRC(0c93b478) SHA1(a92ffbcf04b64e0eee5bcf37008e247700641b25) )
@@ -2789,11 +2757,6 @@ ROM_START( cybsled )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "cy1-obj0.5s", 0x000000, 0x80000, CRC(5ae542d5) SHA1(99b1a3ed476da4a97cb864538909d7b831f0fd3b) )
 	ROM_LOAD( "cy1-obj4.4s", 0x080000, 0x80000, CRC(57904076) SHA1(b1dc0d99543bc4b9584b37ffc12c6ebc59e30e3b) )
@@ -2845,11 +2808,6 @@ ROM_START( cybsledj )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "cy1-obj0.5s", 0x000000, 0x80000, CRC(5ae542d5) SHA1(99b1a3ed476da4a97cb864538909d7b831f0fd3b) )
 	ROM_LOAD( "cy1-obj4.4s", 0x080000, 0x80000, CRC(57904076) SHA1(b1dc0d99543bc4b9584b37ffc12c6ebc59e30e3b) )
@@ -2899,21 +2857,6 @@ void namcos21_state::init(int game_type)
 	}
 }
 
-void namcos21_state::init_winrun()
-{
-	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
-	int pc = 0;
-	pMem[pc++] = 0xff80; /* b */
-	pMem[pc++] = 0;
-
-	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
-
-	m_gametype = NAMCOS21_WINRUN91;
-	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
-	m_pointram_idx = 0;
-	m_mbNeedsKickstart = 0;
-}
-
 void namcos21_state::init_aircomb()
 {
 	init(NAMCOS21_AIRCOMBAT);
@@ -2954,6 +2897,22 @@ void namcos21_state::init_driveyes()
 	m_mbNeedsKickstart = 0;
 }
 
+void namcos21_state::init_winrun()
+{
+	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
+	int pc = 0;
+	pMem[pc++] = 0xff80; /* b */
+	pMem[pc++] = 0;
+
+	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
+
+	m_gametype = NAMCOS21_WINRUN91;
+	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
+	m_pointram_idx = 0;
+	m_mbNeedsKickstart = 0;
+}
+
+
 /*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
 
 // Original 'Namco System 21' with C65 I/O MCU, uses TMS320C25 DSP with no custom part number (no internal ROM?)
@@ -2965,11 +2924,9 @@ GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, init_winr
 // 3 PCB stacks in a single cage (3x 4 PCBs) linked for 3 screen panorama, boards look similar to original Namco System 21 (not 21B) including TMS320C25 DSP, but use C68 I/O MCU and sprite chip instead of "68000 'GPU'" ?
 GAME( 1992, driveyes,  0,        driveyes, driveyes,   namcos21_state, init_driveyes, ROT0,    "Namco", "Driver's Eyes (Japan) (1992/01/10, Main Ver 2.1, Sub Ver 1.1)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
 
-// revised hardware, much more DSP power, similar to below but apparently uses TMS320C20 (no Namco part #?) instead of TMS320C25 (C67)? (verify this isn't just a miscommunication, it seems out of place)
+// uses 5x TMS320C25 (C67, has internal ROM - dumped) 
 GAME( 1991, starblad,  0,        namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starbladj, starblad, namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
-
-// uses 5x TMS320C25 (C67, has internal ROM - dumped) but otherwise same as above?
 GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, init_solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
 GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

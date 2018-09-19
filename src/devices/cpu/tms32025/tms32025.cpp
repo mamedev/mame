@@ -184,7 +184,16 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define IND     m_AR[ARP]                       /* address used in indirect memory access operations */
 
 
+/*
+   Processor can be operated in one of two modes based on Pin 1 (MP/MC)
+   MP/MC = 1 (Microprocessor Mode)
+   MP/MC = 0 (Microcomputer Mode)
+   in 'Microcomputer' mode the 4K Word internal ROM is used (TMS320C25)
+
+   using a different device type for each as MAME doesn't appear to offer an easy way to handle this otherwise?
+*/
 DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "Texas Instruments TMS32025")
+DEFINE_DEVICE_TYPE(TMS32025_MC0, tms32025_mc0_device, "tms32025rom", "Texas Instruments TMS32025 (MP/MC 0)")
 DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "Texas Instruments TMS32026")
 
 void tms32025_device::tms32025_data(address_map &map)
@@ -214,18 +223,16 @@ void tms32025_device::tms32026_data(address_map &map)
 	map(0x0600, 0x07ff).ram().share("b3");
 }
 
-
-tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32025, tag, owner, clock, address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+void tms32025_device::tms32025_program(address_map &map)
 {
-	m_fixed_STR1 = 0x0180;
+	map(0x0000, 0x0fff).rom().region("internal", 0); // 4K Words Internal ROM / EPROM
 }
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map)
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, map)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1, prgmap)
+	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, datamap)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 16, -1)
 	, m_b0(*this, "b0")
 	, m_b1(*this, "b1")
@@ -240,9 +247,26 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 {
 }
 
+tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms32025_device(mconfig, TMS32025, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+{
+	m_fixed_STR1 = 0x0180;
+}
+
+tms32025_mc0_device::tms32025_mc0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms32025_device(mconfig, TMS32025_MC0, tag, owner, clock, address_map_constructor(FUNC(tms32025_device::tms32025_program), this), address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+{
+	m_fixed_STR1 = 0x0180;
+}
+
+tms32025_mc0_device::tms32025_mc0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: tms32025_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(tms32025_device::tms32025_program), this), address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+{
+	m_fixed_STR1 = 0x0180;
+}
 
 tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32026, tag, owner, clock, address_map_constructor(FUNC(tms32026_device::tms32026_data), this))
+	: tms32025_device(mconfig, TMS32026, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms32026_device::tms32026_data), this))
 {
 	m_fixed_STR1 = 0x0100;
 }
