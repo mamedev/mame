@@ -30,7 +30,7 @@
   Pci devices
 */
 
-DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "CRUSH11", "NVIDIA Corporation nForce CPU bridge")
+DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "crush11", "NVIDIA Corporation nForce CPU bridge")
 
 void crush11_host_device::config_map(address_map &map)
 {
