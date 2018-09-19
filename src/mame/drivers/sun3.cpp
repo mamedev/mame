@@ -787,7 +787,7 @@ void sun3_state::vmetype1space_map(address_map &map)
 	map(0x000a0000, 0x000a0003).rw(FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
 	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
 	map(0x00120000, 0x00120003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
-	map(0x00140000, 0x14000007).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask32(0xffffffff);
+	map(0x00140000, 0x00140007).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask32(0xffffffff);
 	map(0x001e0000, 0x001e00ff).rw(FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
 }
 
