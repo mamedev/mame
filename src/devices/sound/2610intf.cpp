@@ -109,11 +109,8 @@ void ym2610_device::device_start()
 		if (m_adpcm_a_region)
 			space(0).install_rom(0, m_adpcm_a_region->bytes() - 1, m_adpcm_a_region->base());
 
-		const std::string name("^" + std::string(basetag()) + ".deltat");
-		memory_region *adpcm_b_region = memregion(name.c_str());
-
-		if (adpcm_b_region)
-			space(1).install_rom(0, adpcm_b_region->bytes() - 1, adpcm_b_region->base());
+		if (m_adpcm_b_region)
+			space(1).install_rom(0, m_adpcm_b_region->bytes() - 1, m_adpcm_b_region->base());
 		else if (m_adpcm_a_region)
 			space(1).install_rom(0, m_adpcm_a_region->bytes() - 1, m_adpcm_a_region->base());
 	}
@@ -193,7 +190,9 @@ ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, co
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
 	, m_irq_handler(*this)
+	, m_adpcm_b_region_name("^" + std::string(basetag()) + ".deltat")
 	, m_adpcm_a_region(*this, DEVICE_SELF)
+	, m_adpcm_b_region(*this, m_adpcm_b_region_name.c_str())
 {
 }
 
