@@ -1941,7 +1941,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			{
 				float const height0(float(screens[0].physical_y()) / screens[0].physical_x());
 				float const height1(float(screens[1].physical_y()) / screens[1].physical_x());
-				float const minor((std::max)((std::min)(height0, 1.0F), (std::min)(height1, 1.0F)));
+				float const minor_dim((std::max)((std::min)(height0, 1.0F), (std::min)(height1, 1.0F)));
 
 				util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
 				if (!viewnode)
@@ -1956,7 +1956,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				if (!mirrorbounds)
 					throw emu_fatalerror("Couldn't create XML node??");
 				mirrorbounds->set_attribute_int("x", 0);
-				mirrorbounds->set_attribute_float("y", (-0.01 * minor) - height1);
+				mirrorbounds->set_attribute_float("y", (-0.01 * minor_dim) - height1);
 				mirrorbounds->set_attribute_int("width", 1);
 				mirrorbounds->set_attribute_float("height", height1);
 				util::xml::data_node *const flipper(mirrornode->add_child("orientation", nullptr));
