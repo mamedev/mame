@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "cpu/tms32025/tms32025.h"
 
 // base class
@@ -18,7 +17,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 };
-
 
 DECLARE_DEVICE_TYPE(NAMCO_C67, namco_c67_device)
 

@@ -23,12 +23,12 @@
 #include "video/namcos2_sprite.h"
 #include "video/namcos2_roz.h"
 #include "video/namcos21_3d.h"
+#include "machine/namcos21_dsp.h"
 
 
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
 
-#define WINRUN_MAX_POLY_PARAM (1+256*3)
 
 #define NAMCOS21_NUM_COLORS 0x8000
 
@@ -82,15 +82,12 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_audiobank(*this, "audiobank"),
-		m_winrun_dspbios(*this,"winrun_dspbios"),
-		m_winrun_polydata(*this,"winrun_polydata"),
 		m_dspram16(*this,"dspram16"),
 		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_ptrom24(*this,"point24"),
-		m_ptrom16(*this,"point16"),
-		m_dsp(*this, "dsp"),
 		m_io_gearbox(*this, "gearbox"),
-		m_gpu_intc(*this, "gpu_intc")
+		m_gpu_intc(*this, "gpu_intc"),
+		m_namcos21_dsp(*this, "namcos21dsp")
 	{ }
 
 	void configure_c148_standard(machine_config &config);
@@ -131,26 +128,20 @@ private:
 	optional_device<screen_device> m_screen;
 	optional_memory_bank m_audiobank;
 
-	optional_shared_ptr<uint16_t> m_winrun_dspbios;
-	optional_shared_ptr<uint16_t> m_winrun_polydata;
 	optional_shared_ptr<uint16_t> m_dspram16;
 	required_shared_ptr<uint8_t> m_mpDualPortRAM;
 
 	optional_region_ptr<int32_t> m_ptrom24;
-	optional_region_ptr<uint16_t> m_ptrom16;
 
-	optional_device<cpu_device> m_dsp;
 	optional_device<namcoio_gearbox_device> m_io_gearbox;
 	optional_device<namco_c148_device> m_gpu_intc;
+	optional_device<namcos21_dsp_device> m_namcos21_dsp;
+
+	
 
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_maskram;
-	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
-	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
-	int m_winrun_poly_index;
-	uint32_t m_winrun_pointrom_addr;
-	int m_winrun_dsp_alive;
-	uint16_t m_winrun_dspcomram_control[8];
+
 	uint16_t m_video_enable;
 	std::unique_ptr<uint8_t[]> m_pointram;
 	int m_pointram_idx;
@@ -204,21 +195,8 @@ private:
 	DECLARE_WRITE16_MEMBER(namcos2_68k_dualportram_word_w);
 	DECLARE_READ8_MEMBER(namcos2_dualportram_byte_r);
 	DECLARE_WRITE8_MEMBER(namcos2_dualportram_byte_w);
-	DECLARE_READ16_MEMBER(winrun_dspcomram_r);
-	DECLARE_WRITE16_MEMBER(winrun_dspcomram_w);
-	DECLARE_READ16_MEMBER(winrun_cuskey_r);
-	DECLARE_WRITE16_MEMBER(winrun_cuskey_w);
-	DECLARE_READ16_MEMBER(winrun_poly_reset_r);
-	DECLARE_WRITE16_MEMBER(winrun_dsp_render_w);
-	DECLARE_WRITE16_MEMBER(winrun_dsp_pointrom_addr_w);
-	DECLARE_READ16_MEMBER(winrun_dsp_pointrom_data_r);
-	DECLARE_WRITE16_MEMBER(winrun_dsp_complete_w);
-	DECLARE_READ16_MEMBER(winrun_table_r);
-	DECLARE_WRITE16_MEMBER(winrun_dspbios_w);
-	DECLARE_READ16_MEMBER(winrun_68k_dspcomram_r);
-	DECLARE_WRITE16_MEMBER(winrun_68k_dspcomram_w);
-	DECLARE_READ16_MEMBER(winrun_dspcomram_control_r);
-	DECLARE_WRITE16_MEMBER(winrun_dspcomram_control_w);
+
+
 	DECLARE_READ16_MEMBER(winrun_gpu_color_r);
 	DECLARE_WRITE16_MEMBER(winrun_gpu_color_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_register_r);
@@ -258,7 +236,6 @@ private:
 	uint16_t get_input_bytes_advertised_for_slave();
 	int init_dsp();
 	void render_slave_output(uint16_t data);
-	void winrun_flush_poly();
 	void init(int game_type);
 	void configure_c65_namcos21(machine_config &config);
 	void configure_c68_namcos21(machine_config &config);
@@ -276,9 +253,7 @@ private:
 	void slave_dsp_program(address_map &map);
 	void slave_map(address_map &map);
 	void sound_map(address_map &map);
-	void winrun_dsp_data(address_map &map);
-	void winrun_dsp_io(address_map &map);
-	void winrun_dsp_program(address_map &map);
+
 	void winrun_gpu_map(address_map &map);
 	void winrun_master_map(address_map &map);
 	void winrun_slave_map(address_map &map);

@@ -786,42 +786,26 @@ READ16_MEMBER(namcos21_state::dspram16_r)
 
 template<bool maincpu> WRITE16_MEMBER(namcos21_state::dspram16_w)
 {
-	COMBINE_DATA( &m_dspram16[offset] );
+	COMBINE_DATA(&m_dspram16[offset]);
 
-	if( m_gametype != NAMCOS21_WINRUN91 )
+	if (m_mpDspState->masterSourceAddr && offset == 1 + (m_mpDspState->masterSourceAddr & 0x7fff))
 	{
-		if( m_mpDspState->masterSourceAddr &&
-			offset == 1+(m_mpDspState->masterSourceAddr&0x7fff) )
-		{
-			if (ENABLE_LOGGING) logerror( "IDC-CONTINUE\n" );
-			transfer_dsp_data();
-		}
-		else if (m_gametype == NAMCOS21_SOLVALOU &&
-					offset == 0x103 &&
-					maincpu)
-		{ /* hack; synchronization for solvalou */
-			m_maincpu->yield();
-		}
+		if (ENABLE_LOGGING) logerror("IDC-CONTINUE\n");
+		transfer_dsp_data();
+	}
+	else if (m_gametype == NAMCOS21_SOLVALOU && offset == 0x103 && maincpu)
+	{
+		/* hack; synchronization for solvalou */
+		m_maincpu->yield();
 	}
 }
+
 
 /************************************************************************************/
 
 int namcos21_state::init_dsp()
 {
-#if 0
-	// TODO: what actually tests this?
-	uint16_t *pMem = (uint16_t *)memregion("c67master:internal")->base();
-	/**
-	 * DSP BIOS tests "CPU ID" on startup
-	 * "JAPAN (C)1990 NAMCO LTD. by H.F "
-	 */
-	memcpy( &pMem[0xbff0], &pMem[0x0008], 0x20 );
-	pMem[0x8000] = 0xFF80;
-	pMem[0x8001] = 0x0000;
-#endif
 	m_mpDspState = make_unique_clear<dsp_state>();
-
 	return 0;
 }
 
@@ -1278,215 +1262,22 @@ void namcos21_state::slave_map(address_map &map)
 	map(0x200000, 0x20ffff).rw(FUNC(namcos21_state::dspram16_r), FUNC(namcos21_state::dspram16_w<false>)).share("dspram16");
 }
 
-
-/*************************************************************
- * Winning Run is prototype "System21" hardware.
- *************************************************************/
-READ16_MEMBER(namcos21_state::winrun_dspcomram_r)
-{
-	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
-	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
-	return mem[offset];
-}
-WRITE16_MEMBER(namcos21_state::winrun_dspcomram_w)
-{
-	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
-	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
-	COMBINE_DATA( &mem[offset] );
-}
-
-READ16_MEMBER(namcos21_state::winrun_cuskey_r)
-{
-	int pc = m_dsp->pc();
-	switch( pc )
-	{
-	case 0x0064: /* winrun91 */
-		return 0xFEBB;
-	case 0x006c: /* winrun91 */
-		return 0xFFFF;
-	case 0x0073: /* winrun91 */
-		return 0x0144;
-
-	case 0x0075: /* winrun */
-		return 0x24;
-
-	default:
-		break;
-	}
-	return 0;
-}
-
-WRITE16_MEMBER(namcos21_state::winrun_cuskey_w)
-{
-}
-
-void namcos21_state::winrun_flush_poly()
-{
-	if( m_winrun_poly_index>0 )
-	{
-		const uint16_t *pSource = m_winrun_poly_buf;
-		uint16_t color;
-		int sx[4], sy[4], zcode[4];
-		int j;
-		color = *pSource++;
-		if( color&0x8000 )
-		{ /* direct-draw */
-			for( j=0; j<4; j++ )
-			{
-				sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)*pSource++;
-				sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)*pSource++;
-				zcode[j] = *pSource++;
-			}
-			m_namcos21_3d->draw_quad(sx, sy, zcode, color&0x7fff);
-		}
-		else
-		{
-			int quad_idx = color*6;
-			for(;;)
-			{
-				uint8_t code = m_pointram[quad_idx++];
-				color = m_pointram[quad_idx++];
-				for( j=0; j<4; j++ )
-				{
-					uint8_t vi = m_pointram[quad_idx++];
-					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)pSource[vi*3+0];
-					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[vi*3+1];
-					zcode[j] = pSource[vi*3+2];
-				}
-				m_namcos21_3d->draw_quad(sx, sy, zcode, color&0x7fff);
-				if( code&0x80 )
-				{ /* end-of-quadlist marker */
-					break;
-				}
-			}
-		}
-		m_winrun_poly_index = 0;
-	}
-} /* winrun_flushpoly */
-
-READ16_MEMBER(namcos21_state::winrun_poly_reset_r)
-{
-	winrun_flush_poly();
-	return 0;
-}
-
-WRITE16_MEMBER(namcos21_state::winrun_dsp_render_w)
-{
-	if( m_winrun_poly_index<WINRUN_MAX_POLY_PARAM )
-	{
-		m_winrun_poly_buf[m_winrun_poly_index++] = data;
-	}
-	else
-	{
-		logerror( "WINRUN_POLY_OVERFLOW\n" );
-	}
-}
-
-WRITE16_MEMBER(namcos21_state::winrun_dsp_pointrom_addr_w)
-{
-	if( offset==0 )
-	{ /* port 8 */
-		m_winrun_pointrom_addr = data;
-	}
-	else
-	{ /* port 9 */
-		m_winrun_pointrom_addr |= (data<<16);
-	}
-}
-
-READ16_MEMBER(namcos21_state::winrun_dsp_pointrom_data_r)
-{
-	return m_ptrom16[m_winrun_pointrom_addr++];
-}
-
-WRITE16_MEMBER(namcos21_state::winrun_dsp_complete_w)
-{
-	if( data )
-	{
-		winrun_flush_poly();
-		m_dsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_namcos21_3d->clear_poly_framebuffer();
-	}
-}
-
-READ16_MEMBER(namcos21_state::winrun_table_r)
-{
-	return m_winrun_polydata[offset];
-}
-
-void namcos21_state::winrun_dsp_program(address_map &map)
-{
-	map(0x0000, 0x0fff).rom();
-}
-
-void namcos21_state::winrun_dsp_data(address_map &map)
-{
-	map(0x2000, 0x200f).rw(FUNC(namcos21_state::winrun_cuskey_r), FUNC(namcos21_state::winrun_cuskey_w));
-	map(0x4000, 0x4fff).rw(FUNC(namcos21_state::winrun_dspcomram_r), FUNC(namcos21_state::winrun_dspcomram_w));
-	map(0x8000, 0xffff).r(FUNC(namcos21_state::winrun_table_r));
-}
-
-void namcos21_state::winrun_dsp_io(address_map &map)
-{
-	map(0x08, 0x09).rw(FUNC(namcos21_state::winrun_dsp_pointrom_data_r), FUNC(namcos21_state::winrun_dsp_pointrom_addr_w));
-	map(0x0a, 0x0a).w(FUNC(namcos21_state::winrun_dsp_render_w));
-	map(0x0b, 0x0b).nopw();
-	map(0x0c, 0x0c).w(FUNC(namcos21_state::winrun_dsp_complete_w));
-}
-
-WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
-{
-	COMBINE_DATA( &m_winrun_dspbios[offset] );
-	if( offset==0xfff )
-	{
-		uint16_t *mem = (uint16_t *)memregion("dsp")->base();
-		memcpy( mem, m_winrun_dspbios, 0x2000 );
-		m_winrun_dsp_alive = 1;
-	}
-}
-
-//380000 : read : dsp status? 1 = busy
-//380000 : write(0x01) - done before dsp comram init
-//380004 : dspcomram bank, as seen by 68k
-//380008 : read : state?
-
-READ16_MEMBER(namcos21_state::winrun_68k_dspcomram_r)
-{
-	int bank = m_winrun_dspcomram_control[0x4/2]&1;
-	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
-	return mem[offset];
-}
-
-WRITE16_MEMBER(namcos21_state::winrun_68k_dspcomram_w)
-{
-	int bank = m_winrun_dspcomram_control[0x4/2]&1;
-	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
-	COMBINE_DATA( &mem[offset] );
-}
-
-READ16_MEMBER(namcos21_state::winrun_dspcomram_control_r)
-{
-	return m_winrun_dspcomram_control[offset];
-}
-
-WRITE16_MEMBER(namcos21_state::winrun_dspcomram_control_w)
-{
-	COMBINE_DATA( &m_winrun_dspcomram_control[offset] );
-}
-
 void namcos21_state::winrun_master_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x180000, 0x183fff).rw(FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	map(0x250000, 0x25ffff).ram().share("winrun_polydata");
-	map(0x260000, 0x26ffff).ram(); /* unused? */
-	map(0x280000, 0x281fff).w(FUNC(namcos21_state::winrun_dspbios_w)).share("winrun_dspbios");
-	map(0x380000, 0x38000f).rw(FUNC(namcos21_state::winrun_dspcomram_control_r), FUNC(namcos21_state::winrun_dspcomram_control_w));
-	map(0x3c0000, 0x3c1fff).rw(FUNC(namcos21_state::winrun_68k_dspcomram_r), FUNC(namcos21_state::winrun_68k_dspcomram_w));
-	map(0x400000, 0x400001).w(FUNC(namcos21_state::pointram_control_w));
-	map(0x440000, 0x440001).rw(FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
+	
+	// DSP Related
+	map(0x250000, 0x25ffff).ram().share("namcos21dsp:winrun_polydata"); // TOADD
+	map(0x260000, 0x26ffff).ram(); /* unused? */ //TOADD
+	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspbios_w)).share("namcos21dsp:winrun_dspbios");
+	map(0x380000, 0x38000f).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspcomram_control_r), FUNC(namcos21_dsp_device::winrun_dspcomram_control_w));
+	map(0x3c0000, 0x3c1fff).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_68k_dspcomram_r), FUNC(namcos21_dsp_device::winrun_68k_dspcomram_w));
+	map(0x400000, 0x400001).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_control_w));
+	map(0x440000, 0x440001).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_data_r), FUNC(namcos21_dsp_device::pointram_data_w));
+	
 	map(0x600000, 0x60ffff).ram().share("gpu_comram");
 	map(0x800000, 0x87ffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
@@ -1622,12 +1413,14 @@ void namcos21_state::driveyes_master_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); /* private work RAM */
 	map(0x180000, 0x183fff).rw(FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	map(0x250000, 0x25ffff).ram().share("winrun_polydata");
-	map(0x280000, 0x281fff).w(FUNC(namcos21_state::winrun_dspbios_w)).share("winrun_dspbios");
-	map(0x380000, 0x38000f).rw(FUNC(namcos21_state::winrun_dspcomram_control_r), FUNC(namcos21_state::winrun_dspcomram_control_w));
-	map(0x3c0000, 0x3c1fff).rw(FUNC(namcos21_state::winrun_68k_dspcomram_r), FUNC(namcos21_state::winrun_68k_dspcomram_w));
-	map(0x400000, 0x400001).w(FUNC(namcos21_state::pointram_control_w));
-	map(0x440000, 0x440001).rw(FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
+	
+	// DSP related
+	map(0x250000, 0x25ffff).ram().share("namcos21dsp:winrun_polydata"); // TOADD
+	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspbios_w)).share("namcos21dsp:winrun_dspbios");
+	map(0x380000, 0x38000f).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspcomram_control_r), FUNC(namcos21_dsp_device::winrun_dspcomram_control_w));
+	map(0x3c0000, 0x3c1fff).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_68k_dspcomram_r), FUNC(namcos21_dsp_device::winrun_68k_dspcomram_w));
+	map(0x400000, 0x400001).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_control_w));
+	map(0x440000, 0x440001).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_data_r), FUNC(namcos21_dsp_device::pointram_data_w));
 }
 
 void namcos21_state::driveyes_slave_map(address_map &map)
@@ -2077,14 +1870,8 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 
 	configure_c65_namcos21(config);
 
-	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000)); /* 24 MHz? overclocked */
-	dsp.set_addrmap(AS_PROGRAM, &namcos21_state::winrun_dsp_program);
-	dsp.set_addrmap(AS_DATA, &namcos21_state::winrun_dsp_data);
-	dsp.set_addrmap(AS_IO, &namcos21_state::winrun_dsp_io);
-	dsp.bio_in_cb().set(FUNC(namcos21_state::winrun_poly_reset_r));
-	dsp.hold_in_cb().set_constant(0);
-	dsp.hold_ack_out_cb().set_nop();
-	dsp.xf_out_cb().set_nop();
+	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
+	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
 	MCFG_DEVICE_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
@@ -2144,14 +1931,8 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 
 	configure_c68_namcos21(config);
 
-	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000*2)); /* 24 MHz? overclocked */
-	dsp.set_addrmap(AS_PROGRAM, &namcos21_state::winrun_dsp_program);
-	dsp.set_addrmap(AS_DATA, &namcos21_state::winrun_dsp_data);
-	dsp.set_addrmap(AS_IO, &namcos21_state::winrun_dsp_io);
-	dsp.bio_in_cb().set(FUNC(namcos21_state::winrun_poly_reset_r));
-	dsp.hold_in_cb().set_constant(0);
-	dsp.hold_ack_out_cb().set_nop();
-	dsp.xf_out_cb().set_nop();
+	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
+	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
@@ -2307,7 +2088,7 @@ ROM_START( winrun )
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
+	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP */
 
 	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "wr1-gp0u.1k",  0x00000, 0x20000, CRC(c66a43be) SHA1(88ec02c5c18c8bb91a95934c14e9ae530ae09880) )
@@ -2325,7 +2106,7 @@ ROM_START( winrun )
 	ROM_LOAD16_BYTE( "wr1-gd0u-2.1p",  0x00000, 0x40000, CRC(9752eef5) SHA1(d6df0faf9c2696247bdf463f53c1e474ec595dd0) )
 	ROM_LOAD16_BYTE( "wr1-gd0l-2.3p",  0x00001, 0x40000, CRC(349c95cc) SHA1(8898eecf5918485ec683900520f123483077df28) )
 
-	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0x80000, "namcos21dsp:point16", 0 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "wr1-pt0u.8j", 0x00000, 0x20000, CRC(7ec4cf6b) SHA1(92ec92567b9f7321efb4a3724cbcdba216eb22f9) )
 	ROM_LOAD16_BYTE( "wr1-pt0l.8d", 0x00001, 0x20000, CRC(58c14b73) SHA1(e34a26866cd870743e166669f7fa5915a82104e9) )
 
@@ -2373,7 +2154,7 @@ ROM_START( winrungp )
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
+	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP */
 
 	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "sg1-gp0-u.1j", 0x00000, 0x20000, CRC(475da78a) SHA1(6e69bcc6caf2e3cd28fed75796c8992e754f9323) )
@@ -2393,7 +2174,7 @@ ROM_START( winrungp )
 	ROM_LOAD16_BYTE( "sg1-gd1-u.1s", 0x80000, 0x40000, CRC(271db29b) SHA1(8b35fcf273b9aec28d4c606c41c0626dded697e1) )
 	ROM_LOAD16_BYTE( "sg1-gd1-l.3s", 0x80001, 0x40000, CRC(a6c4da96) SHA1(377dbf21a1bede01de16708c96c112abab4417ce) )
 
-	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0x80000, "namcos21dsp:point16", 0 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "sg1-pt0-u.8j", 0x00000, 0x20000, CRC(160c3634) SHA1(485d20d6cc459f17d77682201dee07bdf76bf343) )
 	ROM_LOAD16_BYTE( "sg1-pt0-l.8d", 0x00001, 0x20000, CRC(b5a665bf) SHA1(5af6ec492f31395c0492e14590b025b120067b8d) )
 	ROM_LOAD16_BYTE( "sg1-pt1-u.8l", 0x40000, 0x20000, CRC(b63d3006) SHA1(78e78619766b0fd91b1e830cfb066495d6773981) )
@@ -2422,7 +2203,7 @@ ROM_START( winrun91 )
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
+	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP */
 
 	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "r911-gp0u.1j", 0x00000, 0x20000, CRC(f5469a29) SHA1(38b6ea1fbe482b69fbb0e2f44f44a0ca2a49f6bc) )
@@ -2442,7 +2223,7 @@ ROM_START( winrun91 )
 	ROM_LOAD16_BYTE( "r911-gd1u.1s", 0x80000, 0x40000, CRC(17e5a61c) SHA1(272ebd7daa56847f1887809535362331b5465dec) )
 	ROM_LOAD16_BYTE( "r911-gd1l.3s", 0x80001, 0x40000, CRC(64df59a2) SHA1(1e9d0945b94780bb0be16803e767466d2cda07e8) )
 
-	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* winrun91 - 3d objects */
+	ROM_REGION16_BE( 0x80000, "namcos21dsp:point16", 0 ) /* winrun91 - 3d objects */
 	ROM_LOAD16_BYTE( "r911-pt0u.8j", 0x00000, 0x20000, CRC(abf512a6) SHA1(e86288039d6c4dedfa95b11cb7e4b87637f90c09) ) /* Version on SYSTEM21B CPU only has R911 PTU @ 8W */
 	ROM_LOAD16_BYTE( "r911-pt0l.8d", 0x00001, 0x20000, CRC(ac8d468c) SHA1(d1b457a19a5d3259d0caf933f42b3a02b485867b) ) /* and R911 PTL @ 12W with rom type 27C020 */
 	ROM_LOAD16_BYTE( "r911-pt1u.8l", 0x40000, 0x20000, CRC(7e5dab74) SHA1(5bde219d5b4305d38d17b494b2e759f05d05329f) )
@@ -2480,7 +2261,7 @@ We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP (no internal ROM?) */
+	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP (no internal ROM?) */
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
@@ -2496,7 +2277,7 @@ We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
 	ROM_LOAD16_BYTE( "de1-data-l.1a",  0x00001, 0x80000, CRC(9bb37aca) SHA1(7f5dffc95cadcf12f53ff7944920afc25ed3cf68) )
 
-	ROM_REGION16_BE( 0xc0000, "point16", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0xc0000, "namcos21dsp:point16", 0 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "de1-pt0-ub.8j", 0x00000, 0x20000, CRC(3b6b746d) SHA1(40c992ef4cf5187b30aba42c5fe7ce0f8f02bee0) )
 	ROM_LOAD16_BYTE( "de1-pt0-lb.8d", 0x00001, 0x20000, CRC(9c5c477e) SHA1(c8ae8a663227d636d35bd5f432d23f05d6695942) )
 	ROM_LOAD16_BYTE( "de1-pt1-u.8l",  0x40000, 0x20000, CRC(23bc72a1) SHA1(083e2955ae2f88d1ad461517b47054d64375b46e) )
@@ -2900,29 +2681,13 @@ void namcos21_state::init_solvalou()
 
 void namcos21_state::init_driveyes()
 {
-	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
-	int pc = 0;
-	pMem[pc++] = 0xff80; /* b */
-	pMem[pc++] = 0;
-	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
-	m_gametype = NAMCOS21_DRIVERS_EYES;
-	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
-	m_pointram_idx = 0;
+
 	m_mbNeedsKickstart = 0;
 }
 
 void namcos21_state::init_winrun()
 {
-	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
-	int pc = 0;
-	pMem[pc++] = 0xff80; /* b */
-	pMem[pc++] = 0;
 
-	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
-
-	m_gametype = NAMCOS21_WINRUN91;
-	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
-	m_pointram_idx = 0;
 	m_mbNeedsKickstart = 0;
 }
 
