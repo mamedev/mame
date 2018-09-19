@@ -560,12 +560,7 @@
 #include "neogeo.lh"
 
 
-#define VERBOSE     (0)
-
-
 #define LOG_VIDEO_SYSTEM         (0)
-#define LOG_MAIN_CPU_BANKING     (0)
-#define LOG_AUDIO_CPU_BANKING    (0)
 
 
 class mvs_state : public ngarcade_base_state
