@@ -1351,38 +1351,22 @@ void neogeo_base_state::init_audio()
 
 void neogeo_base_state::init_ym()
 {
-	uint8_t *ROM;
-	uint32_t len;
-
 	// Resetting a sound device causes the core to update() it and generate samples if it's not up to date.
-	// Thus we preemptively reset it here while the old pointers are still valid so it's up to date and
-	// doesn't generate samples below when we reset it for the new pointers.
 	m_ym->reset();
 
-	// all these region_free / region_alloc machinery is needed because current YM emulation does not allow
-	// to pass a ROM pointer different from a "ymsnd" / "ymsnd.deltat" region, and therefore we need to copy
-	// the ROM(s) from the cart to the corresponding region(s) with appropriate names...
+	address_space &adpcm_a_space = m_ym->space(0);
+	adpcm_a_space.unmap_readwrite(0x000000, 0xffffff);
+
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_ym_size())
-	{
-		ROM = m_slots[m_curr_slot]->get_ym_base();
-		len = m_slots[m_curr_slot]->get_ym_size();
-		if (memregion(":ymsnd"))
-			machine().memory().region_free(":ymsnd");
-		machine().memory().region_alloc(":ymsnd", len, 1, ENDIANNESS_LITTLE);
-		memcpy(memregion(":ymsnd")->base(), ROM, len);
-	}
+		adpcm_a_space.install_rom(0, m_slots[m_curr_slot]->get_ym_size() - 1, m_slots[m_curr_slot]->get_ym_base());
 
-	if (memregion(":ymsnd.deltat"))
-		machine().memory().region_free(":ymsnd.deltat");
+	address_space &adpcm_b_space = m_ym->space(1);
+	adpcm_b_space.unmap_readwrite(0x000000, 0xffffff);
+
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_ymdelta_size())
-	{
-		ROM = m_slots[m_curr_slot]->get_ymdelta_base();
-		len = m_slots[m_curr_slot]->get_ymdelta_size();
-		machine().memory().region_alloc(":ymsnd.deltat", len, 1, ENDIANNESS_LITTLE);
-		memcpy(memregion(":ymsnd.deltat")->base(), ROM, len);
-	}
-
-	m_ym->reset(); // reset it again to get the new pointers
+		adpcm_b_space.install_rom(0, m_slots[m_curr_slot]->get_ymdelta_size() - 1, m_slots[m_curr_slot]->get_ymdelta_base());
+	else if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_ym_size())
+		adpcm_b_space.install_rom(0, m_slots[m_curr_slot]->get_ym_size() - 1, m_slots[m_curr_slot]->get_ym_base());
 }
 
 void neogeo_base_state::init_sprites()
@@ -1980,11 +1964,10 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_stereo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.28)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.28)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.98)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.98)
+	m_ym->add_route(0, "lspeaker", 0.28);
+	m_ym->add_route(0, "rspeaker", 0.28);
+	m_ym->add_route(1, "lspeaker", 0.98);
+	m_ym->add_route(2, "rspeaker", 0.98);
 MACHINE_CONFIG_END
 
 
@@ -2008,10 +1991,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ngarcade_base_state::neogeo_mono)
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_SOUND_ROUTE(0, "speaker", 0.28)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.49)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.49)
+	m_ym->add_route(0, "speaker", 0.28);
+	m_ym->add_route(1, "speaker", 0.49);
+	m_ym->add_route(2, "speaker", 0.49);
 MACHINE_CONFIG_END
 
 
@@ -2314,8 +2296,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x20000, "cslot1:audiocpu", 0 ) \
 	ROM_LOAD( name, 0x00000, 0x10000, hash ) \
-	ROM_RELOAD(     0x10000, 0x10000 ) \
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
+	ROM_RELOAD(     0x10000, 0x10000 )
 
 #define NEO_BIOS_AUDIO_128K(name, hash) \
 	NEOGEO_BIOS \
@@ -2323,8 +2304,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x30000, "cslot1:audiocpu", 0 ) \
 	ROM_LOAD( name, 0x00000, 0x20000, hash ) \
-	ROM_RELOAD(     0x10000, 0x20000 ) \
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
+	ROM_RELOAD(     0x10000, 0x20000 )
 
 #define NEO_BIOS_AUDIO_256K(name, hash) \
 	NEOGEO_BIOS \
@@ -2332,8 +2312,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x50000, "cslot1:audiocpu", 0 ) \
 	ROM_LOAD( name, 0x00000, 0x40000, hash ) \
-	ROM_RELOAD(     0x10000, 0x40000 ) \
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
+	ROM_RELOAD(     0x10000, 0x40000 )
 
 #define NEO_BIOS_AUDIO_512K(name, hash) \
 	NEOGEO_BIOS \
@@ -2341,9 +2320,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "cslot1:audiocpu", 0 ) \
 	ROM_LOAD( name, 0x00000, 0x80000, hash ) \
-	ROM_RELOAD(     0x10000, 0x80000 ) \
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
-
+	ROM_RELOAD(     0x10000, 0x80000 )
 
 #define NEO_BIOS_AUDIO_ENCRYPTED_128K(name, hash) \
 	NEOGEO_BIOS \
@@ -2351,24 +2328,23 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "cslot1:audiocpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "cslot1:audiocrypt", 0 ) \
-	ROM_LOAD( name, 0x00000, 0x20000, hash ) \
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
+	ROM_LOAD( name, 0x00000, 0x20000, hash )
+
 #define NEO_BIOS_AUDIO_ENCRYPTED_256K(name, hash) \
 	NEOGEO_BIOS \
 	ROM_REGION( 0x20000, "audiobios", 0 ) \
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "cslot1:audiocpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "cslot1:audiocrypt", 0 ) \
-	ROM_LOAD( name, 0x00000, 0x40000, hash ) \
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
+	ROM_LOAD( name, 0x00000, 0x40000, hash )
+
 #define NEO_BIOS_AUDIO_ENCRYPTED_512K(name, hash) \
 	NEOGEO_BIOS \
 	ROM_REGION( 0x20000, "audiobios", 0 ) \
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "cslot1:audiocpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "cslot1:audiocrypt", 0 ) \
-	ROM_LOAD( name,      0x00000, 0x80000, hash ) \
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
+	ROM_LOAD( name,      0x00000, 0x80000, hash )
 
 
 
@@ -2411,8 +2387,6 @@ ROM_START( neogeo )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF )
 ROM_END
 
@@ -2440,10 +2414,6 @@ ROM_START( aes )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x1000000, "ymsnd", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x1000000, "ymsnd.deltat", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -6473,7 +6443,6 @@ ROM_START( dragonsh )
 	ROM_REGION( 0x30000, "cslot1:audiocpu", ROMREGION_ERASEFF )
 	// not present
 
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 	ROM_REGION( 0x200000, "cslot1:ymsnd", ROMREGION_ERASE00 )
 	ROM_LOAD( "sram.v1", 0x000000, 0x200000, NO_DUMP ) // was a dead AXS2000PC 2MB sram card, battery dead, data lost.
 
@@ -7099,7 +7068,6 @@ ROM_START( kizuna4p ) /* same cartridge as kizuna - 4-player mode is enabled by 
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-45.sp1",0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) )
 	ROM_SYSTEM_BIOS( 1, "japan", "Japan MVS (J3)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "japan-j3.bin",0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) )
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x30000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "216-m1.m1", 0x00000, 0x20000, CRC(1b096820) SHA1(72852e78c620038f8dafde5e54e02e418c31be9c) ) /* mask rom TC531001 */
@@ -7796,7 +7764,6 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
 	/* special BIOS with trackball support, we only have one Irritating Maze bios and thats asia */
 	ROM_LOAD16_WORD_SWAP("236-bios.sp1", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x30000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* TC531001 */
@@ -10944,7 +10911,6 @@ ROM_START( svcboot )
 
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x50000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
@@ -10982,7 +10948,6 @@ ROM_START( svcplus )
 
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x50000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
@@ -11021,7 +10986,6 @@ ROM_START( svcplusa )
 
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x50000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
@@ -11058,7 +11022,6 @@ ROM_START( svcsplus )
 
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
-	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x50000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
