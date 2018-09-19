@@ -1107,5 +1107,5 @@ GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,  
 GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )  // sampling voice is not emulated
+GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
