@@ -66,7 +66,6 @@ private:
 	emu_timer *     m_timer[2];
 	devcb_write_line m_irq_handler;
 	optional_memory_region m_adpcm_a_region;
-	optional_memory_region m_adpcm_b_region;
 
 	static const ssg_callbacks psgintf;
 };
