@@ -29,19 +29,22 @@ namcos21_dsp_device::namcos21_dsp_device(const machine_config &mconfig, const ch
 void namcos21_dsp_device::device_start()
 {
 	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
-
-	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
-	int pc = 0;
-	pMem[pc++] = 0xff80; /* b */
-	pMem[pc++] = 0;
+	m_suspend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos21_dsp_device::suspend_callback),this));
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
+}
+
+TIMER_CALLBACK_MEMBER(namcos21_dsp_device::suspend_callback)
+{
+	m_dsp->suspend(SUSPEND_REASON_HALT, true);
 }
 
 void namcos21_dsp_device::device_reset()
 {
 	m_poly_frame_width = m_renderer->get_width();
 	m_poly_frame_height = m_renderer->get_height();
+	// can't suspend directly from here, needs to be on a timer?
+	m_suspend_timer->adjust(attotime::zero);
 }
 
 
@@ -180,11 +183,10 @@ READ16_MEMBER(namcos21_dsp_device::winrun_table_r)
 WRITE16_MEMBER(namcos21_dsp_device::winrun_dspbios_w)
 {
 	COMBINE_DATA( &m_winrun_dspbios[offset] );
-	if( offset==0xfff )
+	if( offset==0xfff ) // is this the real trigger?
 	{
-		uint16_t *mem = (uint16_t *)memregion("dsp")->base();
-		memcpy( mem, m_winrun_dspbios, 0x2000 );
 		m_winrun_dsp_alive = 1;
+		m_dsp->resume(SUSPEND_REASON_HALT);
 	}
 }
 
@@ -220,7 +222,8 @@ WRITE16_MEMBER(namcos21_dsp_device::winrun_dspcomram_control_w)
 
 void namcos21_dsp_device::winrun_dsp_program(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();
+	// MCU is used in external program mode, program is uploaded to shared RAM by the 68k
+	map(0x0000, 0x0fff).ram().share("winrun_dspbios");
 }
 
 void namcos21_dsp_device::winrun_dsp_data(address_map &map)

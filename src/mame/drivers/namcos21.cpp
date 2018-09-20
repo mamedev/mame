@@ -638,7 +638,7 @@ void namcos21_state::winrun_master_map(address_map &map)
 	// DSP Related
 	map(0x250000, 0x25ffff).ram().share("namcos21dsp:winrun_polydata");
 	map(0x260000, 0x26ffff).ram(); /* unused? */
-	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspbios_w)).share("namcos21dsp:winrun_dspbios");
+	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspbios_w));
 	map(0x380000, 0x38000f).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspcomram_control_r), FUNC(namcos21_dsp_device::winrun_dspcomram_control_w));
 	map(0x3c0000, 0x3c1fff).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_68k_dspcomram_r), FUNC(namcos21_dsp_device::winrun_68k_dspcomram_w));
 	map(0x400000, 0x400001).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_control_w));
@@ -782,7 +782,7 @@ void namcos21_state::driveyes_master_map(address_map &map)
 	
 	// DSP related
 	map(0x250000, 0x25ffff).ram().share("namcos21dsp:winrun_polydata");
-	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspbios_w)).share("namcos21dsp:winrun_dspbios");
+	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspbios_w));
 	map(0x380000, 0x38000f).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspcomram_control_r), FUNC(namcos21_dsp_device::winrun_dspcomram_control_w));
 	map(0x3c0000, 0x3c1fff).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_68k_dspcomram_r), FUNC(namcos21_dsp_device::winrun_68k_dspcomram_w));
 	map(0x400000, 0x400001).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_control_w));
@@ -1432,8 +1432,6 @@ ROM_START( winrun )
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP */
-
 	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "wr1-gp0u.1k",  0x00000, 0x20000, CRC(c66a43be) SHA1(88ec02c5c18c8bb91a95934c14e9ae530ae09880) )
 	ROM_LOAD16_BYTE( "wr1-gp0l.3k",  0x00001, 0x20000, CRC(91a70e6f) SHA1(e613e2544f63cd386588445a2a199ae6b84d741e) )
@@ -1498,8 +1496,6 @@ ROM_START( winrungp )
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP */
-
 	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "sg1-gp0-u.1j", 0x00000, 0x20000, CRC(475da78a) SHA1(6e69bcc6caf2e3cd28fed75796c8992e754f9323) )
 	ROM_LOAD16_BYTE( "sg1-gp0-l.3j", 0x00001, 0x20000, CRC(580479bf) SHA1(ba682190cba0d3cdc49aa4937c898ba7ed2a25f5) )
@@ -1546,8 +1542,6 @@ ROM_START( winrun91 )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP */
 
 	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "r911-gp0u.1j", 0x00000, 0x20000, CRC(f5469a29) SHA1(38b6ea1fbe482b69fbb0e2f44f44a0ca2a49f6bc) )
@@ -1604,8 +1598,6 @@ We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom
 
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
-
-	ROM_REGION( 0x20000, "namcos21dsp:dsp", ROMREGION_ERASEFF ) /* DSP (no internal ROM?) */
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )

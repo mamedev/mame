@@ -42,10 +42,10 @@ protected:
 	void winrun_dsp_program(address_map &map);
 private:
 
-	optional_device<cpu_device> m_dsp;
-	optional_shared_ptr<uint16_t> m_winrun_dspbios;
-	optional_shared_ptr<uint16_t> m_winrun_polydata;
-	optional_region_ptr<uint16_t> m_ptrom16;
+	required_device<cpu_device> m_dsp;
+	required_shared_ptr<uint16_t> m_winrun_dspbios;
+	required_shared_ptr<uint16_t> m_winrun_polydata;
+	required_region_ptr<uint16_t> m_ptrom16;
 
 	required_device<namcos21_3d_device> m_renderer;
 	std::unique_ptr<uint8_t[]> m_pointram;
@@ -74,6 +74,9 @@ private:
 	DECLARE_READ16_MEMBER(winrun_poly_reset_r);
 	DECLARE_WRITE16_MEMBER(winrun_dsp_pointrom_addr_w);
 	DECLARE_READ16_MEMBER(winrun_dsp_pointrom_data_r);
+
+	TIMER_CALLBACK_MEMBER(suspend_callback);
+	emu_timer *m_suspend_timer;
 
 };
 
