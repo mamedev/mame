@@ -128,6 +128,7 @@ void g332_device::map(address_map &map)
 
 void ims_cvc_device::device_start()
 {
+	m_space = &space(0);
 }
 
 void ims_cvc_device::device_reset()
