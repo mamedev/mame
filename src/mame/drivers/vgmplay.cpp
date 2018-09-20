@@ -825,7 +825,7 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	int second = (type & 0x80) ? 1 : 0;
 	type &= 0x7f;
 
-	if (m_data_streams.size() <= type || m_data_streams[type].size() <= src + size)
+	if (m_data_streams.size() <= type || m_data_streams[type].size() < src + size)
 		osd_printf_error("invalid pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
 	else if (type == 0x01 && !second)
 	{
