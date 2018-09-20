@@ -8,12 +8,13 @@
 #include "cpu/tms32025/tms32025.h"
 
 // base class
-class namco_c67_device : public tms32025_mc0_device
+class namco_c67_device : public tms32025_device
 {
 public:
 	namco_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 };

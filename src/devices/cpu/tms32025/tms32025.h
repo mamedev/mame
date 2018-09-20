@@ -63,6 +63,7 @@ class tms32025_device : public cpu_device
 public:
 	// construction/destruction
 	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	auto bio_in_cb() { return m_bio_in.bind(); }
@@ -85,7 +86,7 @@ public:
 	DECLARE_READ16_MEMBER( greg_r);
 	DECLARE_WRITE16_MEMBER(greg_w);
 
-	void tms32025_program(address_map &map);
+	//void tms32025_program(address_map &map);
 	void tms32025_data(address_map &map);
 	void tms32026_data(address_map &map);
 protected:
@@ -357,14 +358,6 @@ protected:
 	inline void process_timer(int clocks);
 };
 
-class tms32025_mc0_device : public tms32025_device
-{
-public:
-	// construction/destruction
-	tms32025_mc0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32025_mc0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-};
 
 class tms32026_device : public tms32025_device
 {
@@ -380,7 +373,6 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
-DECLARE_DEVICE_TYPE(TMS32025_MC0, tms32025_mc0_device)
 DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)
 
 #endif // MAME_TMS32025_TMS32025_H
