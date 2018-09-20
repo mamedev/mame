@@ -59,15 +59,15 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 	{
 		if( mask&(0x01<<i) )
 		{
-			m_videoram[(offset+i)&0x7ffff] = color;
-			m_maskram[(offset+i)&0x7ffff] = mask;
+			m_gpu_videoram[(offset+i)&0x7ffff] = color;
+			m_gpu_maskram[(offset+i)&0x7ffff] = mask;
 		}
 	}
 }
 
 READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
 {
-	return (m_videoram[offset]<<8) | m_maskram[offset];
+	return (m_gpu_videoram[offset]<<8) | m_gpu_maskram[offset];
 }
 
 
@@ -77,7 +77,7 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 
 uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//uint8_t *videoram = m_videoram.get();
+	//uint8_t *videoram = m_gpu_videoram.get();
 	int pivot = 3;
 	int pri;
 	bitmap.fill(0xff, cliprect );
@@ -103,7 +103,7 @@ uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_in
 
 uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//uint8_t *videoram = m_videoram.get();
+	//uint8_t *videoram = m_gpu_videoram.get();
 	int pivot = 3;
 	int pri;
 	bitmap.fill(0xff, cliprect );
@@ -131,7 +131,7 @@ uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_in
 
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram.get();
+	uint8_t *videoram = m_gpu_videoram.get();
 	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.top(),cliprect.bottom(),m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
 
 	int yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
