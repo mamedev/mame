@@ -11,7 +11,10 @@ namcos21_3d_device::namcos21_3d_device(const machine_config &mconfig, const char
 	m_fixed_palbase(-1),
 	m_zz_shift(10),
 	m_zzmult(0x100),
-	m_depth_reverse(false)
+	m_depth_reverse(false),
+	m_poly_frame_width(0),
+	m_poly_frame_height(0),
+	m_framebuffer_size_in_bytes(0)
 {
 }
 
@@ -26,11 +29,14 @@ void namcos21_3d_device::device_reset()
 
 void namcos21_3d_device::allocate_poly_framebuffer()
 {
-	m_mpPolyFrameBufferZ = std::make_unique<uint16_t[]>(FRAMEBUFFER_SIZE_IN_BYTES / 2);
-	m_mpPolyFrameBufferPens = std::make_unique<uint16_t[]>(FRAMEBUFFER_SIZE_IN_BYTES / 2);
+	if (m_framebuffer_size_in_bytes == 0)
+		fatalerror("m_framebuffer_size_in_bytes == 0\n");
 
-	m_mpPolyFrameBufferZ2 = std::make_unique<uint16_t[]>(FRAMEBUFFER_SIZE_IN_BYTES / 2);
-	m_mpPolyFrameBufferPens2 = std::make_unique<uint16_t[]>(FRAMEBUFFER_SIZE_IN_BYTES / 2);
+	m_mpPolyFrameBufferZ = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
+	m_mpPolyFrameBufferPens = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
+
+	m_mpPolyFrameBufferZ2 = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
+	m_mpPolyFrameBufferPens2 = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
 
 	swap_and_clear_poly_framebuffer();
 	swap_and_clear_poly_framebuffer();
@@ -44,7 +50,7 @@ void namcos21_3d_device::swap_and_clear_poly_framebuffer()
 	m_mpPolyFrameBufferPens.swap(m_mpPolyFrameBufferPens2);
 
 	/* wipe work zbuffer */
-	for (int i = 0; i < NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT; i++)
+	for (int i = 0; i < m_poly_frame_width*m_poly_frame_height; i++)
 	{
 		m_mpPolyFrameBufferZ[i] = 0x7fff;
 	}
@@ -57,8 +63,8 @@ void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, con
 	for (sy = clip.top(); sy <= clip.bottom(); sy++)
 	{
 		uint16_t *dest = &bitmap.pix16(sy);
-		const uint16_t *pPen = m_mpPolyFrameBufferPens2.get() + NAMCOS21_POLY_FRAME_WIDTH * sy;
-		const uint16_t *pZ = m_mpPolyFrameBufferZ2.get() + NAMCOS21_POLY_FRAME_WIDTH * sy;
+		const uint16_t *pPen = m_mpPolyFrameBufferPens2.get() + m_poly_frame_width * sy;
+		const uint16_t *pZ = m_mpPolyFrameBufferZ2.get() + m_poly_frame_width * sy;
 		int sx;
 		for (sx = clip.left(); sx <= clip.right(); sx++)
 		{
@@ -84,8 +90,8 @@ void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, int
 	}
 
 	{
-		uint16_t *pDest = m_mpPolyFrameBufferPens.get() + sy * NAMCOS21_POLY_FRAME_WIDTH;
-		uint16_t *pZBuf = m_mpPolyFrameBufferZ.get() + sy * NAMCOS21_POLY_FRAME_WIDTH;
+		uint16_t *pDest = m_mpPolyFrameBufferPens.get() + sy * m_poly_frame_width;
+		uint16_t *pZBuf = m_mpPolyFrameBufferZ.get() + sy * m_poly_frame_width;
 		int x0 = (int)e1->x;
 		int x1 = (int)e2->x;
 		int w = x1 - x0;
@@ -100,9 +106,9 @@ void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, int
 				z += crop * dz;
 				x0 = 0;
 			}
-			if (x1 > NAMCOS21_POLY_FRAME_WIDTH - 1)
+			if (x1 > m_poly_frame_width - 1)
 			{
-				x1 = NAMCOS21_POLY_FRAME_WIDTH - 1;
+				x1 = m_poly_frame_width - 1;
 			}
 
 			for (x = x0; x < x1; x++)
@@ -197,7 +203,7 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 				e1.z += dz1dy * crop;
 				ystart = 0;
 			}
-			if (yend > NAMCOS21_POLY_FRAME_HEIGHT - 1) yend = NAMCOS21_POLY_FRAME_HEIGHT - 1;
+			if (yend > m_poly_frame_height - 1) yend = m_poly_frame_height - 1;
 
 			for (y = ystart; y < yend; y++)
 			{
@@ -229,9 +235,9 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 				e1.z += dz1dy * crop;
 				ystart = 0;
 			}
-			if (yend > NAMCOS21_POLY_FRAME_HEIGHT - 1)
+			if (yend > m_poly_frame_height - 1)
 			{
-				yend = NAMCOS21_POLY_FRAME_HEIGHT - 1;
+				yend = m_poly_frame_height - 1;
 			}
 			for (y = ystart; y < yend; y++)
 			{

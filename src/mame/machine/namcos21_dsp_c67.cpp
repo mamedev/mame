@@ -40,6 +40,9 @@ void namcos21_dsp_c67_device::device_start()
 
 void namcos21_dsp_c67_device::device_reset()
 {
+	m_poly_frame_width = m_renderer->get_width();
+	m_poly_frame_height = m_renderer->get_height();
+
 	/* DSP startup hacks */
 	m_mbNeedsKickstart = 20;
 	if (m_gametype == NAMCOS21_CYBERSLED)
@@ -489,8 +492,8 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_portb_w)
 		int color  = m_mpDspState->masterDirectDrawBuffer[0];
 		for( i=0; i<4; i++ )
 		{
-			sx[i] = NAMCOS21_POLY_FRAME_WIDTH/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+1];
-			sy[i] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+2];
+			sx[i] = m_poly_frame_width/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+1];
+			sy[i] = m_poly_frame_height/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+2];
 			zcode[i] = m_mpDspState->masterDirectDrawBuffer[i*3+3];
 		}
 		if( color&0x8000 )
@@ -582,8 +585,8 @@ void namcos21_dsp_c67_device::render_slave_output(uint16_t data)
 				if( count!=13 ) logerror( "?!direct-draw(%d)\n", count );
 				for( j=0; j<4; j++ )
 				{
-					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2 + (int16_t)pSource[3*j+0];
-					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[3*j+1];
+					sx[j] = m_poly_frame_width/2 + (int16_t)pSource[3*j+0];
+					sy[j] = m_poly_frame_height/2 + (int16_t)pSource[3*j+1];
 					zcode[j] = pSource[3*j+2];
 				}
 				m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
@@ -598,8 +601,8 @@ void namcos21_dsp_c67_device::render_slave_output(uint16_t data)
 					for( j=0; j<4; j++ )
 					{
 						uint8_t vi = m_pointram[quad_idx++];
-						sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)pSource[vi*3+0];
-						sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[vi*3+1];
+						sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3+0];
+						sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3+1];
 						zcode[j] = pSource[vi*3+2];
 					}
 					m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);

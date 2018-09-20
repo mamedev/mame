@@ -5,14 +5,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
-#define NAMCOS21_POLY_FRAME_WIDTH 496
-#define NAMCOS21_POLY_FRAME_HEIGHT 480
-
-#define FRAMEBUFFER_SIZE_IN_BYTES (sizeof(uint16_t)*NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT)
-
-
 class namcos21_3d_device : public device_t
 {
 public:
@@ -23,6 +15,15 @@ public:
 	void set_zz_shift_mult(int shift, int mult) { m_zz_shift = shift; m_zzmult = mult;  }
 	void set_depth_reverse(bool reverse) { m_depth_reverse = reverse;  }
 
+	void set_framebuffer_size(int width, int height)
+	{ 
+		m_poly_frame_width = width;
+		m_poly_frame_height = height;
+		m_framebuffer_size_in_bytes = (sizeof(uint16_t)*m_poly_frame_width*m_poly_frame_height);
+	}
+
+	int get_width() { return m_poly_frame_width; }
+	int get_height() { return m_poly_frame_height; }
 
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
 	void swap_and_clear_poly_framebuffer();
@@ -35,16 +36,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	enum
-	{	/* Namco System21 */
-		NAMCOS21_AIRCOMBAT = 0x4000,
-		NAMCOS21_STARBLADE,
-		NAMCOS21_CYBERSLED,
-		NAMCOS21_SOLVALOU,
-		NAMCOS21_WINRUN91,
-		NAMCOS21_DRIVERS_EYES,
-	};
-
 	struct n21_vertex
 	{
 		double x,y;
@@ -69,6 +60,10 @@ private:
 	int m_fixed_palbase;
 	int m_zz_shift, m_zzmult;
 	bool m_depth_reverse;
+
+	int m_poly_frame_width;
+	int m_poly_frame_height;
+	int m_framebuffer_size_in_bytes;
 };
 
 DECLARE_DEVICE_TYPE(NAMCOS21_3D, namcos21_3d_device)

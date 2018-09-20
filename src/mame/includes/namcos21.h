@@ -30,18 +30,13 @@
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
 
-
 #define NAMCOS21_NUM_COLORS 0x8000
-
-
-
 
 class namcos21_state : public driver_device
 {
 public:
 	namcos21_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_namcos21_3d(*this, "namcos21_3d"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_slave(*this, "slave"),
@@ -58,6 +53,7 @@ public:
 		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_io_gearbox(*this, "gearbox"),
 		m_gpu_intc(*this, "gpu_intc"),
+		m_namcos21_3d(*this, "namcos21_3d"),
 		m_namcos21_dsp(*this, "namcos21dsp"),
 		m_namcos21_dsp_c67(*this, "namcos21dsp_c67")
 	{ }
@@ -73,8 +69,6 @@ public:
 
 	void init_winrun();
 	void init_solvalou();
-
-	optional_device<namcos21_3d_device> m_namcos21_3d;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -96,6 +90,7 @@ private:
 
 	optional_device<namcoio_gearbox_device> m_io_gearbox;
 	optional_device<namco_c148_device> m_gpu_intc;
+	optional_device<namcos21_3d_device> m_namcos21_3d;
 	optional_device<namcos21_dsp_device> m_namcos21_dsp;
 	optional_device<namcos21_dsp_c67_device> m_namcos21_dsp_c67;
 

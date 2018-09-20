@@ -5,12 +5,8 @@
 
 #pragma once
 
-#include "emupal.h"
 #include "cpu/tms32025/tms32025.h"
 #include "video/namcos21_3d.h"
-
-#define NAMCOS21_POLY_FRAME_WIDTH 496
-#define NAMCOS21_POLY_FRAME_HEIGHT 480
 
 #define WINRUN_MAX_POLY_PARAM (1+256*3)
 
@@ -64,6 +60,9 @@ private:
 	int m_winrun_dsp_alive;
 
 	void winrun_flush_poly();
+
+	int m_poly_frame_width;
+	int m_poly_frame_height;
 
 	DECLARE_READ16_MEMBER(winrun_cuskey_r);
 	DECLARE_WRITE16_MEMBER(winrun_cuskey_w);

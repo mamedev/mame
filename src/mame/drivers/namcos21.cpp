@@ -54,6 +54,8 @@ Each quad has a reference color (shared across vertices), and for each vertex th
 The z-code scalar accounts for depth bias.  A zbuffer is used while rendering quads, and depth cueing is used to
 shade pixels according to their depth.
 
+Galaxian 3 (gal3.cpp) uses the same DSP PCB as Cyber Sled, Star Blade etc. (2x, 1 for each screen)
+
 ---------------------------------------------------------------------------
 
 STATUS:
@@ -1241,6 +1243,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	m_namcos21_3d->set_fixed_palbase(0x4000);
 	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
 	m_namcos21_3d->set_depth_reverse(true);
+	m_namcos21_3d->set_framebuffer_size(496,480);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
@@ -1301,6 +1304,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	m_namcos21_3d->set_fixed_palbase(0x3f00);
 	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
 	m_namcos21_3d->set_depth_reverse(false);
+	m_namcos21_3d->set_framebuffer_size(496,480);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_palette_tag("palette");
@@ -1358,6 +1362,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
 	m_namcos21_3d->set_zz_shift_mult(11, 0x200);
 	m_namcos21_3d->set_depth_reverse(false);
+	m_namcos21_3d->set_framebuffer_size(496,480);
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);

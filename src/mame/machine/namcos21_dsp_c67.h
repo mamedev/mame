@@ -5,12 +5,8 @@
 
 #pragma once
 
-#include "emupal.h"
 #include "machine/namco_c67.h"
 #include "video/namcos21_3d.h"
-
-#define NAMCOS21_POLY_FRAME_WIDTH 496
-#define NAMCOS21_POLY_FRAME_HEIGHT 480
 
 #define PTRAM_SIZE 0x20000
 
@@ -90,6 +86,9 @@ private:
 	int m_irq_enable;
 
 	int m_mbNeedsKickstart;
+
+	int m_poly_frame_width;
+	int m_poly_frame_height;
 
 	int32_t read_pointrom_data(unsigned offset);
 	void transmit_word_to_slave(uint16_t data);

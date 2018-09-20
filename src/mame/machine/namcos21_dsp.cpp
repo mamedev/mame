@@ -7,8 +7,9 @@ Common code for the original Namco System 21 DSP board, with a single DSP
 used by Winning Run, Driver's Eyes
 
 TODO: handle protection properly and with callbacks
+      some of the list processing should probably be in the 3d device, split it out
 
-*/
+	  */
 
 #include "emu.h"
 #include "namcos21_dsp.h"
@@ -39,6 +40,8 @@ void namcos21_dsp_device::device_start()
 
 void namcos21_dsp_device::device_reset()
 {
+	m_poly_frame_width = m_renderer->get_width();
+	m_poly_frame_height = m_renderer->get_height();
 }
 
 
@@ -93,8 +96,8 @@ void namcos21_dsp_device::winrun_flush_poly()
 		{ /* direct-draw */
 			for( j=0; j<4; j++ )
 			{
-				sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)*pSource++;
-				sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)*pSource++;
+				sx[j] = m_poly_frame_width/2  + (int16_t)*pSource++;
+				sy[j] = m_poly_frame_height/2 + (int16_t)*pSource++;
 				zcode[j] = *pSource++;
 			}
 			m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
@@ -109,8 +112,8 @@ void namcos21_dsp_device::winrun_flush_poly()
 				for( j=0; j<4; j++ )
 				{
 					uint8_t vi = m_pointram[quad_idx++];
-					sx[j] = NAMCOS21_POLY_FRAME_WIDTH/2  + (int16_t)pSource[vi*3+0];
-					sy[j] = NAMCOS21_POLY_FRAME_HEIGHT/2 + (int16_t)pSource[vi*3+1];
+					sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3+0];
+					sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3+1];
 					zcode[j] = pSource[vi*3+2];
 				}
 				m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
