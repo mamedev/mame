@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Robbbert
-/***************************************************************************
+/***************************************************************************************
 
 Jugend+Technik CompJU+TEr
 
@@ -9,13 +9,12 @@ Jugend+Technik CompJU+TEr
 2018-09: Made mostly working
 
 To Do:
-- Add quickload of jtc files
-- Find out if cassette works
 - Figure out how to use the so-called "Basic", all documents are in German.
 - Fix any remaining CPU bugs
 - On jtces40, the use of ALT key will usually freeze the system. Normal, or a bug?
 - On jtces40, no backspace?
 - On jtces40, is there a way to type lower case?
+- On jtces40, hires gfx and colours to fix.
 
 ****************************************************************************************/
 
@@ -26,6 +25,7 @@ To Do:
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "imagedev/snapquik.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -48,12 +48,6 @@ public:
 		, m_video_ram(*this, "videoram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<cassette_image_device> m_cassette;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<centronics_device> m_centronics;
-
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -62,13 +56,20 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 	DECLARE_PALETTE_INIT(jtc_es40);
-	optional_shared_ptr<uint8_t> m_video_ram;
+	DECLARE_QUICKLOAD_LOAD_MEMBER( jtc );
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	void basic(machine_config &config);
 	void jtc(machine_config &config);
 	void jtc_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<cassette_image_device> m_cassette;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<centronics_device> m_centronics;
+	optional_shared_ptr<uint8_t> m_video_ram;
 };
 
 
@@ -158,10 +159,6 @@ READ8_MEMBER( jtc_state::p3_r )
 	    P31
 	    P32
 	    P33     centronics busy input
-	    P34
-	    P35
-	    P36     tape output
-	    P37     speaker output
 
 	*/
 
@@ -179,10 +176,6 @@ WRITE8_MEMBER( jtc_state::p3_w )
 
 	    bit     description
 
-	    P30     tape input
-	    P31
-	    P32
-	    P33     centronics busy input
 	    P34
 	    P35
 	    P36     tape output
@@ -597,6 +590,94 @@ static INPUT_PORTS_START( jtces40 )
 	PORT_START("Y15")
 INPUT_PORTS_END
 
+QUICKLOAD_LOAD_MEMBER( jtc_state, jtc )
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	u16 i, quick_addr, quick_length;
+	std::vector<uint8_t> quick_data;
+	image_init_result result = image_init_result::FAIL;
+
+	quick_length = image.length();
+	if (image.is_filetype("jtc"))
+	{
+		if (quick_length < 0x0088)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+			image.message(" File too short");
+		}
+		else
+		if (quick_length > 0x8000)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.message(" File too long");
+		}
+		else
+		{
+			quick_data.resize(quick_length+1);
+			u16 read_ = image.fread( &quick_data[0], quick_length);
+			if (read_ != quick_length)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.message(" Cannot read the file");
+			}
+			else
+			{
+				quick_addr = quick_data[0x12] * 256 + quick_data[0x11];
+				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
+				if (image.length() != quick_length)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid file header");
+					image.message(" Invalid file header");
+				}
+				else
+				{
+					for (i = 0x80; i < image.length(); i++)
+						space.write_byte(quick_addr+i-0x80, quick_data[i]);
+
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+					result = image_init_result::PASS;
+				}
+			}
+		}
+	}
+	else
+	if (image.is_filetype("bin"))
+	{
+		quick_addr = 0xe000;
+		if (quick_length > 0x8000)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.message(" File too long");
+		}
+		else
+		{
+			quick_data.resize(quick_length+1);
+			u16 read_ = image.fread( &quick_data[0], quick_length);
+			if (read_ != quick_length)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.message(" Cannot read the file");
+			}
+			else
+			{
+				for (i = 0; i < image.length(); i++)
+					space.write_byte(quick_addr+i, quick_data[i]);
+
+				/* display a message about the loaded quickload */
+				image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+				result = image_init_result::PASS;
+				m_maincpu->set_pc(quick_addr);
+			}
+		}
+	}
+
+	return result;
+}
+
+
 /* Video */
 
 uint32_t jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -737,19 +818,21 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	MCFG_Z8_PORT_P3_READ_CB(READ8(*this, jtc_state, p3_r))
 	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(*this, jtc_state, p3_w))
 
+	/* cassette */
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
-
-	/* cassette */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* printer */
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", jtc_state, jtc, "jtc,bin", 2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtc_state::jtc)
