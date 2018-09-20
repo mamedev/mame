@@ -28,12 +28,14 @@ namcos21_dsp_c67_device::namcos21_dsp_c67_device(const machine_config &mconfig, 
 	m_dspram16(*this,"dspram16"),
 	m_master_dsp_ram(*this,"master_dsp_ram"),
 	m_gametype(0),
+	m_yield_hack_cb(*this),
 	m_irq_enable(false)
 {
 }
 
 void namcos21_dsp_c67_device::device_start()
 {
+	m_yield_hack_cb.resolve_safe();
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_mpDspState = make_unique_clear<dsp_state>();
 }
@@ -359,8 +361,8 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::dspram16_hack_w)
 	}
 	else if (m_gametype == NAMCOS21_SOLVALOU && offset == 0x103)
 	{
-		/* hack; synchronization for solvalou */
-		// TOADD m_maincpu->yield();
+		// HACK: synchronization for solvalou - is this really needed?
+		m_yield_hack_cb(1);
 	}
 }
 

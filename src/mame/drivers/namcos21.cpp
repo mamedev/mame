@@ -1409,9 +1409,15 @@ MACHINE_CONFIG_START(namcos21_state::cybsled)
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_CYBERSLED);
 MACHINE_CONFIG_END
 
+WRITE_LINE_MEMBER(namcos21_state::yield_hack)
+{
+	m_maincpu->yield();
+}
+
 MACHINE_CONFIG_START(namcos21_state::solvalou)
 	namcos21(config);
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_SOLVALOU);
+	m_namcos21_dsp_c67->yield_hack_callback().set(FUNC(namcos21_state::yield_hack)); // VCK function
 MACHINE_CONFIG_END
 
 

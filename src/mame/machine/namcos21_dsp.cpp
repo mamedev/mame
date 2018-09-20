@@ -9,7 +9,7 @@ used by Winning Run, Driver's Eyes
 TODO: handle protection properly and with callbacks
       some of the list processing should probably be in the 3d device, split it out
 
-	  */
+*/
 
 #include "emu.h"
 #include "namcos21_dsp.h"

@@ -132,6 +132,8 @@ private:
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
 
+	DECLARE_WRITE_LINE_MEMBER(yield_hack);
+
 	DECLARE_MACHINE_START(namcos21);
 	DECLARE_MACHINE_RESET(namcos21);
 	DECLARE_VIDEO_START(namcos21);

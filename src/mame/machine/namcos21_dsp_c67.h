@@ -27,6 +27,9 @@ public:
 
 	// config
 	template <typename T> void set_renderer_tag(T &&tag) { m_renderer.set_tag(std::forward<T>(tag)); }
+	template <class Object> devcb_base &set_yield_hack_callback(Object &&cb) { return m_yield_hack_cb.set_callback(std::forward<Object>(cb)); }
+	auto yield_hack_callback() { return m_yield_hack_cb.bind(); }
+	
 	void set_gametype(int gametype) { m_gametype = gametype; }
 
 	DECLARE_READ16_MEMBER(dspram16_r);
@@ -73,6 +76,7 @@ private:
 	required_shared_ptr<uint16_t> m_master_dsp_ram;
 
 	int m_gametype; // hacks
+	devcb_write_line m_yield_hack_cb;
 
 	std::unique_ptr<dsp_state> m_mpDspState;
 
