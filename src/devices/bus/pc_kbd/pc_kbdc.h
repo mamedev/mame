@@ -69,6 +69,8 @@ public:
 
 	template <class Object> devcb_base &set_out_clock_callback(Object &&cb) { return m_out_clock_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_data_callback(Object &&cb) { return m_out_data_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_clock_cb() { return m_out_clock_cb.bind(); }
+	auto out_data_cb() { return m_out_data_cb.bind(); }
 
 	void set_keyboard(device_pc_kbd_interface *keyboard);
 
