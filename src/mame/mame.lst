@@ -38564,8 +38564,9 @@ twcup90ba                          // bootleg
 hotchase                        // GX763 (c) 1988
 hotchasea                       //
 wecleman                        // GX602 (c) 1986
-weclemana                       // GX602?(c) 1988
-weclemanb                       // GX602 (c) 1986
+weclemana                       // GX602 (c) 1986
+weclemanb                       // GX602?(c) 1988
+weclemanc                       // GX602 (c) 1986
 
 @source:welltris.cpp
 quiz18k                         // (c) 1992 EIM (Welltris hardware)
