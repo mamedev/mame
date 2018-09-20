@@ -406,6 +406,7 @@ WRITE16_MEMBER(ngcd_state::control_w)
 READ8_MEMBER(ngcd_state::transfer_r)
 {
 	uint32_t sekAddress = 0xe00000+ (offset);
+	int address;
 	sekAddress ^= 1;
 
 	switch (m_active_transfer_area) {
@@ -440,6 +441,7 @@ WRITE8_MEMBER(ngcd_state::transfer_w)
 	if (!m_transfer_write_enable) {
 //      return;
 	}
+	int address;
 
 	sekAddress ^= 1;
 
