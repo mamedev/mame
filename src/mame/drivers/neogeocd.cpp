@@ -403,12 +403,6 @@ WRITE16_MEMBER(ngcd_state::control_w)
  *  When the Z80 space is banked in to 0xe00000, only the low byte of each word is used
  */
 
-inline int ngcd_state::swap_spraddr(int address)
-{
-	// address is swizzled a bit due to out sprite decoding
-	return bitswap<20>(address, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0, 1);
-}
-
 READ8_MEMBER(ngcd_state::transfer_r)
 {
 	uint32_t sekAddress = 0xe00000+ (offset);
@@ -1054,7 +1048,7 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	MCFG_SET_TYPE2_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type2 )
 	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type3 )
 
-	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_save_ram, nvram_device::DEFAULT_ALL_0);
 
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
