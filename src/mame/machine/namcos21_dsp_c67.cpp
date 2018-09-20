@@ -42,7 +42,7 @@ void namcos21_dsp_c67_device::device_reset()
 {
 	/* DSP startup hacks */
 	m_mbNeedsKickstart = 20;
-	if( m_gametype==NAMCOS21_CYBERSLED )
+	if (m_gametype == NAMCOS21_CYBERSLED)
 	{
 		m_mbNeedsKickstart = 200;
 	}
@@ -50,6 +50,31 @@ void namcos21_dsp_c67_device::device_reset()
 	/* Wipe the framebuffers */
 	m_renderer->swap_and_clear_poly_framebuffer();
 	m_renderer->swap_and_clear_poly_framebuffer();
+
+	//reset_dsps(ASSERT_LINE);
+
+	m_mpDspState->masterSourceAddr = 0;
+	m_mpDspState->slaveBytesAvailable = 0;
+	m_mpDspState->slaveBytesAdvertised = 0;
+	m_mpDspState->slaveInputStart = 0;
+	m_mpDspState->slaveOutputSize = 0;
+	m_mpDspState->masterDirectDrawSize = 0;
+	m_mpDspState->masterFinished = 0;
+	m_mpDspState->slaveActive = 0;
+
+	m_pointram_idx = 0;
+	m_pointram_control = 0;
+	m_pointrom_idx = 0;
+	m_mPointRomMSB = 0;
+	m_mbPointRomDataAvailable = 0;
+	m_irq_enable = 0;
+
+	// clear these?
+	//m_depthcue[2][0x400];
+	//m_pointram
+	//m_mpDspState->slaveInputBuffer[DSP_BUF_MAX];
+	//m_mpDspState->slaveOutputBuffer[DSP_BUF_MAX];
+	//m_mpDspState->masterDirectDrawBuffer[256];
 }
 
 void namcos21_dsp_c67_device::reset_dsps(int state)

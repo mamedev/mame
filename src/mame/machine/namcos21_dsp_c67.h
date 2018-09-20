@@ -76,7 +76,8 @@ private:
 	optional_shared_ptr<uint16_t> m_dspram16;
 	optional_shared_ptr<uint16_t> m_master_dsp_ram;
 
-	int m_gametype;
+	int m_gametype; // hacks
+
 	std::unique_ptr<dsp_state> m_mpDspState;
 
 	std::unique_ptr<uint8_t[]> m_pointram;
