@@ -3359,6 +3359,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cvicny.cpp",
 	MAME_DIR .. "src/mame/drivers/datum.cpp",
 	MAME_DIR .. "src/mame/drivers/dolphunk.cpp",
+	MAME_DIR .. "src/mame/drivers/emma2.cpp",
 	MAME_DIR .. "src/mame/drivers/instruct.cpp",
 	MAME_DIR .. "src/mame/drivers/mk14.cpp",
 	MAME_DIR .. "src/mame/drivers/pro80.cpp",

@@ -12324,6 +12324,9 @@ emate                           // (c) 1997 Apple Computer
 @source:embargo.cpp
 embargo                         //
 
+@source:emma2.cpp
+emma2                           // 1979 L.J.Technical Systems
+
 @source:enigma2.cpp
 enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
 enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
