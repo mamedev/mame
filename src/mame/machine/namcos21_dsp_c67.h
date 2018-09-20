@@ -72,7 +72,8 @@ private:
 	required_device<cpu_device> m_c67master;
 	required_device_array<cpu_device,4> m_c67slave;
 	required_region_ptr<int32_t> m_ptrom24;
-	required_shared_ptr<uint16_t> m_dspram16;
+	std::vector<uint16_t> m_dspram16;
+
 	required_shared_ptr<uint16_t> m_master_dsp_ram;
 
 	int m_gametype; // hacks

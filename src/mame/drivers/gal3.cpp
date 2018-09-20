@@ -45,8 +45,8 @@
        | | | |
        | | | |------- Slave 68020
        | | |                |-------- 1x master DSP, 4x slave DSPs, Polygon, 2D Sprite ------> V-MIX board -----> SCREEN
-       | | |                |-------- ........ more video boards .........                          |
-       | | |                |-------- ........ more video boards .........                      LD Player
+       | | |                |-------- ........ more video boards ......... (max 2 per slave?)      |
+       | | |                                                                                   LD Player
        | | |
        | | |------- ........ more slave 68020s .........
        | |
@@ -135,6 +135,9 @@ better notes (complete chip lists) for each board still needed
 #include "rendlay.h"
 #include "speaker.h"
 #include "video/namco_c355spr.h"
+#include "machine/namcos21_dsp_c67.h"
+#include "video/namcos21_3d.h"
+
 
 #define NAMCOS21_NUM_COLORS 0x8000
 
@@ -147,7 +150,9 @@ public:
 		m_palette(*this, "palette_%u", 1U),
 		m_rso_shared_ram(*this, "rso_shared_ram"),
 		m_c140_16a(*this, "c140_16a"),
-		m_c140_16g(*this, "c140_16g")
+		m_c140_16g(*this, "c140_16g"),
+		m_namcos21_3d(*this, "namcos21_3d_%u", 1U),
+		m_namcos21_dsp_c67(*this, "namcos21dsp_c67_%u", 1U)
 	{ }
 
 	void gal3(machine_config &config);
@@ -159,6 +164,11 @@ private:
 	required_shared_ptr<uint16_t> m_rso_shared_ram;
 	required_device<c140_device> m_c140_16a;
 	required_device<c140_device> m_c140_16g;
+
+
+	required_device_array<namcos21_3d_device, 2> m_namcos21_3d;
+	required_device_array<namcos21_dsp_c67_device, 2> m_namcos21_dsp_c67;
+
 	uint32_t m_led_mst;
 	uint32_t m_led_slv;
 	DECLARE_READ32_MEMBER(led_mst_r);
@@ -348,18 +358,26 @@ void gal3_state::cpu_slv_map(address_map &map)
 	map(0x60010000, 0x60017fff).ram().share("share1");
 	map(0x80000000, 0x8007ffff).ram(); //512K Local RAM
 
-	map(0xf1200000, 0xf120ffff).ram(); //DSP RAM (1st DSP board)
-/// AM_RANGE(0xf1400000, 0xf1400003) AM_WRITE(pointram_control_w)
-/// AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE(pointram_data_r,pointram_data_w)
-/// AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */
-/// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w)
+	// Video chain 1
+	map(0xf1200000, 0xf120ffff).rw(m_namcos21_dsp_c67[0], FUNC(namcos21_dsp_c67_device::dspram16_r), FUNC(namcos21_dsp_c67_device::dspram16_hack_w));
+	map(0xf1400000, 0xf1400003).w(m_namcos21_dsp_c67[0], FUNC(namcos21_dsp_c67_device::pointram_control_w));
+	map(0xf1440000, 0xf1440003).rw(m_namcos21_dsp_c67[0], FUNC(namcos21_dsp_c67_device::pointram_data_r), FUNC(namcos21_dsp_c67_device::pointram_data_w));
+	map(0xf1440004, 0xf147ffff).nopw();
+	map(0xf1480000, 0xf14807ff).rw(m_namcos21_dsp_c67[0], FUNC(namcos21_dsp_c67_device::namcos21_depthcue_r), FUNC(namcos21_dsp_c67_device::namcos21_depthcue_w));
+	
 	map(0xf1700000, 0xf170ffff).rw(m_c355spr[0], FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram_1");
 	map(0xf1720000, 0xf1720007).rw(m_c355spr[0], FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xf1740000, 0xf174ffff).rw(m_palette[0], FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette_1");
 	map(0xf1750000, 0xf175ffff).rw(m_palette[0], FUNC(palette_device::read16_ext), FUNC(palette_device::write16_ext)).share("palette_1_ext");
 	map(0xf1760000, 0xf1760001).rw(FUNC(gal3_state::video_enable_r<0>), FUNC(gal3_state::video_enable_w<0>));
 
-	map(0xf2200000, 0xf220ffff).ram(); //DSP RAM (2nd DSP board)
+	// Video chain 2
+	map(0xf2200000, 0xf220ffff).rw(m_namcos21_dsp_c67[1], FUNC(namcos21_dsp_c67_device::dspram16_r), FUNC(namcos21_dsp_c67_device::dspram16_hack_w));
+	map(0xf2400000, 0xf2400003).w(m_namcos21_dsp_c67[1], FUNC(namcos21_dsp_c67_device::pointram_control_w));
+	map(0xf2440000, 0xf2440003).rw(m_namcos21_dsp_c67[1], FUNC(namcos21_dsp_c67_device::pointram_data_r), FUNC(namcos21_dsp_c67_device::pointram_data_w));
+	map(0xf2440004, 0xf247ffff).nopw();
+	map(0xf2480000, 0xf24807ff).rw(m_namcos21_dsp_c67[1], FUNC(namcos21_dsp_c67_device::namcos21_depthcue_r), FUNC(namcos21_dsp_c67_device::namcos21_depthcue_w)); 
+
 	map(0xf2700000, 0xf270ffff).rw(m_c355spr[1], FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram_2");
 	map(0xf2720000, 0xf2720007).rw(m_c355spr[1], FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xf2740000, 0xf274ffff).rw(m_palette[1], FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette_2");
@@ -619,6 +637,8 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 
 	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
 
+	// video chain 1
+
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -627,21 +647,8 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette_1")
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette_2")
-
 	MCFG_DEVICE_ADD("gfxdecode_1", GFXDECODE, "palette_1", gfx_gal3_l)
 	MCFG_PALETTE_ADD("palette_1", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_MEMBITS(16)
-	MCFG_PALETTE_FORMAT(XBRG)
-
-	MCFG_DEVICE_ADD("gfxdecode_2", GFXDECODE, "palette_2", gfx_gal3_r)
-	MCFG_PALETTE_ADD("palette_2", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_MEMBITS(16)
 	MCFG_PALETTE_FORMAT(XBRG)
 
@@ -653,6 +660,29 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	m_c355spr[0]->set_palxor(0xf); // reverse mapping
 	m_c355spr[0]->set_gfxregion(0);
 
+	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
+	m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
+	m_namcos21_3d[0]->set_depth_reverse(false);
+	m_namcos21_3d[0]->set_framebuffer_size(496,480);
+
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[0], 0);
+	m_namcos21_dsp_c67[0]->set_renderer_tag("namcos21_3d_1");
+
+	// video chain 2
+
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_right)
+	MCFG_SCREEN_PALETTE("palette_2")
+
+	MCFG_DEVICE_ADD("gfxdecode_2", GFXDECODE, "palette_2", gfx_gal3_r)
+	MCFG_PALETTE_ADD("palette_2", NAMCOS21_NUM_COLORS)
+	MCFG_PALETTE_MEMBITS(16)
+	MCFG_PALETTE_FORMAT(XBRG)
+
 	NAMCO_C355SPR(config, m_c355spr[1], 0);
 	m_c355spr[1]->set_palette_tag("palette_2");
 	m_c355spr[1]->set_gfxdecode_tag("gfxdecode_2");
@@ -660,6 +690,15 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate()); 
 	m_c355spr[1]->set_palxor(0xf); // reverse mapping
 	m_c355spr[1]->set_gfxregion(0);
+
+	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
+	m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
+	m_namcos21_3d[1]->set_depth_reverse(false);
+	m_namcos21_3d[1]->set_framebuffer_size(496,480);
+
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[1], 0);
+	m_namcos21_dsp_c67[1]->set_renderer_tag("namcos21_3d_2");
+
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -814,17 +853,15 @@ ROM_START( gal3 )
 	ROM_LOAD32_BYTE( "glc-slv-prg3.18b", 0x00000, 0x20000, CRC(deae86d2) SHA1(1898955423b8da585b6319406566aad02db20d64) )
 
 	/********* DSP board x2 *********/
-	ROM_REGION32_BE( 0x400000, "dsp_board1", ROMREGION_ERASE ) /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "namcos21dsp_c67_1:point24", ROMREGION_ERASE ) /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "glc1-dsp-ptoh.2f", 0x000001, 0x80000, CRC(b4213c83) SHA1(9d036b73149656fdc13eed38946a70f532bff3f1) )  /* most significant */
 	ROM_LOAD32_BYTE( "glc1-dsp-ptou.2k", 0x000002, 0x80000, CRC(14877cef) SHA1(5ebdccd6db837ceb9473bd219eb211431944cbf0) )
 	ROM_LOAD32_BYTE( "glc1-dsp-ptol.2n", 0x000003, 0x80000, CRC(b318534a) SHA1(6fcf2ead6dd0d5a6f22438520588ba4e33ca39a8) )  /* least significant */
-	/* and 5x C67 (TMS320C25) */
 
-	ROM_REGION32_BE( 0x400000, "dsp_board2", ROMREGION_ERASE ) /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "namcos21dsp_c67_2:point24", ROMREGION_ERASE ) /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "glc1-dsp-ptoh.2f", 0x000001, 0x80000, CRC(b4213c83) SHA1(9d036b73149656fdc13eed38946a70f532bff3f1) )  /* most significant */
 	ROM_LOAD32_BYTE( "glc1-dsp-ptou.2k", 0x000002, 0x80000, CRC(14877cef) SHA1(5ebdccd6db837ceb9473bd219eb211431944cbf0) )
 	ROM_LOAD32_BYTE( "glc1-dsp-ptol.2n", 0x000003, 0x80000, CRC(b318534a) SHA1(6fcf2ead6dd0d5a6f22438520588ba4e33ca39a8) )  /* least significant */
-	/* and 5x C67 (TMS320C25) */
 
 	/********* OBJ board x2 *********/
 	ROM_REGION( 0x200000, "obj_board1", 0 )

@@ -25,7 +25,6 @@ namcos21_dsp_c67_device::namcos21_dsp_c67_device(const machine_config &mconfig, 
 	m_c67master(*this, "dspmaster"),
 	m_c67slave(*this, "dspslave%u", 0U),
 	m_ptrom24(*this,"point24"),
-	m_dspram16(*this,"dspram16"),
 	m_master_dsp_ram(*this,"master_dsp_ram"),
 	m_gametype(0),
 	m_yield_hack_cb(*this),
@@ -35,9 +34,14 @@ namcos21_dsp_c67_device::namcos21_dsp_c67_device(const machine_config &mconfig, 
 
 void namcos21_dsp_c67_device::device_start()
 {
+	m_dspram16.resize(0x10000/2); // 0x8000 16-bit words
+	std::fill(std::begin(m_dspram16), std::end(m_dspram16), 0x0000);
+
 	m_yield_hack_cb.resolve_safe();
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_mpDspState = make_unique_clear<dsp_state>();
+
+	save_item(NAME(m_dspram16));
 }
 
 void namcos21_dsp_c67_device::device_reset()
