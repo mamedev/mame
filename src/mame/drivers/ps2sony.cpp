@@ -400,7 +400,7 @@ WRITE32_MEMBER(ps2sony_state::ipu_w)
 					break;
 				case 0x03: /* VDEC */
 				{
-					static const char *vlc[4] =
+					static char const *const vlc[4] =
 					{
 						"Macroblock Address Increment",
 						"Macroblock Type",

@@ -50,7 +50,7 @@ void nscsi_bus_device::regen_data()
 
 void nscsi_bus_device::regen_ctrl(int refid)
 {
-	static const char *phase[8] = {
+	static char const *const phase[8] = {
 		"dout", "din ", "cmd ", "stat", "4   ", "5   ", "mout", "min "
 	};
 

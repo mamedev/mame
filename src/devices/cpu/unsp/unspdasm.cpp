@@ -13,18 +13,18 @@
 
 /*****************************************************************************/
 
-const char *unsp_disassembler::reg[] =
+char const *const unsp_disassembler::reg[] =
 {
 	"sp", "r1", "r2", "r3", "r4", "bp", "sr", "pc"
 };
 
-const char *unsp_disassembler::jmp[] =
+char const *const unsp_disassembler::jmp[] =
 {
 	"jb", "jae", "jge", "jl", "jne", "je", "jpl", "jmi",
 	"jbe", "ja", "jle", "jg", "jvc", "jvs", "jmp", "<inv>"
 };
 
-const char *unsp_disassembler::alu[] =
+char const *const unsp_disassembler::alu[] =
 {
 	"add",  "adc",   "sub",   "sbc",
 	"cmp",  "<inv>", "neg",   "<inv>",
