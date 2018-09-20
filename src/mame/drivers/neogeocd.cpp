@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	MCFG_CDROM_INTERFACE("neocd_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","neocd")
 
-	m_ym->set_addrmap(0, neocd_ym_map);
+	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
 MACHINE_CONFIG_END
 
 
