@@ -334,6 +334,7 @@ isbc8030.cpp
 iskr103x.cpp
 itt3030.cpp
 jade.cpp
+jazz.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
