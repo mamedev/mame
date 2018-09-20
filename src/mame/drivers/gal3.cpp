@@ -171,8 +171,10 @@ private:
 	DECLARE_WRITE16_MEMBER(rso_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	uint32_t screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	// using ind16 for now because namco_c355spr_device::zdrawgfxzoom does not support rgb32, will probably need to be improved for LD use
+	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cpu_mst_map(address_map &map);
 	void cpu_slv_map(address_map &map);
 	void psn_b1_cpu_map(address_map &map);
@@ -192,7 +194,7 @@ void gal3_state::video_start()
 	save_item(NAME(m_video_enable));
 }
 
-uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	char mst[18], slv[18];
@@ -242,7 +244,7 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static int pivot = 15;
 	int pri;
@@ -346,7 +348,7 @@ void gal3_state::cpu_slv_map(address_map &map)
 	map(0x60010000, 0x60017fff).ram().share("share1");
 	map(0x80000000, 0x8007ffff).ram(); //512K Local RAM
 
-	map(0xf1200000, 0xf120ffff).ram(); //DSP RAM
+	map(0xf1200000, 0xf120ffff).ram(); //DSP RAM (1st DSP board)
 /// AM_RANGE(0xf1400000, 0xf1400003) AM_WRITE(pointram_control_w)
 /// AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE(pointram_data_r,pointram_data_w)
 /// AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */
@@ -357,7 +359,7 @@ void gal3_state::cpu_slv_map(address_map &map)
 	map(0xf1750000, 0xf175ffff).rw(m_palette[0], FUNC(palette_device::read16_ext), FUNC(palette_device::write16_ext)).share("palette_1_ext");
 	map(0xf1760000, 0xf1760001).rw(FUNC(gal3_state::video_enable_r<0>), FUNC(gal3_state::video_enable_w<0>));
 
-	map(0xf2200000, 0xf220ffff).ram();
+	map(0xf2200000, 0xf220ffff).ram(); //DSP RAM (2nd DSP board)
 	map(0xf2700000, 0xf270ffff).rw(m_c355spr[1], FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram_2");
 	map(0xf2720000, 0xf2720007).rw(m_c355spr[1], FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xf2740000, 0xf274ffff).rw(m_palette[1], FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette_2");
@@ -623,6 +625,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_left)
+	MCFG_SCREEN_PALETTE("palette_1")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -630,6 +633,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_right)
+	MCFG_SCREEN_PALETTE("palette_2")
 
 	MCFG_DEVICE_ADD("gfxdecode_1", GFXDECODE, "palette_1", gfx_gal3_l)
 	MCFG_PALETTE_ADD("palette_1", NAMCOS21_NUM_COLORS)
