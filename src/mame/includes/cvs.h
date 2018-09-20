@@ -48,8 +48,20 @@ public:
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void init_raiders();
+	void init_huncholy();
+	void init_hero();
+	void init_superbik();
+	void init_hunchbaka();
+	void cvs(machine_config &config);
+
+protected:
+
+	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag); // used by galaxia_state
+	DECLARE_READ8_MEMBER(huncholy_prot_r);
+	DECLARE_READ8_MEMBER(superbik_prot_r);
+	DECLARE_READ8_MEMBER(hero_prot_r);
 	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
-	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
 	DECLARE_WRITE_LINE_MEMBER(cvs_slave_cpu_interrupt);
 	DECLARE_READ8_MEMBER(cvs_input_r);
 	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_lo_w);
@@ -75,29 +87,22 @@ public:
 	DECLARE_WRITE8_MEMBER(cvs_unknown_w);
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_ctl_w);
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_pdc_w);
-	void init_raiders();
-	void init_huncholy();
-	void init_hero();
-	void init_superbik();
-	void init_hunchbaka();
 	DECLARE_VIDEO_START(cvs);
 	DECLARE_PALETTE_INIT(cvs);
 	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
 	TIMER_CALLBACK_MEMBER(cvs_393hz_timer_cb);
-	void set_pens(  );
-	void cvs_scroll_stars(  );
-	void cvs_init_stars(  );
+	void set_pens();
+	void cvs_scroll_stars();
+	void cvs_init_stars();
 	void cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
 	void start_393hz_timer();
-	void cvs(machine_config &config);
 	void cvs_dac_cpu_map(address_map &map);
 	void cvs_main_cpu_data_map(address_map &map);
 	void cvs_main_cpu_io_map(address_map &map);
 	void cvs_main_cpu_map(address_map &map);
 	void cvs_speech_cpu_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -123,6 +128,7 @@ protected:
 	int m_s2650_flag;
 	emu_timer  *m_cvs_393hz_timer;
 	uint8_t      m_cvs_393hz_clock;
+	uint8_t      m_protection_counter;
 
 	uint8_t      m_character_banking_mode;
 	uint16_t     m_character_ram_page_start;

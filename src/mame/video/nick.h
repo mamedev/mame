@@ -33,7 +33,7 @@
 
 
 #define MCFG_NICK_VIRQ_CALLBACK(_write) \
-	devcb = &downcast<nick_device &>(*device).set_virq_wr_callback(DEVCB_##_write);
+	downcast<nick_device &>(*device).set_virq_wr_callback(DEVCB_##_write);
 
 
 /* there are 64us per line, although in reality

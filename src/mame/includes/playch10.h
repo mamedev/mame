@@ -27,6 +27,32 @@ public:
 	{
 	}
 
+	void playch10(machine_config &config);
+	void playchnv(machine_config &config);
+	void playch10_hboard(machine_config &config);
+
+	void init_playch10();
+	void init_pc_gun();
+	void init_pcaboard();
+	void init_pcbboard();
+	void init_pccboard();
+	void init_pcdboard();
+	void init_pcdboard_2();
+	void init_pceboard();
+	void init_pcfboard();
+	void init_pcfboard_2();
+	void init_virus();
+	void init_ttoon();
+	void init_pcgboard();
+	void init_pcgboard_type2();
+	void init_pchboard();
+	void init_pciboard();
+	void init_pckboard();
+	void init_pc_hrz();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);
 	DECLARE_READ8_MEMBER(ram_8w_r);
 	DECLARE_WRITE8_MEMBER(ram_8w_w);
@@ -59,43 +85,17 @@ public:
 	DECLARE_WRITE8_MEMBER(iboard_rom_switch_w);
 	DECLARE_WRITE8_MEMBER(hboard_rom_switch_w);
 	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
-
-	void init_playch10();
-	void init_pc_gun();
-	void init_pcaboard();
-	void init_pcbboard();
-	void init_pccboard();
-	void init_pcdboard();
-	void init_pcdboard_2();
-	void init_pceboard();
-	void init_pcfboard();
-	void init_pcfboard_2();
-	void init_virus();
-	void init_ttoon();
-	void init_pcgboard();
-	void init_pcgboard_type2();
-	void init_pchboard();
-	void init_pciboard();
-	void init_pckboard();
-	void init_pc_hrz();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	// machine configuration builders
-	void playch10(machine_config &config);
-	void playchnv(machine_config &config);
-	void playch10_hboard(machine_config &config);
 
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void cart_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	struct chr_bank
 	{
 		int writable;   // 1 for RAM, 0 for ROM

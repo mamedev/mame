@@ -28,7 +28,7 @@
 	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0)
 
 #define MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(_write) \
-	devcb = &downcast<microdrive_image_device &>(*device).set_comms_out_wr_callback(DEVCB_##_write);
+	downcast<microdrive_image_device &>(*device).set_comms_out_wr_callback(DEVCB_##_write);
 
 
 

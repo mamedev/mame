@@ -2002,8 +2002,10 @@ void btime_state::init_zoar()
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
 	   implementing it given what opcode 0x23 should do, but it still didn't
-	   work in demo mode. So this could be another protection or a bad ROM read.
-	   I'm NOPing it out for now. */
+	   work in demo mode, this could be another protection.
+
+	   The ROM has been confirmed as good on multiple working PCBs, so this
+	   isn't a bitrot issue */
 	memset(&rom[0xd50a],0xea,8);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
@@ -2016,7 +2018,11 @@ void btime_state::init_tisland()
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
 	   unmapped area that causes the game to fail in several circumstances.On the Cassette
 	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-	   wrong going on in the encryption scheme.*/
+	   wrong going on in the encryption scheme.
+
+	   There are other locations with similar problems. These ROMs have NOT yet been
+	   confirmed on multiple PCBs, so this could still be a bad dump.
+	   */
 	memset(&rom[0xa2b6],0x24,1);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;

@@ -817,7 +817,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
 		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= m_diw.min_y && scanline < m_diw.max_y)
+			planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -922,7 +922,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != nullptr && x >= m_diw.min_x && x < m_diw.max_x)
+			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
 			{
 				int pix, pri;
 
@@ -1012,7 +1012,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	}
 
 	// end of the line: time to add the modulos
-	if (scanline >= m_diw.min_y && scanline < m_diw.max_y)
+	if (scanline >= m_diw.top() && scanline < m_diw.bottom())
 	{
 		// update odd planes
 		for (pl = 0; pl < planes; pl += 2)
@@ -1054,11 +1054,11 @@ uint32_t amiga_state::screen_update_amiga(screen_device &screen, bitmap_ind16 &b
 {
 	// sometimes the core tells us to render a bunch of lines to keep up (resolution change, for example)
 	// this causes trouble for us since it can happen at any time
-	if (cliprect.min_y != cliprect.max_y)
+	if (cliprect.top() != cliprect.bottom())
 		return 0;
 
 	// render each scanline in the visible region
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		render_scanline(bitmap, y);
 
 	return 0;

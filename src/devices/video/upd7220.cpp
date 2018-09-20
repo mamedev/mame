@@ -408,15 +408,14 @@ inline void upd7220_device::recompute_parameters()
 
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock() * 8) * horiz_pix_total * vert_pix_total;
 
-	rectangle visarea;
-
-	visarea.min_x = 0; //(m_hs + m_hbp) * 8;
-	visarea.min_y = m_vbp; //m_vs + m_vbp;
-	visarea.max_x = m_aw * horiz_mult - 1;//horiz_pix_total - (m_hfp * 8) - 1;
-	visarea.max_y = m_al * vert_mult + m_vbp - 1;//vert_pix_total - m_vfp - 1;
+	rectangle visarea(
+			0, //(m_hs + m_hbp) * 8;
+			m_aw * horiz_mult - 1,//horiz_pix_total - (m_hfp * 8) - 1;
+			m_vbp, //m_vs + m_vbp;
+			m_al * vert_mult + m_vbp - 1);//vert_pix_total - m_vfp - 1;
 
 	LOG("uPD7220 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-	LOG("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	LOG("Visible Area: (%u, %u) - (%u, %u)\n", visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 	LOG("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch);
 	LOG("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);
 

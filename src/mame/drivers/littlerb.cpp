@@ -117,6 +117,13 @@ public:
 	{
 	}
 
+	void littlerb(machine_config &config);
+
+	void init_littlerb();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<inder_vid_device> m_indervid;
 
@@ -126,7 +133,6 @@ public:
 	uint16_t m_sound_pointer_l,m_sound_pointer_r;
 	int m_soundframe;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
 	DECLARE_WRITE16_MEMBER(littlerb_l_sound_w);
 	DECLARE_WRITE16_MEMBER(littlerb_r_sound_w);
 	uint8_t sound_data_shift();
@@ -134,8 +140,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
 
-	void init_littlerb();
-	void littlerb(machine_config &config);
 	void littlerb_main(address_map &map);
 };
 

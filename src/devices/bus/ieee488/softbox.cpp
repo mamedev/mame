@@ -26,9 +26,7 @@
 #define I8251_TAG       "ic15"
 #define I8255_0_TAG     "ic17"
 #define I8255_1_TAG     "ic16"
-#define COM8116_TAG     "ic14"
 #define RS232_TAG       "rs232"
-#define CORVUS_HDC_TAG  "corvus"
 
 
 
@@ -91,7 +89,7 @@ void softbox_device::softbox_io(address_map &map)
 	map(0x0c, 0x0c).w(FUNC(softbox_device::dbrg_w));
 	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x18, 0x18).rw(CORVUS_HDC_TAG, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
+	map(0x18, 0x18).rw(m_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
 }
 
 
@@ -241,32 +239,32 @@ MACHINE_CONFIG_START(softbox_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(softbox_io)
 
 	// devices
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, softbox_device, ppi0_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, softbox_device, ppi0_pb_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SW1"))
+	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
+	ppi0.in_pa_callback().set(FUNC(softbox_device::ppi0_pa_r));
+	ppi0.out_pb_callback().set(FUNC(softbox_device::ppi0_pb_w));
+	ppi0.in_pc_callback().set_ioport("SW1");
 
-	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, softbox_device, ppi1_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, softbox_device, ppi1_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, softbox_device, ppi1_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, softbox_device, ppi1_pc_w))
+	i8255_device &ppi1(I8255A(config, I8255_1_TAG));
+	ppi1.in_pa_callback().set(FUNC(softbox_device::ppi1_pa_r));
+	ppi1.out_pb_callback().set(FUNC(softbox_device::ppi1_pb_w));
+	ppi1.in_pc_callback().set(FUNC(softbox_device::ppi1_pc_r));
+	ppi1.out_pc_callback().set(FUNC(softbox_device::ppi1_pc_w));
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
+	COM8116(config, m_dbrg, 5.0688_MHz_XTAL);
+	m_dbrg->fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));
+	m_dbrg->ft_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
+	MCFG_DEVICE_ADD(m_hdc, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 	MCFG_HARDDISK_ADD("harddisk2")
@@ -322,8 +320,8 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SOFTBOX, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)
-	, m_dbrg(*this, COM8116_TAG)
-	, m_hdc(*this, CORVUS_HDC_TAG)
+	, m_dbrg(*this, "ic14")
+	, m_hdc(*this, "corvus")
 	, m_leds(*this, "led%u", 0U)
 	, m_ifc(0)
 {

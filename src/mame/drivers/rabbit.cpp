@@ -112,6 +112,11 @@ public:
 		m_blitterregs(*this, "blitterregs"),
 		m_spriteram(*this, "spriteram") { }
 
+	void rabbit(machine_config &config);
+
+	void init_rabbit();
+
+private:
 	DECLARE_WRITE32_MEMBER(tilemap0_w);
 	DECLARE_WRITE32_MEMBER(tilemap1_w);
 	DECLARE_WRITE32_MEMBER(tilemap2_w);
@@ -125,16 +130,11 @@ public:
 	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
-	void init_rabbit();
-
-	void rabbit(machine_config &config);
-
 	void rabbit_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
 

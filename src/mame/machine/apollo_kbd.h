@@ -32,10 +32,10 @@
 //**************************************************************************
 
 #define MCFG_APOLLO_KBD_TX_CALLBACK(_cb) \
-	devcb = &downcast<apollo_kbd_device &>(*device).set_tx_cb(DEVCB_##_cb);
+	downcast<apollo_kbd_device &>(*device).set_tx_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_KBD_GERMAN_CALLBACK(_cb) \
-	devcb = &downcast<apollo_kbd_device &>(*device).set_german_cb(DEVCB_##_cb);
+	downcast<apollo_kbd_device &>(*device).set_german_cb(DEVCB_##_cb);
 
 
 //**************************************************************************

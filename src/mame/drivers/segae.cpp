@@ -321,6 +321,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vdp1(*this, "vdp1"),
 		m_vdp2(*this, "vdp2"),
+		m_ppi(*this, "ppi"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu_region(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
@@ -329,23 +330,26 @@ public:
 		m_lamp(*this, "lamp0")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank_write);
-	DECLARE_WRITE8_MEMBER(coin_counters_write);
-
-	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
-	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
-
-	void init_opaopa();
-	void init_fantzn2();
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void systemex_315_5177(machine_config &config);
 	void systemex(machine_config &config);
 	void ridleofp(machine_config &config);
 	void hangonjr(machine_config &config);
 	void systeme(machine_config &config);
 	void systemeb(machine_config &config);
+
+	void init_opaopa();
+	void init_fantzn2();
+
+private:
+	DECLARE_WRITE8_MEMBER(bank_write);
+	DECLARE_WRITE8_MEMBER(coin_counters_write);
+
+	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
+	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
+
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void banked_decrypted_opcodes_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void io_map(address_map &map);
@@ -353,14 +357,13 @@ public:
 	void vdp1_map(address_map &map);
 	void vdp2_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
-private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<sega315_5124_device> m_vdp2;
+	required_device<i8255_device>		 m_ppi;
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
@@ -411,17 +414,17 @@ void systeme_state::io_map(address_map &map)
 	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
-	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
-	map(0xbe, 0xbe).rw(m_vdp2, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0xbf, 0xbf).rw(m_vdp2, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
+	map(0xbe, 0xbe).rw(m_vdp2, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0xbf, 0xbf).rw(m_vdp2, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xe0, 0xe0).portr("e0");
 	map(0xe1, 0xe1).portr("e1");
 	map(0xe2, 0xe2).portr("e2");
 	map(0xf2, 0xf2).portr("f2");
 	map(0xf3, 0xf3).portr("f3");
 	map(0xf7, 0xf7).w(FUNC(systeme_state::bank_write));
-	map(0xf8, 0xfb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf8, 0xfb).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 
@@ -888,9 +891,9 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	MCFG_DEVICE_PROGRAM_MAP(systeme_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, systeme_state, coin_counters_write))
-	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
+	I8255(config, m_ppi);
+	m_ppi->out_pb_callback().set(FUNC(systeme_state::coin_counters_write));
+	m_ppi->tri_pb_callback().set_constant(0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
@@ -917,13 +920,13 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(systeme_state::hangonjr)
+void systeme_state::hangonjr(machine_config &config)
+{
 	systeme(config);
-	MCFG_DEVICE_MODIFY("ppi")
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, systeme_state, hangonjr_port_f8_read))
-	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 must be the ADC0804 /INTR signal
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, systeme_state, hangonjr_port_fa_write)) // CD4051 selector input
-MACHINE_CONFIG_END
+	m_ppi->in_pa_callback().set(FUNC(systeme_state::hangonjr_port_f8_read));
+	m_ppi->in_pc_callback().set_constant(0); // bit 4 must be the ADC0804 /INTR signal
+	m_ppi->out_pc_callback().set(FUNC(systeme_state::hangonjr_port_fa_write)); // CD4051 selector input
+}
 
 MACHINE_CONFIG_START(systeme_state::ridleofp)
 	systeme(config);
@@ -931,13 +934,13 @@ MACHINE_CONFIG_START(systeme_state::ridleofp)
 	MCFG_UPD4701_PORTX("PAD1")
 	MCFG_UPD4701_PORTY("PAD2")
 
-	MCFG_DEVICE_MODIFY("ppi")
-	MCFG_I8255_IN_PORTA_CB(READ8("upd4701", upd4701_device, d_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE("upd4701", upd4701_device, cs_w)) MCFG_DEVCB_BIT(4)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, xy_w)) MCFG_DEVCB_BIT(3)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, ul_w)) MCFG_DEVCB_BIT(2)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, resetx_w)) MCFG_DEVCB_BIT(1) // or possibly bit 0
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, resety_w)) MCFG_DEVCB_BIT(0) // or possibly bit 1
+	i8255_device &ppi(*subdevice<i8255_device>("ppi"));
+	ppi.in_pa_callback().set("upd4701", FUNC(upd4701_device::d_r));
+	ppi.out_pc_callback().set("upd4701", FUNC(upd4701_device::cs_w)).bit(4);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::xy_w)).bit(3);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::ul_w)).bit(2);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resetx_w)).bit(1); // or possibly bit 0
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resety_w)).bit(0); // or possibly bit 1
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(systeme_state::systemex)

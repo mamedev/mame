@@ -21,40 +21,40 @@ DEFINE_DEVICE_TYPE(AL_MAGICSOUND, al_magicsound_device, "al_magicsound", "Aleste
 
 
 MACHINE_CONFIG_START(al_magicsound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "dmac", AM9517A, XTAL(4'000'000) )  // CLK from expansion port
+	AM9517A(config, m_dmac, 4_MHz_XTAL);  // CLK from expansion port
 	// According to the schematics, the TC pin (EOP on western chips) is connected to NMI on the expansion port.
 	// NMIs seem to occur too quickly when this is active, so either EOP is not triggered at the correct time, or
 	// the K1810WT37 is different to the i8237/AM9517A
-	//MCFG_I8237_OUT_EOP_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w)) // MCFG_DEVCB_INVERT
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dmac", am9517a_device, hack_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, al_magicsound_device, dma_read_byte))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, al_magicsound_device, dma_write_byte))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, al_magicsound_device, dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, al_magicsound_device, dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, al_magicsound_device, dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, al_magicsound_device, dack3_w))
+	//m_dmac->out_eop_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::nmi_w))/*.invert()*/;
+	m_dmac->out_hreq_callback().set(m_dmac, FUNC(am9517a_device::hack_w));
+	m_dmac->in_memr_callback().set(FUNC(al_magicsound_device::dma_read_byte));
+	m_dmac->out_iow_callback<0>().set(FUNC(al_magicsound_device::dma_write_byte));
+	m_dmac->out_iow_callback<1>().set(FUNC(al_magicsound_device::dma_write_byte));
+	m_dmac->out_iow_callback<2>().set(FUNC(al_magicsound_device::dma_write_byte));
+	m_dmac->out_iow_callback<3>().set(FUNC(al_magicsound_device::dma_write_byte));
+	m_dmac->out_dack_callback<0>().set(FUNC(al_magicsound_device::dack0_w));
+	m_dmac->out_dack_callback<1>().set(FUNC(al_magicsound_device::dack1_w));
+	m_dmac->out_dack_callback<2>().set(FUNC(al_magicsound_device::dack2_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(al_magicsound_device::dack3_w));
 
 	// Timing does not seem to be correct.
 	// According to the schematics, the clock is from the clock pin on the expansion port (4MHz), and
 	// passes through an inverter to each CLK pin on both timers.  This seems to be too fast.
 	// Timer outputs to SAM0/1/2/3 are sample clocks for each sound channel, D/A0 is the low bit of the channel select.
-	MCFG_DEVICE_ADD("timer1", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL(4'000'000))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, al_magicsound_device, sam0_w))
-	MCFG_PIT8253_CLK1(XTAL(4'000'000))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, al_magicsound_device, sam1_w))
-	MCFG_PIT8253_CLK2(XTAL(4'000'000))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, al_magicsound_device, sam2_w))
+	PIT8254(config, m_timer1, 0);
+	m_timer1->set_clk<0>(4_MHz_XTAL);
+	m_timer1->out_handler<0>().set(FUNC(al_magicsound_device::sam0_w));
+	m_timer1->set_clk<1>(4_MHz_XTAL);
+	m_timer1->out_handler<1>().set(FUNC(al_magicsound_device::sam1_w));
+	m_timer1->set_clk<2>(4_MHz_XTAL);
+	m_timer1->out_handler<2>().set(FUNC(al_magicsound_device::sam2_w));
 
-	MCFG_DEVICE_ADD("timer2", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL(4'000'000))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, al_magicsound_device, sam3_w))
-	MCFG_PIT8253_CLK1(XTAL(4'000'000))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, al_magicsound_device, da0_w))
-	MCFG_PIT8253_CLK2(XTAL(4'000'000))
+	PIT8254(config, m_timer2, 0);
+	m_timer2->set_clk<0>(4_MHz_XTAL);
+	m_timer2->out_handler<0>().set(FUNC(al_magicsound_device::sam3_w));
+	m_timer2->set_clk<1>(4_MHz_XTAL);
+	m_timer2->out_handler<1>().set(FUNC(al_magicsound_device::da0_w));
+	m_timer2->set_clk<2>(4_MHz_XTAL);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -74,7 +74,8 @@ al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const 
 	m_dac(*this,"dac"),
 	m_dmac(*this,"dmac"),
 	m_timer1(*this,"timer1"),
-	m_timer2(*this,"timer2"), m_current_channel(0), m_ramptr(nullptr), m_current_output(0)
+	m_timer2(*this,"timer2"),
+	m_current_channel(0), m_ramptr(nullptr), m_current_output(0)
 {
 }
 

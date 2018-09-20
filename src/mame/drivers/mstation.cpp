@@ -34,7 +34,6 @@
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -52,6 +51,9 @@ public:
 	{
 	}
 
+	void mstation(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_bankdev1;
@@ -61,7 +63,7 @@ public:
 
 	uint8_t m_bank1[2];
 	uint8_t m_bank2[2];
-	uint8_t *m_vram;
+	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t m_screen_column;
 	uint8_t m_port2;
 	uint8_t m_irq;
@@ -98,7 +100,6 @@ public:
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
-	void mstation(machine_config &config);
 	void mstation_banked_map(address_map &map);
 	void mstation_io(address_map &map);
 	void mstation_mem(address_map &map);
@@ -395,7 +396,7 @@ INPUT_PORTS_END
 void mstation_state::machine_start()
 {
 	// allocate the videoram
-	m_vram = (uint8_t*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
+	m_vram = make_unique_clear<uint8_t[]>(9600);
 
 	// map firsh RAM bank at 0xc000-0xffff
 	membank("sysram")->set_base(m_nvram);
@@ -406,7 +407,6 @@ void mstation_state::machine_reset()
 {
 	m_bank1[0] =  m_bank1[1] = 0;
 	m_bank2[0] =  m_bank2[1] = 0;
-	memset(m_vram, 0, 9600);
 
 	// reset banks
 	m_bankdev1->set_bank(0);
@@ -461,10 +461,9 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_AMD_29F080_ADD("flash0")
-	MCFG_SST_28SF040_ADD("flash1")
+	AMD_29F080(config, "flash0");
+	SST_28SF040(config, "flash1");
 
 	// IRQ 4 is generated every second, used for auto power off
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", mstation_state, mstation_1hz_timer, attotime::from_hz(1))
@@ -475,21 +474,11 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, mstation_state, rtc_irq))
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

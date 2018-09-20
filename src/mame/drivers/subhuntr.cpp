@@ -37,7 +37,7 @@ public:
 
 	void subhuntr(machine_config &config);
 
-protected:
+private:
 	INTERRUPT_GEN_MEMBER(subhuntr_interrupt);
 
 	virtual void machine_start() override;
@@ -50,7 +50,6 @@ protected:
 	void subhuntr_io_map(address_map &map);
 	void subhuntr_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

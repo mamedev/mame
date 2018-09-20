@@ -20,10 +20,10 @@
 	MCFG_PPU2C0X_ADD(_tag, PPU_VT03)
 
 #define MCFG_PPU_VT03_READ_BG_CB(_devcb) \
-	devcb = &downcast<ppu_vt03_device &>(*device).set_read_bg_callback(DEVCB_##_devcb);
+	downcast<ppu_vt03_device &>(*device).set_read_bg_callback(DEVCB_##_devcb);
 
 #define MCFG_PPU_VT03_READ_SP_CB(_devcb) \
-	devcb = &downcast<ppu_vt03_device &>(*device).set_read_sp_callback(DEVCB_##_devcb);
+	downcast<ppu_vt03_device &>(*device).set_read_sp_callback(DEVCB_##_devcb);
 
 #define MCFG_PPU_VT03_MODIFY MCFG_DEVICE_MODIFY
 

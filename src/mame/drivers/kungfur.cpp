@@ -77,6 +77,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void kungfur(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
@@ -87,10 +90,8 @@ public:
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
-	void kungfur(machine_config &config);
 	void kungfur_map(address_map &map);
 
-private:
 	uint8_t m_latch[3];
 	uint8_t m_control;
 	uint32_t m_adpcm_pos[2];
@@ -302,18 +303,18 @@ MACHINE_CONFIG_START(kungfur_state::kungfur)
 	MCFG_DEVICE_PROGRAM_MAP(kungfur_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(kungfur_state, kungfur_irq,  975)      // close approximation
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kungfur_state, kungfur_output_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kungfur_state, kungfur_control_w))
+	ppi0.out_pa_callback().set(FUNC(kungfur_state::kungfur_output_w));
+	ppi0.in_pb_callback().set_ioport("IN0");
+	ppi0.in_pc_callback().set_ioport("IN1");
+	ppi0.out_pc_callback().set(FUNC(kungfur_state::kungfur_control_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	// $400c - always $80 (PPI mode 0, all ports as output)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kungfur_state, kungfur_latch1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kungfur_state, kungfur_latch2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kungfur_state, kungfur_latch3_w))
+	ppi1.out_pa_callback().set(FUNC(kungfur_state::kungfur_latch1_w));
+	ppi1.out_pb_callback().set(FUNC(kungfur_state::kungfur_latch2_w));
+	ppi1.out_pc_callback().set(FUNC(kungfur_state::kungfur_latch3_w));
 
 	/* no video! */
 

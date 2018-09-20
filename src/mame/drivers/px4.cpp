@@ -84,8 +84,13 @@ public:
 		m_centronics_busy(0), m_centronics_perror(0)
 	{ }
 
+	void px4(machine_config &config);
+
 	void init_px4();
 
+	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
+
+protected:
 	DECLARE_PALETTE_INIT( px4 );
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -117,7 +122,6 @@ public:
 	DECLARE_WRITE8_MEMBER( swr_w );
 	DECLARE_WRITE8_MEMBER( ioctlr_w );
 
-	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ext_cassette_read );
 	TIMER_DEVICE_CALLBACK_MEMBER( frc_tick );
@@ -135,10 +139,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
 
-	void px4(machine_config &config);
 	void px4_io(address_map &map);
 	void px4_mem(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -149,7 +152,6 @@ protected:
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
 
-private:
 	// z80 interrupt sources
 	enum
 	{
@@ -262,8 +264,11 @@ public:
 	m_ramdisk(nullptr)
 	{ }
 
+	void px4p(machine_config &config);
+
 	void init_px4p();
 
+private:
 	DECLARE_PALETTE_INIT( px4p );
 
 	DECLARE_WRITE8_MEMBER( ramdisk_address_w );
@@ -271,13 +276,11 @@ public:
 	DECLARE_WRITE8_MEMBER( ramdisk_data_w );
 	DECLARE_READ8_MEMBER( ramdisk_control_r );
 
-	void px4p(machine_config &config);
 	void px4p_io(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 
-private:
 	required_device<nvram_device> m_rdnvram;
 	required_device<generic_slot_device> m_rdsocket;
 
@@ -1496,7 +1499,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_SCREEN_UPDATE_DRIVER(px4_state, screen_update_px4)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_px4)
+	config.set_default_layout(layout_px4);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(px4_state, px4)
@@ -1510,9 +1513,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64k")
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	RAM(config, RAM_TAG).set_default_size("64K");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// centronics printer
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
@@ -1553,7 +1555,7 @@ MACHINE_CONFIG_START(px4p_state::px4p)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(px4p_io)
 
-	MCFG_NVRAM_ADD_0FILL("rdnvram")
+	NVRAM(config, "rdnvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(px4p_state, px4p)

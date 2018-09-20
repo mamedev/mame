@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 	DECLARE_WRITE16_MEMBER(weststry_layer_scroll_w);
-	DECLARE_WRITE8_MEMBER(weststry_soundlatch_w);
+	void weststry_soundlatch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(weststry_opl_irq_w);
 	DECLARE_WRITE8_MEMBER(weststry_opl_w);
 	DECLARE_WRITE8_MEMBER(weststry_soundnmi_ack_w);

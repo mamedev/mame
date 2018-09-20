@@ -21,15 +21,15 @@ public:
 
 	void kissp(machine_config &config);
 	void kissp_map(address_map &map);
-protected:
 
+	void init_kissp();
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_kissp();
 };
 
 

@@ -53,15 +53,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void minicom(machine_config &config);
+
+	void init_minicom();
+
+private:
 	DECLARE_WRITE8_MEMBER(i87c52_p0_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p1_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p2_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p3_w);
 	DECLARE_READ8_MEMBER(i87c52_p1_r);
 	DECLARE_READ8_MEMBER(i87c52_p2_r);
-	void init_minicom();
-	void minicom(machine_config &config);
-private:
+
 	uint8_t m_p[4];
 	uint16_t m_display_data;
 	int m_digit_index;
@@ -228,7 +231,7 @@ MACHINE_CONFIG_START(minicom_state::minicom)
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */
-	MCFG_DEFAULT_LAYOUT(layout_minicom)
+	config.set_default_layout(layout_minicom);
 
 /* TODO: Map the keyboard rows/cols inputs (43-key, 4-row keyboard) */
 

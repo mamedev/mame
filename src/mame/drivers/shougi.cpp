@@ -92,8 +92,8 @@ PROM  : Type MB7051
 class shougi_state : public driver_device
 {
 public:
-	shougi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shougi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_alpha_8201(*this, "alpha_8201"),
@@ -102,7 +102,7 @@ public:
 
 	void shougi(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
@@ -116,7 +116,6 @@ protected:
 	void readport_sub(address_map &map);
 	void sub_map(address_map &map);
 
-private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -384,18 +383,17 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // 0: sharedram = sub, 1: sharedram = main (TODO!)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, shougi_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("alpha_8201", alpha_8201_device, mcu_start_w)) // start/halt ALPHA-8201
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("alpha_8201", alpha_8201_device, bus_dir_w)) MCFG_DEVCB_INVERT // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // nothing? connected to +5v via resistor
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // 0: sharedram = sub, 1: sharedram = main (TODO!)
+	mainlatch.q_out_cb<1>().set(FUNC(shougi_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set_nop(); // ?
+	mainlatch.q_out_cb<3>().set("alpha_8201", FUNC(alpha_8201_device::mcu_start_w)); // start/halt ALPHA-8201
+	mainlatch.q_out_cb<4>().set("alpha_8201", FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10) // assuming it's the same as champbas
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

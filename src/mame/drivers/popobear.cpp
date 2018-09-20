@@ -104,6 +104,9 @@ public:
 		m_tilemap_base[3] = 0xfc000;
 	}
 
+	void popobear(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -132,7 +135,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
 	void postload();
-	void popobear(machine_config &config);
 	void popobear_mem(address_map &map);
 };
 
@@ -412,7 +414,7 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			uint16_t val = m_vram[scrollbase/2 + line];
 			uint16_t upper = (m_vram[scrollbase2/2 + line]&0xff00)>>8;
 
-			clip.min_y = clip.max_y = line;
+			clip.sety(line, line);
 
 			m_bg_tilemap[1]->set_scrollx(0,(val&0x00ff) | (upper << 8));
 			m_bg_tilemap[1]->set_scrolly(0,((val&0xff00)>>8)-line);
@@ -437,7 +439,7 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			uint16_t val = m_vram[scrollbase/2 + line];
 			uint16_t upper = (m_vram[scrollbase2/2 + line]&0x00ff)>>0;
 
-			clip.min_y = clip.max_y = line;
+			clip.sety(line, line);
 
 			m_bg_tilemap[0]->set_scrollx(0,(val&0x00ff) | (upper << 8));
 			m_bg_tilemap[0]->set_scrolly(0,((val&0xff00)>>8)-line);

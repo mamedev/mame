@@ -31,6 +31,9 @@ public:
 		, m_led(*this, "led0")
 	{ }
 
+	void overdriv(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
 	DECLARE_READ16_MEMBER(cpuB_ctrl_r);
@@ -49,13 +52,12 @@ public:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
-	void overdriv(machine_config &config);
 	void overdriv_k053260_map(address_map &map);
 	void overdriv_master_map(address_map &map);
 	void overdriv_slave_map(address_map &map);
 	void overdriv_sound_map(address_map &map);
 
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

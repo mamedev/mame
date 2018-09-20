@@ -163,22 +163,22 @@ void igs_bitswap_device::set_val_xor(uint16_t val_xor)
 }
 
 #define MCFG_IGS_BITSWAP_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 
 // note: b3 seems fixed to ~15, it may go away in the future
 #define MCFG_IGS_BITSWAP_M3_0_BITS(_b0, _b1, _b2, _b3) \
@@ -3562,10 +3562,10 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
+	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// protection
 	MCFG_DEVICE_ADD("igs_bitswap", IGS_BITSWAP, 0)
@@ -3659,9 +3659,9 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, igs017_state, mgcs_keys_r))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("COINS");
+	ppi.in_pb_callback().set(FUNC(igs017_state::mgcs_keys_r));
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
@@ -3698,10 +3698,10 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("COINS");
+	ppi.in_pb_callback().set_ioport("DSW1");
+	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
@@ -3794,10 +3794,10 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("COINS");
+	ppi.in_pb_callback().set_ioport("DSW1");
+	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
@@ -3838,9 +3838,9 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3885,8 +3885,8 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3921,10 +3921,10 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
+	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3963,10 +3963,10 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
+	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)

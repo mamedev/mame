@@ -160,7 +160,7 @@ TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
 	/* set a callback for the next 32-scanline increment */
 	scanline += 32;
 	if (scanline >= 256) scanline = 0;
-	machine().scheduler().timer_set(m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this), scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 void irobot_state::machine_start()
@@ -168,6 +168,10 @@ void irobot_state::machine_start()
 	m_leds.resolve();
 	m_vg_clear = 0;
 	m_statwr = 0;
+
+	/* set an initial timer to go off on scanline 0 */
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irobot_state::scanline_callback), this));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 void irobot_state::machine_reset()
@@ -183,9 +187,6 @@ void irobot_state::machine_reset()
 	m_irvg_vblank=0;
 	m_irvg_running = 0;
 	m_irmb_running = 0;
-
-	/* set an initial timer to go off on scanline 0 */
-	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this));
 
 	address_space &space = machine().dummy_space();
 	irobot_rom_banksel_w(space, 0, 0);

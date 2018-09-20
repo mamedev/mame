@@ -38,6 +38,54 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void ssv(machine_config &config);
+	void gdfs(machine_config &config);
+	void dynagear(machine_config &config);
+	void hypreac2(machine_config &config);
+	void meosism(machine_config &config);
+	void drifto94(machine_config &config);
+	void stmblade(machine_config &config);
+	void srmp4(machine_config &config);
+	void srmp7(machine_config &config);
+	void twineag2(machine_config &config);
+	void ryorioh(machine_config &config);
+	void janjans1(machine_config &config);
+	void eaglshot(machine_config &config);
+	void survarts(machine_config &config);
+	void sxyreac2(machine_config &config);
+	void ultrax(machine_config &config);
+	void vasara(machine_config &config);
+	void sxyreact(machine_config &config);
+	void mslider(machine_config &config);
+	void jsk(machine_config &config);
+	void hypreact(machine_config &config);
+	void keithlcy(machine_config &config);
+	void cairblad(machine_config &config);
+
+	void init_gdfs();
+	void init_sxyreac2();
+	void init_hypreac2();
+	void init_hypreact();
+	void init_dynagear();
+	void init_eaglshot();
+	void init_srmp4();
+	void init_srmp7();
+	void init_keithlcy();
+	void init_meosism();
+	void init_vasara();
+	void init_cairblad();
+	void init_sxyreact();
+	void init_janjans1();
+	void init_ryorioh();
+	void init_drifto94();
+	void init_survarts();
+	void init_ultrax();
+	void init_stmblade();
+	void init_jsk();
+	void init_twineag2();
+	void init_mslider();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<es5506_device> m_ensoniq;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -103,28 +151,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 
-	void init_gdfs();
-	void init_sxyreac2();
-	void init_hypreac2();
-	void init_hypreact();
-	void init_dynagear();
-	void init_eaglshot();
-	void init_srmp4();
-	void init_srmp7();
-	void init_keithlcy();
-	void init_meosism();
-	void init_vasara();
-	void init_cairblad();
-	void init_sxyreact();
-	void init_janjans1();
-	void init_ryorioh();
-	void init_drifto94();
-	void init_survarts();
-	void init_ultrax();
-	void init_stmblade();
-	void init_jsk();
-	void init_twineag2();
-	void init_mslider();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(gdfs);
@@ -148,29 +174,7 @@ public:
 	void init_hypreac2_common();
 	void init_eaglshot_banking();
 
-	void ssv(machine_config &config);
-	void gdfs(machine_config &config);
-	void dynagear(machine_config &config);
-	void hypreac2(machine_config &config);
-	void meosism(machine_config &config);
-	void drifto94(machine_config &config);
-	void stmblade(machine_config &config);
-	void srmp4(machine_config &config);
-	void srmp7(machine_config &config);
-	void twineag2(machine_config &config);
-	void ryorioh(machine_config &config);
-	void janjans1(machine_config &config);
-	void eaglshot(machine_config &config);
-	void survarts(machine_config &config);
-	void sxyreac2(machine_config &config);
-	void ultrax(machine_config &config);
-	void vasara(machine_config &config);
-	void sxyreact(machine_config &config);
-	void mslider(machine_config &config);
-	void jsk(machine_config &config);
-	void hypreact(machine_config &config);
-	void keithlcy(machine_config &config);
-	void cairblad(machine_config &config);
+
 	void drifto94_map(address_map &map);
 	void dsp_data_map(address_map &map);
 	void dsp_prg_map(address_map &map);
@@ -191,7 +195,7 @@ public:
 	void sxyreact_map(address_map &map);
 	void twineag2_map(address_map &map);
 	void ultrax_map(address_map &map);
-protected:
+
 	optional_ioport_array<4> m_io_key;
 	optional_ioport m_io_service;
 	optional_ioport m_io_paddle;

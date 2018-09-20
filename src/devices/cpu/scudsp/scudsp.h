@@ -37,13 +37,13 @@ enum
 
 
 #define MCFG_SCUDSP_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<scudsp_cpu_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<scudsp_cpu_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCUDSP_IN_DMA_CB(_devcb) \
-	devcb = &downcast<scudsp_cpu_device &>(*device).set_in_dma_callback(DEVCB_##_devcb);
+	downcast<scudsp_cpu_device &>(*device).set_in_dma_callback(DEVCB_##_devcb);
 
 #define MCFG_SCUDSP_OUT_DMA_CB(_devcb) \
-	devcb = &downcast<scudsp_cpu_device &>(*device).set_out_dma_callback(DEVCB_##_devcb);
+	downcast<scudsp_cpu_device &>(*device).set_out_dma_callback(DEVCB_##_devcb);
 
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */

@@ -6,12 +6,12 @@
 #pragma once
 
 
-#define MCFG_HCD62121_KOL_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_kol_callback(DEVCB_##_devcb);
-#define MCFG_HCD62121_KOH_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_koh_callback(DEVCB_##_devcb);
-#define MCFG_HCD62121_PORT_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_port_callback(DEVCB_##_devcb);
-#define MCFG_HCD62121_OPT_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_opt_callback(DEVCB_##_devcb);
-#define MCFG_HCD62121_KI_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_ki_callback(DEVCB_##_devcb);
-#define MCFG_HCD62121_IN0_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_in0_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_KOL_CB(_devcb) downcast<hcd62121_cpu_device &>(*device).set_kol_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_KOH_CB(_devcb) downcast<hcd62121_cpu_device &>(*device).set_koh_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_PORT_CB(_devcb) downcast<hcd62121_cpu_device &>(*device).set_port_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_OPT_CB(_devcb) downcast<hcd62121_cpu_device &>(*device).set_opt_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_KI_CB(_devcb) downcast<hcd62121_cpu_device &>(*device).set_ki_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_IN0_CB(_devcb) downcast<hcd62121_cpu_device &>(*device).set_in0_callback(DEVCB_##_devcb);
 
 
 class hcd62121_cpu_device :  public cpu_device

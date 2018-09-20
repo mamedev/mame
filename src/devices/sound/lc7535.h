@@ -32,7 +32,7 @@
 //**************************************************************************
 
 #define MCFG_LC7535_SELECT_CB(_read) \
-	devcb = &downcast<lc7535_device &>(*device).set_select_callback(DEVCB_##_read);
+	downcast<lc7535_device &>(*device).set_select_callback(DEVCB_##_read);
 
 #define MCFG_LC7535_VOLUME_CB(_class, _method) \
 	downcast<lc7535_device &>(*device).set_volume_callback(lc7535_device::volume_delegate(&_class::_method, #_class "::" #_method, this));

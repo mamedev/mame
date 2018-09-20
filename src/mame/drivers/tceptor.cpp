@@ -343,13 +343,13 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock (needs to >640khz or the wait loop is too fast)
-	MCFG_ADC0808_IN0_CB(NOOP) // unknown
-	MCFG_ADC0808_IN1_CB(IOPORT("PEDAL"))
-	MCFG_ADC0808_IN2_CB(IOPORT("STICKX"))
-	MCFG_ADC0808_IN3_CB(IOPORT("STICKY"))
+	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
+	adc.in_callback<0>().set_constant(0); // unknown
+	adc.in_callback<1>().set_ioport("PEDAL");
+	adc.in_callback<2>().set_ioport("STICKX");
+	adc.in_callback<3>().set_ioport("STICKY");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tceptor)
@@ -357,8 +357,8 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_PALETTE_INDIRECT_ENTRIES(1024)
 	MCFG_PALETTE_INIT_OWNER(tceptor_state, tceptor)
 
-	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_palette);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)

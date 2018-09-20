@@ -183,6 +183,11 @@ public:
 		, m_ctrl(*this, "ctrl")
 	{ }
 
+	void jchan(machine_config &config);
+
+	void init_jchan();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<palette_device> m_palette;
@@ -206,13 +211,11 @@ public:
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_w);
 
-	void init_jchan();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
-	void jchan(machine_config &config);
 	void jchan_main(address_map &map);
 	void jchan_sub(address_map &map);
 };
@@ -305,7 +308,6 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (int chip = 0; chip < 2; chip++)
 	{
-		m_sprite_bitmap[chip]->fill(0, cliprect);
 		m_spritegen[chip]->skns_draw_sprites(*m_sprite_bitmap[chip], cliprect, m_sprite_ram32[chip].get(), 0x4000, m_sprite_regs32[chip].get() );
 	}
 
@@ -610,7 +612,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_DEVICE_ADD("sub", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(jchan_sub)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jchan)
 
@@ -635,7 +637,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

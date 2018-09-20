@@ -27,6 +27,28 @@ public:
 		m_audio(*this, "irem_audio")
 	{ }
 
+	void ldrun2(machine_config &config);
+	void lotlot(machine_config &config);
+	void ldrun3(machine_config &config);
+	void battroad(machine_config &config);
+	void horizon(machine_config &config);
+	void ldrun4(machine_config &config);
+	void spelunk2(machine_config &config);
+	void youjyudn(machine_config &config);
+	void kungfum(machine_config &config);
+	void spelunkr(machine_config &config);
+	void ldrun(machine_config &config);
+	void kidniki(machine_config &config);
+
+	void init_youjyudn();
+	void init_spelunkr();
+	void init_ldrun2();
+	void init_ldrun4();
+	void init_spelunk2();
+	void init_kidniki();
+	void init_battroad();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 
@@ -76,13 +98,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spelunkr_palbank_w);
 	DECLARE_WRITE8_MEMBER(spelunk2_gfxport_w);
 	DECLARE_WRITE8_MEMBER(horizon_scrollram_w);
-	void init_youjyudn();
-	void init_spelunkr();
-	void init_ldrun2();
-	void init_ldrun4();
-	void init_spelunk2();
-	void init_kidniki();
-	void init_battroad();
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ldrun_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ldrun2_bg_tile_info);
@@ -143,18 +158,7 @@ public:
 	required_device<palette_device> m_spr_palette;
 	required_device<palette_device> m_chr_palette;
 	required_device<irem_audio_device> m_audio;
-	void ldrun2(machine_config &config);
-	void lotlot(machine_config &config);
-	void ldrun3(machine_config &config);
-	void battroad(machine_config &config);
-	void horizon(machine_config &config);
-	void ldrun4(machine_config &config);
-	void spelunk2(machine_config &config);
-	void youjyudn(machine_config &config);
-	void kungfum(machine_config &config);
-	void spelunkr(machine_config &config);
-	void ldrun(machine_config &config);
-	void kidniki(machine_config &config);
+
 	void battroad_io_map(address_map &map);
 	void battroad_map(address_map &map);
 	void horizon_map(address_map &map);

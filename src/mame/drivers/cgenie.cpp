@@ -484,9 +484,7 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_CG_PARALLEL_SLOT_ADD("par")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 

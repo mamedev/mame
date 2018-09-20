@@ -193,6 +193,10 @@ public:
 		m_y(*this, "Y%u", 0)
 	{ }
 
+	void ep128(machine_config &config);
+	void ep64(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dave_device> m_dave;
 	required_device<nick_device> m_nick;
@@ -217,8 +221,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
-	void ep128(machine_config &config);
-	void ep64(machine_config &config);
 	void dave_128k_mem(address_map &map);
 	void dave_64k_mem(address_map &map);
 	void dave_io(address_map &map);
@@ -605,8 +607,7 @@ MACHINE_CONFIG_START(ep64_state::ep64)
 	MCFG_CASSETTE_INTERFACE("ep64_cass")
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "ep64_cart")
@@ -629,8 +630,7 @@ MACHINE_CONFIG_START(ep64_state::ep128)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, dave_128k_mem)
 
 	// internal RAM
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 MACHINE_CONFIG_END
 
 

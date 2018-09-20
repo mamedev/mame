@@ -13,7 +13,6 @@
     sprite sync fixes, sprite zoom fixes and others!
 
     Other Issues:
-    - ES5510 DSP isn't hooked up.
     - Various hacks in video core that needs squashing;
     - When playing space invaders dx in original mode, t.t. with overlay, the
       alpha blending effect is wrong (see Taito B version of game)
@@ -36,7 +35,6 @@
 #include "includes/taito_f3.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -458,72 +456,68 @@ void taito_f3_state::machine_reset()
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(taito_f3_state::f3)
-
+void taito_f3_state::f3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(f3_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
+	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::f3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::f3_interrupt2));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.97)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.97);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
+	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_f3)
-	MCFG_PALETTE_ADD("palette", 0x2000)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taito_f3);
+	PALETTE(config, m_palette, 0x2000);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
-MACHINE_CONFIG_END
+	TAITO_EN(config, m_taito_en, 0);
+}
 
 /* These games reprogram the video output registers to display different scanlines,
  we can't change our screen display at runtime, so we do it here instead.  None
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-MACHINE_CONFIG_START(taito_f3_state::f3_224a)
+void taito_f3_state::f3_224a(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 31, 31+224-1);
+}
 
-MACHINE_CONFIG_START(taito_f3_state::f3_224b)
+void taito_f3_state::f3_224b(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 32, 32+224-1);
+}
 
-MACHINE_CONFIG_START(taito_f3_state::f3_224c)
+void taito_f3_state::f3_224c(machine_config &config)
+{
 	f3(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
+}
 
 /* recalh and gseeker need a default EEPROM to work */
-MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
+void taito_f3_state::f3_eeprom(machine_config &config)
+{
 	f3(config);
+	m_eeprom->default_data(recalh_eeprom, 128); //TODO: convert this into ROM
+}
 
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
+void taito_f3_state::f3_224b_eeprom(machine_config &config)
+{
 	f3_224b(config);
-
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
-MACHINE_CONFIG_END
+	m_eeprom->default_data(recalh_eeprom, 128); //TODO: convert this into ROM
+}
 
 static const gfx_layout bubsympb_sprite_layout =
 {
@@ -555,34 +549,35 @@ static GFXDECODE_START( gfx_bubsympb )
 	GFXDECODE_ENTRY( nullptr,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-MACHINE_CONFIG_START(taito_f3_state::bubsympb)
+void taito_f3_state::bubsympb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(bubsympb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
+	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::bubsympb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::f3_interrupt2));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.97)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.97);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 31, 31+224-1);
+	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bubsympb)
-	MCFG_PALETTE_ADD("palette", 8192)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bubsympb);
+	PALETTE(config, m_palette, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000 , okim6295_device::PIN7_HIGH) // not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /******************************************************************************/
 

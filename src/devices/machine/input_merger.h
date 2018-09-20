@@ -33,7 +33,7 @@
 	MCFG_DEVICE_ADD(_tag, INPUT_MERGER_ALL_LOW, 0)
 
 #define MCFG_INPUT_MERGER_OUTPUT_HANDLER(_devcb) \
-	devcb = &downcast<input_merger_device &>(*device).set_output_handler(DEVCB_##_devcb);
+	downcast<input_merger_device &>(*device).set_output_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -45,6 +45,7 @@ class input_merger_device : public device_t
 public:
 	// callback
 	template <class Object> devcb_base &set_output_handler(Object &&cb) { return m_output_handler.set_callback(std::forward<Object>(cb)); }
+	auto output_handler() { return m_output_handler.bind(); }
 
 	// input lines
 	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(in_w) { static_assert(Bit < 32, "invalid bit"); machine().scheduler().synchronize(timer_expired_delegate(FUNC(input_merger_device::update_state), this), (Bit << 1) | (state ? 1U : 0U)); }

@@ -27,6 +27,16 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void ganjaja(machine_config &config);
+	void dynashot(machine_config &config);
+	void homerun(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(homerun_sprite0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(homerun_d7756_busy_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -53,11 +63,6 @@ public:
 	DECLARE_WRITE8_MEMBER(homerun_scrolly_w);
 	DECLARE_WRITE8_MEMBER(homerun_scrollx_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_sprite0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
-
 	TILE_GET_INFO_MEMBER(get_homerun_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -65,9 +70,6 @@ public:
 	uint32_t screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(homerun_banking_w);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void ganjaja(machine_config &config);
-	void dynashot(machine_config &config);
-	void homerun(machine_config &config);
 	void homerun_iomap(address_map &map);
 	void homerun_memmap(address_map &map);
 };

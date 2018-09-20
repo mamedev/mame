@@ -513,28 +513,27 @@ void buggychl_state::machine_reset()
 MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(48'000'000)/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
+	MCFG_DEVICE_ADD("maincpu", Z80, 48_MHz_XTAL/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
 	MCFG_DEVICE_PROGRAM_MAP(buggychl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz according to schematics */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2) /* 4 MHz according to schematics */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL(8'000'000)/2)/2)/256)/64)) // timer irq
-	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, ((((XTAL_8MHz/2)/2)/256)/64))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 8_MHz_XTAL/2/2/256/64) // timer irq
+	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, 8_MHz_XTAL/2/2/256/64)
 	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
-	// 61.035Hz ((((XTAL_8MHz/2)/2)/256)/128)
-	// or 122.0Hz ((((XTAL_8MHz/2)/2)/256)/64)
+	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
+	// or 122.0Hz (8_MHz_XTAL/2/2/256/64)
 	// similar to flstory.cpp and other Taito MSM5232 based games.
 	// The real sound pcb probably lacks the latch for this configurable timer, but does have a jumper which likely has a similar function.
 	// The game code implies the timer int is enable/disabled by one of the "sound_enable_w" bits?
 	// TODO: actually hook this up?
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, (XTAL(48'000'000)/8)/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 48_MHz_XTAL/8/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
 
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // typical Taito 74ls392
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // typical Taito 74ls392
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -543,7 +542,7 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	// derived from ladyfrog.cpp, causes glitches?
-//  MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+//  MCFG_SCREEN_RAW_PARAMS( 8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -566,17 +565,17 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("ay1", YM2149, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("ay1", YM2149, 8_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("ay2", YM2149, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("ay2", YM2149, 8_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, 8_MHz_XTAL/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

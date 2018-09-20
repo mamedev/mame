@@ -92,6 +92,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void jokrwild(machine_config &config);
+
+	void init_jokrwild();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -100,14 +105,12 @@ public:
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(testa_w);
 	DECLARE_WRITE8_MEMBER(testb_w);
-	void init_jokrwild();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jokrwild);
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void jokrwild(machine_config &config);
 	void jokrwild_map(address_map &map);
 };
 
@@ -412,17 +415,17 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(jokrwild_map)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, jokrwild_state, testa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jokrwild_state, testb_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
+	pia0.writepa_handler().set(FUNC(jokrwild_state::testa_w));
+	pia0.writepb_handler().set(FUNC(jokrwild_state::testb_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN3"))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.readpb_handler().set_ioport("IN3");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

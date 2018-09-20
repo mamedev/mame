@@ -16,7 +16,7 @@
 	downcast<huc6270_device &>(*device).set_vram_size(_size);
 
 #define MCFG_HUC6270_IRQ_CHANGED_CB(_devcb) \
-	devcb = &downcast<huc6270_device &>(*device).set_irq_changed_callback(DEVCB_##_devcb);
+	downcast<huc6270_device &>(*device).set_irq_changed_callback(DEVCB_##_devcb);
 
 class huc6270_device : public device_t
 {

@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	void junior(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
@@ -59,7 +59,6 @@ protected:
 
 	void junior_mem(address_map &map);
 
-private:
 	required_device<mos6532_new_device> m_riot;
 	uint8_t m_port_a;
 	uint8_t m_port_b;
@@ -233,7 +232,7 @@ MACHINE_CONFIG_START(junior_state::junior)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_junior )
+	config.set_default_layout(layout_junior);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)

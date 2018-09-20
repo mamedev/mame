@@ -25,12 +25,6 @@ TODO:
 class destroyr_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DESTROYR_DIAL,
-		TIMER_DESTROYR_FRAME
-	};
-
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -45,7 +39,14 @@ public:
 
 	void destroyr(machine_config &config);
 
-protected:
+private:
+
+	enum
+	{
+		TIMER_DESTROYR_DIAL,
+		TIMER_DESTROYR_FRAME
+	};
+
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(cursor_load_w);
 	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
@@ -64,7 +65,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void destroyr_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -472,9 +472,9 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	MCFG_DEVICE_PROGRAM_MAP(destroyr_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2 (no second LED present on cab)
+	f9334_device &outlatch(F9334(config, "outlatch")); // F8
+	outlatch.q_out_cb<0>().set_output("led0").invert(); // LED 1
+	outlatch.q_out_cb<1>().set_output("led1").invert(); // LED 2 (no second LED present on cab)
 	// Q2 => songate
 	// Q3 => launch
 	// Q4 => explosion
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	// Q6 => high explosion
 	// Q7 => low explosion
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

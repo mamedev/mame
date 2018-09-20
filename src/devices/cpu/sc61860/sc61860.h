@@ -45,28 +45,28 @@ enum
 
 
 #define MCFG_SC61860_READ_RESET_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_reset_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_reset_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_BRK_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_brk_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_brk_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_X_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_x_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_x_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_A_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_ina_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_ina_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_A_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outa_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_outa_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_READ_B_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_inb_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_inb_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_B_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outb_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_outb_cb(DEVCB_##_devcb);
 
 #define MCFG_SC61860_WRITE_C_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outc_cb(DEVCB_##_devcb);
+	downcast<sc61860_device &>(*device).set_outc_cb(DEVCB_##_devcb);
 
 class sc61860_device : public cpu_device
 {

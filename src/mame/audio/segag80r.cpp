@@ -417,9 +417,9 @@ static const char *const sega005_sample_names[] =
 
 MACHINE_CONFIG_START(segag80r_state::sega005_sound_board)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segag80r_state, sega005_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segag80r_state, sega005_sound_b_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(segag80r_state::sega005_sound_a_w));
+	ppi.out_pb_callback().set(FUNC(segag80r_state::sega005_sound_b_w));
 
 	/* sound hardware */
 
@@ -696,16 +696,16 @@ void monsterb_sound_device::device_start()
 MACHINE_CONFIG_START(monsterb_sound_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD(m_audiocpu, N7751, 6000000)
-	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, monsterb_sound_device, n7751_command_r))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, monsterb_sound_device, n7751_rom_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monsterb_sound_device, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 
-	MCFG_DEVICE_ADD(m_i8243, I8243, 0)
-	MCFG_I8243_READHANDLER(NOOP)
-	MCFG_I8243_WRITEHANDLER(WRITE8(*this, monsterb_sound_device, n7751_rom_control_w))
+	I8243(config, m_i8243);
+	m_i8243->read_handler().set_constant(0);
+	m_i8243->write_handler().set(FUNC(monsterb_sound_device::n7751_rom_control_w));
 
 	MCFG_DEVICE_ADD(m_samples, SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)

@@ -251,11 +251,6 @@ INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
-{
-	device.execute().pulse_input_line(UPD7810_INTF1, device.execute().minimum_quantum_time());
-}
-
 
 /********************************************************************************
 
@@ -1272,14 +1267,13 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_DEVICE_PROGRAM_MAP(reikaids_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_DEVICE_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
-	MCFG_DEVICE_PROGRAM_MAP(reikaids_upd7807_map)
-	MCFG_UPD7807_PORTA_READ_CB(READ8(*this, homedata_state, reikaids_upd7807_porta_r))
-	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(*this, homedata_state, reikaids_upd7807_porta_w))
-	MCFG_UPD7807_PORTB_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(*this, homedata_state, reikaids_upd7807_portc_w))
-	MCFG_UPD7807_PORTT_READ_CB(READ8(*this, homedata_state, reikaids_snd_command_r))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
+	upd7807_device &audiocpu(UPD7807(config, m_audiocpu, 8000000));  /* ??? MHz (max speed for the 7807 is 12MHz) */
+	audiocpu.set_addrmap(AS_PROGRAM, &homedata_state::reikaids_upd7807_map);
+	audiocpu.pa_in_cb().set(FUNC(homedata_state::reikaids_upd7807_porta_r));
+	audiocpu.pa_out_cb().set(FUNC(homedata_state::reikaids_upd7807_porta_w));
+	audiocpu.pb_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	audiocpu.pc_out_cb().set(FUNC(homedata_state::reikaids_upd7807_portc_w));
+	audiocpu.pt_in_cb().set(FUNC(homedata_state::reikaids_snd_command_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) // very high interleave required to sync for startup tests
 
@@ -1287,14 +1281,15 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,reikaids)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_reikaids)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 16, 256-1-16);
+	screen.set_screen_update(FUNC(homedata_state::screen_update_reikaids));
+	screen.screen_vblank().set(FUNC(homedata_state::screen_vblank_homedata));
+	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
+	screen.set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_reikaids)
 	MCFG_PALETTE_ADD("palette", 0x8000)
@@ -1328,15 +1323,14 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_DEVICE_PROGRAM_MAP(pteacher_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_DEVICE_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(pteacher_upd7807_map)
-	MCFG_UPD7807_PORTA_READ_CB(READ8(*this, homedata_state, pteacher_upd7807_porta_r))
-	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(*this, homedata_state, pteacher_upd7807_porta_w))
-	MCFG_UPD7807_PORTB_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_UPD7807_PORTC_READ_CB(IOPORT("COIN"))
-	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(*this, homedata_state, pteacher_upd7807_portc_w))
-	MCFG_UPD7807_PORTT_READ_CB(READ8(*this, homedata_state, pteacher_keyboard_r))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
+	upd7807_device &audiocpu(UPD7807(config, m_audiocpu, 9000000));  /* 9MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &homedata_state::pteacher_upd7807_map);
+	audiocpu.pa_in_cb().set(FUNC(homedata_state::pteacher_upd7807_porta_r));
+	audiocpu.pa_out_cb().set(FUNC(homedata_state::pteacher_upd7807_porta_w));
+	audiocpu.pb_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	audiocpu.pc_in_cb().set_ioport("COIN");
+	audiocpu.pc_out_cb().set(FUNC(homedata_state::pteacher_upd7807_portc_w));
+	audiocpu.pt_in_cb().set(FUNC(homedata_state::pteacher_keyboard_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // should be enough
 
@@ -1344,15 +1338,16 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,pteacher)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
 	// visible area can be changed at runtime
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_pteacher)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_visarea(0*8, 54*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(homedata_state::screen_update_pteacher));
+	screen.screen_vblank().set(FUNC(homedata_state::screen_vblank_homedata));
+	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
+	screen.set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pteacher)
 	MCFG_PALETTE_ADD("palette", 0x8000)

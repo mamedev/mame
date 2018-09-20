@@ -27,6 +27,11 @@ public:
 		m_tx_clut(*this, "tx_clut"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void darkmist(machine_config &config);
+
+	void init_darkmist();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
 	required_device<screen_device> m_screen;
@@ -57,7 +62,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
 	virtual void machine_start() override;
-	void init_darkmist();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(darkmist);
 
@@ -70,7 +74,6 @@ public:
 	void decrypt_snd();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void darkmist(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void memmap(address_map &map);
 };

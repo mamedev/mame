@@ -264,9 +264,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,512K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,512K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof180")

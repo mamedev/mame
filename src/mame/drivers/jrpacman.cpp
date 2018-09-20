@@ -114,11 +114,15 @@ class jrpacman_state : public pacman_state
 public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
+
+	void jrpacman(machine_config &config);
+
+	void init_jrpacman();
+
+private:
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	void init_jrpacman();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void jrpacman(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };
@@ -282,20 +286,20 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IO_MAP(port_map)
 
-	MCFG_DEVICE_ADD("latch1", LS259, 0) // 5P
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jrpacman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, jrpacman_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, jrpacman_state, coin_counter_w))
+	ls259_device &latch1(LS259(config, "latch1")); // 5P
+	latch1.q_out_cb<0>().set(FUNC(jrpacman_state::irq_mask_w));
+	latch1.q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+	latch1.q_out_cb<3>().set(FUNC(jrpacman_state::flipscreen_w));
+	latch1.q_out_cb<7>().set(FUNC(jrpacman_state::coin_counter_w));
 
-	MCFG_DEVICE_ADD("latch2", LS259, 0) // 1H
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jrpacman_state, pengo_palettebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jrpacman_state, pengo_colortablebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, jrpacman_state, jrpacman_bgpriority_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, jrpacman_state, jrpacman_charbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, jrpacman_state, jrpacman_spritebank_w))
+	ls259_device &latch2(LS259(config, "latch2")); // 1H
+	latch2.q_out_cb<0>().set(FUNC(jrpacman_state::pengo_palettebank_w));
+	latch2.q_out_cb<1>().set(FUNC(jrpacman_state::pengo_colortablebank_w));
+	latch2.q_out_cb<3>().set(FUNC(jrpacman_state::jrpacman_bgpriority_w));
+	latch2.q_out_cb<4>().set(FUNC(jrpacman_state::jrpacman_charbank_w));
+	latch2.q_out_cb<5>().set(FUNC(jrpacman_state::jrpacman_spritebank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

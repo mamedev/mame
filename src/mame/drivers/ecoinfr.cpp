@@ -64,6 +64,17 @@ public:
 		m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void ecoinfr(machine_config &config);
+
+	void init_ecoinfrbr();
+	void init_ecoinfr();
+	void init_ecoinfrmab();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
+
+private:
 	int irq_toggle;
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
@@ -106,13 +117,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ec_port16_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port17_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port18_out_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
 
-	void init_ecoinfrbr();
-	void init_ecoinfr();
-	void init_ecoinfrmab();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
@@ -126,7 +131,6 @@ public:
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
 	output_finder<16> m_digits;
-	void ecoinfr(machine_config &config);
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };
@@ -484,8 +488,7 @@ void ecoinfr_state::memmap(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 
-	map(0xa000, 0xa000).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xa001, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa000, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 }
 
@@ -785,7 +788,7 @@ MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
 	MCFG_DEVICE_IO_MAP(portmap)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ectimer", ecoinfr_state, ecoinfr_irq_timer, attotime::from_hz(250))
 
-	MCFG_DEFAULT_LAYOUT(layout_ecoinfr)
+	config.set_default_layout(layout_ecoinfr);
 
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)

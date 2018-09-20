@@ -66,12 +66,13 @@ void iq151_grafik_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(iq151_grafik_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, iq151_grafik_device, x_write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, iq151_grafik_device, y_write))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iq151_grafik_device, control_w))
-MACHINE_CONFIG_END
+void iq151_grafik_device::device_add_mconfig(machine_config &config)
+{
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(iq151_grafik_device::x_write));
+	m_ppi8255->out_pb_callback().set(FUNC(iq151_grafik_device::y_write));
+	m_ppi8255->out_pc_callback().set(FUNC(iq151_grafik_device::control_w));
+}
 
 //-------------------------------------------------
 //  I8255 port a

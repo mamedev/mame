@@ -23,7 +23,7 @@
 	downcast<imagetek_i4100_device &>(*device).set_gfxdecode_tag(gfxtag);
 
 #define MCFG_I4100_BLITTER_END_CALLBACK(_devcb) \
-	devcb = &downcast<imagetek_i4100_device &>(*device).set_blitter_irq_callback(DEVCB_##_devcb);
+	downcast<imagetek_i4100_device &>(*device).set_blitter_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_I4100_TILEMAP_XOFFSETS(_a, _b, _c) \
 	downcast<imagetek_i4100_device &>(*device).set_tmap_xoffsets(_a, _b, _c);

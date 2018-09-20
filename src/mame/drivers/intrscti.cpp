@@ -31,16 +31,19 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void intrscti(machine_config &config);
+
+	void init_intrscti();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	void init_intrscti();
 	virtual void video_start() override;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void intrscti(machine_config &config);
 	void intrscti_io_map(address_map &map);
 	void intrscti_map(address_map &map);
 	void intrscti_sub_io_map(address_map &map);

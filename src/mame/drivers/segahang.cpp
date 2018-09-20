@@ -769,14 +769,14 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segahang_state, video_lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segahang_state, tilemap_sound_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_i8255_1->out_pb_callback().set(FUNC(segahang_state::video_lamps_w));
+	m_i8255_1->out_pc_callback().set(FUNC(segahang_state::tilemap_sound_w));
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segahang_state, sub_control_adc_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, segahang_state, adc_status_r))
+	I8255(config, m_i8255_2);
+	m_i8255_2->out_pa_callback().set(FUNC(segahang_state::sub_control_adc_w));
+	m_i8255_2->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
 
 	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)

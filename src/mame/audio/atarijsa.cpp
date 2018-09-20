@@ -460,6 +460,8 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::mix_w )
 	if (m_oki2_banklo != nullptr)
 		m_oki2_banklo->set_entry((data >> 6) & 3);
 
+	// TODO: emulate the low pass filter!
+
 	// update the (left) OKI bank (JSA III/IIIs only)
 	if (m_oki1_banklo != nullptr)
 		m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 1) | ((data >> 3) & 2));
@@ -662,7 +664,7 @@ WRITE8_MEMBER( atari_jsa_i_device::mix_w )
 WRITE8_MEMBER( atari_jsa_i_device::tms5220_voice )
 {
 	if (m_tms5220 != nullptr)
-		m_tms5220->data_w(space, 0, data);
+		m_tms5220->data_w(data);
 }
 
 
@@ -704,7 +706,8 @@ MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
+	ATARI_SOUND_COMM(config, "soundcomm", "cpu")
+		.int_callback().set(FUNC(atari_jsa_base_device::main_int_write_line));
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
@@ -834,7 +837,8 @@ MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
+	ATARI_SOUND_COMM(config, "soundcomm", "cpu")
+		.int_callback().set(FUNC(atari_jsa_base_device::main_int_write_line));
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
@@ -916,7 +920,8 @@ MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
+	ATARI_SOUND_COMM(config, "soundcomm", "cpu")
+		.int_callback().set(FUNC(atari_jsa_base_device::main_int_write_line));
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))

@@ -21,16 +21,14 @@ public:
 		m_decodmd(*this, "decodmd")
 	{ }
 
+	void whitestar(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	//required_device<cpu_device> m_dmdcpu;
 	//required_device<mc6845_device> m_mc6845;
 	required_device<decobsmt_device> m_decobsmt;
 	required_device<decodmd_type2_device> m_decodmd;
-
-	uint8_t m_dmd_latch;
-	uint8_t m_dmd_ctrl;
-	uint8_t m_dmd_status;
-	uint8_t m_dmd_busy;
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(dmddata_w);
@@ -39,7 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
-	void whitestar(machine_config &config);
 	void whitestar_map(address_map &map);
 };
 
@@ -3517,26 +3514,26 @@ GAME(2002,  playboyl_303, playboyl,   whitestar,  whitestar, whitestar_state, em
 GAME(2002,  playboyl_302, playboyl,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Playboy (3.02 Spain)",                                     MACHINE_IS_PINBALL)
 GAME(2002,  playboyl_300, playboyl,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Playboy (3.00 Spain)",                                     MACHINE_IS_PINBALL)
 GAME(2002,  playboyl_203, playboyl,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Playboy (2.03 Spain)",                                     MACHINE_IS_PINBALL)
-GAME(2002,  rctycn,       0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.02)",                             MACHINE_IS_PINBALL)
-GAME(2002,  rctycn_701,   rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.01)",                             MACHINE_IS_PINBALL)
-GAME(2002,  rctycn_600,   rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (6.00)",                             MACHINE_IS_PINBALL)
-GAME(2002,  rctycn_400,   rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (4.00)",                             MACHINE_IS_PINBALL)
-GAME(2002,  rctnew,       rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (ARM7 Sound Board)",                 MACHINE_IS_PINBALL)
-GAME(2002,  rctycng,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.02 Germany)",                     MACHINE_IS_PINBALL)
-GAME(2002,  rctycng_701,  rctycng,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.01 Germany)",                     MACHINE_IS_PINBALL)
-GAME(2002,  rctycng_400,  rctycng,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (4.00 Germany)",                     MACHINE_IS_PINBALL)
-GAME(2002,  rctycnf,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.02 France)",                      MACHINE_IS_PINBALL)
-GAME(2002,  rctycnf_701,  rctycnf,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.01 France)",                      MACHINE_IS_PINBALL)
-GAME(2002,  rctycnf_600,  rctycnf,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (6.00 France)",                      MACHINE_IS_PINBALL)
-GAME(2002,  rctycnf_400,  rctycnf,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (4.00 France)",                      MACHINE_IS_PINBALL)
-GAME(2002,  rctycni,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.02 Italy)",                       MACHINE_IS_PINBALL)
-GAME(2002,  rctycni_701,  rctycni,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.01 Italy)",                       MACHINE_IS_PINBALL)
-GAME(2002,  rctycni_600,  rctycni,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (6.00 Italy)",                       MACHINE_IS_PINBALL)
-GAME(2002,  rctycni_400,  rctycni,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (4.00 Italy)",                       MACHINE_IS_PINBALL)
-GAME(2002,  rctycnl,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.02 Spain)",                       MACHINE_IS_PINBALL)
-GAME(2002,  rctycnl_701,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (7.01 Spain)",                       MACHINE_IS_PINBALL)
-GAME(2002,  rctycnl_600,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (6.00 Spain)",                       MACHINE_IS_PINBALL)
-GAME(2002,  rctycnl_400,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Roller Coaster Tycoon (4.00 Spain)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycn,       0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.02)",                             MACHINE_IS_PINBALL)
+GAME(2002,  rctycn_701,   rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.01)",                             MACHINE_IS_PINBALL)
+GAME(2002,  rctycn_600,   rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (6.00)",                             MACHINE_IS_PINBALL)
+GAME(2002,  rctycn_400,   rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (4.00)",                             MACHINE_IS_PINBALL)
+GAME(2002,  rctnew,       rctycn,     whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (ARM7 Sound Board)",                 MACHINE_IS_PINBALL)
+GAME(2002,  rctycng,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.02 Germany)",                     MACHINE_IS_PINBALL)
+GAME(2002,  rctycng_701,  rctycng,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.01 Germany)",                     MACHINE_IS_PINBALL)
+GAME(2002,  rctycng_400,  rctycng,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (4.00 Germany)",                     MACHINE_IS_PINBALL)
+GAME(2002,  rctycnf,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.02 France)",                      MACHINE_IS_PINBALL)
+GAME(2002,  rctycnf_701,  rctycnf,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.01 France)",                      MACHINE_IS_PINBALL)
+GAME(2002,  rctycnf_600,  rctycnf,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (6.00 France)",                      MACHINE_IS_PINBALL)
+GAME(2002,  rctycnf_400,  rctycnf,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (4.00 France)",                      MACHINE_IS_PINBALL)
+GAME(2002,  rctycni,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.02 Italy)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycni_701,  rctycni,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.01 Italy)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycni_600,  rctycni,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (6.00 Italy)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycni_400,  rctycni,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (4.00 Italy)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycnl,      0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.02 Spain)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycnl_701,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (7.01 Spain)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycnl_600,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (6.00 Spain)",                       MACHINE_IS_PINBALL)
+GAME(2002,  rctycnl_400,  rctycnl,    whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "RollerCoaster Tycoon (4.00 Spain)",                       MACHINE_IS_PINBALL)
 GAME(2000,  shrkysht,     0,          whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.11)",                                MACHINE_IS_PINBALL)
 GAME(2000,  shrky_207,    shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (2.07)",                                MACHINE_IS_PINBALL)
 GAME(2001,  shrknew,      shrkysht,   whitestar,  whitestar, whitestar_state, empty_init, ROT0, "Stern",    "Sharkey's Shootout (ARM7 Sound Board)",                    MACHINE_IS_PINBALL)

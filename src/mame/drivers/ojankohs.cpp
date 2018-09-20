@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -802,7 +802,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

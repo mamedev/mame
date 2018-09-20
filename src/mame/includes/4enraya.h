@@ -28,19 +28,21 @@ public:
 	{
 	}
 
+	void _4enraya(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER(fenraya_videoram_w);
+
+protected:
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_READ8_MEMBER(fenraya_custom_map_r);
 	DECLARE_WRITE8_MEMBER(fenraya_custom_map_w);
-	DECLARE_WRITE8_MEMBER(fenraya_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void _4enraya(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -73,10 +75,11 @@ public:
 	}
 
 	void unkpacg(machine_config &config);
+
+private:
 	void unkpacg_main_map(address_map &map);
 	void unkpacg_main_portmap(address_map &map);
 
-protected:
 	void driver_init() override;
 };
 

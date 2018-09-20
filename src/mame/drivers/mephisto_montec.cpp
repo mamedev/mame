@@ -45,7 +45,14 @@ public:
 		, m_high_leds(*this, "led%u", 100U)
 	{ }
 
+	void smondial(machine_config &config);
+	void mondial2(machine_config &config);
+	void smondial2(machine_config &config);
+	void montec(machine_config &config);
+	void monteciv(machine_config &config);
+	void megaiv(machine_config &config);
 
+private:
 	DECLARE_READ8_MEMBER(montec_input_r);
 	DECLARE_READ8_MEMBER(montec_nmi_ack_r);
 	DECLARE_WRITE8_MEMBER(montec_nmi_ack_w);
@@ -66,22 +73,15 @@ public:
 	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
-	void smondial(machine_config &config);
-	void mondial2(machine_config &config);
-	void smondial2(machine_config &config);
-	void montec(machine_config &config);
-	void monteciv(machine_config &config);
-	void megaiv(machine_config &config);
 	void megaiv_mem(address_map &map);
 	void mondial2_mem(address_map &map);
 	void montec_mem(address_map &map);
 	void smondial2_mem(address_map &map);
 	void smondial_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<beep_device> m_beeper;
@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::montec)
 	MCFG_DEVICE_PROGRAM_MAP( montec_mem )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::montec)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_montec)
+	config.set_default_layout(layout_mephisto_montec);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::monteciv)
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_megaiv)
+	config.set_default_layout(layout_mephisto_megaiv);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
+	config.set_default_layout(layout_mephisto_mondial2);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::smondial)
@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_smondial2)
+	config.set_default_layout(layout_mephisto_smondial2);
 MACHINE_CONFIG_END
 
 

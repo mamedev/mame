@@ -169,7 +169,7 @@ NOTE:  Sets marked PSR Verified use official IGT CG+CAP combo as documented in a
        Sets marked as PSR Verified on superboards means the XP000xxx poker program is correctly matched to the
        CG+CAP combo. Except for specialty games the CG set is determined by XP000xxx Poker Program. However,
        where specialty games are involved the X00xxxxP DATA rom determines the CG set due to specific needs.
-       PSR Verified does not gaurantee or imply that other XP000xxx programs are incompatible with said DATA rom.
+       PSR Verified does not guarantee or imply that other XP000xxx programs are incompatible with said DATA rom.
 
 NOTE:  International PP0xxx sets support a Tournament mode.  You can toggle back and forth between standard and
        Tournament mode by pressing and holding Jackpot Reset (L key) and pressing Change Request (Y key)
@@ -218,11 +218,6 @@ A Note about Best Bet Products.
 class peplus_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_ASSERT_LP
-	};
-
 	peplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -247,10 +242,28 @@ public:
 		m_s7000_ram(*this, "s7000_ram"),
 		m_sb000_ram(*this, "sb000_ram"),
 		m_sd000_ram(*this, "sd000_ram"),
-		m_sf000_ram(*this, "sf000_ram")
+		m_sf000_ram(*this, "sf000_ram"),
+		m_bnka(*this, "pe_bnka%u", 0U),
+		m_bnkb(*this, "pe_bnkb%u", 0U),
+		m_bnkc(*this, "pe_bnkc%u", 0U)
 	{
 	}
 
+	void peplus(machine_config &config);
+
+	void init_nonplus();
+	void init_peplus();
+	void init_peplussb();
+	void init_pepluss64();
+	void init_peplussbw();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(input_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<r6545_1_device> m_crtc;
 	required_device<i2cmem_device> m_i2cmem;
@@ -277,14 +290,17 @@ public:
 	required_shared_ptr<uint8_t> m_sd000_ram;
 	required_shared_ptr<uint8_t> m_sf000_ram;
 
+	output_finder<8> m_bnka;
+	output_finder<8> m_bnkb;
+	output_finder<8> m_bnkc;
+
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_wingboard;
 	uint8_t m_doorcycle;
-	uint16_t door_wait;
+	uint16_t m_door_wait;
 	uint8_t m_jumper_e16_e17;
 	uint16_t m_vid_address;
-	std::unique_ptr<uint8_t[]> m_palette_ram;
-	std::unique_ptr<uint8_t[]> m_palette_ram2;
+	std::unique_ptr<uint8_t[]> m_palette_ram[2];
 	uint64_t m_last_cycles;
 	uint8_t m_coin_state;
 	uint64_t m_last_door;
@@ -303,48 +319,37 @@ public:
 	uint8_t m_bv_enable_count;
 	uint8_t m_bv_data_bit;
 	uint8_t m_bv_loop_count;
-	uint16_t id023_data;
-	uint8_t m_paldata;
-	uint8_t m_paldata2;
+	uint16_t m_id023_data;
+	uint8_t m_paldata[2];
+	emu_timer *m_assert_lp_timer;
 
-	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
-	DECLARE_WRITE8_MEMBER(paldata_w);
-	DECLARE_WRITE8_MEMBER(paldata2_w);
-	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
-	DECLARE_WRITE8_MEMBER(peplus_duart_w);
-	DECLARE_WRITE8_MEMBER(peplus_cmos_w);
-	DECLARE_WRITE8_MEMBER(peplus_output_bank_a_w);
-	DECLARE_WRITE8_MEMBER(peplus_output_bank_b_w);
-	DECLARE_WRITE8_MEMBER(peplus_output_bank_c_w);
-	DECLARE_READ8_MEMBER(peplus_duart_r);
-	DECLARE_READ8_MEMBER(peplus_bgcolor_r);
-	DECLARE_READ8_MEMBER(peplus_dropdoor_r);
-	DECLARE_READ8_MEMBER(peplus_watchdog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
-	DECLARE_WRITE8_MEMBER(peplus_crtc_mode_w);
+	DECLARE_WRITE8_MEMBER(bgcolor_w);
+	template<uint8_t Which> DECLARE_WRITE8_MEMBER(paldata_w);
+	DECLARE_WRITE8_MEMBER(crtc_display_w);
+	DECLARE_WRITE8_MEMBER(duart_w);
+	DECLARE_WRITE8_MEMBER(cmos_w);
+	DECLARE_WRITE8_MEMBER(output_bank_a_w);
+	DECLARE_WRITE8_MEMBER(output_bank_b_w);
+	DECLARE_WRITE8_MEMBER(output_bank_c_w);
+	DECLARE_READ8_MEMBER(duart_r);
+	DECLARE_READ8_MEMBER(bgcolor_r);
+	DECLARE_READ8_MEMBER(dropdoor_r);
+	DECLARE_READ8_MEMBER(watchdog_r);
+	DECLARE_WRITE8_MEMBER(crtc_mode_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
-	DECLARE_READ8_MEMBER(peplus_input_bank_a_r);
-	DECLARE_READ8_MEMBER(peplus_input0_r);
-	void init_nonplus();
-	void init_peplus();
-	void init_peplussb();
-	void init_pepluss64();
-	void init_peplussbw();
+	DECLARE_READ8_MEMBER(input_bank_a_r);
+	DECLARE_READ8_MEMBER(input0_r);
+	TIMER_CALLBACK_MEMBER(assert_lp);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void peplus_load_superdata(const char *bank_name);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void load_superdata(const char *bank_name);
 	DECLARE_PALETTE_INIT(peplus);
 	void handle_lightpen();
 
-	void peplus(machine_config &config);
-	void peplus_iomap(address_map &map);
-	void peplus_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void main_iomap(address_map &map);
+	void main_map(address_map &map);
 };
 
 static const uint8_t  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
@@ -355,7 +360,7 @@ static const uint16_t id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a
 * Memory Copy *
 ***************/
 
-void peplus_state::peplus_load_superdata(const char *bank_name)
+void peplus_state::load_superdata(const char *bank_name)
 {
 	uint8_t *super_data = memregion(bank_name)->base();
 
@@ -373,31 +378,27 @@ void peplus_state::peplus_load_superdata(const char *bank_name)
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
+WRITE8_MEMBER(peplus_state::bgcolor_w)
 {
-	int i;
-
-	for (i = 0; i < m_palette->entries(); i++)
+	for (int i = 0; i < m_palette->entries() / 16; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
-
 		/* red component */
-		bit0 = (~data >> 0) & 0x01;
-		bit1 = (~data >> 1) & 0x01;
-		bit2 = (~data >> 2) & 0x01;
-		r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int bit0 = (~data >> 0) & 0x01;
+		int bit1 = (~data >> 1) & 0x01;
+		int bit2 = (~data >> 2) & 0x01;
+		int r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* green component */
 		bit0 = (~data >> 3) & 0x01;
 		bit1 = (~data >> 4) & 0x01;
 		bit2 = (~data >> 5) & 0x01;
-		g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* blue component */
 		bit0 = (~data >> 6) & 0x01;
 		bit1 = (~data >> 7) & 0x01;
 		bit2 = 0;
-		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		m_palette->set_pen_color((15 + (i*16)), rgb_t(r, g, b));
 	}
@@ -412,35 +413,26 @@ MC6845_ON_UPDATE_ADDR_CHANGED(peplus_state::crtc_addr)
 }
 
 
-WRITE8_MEMBER(peplus_state::peplus_crtc_mode_w)
+WRITE8_MEMBER(peplus_state::crtc_mode_w)
 {
 	/* Reset timing logic */
 }
 
-void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(peplus_state::assert_lp)
 {
-	switch (id)
-	{
-	case TIMER_ASSERT_LP:
-		m_crtc->assert_light_pen_input();
-		break;
-	default:
-		assert_always(false, "Unknown id in peplus_state::device_timer");
-	}
+	m_crtc->assert_light_pen_input();
 }
-
 
 void peplus_state::handle_lightpen()
 {
 	int x_val = m_touch_x.read_safe(0x00);
 	int y_val = m_touch_y.read_safe(0x00);
 	const rectangle &vis_area = m_screen->visible_area();
-	int xt, yt;
 
-	xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
-	yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
+	int xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
+	int yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
 
-	timer_set(m_screen->time_until_pos(yt, xt), TIMER_ASSERT_LP, 0);
+	m_assert_lp_timer->adjust(m_screen->time_until_pos(yt, xt), 0);
 }
 
 WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
@@ -449,21 +441,17 @@ WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 	handle_lightpen();
 }
 
+template<uint8_t Which>
 WRITE8_MEMBER(peplus_state::paldata_w)
 {
-	m_paldata = data;
+	m_paldata[Which] = data;
 }
 
-WRITE8_MEMBER(peplus_state::paldata2_w)
-{
-	m_paldata2 = data;
-}
-
-WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
+WRITE8_MEMBER(peplus_state::crtc_display_w)
 {
 	m_videoram[m_vid_address] = data;
-	m_palette_ram[m_vid_address] = m_paldata;
-	m_palette_ram2[m_vid_address] = m_paldata2;
+	m_palette_ram[0][m_vid_address] = m_paldata[0];
+	m_palette_ram[1][m_vid_address] = m_paldata[1];
 
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
@@ -471,12 +459,12 @@ WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 	m_crtc->register_r(space, 0);
 }
 
-WRITE8_MEMBER(peplus_state::peplus_duart_w)
+WRITE8_MEMBER(peplus_state::duart_w)
 {
 	// Used for Slot Accounting System Communication
 }
 
-WRITE8_MEMBER(peplus_state::peplus_cmos_w)
+WRITE8_MEMBER(peplus_state::cmos_w)
 {
 	char bank_name[6];
 
@@ -484,50 +472,68 @@ WRITE8_MEMBER(peplus_state::peplus_cmos_w)
 	if (offset == 0x1fff && m_wingboard && data < 5)
 	{
 		sprintf(bank_name, "user%d", data + 1);
-		peplus_load_superdata(bank_name);
+		load_superdata(bank_name);
 	}
 
 	m_cmos_ram[offset] = data;
 }
 
-WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
+WRITE8_MEMBER(peplus_state::output_bank_a_w)
 {
-	output().set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
-	output().set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
-	output().set_value("pe_bnka2",(data >> 2) & 1); /* Bell */
-	output().set_value("pe_bnka3",(data >> 3) & 1); /* N/A */
-	output().set_value("pe_bnka4",(data >> 4) & 1); /* Hopper 1 */
-	output().set_value("pe_bnka5",(data >> 5) & 1); /* Hopper 2 */
-	output().set_value("pe_bnka6",(data >> 6) & 1); /* specific to a kind of machine */
-	output().set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
+/*
+bits
+7654 3210
+---- ---x Coin Lockout
+---- --x- Diverter
+---- -x-- Bell
+---- x--- N/A
+---x ---- Hopper 1
+--x- ---- Hopper 2
+-x-- ---- specific to a kind of machine
+x--- ---- specific to a kind of machine
+*/
+	for (uint8_t i = 0; i < 8; i++)
+		m_bnka[i] = BIT(data, i);
 
 	m_coin_out_state = 0;
 	if(((data >> 4) & 1) || ((data >> 5) & 1))
 		m_coin_out_state = 3;
 }
 
-WRITE8_MEMBER(peplus_state::peplus_output_bank_b_w)
+WRITE8_MEMBER(peplus_state::output_bank_b_w)
 {
-	output().set_value("pe_bnkb0",(data >> 0) & 1); /* specific to a kind of machine */
-	output().set_value("pe_bnkb1",(data >> 1) & 1); /* Deal Spin Start */
-	output().set_value("pe_bnkb2",(data >> 2) & 1); /* Cash Out */
-	output().set_value("pe_bnkb3",(data >> 3) & 1); /* specific to a kind of machine */
-	output().set_value("pe_bnkb4",(data >> 4) & 1); /* Bet 1 / Bet Max */
-	output().set_value("pe_bnkb5",(data >> 5) & 1); /* Change Request */
-	output().set_value("pe_bnkb6",(data >> 6) & 1); /* Door Open */
-	output().set_value("pe_bnkb7",(data >> 7) & 1); /* specific to a kind of machine */
+/*
+bits
+7654 3210
+---- ---x specific to a kind of machine
+---- --x- Deal Spin Start
+---- -x-- Cash Out
+---- x--- specific to a kind of machine
+---x ---- Bet 1 / Bet Max
+--x- ---- Change Request
+-x-- ---- Door Open
+x--- ---- specific to a kind of machine
+*/
+	for (uint8_t i = 0; i < 8; i++)
+		m_bnkb[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
+WRITE8_MEMBER(peplus_state::output_bank_c_w)
 {
-	output().set_value("pe_bnkc0",(data >> 0) & 1); /* Coin In Meter */
-	output().set_value("pe_bnkc1",(data >> 1) & 1); /* Coin Out Meter */
-	output().set_value("pe_bnkc2",(data >> 2) & 1); /* Coin Drop Meter */
-	output().set_value("pe_bnkc3",(data >> 3) & 1); /* Jackpot Meter */
-	output().set_value("pe_bnkc4",(data >> 4) & 1); /* Bill Acceptor Enabled */
-	output().set_value("pe_bnkc5",(data >> 5) & 1); /* SDS Out */
-	output().set_value("pe_bnkc6",(data >> 6) & 1); /* N/A */
-	output().set_value("pe_bnkc7",(data >> 7) & 1); /* Game Meter */
+/*
+bits
+7654 3210
+---- ---x Coin In Meter
+---- --x- Coin Out Meter
+---- -x-- Coin Drop Meter
+---- x--- Jackpot Meter
+---x ---- Bill Acceptor Enabled
+--x- ---- SDS Out
+-x-- ---- N/A
+x--- ---- Game Meter
+*/
+	for (uint8_t i = 0; i < 8; i++)
+		m_bnkc[i] = BIT(data, i);
 
 	m_bv_enable_state = (data >> 4) & 1;
 }
@@ -544,29 +550,29 @@ WRITE8_MEMBER(peplus_state::i2c_nvram_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(peplus_state::peplus_duart_r)
+READ8_MEMBER(peplus_state::duart_r)
 {
 	// Used for Slot Accounting System Communication
 	return 0x00;
 }
 
 /* Last Color in Every Palette is bgcolor */
-READ8_MEMBER(peplus_state::peplus_bgcolor_r)
+READ8_MEMBER(peplus_state::bgcolor_r)
 {
 	return m_palette->pen_color(15); // Return bgcolor from First Palette
 }
 
-READ8_MEMBER(peplus_state::peplus_dropdoor_r)
+READ8_MEMBER(peplus_state::dropdoor_r)
 {
 	return 0x00; // Drop Door 0x00=Closed 0x02=Open
 }
 
-READ8_MEMBER(peplus_state::peplus_watchdog_r)
+READ8_MEMBER(peplus_state::watchdog_r)
 {
 	return 0x00; // Watchdog
 }
 
-READ8_MEMBER(peplus_state::peplus_input0_r)
+READ8_MEMBER(peplus_state::input0_r)
 {
 /*
         PE+ bill validators have a dip switch setting to switch between ID-022 and ID-023 protocols.
@@ -636,7 +642,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 					m_bv_state = 0x01; // Greater than $1 Needs Credit Pulse
 			} else {
 				// ID-023
-				id023_data = id_023[m_bv_denomination];
+				m_id023_data = id_023[m_bv_denomination];
 
 				m_bv_data_bit = 14;
 				m_bv_loop_count = 0;
@@ -730,7 +736,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 		case 0x13: // Data Sync Pulse 20ms ON
 			if (curr_cycles - m_bv_cycles >= 833.3 * 20) {
 				m_bv_cycles = curr_cycles;
-				m_bv_pulse = 1 - ((id023_data >> m_bv_data_bit) & 0x01);
+				m_bv_pulse = 1 - ((m_id023_data >> m_bv_data_bit) & 0x01);
 				m_bv_state++;
 			}
 			break;
@@ -817,7 +823,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	}
 }
 
-READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
+READ8_MEMBER(peplus_state::input_bank_a_r)
 {
 /*
         Bit 0 = COIN DETECTOR A
@@ -875,7 +881,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 			break;
 	}
 
-	if (curr_cycles - m_last_door > door_wait) {
+	if (curr_cycles - m_last_door > m_door_wait) {
 		if ((m_door.read_safe(0xff) & 0x01) == 0x01) {
 			if (m_doorcycle) {
 				m_door_open = (m_door_open ^ 0x01) & 0x01;
@@ -926,10 +932,9 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 
 TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int pr = m_palette_ram[tile_index];
-	int pr2 = m_palette_ram2[tile_index];
-	int vr = videoram[tile_index];
+	int pr = m_palette_ram[0][tile_index];
+	int pr2 = m_palette_ram[1][tile_index];
+	int vr = m_videoram[tile_index];
 
 	int code = ((pr & 0x0f)*256) | vr;
 	int color = (pr>>4) & 0x0f;
@@ -947,13 +952,18 @@ TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 void peplus_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
-	m_palette_ram = std::make_unique<uint8_t[]>(0x3000);
-	memset(m_palette_ram.get(), 0, 0x3000);
-	m_palette_ram2 = std::make_unique<uint8_t[]>(0x3000);
-	memset(m_palette_ram2.get(), 0, 0x3000);
+	m_palette_ram[0] = std::make_unique<uint8_t[]>(0x3000);
+	memset(m_palette_ram[0].get(), 0, 0x3000);
+	m_palette_ram[1] = std::make_unique<uint8_t[]>(0x3000);
+	memset(m_palette_ram[1].get(), 0, 0x3000);
+
+	save_pointer(NAME(m_palette_ram[0]), 0x3000);
+	save_pointer(NAME(m_palette_ram[1]), 0x3000);
+	save_item(NAME(m_paldata));
+	save_item(NAME(m_vid_address));
 }
 
-uint32_t peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t peplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -970,29 +980,26 @@ PALETTE_INIT_MEMBER(peplus_state, peplus)
     --xx x---   green component.
     xx-- ----   blue component.
 */
-	int i;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0;i < palette.entries();i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
-
 		/* red component */
-		bit0 = (~color_prom[i % proms_size] >> 0) & 0x01;
-		bit1 = (~color_prom[i % proms_size] >> 1) & 0x01;
-		bit2 = (~color_prom[i % proms_size] >> 2) & 0x01;
-		r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int bit0 = (~color_prom[i % proms_size] >> 0) & 0x01;
+		int bit1 = (~color_prom[i % proms_size] >> 1) & 0x01;
+		int bit2 = (~color_prom[i % proms_size] >> 2) & 0x01;
+		int r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* green component */
 		bit0 = (~color_prom[i % proms_size] >> 3) & 0x01;
 		bit1 = (~color_prom[i % proms_size] >> 4) & 0x01;
 		bit2 = (~color_prom[i % proms_size] >> 5) & 0x01;
-		g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* blue component */
 		bit0 = (~color_prom[i % proms_size] >> 6) & 0x01;
 		bit1 = (~color_prom[i % proms_size] >> 7) & 0x01;
 		bit2 = 0;
-		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -1012,64 +1019,64 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-void peplus_state::peplus_map(address_map &map)
+void peplus_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share("prograram");
+	map(0x0000, 0xffff).rom().share(m_program_ram);
 }
 
-void peplus_state::peplus_iomap(address_map &map)
+void peplus_state::main_iomap(address_map &map)
 {
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	map(0x0000, 0x1fff).ram().w(FUNC(peplus_state::peplus_cmos_w)).share("cmos");
+	map(0x0000, 0x1fff).ram().w(FUNC(peplus_state::cmos_w)).share(m_cmos_ram);
 
 	// CRT Controller
-	map(0x2008, 0x2008).w(FUNC(peplus_state::peplus_crtc_mode_w));
+	map(0x2008, 0x2008).w(FUNC(peplus_state::crtc_mode_w));
 	map(0x2080, 0x2080).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2081, 0x2081).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2083, 0x2083).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(peplus_state::peplus_crtc_display_w));
+	map(0x2083, 0x2083).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(peplus_state::crtc_display_w));
 
 	// Superboard Data
-	map(0x3000, 0x3fff).ram().share("s3000_ram");
+	map(0x3000, 0x3fff).ram().share(m_s3000_ram);
 
 	// Sound and Dipswitches
 	map(0x4000, 0x4000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x4004, 0x4004).portr("SW1") /* likely ay8910 input port, not direct */ .w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Superboard Data
-	map(0x5000, 0x5fff).ram().share("s5000_ram");
+	map(0x5000, 0x5fff).ram().share(m_s5000_ram);
 
 	// Background Color Latch
-	map(0x6000, 0x6000).r(FUNC(peplus_state::peplus_bgcolor_r)).w(FUNC(peplus_state::peplus_bgcolor_w));
+	map(0x6000, 0x6000).r(FUNC(peplus_state::bgcolor_r)).w(FUNC(peplus_state::bgcolor_w));
 
 	// Bogus Location for Video RAM
-	map(0x06001, 0x06400).ram().share("videoram");
+	map(0x06001, 0x06400).ram().share(m_videoram);
 
 	// Superboard Data
-	map(0x7000, 0x7fff).ram().share("s7000_ram");
+	map(0x7000, 0x7fff).ram().share(m_s7000_ram);
 
 	// Input Bank A, Output Bank C
-	map(0x8000, 0x8000).r(FUNC(peplus_state::peplus_input_bank_a_r)).w(FUNC(peplus_state::peplus_output_bank_c_w));
+	map(0x8000, 0x8000).r(FUNC(peplus_state::input_bank_a_r)).w(FUNC(peplus_state::output_bank_c_w));
 
 	// Drop Door, I2C EEPROM Writes
-	map(0x9000, 0x9000).r(FUNC(peplus_state::peplus_dropdoor_r)).w(FUNC(peplus_state::i2c_nvram_w));
+	map(0x9000, 0x9000).r(FUNC(peplus_state::dropdoor_r)).w(FUNC(peplus_state::i2c_nvram_w));
 
 	// Input Banks B & C, Output Bank B
-	map(0xa000, 0xa000).r(FUNC(peplus_state::peplus_input0_r)).w(FUNC(peplus_state::peplus_output_bank_b_w));
+	map(0xa000, 0xa000).r(FUNC(peplus_state::input0_r)).w(FUNC(peplus_state::output_bank_b_w));
 
 	// Superboard Data
-	map(0xb000, 0xbfff).ram().share("sb000_ram");
+	map(0xb000, 0xbfff).ram().share(m_sb000_ram);
 
 	// Output Bank A
-	map(0xc000, 0xc000).r(FUNC(peplus_state::peplus_watchdog_r)).w(FUNC(peplus_state::peplus_output_bank_a_w));
+	map(0xc000, 0xc000).r(FUNC(peplus_state::watchdog_r)).w(FUNC(peplus_state::output_bank_a_w));
 
 	// Superboard Data
-	map(0xd000, 0xdfff).ram().share("sd000_ram");
+	map(0xd000, 0xdfff).ram().share(m_sd000_ram);
 
 	// DUART
-	map(0xe000, 0xe00f).rw(FUNC(peplus_state::peplus_duart_r), FUNC(peplus_state::peplus_duart_w));
+	map(0xe000, 0xe00f).rw(FUNC(peplus_state::duart_r), FUNC(peplus_state::duart_w));
 
 	// Superboard Data
-	map(0xf000, 0xffff).ram().share("sf000_ram");
+	map(0xf000, 0xffff).ram().share(m_sf000_ram);
 }
 
 
@@ -1077,7 +1084,7 @@ void peplus_state::peplus_iomap(address_map &map)
 *      Input ports       *
 *************************/
 
-CUSTOM_INPUT_MEMBER(peplus_state::peplus_input_r)
+CUSTOM_INPUT_MEMBER(peplus_state::input_r)
 {
 	uint8_t inp_ret = 0x00;
 	uint8_t inp_read = ioport((const char *)param)->read();
@@ -1154,9 +1161,9 @@ static INPUT_PORTS_START( peplus_schip )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1182,9 +1189,9 @@ static INPUT_PORTS_START( nonplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 
 	PORT_MODIFY("SW1")
@@ -1232,9 +1239,9 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1260,9 +1267,9 @@ static INPUT_PORTS_START( peplus_bjack )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1293,9 +1300,9 @@ static INPUT_PORTS_START( peplus_keno )
 	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1321,19 +1328,40 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
 
-/*************************
-*     Machine Reset      *
-*************************/
-
-void peplus_state::machine_reset()
+void peplus_state::machine_start()
 {
+	m_bnka.resolve();
+	m_bnkb.resolve();
+	m_bnkc.resolve();
+
+	m_assert_lp_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(peplus_state::assert_lp), this));
+
+	save_item(NAME(m_last_cycles));
+	save_item(NAME(m_coin_state));
+	save_item(NAME(m_last_door));
+	save_item(NAME(m_door_open));
+	save_item(NAME(m_last_coin_out));
+	save_item(NAME(m_coin_out_state));
+	save_item(NAME(m_sda_dir));
+	save_item(NAME(m_bv_state));
+	save_item(NAME(m_bv_busy));
+	save_item(NAME(m_bv_pulse));
+	save_item(NAME(m_bv_denomination));
+	save_item(NAME(m_bv_protocol));
+	save_item(NAME(m_bv_cycles));
+	save_item(NAME(m_bv_last_enable_state));
+	save_item(NAME(m_bv_enable_state));
+	save_item(NAME(m_bv_enable_count));
+	save_item(NAME(m_bv_data_bit));
+	save_item(NAME(m_bv_loop_count));
+	save_item(NAME(m_id023_data));
 }
 
 /*************************
@@ -1342,33 +1370,33 @@ void peplus_state::machine_reset()
 
 MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(peplus_map)
-	MCFG_DEVICE_IO_MAP(peplus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, peplus_state, paldata_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, peplus_state, paldata2_w))
+	MCFG_DEVICE_ADD(m_maincpu, I80C32, XTAL(20'000'000)/2) /* 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, peplus_state, paldata_w<0>))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, peplus_state, paldata_w<1>))
 
-	MCFG_NVRAM_ADD_0FILL("cmos")
+	NVRAM(config, "cmos", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update_peplus)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_peplus)
-	MCFG_PALETTE_ADD("palette", 16*16*2)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_peplus)
+	MCFG_PALETTE_ADD(m_palette, 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(20'000'000)/8/3)
+	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(20'000'000)/8/3)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, peplus_state, crtc_vsync))
 
-	MCFG_X2404P_ADD("i2cmem")
+	MCFG_X2404P_ADD(m_i2cmem)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1386,7 +1414,7 @@ MACHINE_CONFIG_END
 /* Non Plus board */
 void peplus_state::init_nonplus()
 {
-	door_wait = 500;
+	m_door_wait = 500;
 	m_doorcycle = false;
 	m_wingboard = false;
 	m_jumper_e16_e17 = false;
@@ -1395,7 +1423,7 @@ void peplus_state::init_nonplus()
 /* Normal board */
 void peplus_state::init_peplus()
 {
-	door_wait = 500;
+	m_door_wait = 500;
 	m_doorcycle = true;
 	m_wingboard = false;
 	m_jumper_e16_e17 = false;
@@ -1404,31 +1432,31 @@ void peplus_state::init_peplus()
 /* Superboard */
 void peplus_state::init_peplussb()
 {
-	door_wait = 500;
+	m_door_wait = 500;
 	m_doorcycle = true;
 	m_wingboard = false;
 	m_jumper_e16_e17 = false;
-	peplus_load_superdata("user1");
+	load_superdata("user1");
 }
 
 /* Superboard with 64K CG rom set */
 void peplus_state::init_pepluss64()
 {
-	door_wait = 500;
+	m_door_wait = 500;
 	m_doorcycle = true;
 	m_wingboard = false;
 	m_jumper_e16_e17 = true;
-	peplus_load_superdata("user1");
+	load_superdata("user1");
 }
 
 /* Superboard with Attached Wingboard */
 void peplus_state::init_peplussbw()
 {
-	door_wait = 12345;
+	m_door_wait = 12345;
 	m_doorcycle = true;
 	m_wingboard = true;
 	m_jumper_e16_e17 = true;
-	peplus_load_superdata("user1");
+	load_superdata("user1");
 }
 
 
@@ -13050,7 +13078,7 @@ NOTE: This DATA rom is compatible with the Multi-Poker XMP00030 + CG2451 set bel
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* Errors with INCOMPATIBLE EPROM error, no dumped program works with this DATA set */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002474p.u66",   0x00000, 0x10000, CRC(74cc1423) SHA1(0522cee3a7e123ce51739c69f38915ca92bd03e5) ) /* Double Double Bonus Plus */
+	ROM_LOAD( "x002474p.u66",   0x00000, 0x10000, CRC(74cc1423) SHA1(0522cee3a7e123ce51739c69f38915ca92bd03e5) ) /* Double Double Bonus Plus - 09/20/00   @ IGT  L01-0198 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2275.u77",  0x00000, 0x8000, CRC(15d5d6b8) SHA1(61b6821d4cc059732bc3831bf19bf01aa3910b31) )
@@ -14230,577 +14258,577 @@ ROM_END
 /*    YEAR  NAME      PARENT  MACHINE   INPUT         INIT      ROT    COMPANY                                  FULLNAME                                                  FLAGS   LAYOUT */
 
 /* Set chips */
-GAMEL( 1987, peset001, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET001) Set Chip",                      0,   layout_pe_schip )
-GAMEL( 1987, peset004, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET004) Set Chip",                      0,   layout_pe_schip )
-GAMEL( 1987, peset012, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET012) Set Chip",                      0,   layout_pe_schip )
-GAMEL( 1987, peset022, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET022) Set Chip",                      0,   layout_pe_schip )
-GAMEL( 1987, peset038, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET038) Set Chip",                      0,   layout_pe_schip )
-GAMEL( 1987, peset100, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET100) Set Chip",                      0,   layout_pe_schip )
-GAMEL( 1987, peset117, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET117) Set Chip",                      0,   layout_pe_schip )
-GAMEL( 1987, peivc006, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IVC006) Clear EEPROM Chip",             0,   layout_pe_schip )
+GAMEL( 1987, peset001, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET001) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peset004, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET004) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peset012, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET012) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peset022, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET022) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peset038, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET038) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peset100, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET100) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peset117, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET117) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peivc006, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IVC006) Clear EEPROM Chip",             MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
 
 /* Normal (non-plus) board : Poker */
-GAMEL( 1987, pepk0719,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0719-PC092) Standard Draw Poker (El Cortez)",  MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0719a, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0719-PC041) Standard Draw Poker",              MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0719b, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0719-PC011) Standard Draw Poker",              MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0756,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC084) Standard Draw Poker",              MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0756a, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC041) Standard Draw Poker",              MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0756b, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC011) Standard Draw Poker (El Cortez)",  MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0756c, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC001) Standard Draw Poker",              MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0757,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0757-PC074) Two Pair or Better",               MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0758,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0758-PC041) Jacks or Better",                  MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0769,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0769-PC092) Standard Draw Poker",              MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0773,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0773-PC041) Jacks or Better",                  MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0810,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0810-PC041) Joker Poker",                      MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0810a, pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0810-PC011) Joker Poker",                      MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0811,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0811-PC041) Joker Poker",                      MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0823,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0823-PC009) Standard Draw Poker",              MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0832,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0832-PC041) Joker Poker",                      MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0849,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0849-PC041) Joker Poker (Two Pair or Better)", MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0856,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0856-PC092) Joker Poker",                      MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0856a, pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0856-PC011) Joker Poker",                      MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0858,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0858-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0873,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0873-PC093) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0873a, pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0873-PC046) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0885,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0885-PC056) Deuces Wild Poker (El Cortez)",    MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0930,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0930-PC093) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk0930a, pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0930-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk1002,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1002-PC082) Jake's Jacks Bonus Poker",         MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk1004,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1004-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk1013,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1013-PC087) Tens or Better",                   MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk1020,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1020-PC078) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk1024,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1024-PC095) Aces and Faces Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepk1030,  pepk1020, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1030-PC088) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepk1069,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1069-PC088) Double Bonus Poker",               MACHINE_NOT_WORKING, layout_pe_poker )
+GAMEL( 1987, pepk0719,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0719-PC092) Standard Draw Poker (El Cortez)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0719a, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0719-PC041) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0719b, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0719-PC011) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0756,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC084) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0756a, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC041) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0756b, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC011) Standard Draw Poker (El Cortez)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0756c, pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0756-PC001) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0757,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0757-PC074) Two Pair or Better",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0758,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0758-PC041) Jacks or Better",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0769,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0769-PC092) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0773,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0773-PC041) Jacks or Better",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0810,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0810-PC041) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0810a, pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0810-PC011) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0811,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0811-PC041) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0823,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0823-PC009) Standard Draw Poker",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0832,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0832-PC041) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0849,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0849-PC041) Joker Poker (Two Pair or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0856,  pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0856-PC092) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0856a, pepk0810, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0856-PC011) Joker Poker",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0858,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0858-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0873,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0873-PC093) Deuces Wild Poker",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0873a, pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0873-PC046) Deuces Wild Poker",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0885,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0885-PC056) Deuces Wild Poker (El Cortez)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0930,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0930-PC093) Deuces Wild Poker",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk0930a, pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK0930-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1002,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1002-PC082) Jake's Jacks Bonus Poker",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1004,  pepk0858, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1004-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1013,  pepk0719, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1013-PC087) Tens or Better",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1020,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1020-PC078) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1024,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1024-PC095) Aces and Faces Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1030,  pepk1020, peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1030-PC088) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepk1069,  0,        peplus, nonplus_poker, peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge (PK1069-PC088) Double Bonus Poker",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 /* Normal board : Poker */
-GAMEL( 1987, pepp0001,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0001) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0002,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0002) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0002a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0002) Standard Draw Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0006,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0006) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0008,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0008) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0008a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0008) Standard Draw Poker (set 2, El Cortez)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0008b, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0008) Standard Draw Poker (set 3)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0009,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0009) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0010,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0010) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0014,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0014) Standard Draw Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0014a, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0014) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0021,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0021) Standard Draw Poker",           MACHINE_NOT_WORKING, layout_pe_poker) /* Progressive with link ONLY */
-GAMEL( 1987, pepp0023,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0023) 10's or Better",                0, layout_pe_poker )
-GAMEL( 1987, pepp0038,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0038) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0040,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0040) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0040a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0040) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0040b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0040) Standard Draw Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0041,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0041) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0042,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0042) 10's or Better (set 1)",        0, layout_pe_poker )
-GAMEL( 1987, pepp0042a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0042) 10's or Better (set 2)",        0, layout_pe_poker )
-GAMEL( 1987, pepp0043,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0043) 10's or Better",                0, layout_pe_poker )
-GAMEL( 1987, pepp0043a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0043) 10's or Better (International, set 1)",0, layout_pe_poker )
-GAMEL( 1987, pepp0043b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0043) 10's or Better (International, set 2)",0, layout_pe_poker )
-GAMEL( 1987, pepp0045,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better",                0, layout_pe_poker )
-GAMEL( 1987, pepp0045a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Gambler Downtown Reno)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0045b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Par-A-Dice Riverboat Casino)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1150 not dumped */
-GAMEL( 1987, pepp0045c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Annie Oakley's Central City)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1072 not dumped */
-GAMEL( 1987, pepp0045d, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Las Vegas Rio)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0046,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (set 1)",        0, layout_pe_poker )
-GAMEL( 1987, pepp0046a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (International)",0, layout_pe_poker )
-GAMEL( 1987, pepp0046b, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (set 2)",        0, layout_pe_poker )
-GAMEL( 1987, pepp0048,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 1)",           0, layout_pe_poker )
-GAMEL( 1987, pepp0048a, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 2)",           0, layout_pe_poker )
-GAMEL( 1987, pepp0048b, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 3)",           0, layout_pe_poker )
-GAMEL( 1987, pepp0048c, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 4)",           0, layout_pe_poker )
-GAMEL( 1987, pepp0050,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 1)",           0, layout_pe_poker )
-GAMEL( 1987, pepp0050a, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 2)",           0, layout_pe_poker )
-GAMEL( 1987, pepp0050b, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 3)",           0, layout_pe_poker )
-GAMEL( 1987, pepp0050c, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 4, El Cortez)",  0, layout_pe_poker )
-GAMEL( 1987, pepp0051,  pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0051) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0053,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0053) Joker Poker (Aces or Better)",  0, layout_pe_poker )
-GAMEL( 1987, pepp0054,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0054) Deuces Wild Poker (El Cortez)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0055,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0055a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 2, Skyline Casino)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0055b, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 3)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0055c, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 4)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0057,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0057a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0057b, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 3, El Cortez)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0057c, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 4)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0057d, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 5)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0059,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0059) Two Pair or Better (set 1)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0059a, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0059) Two Pair or Better (set 2)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0060,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0060a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0060b, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 3)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0060c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 4)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0063,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0063) 10's or Better",                0, layout_pe_poker )
-GAMEL( 1987, pepp0064,  pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0064) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0065,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0065) Joker Poker (Aces or Better)",  0, layout_pe_poker )
-GAMEL( 1987, pepp0083,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0083) 10's or Better",                0, layout_pe_poker )
-GAMEL( 1987, pepp0085,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0085) Joker Poker (Two Pair or Better)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0089,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0089) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0094,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0094) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0103,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0103a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0103b, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 3)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0103c, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 4)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0104,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0104) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0116,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0116) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0116a, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0116) Standard Draw Poker (Mirage)",  0, layout_pe_poker )
-GAMEL( 1987, pepp0118,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0118) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0120,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0120) Wild Sevens Poker",             0, layout_pe_poker )
-GAMEL( 1987, pepp0125,  pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0125) Deuces Wild Poker",             0, layout_pe_poker )
-GAMEL( 1987, pepp0126,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0126) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0126a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0126) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0126b, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0126) Deuces Wild Poker (set 3)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0127,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0127) Deuces Joker Wild Poker (set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0127a, pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0127) Deuces Joker Wild Poker (set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0127b, pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0127) Deuces Joker Wild Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0129,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0129) Joker Poker (Two Pair or Better)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0130,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0130) Aces and Faces Bonus Poker",    MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1292 not dumped */
-GAMEL( 1987, pepp0132,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0132) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0150,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0150) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0158,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0158a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 2, Skyline Casino)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0158b, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 3)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0158c, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 4)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0158d, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 5)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0159,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0159) Standard Draw Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0171,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0171) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0171a, pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0171) Joker Poker (International)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0178,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0178) 4 of a Kind Bonus Poker (Operator selectable special 4 of a Kind)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0181,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0181) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0188,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0188a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0188b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 3)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0189,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0189) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0190,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0190a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0190b, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 3)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0190c, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0195,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0195) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0197,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0197a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0197b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 3)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0197c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 4)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0197d, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 5)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0197e, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (Cruise)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0203,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0203a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0203b, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 3)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0203c, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 4)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0203d, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0203e, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 5)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0218,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0218) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0219,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0219) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0221,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0221) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0221a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0221) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0221b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0221) Standard Draw Poker (set 3)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0223,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0223) Deuces Joker Wild Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0224,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0224) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0224a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0224) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0230,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0230) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0232,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0232) Patriot Poker",                 0, layout_pe_poker )
-GAMEL( 1987, pepp0242,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0242) Deuces Wild Poker (International English/Spanish)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0249,  pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0249) Deuces Wild Poker",             0, layout_pe_poker )
-GAMEL( 1987, pepp0250,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0250) Double Down Stud Poker (set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0250a, pepp0250, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0250) Double Down Stud Poker (set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0265,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0265a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0265b, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (set 3)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0265c, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0274,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0274) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0288,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0288) Standard Draw Poker (Spanish)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0290,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0290) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0290a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0290) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0291,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0291) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0291a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0291) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0294,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0294) Aces and Faces Bonus Joker Poker", 0, layout_pe_poker )
-GAMEL( 1987, pepp0295,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0295) Super Deuces Wild Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0401,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0401) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0409,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0409) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0410,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0410) 4 of a Kind Bonus Poker (set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0410a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0410) 4 of a Kind Bonus Poker (set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0417,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0417) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0417a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0417) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
-GAMEL( 1987, pepp0418,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0418) Deuces Wild Poker",             0, layout_pe_poker )
-GAMEL( 1987, pepp0419,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0419) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0420,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0420) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0423,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0423a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0423b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 3)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0423c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 4)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0426,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0426) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0428,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0428) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0429,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0429a, pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0430,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0430) Deuces Joker Wild Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0431,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0431) Deuces Joker Wild Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0434,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0434) Bonus Poker Deluxe (set 1)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0434a, pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0434) Bonus Poker Deluxe (set 2)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0445,  pepp0294, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0445) Aces and Faces Bonus Joker Poker", 0, layout_pe_poker )
-GAMEL( 1987, pepp0447,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 1)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0447a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0447b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 3)",   0, layout_pe_poker )
-GAMEL( 1987, pepp0449,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0449) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0449a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0449) Standard Draw Poker (International English/Spanish)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0450,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0450) Loose Deuce Deuces Wild! Poker",0, layout_pe_poker )
-GAMEL( 1987, pepp0452,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0452) Double Deuces Wild Poker (set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0452a, pepp0452, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0452) Double Deuces Wild Poker (set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0453,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0453) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0454,  pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0454) Bonus Poker Deluxe (set 1)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0454a, pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0454) Bonus Poker Deluxe (set 2)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0455,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0455) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0467,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0467) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0458,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0458) Joker Poker (Aces or Better)",  0, layout_pe_poker )
-GAMEL( 1987, pepp0459,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0459) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0472,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0472) Deuces Wild Poker",             0, layout_pe_poker )
-GAMEL( 1985, pepp0488,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0488) Standard Draw Poker (Arizona Charlie's)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0508,  pepp0450, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0508) Loose Deuce Deuces Wild! Poker",0, layout_pe_poker )
-GAMEL( 1987, pepp0509,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0509) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0510,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0510) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0514,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0514) Double Bonus Poker (set 1)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0514a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0514) Double Bonus Poker (set 2)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0514b, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0514) Double Bonus Poker (set 3)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0515,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 1)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0515a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 2)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0515b, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 3)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0515c, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 4)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0516,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0516) Double Bonus Poker (set 1)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0516a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0516) Double Bonus Poker (set 2)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0516b, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0516) Double Bonus Poker (International)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0526,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0526) Deuces Wild Poker",             0, layout_pe_poker )
-GAMEL( 1987, pepp0531,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0531) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0536,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0536) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0538,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0538) Double Bonus Poker",            0, layout_pe_poker )
-GAMEL( 1987, pepp0540,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0540) Double Bonus Poker",            0, layout_pe_poker )
-GAMEL( 1987, pepp0542,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0542) One Eyed Jacks Wild Poker (CG2243)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0542a, pepp0542, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0542) One Eyed Jacks Wild Poker (CG2020)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0542b, pepp0542, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0542) One Eyed Jacks Wild Poker (CG1199)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0550,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0550) Joker Poker (Two Pair or Better, set 1)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0550a, pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0550) Joker Poker (Two Pair or Better, set 2)", 0, layout_pe_poker )
-GAMEL( 1987, pepp0555,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0555) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0559,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0559) Joker Poker (Aces or Better)",  0, layout_pe_poker )
-GAMEL( 1987, pepp0562,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0562) 10's or Better",                0, layout_pe_poker )
-GAMEL( 1987, pepp0568,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0568) Joker Poker",                   0, layout_pe_poker )
-GAMEL( 1987, pepp0585,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0585) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0587,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0587) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0596,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0596) Spades Sequential Royal Double Bonus Poker", MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepp0598,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0598) Hearts Sequential Royal Double Bonus Poker", MACHINE_NOT_WORKING, layout_pe_poker )
-GAMEL( 1987, pepp0711,  pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0711) Bonus Poker Deluxe",            0, layout_pe_poker )
-GAMEL( 1987, pepp0713,  pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0713) Bonus Poker Deluxe",            0, layout_pe_poker )
-GAMEL( 1987, pepp0725,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0725) Double Bonus Poker (set 1)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0725a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0725) Double Bonus Poker (set 2)",    0, layout_pe_poker )
-GAMEL( 1987, pepp0726,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0726) Double Bonus Poker",            0, layout_pe_poker )
-GAMEL( 1987, pepp0728,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0728) Double Bonus Poker",            0, layout_pe_poker )
-GAMEL( 1987, pepp0733,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0733) Double Aces and Faces Bonus Poker", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1292 not dumped */
-GAMEL( 1987, pepp0750,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0750) Standard Draw Poker",           0, layout_pe_poker )
-GAMEL( 1987, pepp0757,  pepp0250, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0757) Double Down Stud Joker Poker",  0, layout_pe_poker )
-GAMEL( 1987, pepp0760,  pepp0250, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0760) Double Down Stud Poker",        0, layout_pe_poker )
-GAMEL( 1987, pepp0763,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0763) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0764,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0764) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0775,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0775) Royal Deuces Poker??",          MACHINE_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs CG2195 graphics roms */
-GAMEL( 1987, pepp0797,  pepp0542, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0797) One Eyed Jacks Wild Poker",     0, layout_pe_poker )
-GAMEL( 1987, pepp0812,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0812) Deuces Joker Wild Poker",       0, layout_pe_poker )
-GAMEL( 1987, pepp0816,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0816) Treasure Chest Poker",          MACHINE_IMPERFECT_GRAPHICS, layout_pe_poker ) /* CG2283+CAP2283 undumped - Missing "Bonus" at MAX Bet for 4 of a Kind & Treasure Chest graphics */
+GAMEL( 1987, pepp0001,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0001) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0002,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0002) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0002a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0002) Standard Draw Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0006,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0006) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0008,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0008) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0008a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0008) Standard Draw Poker (set 2, El Cortez)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0008b, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0008) Standard Draw Poker (set 3)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0009,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0009) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0010,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0010) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0014,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0014) Standard Draw Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0014a, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0014) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0021,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0021) Standard Draw Poker",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* Progressive with link ONLY */
+GAMEL( 1987, pepp0023,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0023) 10's or Better",                MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0038,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0038) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0040,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0040) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0040a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0040) Standard Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0040b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0040) Standard Draw Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0041,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0041) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0042,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0042) 10's or Better (set 1)",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0042a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0042) 10's or Better (set 2)",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0043,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0043) 10's or Better",                MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0043a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0043) 10's or Better (International, set 1)",MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0043b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0043) 10's or Better (International, set 2)",MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0045,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better",                MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0045a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Gambler Downtown Reno)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0045b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Par-A-Dice Riverboat Casino)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAP1150 not dumped */
+GAMEL( 1987, pepp0045c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Annie Oakley's Central City)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAP1072 not dumped */
+GAMEL( 1987, pepp0045d, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better (Las Vegas Rio)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0046,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (set 1)",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0046a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (International)",MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0046b, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better (set 2)",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0048,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 1)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0048a, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 2)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0048b, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 3)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0048c, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0048) Joker Poker (set 4)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0050,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 1)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0050a, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 2)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0050b, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 3)",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0050c, pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0050) Joker Poker (set 4, El Cortez)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0051,  pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0051) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0053,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0053) Joker Poker (Aces or Better)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0054,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0054) Deuces Wild Poker (El Cortez)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0055,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0055a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 2, Skyline Casino)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0055b, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 3)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0055c, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 4)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0057,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0057a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0057b, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 3, El Cortez)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0057c, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 4)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0057d, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0057) Deuces Wild Poker (set 5)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0059,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0059) Two Pair or Better (set 1)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0059a, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0059) Two Pair or Better (set 2)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0060,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0060a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0060b, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 3)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0060c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 4)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0063,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0063) 10's or Better",                MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0064,  pepp0048, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0064) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0065,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0065) Joker Poker (Aces or Better)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0083,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0083) 10's or Better",                MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0085,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0085) Joker Poker (Two Pair or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0089,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0089) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0094,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0094) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0103,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0103a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0103b, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 3)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0103c, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0103) Deuces Wild Poker (set 4)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0104,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0104) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0116,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0116) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0116a, pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0116) Standard Draw Poker (Mirage)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0118,  pepp0001, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0118) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0120,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0120) Wild Sevens Poker",             MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0125,  pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0125) Deuces Wild Poker",             MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0126,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0126) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0126a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0126) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0126b, pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0126) Deuces Wild Poker (set 3)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0127,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0127) Deuces Joker Wild Poker (set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0127a, pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0127) Deuces Joker Wild Poker (set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0127b, pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0127) Deuces Joker Wild Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0129,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0129) Joker Poker (Two Pair or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0130,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0130) Aces and Faces Bonus Poker",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAP1292 not dumped */
+GAMEL( 1987, pepp0132,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0132) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0150,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0150) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0158,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0158a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 2, Skyline Casino)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0158b, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 3)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0158c, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 4)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0158d, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker (set 5)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0159,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0159) Standard Draw Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0171,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0171) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0171a, pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0171) Joker Poker (International)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0178,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0178) 4 of a Kind Bonus Poker (Operator selectable special 4 of a Kind)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0181,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0181) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0188,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0188a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0188b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 3)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0189,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0189) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0190,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0190a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0190b, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 3)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0190c, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0195,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0195) 4 of a Kind Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0197,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0197a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0197b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 3)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0197c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 4)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0197d, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (set 5)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0197e, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0197) Standard Draw Poker (Cruise)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0203,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0203a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0203b, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 3)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0203c, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 4)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0203d, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0203e, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0203) 4 of a Kind Bonus Poker (set 5)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0218,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0218) 4 of a Kind Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0219,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0219) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0221,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0221) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0221a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0221) Standard Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0221b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0221) Standard Draw Poker (set 3)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0223,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0223) Deuces Joker Wild Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0224,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0224) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0224a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0224) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0230,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0230) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0232,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0232) Patriot Poker",                 MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0242,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0242) Deuces Wild Poker (International English/Spanish)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0249,  pepp0054, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0249) Deuces Wild Poker",             MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0250,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0250) Double Down Stud Poker (set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0250a, pepp0250, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0250) Double Down Stud Poker (set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0265,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0265a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0265b, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (set 3)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0265c, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0265) 4 of a Kind Bonus Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0274,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0274) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0288,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0288) Standard Draw Poker (Spanish)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0290,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0290) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0290a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0290) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0291,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0291) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0291a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0291) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0294,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0294) Aces and Faces Bonus Joker Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0295,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0295) Super Deuces Wild Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0401,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0401) 4 of a Kind Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0409,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0409) 4 of a Kind Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0410,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0410) 4 of a Kind Bonus Poker (set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0410a, pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0410) 4 of a Kind Bonus Poker (set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0417,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0417) Deuces Wild Poker (set 1)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0417a, pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0417) Deuces Wild Poker (set 2)",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0418,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0418) Deuces Wild Poker",             MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0419,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0419) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0420,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0420) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0423,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0423a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0423b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 3)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0423c, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 4)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0426,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0426) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0428,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0428) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0429,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0429a, pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0430,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0430) Deuces Joker Wild Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0431,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0431) Deuces Joker Wild Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0434,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0434) Bonus Poker Deluxe (set 1)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0434a, pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0434) Bonus Poker Deluxe (set 2)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0445,  pepp0294, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0445) Aces and Faces Bonus Joker Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0447,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0447a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0447b, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 3)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0449,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0449) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0449a, pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0449) Standard Draw Poker (International English/Spanish)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0450,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0450) Loose Deuce Deuces Wild! Poker",MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0452,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0452) Double Deuces Wild Poker (set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0452a, pepp0452, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0452) Double Deuces Wild Poker (set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0453,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0453) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0454,  pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0454) Bonus Poker Deluxe (set 1)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0454a, pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0454) Bonus Poker Deluxe (set 2)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0455,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0455) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0467,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0467) 4 of a Kind Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0458,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0458) Joker Poker (Aces or Better)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0459,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0459) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0472,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0472) Deuces Wild Poker",             MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1985, pepp0488,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0488) Standard Draw Poker (Arizona Charlie's)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0508,  pepp0450, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0508) Loose Deuce Deuces Wild! Poker",MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0509,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0509) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0510,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0510) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0514,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0514) Double Bonus Poker (set 1)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0514a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0514) Double Bonus Poker (set 2)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0514b, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0514) Double Bonus Poker (set 3)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0515,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 1)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0515a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 2)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0515b, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 3)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0515c, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0515) Double Bonus Poker (set 4)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0516,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0516) Double Bonus Poker (set 1)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0516a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0516) Double Bonus Poker (set 2)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0516b, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0516) Double Bonus Poker (International)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0526,  pepp0054, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0526) Deuces Wild Poker",             MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0531,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0531) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0536,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0536) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0538,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0538) Double Bonus Poker",            MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0540,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0540) Double Bonus Poker",            MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0542,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0542) One Eyed Jacks Wild Poker (CG2243)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0542a, pepp0542, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0542) One Eyed Jacks Wild Poker (CG2020)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0542b, pepp0542, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0542) One Eyed Jacks Wild Poker (CG1199)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0550,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0550) Joker Poker (Two Pair or Better, set 1)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0550a, pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0550) Joker Poker (Two Pair or Better, set 2)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0555,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0555) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0559,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0559) Joker Poker (Aces or Better)",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0562,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0562) 10's or Better",                MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0568,  pepp0048, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0568) Joker Poker",                   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0585,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0585) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0587,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0587) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0596,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0596) Spades Sequential Royal Double Bonus Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0598,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0598) Hearts Sequential Royal Double Bonus Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0711,  pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0711) Bonus Poker Deluxe",            MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0713,  pepp0434, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0713) Bonus Poker Deluxe",            MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0725,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0725) Double Bonus Poker (set 1)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0725a, pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0725) Double Bonus Poker (set 2)",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0726,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0726) Double Bonus Poker",            MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0728,  pepp0514, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0728) Double Bonus Poker",            MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0733,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0733) Double Aces and Faces Bonus Poker", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAP1292 not dumped */
+GAMEL( 1987, pepp0750,  pepp0001, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0750) Standard Draw Poker",           MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0757,  pepp0250, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0757) Double Down Stud Joker Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0760,  pepp0250, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0760) Double Down Stud Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0763,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0763) 4 of a Kind Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0764,  pepp0158, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0764) 4 of a Kind Bonus Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0775,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0775) Royal Deuces Poker??",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* Needs CG2195 graphics roms */
+GAMEL( 1987, pepp0797,  pepp0542, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0797) One Eyed Jacks Wild Poker",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0812,  pepp0127, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0812) Deuces Joker Wild Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, pepp0816,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0816) Treasure Chest Poker",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CG2283+CAP2283 undumped - Missing "Bonus" at MAX Bet for 4 of a Kind & Treasure Chest graphics */
 
 /* Normal board : International Poker */
-GAMEL( 1987, peip0028,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0028) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0029,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0029) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0031,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0031) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0041,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0041) Double Deuces Wild Poker - French", 0, layout_pe_poker )
-GAMEL( 1987, peip0051,  peip0028, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0051) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0058,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0058) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0062,  peip0028, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0062) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0074,  peip0028, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0074) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0079,  peip0031, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0079) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0101,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0101) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0103,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0103) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0105,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0105) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0108,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0108) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0111,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0111) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0112,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0112) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0114,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0114) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0115,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0115) Joker Poker - French",          0, layout_pe_poker )
-GAMEL( 1987, peip0116,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0116) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0118,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0118) Standard Draw Poker - French",  0, layout_pe_poker )
-GAMEL( 1987, peip0120,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0120) Standard Draw Poker - French",  0, layout_pe_poker )
+GAMEL( 1987, peip0028,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0028) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0029,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0029) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0031,  0,        peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0031) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0041,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0041) Double Deuces Wild Poker - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0051,  peip0028, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0051) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0058,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0058) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0062,  peip0028, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0062) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0074,  peip0028, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0074) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0079,  peip0031, peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0079) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0101,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0101) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0103,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0103) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0105,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0105) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0108,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0108) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0111,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0111) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0112,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0112) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0114,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0114) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0115,  peip0028, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0115) Joker Poker - French",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0116,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0116) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0118,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0118) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1987, peip0120,  peip0031, peplus, peplus_poker,  peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (IP0120) Standard Draw Poker - French",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 /* Normal board : Multi-Game - Player's Choice - Some sets require a printer (not yet supported) */
-GAMEL( 1994, pemg0025,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0025) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer */
-GAMEL( 1994, pemg0026,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0026) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer */
-GAMEL( 1994, pemg0182,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0182) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer & touchscreen support */
-GAMEL( 1994, pemg0183,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0183) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support */
-GAMEL( 1994, pemg0213,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (MG0213) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support & CAPX2329 not dumped*/
-GAMEL( 1994, pemg0252,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (MG0252) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support */
+GAMEL( 1994, pemg0025,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0025) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE, layout_pe_poker) /* Needs printer */
+GAMEL( 1994, pemg0026,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0026) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE, layout_pe_poker) /* Needs printer */
+GAMEL( 1994, pemg0182,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0182) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE, layout_pe_poker) /* Needs printer & touchscreen support */
+GAMEL( 1994, pemg0183,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Montana Choice (MG0183) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE, layout_pe_poker) /* Needs printer support */
+GAMEL( 1994, pemg0213,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (MG0213) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE, layout_pe_poker) /* Needs printer support & CAPX2329 not dumped*/
+GAMEL( 1994, pemg0252,  0,        peplus, peplus_poker,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Choice (MG0252) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE, layout_pe_poker) /* Needs printer support */
 
 /* Normal board : Blackjack */
-GAMEL( 1994, pebe0014,  0,        peplus, peplus_bjack,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack",                     0, layout_pe_bjack )
-GAMEL( 1994, pebe0014a, pebe0014, peplus, peplus_bjack,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack (International English/Spanish)", MACHINE_IMPERFECT_GRAPHICS, layout_pe_bjack ) /* Needs CG1339 graphics roms */
+GAMEL( 1994, pebe0014,  0,        peplus, peplus_bjack,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack",                     MACHINE_SUPPORTS_SAVE, layout_pe_bjack )
+GAMEL( 1994, pebe0014a, pebe0014, peplus, peplus_bjack,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack (International English/Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_pe_bjack ) /* Needs CG1339 graphics roms */
 
 /* Normal board : Keno */
-GAMEL( 1994, peke0004,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno",                          MACHINE_NOT_WORKING, layout_pe_keno )
-GAMEL( 1994, peke0017,  peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0017) Keno",                          MACHINE_NOT_WORKING, layout_pe_keno )
-GAMEL( 1994, peke1001,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1001) Keno",                          0, layout_pe_keno )
-GAMEL( 1994, peke1006,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1006) Keno",                          0, layout_pe_keno )
-GAMEL( 1994, peke1012,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 1)",                  0, layout_pe_keno )
-GAMEL( 1994, peke1012a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 2)",                  0, layout_pe_keno )
-GAMEL( 1994, peke1012b, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 3)",                  0, layout_pe_keno )
-GAMEL( 1994, peke1013,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 1)",                  0, layout_pe_keno )
-GAMEL( 1994, peke1013a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 2)",                  0, layout_pe_keno )
+GAMEL( 1994, peke0004,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke0017,  peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0017) Keno",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1001,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1001) Keno",                          MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1006,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1006) Keno",                          MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1012,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 1)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1012a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 2)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1012b, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 3)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1013,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 1)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1013a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 2)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
 
 /* Normal board : Slots machine */
-GAMEL( 1996, peps0014,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0014) Super Joker Slots",                0, layout_pe_slots )
-GAMEL( 1996, peps0021,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0021) Red White & Blue Slots",           0, layout_pe_slots )
-GAMEL( 1996, peps0022,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0022) Red White & Blue Slots",           0, layout_pe_slots )
-GAMEL( 1996, peps0042,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0042) Double Diamond Slots",             0, layout_pe_slots )
-GAMEL( 1996, peps0043,  peps0042, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0043) Double Diamond Slots",             0, layout_pe_slots )
-GAMEL( 1996, peps0045,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0045) Red White & Blue Slots",           0, layout_pe_slots )
-GAMEL( 1996, peps0047,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0047) Wild Cherry Slots",                0, layout_pe_slots )
-GAMEL( 1996, peps0090,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0090) Gold, Silver & Bronze Slots",      0, layout_pe_slots )
-GAMEL( 1996, peps0092,  peps0047, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0092) Wild Cherry Slots",                0, layout_pe_slots )
-GAMEL( 1996, peps0206,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0206) Red White & Blue Slots",           0, layout_pe_slots )
-GAMEL( 1996, peps0207,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0207) Red White & Blue Slots",           0, layout_pe_slots )
-GAMEL( 1996, peps0239,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0239) Jackpot Jewels Slots",             0, layout_pe_slots )
-GAMEL( 1996, peps0280,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0280) 4th of July Slots",                0, layout_pe_slots )
-GAMEL( 1996, peps0296,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire Slots",                    0, layout_pe_slots )
-GAMEL( 1996, peps0298,  peps0042, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",             0, layout_pe_slots )
-GAMEL( 1996, peps0308,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",             0, layout_pe_slots )
-GAMEL( 1996, peps0358,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0358) Wild Star Red White & Blue Slots", 0, layout_pe_slots )
-GAMEL( 1996, peps0364,  peps0358, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0364) Wild Star Red White & Blue Slots", 0, layout_pe_slots )
-GAMEL( 1996, peps0366,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0366) Double Diamond Deluxe Slots",      0, layout_pe_slots )
-GAMEL( 1996, peps0372,  peps0366, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0372) Double Diamond Deluxe Slots",      0, layout_pe_slots )
-GAMEL( 1996, peps0373,  peps0366, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0373) Double Diamond Deluxe Slots",      0, layout_pe_slots )
-GAMEL( 1996, peps0425,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0425) Sizzling Sevens Slots",            0, layout_pe_slots )
-GAMEL( 1996, peps0426,  peps0425, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0426) Sizzling Sevens Slots",            0, layout_pe_slots )
-GAMEL( 1996, peps0470,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0470) Triple Diamond Slots",             0, layout_pe_slots )
-GAMEL( 1996, peps0581,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0581) Red White & Blue Slots",           0, layout_pe_slots )
-GAMEL( 1996, peps0615,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0615) Chaos Slots",                      MACHINE_WRONG_COLORS, layout_pe_slots ) /* CAP2246 not dumped */
-GAMEL( 1996, peps0628,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0628) Double Black Jack Slots",          MACHINE_WRONG_COLORS, layout_pe_slots ) /* CAP2250 not dumped */
-GAMEL( 1996, peps0629,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0629) Double Hot Peppers Slots",         0, layout_pe_slots )
-GAMEL( 1996, peps0631,  peps0358, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0631) Wild Star Red White & Blue Slots", 0, layout_pe_slots )
-GAMEL( 1996, peps0708,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0708) Double Cherry Bar Slots",          0, layout_pe_slots )
-GAMEL( 1996, peps0716,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0716) River Gambler Slots",              0, layout_pe_slots )
-GAMEL( 1996, peps0722,  peps0716, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0722) River Gambler Slots",              0, layout_pe_slots )
+GAMEL( 1996, peps0014,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0014) Super Joker Slots",                MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0021,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0021) Red White & Blue Slots",           MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0022,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0022) Red White & Blue Slots",           MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0042,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0042) Double Diamond Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0043,  peps0042, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0043) Double Diamond Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0045,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0045) Red White & Blue Slots",           MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0047,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0047) Wild Cherry Slots",                MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0090,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0090) Gold, Silver & Bronze Slots",      MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0092,  peps0047, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0092) Wild Cherry Slots",                MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0206,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0206) Red White & Blue Slots",           MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0207,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0207) Red White & Blue Slots",           MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0239,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0239) Jackpot Jewels Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0280,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0280) 4th of July Slots",                MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0296,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire Slots",                    MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0298,  peps0042, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0308,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0358,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0358) Wild Star Red White & Blue Slots", MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0364,  peps0358, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0364) Wild Star Red White & Blue Slots", MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0366,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0366) Double Diamond Deluxe Slots",      MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0372,  peps0366, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0372) Double Diamond Deluxe Slots",      MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0373,  peps0366, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0373) Double Diamond Deluxe Slots",      MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0425,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0425) Sizzling Sevens Slots",            MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0426,  peps0425, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0426) Sizzling Sevens Slots",            MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0470,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0470) Triple Diamond Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0581,  peps0021, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0581) Red White & Blue Slots",           MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0615,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0615) Chaos Slots",                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) /* CAP2246 not dumped */
+GAMEL( 1996, peps0628,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0628) Double Black Jack Slots",          MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) /* CAP2250 not dumped */
+GAMEL( 1996, peps0629,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0629) Double Hot Peppers Slots",         MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0631,  peps0358, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0631) Wild Star Red White & Blue Slots", MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0708,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0708) Double Cherry Bar Slots",          MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0716,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0716) River Gambler Slots",              MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1996, peps0722,  peps0716, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0722) River Gambler Slots",              MACHINE_SUPPORTS_SAVE, layout_pe_slots )
 
 /* Superboard : Poker */
-GAMEL( 1995, pex0002p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000002P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0002pa, pex0002p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000002P+XP000006) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0006p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000006P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0040p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000040P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0042p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000042P+XP000038) 10's or Better",      0, layout_pe_poker )
-GAMEL( 1995, pex0045p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000045P+XP000038) 10's or Better",      0, layout_pe_poker )
-GAMEL( 1995, pex0046p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000046P+XP000038) 10's or Better",      0, layout_pe_poker )
-GAMEL( 1995, pex0053p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000053P+XP000038) Joker Poker (Aces or Better)", 0, layout_pe_poker )
-GAMEL( 1995, pex0054p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000054P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000019) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pa, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000022) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pb, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000023) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pc, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000028) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pd, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000035) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pe, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pf, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000040) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pg, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000048) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055ph, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000055) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pi, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000063) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pj, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000075) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pk, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000079) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pl, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000094) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pm, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000095) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pn, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000098) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055po, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000102) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pp, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000104) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pq, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000109) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pr, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000126) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055ps, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000132) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0055pt, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000137) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0057p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0057pa, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Orleans)", 0, layout_pe_poker )
-GAMEL( 1995, pex0057pb, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Fun Ships)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2399 not dumped */
-GAMEL( 1995, pex0057pc, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Horseshoe)", 0, layout_pe_poker )
-GAMEL( 1995, pex0057pd, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Wild Wild West Casino)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2389 not dumped */
-GAMEL( 1995, pex0057pe, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Sunset Station Hotel-Casino)", 0, layout_pe_poker )
-GAMEL( 1995, pex0057pf, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Stratosphere Players Club)", 0, layout_pe_poker )
-GAMEL( 1995, pex0060p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000060P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0124p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000124P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0150p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000150P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0158p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000158P+XP000038) 4 of a Kind Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0171p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000171P+XP000038) Joker Poker",         0, layout_pe_poker )
-GAMEL( 1995, pex0188p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000188P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0190p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000190P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0197p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000197P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0203p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000203P+XP000038) 4 of a Kind Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0224p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000224P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
+GAMEL( 1995, pex0002p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000002P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0002pa, pex0002p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000002P+XP000006) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0006p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000006P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0040p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000040P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0042p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000042P+XP000038) 10's or Better",      MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0045p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000045P+XP000038) 10's or Better",      MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0046p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000046P+XP000038) 10's or Better",      MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0053p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000053P+XP000038) Joker Poker (Aces or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0054p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000054P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000019) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pa, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000022) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pb, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000023) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pc, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000028) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pd, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000035) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pe, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pf, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000040) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pg, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000048) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055ph, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000055) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pi, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000063) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pj, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000075) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pk, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000079) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pl, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000094) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pm, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000095) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pn, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000098) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055po, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000102) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pp, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000104) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pq, pex0055p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000109) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pr, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000126) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055ps, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000132) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0055pt, pex0055p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000137) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0057p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0057pa, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Orleans)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0057pb, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Fun Ships)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAPX2399 not dumped */
+GAMEL( 1995, pex0057pc, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Horseshoe)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0057pd, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Wild Wild West Casino)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAPX2389 not dumped */
+GAMEL( 1995, pex0057pe, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Sunset Station Hotel-Casino)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0057pf, pex0057p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (Stratosphere Players Club)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0060p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000060P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0124p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000124P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0150p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000150P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0158p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000158P+XP000038) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0171p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000171P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0188p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000188P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0190p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000190P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0197p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000197P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0203p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000203P+XP000038) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0224p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000224P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex0225p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000225P+XP000079) Dueces Joker Wild Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex0242p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000242P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0265p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000265P+XP000038) 4 of a Kind Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0291p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000291P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0417p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000417P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex0426p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000426P+XP000038) Joker Poker",         0, layout_pe_poker )
+GAMEL( 1995, pex0242p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000242P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0265p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000265P+XP000038) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0291p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000291P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0417p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000417P+XP000038) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0426p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000426P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex0430p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000430P+XP000079) Dueces Joker Wild Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex0434p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000434P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
-GAMEL( 1995, pex0447p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000447P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0449p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000449P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0451p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000451P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
-GAMEL( 1995, pex0452p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000452P+XP000038) Double Deuces Wild Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0454p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000454P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
-GAMEL( 1995, pex0455p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000455P+XP000038) Joker Poker",         0, layout_pe_poker )
-GAMEL( 1995, pex0458p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000458P+XP000038) Joker Poker (Aces or Better)", 0, layout_pe_poker )
-GAMEL( 1995, pex0459p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000459P+XP000038) Joker Poker",         0, layout_pe_poker )
-GAMEL( 1995, pex0459pa, pex0459p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000459P+XP000155) Joker Poker",         0, layout_pe_poker )
-GAMEL( 1995, pex0489p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000489P+XP000038) Double Down Stud Deuces Wild Poker", MACHINE_NOT_WORKING, layout_pe_poker ) /* Needs XP000074 PE+ GAME POKER program to run */
-GAMEL( 1995, pex0508p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000508P+XP000038) Loose Deuce Deuces Wild! Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0514p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000514P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex0515p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000515P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex0516p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000516P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex0536p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000536P+XP000038) Joker Poker",         0, layout_pe_poker )
-GAMEL( 1995, pex0537p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000537P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0550p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000550P+XP000119) Joker Poker (Two Pair or Better)", 0, layout_pe_poker )
-GAMEL( 1995, pex0557p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000557P+XP000119) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0568p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000568P+XP000038) Joker Poker",         0, layout_pe_poker )
-GAMEL( 1995, pex0578p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000578P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0581p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000581P+XP000038) 4 of a Kind Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex0588p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000588P+XP000038) Joker Poker",         0, layout_pe_poker )
-GAMEL( 1995, pex0725p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000725P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex0726p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000726P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex0727p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000727P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex0763p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000763P+XP000038) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex0764p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000764P+XP000038) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex2002p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002002P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2010p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002010P+XP000038) Nevada Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2016p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002016P+XP000038) Full House Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2017p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002017P+XP000038) Full House Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2018p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002018P+XP000038) Full House Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2021p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002021P+XP000038) Lucky Deal Poker",    0, layout_pe_poker )
-GAMEL( 1995, pex2024p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002024P+XP000119) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2025p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002025P+XP000019) Deuces Wild Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2026p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002026P+XP000019) Deuces Wild Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2027p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002027P+XP000019) Deuces Wild Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2028p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002028P+XP000019) Deuces Wild Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2029p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002029P+XP000019) Deuces Wild Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2031p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002031P+XP000038) Lucky Deal Poker",    0, layout_pe_poker )
-GAMEL( 1995, pex2033p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002033P+XP000038) White Hot Aces Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2034p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002034P+XP000038) White Hot Aces Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2035p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002035P+XP000038) White Hot Aces Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2036p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002036P+XP000038) White Hot Aces Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2037p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002037P+XP000038) Nevada Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2038p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002038P+XP000038) Nevada Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2039p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002039P+XP000038) Nevada Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2040p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002040P+XP000038) Nevada Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2042p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002042P+XP000038) Triple Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2043p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002043P+XP000038) Triple Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2044p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002044P+XP000038) Triple Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2045p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002045P+XP000038) Triple Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2066p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002066P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2067p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002067P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2068p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002068P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2069p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002069P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2070p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002070P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2111p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002111P+XP000038) 4 of a Kind Bonus Poker (with Seq Royal Flush)", 0, layout_pe_poker )
-GAMEL( 1995, pex2121p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002121P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2121pa, pex2121p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002121P+XP000037) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2127p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002127P+XP000043) Double Bonus Poker featuring 'Your Property' Royals", 0, layout_pe_poker )
-GAMEL( 1995, pex2134p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002134P+XP000043) Faces 'n' Deuces Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2149p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002149P+XP000038) Triple Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2150p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002150P+XP000038) Triple Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2152p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002152P+XP000043) Blackjack Poker",     0, layout_pe_poker )
-GAMEL( 1995, pex2172p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002172P+XP000038) Ace$ Bonus Poker",    0, layout_pe_poker )
-GAMEL( 1995, pex2172pa, pex2172p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002172P+XP000038) Ace$ Bonus Poker (The Fun Ships)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2399 not dumped */
-GAMEL( 1995, pex2173p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002173P+XP000038) Ace$ Bonus Poker",    0, layout_pe_poker )
-GAMEL( 1995, pex2178p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002178P+XP000119) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2179p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002179P+XP000119) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2180p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002180P+XP000119) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2211p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002211P+XP000043) Double Double Bonus with 3 Jacks Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex2236p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002236P+XP000043) Double Double Bonus with 3 Aces Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex2240p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002240P+XP000038) Joker Poker (Two Pair or Better)", 0, layout_pe_poker )
-GAMEL( 1995, pex2241p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002241P+XP000079) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex2244p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002244P+XP000079) Double Bonus Poker",  0, layout_pe_poker )
-GAMEL( 1995, pex2245p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002245P+XP000055) Standard Draw Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex2245pa, pex2245p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002245P+XP000079) Standard Draw Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex2247p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002247P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2250p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002250P+XP000050) Shockwave Poker",     0, layout_pe_poker )
-GAMEL( 1995, pex2251p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002251P+XP000050) Shockwave Poker",     0, layout_pe_poker )
-GAMEL( 1995, pex2252p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002252P+XP000050) Shockwave Poker",     0, layout_pe_poker )
-GAMEL( 1995, pex2270p,  0,        peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002270P+XP000053) Jackpot Poker",       0, layout_pe_poker )
-GAMEL( 1995, pex2272p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002272P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2275p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002275P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2276p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002276P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2279p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002279P+XP000057) Ace$ Bonus",          0, layout_pe_poker )
-GAMEL( 1995, pex2283p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2284p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2287p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002287P+XP000057) No Faces Pay the Aces Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2297p,  0,        peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002297P+XP000053) Jackpot Poker",       0, layout_pe_poker )
-GAMEL( 1995, pex2297pa, pex2297p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002297P+XP000112) Jackpot Poker",       0, layout_pe_poker )
-GAMEL( 1995, pex2302p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002302P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
-GAMEL( 1995, pex2303p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002303P+XP000038) White Hot Aces Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2306p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002306P+XP000038) Triple Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2307p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002307P+XP000038) Triple Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2308p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002308P+XP000038) Triple Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2309p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002309P+XP000038) Triple Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2310p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002310P+XP000038) Triple Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2312p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002312P+XP000038) Triple Bonus Poker Plus", 0, layout_pe_poker )
-GAMEL( 1995, pex2314p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002314P+XP000038) Triple Bonus Poker Plus", 0, layout_pe_poker )
-GAMEL( 1995, pex2315p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002315P+XP000038) Triple Bonus Poker Plus", 0, layout_pe_poker )
-GAMEL( 1995, pex2374p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002374P+XP000038) Super Aces Poker",     0, layout_pe_poker )
-GAMEL( 1995, pex2376p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002376P+XP000038) Super Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2377p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002377P+XP000038) Super Double Bonus Poker", 0, layout_pe_poker )
-GAMEL( 1995, pex2386p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002386P+XP000038) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
-GAMEL( 1995, pex2412p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002412P+XP000096) Standard Draw with 5 decks (Two Pair or Better)", 0, layout_pe_poker )
-GAMEL( 1995, pex2419p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002419P+XP000064) Deuces Wild Bonus Poker - French", 0, layout_pe_poker )
-GAMEL( 1995, pex2420p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002420P+XP000064) Deuces Wild Bonus Poker - French", 0, layout_pe_poker )
-GAMEL( 1995, pex2421p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002421P+XP000064) Deuces Wild Bonus Poker - French", 0, layout_pe_poker )
-GAMEL( 1995, pex2440p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002440P+XP000053) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL( 1995, pex2461p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002461P+XP000055) Joker Poker (Two Pair or Better)", 0, layout_pe_poker )
-GAMEL( 1995, pex2474p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002474P+XP000038) Double Double Bonus Plus", MACHINE_NOT_WORKING, layout_pe_poker ) /* Needs unknown PE+ GAME POKER program to run */
-GAMEL( 1995, pex2478p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002478P+XP000154) Joker Poker - French", 0, layout_pe_poker )
-GAMEL( 1995, pex2479p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002479P+XP000154) Joker Poker - French", 0, layout_pe_poker )
-GAMEL( 1995, pex2480p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002480P+XP000154) Joker Poker (Aces or Better) - French", 0, layout_pe_poker )
-GAMEL( 1995, pex2485p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002485P+XP000154) Standard Draw Poker - French", 0, layout_pe_poker )
+GAMEL( 1995, pex0434p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000434P+XP000038) Bonus Poker Deluxe",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0447p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000447P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0449p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000449P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0451p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000451P+XP000038) Bonus Poker Deluxe",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0452p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000452P+XP000038) Double Deuces Wild Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0454p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000454P+XP000038) Bonus Poker Deluxe",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0455p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000455P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0458p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000458P+XP000038) Joker Poker (Aces or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0459p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000459P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0459pa, pex0459p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000459P+XP000155) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0489p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000489P+XP000038) Double Down Stud Deuces Wild Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* Needs XP000074 PE+ GAME POKER program to run */
+GAMEL( 1995, pex0508p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000508P+XP000038) Loose Deuce Deuces Wild! Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0514p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000514P+XP000038) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0515p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000515P+XP000038) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0516p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000516P+XP000038) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0536p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000536P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0537p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000537P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0550p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000550P+XP000119) Joker Poker (Two Pair or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0557p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000557P+XP000119) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0568p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000568P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0578p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000578P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0581p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000581P+XP000038) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0588p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000588P+XP000038) Joker Poker",         MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0725p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000725P+XP000038) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0726p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000726P+XP000038) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0727p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000727P+XP000038) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex0763p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000763P+XP000038) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE,layout_pe_poker )
+GAMEL( 1995, pex0764p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000764P+XP000038) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE,layout_pe_poker )
+GAMEL( 1995, pex2002p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002002P+XP000038) Double Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2010p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002010P+XP000038) Nevada Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2016p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002016P+XP000038) Full House Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2017p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002017P+XP000038) Full House Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2018p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002018P+XP000038) Full House Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2021p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002021P+XP000038) Lucky Deal Poker",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2024p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002024P+XP000119) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2025p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002025P+XP000019) Deuces Wild Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2026p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002026P+XP000019) Deuces Wild Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2027p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002027P+XP000019) Deuces Wild Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2028p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002028P+XP000019) Deuces Wild Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2029p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002029P+XP000019) Deuces Wild Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2031p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002031P+XP000038) Lucky Deal Poker",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2033p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002033P+XP000038) White Hot Aces Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2034p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002034P+XP000038) White Hot Aces Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2035p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002035P+XP000038) White Hot Aces Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2036p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002036P+XP000038) White Hot Aces Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2037p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002037P+XP000038) Nevada Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2038p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002038P+XP000038) Nevada Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2039p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002039P+XP000038) Nevada Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2040p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002040P+XP000038) Nevada Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2042p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002042P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2043p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002043P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2044p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002044P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2045p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002045P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2066p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002066P+XP000038) Double Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2067p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002067P+XP000038) Double Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2068p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002068P+XP000038) Double Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2069p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002069P+XP000038) Double Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2070p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002070P+XP000038) Double Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2111p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002111P+XP000038) 4 of a Kind Bonus Poker (with Seq Royal Flush)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2121p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002121P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2121pa, pex2121p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002121P+XP000037) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2127p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002127P+XP000043) Double Bonus Poker featuring 'Your Property' Royals", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2134p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002134P+XP000043) Faces 'n' Deuces Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2149p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002149P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2150p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002150P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2152p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002152P+XP000043) Blackjack Poker",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2172p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002172P+XP000038) Ace$ Bonus Poker",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2172pa, pex2172p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002172P+XP000038) Ace$ Bonus Poker (The Fun Ships)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAPX2399 not dumped */
+GAMEL( 1995, pex2173p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002173P+XP000038) Ace$ Bonus Poker",    MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2178p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002178P+XP000119) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2179p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002179P+XP000119) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2180p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002180P+XP000119) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2211p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002211P+XP000043) Double Double Bonus with 3 Jacks Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2236p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002236P+XP000043) Double Double Bonus with 3 Aces Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2240p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002240P+XP000038) Joker Poker (Two Pair or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2241p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002241P+XP000079) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2244p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002244P+XP000079) Double Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2245p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002245P+XP000055) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2245pa, pex2245p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002245P+XP000079) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2247p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002247P+XP000038) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2250p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002250P+XP000050) Shockwave Poker",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2251p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002251P+XP000050) Shockwave Poker",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2252p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002252P+XP000050) Shockwave Poker",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2270p,  0,        peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002270P+XP000053) Jackpot Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2272p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002272P+XP000055) Black Jack Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2275p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002275P+XP000055) Black Jack Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2276p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002276P+XP000055) Black Jack Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2279p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002279P+XP000057) Ace$ Bonus",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2283p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Barbaric Decues Wild Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2284p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2287p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002287P+XP000057) No Faces Pay the Aces Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2297p,  0,        peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002297P+XP000053) Jackpot Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2297pa, pex2297p, peplus, peplus_poker,  peplus_state, init_pepluss64,ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002297P+XP000112) Jackpot Poker",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2302p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002302P+XP000038) Bonus Poker Deluxe",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2303p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002303P+XP000038) White Hot Aces Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2306p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002306P+XP000038) Triple Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2307p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002307P+XP000038) Triple Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2308p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002308P+XP000038) Triple Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2309p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002309P+XP000038) Triple Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2310p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002310P+XP000038) Triple Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2312p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002312P+XP000038) Triple Bonus Poker Plus", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2314p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002314P+XP000038) Triple Bonus Poker Plus", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2315p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002315P+XP000038) Triple Bonus Poker Plus", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2374p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002374P+XP000038) Super Aces Poker",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2376p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002376P+XP000038) Super Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2377p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002377P+XP000038) Super Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2386p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002386P+XP000038) 4 of a Kind Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2412p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002412P+XP000096) Standard Draw with 5 decks (Two Pair or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2419p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002419P+XP000064) Deuces Wild Bonus Poker - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2420p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002420P+XP000064) Deuces Wild Bonus Poker - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2421p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002421P+XP000064) Deuces Wild Bonus Poker - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2440p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002440P+XP000053) Deuces Wild Poker",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2461p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002461P+XP000055) Joker Poker (Two Pair or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2474p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002474P+XP000038) Double Double Bonus Plus", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* Needs unknown PE+ GAME POKER program to run */
+GAMEL( 1995, pex2478p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002478P+XP000154) Joker Poker - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2479p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002479P+XP000154) Joker Poker - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2480p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002480P+XP000154) Joker Poker (Aces or Better) - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2485p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002485P+XP000154) Standard Draw Poker - French", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 /* Superboard : Poker (Key On Credit) */
-GAMEL( 1995, pekoc766,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0766 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
-GAMEL( 1995, pekoc801,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0801 A5W-A6F) 10's or Better",       0, layout_pe_poker )
-GAMEL( 1995, pekoc802,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0802 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
-GAMEL( 1995, pekoc803,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0803 A5W-A6F) Joker Poker",          0, layout_pe_poker )
-GAMEL( 1995, pekoc803a, pekoc803, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0803 A50-A6N) Joker Poker",          0, layout_pe_poker )
-GAMEL( 1995, pekoc804,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0804 A5W-A6F) Bonus Poker Deluxe",   0, layout_pe_poker )
-GAMEL( 1995, pekoc806,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0806 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
-GAMEL( 1995, pekoc818,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0818 A5W-A6F) Joker Poker (Aces or Better)", 0, layout_pe_poker )
-GAMEL( 1995, pekoc819,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0819 A5W-A6F) Bonus Poker Deluxe",   0, layout_pe_poker )
-GAMEL( 1995, pekoc822,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0822 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
-GAMEL( 1995, pekoc825,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0825 A59-A7C) White Hot Aces",       0, layout_pe_poker )
+GAMEL( 1995, pekoc766,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0766 A5W-A6F) Standard Draw Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc801,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0801 A5W-A6F) 10's or Better",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc802,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0802 A5W-A6F) Standard Draw Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc803,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0803 A5W-A6F) Joker Poker",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc803a, pekoc803, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0803 A50-A6N) Joker Poker",          MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc804,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0804 A5W-A6F) Bonus Poker Deluxe",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc806,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0806 A5W-A6F) Standard Draw Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc818,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0818 A5W-A6F) Joker Poker (Aces or Better)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc819,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0819 A5W-A6F) Bonus Poker Deluxe",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc822,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0822 A5W-A6F) Standard Draw Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pekoc825,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (PP0825 A59-A7C) White Hot Aces",       MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 /* Superboard : Multi-Poker */
-GAMEL( 1995, pexm001p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00001P+XMP00003) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm002p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm002pa, pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker (MGM Grand Detroit Casino)", 0, layout_pe_poker ) /* CAPX2440 needs a redumped */
-GAMEL( 1995, pexm003p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00003P+XMP00024) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm004p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00004P+XMP00002) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm005p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm006p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00006P+XMP00020) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm006pa, pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00006P+XMP00002) Multi-Poker (The Orleans)", 0, layout_pe_poker )
-GAMEL( 1995, pexm007p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00007P+XMP00006) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm008p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00008P+XMP00006) Multi-Poker",        0, layout_pe_poker )
-GAMEL( 1995, pexm009p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00009P+XMP00002) Multi-Poker",        MACHINE_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs unknown CG2??? graphics roms for correct MENU game banners */
-GAMEL( 1995, pexm013p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00013P+XMP00025) Multi-Poker",        0, layout_pe_poker )
+GAMEL( 1995, pexm001p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00001P+XMP00003) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm002p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm002pa, pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker (MGM Grand Detroit Casino)", MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* CAPX2440 needs a redumped */
+GAMEL( 1995, pexm003p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00003P+XMP00024) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm004p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00004P+XMP00002) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm005p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm006p,  pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00006P+XMP00020) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm006pa, pexm001p, peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00006P+XMP00002) Multi-Poker (The Orleans)", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm007p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00007P+XMP00006) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm008p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00008P+XMP00006) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexm009p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00009P+XMP00002) Multi-Poker",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_pe_poker ) /* Needs unknown CG2??? graphics roms for correct MENU game banners */
+GAMEL( 1995, pexm013p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (XM00013P+XMP00025) Multi-Poker",        MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 /* Superboard : Multi-Poker (Wingboard) */
-GAMEL( 1995, pexmp011,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00011) 5-in-1 Wingboard (CG2298)",   0, layout_pe_poker )
-GAMEL( 1995, pexmp013,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00013) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
-GAMEL( 1995, pexmp017,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2298)",   0, layout_pe_poker )
-GAMEL( 1995, pexmp017a, pexmp017, peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2352)",   0, layout_pe_poker )
-GAMEL( 1995, pexmp017b, pexmp017, peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2426)",   0, layout_pe_poker )
-GAMEL( 1995, pexmp022,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00022) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
-GAMEL( 1995, pexmp026,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00026) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
-GAMEL( 1995, pexmp030,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2451)",   0, layout_pe_poker )
+GAMEL( 1995, pexmp011,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00011) 5-in-1 Wingboard (CG2298)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexmp013,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00013) 5-in-1 Wingboard (CG2346) - Spanish", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexmp017,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2298)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexmp017a, pexmp017, peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2352)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexmp017b, pexmp017, peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2426)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexmp022,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00022) 5-in-1 Wingboard (CG2346) - Spanish", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexmp026,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00026) 5-in-1 Wingboard (CG2346) - Spanish", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pexmp030,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2451)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 /* Superboard : Keno */
-GAMEL( 1995, pex0006k,  0,        peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000006K+XK000001) Keno",               MACHINE_NOT_WORKING, layout_pe_keno )
-GAMEL( 1995, pex0013k,  pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000011) Keno",               MACHINE_NOT_WORKING, layout_pe_keno )
-GAMEL( 1995, pex0013ka, pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000012) Keno",               MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL( 1995, pex0006k,  0,        peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000006K+XK000001) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1995, pex0013k,  pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000011) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1995, pex0013ka, pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000012) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
 
 /* Superboard : Slots machine */
-GAMEL( 1997, pex0827s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000827S+XS000002) Red, White & Blue Slots",          MACHINE_WRONG_COLORS, layout_pe_slots ) /* Wrong CG graphics and CAPX color chip */
-GAMEL( 1997, pex0838s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000838S+XS000002) Five Times Pay Slots",             0, layout_pe_slots )
-GAMEL( 1997, pex0841s,  pex0838s, peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000841S+XS000002) Five Times Pay Slots",             0, layout_pe_slots )
-GAMEL( 1997, pex0846s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000846S+XS000006) Wild Star Red White & Blue Slots", MACHINE_WRONG_COLORS, layout_pe_slots ) /* Wrong CG graphics and CAPX color chip */
-GAMEL( 1997, pex0998s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000998S+XS000006) Triple Triple Diamond Slots",      0, layout_pe_slots )
-GAMEL( 1997, pex1087s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X001087S+XS000006) Double Double Diamond Slots",      MACHINE_WRONG_COLORS, layout_pe_slots ) /* CAPX2415 not dumped */
+GAMEL( 1997, pex0827s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000827S+XS000002) Red, White & Blue Slots",          MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) /* Wrong CG graphics and CAPX color chip */
+GAMEL( 1997, pex0838s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000838S+XS000002) Five Times Pay Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1997, pex0841s,  pex0838s, peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000841S+XS000002) Five Times Pay Slots",             MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1997, pex0846s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000846S+XS000006) Wild Star Red White & Blue Slots", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) /* Wrong CG graphics and CAPX color chip */
+GAMEL( 1997, pex0998s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000998S+XS000006) Triple Triple Diamond Slots",      MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+GAMEL( 1997, pex1087s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X001087S+XS000006) Double Double Diamond Slots",      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) /* CAPX2415 not dumped */

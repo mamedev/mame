@@ -61,7 +61,7 @@ enum
 
 
 #define MCFG_LH5801_IN(_devcb) \
-	devcb = &downcast<lh5801_cpu_device &>(*device).set_in_func(DEVCB_##_devcb);
+	downcast<lh5801_cpu_device &>(*device).set_in_func(DEVCB_##_devcb);
 
 
 class lh5801_cpu_device :  public cpu_device

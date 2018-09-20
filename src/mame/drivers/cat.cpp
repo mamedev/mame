@@ -1080,16 +1080,15 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txb))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, cat_state, cat_duart_output))
 
-	MCFG_DEVICE_ADD(m_ctx, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, cat_state, prn_ack_ff))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
+	CENTRONICS(config, m_ctx, centronics_devices, "printer");
+	m_ctx->ack_handler().set(FUNC(cat_state::prn_ack_ff));
+	m_ctx->busy_handler().set("duartn68681", FUNC(mc68681_device::ip4_w)).invert();
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( cat )

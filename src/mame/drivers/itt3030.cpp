@@ -229,10 +229,11 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void itt3030(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
 	DECLARE_WRITE8_MEMBER( beep_w );
@@ -252,11 +253,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
 	DECLARE_PALETTE_INIT(itt3030);
 
-	void itt3030(machine_config &config);
 	void itt3030_io(address_map &map);
 	void itt3030_map(address_map &map);
 	void lower48_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -598,12 +598,12 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 /* As far as we can tell, the mess of ttl de-inverts the bus */
 READ8_MEMBER(itt3030_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(itt3030_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 /*
@@ -722,20 +722,14 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD("lowerbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lower48_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0xc000)
+	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
 
-	MCFG_DEVICE_ADD("crt5027", CRT5027, 6_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5027(config, m_crtc, 6_MHz_XTAL / 8).set_char_width(8);
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, itt3030_state, fdchld_w))
+	FD1791(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(itt3030_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(itt3030_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(itt3030_state::fdchld_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
@@ -746,8 +740,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)
 
 	/* internal ram */
-	MCFG_RAM_ADD("mainram")
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, "mainram").set_default_size("256K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

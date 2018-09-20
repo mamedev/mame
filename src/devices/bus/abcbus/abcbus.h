@@ -120,34 +120,34 @@
 
 
 #define MCFG_ABCBUS_SLOT_IRQ_CALLBACK(_irq) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB_##_irq);
+	downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB_##_irq);
 
 #define MCFG_ABCBUS_SLOT_NMI_CALLBACK(_nmi) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_ABCBUS_SLOT_RDY_CALLBACK(_rdy) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB_##_rdy);
+	downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB_##_rdy);
 
 #define MCFG_ABCBUS_SLOT_RESIN_CALLBACK(_resin) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB_##_resin);
+	downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB_##_resin);
 
 #define MCFG_ABCBUS_SLOT_PREN_CALLBACK(_pren) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB_##_pren);
+	downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB_##_pren);
 
 #define MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(_trrq) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB_##_trrq);
+	downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB_##_trrq);
 
 #define MCFG_ABCBUS_SLOT_XINT2_CALLBACK(_xint2) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB_##_xint2);
+	downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB_##_xint2);
 
 #define MCFG_ABCBUS_SLOT_XINT3_CALLBACK(_xint3) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB_##_xint3);
+	downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB_##_xint3);
 
 #define MCFG_ABCBUS_SLOT_XINT4_CALLBACK(_xint4) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB_##_xint4);
+	downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB_##_xint4);
 
 #define MCFG_ABCBUS_SLOT_XINT5_CALLBACK(_xint5) \
-	devcb = &downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB_##_xint5);
+	downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB_##_xint5);
 
 
 

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_M90_H
+#define MAME_INCLUDES_M90_H
+
+#pragma once
+
 #include "audio/m72.h"
 #include "emupal.h"
 
@@ -19,6 +24,21 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void m90(machine_config &config);
+	void bbmanw(machine_config &config);
+	void hasamu(machine_config &config);
+	void bombrman(machine_config &config);
+	void riskchal(machine_config &config);
+	void bomblord(machine_config &config);
+	void bbmanwj(machine_config &config);
+	void dynablsb(machine_config &config);
+	void matchit2(machine_config &config);
+	void quizf1(machine_config &config);
+
+	void init_bomblord();
+	void init_quizf1();
+
+private:
 	required_shared_ptr<uint16_t> m_video_control_data;
 	required_shared_ptr<uint16_t> m_video_data;
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -36,8 +56,6 @@ public:
 	DECLARE_WRITE16_MEMBER(coincounter_w);
 	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
-	void init_bomblord();
-	void init_quizf1();
 	DECLARE_WRITE16_MEMBER(bootleg_video_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
@@ -55,16 +73,6 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void m90(machine_config &config);
-	void bbmanw(machine_config &config);
-	void hasamu(machine_config &config);
-	void bombrman(machine_config &config);
-	void riskchal(machine_config &config);
-	void bomblord(machine_config &config);
-	void bbmanwj(machine_config &config);
-	void dynablsb(machine_config &config);
-	void matchit2(machine_config &config);
-	void quizf1(machine_config &config);
 	void bomblord_main_cpu_map(address_map &map);
 	void dynablsb_main_cpu_io_map(address_map &map);
 	void dynablsb_main_cpu_map(address_map &map);
@@ -77,3 +85,5 @@ public:
 	void quizf1_main_cpu_io_map(address_map &map);
 	void quizf1_main_cpu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M90_H

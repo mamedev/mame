@@ -247,22 +247,27 @@
 
 class goldngam_state : public driver_device
 {
-	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
-	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
-
 public:
 	goldngam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_ptm(*this, "ptm"),
 		m_duart(*this, "duart%u", 1U) { }
 
 	void swisspkr(machine_config &config);
 	void moviecrd(machine_config &config);
+
+protected:
+	void base(machine_config &config);
+
 private:
+	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
+	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
+
 	DECLARE_READ8_MEMBER(unk_r);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldngam);
+	void palette_init(palette_device &palette);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(moviecrd_irq_ack);
 
@@ -271,6 +276,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_device<ptm6840_device> m_ptm;
 	optional_device_array<mc68681_device, 2> m_duart;
 };
 
@@ -304,7 +310,7 @@ uint32_t goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(goldngam_state, goldngam)
+void goldngam_state::palette_init(palette_device &palette)
 {
 }
 
@@ -592,63 +598,58 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-
-MACHINE_CONFIG_START(goldngam_state::swisspkr)
-
+void goldngam_state::base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(swisspkr_map)
+	M68000(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldngam_state::swisspkr_map);
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 2'000'000)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_2))
-
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_4))
+	PTM6840(config, m_ptm, 2'000'000);
+	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)  // 312x288
-	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(4*8, 43*8-1, 1*8, 37*8-1); // 312x288
+	screen.set_screen_update(FUNC(goldngam_state::screen_update_goldngam));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldngam)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_goldngam);
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(goldngam_state, goldngam)
+	PALETTE(config, "palette", 512).set_init(DEVICE_SELF, FUNC(goldngam_state::palette_init));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+}
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+void goldngam_state::swisspkr(machine_config &config)
+{
+	base(config);
 
+	ACIA6850(config, "acia", 0).irq_handler().set_inputline("maincpu", M68K_IRQ_4);
+	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-MACHINE_CONFIG_START(goldngam_state::moviecrd)
-	swisspkr(config);
+void goldngam_state::moviecrd(machine_config &config)
+{
+	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(moviecrd_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(goldngam_state, moviecrd_irq_ack)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldngam_state::moviecrd_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(goldngam_state::moviecrd_irq_ack));
 
-	MCFG_DEVICE_MODIFY("ptm")
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_1))
+	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_1);
 
-	MCFG_DEVICE_REMOVE("acia")
+	MC68681(config, m_duart[0], 3'686'400);
+	m_duart[0]->irq_cb().set_inputline("maincpu", MOVIECRD_DUART1_IRQ);
 
-	MCFG_DEVICE_ADD("duart1", MC68681, 3'686'400)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MOVIECRD_DUART1_IRQ))
+	MC68681(config, m_duart[1], 3'686'400);
+	m_duart[1]->irq_cb().set_inputline("maincpu", MOVIECRD_DUART2_IRQ);
 
-	MCFG_DEVICE_ADD("duart2", MC68681, 3'686'400)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MOVIECRD_DUART2_IRQ))
-
-	MCFG_DEVICE_REPLACE("aysnd", YM2149, MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	YM2149(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 /*************************

@@ -36,6 +36,9 @@ public:
 		m_vdp(*this, "tc0091lvc")
 	{ }
 
+	void dfruit(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 
@@ -71,7 +74,6 @@ public:
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
-	void dfruit(machine_config &config);
 	void dfruit_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };
@@ -395,10 +397,10 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -24,6 +24,11 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
+	void scorpion(machine_config &config);
+	void profi(machine_config &config);
+	void quorum(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
@@ -33,19 +38,17 @@ public:
 	DECLARE_MACHINE_START(scorpion);
 	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
-	void scorpion(machine_config &config);
-	void profi(machine_config &config);
-	void quorum(machine_config &config);
+
 	void scorpion_io(address_map &map);
 	void scorpion_mem(address_map &map);
 	void scorpion_switch(address_map &map);
-protected:
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
-private:
+
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void scorpion_update_memory();
@@ -303,8 +306,7 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	m_ram->set_default_size("256K");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", scorpion_state, nmi_check_callback, attotime::from_hz(50))
 

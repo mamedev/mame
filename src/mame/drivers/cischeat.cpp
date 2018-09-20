@@ -227,7 +227,7 @@ void cischeat_state::bigrun_map(address_map &map)
 	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
 	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-	/* It's actually 0x840000-0x847ff, divided in four banks and shared with other boards.
+	/* It's actually 0x84000-0x847ff, divided in four banks and shared with other boards.
 	    Each board expects reads from the other boards and writes to own bank.
 	    Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
 	    so it's likely to be the only thing needed. */
@@ -421,7 +421,7 @@ void wildplt_state::wildplt_map(address_map &map)
 	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
 	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-//  AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+//  map(0x088000, 0x088fff).ram(); // Linking with other units (not present on this)
 
 	map(0x090000, 0x097fff).ram().share("share2"); // Sharedram with sub CPU#2
 	map(0x098000, 0x09ffff).ram().share("share1"); // Sharedram with sub CPU#1
@@ -1914,22 +1914,31 @@ GFXDECODE_END
                     Big Run, Cisco Heat, F1 GrandPrix Star
 **************************************************************************/
 
-/*
- irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. Wild Pilot of course doesn't need it.
- irq 2/4 controls gameplay speed, currently unknown about the timing
- */
+// TODO: irq generation is unknown, as usual with Jaleco/NMK HW
+//       - irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times.
+//         Wild Pilot of course doesn't need it.
+//       - irq 2/4 controls gameplay speed, currently unknown about the timing
+//       - 2 updates palettes while 4 is vblank?
+//       - Calling 2 every frame causes attract mode to desync in Big Run.
+//       - Not calling 1 in Big Run causes service mode to not work at all, so even if the comms doesn't work
+//         something still triggers it somehow?
 TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 {
 	int scanline = param;
 
+	if(m_screen->frame_number() & 1)
+	{
+		if(scanline == 240)
+			m_cpu1->set_input_line(1, HOLD_LINE);
+
+		return;
+	}
+
 	if(scanline == 240) // vblank-out irq
-		m_cpu1->set_input_line(m_screen->frame_number() & 1 ? 4 : 1, HOLD_LINE);
+		m_cpu1->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
 		m_cpu1->set_input_line(2, HOLD_LINE);
-
-//  if(scanline == 69)
-//      m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER(cischeat_state::sound_irq)
@@ -2133,7 +2142,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2224,8 +2233,8 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	WATCHDOG_TIMER(config, m_watchdog);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2250,7 +2259,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_TIMER_ADD_NONE("motor_right")
 
 	// Layout
-	MCFG_DEFAULT_LAYOUT(layout_captflag)
+	config.set_default_layout(layout_captflag);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

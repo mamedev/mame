@@ -88,8 +88,9 @@ static constexpr int INSTRUCTION_NO  = 0x08;
 static constexpr int MODE_READ       = 0x10;
 static constexpr int MODE_WRITE      = 0;
 
-static constexpr int RUN_MODE_NORMAL          = 0;
-static constexpr int RUN_MODE_BERR_AERR_RESET = 1;
+static constexpr int RUN_MODE_NORMAL              = 0;
+static constexpr int RUN_MODE_BERR_AERR_RESET_WSF = 1; // writing the stack frame
+static constexpr int RUN_MODE_BERR_AERR_RESET     = 2; // stack frame done
 
 
 
@@ -1516,13 +1517,14 @@ inline void m68ki_exception_address_error()
 	 * this is a catastrophic failure.
 	 * Halt the CPU
 	 */
-	if(m_run_mode == RUN_MODE_BERR_AERR_RESET)
+	if(m_run_mode == RUN_MODE_BERR_AERR_RESET_WSF)
 	{
 		m_read8(0x00ffff01);
 		m_stopped = STOP_LEVEL_HALT;
 		return;
 	}
-	m_run_mode = RUN_MODE_BERR_AERR_RESET;
+
+	m_run_mode = RUN_MODE_BERR_AERR_RESET_WSF;
 
 	if (!CPU_TYPE_IS_010_PLUS())
 	{
@@ -1544,6 +1546,8 @@ inline void m68ki_exception_address_error()
 	}
 
 	m68ki_jump_vector(EXCEPTION_ADDRESS_ERROR);
+
+	m_run_mode = RUN_MODE_BERR_AERR_RESET;
 
 	/* Use up some clock cycles and undo the instruction's cycles */
 	m_remaining_cycles -= m_cyc_exception[EXCEPTION_ADDRESS_ERROR] - m_cyc_instruction[m_ir];

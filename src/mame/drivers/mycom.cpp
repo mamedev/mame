@@ -84,6 +84,11 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mycom(machine_config &config);
+
+	void init_mycom();
+
+private:
 	DECLARE_READ8_MEMBER(mycom_upper_r);
 	DECLARE_WRITE8_MEMBER(mycom_upper_w);
 	DECLARE_READ8_MEMBER(vram_data_r);
@@ -95,15 +100,13 @@ public:
 	DECLARE_READ8_MEMBER(mycom_05_r);
 	DECLARE_READ8_MEMBER(mycom_06_r);
 	DECLARE_READ8_MEMBER(mycom_08_r);
-	void init_mycom();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mycom(machine_config &config);
 	void mycom_io(address_map &map);
 	void mycom_map(address_map &map);
-private:
+
 	uint8_t m_0a;
 	uint16_t m_i_videoram;
 	uint8_t m_keyb_press;
@@ -510,20 +513,20 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_DEVICE_PROGRAM_MAP(mycom_map)
 	MCFG_DEVICE_IO_MAP(mycom_io)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mycom_state, mycom_04_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mycom_state, mycom_05_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mycom_state, mycom_06_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_06_w))
+	I8255(config, m_ppi0);
+	m_ppi0->out_pa_callback().set(FUNC(mycom_state::mycom_04_w));
+	m_ppi0->in_pb_callback().set(FUNC(mycom_state::mycom_05_r));
+	m_ppi0->in_pc_callback().set(FUNC(mycom_state::mycom_06_r));
+	m_ppi0->out_pc_callback().set(FUNC(mycom_state::mycom_06_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mycom_state, mycom_08_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_0a_w))
+	I8255(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(mycom_state::mycom_08_r));
+	m_ppi1->out_pc_callback().set(FUNC(mycom_state::mycom_0a_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8("rtc", msm5832_device, data_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("rtc", msm5832_device, data_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_rtc_w))
+	I8255(config, m_ppi2);
+	m_ppi2->in_pb_callback().set("rtc", FUNC(msm5832_device::data_r));
+	m_ppi2->out_pb_callback().set("rtc", FUNC(msm5832_device::data_w));
+	m_ppi2->out_pc_callback().set(FUNC(mycom_state::mycom_rtc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -554,7 +557,7 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 
 	MCFG_CASSETTE_ADD("cassette")
 
-	MCFG_DEVICE_ADD("fdc", FD1771, 16_MHz_XTAL / 16)
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)

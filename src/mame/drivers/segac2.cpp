@@ -111,27 +111,8 @@ public:
 	{
 	}
 
-	// for Print Club only
-	int m_cam_data;
-
-	int m_segac2_enable_display;
-
-	required_shared_ptr<uint16_t> m_paletteram;
-	optional_memory_region m_upd_region;
-
-	/* protection-related tracking */
-	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
-	uint8_t       m_prot_write_buf;       /* remembers what was written */
-	uint8_t       m_prot_read_buf;        /* remembers what was returned */
-
-	/* palette-related variables */
-	uint8_t       m_segac2_alt_palette_mode;
-	uint8_t       m_palbank;
-	uint8_t       m_bg_palbase;
-	uint8_t       m_sp_palbase;
-
-	/* sound-related variables */
-	uint8_t       m_sound_banks;      /* number of sound banks */
+	void segac2(machine_config &config);
+	void segac(machine_config &config);
 
 	void init_c2boot();
 	void init_bloxeedc();
@@ -159,6 +140,30 @@ public:
 	void init_pclubjv2();
 	void init_pclubjv4();
 	void init_pclubjv5();
+
+private:
+	// for Print Club only
+	int m_cam_data;
+
+	int m_segac2_enable_display;
+
+	required_shared_ptr<uint16_t> m_paletteram;
+	optional_memory_region m_upd_region;
+
+	/* protection-related tracking */
+	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
+	uint8_t       m_prot_write_buf;       /* remembers what was written */
+	uint8_t       m_prot_read_buf;        /* remembers what was returned */
+
+	/* palette-related variables */
+	uint8_t       m_segac2_alt_palette_mode;
+	uint8_t       m_palbank;
+	uint8_t       m_bg_palbase;
+	uint8_t       m_sp_palbase;
+
+	/* sound-related variables */
+	uint8_t       m_sound_banks;      /* number of sound banks */
+
 	void segac2_common_init(segac2_prot_delegate prot_func);
 	DECLARE_VIDEO_START(segac2_new);
 	DECLARE_MACHINE_START(segac2);
@@ -214,8 +219,7 @@ public:
 	int prot_func_pclubjv2(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
-	void segac2(machine_config &config);
-	void segac(machine_config &config);
+
 	void main_map(address_map &map);
 };
 
@@ -305,7 +309,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(space, 0, data & 0xff);
+		m_upd7759->port_w(data & 0xff);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}
@@ -481,7 +485,7 @@ WRITE8_MEMBER(segac2_state::io_porth_w)
 	if (m_sound_banks > 1)
 	{
 		newbank = (data >> 2) & (m_sound_banks - 1);
-		m_upd7759->set_bank_base(newbank * 0x20000);
+		m_upd7759->set_rom_bank(newbank);
 	}
 }
 
@@ -1547,17 +1551,17 @@ MACHINE_CONFIG_START(segac2_state::segac)
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
-	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, XL2_CLOCK/6) // clock divider guessed
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segac2_state, io_portc_r))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segac2_state, io_portd_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segac2_state, io_porth_w))
+	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
+	io.in_pa_callback().set_ioport("P1");
+	io.in_pb_callback().set_ioport("P2");
+	io.in_pc_callback().set(FUNC(segac2_state::io_portc_r));
+	io.out_pd_callback().set(FUNC(segac2_state::io_portd_w));
+	io.in_pe_callback().set_ioport("SERVICE");
+	io.in_pf_callback().set_ioport("COINAGE");
+	io.in_pg_callback().set_ioport("DSW");
+	io.out_ph_callback().set(FUNC(segac2_state::io_porth_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, XL2_CLOCK, "maincpu")
@@ -1592,17 +1596,16 @@ MACHINE_CONFIG_START(segac2_state::segac)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(segac2_state::segac2)
+void segac2_state::segac2(machine_config &config)
+{
 	segac(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE("upd", upd7759_device, reset_w))
+	subdevice<sega_315_5296_device>("io")->out_cnt1_callback().set(m_upd7759, FUNC(upd7759_device::reset_w));
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("upd", UPD7759, XL1_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759, XL1_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

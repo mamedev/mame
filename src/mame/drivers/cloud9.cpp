@@ -216,18 +216,6 @@ WRITE8_MEMBER(cloud9_state::irq_ack_w)
 }
 
 
-WRITE_LINE_MEMBER(cloud9_state::coin1_counter_w)
-{
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-
-WRITE_LINE_MEMBER(cloud9_state::coin2_counter_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-
 READ8_MEMBER(cloud9_state::leta_r)
 {
 	return ioport(offset ? "TRACKX" : "TRACKY")->read();
@@ -407,19 +395,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cloud9_state::cloud9)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(cloud9_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cloud9_state::cloud9_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cloud9_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cloud9_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	outlatch.q_out_cb<1>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
+	outlatch.q_out_cb<2>().set_output("led0").invert();
+	outlatch.q_out_cb<3>().set_output("led1").invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram")
+	X2212(config, "nvram").set_auto_save(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloud9)

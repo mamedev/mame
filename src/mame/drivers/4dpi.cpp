@@ -34,6 +34,11 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
+	void sgi_ip6(machine_config &config);
+
+	void init_sgi_ip6();
+
+private:
 	ip6_regs_t m_ip6_regs;
 	DECLARE_READ32_MEMBER(ip6_unk1_r);
 	DECLARE_WRITE32_MEMBER(ip6_unk1_w);
@@ -41,7 +46,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ip6_unk2_w);
 	DECLARE_READ32_MEMBER(ip6_unk3_r);
 	DECLARE_WRITE32_MEMBER(ip6_unk3_w);
-	void init_sgi_ip6();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -49,7 +53,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
-	void sgi_ip6(machine_config &config);
 	void sgi_ip6_map(address_map &map);
 };
 

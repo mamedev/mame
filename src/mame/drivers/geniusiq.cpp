@@ -167,14 +167,6 @@ PCB - German Version:
 class geniusiq_state : public driver_device
 {
 public:
-	enum
-	{
-		IQ128_ROM_CART      = 0x00,
-		IQ128_ROMLESS1_CART = 0x01,
-		IQ128_ROMLESS2_CART = 0x02,
-		IQ128_NO_CART       = 0x03
-	};
-
 	geniusiq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -184,6 +176,21 @@ public:
 		m_mouse_gfx(*this, "mouse_gfx"),
 		m_cart_state(IQ128_NO_CART)
 	{ }
+
+	void iqtv512(machine_config &config);
+	void iq128(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(send_input);
+	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
+
+private:
+	enum
+	{
+		IQ128_ROM_CART      = 0x00,
+		IQ128_ROMLESS1_CART = 0x01,
+		IQ128_ROMLESS2_CART = 0x02,
+		IQ128_NO_CART       = 0x03
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -198,8 +205,6 @@ public:
 
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(mouse_pos_w);
-	DECLARE_INPUT_CHANGED_MEMBER(send_input);
-	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
 	DECLARE_WRITE16_MEMBER(gfx_base_w);
 	DECLARE_WRITE16_MEMBER(gfx_dest_w);
 	DECLARE_WRITE16_MEMBER(gfx_color_w);
@@ -212,10 +217,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
 
-	void iqtv512(machine_config &config);
-	void iq128(machine_config &config);
 	void geniusiq_mem(address_map &map);
-private:
+
 	uint16_t      m_gfx_y;
 	uint16_t      m_gfx_x;
 	uint32_t      m_gfx_base;
@@ -713,7 +716,7 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_PALETTE_INIT_OWNER(geniusiq_state, geniusiq)
 
 	/* internal flash */
-	MCFG_AMD_29F010_ADD("flash")
+	AMD_29F010(config, "flash");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "iq128_cart")
@@ -724,12 +727,12 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(geniusiq_state::iqtv512)
+void geniusiq_state::iqtv512(machine_config &config)
+{
 	iq128(config);
 	/* internal flash */
-	MCFG_DEVICE_REMOVE("flash")
-	MCFG_AMD_29F040_ADD("flash")
-MACHINE_CONFIG_END
+	AMD_29F040(config.replace(), "flash");
+}
 
 /* ROM definition */
 

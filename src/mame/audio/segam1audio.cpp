@@ -26,8 +26,7 @@ void segam1audio_device::segam1audio_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x09ffff).rom().region(M68000_TAG, 0x20000); // mirror of upper ROM socket
-	map(0xc20001, 0xc20001).rw(UART_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc20003, 0xc20003).rw(UART_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc20000, 0xc20003).rw(UART_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xc40000, 0xc40007).rw(MULTIPCM_1_TAG, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0x00ff);
 	map(0xc40012, 0xc40013).nopw();
 	map(0xc50000, 0xc50001).w(FUNC(segam1audio_device::m1_snd_mpcm_bnk1_w));
@@ -80,13 +79,13 @@ MACHINE_CONFIG_START(segam1audio_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD(UART_TAG, I8251, 8000000) // T82C51, clock unknown
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(M68000_TAG, M68K_IRQ_2))
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, segam1audio_device, output_txd))
+	I8251(config, m_uart, 8000000); // T82C51, clock unknown
+	m_uart->rxrdy_handler().set_inputline(m_audiocpu, M68K_IRQ_2);
+	m_uart->txd_handler().set(FUNC(segam1audio_device::output_txd));
 
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(UART_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(UART_TAG, i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 //**************************************************************************

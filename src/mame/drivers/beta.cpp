@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_DEVICE_PROGRAM_MAP(beta_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_beta )
+	config.set_default_layout(layout_beta);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -372,8 +372,7 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_GENERIC_UNLOAD(beta_state, beta_eprom)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
+	RAM(config, RAM_TAG).set_default_size("256");
 MACHINE_CONFIG_END
 
 /* ROMs */

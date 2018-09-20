@@ -49,16 +49,18 @@ public:
 		, m_io_row3(*this, "ROW3")
 	{ }
 
+	void myvision(machine_config &config);
+
+private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
 	DECLARE_WRITE8_MEMBER( ay_port_a_w );
 	DECLARE_WRITE8_MEMBER( ay_port_b_w );
 
-	void myvision(machine_config &config);
 	void myvision_io(address_map &map);
 	void myvision_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -219,11 +221,11 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	MCFG_DEVICE_IO_MAP(myvision_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL(10'738'635) / 2 )  /* Exact model not verified */
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)  /* Not verified */
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, "tms9918", XTAL(10'738'635)));  /* Exact model not verified */
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);  /* Not verified */
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

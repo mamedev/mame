@@ -287,13 +287,12 @@ MACHINE_RESET_MEMBER( model2_state, model2_common )
 
 MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 {
-	membank("bank4")->set_base(memregion("scsp")->base() + 0x200000);
-	membank("bank5")->set_base(memregion("scsp")->base() + 0x600000);
+	membank("bank4")->set_base(memregion("samples")->base() + 0x200000);
+	membank("bank5")->set_base(memregion("samples")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(m_soundram, memregion("audiocpu")->base() + 0x80000, 16);
+	memcpy(m_soundram, memregion("audiocpu")->base(), 16);
 	m_audiocpu->reset();
-	m_scsp->set_ram_base(m_soundram);
 }
 
 MACHINE_RESET_MEMBER(model2_tgp_state,model2_tgp)
@@ -991,9 +990,9 @@ READ32_MEMBER(model2_state::model2_serial_r)
 	{
 		u32 result = 0;
 		if (ACCESSING_BITS_0_7 && (offset == 0))
-			result |= m_uart->data_r(space, 0);
+			result |= m_uart->data_r();
 		if (ACCESSING_BITS_16_23 && (offset == 0))
-			result |= m_uart->status_r(space, 0) << 16;
+			result |= m_uart->status_r() << 16;
 		return result;
 	}
 
@@ -1005,11 +1004,11 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		m_uart->data_w(space, 0, data & 0xff);
+		m_uart->data_w(data & 0xff);
 
 		if (m_scsp.found())
 		{
-			m_scsp->midi_in(space, 0, data&0xff, 0);
+			m_scsp->midi_in(data&0xff);
 
 			// give the 68k time to notice
 			// TODO: 40 usecs is too much for Sky Target
@@ -1018,7 +1017,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 	}
 	if (ACCESSING_BITS_16_23 && (offset == 0))
 	{
-		m_uart->control_w(space, 0, (data >> 16) & 0xff);
+		m_uart->control_w((data >> 16) & 0xff);
 	}
 }
 
@@ -1418,6 +1417,12 @@ void model2a_state::model2a_5881_mem(address_map &map)
 	model2_5881_mem(map);
 }
 
+void model2a_state::model2a_0229_mem(address_map &map)
+{
+	model2a_crx_mem(map);
+	model2_0229_mem(map);
+}
+
 /* 2B-CRX overrides */
 void model2b_state::model2b_crx_mem(address_map &map)
 {
@@ -1456,6 +1461,12 @@ void model2b_state::model2b_5881_mem(address_map &map)
 {
 	model2b_crx_mem(map);
 	model2_5881_mem(map);
+}
+
+void model2b_state::model2b_0229_mem(address_map &map)
+{
+	model2b_crx_mem(map);
+	model2_0229_mem(map);
 }
 
 /* 2C-CRX overrides */
@@ -2370,9 +2381,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2c_state::model2c_interrupt)
 WRITE16_MEMBER(model2_state::model2snd_ctrl)
 {
 	// handle sample banking
-	if (memregion("scsp")->bytes() > 0x800000)
+	if (memregion("samples")->bytes() > 0x800000)
 	{
-		uint8_t *snd = memregion("scsp")->base();
+		uint8_t *snd = memregion("samples")->base();
 		if (data & 0x20)
 		{
 			membank("bank4")->set_base(snd + 0x200000);
@@ -2388,15 +2399,19 @@ WRITE16_MEMBER(model2_state::model2snd_ctrl)
 
 void model2_state::model2_snd(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().region("audiocpu", 0).share("soundram");
+	map(0x000000, 0x07ffff).ram().share("soundram");
 	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x400000, 0x400001).w(FUNC(model2_state::model2snd_ctrl));
-	map(0x600000, 0x67ffff).rom().region("audiocpu", 0x80000);
-	map(0x800000, 0x9fffff).rom().region("scsp", 0);
+	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
+	map(0x800000, 0x9fffff).rom().region("samples", 0);
 	map(0xa00000, 0xdfffff).bankr("bank4");
 	map(0xe00000, 0xffffff).bankr("bank5");
 }
 
+void model2_state::scsp_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("soundram");
+}
 
 WRITE8_MEMBER(model2_state::scsp_irq)
 {
@@ -2441,17 +2456,18 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp_map)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-//  MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
-//  MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
+	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
+//  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
+//  m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 /* original Model 2 */
@@ -2466,45 +2482,45 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
-	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_SHIFT(-2)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
+	m_copro_tgp_bank->set_addrmap(0, &model2o_state::copro_tgp_bank_map);
+	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
+	m_copro_tgp_bank->set_data_width(32);
+	m_copro_tgp_bank->set_addr_width(17);
+	m_copro_tgp_bank->set_shift(-2);
+	m_copro_tgp_bank->set_stride(0x10000);
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2o_state,model2o)
 
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
-	MCFG_DEVICE_BIOS("epr14869c");
-	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO_IN0_CB(IOPORT("IN0"))
-	MCFG_MODEL1IO_IN1_CB(IOPORT("IN1"))
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	ioboard.set_default_bios_tag("epr14869c");
+	ioboard.read_callback().set("dpram", FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set("dpram", FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN0");
+	ioboard.in_callback<1>().set_ioport("IN1");
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MB8421(config, "dpram", 0);
 
 	model2_timers(config);
 	model2_screen(config);
 
-	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	SEGAM1AUDIO(config, m_m1audio, 0);
+	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	I8251(config, m_uart, 8000000);  // uPD71051C, clock unknown
+	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
 READ8_MEMBER(model2_state::driveio_portg_r)
@@ -2544,27 +2560,28 @@ MACHINE_CONFIG_START(model2_state::sj25_0207_01)
 	MCFG_DEVICE_IO_MAP(drive_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, model2_state, driveio_port_w))
-	MCFG_315_5296_IN_PORTG_CB(READ8(*this, model2_state, driveio_portg_r))
-	MCFG_315_5296_IN_PORTH_CB(READ8(*this, model2_state, driveio_porth_r))
+	sega_315_5296_device &driveio1(SEGA_315_5296(config, "driveio1", 0)); // unknown clock
+	driveio1.out_pd_callback().set(FUNC(model2_state::driveio_port_w));
+	driveio1.in_pg_callback().set(FUNC(model2_state::driveio_portg_r));
+	driveio1.in_ph_callback().set(FUNC(model2_state::driveio_porth_r));
 
-	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 0) // unknown clock
+	SEGA_315_5296(config, "driveio2", 0); // unknown clock
 
-	MCFG_DEVICE_ADD("driveadc", MSM6253, 0)
+	MSM6253(config, "driveadc", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2o_state::daytona)
+void model2o_state::daytona(machine_config &config)
+{
 	model2o(config);
 	sj25_0207_01(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_DRIVE_WRITE_CB(WRITE8(*this, model2o_state, drive_board_w))
-	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, daytona_output_w))
-MACHINE_CONFIG_END
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.drive_write_callback().set(FUNC(model2o_state::drive_board_w));
+	ioboard.an_callback<0>().set_ioport("STEER");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model2o_state::daytona_output_w));
+}
 
 MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
 	daytona(config);
@@ -2580,35 +2597,34 @@ MACHINE_CONFIG_START(model2o_gtx_state::daytona_gtx)
 	MCFG_DEVICE_PROGRAM_MAP(model2o_gtx_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2o_state::desert)
+void model2o_state::desert(machine_config &config)
+{
 	model2o(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, desert_output_w))
-MACHINE_CONFIG_END
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.an_callback<0>().set_ioport("STEER");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model2o_state::desert_output_w));
+}
 
 MACHINE_CONFIG_START(model2o_state::vcop)
 	model2o(config);
 
-	MCFG_DEVICE_REMOVE("ioboard")
+	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
+	ioboard.set_default_bios_tag("epr17181");
+	ioboard.read_callback().set("dpram", FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set("dpram", FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN0");
+	ioboard.in_callback<1>().set_ioport("IN1");
+	ioboard.in_callback<2>().set_ioport("IN2");
+	ioboard.output_callback().set(FUNC(model2o_state::vcop_output_w));
+	ioboard.set_lightgun_p1x_tag("P1_X");
+	ioboard.set_lightgun_p1y_tag("P1_Y");
+	ioboard.set_lightgun_p2x_tag("P2_X");
+	ioboard.set_lightgun_p2y_tag("P2_Y");
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
-	MCFG_DEVICE_BIOS("epr17181");
-	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN0"))
-	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN1"))
-	MCFG_MODEL1IO2_IN2_CB(IOPORT("IN2"))
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
-	MCFG_MODEL1IO2_LIGHTGUN_P1X_TAG("P1_X")
-	MCFG_MODEL1IO2_LIGHTGUN_P1Y_TAG("P1_Y")
-	MCFG_MODEL1IO2_LIGHTGUN_P2X_TAG("P2_X")
-	MCFG_MODEL1IO2_LIGHTGUN_P2Y_TAG("P2_Y")
-
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
+	config.set_default_layout(layout_model1io2);
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -2623,81 +2639,86 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
-	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_SHIFT(-2)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
+	m_copro_tgp_bank->set_addrmap(0, &model2a_state::copro_tgp_bank_map);
+	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
+	m_copro_tgp_bank->set_data_width(32);
+	m_copro_tgp_bank->set_addr_width(17);
+	m_copro_tgp_bank->set_shift(-2);
+	m_copro_tgp_bank->set_stride(0x10000);
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2a_state,model2a)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2a_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(*this, model2a_state, in0_r))
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pa_callback().set(FUNC(model2a_state::eeprom_w));
+	io.in_pb_callback().set(FUNC(model2a_state::in0_r));
+	io.in_pc_callback().set_ioport("IN1");
+	io.in_pd_callback().set_ioport("IN2");
 
 	model2_timers(config);
 	model2_screen(config);
 	model2_scsp(config);
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2a_state::manxtt)
+void model2a_state::manxtt(machine_config &config)
+{
 	model2a(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("THROTTLE"))
-	MCFG_315_5649_AN1_CB(IOPORT("BRAKE"))
-	MCFG_315_5649_AN2_CB(IOPORT("BANK"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("THROTTLE");
+	io.an_port_callback<1>().set_ioport("BRAKE");
+	io.an_port_callback<2>().set_ioport("BANK");
+}
 
 // Includes a Model 1 Sound board for additional sounds - Deluxe version only
-MACHINE_CONFIG_START(model2a_state::manxttdx)
+void model2a_state::manxttdx(machine_config &config)
+{
 	manxtt(config);
-	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
 
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
-MACHINE_CONFIG_END
+	SEGAM1AUDIO(config, m_m1audio, 0);
+	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
-MACHINE_CONFIG_START( model2a_state::srallyc )
+	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
+}
+
+void model2a_state::srallyc(machine_config &config)
+{
 	model2a(config);
 	sj25_0207_01(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2a_state, drive_board_w))
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2a_state::drive_board_w));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
+}
 
-MACHINE_CONFIG_START( model2a_state::vcop2 )
+void model2a_state::vcop2(machine_config &config)
+{
 	model2a(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2a_state, lightgun_mux_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2a_state, lightgun_mux_w))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.serial_ch2_rd_callback().set(FUNC(model2a_state::lightgun_mux_r));
+	io.serial_ch2_wr_callback().set(FUNC(model2a_state::lightgun_mux_w));
+}
 
-MACHINE_CONFIG_START( model2a_state::skytargt )
+void model2a_state::skytargt(machine_config &config)
+{
 	model2a(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STICKY"))
-	MCFG_315_5649_AN2_CB(IOPORT("STICKX"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STICKY");
+	io.an_port_callback<2>().set_ioport("STICKX");
+}
 
 uint16_t model2_state::crypt_read_callback(uint32_t addr)
 {
@@ -2715,18 +2736,25 @@ MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
+
+
 MACHINE_CONFIG_START(model2a_state::model2a_0229)
 	model2a(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2a_0229_mem)
+
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
-//  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+	MCFG_DEVICE_ADDRESS_MAP(0, sega_0229_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2a_state::zeroguna )
+void model2a_state::zeroguna(machine_config &config)
+{
 	model2a_5881(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_IN_PG_CB(IOPORT("DSW"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.in_pg_callback().set_ioport("DSW");
+}
 
 /* 2B-CRX */
 MACHINE_CONFIG_START(model2b_state::model2b)
@@ -2744,26 +2772,26 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2b_state,model2b)
 	MCFG_MACHINE_RESET_OVERRIDE(model2b_state,model2b)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2b_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(*this, model2b_state, in0_r))
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pa_callback().set(FUNC(model2b_state::eeprom_w));
+	io.in_pb_callback().set(FUNC(model2b_state::in0_r));
+	io.in_pc_callback().set_ioport("IN1");
+	io.in_pd_callback().set_ioport("IN2");
 
 	model2_timers(config);
 	model2_screen(config);
 	model2_scsp(config);
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2b_state::model2b_5881)
@@ -2778,18 +2806,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2b_state::model2b_0229)
 	model2b(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2b_0229_mem)
+
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
-//  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+	MCFG_DEVICE_ADDRESS_MAP(0, sega_0229_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2b_state::indy500)
+void model2b_state::indy500(machine_config &config)
+{
 	model2b(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
+}
 
 
 void model2b_state::rchase2_iocpu_map(address_map &map)
@@ -2811,41 +2844,44 @@ MACHINE_CONFIG_START( model2b_state::rchase2 )
 	MCFG_DEVICE_PROGRAM_MAP(rchase2_iocpu_map)
 	MCFG_DEVICE_IO_MAP(rchase2_ioport_map)
 
-	MCFG_DEVICE_ADD("ioexp", CXD1095, 0)
+	CXD1095(config, "ioexp", 0);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_IN_PD_CB(READ8(*this, model2b_state, rchase2_drive_board_r))
-	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2b_state, rchase2_drive_board_w))
-	MCFG_315_5649_AN0_CB(IOPORT("P2_X"))
-	MCFG_315_5649_AN1_CB(IOPORT("P1_X"))
-	MCFG_315_5649_AN2_CB(IOPORT("P2_Y"))
-	MCFG_315_5649_AN3_CB(IOPORT("P1_Y"))
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.in_pd_callback().set(FUNC(model2b_state::rchase2_drive_board_r));
+	io.out_pe_callback().set(FUNC(model2b_state::rchase2_drive_board_w));
+	io.an_port_callback<0>().set_ioport("P2_X");
+	io.an_port_callback<1>().set_ioport("P1_X");
+	io.an_port_callback<2>().set_ioport("P2_Y");
+	io.an_port_callback<3>().set_ioport("P1_Y");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2b_state::gunblade )
+void model2b_state::gunblade(machine_config &config)
+{
 	model2b(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("P1_X"))
-	MCFG_315_5649_AN1_CB(IOPORT("P2_X"))
-	MCFG_315_5649_AN2_CB(IOPORT("P1_Y"))
-	MCFG_315_5649_AN3_CB(IOPORT("P2_Y"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("P1_X");
+	io.an_port_callback<1>().set_ioport("P2_X");
+	io.an_port_callback<2>().set_ioport("P1_Y");
+	io.an_port_callback<3>().set_ioport("P2_Y");
+}
 
-MACHINE_CONFIG_START( model2b_state::dynabb )
+void model2b_state::dynabb(machine_config &config)
+{
 	model2b(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("BAT1"))
-	MCFG_315_5649_AN1_CB(IOPORT("BAT2"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("BAT1");
+	io.an_port_callback<1>().set_ioport("BAT2");
+}
 
-MACHINE_CONFIG_START( model2b_state::zerogun )
+void model2b_state::zerogun(machine_config &config)
+{
 	model2b_5881(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_IN_PG_CB(IOPORT("DSW"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.in_pg_callback().set_ioport("DSW");
+}
 
 /* 2C-CRX */
 MACHINE_CONFIG_START(model2c_state::model2c)
@@ -2859,79 +2895,83 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_MB86235_FIFOIN("copro_fifo_in")
 	MCFG_MB86235_FIFOOUT0("copro_fifo_out")
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2c_state,model2c)
 	MCFG_MACHINE_RESET_OVERRIDE(model2c_state,model2c)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2c_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(*this, model2c_state, in0_r))
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pa_callback().set(FUNC(model2c_state::eeprom_w));
+	io.in_pb_callback().set(FUNC(model2c_state::in0_r));
+	io.in_pc_callback().set_ioport("IN1");
+	io.in_pd_callback().set_ioport("IN2");
 
 	model2_timers(config);
 	model2_screen(config);
 	model2_scsp(config);
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2c_state::skisuprg )
+void model2c_state::skisuprg(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("SWING"))
-	MCFG_315_5649_AN1_CB(IOPORT("INCLINING"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("SWING");
+	io.an_port_callback<1>().set_ioport("INCLINING");
+}
 
-MACHINE_CONFIG_START( model2c_state::stcc )
+void model2c_state::stcc(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
 
-	MCFG_DSBZ80_ADD(DSBZ80_TAG)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	DSBZ80(config, m_dsbz80, 0);
+	m_dsbz80->add_route(0, "lspeaker", 1.0);
+	m_dsbz80->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
-MACHINE_CONFIG_END
+	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));
+}
 
-MACHINE_CONFIG_START( model2c_state::waverunr )
+void model2c_state::waverunr(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("HANDLE"))
-	MCFG_315_5649_AN1_CB(IOPORT("ROLL"))
-	MCFG_315_5649_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_315_5649_AN3_CB(IOPORT("PITCH"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("HANDLE");
+	io.an_port_callback<1>().set_ioport("ROLL");
+	io.an_port_callback<2>().set_ioport("THROTTLE");
+	io.an_port_callback<3>().set_ioport("PITCH");
+}
 
-MACHINE_CONFIG_START( model2c_state::bel )
+void model2c_state::bel(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("P1_X"))
-	MCFG_315_5649_AN1_CB(IOPORT("P2_X"))
-	MCFG_315_5649_AN2_CB(IOPORT("P1_Y"))
-	MCFG_315_5649_AN3_CB(IOPORT("P2_Y"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("P1_X");
+	io.an_port_callback<1>().set_ioport("P2_X");
+	io.an_port_callback<2>().set_ioport("P1_Y");
+	io.an_port_callback<3>().set_ioport("P2_Y");
+}
 
-MACHINE_CONFIG_START( model2c_state::hotd )
+void model2c_state::hotd(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2c_state, lightgun_mux_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2c_state, lightgun_mux_w))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.serial_ch2_rd_callback().set(FUNC(model2c_state::lightgun_mux_r));
+	io.serial_ch2_wr_callback().set(FUNC(model2c_state::lightgun_mux_w));
+}
 
 MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	model2c(config);
@@ -2943,29 +2983,32 @@ MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2c_state::overrev2c )
+void model2c_state::overrev2c(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
+}
 
-MACHINE_CONFIG_START( model2c_state::segawski )
+void model2c_state::segawski(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("SLIDE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("SLIDE");
+}
 
-MACHINE_CONFIG_START( model2c_state::topskatr )
+void model2c_state::topskatr(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("CURVING"))
-	MCFG_315_5649_AN1_CB(IOPORT("SLIDE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("CURVING");
+	io.an_port_callback<1>().set_ioport("SLIDE");
+}
 
 
 /* ROM definitions */
@@ -3032,12 +3075,12 @@ ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */
 	ROM_LOAD32_WORD("mpr-20301.27", 0x000000, 0x200000, CRC(52010fb2) SHA1(8dce67c6f9e48d749c64b11d4569df413dc40e07) )
 	ROM_LOAD32_WORD("mpr-20300.25", 0x000002, 0x200000, CRC(6f042792) SHA1(75db68e57ec3fbc7af377342eef81f26fae4e1c4) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20302.31",  0x080000,  0x80000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20302.31", 0x000000, 0x080000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
 
-	ROM_REGION( 0x400000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
-	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
+	ROM_REGION16_BE( 0x400000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
+	ROM_LOAD16_WORD_SWAP("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3067,12 +3110,12 @@ ROM_START( zerogunaj ) /* Zero Gunner (Japan), Model 2A - Sega game ID# 833-1134
 	ROM_LOAD32_WORD("mpr-20301.27", 0x000000, 0x200000, CRC(52010fb2) SHA1(8dce67c6f9e48d749c64b11d4569df413dc40e07) )
 	ROM_LOAD32_WORD("mpr-20300.25", 0x000002, 0x200000, CRC(6f042792) SHA1(75db68e57ec3fbc7af377342eef81f26fae4e1c4) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20302.31",  0x080000,  0x80000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20302.31", 0x000000, 0x080000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
 
-	ROM_REGION( 0x400000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
-	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
+	ROM_REGION16_BE( 0x400000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
+	ROM_LOAD16_WORD_SWAP("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3102,12 +3145,12 @@ ROM_START( zerogun ) /* Zero Gunner (Export), Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20302.31",  0x080000,  0x80000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20302.31", 0x000000, 0x080000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
 
-	ROM_REGION( 0x400000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
-	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
+	ROM_REGION16_BE( 0x400000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
+	ROM_LOAD16_WORD_SWAP("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
 	//             1997     317-5038-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
@@ -3134,12 +3177,12 @@ ROM_START( zerogunj ) /* Zero Gunner (Japan), Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20302.31",  0x080000,  0x80000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20302.31", 0x000000, 0x080000, CRC(44ff50d2) SHA1(6ffec81042fd5708e8a5df47b63f9809f93bf0f8) )
 
-	ROM_REGION( 0x400000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
-	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
+	ROM_REGION16_BE( 0x400000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
+	ROM_LOAD16_WORD_SWAP("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
 	//             1997     317-5038-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
@@ -3170,12 +3213,12 @@ ROM_START( gunblade ) /* Gunblade NY Revision A, Model 2B, Sega game ID# 833-125
 	ROM_LOAD32_WORD("mpr-18985.27", 0x000000, 0x400000, CRC(ad6166e3) SHA1(2c487fb743730cacf92dbea952b1efada0f073df) )
 	ROM_LOAD32_WORD("mpr-18984.25", 0x000002, 0x400000, CRC(756f6f37) SHA1(095964de773f515d64d65dbc8f8ef9bae97e5ba9) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18990.31", 0x080000,  0x80000, CRC(02b1b0d1) SHA1(759b4683dc7149e04f41ddac7bd395e8d07ea858) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18990.31", 0x000000, 0x080000, CRC(02b1b0d1) SHA1(759b4683dc7149e04f41ddac7bd395e8d07ea858) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18978.32", 0x000000, 0x400000, CRC(0f78b3e3) SHA1(6c2cd6236cb001bb8d487a9b1e9907519dc43daa) )
-	ROM_LOAD("mpr-18979.34", 0x400000, 0x400000, CRC(f13ea36f) SHA1(a8165116b5e07e031ff960201dd8c9a441544961) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18978.32", 0x000000, 0x400000, CRC(0f78b3e3) SHA1(6c2cd6236cb001bb8d487a9b1e9907519dc43daa) )
+	ROM_LOAD16_WORD_SWAP("mpr-18979.34", 0x400000, 0x400000, CRC(f13ea36f) SHA1(a8165116b5e07e031ff960201dd8c9a441544961) )
 ROM_END
 
 ROM_START( vf2 ) /* Virtua Fighter 2 Version 2.1, Model 2A */
@@ -3211,14 +3254,14 @@ ROM_START( vf2 ) /* Virtua Fighter 2 Version 2.1, Model 2A */
 	ROM_LOAD32_WORD( "mpr-17547.27", 0x800000, 0x200000, CRC(be940431) SHA1(5c1196a6454a4fead79a930979f2e69639ec2bb9) )
 	ROM_LOAD32_WORD( "mpr-17546.26", 0x800002, 0x200000, CRC(042a194b) SHA1(c6d8524dc0a879394f1234b7bb04836081bb3830) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x080000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x000000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
-	ROM_LOAD( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
-	ROM_LOAD( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
-	ROM_LOAD( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3257,14 +3300,14 @@ ROM_START( vf2b ) /* Virtua Fighter 2 Revision B, Model 2A */
 	ROM_LOAD32_WORD( "mpr-17547.27", 0x800000, 0x200000, CRC(be940431) SHA1(5c1196a6454a4fead79a930979f2e69639ec2bb9) )
 	ROM_LOAD32_WORD( "mpr-17546.26", 0x800002, 0x200000, CRC(042a194b) SHA1(c6d8524dc0a879394f1234b7bb04836081bb3830) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x080000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x000000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
-	ROM_LOAD( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
-	ROM_LOAD( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
-	ROM_LOAD( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3303,14 +3346,14 @@ ROM_START( vf2a ) /* Virtua Fighter 2 Revision A, Model 2A */
 	ROM_LOAD32_WORD( "mpr-17547.27", 0x800000, 0x200000, CRC(be940431) SHA1(5c1196a6454a4fead79a930979f2e69639ec2bb9) )
 	ROM_LOAD32_WORD( "mpr-17546.26", 0x800002, 0x200000, CRC(042a194b) SHA1(c6d8524dc0a879394f1234b7bb04836081bb3830) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x080000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x000000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
-	ROM_LOAD( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
-	ROM_LOAD( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
-	ROM_LOAD( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3349,14 +3392,14 @@ ROM_START( vf2o ) /* Virtua Fighter 2, Model 2A */
 	ROM_LOAD32_WORD( "mpr-17547.27", 0x800000, 0x200000, CRC(be940431) SHA1(5c1196a6454a4fead79a930979f2e69639ec2bb9) )
 	ROM_LOAD32_WORD( "mpr-17546.26", 0x800002, 0x200000, CRC(042a194b) SHA1(c6d8524dc0a879394f1234b7bb04836081bb3830) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x080000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17574.30", 0x000000, 0x080000, CRC(4d4c3a55) SHA1(b6c0c3f0473bd7fc3ef4f5146110dfcc899a5af9) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
-	ROM_LOAD( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
-	ROM_LOAD( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
-	ROM_LOAD( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17573.31", 0x000000, 0x200000, CRC(e43557fe) SHA1(4c61a135819862df02347c118dc4d88a0adac273) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17572.32", 0x200000, 0x200000, CRC(4febecc8) SHA1(9683ea9bedfc5cd7b4a28e9a68792c0dc549d911) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17571.36", 0x400000, 0x200000, CRC(51caa584) SHA1(cbbde1c55eddbeeefd283bb5afd79a670a282e3a) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17570.37", 0x600000, 0x200000, CRC(bccd324b) SHA1(4c7ebdea08b2dedf621f121785ed1c40ebae4236) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3396,14 +3439,14 @@ ROM_START( srallyc )
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x080000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x000000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
-	ROM_LOAD( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
-	ROM_LOAD( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) )
-	ROM_LOAD( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3442,14 +3485,14 @@ ROM_START( srallycb ) /* Sega Rally Championship Revision B, Model 2A, Sega game
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x080000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x000000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
-	ROM_LOAD( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
-	ROM_LOAD( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) )
-	ROM_LOAD( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3489,17 +3532,17 @@ ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Sing
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17763.30", 0x080000, 0x040000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
-	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x080000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) ) /* REMOVE when EPR-17763 & EPR-17758 is dumped & added */
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17763.30", 0x000000, 0x040000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
+	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x000000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) ) /* REMOVE when EPR-17763 & EPR-17758 is dumped & added */
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
-	ROM_LOAD( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
-	ROM_LOAD( "mpr-17758.36", 0x400000, 0x200000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17758.36", 0x400000, 0x200000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
 	/* The DX version doesn't have any sound rom at IC37 */
-	ROM_LOAD( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
-	ROM_LOAD( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
+	ROM_LOAD16_WORD_SWAP( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
+	ROM_LOAD16_WORD_SWAP( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3539,17 +3582,17 @@ ROM_START( srallycdxa ) // Sega Rally Championship DX, Model 2A? - Single player
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17763.30", 0x080000, 0x040000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
-	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x080000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) ) /* REMOVE when EPR-17763 & EPR-17758 is dumped & added */
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-17763.30", 0x000000, 0x040000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
+	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x000000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) ) /* REMOVE when EPR-17763 & EPR-17758 is dumped & added */
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
-	ROM_LOAD( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
-	ROM_LOAD( "mpr-17758.36", 0x400000, 0x200000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
+	ROM_LOAD16_WORD_SWAP( "mpr-17758.36", 0x400000, 0x200000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
 	/* The DX version doesn't have any sound rom at IC37 */
-	ROM_LOAD( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
-	ROM_LOAD( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
+	ROM_LOAD16_WORD_SWAP( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
+	ROM_LOAD16_WORD_SWAP( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3624,14 +3667,14 @@ ROM_START( manxtt ) /* Manx TT Superbike Twin Revision D, Model 2A - Can be set 
 	ROM_LOAD32_WORD( "mpr-18760.25", 0x000000, 0x200000, CRC(4e3a4a89) SHA1(bba6cd2a15b3f963388a3a87880da86b10f6e0a2) )
 	ROM_LOAD32_WORD( "mpr-18759.24", 0x000002, 0x200000, CRC(278d8742) SHA1(5f285fc8cfe88c00ba2bbe1b509b49abd38e00ec) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-18924a.30", 0x080000, 0x040000, CRC(ad6f40ec) SHA1(27aa0477dc325162766d459ffe95b61ee65dd28f) ) /* Sound program for DX set */
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-18924a.30", 0x000000, 0x040000, CRC(ad6f40ec) SHA1(27aa0477dc325162766d459ffe95b61ee65dd28f) ) /* Sound program for DX set */
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) ) /* Sound sample for DX set */
-	ROM_LOAD( "mpr-18764.32", 0x200000, 0x200000, CRC(0dc6a860) SHA1(cb2ada0f8a592940de11ee781ad4beb5095c3b37) )
-	ROM_LOAD( "mpr-18765.36", 0x400000, 0x200000, CRC(ca4a803c) SHA1(70b59da8f2532a02e980caba5bb86ec13a4d7ab5) )
-	ROM_LOAD( "mpr-18766.37", 0x600000, 0x200000, CRC(e41892ea) SHA1(9ef5e26db4abf0ed36df63fc246b568e1c5d6cfa) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) ) /* Sound sample for DX set */
+	ROM_LOAD16_WORD_SWAP( "mpr-18764.32", 0x200000, 0x200000, CRC(0dc6a860) SHA1(cb2ada0f8a592940de11ee781ad4beb5095c3b37) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18765.36", 0x400000, 0x200000, CRC(ca4a803c) SHA1(70b59da8f2532a02e980caba5bb86ec13a4d7ab5) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18766.37", 0x600000, 0x200000, CRC(e41892ea) SHA1(9ef5e26db4abf0ed36df63fc246b568e1c5d6cfa) )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-18742.7", 0x000000, 0x020000, CRC(1b78da74) SHA1(939b0f2413ae3c11fac11b49ab8b0de2c5e35e61) )
@@ -3684,16 +3727,16 @@ ROM_START( manxttc ) /* Manx TT Superbike Twin Revision C, Model 2A */
 	ROM_LOAD32_WORD( "mpr-18760.25", 0x000000, 0x200000, CRC(4e3a4a89) SHA1(bba6cd2a15b3f963388a3a87880da86b10f6e0a2) )
 	ROM_LOAD32_WORD( "mpr-18759.24", 0x000002, 0x200000, CRC(278d8742) SHA1(5f285fc8cfe88c00ba2bbe1b509b49abd38e00ec) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-18826.30",  0x080000, 0x040000, CRC(ed9fe4c1) SHA1(c3dd8a1324a4dc9b012bd9bf21d1f48578870f72) ) /* Sound program for Twin set */
-//  ROM_LOAD16_WORD_SWAP( "epr-18924a.30", 0x080000, 0x040000, CRC(ad6f40ec) SHA1(27aa0477dc325162766d459ffe95b61ee65dd28f) ) /* Sound program for ?? set */
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-18826.30", 0x000000, 0x040000, CRC(ed9fe4c1) SHA1(c3dd8a1324a4dc9b012bd9bf21d1f48578870f72) ) /* Sound program for Twin set */
+//  ROM_LOAD16_WORD_SWAP( "epr-18924a.30", 0x000000, 0x040000, CRC(ad6f40ec) SHA1(27aa0477dc325162766d459ffe95b61ee65dd28f) ) /* Sound program for ?? set */
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-18827.31", 0x000000, 0x200000, CRC(58d78ca1) SHA1(95275ed8315c044bfde2f23c10416f22627b34df) ) /* Sound sample for Twin set */
-//  ROM_LOAD( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) ) /* Sound sample for DX set */
-	ROM_LOAD( "mpr-18764.32", 0x200000, 0x200000, CRC(0dc6a860) SHA1(cb2ada0f8a592940de11ee781ad4beb5095c3b37) )
-	ROM_LOAD( "mpr-18765.36", 0x400000, 0x200000, CRC(ca4a803c) SHA1(70b59da8f2532a02e980caba5bb86ec13a4d7ab5) )
-	ROM_LOAD( "mpr-18766.37", 0x600000, 0x200000, CRC(e41892ea) SHA1(9ef5e26db4abf0ed36df63fc246b568e1c5d6cfa) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-18827.31", 0x000000, 0x200000, CRC(58d78ca1) SHA1(95275ed8315c044bfde2f23c10416f22627b34df) ) /* Sound sample for Twin set */
+//  ROM_LOAD16_WORD_SWAP( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) ) /* Sound sample for DX set */
+	ROM_LOAD16_WORD_SWAP( "mpr-18764.32", 0x200000, 0x200000, CRC(0dc6a860) SHA1(cb2ada0f8a592940de11ee781ad4beb5095c3b37) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18765.36", 0x400000, 0x200000, CRC(ca4a803c) SHA1(70b59da8f2532a02e980caba5bb86ec13a4d7ab5) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18766.37", 0x600000, 0x200000, CRC(e41892ea) SHA1(9ef5e26db4abf0ed36df63fc246b568e1c5d6cfa) )
 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
@@ -3741,14 +3784,14 @@ ROM_START( motoraid ) /* Motor Raid, Model 2A, Sega game ID# 833-13232 MOTOR RAI
 	ROM_LOAD32_WORD( "mpr-20022.25", 0x000000, 0x400000, CRC(9e47b3c2) SHA1(c73279e837f56c0417c07ba3c642af28fe9a24fa) )
 	ROM_LOAD32_WORD( "mpr-20021.24", 0x000002, 0x400000, CRC(3cbf36cb) SHA1(059cea17f9d6f5960d9fd869c36ffb6fcf230c1a) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20029.30", 0x080000, 0x080000, CRC(927d31b9) SHA1(e7a18ccf5a0b9ebf18ae1d5518973fa3b4eb4653) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-20029.30", 0x000000, 0x080000, CRC(927d31b9) SHA1(e7a18ccf5a0b9ebf18ae1d5518973fa3b4eb4653) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-20030.31", 0x000000, 0x200000, CRC(b70ab686) SHA1(006911ce6332091d17808855c60a72fe928df778) )
-	ROM_LOAD( "mpr-20031.32", 0x200000, 0x200000, CRC(84da70e4) SHA1(77962afcac82589cc7bc852329335676ae3e23cf) )
-	ROM_LOAD( "mpr-20032.36", 0x400000, 0x200000, CRC(15516d35) SHA1(bced0d30f9b6ab579a11ac069cbb9d6d91352246) )
-	ROM_LOAD( "mpr-20033.37", 0x600000, 0x200000, CRC(8c8ed187) SHA1(a9e8e2d38b23716df2e211748c52b6b666f4c111) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-20030.31", 0x000000, 0x200000, CRC(b70ab686) SHA1(006911ce6332091d17808855c60a72fe928df778) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20031.32", 0x200000, 0x200000, CRC(84da70e4) SHA1(77962afcac82589cc7bc852329335676ae3e23cf) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20032.36", 0x400000, 0x200000, CRC(15516d35) SHA1(bced0d30f9b6ab579a11ac069cbb9d6d91352246) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20033.37", 0x600000, 0x200000, CRC(8c8ed187) SHA1(a9e8e2d38b23716df2e211748c52b6b666f4c111) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3792,14 +3835,14 @@ ROM_START( motoraiddx ) /* Motor Raid DX, Model 2A, Sega ROM board ID# 834-13231
 	ROM_LOAD32_WORD( "mpr-20022.25", 0x000000, 0x400000, CRC(9e47b3c2) SHA1(c73279e837f56c0417c07ba3c642af28fe9a24fa) )
 	ROM_LOAD32_WORD( "mpr-20021.24", 0x000002, 0x400000, CRC(3cbf36cb) SHA1(059cea17f9d6f5960d9fd869c36ffb6fcf230c1a) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20222.30", 0x080000, 0x080000, CRC(079d28e6) SHA1(85a863cf5e53a88e2331898e2505ac1063cdb9ad) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-20222.30", 0x000000, 0x080000, CRC(079d28e6) SHA1(85a863cf5e53a88e2331898e2505ac1063cdb9ad) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-20030.31", 0x000000, 0x200000, CRC(b70ab686) SHA1(006911ce6332091d17808855c60a72fe928df778) )
-	ROM_LOAD( "mpr-20031.32", 0x200000, 0x200000, CRC(84da70e4) SHA1(77962afcac82589cc7bc852329335676ae3e23cf) )
-	ROM_LOAD( "mpr-20032.36", 0x400000, 0x200000, CRC(15516d35) SHA1(bced0d30f9b6ab579a11ac069cbb9d6d91352246) )
-	ROM_LOAD( "mpr-20033.37", 0x600000, 0x200000, CRC(8c8ed187) SHA1(a9e8e2d38b23716df2e211748c52b6b666f4c111) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-20030.31", 0x000000, 0x200000, CRC(b70ab686) SHA1(006911ce6332091d17808855c60a72fe928df778) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20031.32", 0x200000, 0x200000, CRC(84da70e4) SHA1(77962afcac82589cc7bc852329335676ae3e23cf) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20032.36", 0x400000, 0x200000, CRC(15516d35) SHA1(bced0d30f9b6ab579a11ac069cbb9d6d91352246) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20033.37", 0x600000, 0x200000, CRC(8c8ed187) SHA1(a9e8e2d38b23716df2e211748c52b6b666f4c111) )
 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP( "epr-18643a.7", 0x000000, 0x020000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
@@ -3850,14 +3893,14 @@ ROM_START( skytargt ) /* Sky Target, Model 2A */
 	ROM_LOAD32_WORD( "mpr-18411.24", 0x000002, 0x400000, CRC(9c2dc40c) SHA1(842a647a70ef29a8c775e88c0bcbc63782496bba) )
 	ROM_LOAD32_WORD( "mpr-18412.25", 0x000000, 0x400000, CRC(4db52f8b) SHA1(66796f6c20e680a87e8939a70692680b1dd0b324) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-18408.30", 0x080000, 0x080000, CRC(6deb9657) SHA1(30e1894432a0765c64b93dd5ca7ca17ef58ac6c0) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-18408.30", 0x000000, 0x080000, CRC(6deb9657) SHA1(30e1894432a0765c64b93dd5ca7ca17ef58ac6c0) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-18424.31",   0x000000, 0x200000, CRC(590a4338) SHA1(826f167d7a4f5d30466b2f75f0123187c29c2d69) )
-	ROM_LOAD( "mpr-18423.32",   0x200000, 0x200000, CRC(c356d765) SHA1(ae69c9d4e333579d826178d2863156dc784aedef) )
-	ROM_LOAD( "mpr-18422.36",   0x400000, 0x200000, CRC(b4f3cea6) SHA1(49669be09e10dfae7fddce0fc4e415466cb29566) )
-	ROM_LOAD( "mpr-18421.37",   0x600000, 0x200000, CRC(00522390) SHA1(5dbbf2ba008adad36929fcecb7c2c1e5ffd12618) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-18424.31",   0x000000, 0x200000, CRC(590a4338) SHA1(826f167d7a4f5d30466b2f75f0123187c29c2d69) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18423.32",   0x200000, 0x200000, CRC(c356d765) SHA1(ae69c9d4e333579d826178d2863156dc784aedef) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18422.36",   0x400000, 0x200000, CRC(b4f3cea6) SHA1(49669be09e10dfae7fddce0fc4e415466cb29566) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18421.37",   0x600000, 0x200000, CRC(00522390) SHA1(5dbbf2ba008adad36929fcecb7c2c1e5ffd12618) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3894,14 +3937,14 @@ ROM_START( vcop2 ) /* Virtua Cop 2, Model 2A, Sega Game ID# 833-12266, ROM board
 	ROM_LOAD32_WORD( "mpr-18511.24", 0x000002, 0x200000, CRC(cae77a4f) SHA1(f21474486f0dc4092cbad4566deea8a952862ab7) )
 	ROM_LOAD32_WORD( "mpr-18512.25", 0x000000, 0x200000, CRC(d9bc7e71) SHA1(774eba886083b0dad9a47519c5801e44346312cf) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-18530.30", 0x080000, 0x080000, CRC(ac9c8357) SHA1(ad297c7fecaa9b877f0dd31e859983816947e437) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-18530.30", 0x000000, 0x080000, CRC(ac9c8357) SHA1(ad297c7fecaa9b877f0dd31e859983816947e437) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-18529.31", 0x000000, 0x200000, CRC(f76715b1) SHA1(258418c1cb37338a694e48f3b48fadfae5f40239) )
-	ROM_LOAD( "mpr-18528.32", 0x200000, 0x200000, CRC(287a2f9a) SHA1(78ba93ab90322152efc37f7130073b0dc516ef5d) )
-	ROM_LOAD( "mpr-18527.36", 0x400000, 0x200000, CRC(e6a49314) SHA1(26563f425f2f0906ae9278fe5de02955653d49fe) )
-	ROM_LOAD( "mpr-18526.37", 0x600000, 0x200000, CRC(6516d9b5) SHA1(8f13cb02c76f7b7cd11f3c3772ff13302d55e9c3) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-18529.31", 0x000000, 0x200000, CRC(f76715b1) SHA1(258418c1cb37338a694e48f3b48fadfae5f40239) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18528.32", 0x200000, 0x200000, CRC(287a2f9a) SHA1(78ba93ab90322152efc37f7130073b0dc516ef5d) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18527.36", 0x400000, 0x200000, CRC(e6a49314) SHA1(26563f425f2f0906ae9278fe5de02955653d49fe) )
+	ROM_LOAD16_WORD_SWAP( "mpr-18526.37", 0x600000, 0x200000, CRC(6516d9b5) SHA1(8f13cb02c76f7b7cd11f3c3772ff13302d55e9c3) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3969,14 +4012,14 @@ ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-1134
 	ROM_LOAD32_WORD("mpr-20810.27", 0x0800000, 0x400000, CRC(838a10a7) SHA1(a658f1864829058b1d419e7c001e47cd0ab06a20) )
 	ROM_LOAD32_WORD("mpr-20808.26", 0x0800002, 0x400000, CRC(706bd495) SHA1(f857b303afda6301b19d97dfe5c313126261716e) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x080000,  0x80000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x000000, 0x080000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
-	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
-	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
-	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
+	ROM_LOAD16_WORD_SWAP("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
+	ROM_LOAD16_WORD_SWAP("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
+	ROM_LOAD16_WORD_SWAP("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -4020,14 +4063,14 @@ ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A */
 	ROM_LOAD32_WORD("mpr-20810.27", 0x0800000, 0x400000, CRC(838a10a7) SHA1(a658f1864829058b1d419e7c001e47cd0ab06a20) )
 	ROM_LOAD32_WORD("mpr-20808.26", 0x0800002, 0x400000, CRC(706bd495) SHA1(f857b303afda6301b19d97dfe5c313126261716e) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x080000,  0x80000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x000000, 0x080000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
-	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
-	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
-	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
+	ROM_LOAD16_WORD_SWAP("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
+	ROM_LOAD16_WORD_SWAP("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
+	ROM_LOAD16_WORD_SWAP("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -4071,14 +4114,14 @@ ROM_START( dynamcopb ) /* Dynamite Cop (Export), Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x080000,  0x80000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x000000, 0x080000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
-	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
-	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
-	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
+	ROM_LOAD16_WORD_SWAP("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
+	ROM_LOAD16_WORD_SWAP("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
+	ROM_LOAD16_WORD_SWAP("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	//             1998     317-0236-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
@@ -4119,14 +4162,14 @@ ROM_START( dyndeka2b ) /* Dynamite Deka 2 (Japan), Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x080000,  0x80000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x000000, 0x080000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
-	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
-	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
-	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) )
+	ROM_LOAD16_WORD_SWAP("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
+	ROM_LOAD16_WORD_SWAP("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
+	ROM_LOAD16_WORD_SWAP("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	//             1998     317-0236-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
@@ -4167,14 +4210,14 @@ ROM_START( dynamcopc ) /* Dynamite Cop (USA), Model 2C */
 	ROM_LOAD32_WORD("mpr-20810.27", 0x0800000, 0x400000, CRC(838a10a7) SHA1(a658f1864829058b1d419e7c001e47cd0ab06a20) ) /* Located at position 28 on 2C-CRX rom board */
 	ROM_LOAD32_WORD("mpr-20808.26", 0x0800002, 0x400000, CRC(706bd495) SHA1(f857b303afda6301b19d97dfe5c313126261716e) ) /* Located at position 26 on 2C-CRX rom board */
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x080000,  0x80000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) ) /* Located at position 31 on 2C-CRX rom board */
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20811.30", 0x000000, 0x080000, CRC(a154b83e) SHA1(2640c6b6966f4a888329e583b6b713bd0e779b6b) ) /* Located at position 31 on 2C-CRX rom board */
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) ) /* Located at position 32 on 2C-CRX rom board */
-	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) ) /* Located at position 33 on 2C-CRX rom board */
-	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) ) /* Located at position 34 on 2C-CRX rom board */
-	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) ) /* Located at position 35 on 2C-CRX rom board */
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20812.31", 0x000000, 0x200000, CRC(695b6088) SHA1(09682d18144e60d740a9d7a3e19db6f76fa581f1) ) /* Located at position 32 on 2C-CRX rom board */
+	ROM_LOAD16_WORD_SWAP("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) ) /* Located at position 33 on 2C-CRX rom board */
+	ROM_LOAD16_WORD_SWAP("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) ) /* Located at position 34 on 2C-CRX rom board */
+	ROM_LOAD16_WORD_SWAP("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) ) /* Located at position 35 on 2C-CRX rom board */
 
 	//             1998     317-0236-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
@@ -4224,14 +4267,14 @@ ROM_START( schamp ) /* Sonic Championship, Model 2B - Sega ROM board ID# 834-127
 	ROM_LOAD32_WORD("mpr-19020.28", 0x800000, 0x400000, CRC(9540dba0) SHA1(7b9a75caa8c5b12ba54c6f4f746d80b165ee97ab) )
 	ROM_LOAD32_WORD("mpr-19018.26", 0x800002, 0x400000, CRC(3b7e7a12) SHA1(9c707a7c2cffc5eff19f9919ddfae7300842fd19) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19021.31", 0x080000,  0x80000, CRC(0b9f7583) SHA1(21290389cd8bd9e52ed438152cc6cb5793f809d3) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19021.31", 0x000000, 0x080000, CRC(0b9f7583) SHA1(21290389cd8bd9e52ed438152cc6cb5793f809d3) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19022.32", 0x000000, 0x200000, CRC(4381869b) SHA1(43a21609b49926a227558d4938088526acf1fe42) )
-	ROM_LOAD("mpr-19023.33", 0x200000, 0x200000, CRC(07c67f88) SHA1(696dc85e066fb27c7618e52e0acd0d00451e4589) )
-	ROM_LOAD("mpr-19024.34", 0x400000, 0x200000, CRC(15ff76d3) SHA1(b431bd85c973aa0a4d6032ac98fb057139f142a2) )
-	ROM_LOAD("mpr-19025.35", 0x600000, 0x200000, CRC(6ad8fb70) SHA1(b666d31f9be26eb0cdcb71041a3c3c08d5aa41e1) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19022.32", 0x000000, 0x200000, CRC(4381869b) SHA1(43a21609b49926a227558d4938088526acf1fe42) )
+	ROM_LOAD16_WORD_SWAP("mpr-19023.33", 0x200000, 0x200000, CRC(07c67f88) SHA1(696dc85e066fb27c7618e52e0acd0d00451e4589) )
+	ROM_LOAD16_WORD_SWAP("mpr-19024.34", 0x400000, 0x200000, CRC(15ff76d3) SHA1(b431bd85c973aa0a4d6032ac98fb057139f142a2) )
+	ROM_LOAD16_WORD_SWAP("mpr-19025.35", 0x600000, 0x200000, CRC(6ad8fb70) SHA1(b666d31f9be26eb0cdcb71041a3c3c08d5aa41e1) )
 ROM_END
 
 ROM_START( sfight ) /* Sonic The Fighters, Model 2B */
@@ -4278,14 +4321,14 @@ ROM_START( sfight ) /* Sonic The Fighters, Model 2B */
 	ROM_LOAD32_WORD("mpr-19020.28", 0x800000, 0x400000, CRC(9540dba0) SHA1(7b9a75caa8c5b12ba54c6f4f746d80b165ee97ab) )
 	ROM_LOAD32_WORD("mpr-19018.26", 0x800002, 0x400000, CRC(3b7e7a12) SHA1(9c707a7c2cffc5eff19f9919ddfae7300842fd19) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19021.31", 0x080000,  0x80000, CRC(0b9f7583) SHA1(21290389cd8bd9e52ed438152cc6cb5793f809d3) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19021.31", 0x000000, 0x080000, CRC(0b9f7583) SHA1(21290389cd8bd9e52ed438152cc6cb5793f809d3) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19022.32", 0x000000, 0x200000, CRC(4381869b) SHA1(43a21609b49926a227558d4938088526acf1fe42) )
-	ROM_LOAD("mpr-19023.33", 0x200000, 0x200000, CRC(07c67f88) SHA1(696dc85e066fb27c7618e52e0acd0d00451e4589) )
-	ROM_LOAD("mpr-19024.34", 0x400000, 0x200000, CRC(15ff76d3) SHA1(b431bd85c973aa0a4d6032ac98fb057139f142a2) )
-	ROM_LOAD("mpr-19025.35", 0x600000, 0x200000, CRC(6ad8fb70) SHA1(b666d31f9be26eb0cdcb71041a3c3c08d5aa41e1) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19022.32", 0x000000, 0x200000, CRC(4381869b) SHA1(43a21609b49926a227558d4938088526acf1fe42) )
+	ROM_LOAD16_WORD_SWAP("mpr-19023.33", 0x200000, 0x200000, CRC(07c67f88) SHA1(696dc85e066fb27c7618e52e0acd0d00451e4589) )
+	ROM_LOAD16_WORD_SWAP("mpr-19024.34", 0x400000, 0x200000, CRC(15ff76d3) SHA1(b431bd85c973aa0a4d6032ac98fb057139f142a2) )
+	ROM_LOAD16_WORD_SWAP("mpr-19025.35", 0x600000, 0x200000, CRC(6ad8fb70) SHA1(b666d31f9be26eb0cdcb71041a3c3c08d5aa41e1) )
 ROM_END
 
 ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan, Twin & Default View set to Bird's */
@@ -4330,8 +4373,8 @@ ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan
 	ROM_COPY( "textures", 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( "textures", 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x080000,  0x20000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x000000, 0x020000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
 
 	ROM_REGION( 0x20000, "mpegcpu", 0) // Z80 DSB program
 	ROM_LOAD("epr-19275.2s", 0x000000,  0x20000, CRC(ee809d3f) SHA1(347080858fbfe9955002f382603a1b86a52d26d5) )
@@ -4339,7 +4382,7 @@ ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP("epr-18643a.7", 0x000000,  0x20000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19259.32", 0x000000, 0x400000, CRC(4d55dbfc) SHA1(6e57e6e6e785b0f14bb5e221a44d518dbde7ad65) )
 	ROM_LOAD16_WORD_SWAP("mpr-19261.34", 0x400000, 0x400000, CRC(b88878ff) SHA1(4bebcfba68b0cc2fa0bcacfaaf2d2e8af3625c5d) )
 
@@ -4395,8 +4438,8 @@ ROM_START( stccb ) /* Sega Touring Car Championship Revision B, Model 2C - Defau
 	ROM_COPY( "textures", 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( "textures", 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x080000,  0x20000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x000000, 0x020000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
 
 	ROM_REGION( 0x20000, "mpegcpu", 0) // Z80 DSB program
 	ROM_LOAD("epr-19275.2s", 0x000000,  0x20000, CRC(ee809d3f) SHA1(347080858fbfe9955002f382603a1b86a52d26d5) )
@@ -4404,7 +4447,7 @@ ROM_START( stccb ) /* Sega Touring Car Championship Revision B, Model 2C - Defau
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP("epr-18643a.7", 0x000000,  0x20000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19259.32", 0x000000, 0x400000, CRC(4d55dbfc) SHA1(6e57e6e6e785b0f14bb5e221a44d518dbde7ad65) )
 	ROM_LOAD16_WORD_SWAP("mpr-19261.34", 0x400000, 0x400000, CRC(b88878ff) SHA1(4bebcfba68b0cc2fa0bcacfaaf2d2e8af3625c5d) )
 
@@ -4460,8 +4503,8 @@ ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defau
 	ROM_COPY( "textures", 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( "textures", 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x080000,  0x20000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x000000, 0x020000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
 
 	ROM_REGION( 0x20000, "mpegcpu", 0) // Z80 DSB program
 	ROM_LOAD("epr-19275.2s", 0x000000,  0x20000, CRC(ee809d3f) SHA1(347080858fbfe9955002f382603a1b86a52d26d5) )
@@ -4469,7 +4512,7 @@ ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defau
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP("epr-18643a.7", 0x000000,  0x20000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19259.32", 0x000000, 0x400000, CRC(4d55dbfc) SHA1(6e57e6e6e785b0f14bb5e221a44d518dbde7ad65) )
 	ROM_LOAD16_WORD_SWAP("mpr-19261.34", 0x400000, 0x400000, CRC(b88878ff) SHA1(4bebcfba68b0cc2fa0bcacfaaf2d2e8af3625c5d) )
 
@@ -4510,12 +4553,12 @@ ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C, Sega Game ID# 833-12861, RO
 	ROM_LOAD32_WORD( "mpr-19501.27", 0x000000, 0x400000, CRC(66d7b02e) SHA1(cede0dc5c8d9fbfa8de01fe864b3cc101abf67d7) )
 	ROM_LOAD32_WORD( "mpr-19500.25", 0x000002, 0x400000, CRC(905f5798) SHA1(31f104e3022b5bc7ed7c667eb801a57949a06c93) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-19491.31", 0x080000, 0x080000, CRC(1c9b15fd) SHA1(045244a4eebc45f149aecf47f090cede1813477b) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-19491.31", 0x000000, 0x080000, CRC(1c9b15fd) SHA1(045244a4eebc45f149aecf47f090cede1813477b) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-19504.32", 0x000000, 0x400000, CRC(9419ec08) SHA1(d05d9ceb7fd09fa8991c0df4d1c57eb621460e30) )
-	ROM_LOAD( "mpr-19505.34", 0x400000, 0x400000, CRC(eba7f41d) SHA1(f6e521bedf298808a768f6fdcb0b60b320a66d04) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-19504.32", 0x000000, 0x400000, CRC(9419ec08) SHA1(d05d9ceb7fd09fa8991c0df4d1c57eb621460e30) )
+	ROM_LOAD16_WORD_SWAP( "mpr-19505.34", 0x400000, 0x400000, CRC(eba7f41d) SHA1(f6e521bedf298808a768f6fdcb0b60b320a66d04) )
 ROM_END
 
 /* Sega Water Ski - There should be a version with program roms EPR-19965 & EPR-19966 (currently undumped) */
@@ -4561,12 +4604,12 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-
 	ROM_LOAD32_WORD("mpr-19971.28", 0x0800000, 0x400000, CRC(c8708096) SHA1(c27e0a90dc1183b0cf7f32e324afa6c126f61d37) )
 	ROM_LOAD32_WORD("mpr-19970.26", 0x0800002, 0x400000, CRC(c59d8d36) SHA1(24232390f0cac5ffbb17a0093a602363c686fbf8) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19967.31", 0x080000, 0x080000, CRC(c6b8ef3f) SHA1(9f86d6e365a5535d354ff6b0614f3a19c0790d0f) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19967.31", 0x000000, 0x080000, CRC(c6b8ef3f) SHA1(9f86d6e365a5535d354ff6b0614f3a19c0790d0f) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19988.32", 0x000000, 0x400000, CRC(303732fb) SHA1(63efbd9f67b38fddeeed25de660514867e03486a) )
-	ROM_LOAD("mpr-19989.34", 0x400000, 0x400000, CRC(8074a4b3) SHA1(98dc1d122ffb9b5c52994dea2b5d8c4f004a5f8e) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19988.32", 0x000000, 0x400000, CRC(303732fb) SHA1(63efbd9f67b38fddeeed25de660514867e03486a) )
+	ROM_LOAD16_WORD_SWAP("mpr-19989.34", 0x400000, 0x400000, CRC(8074a4b3) SHA1(98dc1d122ffb9b5c52994dea2b5d8c4f004a5f8e) )
 ROM_END
 
 ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, ROM board ID# 834-13055 */
@@ -4614,12 +4657,61 @@ ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, 
 	ROM_LOAD32_WORD("mpr-19719.28", 0x0800000, 0x400000, CRC(838f8343) SHA1(fe6622b5917f9a99c097fd60d9446ac6b481fa75) )
 	ROM_LOAD32_WORD("mpr-19717.26", 0x0800002, 0x400000, CRC(393e440b) SHA1(927ac9cad22f87b339cc86043678470ff139ce1f) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19720.31", 0x080000,  0x80000, CRC(b367d21d) SHA1(1edaed489a3518ddad85728e416319f940ea02bb) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19720.31", 0x000000, 0x080000, CRC(b367d21d) SHA1(1edaed489a3518ddad85728e416319f940ea02bb) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19721.32", 0x000000, 0x400000, CRC(f5d8fa9a) SHA1(6836973a687c59dd80f8e6c30d33155e306be199) )
-	ROM_LOAD("mpr-19722.34", 0x400000, 0x400000, CRC(a56fa539) SHA1(405a892bc368ba862ba71bda7525b421d6973c0e) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19721.32", 0x000000, 0x400000, CRC(f5d8fa9a) SHA1(6836973a687c59dd80f8e6c30d33155e306be199) )
+	ROM_LOAD16_WORD_SWAP("mpr-19722.34", 0x400000, 0x400000, CRC(a56fa539) SHA1(405a892bc368ba862ba71bda7525b421d6973c0e) )
+ROM_END
+
+ROM_START( hotdp )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("prg0.15", 0x000000, 0x080000, CRC(548ed10a) SHA1(393f1f96bc7efcaaa41c09ee08ce081391102583) )
+	ROM_LOAD32_WORD("prg1.16", 0x000002, 0x080000, CRC(f43bb51f) SHA1(1a2a68adbfd21042fcfa20e7366f6a250e2fdf8e) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data, Flash ROM modules instead if DIP ROMs
+	ROM_LOAD32_WORD("dat0.11",    0x0000000, 0x400000, CRC(8d40fc82) SHA1(9ce989706795fe103fce8679f3b117cf48d9b843) )
+	ROM_LOAD32_WORD("dat1.12",    0x0000002, 0x400000, CRC(63e04c15) SHA1(c62417b0b8b3a50425da0833550728eb574655fb) )
+	ROM_LOAD32_WORD("dat2.9",     0x0800000, 0x400000, CRC(2aa9e4b9) SHA1(e53583cdb5eef3d31192f3ba7d21e6647e438224) )
+	ROM_LOAD32_WORD("dat3.10",    0x0800002, 0x400000, CRC(356d348b) SHA1(4e43264ab5a61804f12b6f4b63c644d1250dd43d) )
+	ROM_LOAD32_WORD("dat4.7",     0x1000000, 0x400000, CRC(7ec403f6) SHA1(1120616bcf8151c642183dd2e3f8636a640b624d) )
+	ROM_LOAD32_WORD("dat5.8",     0x1000002, 0x400000, CRC(592fac50) SHA1(8a0386478ee8056616ea475979c515e74414a78b) )
+	ROM_COPY( "main_data", 0x1800000, 0x1900000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1a00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1b00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1c00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1d00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1e00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1f00000, 0x100000 )
+
+
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
+	ROM_LOAD32_WORD("copro0.29",  0x000000, 0x200000, CRC(fc2380f5) SHA1(02a2f8bfc3915787f3aa9645de8a0af4450cea33) )
+	ROM_LOAD32_WORD("copro1.30",  0x000002, 0x200000, CRC(e6ae8f3c) SHA1(9a2c3d3b305e4707f7691d6242ff1bf47d1ced10) )
+
+	ROM_REGION( 0x2000000, "polygons", 0 ) // Models, Flash ROM modules instead if DIP ROMs
+	ROM_LOAD32_WORD("tgp0.17", 0x0000000, 0x400000, CRC(b458ec9b) SHA1(8d51443d5d0e790dc9f0060d8cedc50f177fee04) )
+	ROM_LOAD32_WORD("tgp1.21", 0x0000002, 0x400000, CRC(4b250500) SHA1(425a397f8ba8e295d922c76b1145ad92cafa6b32) )
+	ROM_LOAD32_WORD("tgp2.18", 0x0800000, 0x400000, CRC(17f68d25) SHA1(2f194149c456dc5195eca6426c3b1d4ee4e7fc69) )
+	ROM_LOAD32_WORD("tgp3.22", 0x0800002, 0x400000, CRC(caff1d48) SHA1(033676cd1d2cf0008367d17de30675e3d4d75547) )
+	ROM_LOAD32_WORD("tgp4.19", 0x1000000, 0x400000, CRC(8854f204) SHA1(54f7e23f2cc5c939000f8fd257d907cca7919b64) )
+	ROM_LOAD32_WORD("tgp5.23", 0x1000002, 0x400000, CRC(29f311f3) SHA1(2f89767aaefeb2650091b37c4d505701681bb375) )
+
+	ROM_REGION( 0x1000000, "textures", 0 ) // Textures, Flash ROM modules instead if DIP ROMs
+	ROM_LOAD32_WORD("tex1.27", 0x0000000, 0x400000, BAD_DUMP CRC(86ef3ee4) SHA1(8ad2aa98d94e9a4f1abb61a02aba95064e533a61) ) // one of flash ROMs had broken most significant address pin, dump contains only half of even-bytes data mirrored 2x, correct sum should be 28DA
+	ROM_LOAD32_WORD("tex0.25", 0x0000002, 0x400000, CRC(fb10366a) SHA1(189389f84fa5f04c586953c54254f7bd09dd8d92) )
+	ROM_LOAD32_WORD("tex3.28", 0x0800000, 0x400000, CRC(9a61d7e8) SHA1(d9a563f74e485df5bdf149afaed69811b5536712) )
+	ROM_LOAD32_WORD("tex2.26", 0x0800002, 0x400000, CRC(84ec2923) SHA1(daea23864fbc48c14177e77cd783f73621472708) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("sndpgm0.31", 0x000000, 0x080000, CRC(30accd2e) SHA1(098f07feaa007647f86ea02ef5e1102859c5890a) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("sound1.32", 0x000000, 0x200000, CRC(e0a8dd56) SHA1(c80abe8e7541946b7dd615da98aeb04170ebf91d) )
+	ROM_LOAD16_WORD_SWAP("sound2.33", 0x200000, 0x200000, CRC(a517834f) SHA1(232ec02fedf259a6112dd04e8a6b3a7a1ba17786) )
+	ROM_LOAD16_WORD_SWAP("sound3.34", 0x400000, 0x200000, CRC(f0c529bb) SHA1(3c8f3843e9719079d993206feb083305aa85b0fb) )
+	ROM_LOAD16_WORD_SWAP("sound4.35", 0x600000, 0x200000, CRC(3ad48d53) SHA1(b17f513705217966bc224721b444957de66d74b4) )
 ROM_END
 
 ROM_START( lastbrnx ) /* Last Bronx Revision A (Export), Model 2B */
@@ -4643,12 +4735,12 @@ ROM_START( lastbrnx ) /* Last Bronx Revision A (Export), Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-19056.31", 0x080000,  0x80000, CRC(22a22918) SHA1(baa039cd86650b6cd81f295916c4d256e60cb29c) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-19056.31", 0x000000, 0x080000, CRC(22a22918) SHA1(baa039cd86650b6cd81f295916c4d256e60cb29c) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19057.32", 0x0000000, 0x400000, CRC(64809438) SHA1(aa008f83e1eff0daafe01944248ebae6054cee9f) )
-	ROM_LOAD("mpr-19058.34", 0x0400000, 0x400000, CRC(e237c11c) SHA1(7c89cba757bd58747ed0d633b2fe7ef559fcd15e) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19057.32", 0x0000000, 0x400000, CRC(64809438) SHA1(aa008f83e1eff0daafe01944248ebae6054cee9f) )
+	ROM_LOAD16_WORD_SWAP("mpr-19058.34", 0x0400000, 0x400000, CRC(e237c11c) SHA1(7c89cba757bd58747ed0d633b2fe7ef559fcd15e) )
 ROM_END
 
 ROM_START( lastbrnxu ) /* Last Bronx Revision A (USA), Model 2B - Sega ROM board ID# 834-12360 */
@@ -4672,12 +4764,12 @@ ROM_START( lastbrnxu ) /* Last Bronx Revision A (USA), Model 2B - Sega ROM board
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-19056.31", 0x080000,  0x80000, CRC(22a22918) SHA1(baa039cd86650b6cd81f295916c4d256e60cb29c) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-19056.31", 0x000000, 0x080000, CRC(22a22918) SHA1(baa039cd86650b6cd81f295916c4d256e60cb29c) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19057.32", 0x0000000, 0x400000, CRC(64809438) SHA1(aa008f83e1eff0daafe01944248ebae6054cee9f) )
-	ROM_LOAD("mpr-19058.34", 0x0400000, 0x400000, CRC(e237c11c) SHA1(7c89cba757bd58747ed0d633b2fe7ef559fcd15e) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19057.32", 0x0000000, 0x400000, CRC(64809438) SHA1(aa008f83e1eff0daafe01944248ebae6054cee9f) )
+	ROM_LOAD16_WORD_SWAP("mpr-19058.34", 0x0400000, 0x400000, CRC(e237c11c) SHA1(7c89cba757bd58747ed0d633b2fe7ef559fcd15e) )
 ROM_END
 
 ROM_START( lastbrnxj ) /* Last Bronx Revision A (Japan), Model 2B */
@@ -4701,12 +4793,12 @@ ROM_START( lastbrnxj ) /* Last Bronx Revision A (Japan), Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-19056.31", 0x080000,  0x80000, CRC(22a22918) SHA1(baa039cd86650b6cd81f295916c4d256e60cb29c) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-19056.31", 0x000000, 0x080000, CRC(22a22918) SHA1(baa039cd86650b6cd81f295916c4d256e60cb29c) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19057.32", 0x0000000, 0x400000, CRC(64809438) SHA1(aa008f83e1eff0daafe01944248ebae6054cee9f) )
-	ROM_LOAD("mpr-19058.34", 0x0400000, 0x400000, CRC(e237c11c) SHA1(7c89cba757bd58747ed0d633b2fe7ef559fcd15e) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19057.32", 0x0000000, 0x400000, CRC(64809438) SHA1(aa008f83e1eff0daafe01944248ebae6054cee9f) )
+	ROM_LOAD16_WORD_SWAP("mpr-19058.34", 0x0400000, 0x400000, CRC(e237c11c) SHA1(7c89cba757bd58747ed0d633b2fe7ef559fcd15e) )
 ROM_END
 
 ROM_START( pltkidsa ) /* Pilot Kids, Model 2A */
@@ -4736,14 +4828,14 @@ ROM_START( pltkidsa ) /* Pilot Kids, Model 2A */
 	ROM_LOAD32_WORD("mpr-21275.tx3", 0x0800000, 0x400000, CRC(c4870b7c) SHA1(feb8a34acb620a36ed5aea92d22622a76d7e1b29) )
 	ROM_LOAD32_WORD("mpr-21273.tx2", 0x0800002, 0x400000, CRC(722ec8a2) SHA1(1a1dc92488cde6284a96acce80e47a9cceccde76) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-21276.sd0", 0x080000, 0x080000, CRC(8f415bc3) SHA1(4e8e1ccbe025deca42fcf2582f3da46fa34780b7) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-21276.sd0", 0x000000, 0x080000, CRC(8f415bc3) SHA1(4e8e1ccbe025deca42fcf2582f3da46fa34780b7) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-21277.sd1", 0x0000000, 0x200000, CRC(bfba0ff6) SHA1(11081b3eabc33a42ecfc0b2b535ce16510496144) )
-	ROM_LOAD("mpr-21278.sd2", 0x0200000, 0x200000, CRC(27e18e08) SHA1(254c0ad4d6bd572ff0efc3ea80489e73716a31a7) )
-	ROM_LOAD("mpr-21279.sd3", 0x0400000, 0x200000, CRC(3a8dcf68) SHA1(312496b45b699051c8b4dd0e5d94e73fe5f3ad8d) )
-	ROM_LOAD("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-21277.sd1", 0x0000000, 0x200000, CRC(bfba0ff6) SHA1(11081b3eabc33a42ecfc0b2b535ce16510496144) )
+	ROM_LOAD16_WORD_SWAP("mpr-21278.sd2", 0x0200000, 0x200000, CRC(27e18e08) SHA1(254c0ad4d6bd572ff0efc3ea80489e73716a31a7) )
+	ROM_LOAD16_WORD_SWAP("mpr-21279.sd3", 0x0400000, 0x200000, CRC(3a8dcf68) SHA1(312496b45b699051c8b4dd0e5d94e73fe5f3ad8d) )
+	ROM_LOAD16_WORD_SWAP("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -4779,14 +4871,14 @@ ROM_START( pltkids ) /* Pilot Kids Revision A, Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-21276.sd0", 0x080000, 0x080000, CRC(8f415bc3) SHA1(4e8e1ccbe025deca42fcf2582f3da46fa34780b7) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-21276.sd0", 0x000000, 0x080000, CRC(8f415bc3) SHA1(4e8e1ccbe025deca42fcf2582f3da46fa34780b7) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-21277.sd1", 0x0000000, 0x200000, CRC(bfba0ff6) SHA1(11081b3eabc33a42ecfc0b2b535ce16510496144) )
-	ROM_LOAD("mpr-21278.sd2", 0x0200000, 0x200000, CRC(27e18e08) SHA1(254c0ad4d6bd572ff0efc3ea80489e73716a31a7) )
-	ROM_LOAD("mpr-21279.sd3", 0x0400000, 0x200000, CRC(3a8dcf68) SHA1(312496b45b699051c8b4dd0e5d94e73fe5f3ad8d) )
-	ROM_LOAD("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-21277.sd1", 0x0000000, 0x200000, CRC(bfba0ff6) SHA1(11081b3eabc33a42ecfc0b2b535ce16510496144) )
+	ROM_LOAD16_WORD_SWAP("mpr-21278.sd2", 0x0200000, 0x200000, CRC(27e18e08) SHA1(254c0ad4d6bd572ff0efc3ea80489e73716a31a7) )
+	ROM_LOAD16_WORD_SWAP("mpr-21279.sd3", 0x0400000, 0x200000, CRC(3a8dcf68) SHA1(312496b45b699051c8b4dd0e5d94e73fe5f3ad8d) )
+	ROM_LOAD16_WORD_SWAP("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
 
 	//             1998     317-5044-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "042e2dc1" )
@@ -4834,14 +4926,14 @@ ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits t
 	ROM_LOAD32_WORD("mpr-18232.27", 0x000000, 0x400000, CRC(f962347d) SHA1(79f07ee6b821724294ca9e7a079cb33249102508) )
 	ROM_LOAD32_WORD("mpr-18231.25", 0x000002, 0x400000, CRC(673d5338) SHA1(ce592857496ccc0a51efb377cf7cccc000b4296b) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18600.31", 0x080000,  0x40000, CRC(269ee4a0) SHA1(8ebabfcd27d634ff0bead0a1f138efc8708575e7) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18600.31", 0x000000, 0x040000, CRC(269ee4a0) SHA1(8ebabfcd27d634ff0bead0a1f138efc8708575e7) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18241.32", 0x0000000, 0x200000, CRC(3a380ae1) SHA1(114113325e9e5262af8750c05089f24818943cde) )
-	ROM_LOAD("mpr-18242.33", 0x0200000, 0x200000, CRC(1cc3deae) SHA1(5c9cb8ce43a909b25b4e734c6a4ffd786f4dde31) )
-	ROM_LOAD("mpr-18243.34", 0x0400000, 0x200000, CRC(a00a0053) SHA1(9c24fbcd0318c7e195dd153d6ba05e8c1e052968) )
-	ROM_LOAD("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18241.32", 0x0000000, 0x200000, CRC(3a380ae1) SHA1(114113325e9e5262af8750c05089f24818943cde) )
+	ROM_LOAD16_WORD_SWAP("mpr-18242.33", 0x0200000, 0x200000, CRC(1cc3deae) SHA1(5c9cb8ce43a909b25b4e734c6a4ffd786f4dde31) )
+	ROM_LOAD16_WORD_SWAP("mpr-18243.34", 0x0400000, 0x200000, CRC(a00a0053) SHA1(9c24fbcd0318c7e195dd153d6ba05e8c1e052968) )
+	ROM_LOAD16_WORD_SWAP("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
 ROM_END
 
 ROM_START( indy500d ) /* Defaults to Deluxe (Stand Alone) Cab version. 3 credits to start - Can be set to Twin setting in service mode, Sega Game ID# 833-11992, ROM board ID# 834-11993 */
@@ -4886,14 +4978,14 @@ ROM_START( indy500d ) /* Defaults to Deluxe (Stand Alone) Cab version. 3 credits
 	ROM_LOAD32_WORD("mpr-18232.27", 0x000000, 0x400000, CRC(f962347d) SHA1(79f07ee6b821724294ca9e7a079cb33249102508) )
 	ROM_LOAD32_WORD("mpr-18231.25", 0x000002, 0x400000, CRC(673d5338) SHA1(ce592857496ccc0a51efb377cf7cccc000b4296b) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18253.31", 0x080000,  0x40000, CRC(2934e034) SHA1(4a3037b69c4835ef16a20c5573de32a862f0b13e) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18253.31", 0x000000, 0x040000, CRC(2934e034) SHA1(4a3037b69c4835ef16a20c5573de32a862f0b13e) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18241.32", 0x0000000, 0x200000, CRC(3a380ae1) SHA1(114113325e9e5262af8750c05089f24818943cde) )
-	ROM_LOAD("mpr-18242.33", 0x0200000, 0x200000, CRC(1cc3deae) SHA1(5c9cb8ce43a909b25b4e734c6a4ffd786f4dde31) )
-	ROM_LOAD("mpr-18243.34", 0x0400000, 0x200000, CRC(a00a0053) SHA1(9c24fbcd0318c7e195dd153d6ba05e8c1e052968) )
-	ROM_LOAD("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18241.32", 0x0000000, 0x200000, CRC(3a380ae1) SHA1(114113325e9e5262af8750c05089f24818943cde) )
+	ROM_LOAD16_WORD_SWAP("mpr-18242.33", 0x0200000, 0x200000, CRC(1cc3deae) SHA1(5c9cb8ce43a909b25b4e734c6a4ffd786f4dde31) )
+	ROM_LOAD16_WORD_SWAP("mpr-18243.34", 0x0400000, 0x200000, CRC(a00a0053) SHA1(9c24fbcd0318c7e195dd153d6ba05e8c1e052968) )
+	ROM_LOAD16_WORD_SWAP("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
 ROM_END
 
 ROM_START( indy500to ) /* Defaults to Twin (Stand Alone) Cab version. 2 credits to start - Can be set to Deluxe setting in service mode, Sega Game ID# 833-11994, ROM board ID# 834-11995 */
@@ -4938,14 +5030,14 @@ ROM_START( indy500to ) /* Defaults to Twin (Stand Alone) Cab version. 2 credits 
 	ROM_LOAD32_WORD("mpr-18232.27", 0x000000, 0x400000, CRC(f962347d) SHA1(79f07ee6b821724294ca9e7a079cb33249102508) )
 	ROM_LOAD32_WORD("mpr-18231.25", 0x000002, 0x400000, CRC(673d5338) SHA1(ce592857496ccc0a51efb377cf7cccc000b4296b) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18391.31", 0x080000,  0x40000, CRC(79579b72) SHA1(36fed8a9eeb34968b2852ea8fc9198427f0d27c6) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18391.31", 0x000000, 0x040000, CRC(79579b72) SHA1(36fed8a9eeb34968b2852ea8fc9198427f0d27c6) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18241.32", 0x0000000, 0x200000, CRC(3a380ae1) SHA1(114113325e9e5262af8750c05089f24818943cde) )
-	ROM_LOAD("mpr-18242.33", 0x0200000, 0x200000, CRC(1cc3deae) SHA1(5c9cb8ce43a909b25b4e734c6a4ffd786f4dde31) )
-	ROM_LOAD("mpr-18243.34", 0x0400000, 0x200000, CRC(a00a0053) SHA1(9c24fbcd0318c7e195dd153d6ba05e8c1e052968) )
-	ROM_LOAD("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18241.32", 0x0000000, 0x200000, CRC(3a380ae1) SHA1(114113325e9e5262af8750c05089f24818943cde) )
+	ROM_LOAD16_WORD_SWAP("mpr-18242.33", 0x0200000, 0x200000, CRC(1cc3deae) SHA1(5c9cb8ce43a909b25b4e734c6a4ffd786f4dde31) )
+	ROM_LOAD16_WORD_SWAP("mpr-18243.34", 0x0400000, 0x200000, CRC(a00a0053) SHA1(9c24fbcd0318c7e195dd153d6ba05e8c1e052968) )
+	ROM_LOAD16_WORD_SWAP("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
 ROM_END
 
 ROM_START( waverunr ) /* Wave Runner Revision A (Japan), Model 2C, Sega Game ID# 833-12838, ROM board ID# 834-12839 */
@@ -5015,12 +5107,12 @@ ROM_START( waverunr ) /* Wave Runner Revision A (Japan), Model 2C, Sega Game ID#
 	ROM_COPY( "textures", 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( "textures", 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19284.31", 0x080000,  0x40000, CRC(efe5f0f3) SHA1(5e36fc7cca92e2eab7d65434cb39597505a2f8cf) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19284.31", 0x000000, 0x040000, CRC(efe5f0f3) SHA1(5e36fc7cca92e2eab7d65434cb39597505a2f8cf) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19295.32", 0x0000000, 0x400000, CRC(b14eeb09) SHA1(2a6d1b14ea3c031cad9905e4b9b6973755689ee1) )
-	ROM_LOAD("mpr-19296.34", 0x0400000, 0x400000, CRC(b4b9faff) SHA1(3a258e0f7c642d043cbab5f94dfe69fac8561e93) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19295.32", 0x0000000, 0x400000, CRC(b14eeb09) SHA1(2a6d1b14ea3c031cad9905e4b9b6973755689ee1) )
+	ROM_LOAD16_WORD_SWAP("mpr-19296.34", 0x0400000, 0x400000, CRC(b4b9faff) SHA1(3a258e0f7c642d043cbab5f94dfe69fac8561e93) )
 ROM_END
 
 ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-11809 */
@@ -5053,12 +5145,12 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-118
 	ROM_LOAD32_WORD("mpr-18035.27", 0x000000, 0x200000, CRC(4423f66e) SHA1(c1f8dda4781dea00bd97dbf9ecfbb626dadd2c35) )
 	ROM_LOAD32_WORD("mpr-18036.25", 0x000002, 0x200000, CRC(69221cf5) SHA1(e39644a08aa631dbdcfc7c0dc356e73f6a4412a9) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18047.31", 0x080000,  0x80000, CRC(4c31d459) SHA1(424d5e5a7787d0d4c68aa919ba7d575babfd1ce0) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18047.31", 0x000000, 0x080000, CRC(4c31d459) SHA1(424d5e5a7787d0d4c68aa919ba7d575babfd1ce0) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
-	ROM_LOAD("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
+	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
 
 	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
 	ROM_REGION( 0x8000, "iocpu", 0 )
@@ -5163,14 +5255,14 @@ ROM_START( bel ) /* Behind Enemy Lines, Model 2C */
 	ROM_LOAD32_WORD("mpr-20248.28",   0x800000, 0x200000, CRC(0ace6bef) SHA1(a231aeb7b984f5b927144f0eec4ef2282429494f) )
 	ROM_LOAD32_WORD("mpr-20246.26",   0x800002, 0x200000, CRC(250d6ca1) SHA1(cd1d4bc0fcf89e47884b87863a09bb263bce72cc) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-20249.31",  0x080000, 0x020000, CRC(dc24f13d) SHA1(66ab8e843319d07663ef13f3d2299c6c7414071f) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-20249.31", 0x000000, 0x020000, CRC(dc24f13d) SHA1(66ab8e843319d07663ef13f3d2299c6c7414071f) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-20250.32",  0x0000000, 0x200000, CRC(91b735d3) SHA1(b0e7e493fb20ebf30c17378199e49d529ffb3f20) )
-	ROM_LOAD("mpr-20251.33",  0x0200000, 0x200000, CRC(703a947b) SHA1(95b8d3dc29e87e6537b288d8e946728e0b345dd0) )
-	ROM_LOAD("mpr-20252.34",  0x0400000, 0x200000, CRC(8f48f375) SHA1(9e511e89e99c77f06a5fba033ca8f9b98bd86f91) )
-	ROM_LOAD("mpr-20253.35",  0x0600000, 0x200000, CRC(ca6aa17c) SHA1(f6df2483ca75573449ba36638dbbed4be7843a44) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-20250.32",  0x0000000, 0x200000, CRC(91b735d3) SHA1(b0e7e493fb20ebf30c17378199e49d529ffb3f20) )
+	ROM_LOAD16_WORD_SWAP("mpr-20251.33",  0x0200000, 0x200000, CRC(703a947b) SHA1(95b8d3dc29e87e6537b288d8e946728e0b345dd0) )
+	ROM_LOAD16_WORD_SWAP("mpr-20252.34",  0x0400000, 0x200000, CRC(8f48f375) SHA1(9e511e89e99c77f06a5fba033ca8f9b98bd86f91) )
+	ROM_LOAD16_WORD_SWAP("mpr-20253.35",  0x0600000, 0x200000, CRC(ca6aa17c) SHA1(f6df2483ca75573449ba36638dbbed4be7843a44) )
 ROM_END
 
 ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
@@ -5194,12 +5286,12 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x080000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
-	ROM_LOAD( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
 ROM_END
 
 ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, Sega Game ID# 836-13274, ROM board ID# 836-13275 */
@@ -5223,12 +5315,12 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, Sega Game ID# 836-13274,
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x080000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
-	ROM_LOAD( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-20003.32", 0x000000, 0x400000, CRC(149ac22b) SHA1(c890bbaebbbb07b62bcb8a3a8edded9fa0ec9a1e) )
+	ROM_LOAD16_WORD_SWAP( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
 ROM_END
 
 ROM_START( rascot2 ) /* Royal Ascot 2, Model 2C, Rom Board : 837-12485 Com Board : 837-12532 SDC-2 */
@@ -5262,11 +5354,11 @@ ROM_START( rascot2 ) /* Royal Ascot 2, Model 2C, Rom Board : 837-12485 Com Board
 	ROM_LOAD32_WORD("mpr-20184.28",   0x800000, 0x400000, CRC(b8df0b12) SHA1(391c6aa40f2f6296ba3aa2a6ea2414ef2487f80c) )
 	ROM_LOAD32_WORD("mpr-20182.26",   0x800002, 0x400000, CRC(e3f085fe) SHA1(28efa84f6c04fbd285a9bcf6f651a57bfe54a507) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-20168.31",  0x080000, 0x020000, CRC(13a6a78d) SHA1(cbff422567b72d71607a42ea804c98b8c1e65824) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20168.31", 0x000000, 0x020000, CRC(13a6a78d) SHA1(cbff422567b72d71607a42ea804c98b8c1e65824) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("epr-20185.32",  0x0000000, 0x200000, CRC(168cc361) SHA1(fbd2a9d99cc0afd7b5f0d9274916a0960d864118) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("epr-20185.32",  0x0000000, 0x200000, CRC(168cc361) SHA1(fbd2a9d99cc0afd7b5f0d9274916a0960d864118) )
 ROM_END
 
 ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C, Sega Game ID# 833-13080-02, ROM board ID# 834-13081-02 */
@@ -5292,13 +5384,13 @@ ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C, Sega Game ID#
 	ROM_LOAD32_WORD("mpr-19740.27",  0x000000, 0x400000, CRC(b20f508b) SHA1(c90fa3b42d87291ea459ccc137f3a2f3eb7efec0) )
 	ROM_LOAD32_WORD("mpr-19739.25",  0x000002, 0x400000, CRC(8120cfd8) SHA1(a82744bff5dcdfae296c7c3e8c3fbfda26324e85) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x080000,  0x80000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x000000, 0x080000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
 
 	ROM_REGION( 0x20000, "cpu3", 0) // DSB program
 	ROM_LOAD16_WORD_SWAP("mpr-19760.2s", 0x000000,  0x20000, CRC(2e41ca15) SHA1(a302209bfe0f1491dff2da64b32cfaa13c3d3304) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19745.32", 0x000000, 0x400000, CRC(7082a0af) SHA1(415f9d0793a697cb1719bbd96370f4a741866527) )
 	ROM_LOAD16_WORD_SWAP("mpr-19746.34", 0x400000, 0x400000, CRC(657b5977) SHA1(ca76f211d68b6b55678a4d7949bfd2ddef1b1710) )
 
@@ -5332,13 +5424,13 @@ ROM_START( topskatruo ) /* Top Skater (USA), Model 2C, Sega Game ID# 833-13080-0
 	ROM_LOAD32_WORD("mpr-19740.27",  0x000000, 0x400000, CRC(b20f508b) SHA1(c90fa3b42d87291ea459ccc137f3a2f3eb7efec0) )
 	ROM_LOAD32_WORD("mpr-19739.25",  0x000002, 0x400000, CRC(8120cfd8) SHA1(a82744bff5dcdfae296c7c3e8c3fbfda26324e85) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x080000,  0x80000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x000000, 0x080000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
 
 	ROM_REGION( 0x20000, "cpu3", 0) // DSB program
 	ROM_LOAD16_WORD_SWAP("mpr-19760.2s", 0x000000,  0x20000, CRC(2e41ca15) SHA1(a302209bfe0f1491dff2da64b32cfaa13c3d3304) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19745.32", 0x000000, 0x400000, CRC(7082a0af) SHA1(415f9d0793a697cb1719bbd96370f4a741866527) )
 	ROM_LOAD16_WORD_SWAP("mpr-19746.34", 0x400000, 0x400000, CRC(657b5977) SHA1(ca76f211d68b6b55678a4d7949bfd2ddef1b1710) )
 
@@ -5372,13 +5464,13 @@ ROM_START( topskatru ) /* Top Skater Revision A (USA), Model 2C, Sega Game ID# 8
 	ROM_LOAD32_WORD("mpr-19740.27",  0x000000, 0x400000, CRC(b20f508b) SHA1(c90fa3b42d87291ea459ccc137f3a2f3eb7efec0) )
 	ROM_LOAD32_WORD("mpr-19739.25",  0x000002, 0x400000, CRC(8120cfd8) SHA1(a82744bff5dcdfae296c7c3e8c3fbfda26324e85) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x080000,  0x80000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x000000, 0x080000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
 
 	ROM_REGION( 0x20000, "cpu3", 0) // DSB program
 	ROM_LOAD16_WORD_SWAP("mpr-19760.2s", 0x000000,  0x20000, CRC(2e41ca15) SHA1(a302209bfe0f1491dff2da64b32cfaa13c3d3304) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19745.32", 0x000000, 0x400000, CRC(7082a0af) SHA1(415f9d0793a697cb1719bbd96370f4a741866527) )
 	ROM_LOAD16_WORD_SWAP("mpr-19746.34", 0x400000, 0x400000, CRC(657b5977) SHA1(ca76f211d68b6b55678a4d7949bfd2ddef1b1710) )
 
@@ -5412,13 +5504,13 @@ ROM_START( topskatrj ) /* Top Skater (Japan), Model 2C, Sega Game ID# 833-13080-
 	ROM_LOAD32_WORD("mpr-19740.27",  0x000000, 0x400000, CRC(b20f508b) SHA1(c90fa3b42d87291ea459ccc137f3a2f3eb7efec0) )
 	ROM_LOAD32_WORD("mpr-19739.25",  0x000002, 0x400000, CRC(8120cfd8) SHA1(a82744bff5dcdfae296c7c3e8c3fbfda26324e85) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x080000,  0x80000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("mpr-19759.31", 0x000000, 0x080000, CRC(573530f2) SHA1(7b205085965d6694f8e75e29c4028f7cb6f631ab) )
 
 	ROM_REGION( 0x20000, "cpu3", 0) // DSB program
 	ROM_LOAD16_WORD_SWAP("mpr-19760.2s", 0x000000,  0x20000, CRC(2e41ca15) SHA1(a302209bfe0f1491dff2da64b32cfaa13c3d3304) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19745.32", 0x000000, 0x400000, CRC(7082a0af) SHA1(415f9d0793a697cb1719bbd96370f4a741866527) )
 	ROM_LOAD16_WORD_SWAP("mpr-19746.34", 0x400000, 0x400000, CRC(657b5977) SHA1(ca76f211d68b6b55678a4d7949bfd2ddef1b1710) )
 
@@ -5459,14 +5551,14 @@ ROM_START( doaa ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 833-11341
 	ROM_LOAD32_WORD("mpr-19321.27", 0x000000, 0x400000, CRC(9c49e845) SHA1(344839640d9814263fa5ed00c2043cd6f18d5cb2) )
 	ROM_LOAD32_WORD("mpr-19320.25", 0x000002, 0x400000, CRC(190c017f) SHA1(4c3250b9abe39fc5c8fd0fcdb5fb7ea131434516) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19328.30", 0x080000,  0x80000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19328.30", 0x000000, 0x080000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19329.31", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
-	ROM_LOAD("mpr-19330.32", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
-	ROM_LOAD("mpr-19331.33", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
-	ROM_LOAD("mpr-19332.34", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19329.31", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
+	ROM_LOAD16_WORD_SWAP("mpr-19330.32", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
+	ROM_LOAD16_WORD_SWAP("mpr-19331.33", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
+	ROM_LOAD16_WORD_SWAP("mpr-19332.34", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -5502,14 +5594,14 @@ ROM_START( doa ) /* Dead or Alive Revision B, Model 2B, 837-12880 security board
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19328.30", 0x080000,  0x80000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19328.30", 0x000000, 0x080000, CRC(400bdbfb) SHA1(54db969fa54cf3c502d77aa6a6aaeef5d7db9f04) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19329.31", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
-	ROM_LOAD("mpr-19330.32", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
-	ROM_LOAD("mpr-19331.33", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
-	ROM_LOAD("mpr-19332.34", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19329.31", 0x000000, 0x200000, CRC(8fd2708a) SHA1(7a341b15afa489aa95af70cb34ac3934b1a7d887) )
+	ROM_LOAD16_WORD_SWAP("mpr-19330.32", 0x200000, 0x200000, CRC(0c69787d) SHA1(dc5870cd93da2babe5fc9c03b252fc6ea6e45721) )
+	ROM_LOAD16_WORD_SWAP("mpr-19331.33", 0x400000, 0x200000, CRC(c18ea0b8) SHA1(0f42458829ae85fffcedd42cd9f728a7a3d75f1c) )
+	ROM_LOAD16_WORD_SWAP("mpr-19332.34", 0x600000, 0x200000, CRC(2877f96f) SHA1(00e5677da30527b862e238f10762a5cbfbabde2b) )
 ROM_END
 
 ROM_START( sgt24h ) /* Super GT 24h, Model 2B */
@@ -5536,11 +5628,11 @@ ROM_START( sgt24h ) /* Super GT 24h, Model 2B */
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP("epr-18643a.7", 0x000000,  0x20000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19157.31", 0x080000,  0x80000, CRC(8ffea0cf) SHA1(439e784081329db2fe03419681150f3216f4ccff) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19157.31", 0x000000, 0x080000, CRC(8ffea0cf) SHA1(439e784081329db2fe03419681150f3216f4ccff) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19154.32", 0x000000, 0x400000, CRC(7cd9e679) SHA1(b9812c4f3042f95febc96bcdd46e3b0724ad4b4f) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19154.32", 0x000000, 0x400000, CRC(7cd9e679) SHA1(b9812c4f3042f95febc96bcdd46e3b0724ad4b4f) )
 ROM_END
 
 ROM_START( von ) /* Virtual On Cyber Troopers Revision B (US), Model 2B, Sega Game ID# 833-12345-01, ROM board ID# 834-12346-01 */
@@ -5575,12 +5667,12 @@ ROM_START( von ) /* Virtual On Cyber Troopers Revision B (US), Model 2B, Sega Ga
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP("epr-18643a.7", 0x000000,  0x20000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18670.31", 0x080000,  0x80000, CRC(3e715f76) SHA1(4fd997e379a8cdb94ec3b1986b3ab443fc6fa12a) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18670.31", 0x000000, 0x080000, CRC(3e715f76) SHA1(4fd997e379a8cdb94ec3b1986b3ab443fc6fa12a) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18652.32", 0x000000, 0x400000, CRC(037eee53) SHA1(e592f9e97abe0a7bc9009d8327b93da9bc43749c))
-	ROM_LOAD("mpr-18653.34", 0x400000, 0x400000, CRC(9ec3e7bf) SHA1(197bc8adc823e93128c1cebf69361a7c7297f808))
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18652.32", 0x000000, 0x400000, CRC(037eee53) SHA1(e592f9e97abe0a7bc9009d8327b93da9bc43749c))
+	ROM_LOAD16_WORD_SWAP("mpr-18653.34", 0x400000, 0x400000, CRC(9ec3e7bf) SHA1(197bc8adc823e93128c1cebf69361a7c7297f808))
 ROM_END
 
 ROM_START( vonj ) /* Virtual On Cyber Troopers Revision B (Japan), Model 2B */
@@ -5615,12 +5707,12 @@ ROM_START( vonj ) /* Virtual On Cyber Troopers Revision B (Japan), Model 2B */
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP("epr-18643a.7", 0x000000,  0x20000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18670.31", 0x080000,  0x80000, CRC(3e715f76) SHA1(4fd997e379a8cdb94ec3b1986b3ab443fc6fa12a) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18670.31", 0x000000, 0x080000, CRC(3e715f76) SHA1(4fd997e379a8cdb94ec3b1986b3ab443fc6fa12a) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18652.32", 0x000000, 0x400000, CRC(037eee53) SHA1(e592f9e97abe0a7bc9009d8327b93da9bc43749c) )
-	ROM_LOAD("mpr-18653.34", 0x400000, 0x400000, CRC(9ec3e7bf) SHA1(197bc8adc823e93128c1cebf69361a7c7297f808) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18652.32", 0x000000, 0x400000, CRC(037eee53) SHA1(e592f9e97abe0a7bc9009d8327b93da9bc43749c) )
+	ROM_LOAD16_WORD_SWAP("mpr-18653.34", 0x400000, 0x400000, CRC(9ec3e7bf) SHA1(197bc8adc823e93128c1cebf69361a7c7297f808) )
 ROM_END
 
 ROM_START( vstriker ) /* Virtua Striker Revision A, Model 2B */
@@ -5650,13 +5742,13 @@ ROM_START( vstriker ) /* Virtua Striker Revision A, Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18072.31", 0x080000,  0x20000, CRC(73eabb58) SHA1(4f6d70d6e0d7b469c5f2527efb08f208f4aa017e) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18072.31", 0x000000, 0x020000, CRC(73eabb58) SHA1(4f6d70d6e0d7b469c5f2527efb08f208f4aa017e) )
 
-	ROM_REGION( 0x600000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18063.32", 0x000000, 0x200000, CRC(b74d7c8a) SHA1(da0bc8b3822b01087b6f9de0446cab1eb6617e8e) )
-	ROM_LOAD("mpr-18064.33", 0x200000, 0x200000, CRC(783b9910) SHA1(108b23bb57e3133c555083aa4f9bc573ac6e3152) )
-	ROM_LOAD("mpr-18065.34", 0x400000, 0x200000, CRC(046b55fe) SHA1(2db7eabf4318881a67b10dba24f6f0cd68940ace) )
+	ROM_REGION16_BE( 0x600000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18063.32", 0x000000, 0x200000, CRC(b74d7c8a) SHA1(da0bc8b3822b01087b6f9de0446cab1eb6617e8e) )
+	ROM_LOAD16_WORD_SWAP("mpr-18064.33", 0x200000, 0x200000, CRC(783b9910) SHA1(108b23bb57e3133c555083aa4f9bc573ac6e3152) )
+	ROM_LOAD16_WORD_SWAP("mpr-18065.34", 0x400000, 0x200000, CRC(046b55fe) SHA1(2db7eabf4318881a67b10dba24f6f0cd68940ace) )
 ROM_END
 
 ROM_START( vstrikero ) /* Virtua Striker, Model 2B */
@@ -5686,13 +5778,13 @@ ROM_START( vstrikero ) /* Virtua Striker, Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18072.31", 0x080000,  0x20000, CRC(73eabb58) SHA1(4f6d70d6e0d7b469c5f2527efb08f208f4aa017e) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18072.31", 0x000000, 0x020000, CRC(73eabb58) SHA1(4f6d70d6e0d7b469c5f2527efb08f208f4aa017e) )
 
-	ROM_REGION( 0x600000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18063.32", 0x000000, 0x200000, CRC(b74d7c8a) SHA1(da0bc8b3822b01087b6f9de0446cab1eb6617e8e) )
-	ROM_LOAD("mpr-18064.33", 0x200000, 0x200000, CRC(783b9910) SHA1(108b23bb57e3133c555083aa4f9bc573ac6e3152) )
-	ROM_LOAD("mpr-18065.34", 0x400000, 0x200000, CRC(046b55fe) SHA1(2db7eabf4318881a67b10dba24f6f0cd68940ace) )
+	ROM_REGION16_BE( 0x600000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18063.32", 0x000000, 0x200000, CRC(b74d7c8a) SHA1(da0bc8b3822b01087b6f9de0446cab1eb6617e8e) )
+	ROM_LOAD16_WORD_SWAP("mpr-18064.33", 0x200000, 0x200000, CRC(783b9910) SHA1(108b23bb57e3133c555083aa4f9bc573ac6e3152) )
+	ROM_LOAD16_WORD_SWAP("mpr-18065.34", 0x400000, 0x200000, CRC(046b55fe) SHA1(2db7eabf4318881a67b10dba24f6f0cd68940ace) )
 ROM_END
 
 ROM_START( dynabb ) /* Dynamite Baseball, Model 2B. Sega game ID# 833-12803 DYNAMITE BASEBALL */
@@ -5724,13 +5816,13 @@ ROM_START( dynabb ) /* Dynamite Baseball, Model 2B. Sega game ID# 833-12803 DYNA
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19184.31", 0x080000,  0x80000, CRC(c013a163) SHA1(c564df8295e3c19082ead0eb22478dc651e0b430) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19184.31", 0x000000, 0x080000, CRC(c013a163) SHA1(c564df8295e3c19082ead0eb22478dc651e0b430) )
 
-	ROM_REGION( 0x600000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19185.32", 0x000000, 0x200000, CRC(5175b7d8) SHA1(bed43db286703e95cc8025013b2d129598faab3c) )
-	ROM_LOAD("mpr-19186.33", 0x200000, 0x200000, CRC(f23440b5) SHA1(9bb862d61ed079cb3eb0bd7a37b19c6134859b99) )
-	ROM_LOAD("mpr-19187.34", 0x400000, 0x200000, CRC(20918769) SHA1(90951bd61654d39537c54325b6e157a019edcda8) )
+	ROM_REGION16_BE( 0x600000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19185.32", 0x000000, 0x200000, CRC(5175b7d8) SHA1(bed43db286703e95cc8025013b2d129598faab3c) )
+	ROM_LOAD16_WORD_SWAP("mpr-19186.33", 0x200000, 0x200000, CRC(f23440b5) SHA1(9bb862d61ed079cb3eb0bd7a37b19c6134859b99) )
+	ROM_LOAD16_WORD_SWAP("mpr-19187.34", 0x400000, 0x200000, CRC(20918769) SHA1(90951bd61654d39537c54325b6e157a019edcda8) )
 ROM_END
 
 ROM_START( dynabb97 ) /* Dynamite Baseball 97 Revision A, Model 2B */
@@ -5762,14 +5854,14 @@ ROM_START( dynabb97 ) /* Dynamite Baseball 97 Revision A, Model 2B */
 
 	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-19849.31", 0x080000,  0x80000, CRC(b0d5bff0) SHA1(1fb824adaf3ed330a8039be726a87eb85c00abd7) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-19849.31", 0x000000, 0x080000, CRC(b0d5bff0) SHA1(1fb824adaf3ed330a8039be726a87eb85c00abd7) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-19850.32", 0x000000, 0x200000, CRC(e1fd27bf) SHA1(a7189ad398138a91f96b192cb7c112c0301dcda4) )
-	ROM_LOAD("mpr-19851.33", 0x200000, 0x200000, CRC(dc644077) SHA1(8765bdb1d471dbeea065a97ae131f2d8f78aa13d) )
-	ROM_LOAD("mpr-19852.34", 0x400000, 0x200000, CRC(cfda4efd) SHA1(14d55f127da6673c538c2ef9be34a4e02ca449f3) )
-	ROM_LOAD("mpr-19853.35", 0x600000, 0x200000, CRC(cfc64857) SHA1(cf51fafb3d45bf799b9ccb407bee862e15c95981) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-19850.32", 0x000000, 0x200000, CRC(e1fd27bf) SHA1(a7189ad398138a91f96b192cb7c112c0301dcda4) )
+	ROM_LOAD16_WORD_SWAP("mpr-19851.33", 0x200000, 0x200000, CRC(dc644077) SHA1(8765bdb1d471dbeea065a97ae131f2d8f78aa13d) )
+	ROM_LOAD16_WORD_SWAP("mpr-19852.34", 0x400000, 0x200000, CRC(cfda4efd) SHA1(14d55f127da6673c538c2ef9be34a4e02ca449f3) )
+	ROM_LOAD16_WORD_SWAP("mpr-19853.35", 0x600000, 0x200000, CRC(cfc64857) SHA1(cf51fafb3d45bf799b9ccb407bee862e15c95981) )
 ROM_END
 
 ROM_START( fvipers ) /* Fighting Vipers Revision D, Model 2B, Sega Game ID# 833-12359 REV.D FIGHTING VIPERS, ROM board ID# 834-12360 */
@@ -5821,14 +5913,14 @@ ROM_START( fvipers ) /* Fighting Vipers Revision D, Model 2B, Sega Game ID# 833-
 	ROM_LOAD32_WORD("mpr-18627.28", 0x800000, 0x200000, CRC(946175a0) SHA1(8b6e5e1342f98c9c6f2f7d61e843275d244f331a) )
 	ROM_LOAD32_WORD("mpr-18625.26", 0x800002, 0x200000, CRC(182fd572) SHA1(b09a682eff7e835ff8c33aaece12f3727a91dd5e) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18628.31", 0x080000,  0x80000, CRC(aa7dd79f) SHA1(d8bd1485273652d7c2a303bbdcdf607d3b530283) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18628.31", 0x000000, 0x080000, CRC(aa7dd79f) SHA1(d8bd1485273652d7c2a303bbdcdf607d3b530283) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18629.32", 0x000000, 0x200000, CRC(5d0006cc) SHA1(f6d2552ffc5473836aafb06735b62f65ef8f5ef5) )
-	ROM_LOAD("mpr-18630.33", 0x200000, 0x200000, CRC(9d405615) SHA1(7e7ffbb4ec080a0815c6ca49b9d8efe1f676203b) )
-	ROM_LOAD("mpr-18631.34", 0x400000, 0x200000, CRC(9dae5b45) SHA1(055ac989eafb81749326520d0be264f7a984c627) )
-	ROM_LOAD("mpr-18632.35", 0x600000, 0x200000, CRC(39da6805) SHA1(9e9523b7c2bc50f869d062f80955da1281951299) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18629.32", 0x000000, 0x200000, CRC(5d0006cc) SHA1(f6d2552ffc5473836aafb06735b62f65ef8f5ef5) )
+	ROM_LOAD16_WORD_SWAP("mpr-18630.33", 0x200000, 0x200000, CRC(9d405615) SHA1(7e7ffbb4ec080a0815c6ca49b9d8efe1f676203b) )
+	ROM_LOAD16_WORD_SWAP("mpr-18631.34", 0x400000, 0x200000, CRC(9dae5b45) SHA1(055ac989eafb81749326520d0be264f7a984c627) )
+	ROM_LOAD16_WORD_SWAP("mpr-18632.35", 0x600000, 0x200000, CRC(39da6805) SHA1(9e9523b7c2bc50f869d062f80955da1281951299) )
 ROM_END
 
 ROM_START( fvipersb ) /* Fighting Vipers Revision B, Model 2B, Sega Game ID# 833-12359 FIGHTING VIPERS, ROM board ID# 834-12360 */
@@ -5880,14 +5972,14 @@ ROM_START( fvipersb ) /* Fighting Vipers Revision B, Model 2B, Sega Game ID# 833
 	ROM_LOAD32_WORD("mpr-18627.28", 0x800000, 0x200000, CRC(946175a0) SHA1(8b6e5e1342f98c9c6f2f7d61e843275d244f331a) )
 	ROM_LOAD32_WORD("mpr-18625.26", 0x800002, 0x200000, CRC(182fd572) SHA1(b09a682eff7e835ff8c33aaece12f3727a91dd5e) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP("epr-18628.31", 0x080000,  0x80000, CRC(aa7dd79f) SHA1(d8bd1485273652d7c2a303bbdcdf607d3b530283) )
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18628.31", 0x000000, 0x080000, CRC(aa7dd79f) SHA1(d8bd1485273652d7c2a303bbdcdf607d3b530283) )
 
-	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-	ROM_LOAD("mpr-18629.32", 0x000000, 0x200000, CRC(5d0006cc) SHA1(f6d2552ffc5473836aafb06735b62f65ef8f5ef5) )
-	ROM_LOAD("mpr-18630.33", 0x200000, 0x200000, CRC(9d405615) SHA1(7e7ffbb4ec080a0815c6ca49b9d8efe1f676203b) )
-	ROM_LOAD("mpr-18631.34", 0x400000, 0x200000, CRC(9dae5b45) SHA1(055ac989eafb81749326520d0be264f7a984c627) )
-	ROM_LOAD("mpr-18632.35", 0x600000, 0x200000, CRC(39da6805) SHA1(9e9523b7c2bc50f869d062f80955da1281951299) )
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18629.32", 0x000000, 0x200000, CRC(5d0006cc) SHA1(f6d2552ffc5473836aafb06735b62f65ef8f5ef5) )
+	ROM_LOAD16_WORD_SWAP("mpr-18630.33", 0x200000, 0x200000, CRC(9d405615) SHA1(7e7ffbb4ec080a0815c6ca49b9d8efe1f676203b) )
+	ROM_LOAD16_WORD_SWAP("mpr-18631.34", 0x400000, 0x200000, CRC(9dae5b45) SHA1(055ac989eafb81749326520d0be264f7a984c627) )
+	ROM_LOAD16_WORD_SWAP("mpr-18632.35", 0x600000, 0x200000, CRC(39da6805) SHA1(9e9523b7c2bc50f869d062f80955da1281951299) )
 ROM_END
 
 ROM_START( daytona ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Model 1 sound board */
@@ -6477,7 +6569,7 @@ ROM_START( vcopa ) /* Virtua Cop Revision A, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-ROM_START( desert ) /* Desert Tank, Model 2 */
+ROM_START( desert ) /* Desert Tank, Model 2, Sega Game ID# 833-11002, ROM board ID# 834-11003 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-16976.12", 0x000000, 0x020000, CRC(d036dff0) SHA1(f3e5f22ef1f3ff9c9a1ff7352cdad3e2c2977a51) )
 	ROM_LOAD32_WORD("epr-16977.13", 0x000002, 0x020000, CRC(e91194bd) SHA1(cec8eb8d4b52c387d5750ee5a0c6e6ce7c0fe80d) )
@@ -6542,13 +6634,57 @@ void model2_state::init_sgt24h()
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
+READ32_MEMBER(model2_state::doa_prot_r)
+{
+	// doa only reads 16-bits at a time, while STV reads 32-bits
+	uint32 ret = 0;
+
+	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r(space,0,0xffff)<<16);
+	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r(space,0,0xffff);
+
+	return ret;
+}
+
+READ32_MEMBER(model2_state::doa_unk_r)
+{
+	uint32_t retval = 0;
+
+	// this actually looks a busy status flag
+	m_prot_a = !m_prot_a;
+	if (m_prot_a)
+		retval = 0xffff;
+	else
+		retval = 0xfff0;
+
+	return retval;
+}
+
+void model2_state::sega_0229_map(address_map &map)
+{
+	// view the protection device has into RAM, this might need endian swapping
+	map(0x000000, 0x007fff).ram().share("protram0229");
+}
+
+/* common map for 0229 protection */
+void model2_state::model2_0229_mem(address_map &map)
+{
+	// the addresses here suggest this is only connected to a 0x8000 byte window, not 0x80000 like ST-V
+	map(0x01d80000, 0x01d87fff).ram().share("protram0229");
+	map(0x01d87ff0, 0x01d87ff3).w(m_0229crypt, FUNC(sega_315_5838_comp_device::srcaddr_w));
+	map(0x01d87ff4, 0x01d87ff7).w(m_0229crypt, FUNC(sega_315_5838_comp_device::data_w_doa));
+	map(0x01d87ff8, 0x01d87ffb).r(FUNC(model2_state::doa_prot_r));
+
+	 // is this protection related? it's in the same ram range but other games with the device don't use the address for any kind of status doesn't access the device otherwise?
+	map(0x01d8400c, 0x01d8400f).r(FUNC(model2_state::doa_unk_r));
+}
+
 void model2_state::init_doa()
 {
-	m_0229crypt->install_doa_protection();
-
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
-	ROM[0x630/4] = 0x08000004;
-	ROM[0x808/4] = 0x08000004;
+	ROM[0x630 / 4] = 0x08000004;
+	ROM[0x808 / 4] = 0x08000004;
+
+	m_0229crypt->set_hack_mode(sega_315_5838_comp_device::HACK_MODE_DOA);
 }
 
 // Model 2 (TGPs, Model 1 sound board)
@@ -6622,6 +6758,7 @@ GAME( 1996, stcca,     stcc,     stcc,         indy500,  model2c_state, empty_in
 GAME( 1996, waverunr,  0,        waverunr,     waverunr, model2c_state, empty_init, ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, bel,       0,        bel,          bel,      model2c_state, empty_init, ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,      0,        hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hotdp,     hotd,     hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead (prototype)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,   0,        overrev2c,    overrev,  model2c_state, empty_init, ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, empty_init, ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,  0,        segawski,     segawski, model2c_state, empty_init, ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

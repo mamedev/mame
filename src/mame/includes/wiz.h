@@ -30,6 +30,14 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void wiz(machine_config &config);
+	void kungfut(machine_config &config);
+	void scion(machine_config &config);
+	void stinger(machine_config &config);
+
+	void init_stinger();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<discrete_device> m_discrete;
@@ -71,8 +79,6 @@ public:
 	DECLARE_WRITE8_MEMBER(stinger_explosion_w);
 	DECLARE_WRITE8_MEMBER(stinger_shot_w);
 
-	void init_stinger();
-
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(wiz);
@@ -83,10 +89,7 @@ public:
 	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank);
-	void wiz(machine_config &config);
-	void kungfut(machine_config &config);
-	void scion(machine_config &config);
-	void stinger(machine_config &config);
+
 	void decrypted_opcodes_map(address_map &map);
 	void kungfut_main_map(address_map &map);
 	void kungfut_sound_map(address_map &map);

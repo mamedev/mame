@@ -66,6 +66,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void mole(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -86,7 +89,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mole(machine_config &config);
 	void mole_map(address_map &map);
 };
 

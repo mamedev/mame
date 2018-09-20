@@ -66,10 +66,10 @@
 	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
 
 #define MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<spectrum_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<spectrum_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &downcast<spectrum_expansion_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	downcast<spectrum_expansion_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

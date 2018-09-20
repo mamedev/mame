@@ -683,7 +683,7 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -918,6 +918,34 @@ ROM_START( tehkanwcd ) // from a 2-PCB set labeled "A-32302 Tehkan" and "B-32302
 	ROM_LOAD( "twc-5.bin",    0x0000, 0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) )
 ROM_END
 
+/* Just a year hack to put "1986" plus some other small changes, but this set has been found on different bootleg TWC PCBs. */
+ROM_START( tehkanwch )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "worldcup_3.bin",   0x0000, 0x4000, CRC(dd3f789b) SHA1(8e616a64d96f62797485c78e9c3f36fa90486e3f) ) // 27128
+	ROM_LOAD( "worldcup_2.bin",   0x4000, 0x4000, CRC(7017a221) SHA1(4b4700af0a6ff64f976db369ba4b9d97cee1fd5f) ) // 27128
+	ROM_LOAD( "worldcup_1.bin",   0x8000, 0x4000, CRC(8b662902) SHA1(13bcd4bf23e34dd7193545561e05bb2cb2c95f9b) ) // 27128
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "worldcup_6.bin",   0x0000, 0x8000, CRC(70a9f883) SHA1(ace04359265271eb37512a89eb0217eb013aecb7) ) // 24256
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "worldcup_5.bin",   0x0000, 0x4000, CRC(e3112be2) SHA1(7859e51b4312dc5df01c88e1d97cf608abc7ca72) ) // 27128
+
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* fg tiles */
+	ROM_LOAD( "worldcup_9.bin",  0x00000, 0x4000, CRC(a9e274f8) SHA1(02b46e1b149a856f0be74a23faaeb792935b66c7) ) // 27128
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD( "worldcup_7.bin",  0x00000, 0x8000, CRC(055a5264) SHA1(fe294ba57c2c858952e2fab0be1b8859730846cb) ) // 24256
+	ROM_LOAD( "worldcup_8.bin",  0x08000, 0x8000, CRC(59faebe7) SHA1(85dad90928369601e039467d575750539410fcf6) ) // 24256
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) /* bg tiles */
+	ROM_LOAD( "worldcup_10.bin", 0x00000, 0x8000, CRC(669389fc) SHA1(a93e8455060ce5242cb65f78e47b4840aa13ab13) ) // 24256
+	ROM_LOAD( "worldcup_11.bin", 0x08000, 0x8000, CRC(4ea7586f) SHA1(fd852c1d5ff09270e398137a7687f68d7256c8a6) ) // 24256
+
+	ROM_REGION( 0x8000, "adpcm", 0 ) /* ADPCM samples */
+	ROM_LOAD( "worldcup_4.bin",  0x0000,  0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) ) // 27128
+ROM_END
+
 ROM_START( gridiron )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gfight1.bin",  0x0000, 0x4000, CRC(51612741) SHA1(a0417a35f0ce51ba7fc81f27b356852a97f52a58) )
@@ -981,5 +1009,6 @@ GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,
 GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
 GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",  MACHINE_SUPPORTS_SAVE )
 GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
 GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, init_teedoff, ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )

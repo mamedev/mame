@@ -402,16 +402,16 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	MCFG_DEVICE_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // type can only be guessed
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gridlee_state, coin_counter_w))
+	LS259(config, m_latch); // type can only be guessed
+	m_latch->q_out_cb<0>().set_output("led0");
+	m_latch->q_out_cb<1>().set_output("led1");
+	m_latch->q_out_cb<2>().set(FUNC(gridlee_state::coin_counter_w));
 	// Q6 unknown - only written to at startup
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gridlee_state, cocktail_flip_w))
+	m_latch->q_out_cb<7>().set(FUNC(gridlee_state::cocktail_flip_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

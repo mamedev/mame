@@ -60,19 +60,19 @@
 //**************************************************************************
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<cpc_expansion_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	downcast<cpc_expansion_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
-	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_reset_callback(DEVCB_##_devcb);
+	downcast<cpc_expansion_slot_device &>(*device).set_out_reset_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(_devcb) \
-	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_romdis_callback(DEVCB_##_devcb);
+	downcast<cpc_expansion_slot_device &>(*device).set_out_romdis_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(_devcb) \
-	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_rom_select_callback(DEVCB_##_devcb);
+	downcast<cpc_expansion_slot_device &>(*device).set_out_rom_select_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

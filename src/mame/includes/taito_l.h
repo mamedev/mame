@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_INCLUDES_TAITO_L_H
+#define MAME_INCLUDES_TAITO_L_H
+
+#pragma once
+
 #include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
@@ -25,6 +30,13 @@ public:
 	{
 	}
 
+	DECLARE_MACHINE_START(taito_l);
+	DECLARE_MACHINE_RESET(taito_l);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+
+	DECLARE_WRITE8_MEMBER(coin_control_w);
+
+protected:
 	static constexpr size_t SPRITERAM_SIZE = 0x400;
 
 	/* memory pointers */
@@ -55,7 +67,7 @@ public:
 	DECLARE_READ8_MEMBER(rombankswitch_r);
 	DECLARE_WRITE8_MEMBER(rambankswitch_w);
 	DECLARE_READ8_MEMBER(rambankswitch_r);
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+
 	DECLARE_WRITE8_MEMBER(mcu_control_w);
 	DECLARE_READ8_MEMBER(mcu_control_r);
 	DECLARE_WRITE8_MEMBER(taitol_bankc_w);
@@ -65,19 +77,17 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	DECLARE_MACHINE_START(taito_l);
 	DECLARE_VIDEO_START(taito_l);
-	DECLARE_MACHINE_RESET(taito_l);
 	u32 screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitol);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void l_system_video(machine_config &config);
 
 	void common_banks_map(address_map &map);
 	void tc0090lvc_map(address_map &map);
-protected:
+
 	virtual void state_register();
 	virtual void taito_machine_reset();
 
@@ -116,6 +126,7 @@ public:
 	void raimais_2_map(address_map &map);
 	void raimais_3_map(address_map &map);
 	void raimais_map(address_map &map);
+
 protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
@@ -213,6 +224,8 @@ public:
 	DECLARE_MACHINE_RESET(palamed);
 	DECLARE_MACHINE_RESET(cachat);
 
+	void base(machine_config &config);
+	void add_muxes(machine_config &config);
 	void palamed(machine_config &config);
 	void plotting(machine_config &config);
 	void puzznici(machine_config &config);
@@ -246,3 +259,5 @@ public:
 	void horshoes(machine_config &config);
 	void horshoes_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITO_L_H

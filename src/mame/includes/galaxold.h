@@ -5,10 +5,10 @@
   Galaxian hardware family (old)
 
   This include file is used by the following drivers:
-    - dambustr.c
-    - galaxold.c
-    - scramble.c
-    - scobra.c
+    - dambustr.cpp
+    - galaxold.cpp
+    - scramble.cpp
+    - scobra.cpp
 
 ***************************************************************************/
 
@@ -290,6 +290,7 @@ public:
 	void scramblb(machine_config &config);
 	void porter(machine_config &config);
 	void scramb2(machine_config &config);
+	void scramb3(machine_config &config);
 	void ozon1(machine_config &config);
 	void mooncrst(machine_config &config);
 	void guttang(machine_config &config);
@@ -317,10 +318,12 @@ public:
 	void mooncrst_map(address_map &map);
 	void ozon1_io_map(address_map &map);
 	void ozon1_map(address_map &map);
-	void racknrol(address_map &map);
+	void racknrol_map(address_map &map);
 	void racknrol_io(address_map &map);
 	void rockclim_map(address_map &map);
+	void scramb_common_map(address_map &map);
 	void scramb2_map(address_map &map);
+	void scramb3_map(address_map &map);
 	void scramblb_map(address_map &map);
 	void scrambler_map(address_map &map);
 	void spcwarp(address_map &map);

@@ -40,6 +40,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void quizo(machine_config &config);
+
+	void init_quizo();
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -50,11 +55,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 
-	void init_quizo();
 	DECLARE_PALETTE_INIT(quizo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void quizo(machine_config &config);
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };

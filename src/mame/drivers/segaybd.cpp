@@ -1287,20 +1287,20 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("backupram")
+	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MB3773_ADD("watchdog") // IC95
+	MB3773(config, "watchdog"); // IC95
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, MASTER_CLOCK/8)
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("GENERAL"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("LIMITSW"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segaybd_state, output1_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, segaybd_state, misc_output_w))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segaybd_state, output2_w))
+	sega_315_5296_device &io(SEGA_315_5296(config, "io", MASTER_CLOCK/8));
+	io.in_pa_callback().set_ioport("P1");
+	io.in_pb_callback().set_ioport("GENERAL");
+	io.in_pc_callback().set_ioport("LIMITSW");
+	io.out_pd_callback().set(FUNC(segaybd_state::output1_w));
+	io.out_pe_callback().set(FUNC(segaybd_state::misc_output_w));
+	io.in_pf_callback().set_ioport("DSW");
+	io.in_pg_callback().set_ioport("COINAGE");
+	io.out_ph_callback().set(FUNC(segaybd_state::output2_w));
 	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
 	MCFG_DEVICE_ADD("adc", MSM6253, 0)
@@ -1363,9 +1363,9 @@ MACHINE_CONFIG_START(segaybd_state::yboard_link)
 	MCFG_DEVICE_PROGRAM_MAP(link_map)
 	MCFG_DEVICE_IO_MAP(link_portmap)
 
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intr))
+	mb8421_device &mb8421(MB8421(config, "mb8421"));
+	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));
+	mb8421.intr_callback().set(FUNC(segaybd_state::mb8421_intr));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)

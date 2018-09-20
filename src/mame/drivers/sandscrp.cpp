@@ -100,6 +100,9 @@ public:
 		, m_audiobank(*this, "audiobank")
 		{ }
 
+	void sandscrp(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
@@ -130,7 +133,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
-	void sandscrp(machine_config &config);
 	void sandscrp(address_map &map);
 	void sandscrp_soundmem(address_map &map);
 	void sandscrp_soundport(address_map &map);
@@ -476,8 +478,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_DEVICE_PROGRAM_MAP(sandscrp_soundmem)
 	MCFG_DEVICE_IO_MAP(sandscrp_soundport)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

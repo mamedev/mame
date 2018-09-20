@@ -37,31 +37,31 @@
 	downcast<mc6845_device &>(*device).set_char_width(_pixels);
 
 #define MCFG_MC6845_RECONFIGURE_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_reconfigure_callback(mc6845_device::reconfigure_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<mc6845_device &>(*device).set_reconfigure_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_MC6845_BEGIN_UPDATE_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_begin_update_callback(mc6845_device::begin_update_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<mc6845_device &>(*device).set_begin_update_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_MC6845_UPDATE_ROW_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_update_row_callback(mc6845_device::update_row_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<mc6845_device &>(*device).set_update_row_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_MC6845_END_UPDATE_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_end_update_callback(mc6845_device::end_update_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<mc6845_device &>(*device).set_end_update_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_MC6845_ADDR_CHANGED_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_on_update_addr_change_callback(mc6845_device::on_update_addr_changed_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<mc6845_device &>(*device).set_on_update_addr_change_callback(&_class::_method, #_class "::" #_method, this);
 
 #define MCFG_MC6845_OUT_DE_CB(_write) \
-	devcb = &downcast<mc6845_device &>(*device).set_out_de_callback(DEVCB_##_write);
+	downcast<mc6845_device &>(*device).set_out_de_callback(DEVCB_##_write);
 
 #define MCFG_MC6845_OUT_CUR_CB(_write) \
-	devcb = &downcast<mc6845_device &>(*device).set_out_cur_callback(DEVCB_##_write);
+	downcast<mc6845_device &>(*device).set_out_cur_callback(DEVCB_##_write);
 
 #define MCFG_MC6845_OUT_HSYNC_CB(_write) \
-	devcb = &downcast<mc6845_device &>(*device).set_out_hsync_callback(DEVCB_##_write);
+	downcast<mc6845_device &>(*device).set_out_hsync_callback(DEVCB_##_write);
 
 #define MCFG_MC6845_OUT_VSYNC_CB(_write) \
-	devcb = &downcast<mc6845_device &>(*device).set_out_vsync_callback(DEVCB_##_write);
+	downcast<mc6845_device &>(*device).set_out_vsync_callback(DEVCB_##_write);
 
 
 /* callback definitions */
@@ -101,16 +101,20 @@ public:
 	}
 	void set_char_width(int pixels) { m_hpixels_per_column = pixels; }
 
-	template <typename Object> void set_reconfigure_callback(Object &&cb) { m_reconfigure_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_begin_update_callback(Object &&cb) { m_begin_update_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_update_row_callback(Object &&cb) { m_update_row_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_end_update_callback(Object &&cb) { m_end_update_cb = std::forward<Object>(cb); }
-	template <typename Object> void set_on_update_addr_change_callback(Object &&cb) { m_on_update_addr_changed_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb = reconfigure_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb = begin_update_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb = update_row_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb = end_update_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_on_update_addr_change_callback(T &&... args) { m_on_update_addr_changed_cb = on_update_addr_changed_delegate(std::forward<T>(args)...); }
 
 	template <class Object> devcb_base &set_out_de_callback(Object &&cb) { return m_out_de_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_cur_callback(Object &&cb) { return m_out_cur_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_hsync_callback(Object &&cb) { return m_out_hsync_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_vsync_callback(Object &&cb) { return m_out_vsync_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_de_callback() { return m_out_de_cb.bind(); }
+	auto out_cur_callback() { return m_out_cur_cb.bind(); }
+	auto out_hsync_callback() { return m_out_hsync_cb.bind(); }
+	auto out_vsync_callback() { return m_out_vsync_cb.bind(); }
 
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w ) { write_address(data); }

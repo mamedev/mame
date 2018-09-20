@@ -34,6 +34,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void summit(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
 	DECLARE_WRITE8_MEMBER(out_w);
@@ -43,7 +46,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void summit(machine_config &config);
 	void mainmap(address_map &map);
 };
 

@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 // PINBALL
 // Skeleton driver for early Inder pinballs on "Indertronic B-1" hardware.
-// Known pinballs to be dumped: Topaz (1979), Skateboard (1980)
+// Known pinballs to be dumped: Skateboard (1980)
 // Hardware listing and ROM definitions from PinMAME.
 
 /*
@@ -32,13 +32,15 @@ public:
 		, m_inputs(*this, "SW.%u", 0)
 		{ }
 
+	void inderp(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_WRITE8_MEMBER(inputs_w);
 	DECLARE_READ8_MEMBER(inputs_r);
 
-	void inderp(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_inputs;
 	u8 m_inbank;
@@ -230,6 +232,13 @@ ROM_START(centauri2)
 	ROM_RELOAD(0x1400, 0x0400)
 ROM_END
 
+ROM_START(topaz)
+	ROM_REGION(0x1800, "roms", 0)
+	ROM_LOAD("topaz0.bin", 0x0400, 0x0400, CRC(d047aee0) SHA1(b2bc2e9fb088006fd3b7eb080feaa1eac479af58))
+	ROM_LOAD("topaz1.bin", 0x0800, 0x0400, CRC(72a423c2) SHA1(e3ba5d581739fc0871901f861a7692fd86e0f6aa))
+	ROM_LOAD("topaz2.bin", 0x0c00, 0x0400, CRC(b8d2e7c6) SHA1(e19bec04fab15536fea51c4298c6a4cb3817630c))
+ROM_END
 
 GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, topaz,     0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Topaz (Inder)",           MACHINE_IS_SKELETON_MECHANICAL )

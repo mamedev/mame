@@ -213,7 +213,6 @@
 #include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
-#include "machine/atari_vg.h"
 #include "sound/pokey.h"
 #include "screen.h"
 #include "speaker.h"
@@ -239,6 +238,12 @@ void redbaron_state::machine_start()
 {
 	bzone_state::machine_start();
 	save_item(NAME(m_rb_input_select));
+}
+
+
+void redbaron_state::machine_reset()
+{
+	earom_control_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -297,6 +302,32 @@ WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
 
 /*************************************
  *
+ *  Red Baron EAROM
+ *
+ *************************************/
+
+READ8_MEMBER(redbaron_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(redbaron_state::earom_write)
+{
+	m_earom->set_address((offset ^ 0x20) & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(redbaron_state::earom_control_w)
+{
+	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
+}
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -339,9 +370,9 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x1806, 0x1806).r("mathbox", FUNC(mathbox_device::hi_r));
 	map(0x1808, 0x1808).w(FUNC(redbaron_state::redbaron_joysound_w));  /* and select joystick pot also */
 	map(0x180a, 0x180a).nopw();                /* sound reset, yet todo */
-	map(0x180c, 0x180c).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
+	map(0x180c, 0x180c).w(FUNC(redbaron_state::earom_control_w));
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1820, 0x185f).rw("earom", FUNC(atari_vg_earom_device::read), FUNC(atari_vg_earom_device::write));
+	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
 	map(0x1860, 0x187f).w("mathbox", FUNC(mathbox_device::go_w));
 	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x7fff).rom();
@@ -545,7 +576,7 @@ MACHINE_CONFIG_START(bzone_state::bzone_base)
 	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -580,7 +611,7 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(redbaron_map)
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	MCFG_DEVICE_ADD("earom", ER2055)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

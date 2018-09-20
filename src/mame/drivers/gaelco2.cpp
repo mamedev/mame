@@ -710,14 +710,14 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_DEVICE_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
+	EEPROM_93C66_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
+	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));   /* EEPROM data */
+	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));  /* EEPROM serial clock */
+	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));   /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -1256,17 +1256,17 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_DEVICE_PROGRAM_MAP(touchgo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC6
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco2_state, coin3_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco2_state, coin4_counter_w))
+	LS259(config, m_mainlatch); // IC6
+	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(gaelco2_state::coin3_counter_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(gaelco2_state::coin4_counter_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1560,14 +1560,14 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
+	EEPROM_93C66_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
+	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));   /* EEPROM data */
+	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));  /* EEPROM serial clock */
+	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));   /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -1603,14 +1603,14 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_16BIT)
+	EEPROM_93C66_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
+	m_mainlatch->q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));   /* EEPROM data */
+	m_mainlatch->q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));  /* EEPROM serial clock */
+	m_mainlatch->q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));   /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -1852,17 +1852,17 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(26'000'000) / 2) /* 13 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
+	LS259(config, m_mainlatch); // IC6
+	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(wrally2_state::wrally2_adc_clk));   /* ADCs clock-in line */
+	m_mainlatch->q_out_cb<6>().set(FUNC(wrally2_state::wrally2_adc_cs));    /* ADCs chip select line */
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)

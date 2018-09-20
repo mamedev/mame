@@ -21,6 +21,15 @@ public:
 		m_tms(*this, "tms"),
 		m_palette(*this, "palette") { }
 
+	void natodef(machine_config &config);
+	void sharkatt(machine_config &config);
+	void thief(machine_config &config);
+
+	void init_thief();
+
+	DECLARE_WRITE_LINE_MEMBER(slam_w);
+
+private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_input_select;
 	uint8_t m_read_mask;
@@ -41,10 +50,9 @@ public:
 	DECLARE_READ8_MEMBER(thief_coprocessor_r);
 	DECLARE_WRITE8_MEMBER(thief_coprocessor_w);
 	DECLARE_WRITE8_MEMBER(tape_control_w);
-	void init_thief();
 	virtual void video_start() override;
 	uint32_t screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(slam_w);
+
 	IRQ_CALLBACK_MEMBER(iack);
 	uint16_t fetch_image_addr( coprocessor_t &thief_coprocessor );
 	void tape_set_audio( int track, int bOn );
@@ -53,9 +61,7 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<tms9927_device> m_tms;
 	required_device<palette_device> m_palette;
-	void natodef(machine_config &config);
-	void sharkatt(machine_config &config);
-	void thief(machine_config &config);
+
 	void io_map(address_map &map);
 	void sharkatt_main_map(address_map &map);
 	void thief_main_map(address_map &map);

@@ -84,6 +84,9 @@ public:
 		m_audio(0x00)
 	{}
 
+	void mmagic(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(ball_x_w);
 	DECLARE_WRITE8_MEMBER(ball_y_w);
@@ -92,13 +95,11 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mmagic(machine_config &config);
 	void mmagic_io(address_map &map);
 	void mmagic_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

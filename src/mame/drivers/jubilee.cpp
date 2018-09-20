@@ -217,6 +217,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void jubileep(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
@@ -224,11 +227,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
-	void jubileep(machine_config &config);
 	void jubileep_cru_map(address_map &map);
 	void jubileep_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
@@ -672,10 +673,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(jubilee_state::jubileep)
 
 	// Main CPU TMS9980A, no line connections.
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
+	TMS9980A(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jubilee_state::jubileep_map);
+	m_maincpu->set_addrmap(AS_IO, &jubilee_state::jubileep_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jubilee_state::jubileep_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("videoworkram")
+	NVRAM(config, "videoworkram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

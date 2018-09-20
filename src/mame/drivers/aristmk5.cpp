@@ -483,6 +483,19 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	 { }
 
+	void aristmk5(machine_config &config);
+	void aristmk5_touch(machine_config &config);
+	void aristmk5_usa(machine_config &config);
+	void aristmk5_usa_touch(machine_config &config);
+
+	void init_aristmk5();
+
+	INPUT_CHANGED_MEMBER(coin_start);
+	CUSTOM_INPUT_MEMBER(coin_r);
+	CUSTOM_INPUT_MEMBER(coin_usa_r);
+	CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
 	DECLARE_WRITE32_MEMBER(Ns5w48);
 	DECLARE_READ32_MEMBER(Ns5x58);
 	DECLARE_READ32_MEMBER(Ns5r50);
@@ -507,18 +520,6 @@ public:
 	DECLARE_READ8_MEMBER(spi_data_r);
 	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
 
-	void init_aristmk5();
-	void aristmk5(machine_config &config);
-	void aristmk5_touch(machine_config &config);
-	void aristmk5_usa(machine_config &config);
-	void aristmk5_usa_touch(machine_config &config);
-
-	INPUT_CHANGED_MEMBER(coin_start);
-	CUSTOM_INPUT_MEMBER(coin_r);
-	CUSTOM_INPUT_MEMBER(coin_usa_r);
-	CUSTOM_INPUT_MEMBER(hopper_r);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
@@ -535,7 +536,6 @@ protected:
 	uint64_t        m_coin_start_cycles;
 	uint8_t         m_coin_div;
 
-private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
 	required_device<nvram_device> m_nvram;
@@ -2039,8 +2039,7 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 	MCFG_DEVICE_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
 	MCFG_DEVICE_PROGRAM_MAP(aristmk5_drame_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2));  /* 1.6 - 2 seconds */
 
 	/* TODO: this isn't supposed to access a keyboard ... */
 	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
@@ -2054,34 +2053,34 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_DEVICE_ADD("eeprom0", EEPROM_SERIAL_93C56_16BIT)
-	MCFG_DEVICE_ADD("eeprom1", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom0");
+	EEPROM_93C56_16BIT(config, "eeprom1");
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// TL16C452FN U71
-	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<0>))
-	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<1>))
+	ns16450_device &uart0a(NS16450(config, "uart_0a", MASTER_CLOCK / 9));
+	uart0a.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<0>));
+	ns16450_device &uart0b(NS16450(config, "uart_0b", MASTER_CLOCK / 9));
+	uart0b.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<1>));
 
 	// TL16C452FN U72
-	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<2>))
-	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<3>))
+	ns16450_device &uart1a(NS16450(config, "uart_1a", MASTER_CLOCK / 9));
+	uart1a.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<2>));
+	ns16450_device &uart1b(NS16450(config, "uart_1b", MASTER_CLOCK / 9));
+	uart1b.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<3>));
 
 	// COMM port 4 - 5
-	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_2b", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
+	NS16450(config, "uart_2a", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<4>));
+	NS16450(config, "uart_2b", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<5>));
 
 	// COMM port 6 - 7
-	MCFG_DEVICE_ADD("uart_3a", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
+	NS16450(config, "uart_3a", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<6>));
+	NS16450(config, "uart_3b", MASTER_CLOCK / 9);
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<7>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("uart_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, aristmk5_state, uart_irq_callback))
@@ -2113,8 +2112,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
 	aristmk5(config);
-	MCFG_DEVICE_MODIFY("uart_0a")
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	subdevice<ns16450_device>("uart_0a")
+			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
@@ -2127,8 +2126,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
 	aristmk5_usa(config);
-	MCFG_DEVICE_MODIFY("uart_0a")
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	subdevice<ns16450_device>("uart_0a")
+			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
@@ -4317,7 +4316,7 @@ ROM_START( jumpjoey )
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100383v.u7",  0x000000, 0x80000, CRC(9ce4ce4a) SHA1(cde42dc82432baba4c6471cb57be89c0f27ed520) )
-	ROM_LOAD32_WORD( "0100383v.u11", 0x000002, 0x80000, CRC(b67419d0) SHA1(3107d3fd852faB15e8a72850c984b74e522d91cc) )
+	ROM_LOAD32_WORD( "0100383v.u11", 0x000002, 0x80000, CRC(b67419d0) SHA1(3107d3fd852fab15e8a72850c984b74e522d91cc) )
 	ROM_LOAD32_WORD( "0100383v.u8",  0x100000, 0x80000, CRC(94b94149) SHA1(239b510c3ebe9114c27cd7b85fb8f0f5b7b55009) )
 	ROM_LOAD32_WORD( "0100383v.u12", 0x100002, 0x80000, CRC(defce2e9) SHA1(95f88f8647c52f99dceb4920780696d7f7c1c24b) )
 

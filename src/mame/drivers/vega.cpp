@@ -115,6 +115,11 @@ public:
 	{
 	}
 
+	void vega(machine_config &config);
+
+	void init_vega();
+
+private:
 	required_device<cpu_device>     m_maincpu;
 	required_device<i8255_device>   m_i8255;
 	required_device<ins8154_device> m_ins8154;
@@ -161,15 +166,11 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_pb_r);
 	DECLARE_WRITE8_MEMBER(ay8910_pb_w);
 
-	void init_vega();
-
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(vega);
 	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vega(machine_config &config);
 	void vega_io_map(address_map &map);
 	void vega_map(address_map &map);
 };
@@ -807,19 +808,19 @@ MACHINE_CONFIG_START(vega_state::vega)
 	MCFG_MCS48_PORT_PROG_OUT_CB(NOOP) /* prog - inputs CLK */
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, vega_state, txtram_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vega_state, txtram_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vega_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, vega_state, randomizer))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vega_state, ppi_pc_w))
+	I8255A(config, m_i8255);
+	m_i8255->in_pa_callback().set(FUNC(vega_state::txtram_r));
+	m_i8255->in_pb_callback().set_ioport("IN0");
+	m_i8255->in_pc_callback().set(FUNC(vega_state::randomizer));
+	m_i8255->out_pa_callback().set(FUNC(vega_state::txtram_w));
+	m_i8255->out_pb_callback().set(FUNC(vega_state::ppi_pb_w));
+	m_i8255->out_pc_callback().set(FUNC(vega_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD( "ins8154", INS8154, 0 )
-	MCFG_INS8154_IN_A_CB(READ8(*this, vega_state, ins8154_pa_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(*this, vega_state, ins8154_pa_w))
-	MCFG_INS8154_IN_B_CB(READ8(*this, vega_state, ins8154_pb_r))
-	MCFG_INS8154_OUT_B_CB(WRITE8(*this, vega_state, ins8154_pb_w))
+	INS8154(config, m_ins8154);
+	m_ins8154->in_a().set(FUNC(vega_state::ins8154_pa_r));
+	m_ins8154->out_a().set(FUNC(vega_state::ins8154_pa_w));
+	m_ins8154->in_b().set(FUNC(vega_state::ins8154_pb_r));
+	m_ins8154->out_b().set(FUNC(vega_state::ins8154_pb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

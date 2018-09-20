@@ -100,8 +100,8 @@ void efo_zsu_device::zsu_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	map(0x00, 0x03).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x04, 0x07).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x00, 0x03).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x04, 0x07).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	map(0x08, 0x08).w(FUNC(efo_zsu_device::adpcm_fifo_w));
 
@@ -111,7 +111,7 @@ void efo_zsu_device::zsu_io(address_map &map)
 	map(0x10, 0x10).w("aysnd1", FUNC(ay8910_device::address_w));
 	map(0x11, 0x11).w("aysnd1", FUNC(ay8910_device::data_w));
 
-	map(0x14, 0x14).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x14, 0x14).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 }
 
@@ -191,31 +191,31 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 
 
 MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(zsu_map)
-	MCFG_DEVICE_IO_MAP(zsu_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	z80_device& soundcpu(Z80(config, "soundcpu", 4000000));
+	soundcpu.set_addrmap(AS_PROGRAM, &efo_zsu_device::zsu_map);
+	soundcpu.set_addrmap(AS_IO, &efo_zsu_device::zsu_io);
+	soundcpu.set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc0", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, efo_zsu_device, ctc0_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, efo_zsu_device, ctc0_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, efo_zsu_device, ctc0_z2_w))
+	Z80CTC(config, m_ctc0, 4000000);
+	m_ctc0->intr_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
+	m_ctc0->zc_callback<0>().set(FUNC(efo_zsu_device::ctc0_z0_w));
+	m_ctc0->zc_callback<1>().set(FUNC(efo_zsu_device::ctc0_z1_w));
+	m_ctc0->zc_callback<2>().set(FUNC(efo_zsu_device::ctc0_z2_w));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(WRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, efo_zsu_device, ctc1_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, efo_zsu_device, ctc1_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, efo_zsu_device, ctc1_z2_w))
+	Z80CTC(config, m_ctc1, 4000000);
+	m_ctc1->intr_callback().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	m_ctc1->zc_callback<0>().set(FUNC(efo_zsu_device::ctc1_z0_w));
+	m_ctc1->zc_callback<1>().set(FUNC(efo_zsu_device::ctc1_z1_w));
+	m_ctc1->zc_callback<2>().set(FUNC(efo_zsu_device::ctc1_z2_w));
 
 #if 0 // does nothing useful now
-	MCFG_DEVICE_ADD("ck1mhz", CLOCK, 4000000/4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc1", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg2))
+	clock_device &ck1mhz(CLOCK(config, "ck1mhz", 4000000/4);
+	ck1mhz.signal_handler().set(m_ctc1, FUNC(z80ctc_device::trg0));
+	ck1mhz.signal_handler().append(m_ctc1, FUNC(z80ctc_device::trg1));
+	ck1mhz.signal_handler().append(m_ctc1, FUNC(z80ctc_device::trg2));
 #endif
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<2>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq") // 74HC03 NAND gate
@@ -223,19 +223,19 @@ MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd0", AY8910, 4000000/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(MEMBANK("rombank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &aysnd0(AY8910(config, "aysnd0", 4000000/2));
+	aysnd0.port_a_write_callback().set_membank("rombank").mask(0x03);
+	aysnd0.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 4000000/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, efo_zsu_device, ay1_porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 4000000/2));
+	aysnd1.port_a_write_callback().set(FUNC(efo_zsu_device::ay1_porta_w));
+	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("fifo", CD40105, 0)
+	MCFG_DEVICE_ADD(m_fifo, CD40105, 0)
 	MCFG_40105_DATA_OUT_READY_CB(WRITELINE(*this, efo_zsu_device, fifo_dor_w))
-	MCFG_40105_DATA_OUT_CB(WRITE8("adpcm", msm5205_device, data_w))
+	MCFG_40105_DATA_OUT_CB(WRITE8(m_adpcm, msm5205_device, data_w))
 
-	MCFG_DEVICE_ADD("adpcm", MSM5205, 4000000/8)
+	MCFG_DEVICE_ADD(m_adpcm, MSM5205, 4000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

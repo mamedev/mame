@@ -18,7 +18,6 @@
 #include "machine/ram.h"
 #include "video/hd44780.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 class alphasmart_state : public driver_device
@@ -37,6 +36,11 @@ public:
 	{
 	}
 
+	void alphasmart(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
 	required_device<hd44780_device> m_lcdc1;
@@ -51,7 +55,6 @@ public:
 	DECLARE_PALETTE_INIT(alphasmart);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_READ8_MEMBER(kb_r);
 	DECLARE_WRITE8_MEMBER(kb_matrixl_w);
 	DECLARE_WRITE8_MEMBER(kb_matrixh_w);
@@ -61,10 +64,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port_d_w);
 	void update_lcdc(address_space &space, bool lcdc0, bool lcdc1);
 
-	void alphasmart(machine_config &config);
 	void alphasmart_io(address_map &map);
 	void alphasmart_mem(address_map &map);
-protected:
+
 	uint8_t           m_matrix[2];
 	uint8_t           m_port_a;
 	uint8_t           m_port_d;
@@ -80,15 +82,17 @@ public:
 	{
 	}
 
+	void asma2k(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_intram;
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
 
-	void asma2k(machine_config &config);
 	void asma2k_mem(address_map &map);
-private:
+
 	uint8_t m_lcd_ctrl;
 };
 
@@ -439,8 +443,7 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	MCFG_KS0066_F05_ADD("ks0066_1")
 	MCFG_HD44780_LCD_SIZE(2, 40)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -453,9 +456,8 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(asma2k_state::asma2k)

@@ -498,8 +498,9 @@ private:
 		uint8_t buffer_out[32768];
 		int buffer_out_used;
 		int buffer_out_packets;
-		jvs_master *master;
 	} jvs;
+
+	required_device<jvs_master> m_jvs_master;
 };
 
 DEFINE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device, "ohci_hlean2131qc", "OHCI an2131qc HLE")
@@ -561,14 +562,22 @@ DEFINE_DEVICE_TYPE(OHCI_HLEAN2131SC, ohci_hlean2131sc_device, "ohci_hlean2131sc"
 
 class chihiro_state : public xbox_base_state
 {
-public:
-	chihiro_state(const machine_config &mconfig, device_type type, const char *tag) :
-		xbox_base_state(mconfig, type, tag),
-		hack_index(-1),
-		hack_counter(0),
-		dimm_board_memory(nullptr),
-		dimm_board_memory_size(0) { }
+	friend class ide_baseboard_device;
 
+public:
+	chihiro_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xbox_base_state(mconfig, type, tag)
+		, m_ide(*this, "ide")
+		, m_dimmboard(*this, "rom_board")
+		, m_hack_index(-1)
+		, m_hack_counter(0)
+		, m_dimm_board_memory(nullptr)
+		, m_dimm_board_memory_size(0) { }
+
+	void chihirogd(machine_config &config);
+	void chihiro_base(machine_config &config);
+
+private:
 	DECLARE_READ32_MEMBER(mediaboard_r);
 	DECLARE_WRITE32_MEMBER(mediaboard_w);
 
@@ -580,22 +589,20 @@ public:
 	virtual void hack_eeprom() override;
 	virtual void hack_usb() override;
 
-	struct chihiro_devices {
-		bus_master_ide_controller_device    *ide;
-		naomi_gdrom_board *dimmboard;
-	} chihiro_devs;
-	int hack_index;
-	int hack_counter;
-	uint8_t *dimm_board_memory;
-	uint32_t dimm_board_memory_size;
+	// devices
+	optional_device<bus_master_ide_controller_device> m_ide;
+	optional_device<naomi_gdrom_board> m_dimmboard;
+
+	int m_hack_index;
+	int m_hack_counter;
+	uint8_t *m_dimm_board_memory;
+	uint32_t m_dimm_board_memory_size;
 
 	static void an2131qc_configuration(device_t *device);
 	static void an2131sc_configuration(device_t *device);
-	void chihirogd(machine_config &config);
-	void chihiro_base(machine_config &config);
 	void chihiro_map(address_map &map);
 	void chihiro_map_io(address_map &map);
-private:
+
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
 	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
 	void chihiro_help_command(int ref, const std::vector<std::string> &params);
@@ -776,8 +783,8 @@ void chihiro_state::hack_usb()
 {
 	int p;
 
-	if (hack_counter == 1)
-		p = hack_index; // need to patch the game
+	if (m_hack_counter == 1)
+		p = m_hack_index; // need to patch the game
 	else
 		p = -1;
 	if (p >= 0) {
@@ -787,7 +794,7 @@ void chihiro_state::hack_usb()
 			m_maincpu->space(0).write_byte(hacks[p].modify[a].address, hacks[p].modify[a].write_byte);
 		}
 	}
-	hack_counter++;
+	m_hack_counter++;
 }
 
 //**************************************************************************
@@ -812,10 +819,11 @@ const uint8_t ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const uint8_t ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
 
-ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, OHCI_HLEAN2131QC, tag, owner, clock),
-	ohci_function(),
-	device_slot_card_interface(mconfig, *this)
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, OHCI_HLEAN2131QC, tag, owner, clock)
+	, ohci_function()
+	, device_slot_card_interface(mconfig, *this)
+	, m_jvs_master(*this, "^^^^jvs_master")
 {
 	maximum_send = 0;
 	region_tag = nullptr;
@@ -824,7 +832,6 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 	jvs.buffer_in_expected = 0;
 	jvs.buffer_out_used = 0;
 	jvs.buffer_out_packets = 0;
-	jvs.master = nullptr;
 }
 
 void ohci_hlean2131qc_device::initialize(running_machine &machine)
@@ -847,7 +854,6 @@ void ohci_hlean2131qc_device::initialize(running_machine &machine)
 	add_string_descriptor(strdesc0);
 	add_string_descriptor(strdesc1);
 	add_string_descriptor(strdesc2);
-	jvs.master = machine.device<jvs_master>("jvs_master");
 }
 
 void ohci_hlean2131qc_device::set_region_base(uint8_t *data)
@@ -873,7 +879,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
-	sense = jvs.master->get_sense_line();
+	sense = m_jvs_master->get_sense_line();
 	if (sense == 25)
 		sense = 3;
 	else
@@ -1091,11 +1097,11 @@ void ohci_hlean2131qc_device::process_jvs_packet()
 			continue;
 		}
 		// use data of this packet
-		jvs.master->send_packet(dest, len, jvs.buffer_in + p);
+		m_jvs_master->send_packet(dest, len, jvs.buffer_in + p);
 		// generate response
 		if (dest == 0xff)
 			dest = 0;
-		int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
+		int recv = m_jvs_master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
 		// update buffer_out
 		if (recv > 0)
 		{
@@ -1142,10 +1148,10 @@ const uint8_t ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const uint8_t ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
 
-ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, OHCI_HLEAN2131SC, tag, owner, clock),
-	ohci_function(),
-	device_slot_card_interface(mconfig, *this)
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, OHCI_HLEAN2131SC, tag, owner, clock)
+	, ohci_function()
+	, device_slot_card_interface(mconfig, *this)
 {
 	region = nullptr;
 	region_tag = nullptr;
@@ -1666,8 +1672,8 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
 {
 	// return pointer to memory containing decrypted gdrom data (contains an image of a fatx partition)
-	if (chihiro_devs.dimmboard != nullptr)
-		return dimm_board_memory + lba * 512;
+	if (m_dimmboard.found())
+		return &m_dimm_board_memory[lba * 512];
 	return nullptr;
 }
 
@@ -1774,25 +1780,24 @@ static INPUT_PORTS_START(chihiro)
 void chihiro_state::machine_start()
 {
 	xbox_base_state::machine_start();
-	chihiro_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
-	chihiro_devs.dimmboard = machine().device<naomi_gdrom_board>("rom_board");
-	if (chihiro_devs.dimmboard != nullptr) {
-		dimm_board_memory = chihiro_devs.dimmboard->memory(dimm_board_memory_size);
-	}
+
+	if (m_dimmboard.found())
+		m_dimm_board_memory = m_dimmboard->memory(m_dimm_board_memory_size);
+
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));
 	}
-	hack_index = -1;
+	m_hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)
 		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
-			hack_index = a;
+			m_hack_index = a;
 			break;
 		}
-	hack_counter = 0;
+	m_hack_counter = 0;
 	// savestates
-	save_item(NAME(hack_counter));
+	save_item(NAME(m_hack_counter));
 }
 
 class sega_network_board : public device_t
@@ -1855,7 +1860,7 @@ MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	MCFG_DEVICE_PROGRAM_MAP(chihiro_map)
 	MCFG_DEVICE_IO_MAP(chihiro_map_io)
 
-	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, nullptr, "bb", true)
+	//BUS_MASTER_IDE_CONTROLLER(config, "ide").options(ide_baseboard, nullptr, "bb", true);
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
@@ -2351,9 +2356,9 @@ ROM_START( qofd3 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "cdv-10026d", 0, SHA1(b079778f7837100a9b4fa2a536a4efc7817dd2d2) )  // DVD
 
-	// satellite Chihiro security PIC is missing
+	// satellite Chihiro security PIC, label is unknown
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, NO_DUMP )
+	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, CRC(bacf6f52) SHA1(72892aba23a540c02d3260be8c68d2b3fa45bdae) )
 
 	// "Quest of D Ver. 3.0"
 	// CD QOD3 VERSION UPDATE

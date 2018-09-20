@@ -27,16 +27,16 @@
 	downcast<dio32_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
-	devcb = &downcast<dio16_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
+	downcast<dio16_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ4_CB(_devcb) \
-	devcb = &downcast<dio16_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
+	downcast<dio16_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ5_CB(_devcb) \
-	devcb = &downcast<dio16_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
+	downcast<dio16_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ6_CB(_devcb) \
-	devcb = &downcast<dio16_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
+	downcast<dio16_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

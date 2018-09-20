@@ -72,6 +72,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
+	void itgambl2(machine_config &config);
+
+private:
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
@@ -81,7 +84,6 @@ public:
 	uint32_t screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void itgambl2(machine_config &config);
 	void itgambl2_map(address_map &map);
 };
 

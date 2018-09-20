@@ -5,6 +5,10 @@
     nbmj9195 - Nichibutsu Mahjong games for years 1991-1995
 
 ******************************************************************************/
+#ifndef MAME_INCLUDES_NBMJ9195_H
+#define MAME_INCLUDES_NBMJ9195_H
+
+#pragma once
 
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/nb1413m3.h"      // needed for mahjong input controller
@@ -26,8 +30,8 @@ public:
 		TIMER_BLITTER
 	};
 
-	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -35,6 +39,42 @@ public:
 		m_palette_ptr(*this, "paletteram")
 	{ }
 
+	void NBMJDRV1_base(machine_config &config);
+	void NBMJDRV1(machine_config &config);
+	void NBMJDRV2(machine_config &config);
+	void NBMJDRV3(machine_config &config);
+	void patimono(machine_config &config);
+	void mjuraden(machine_config &config);
+	void psailor1(machine_config &config);
+	void ngpgal(machine_config &config);
+	void mjgottsu(machine_config &config);
+	void mkeibaou(machine_config &config);
+	void gal10ren(machine_config &config);
+	void mscoutm(machine_config &config);
+	void imekura(machine_config &config);
+	void mkoiuraa(machine_config &config);
+	void mjkoiura(machine_config &config);
+	void janbari(machine_config &config);
+	void mjlaman(machine_config &config);
+	void yosimotm(machine_config &config);
+	void cmehyou(machine_config &config);
+	void sailorwr(machine_config &config);
+	void koinomp(machine_config &config);
+	void sailorws(machine_config &config);
+	void mjegolf(machine_config &config);
+	void renaiclb(machine_config &config);
+	void psailor2(machine_config &config);
+	void yosimoto(machine_config &config);
+	void pachiten(machine_config &config);
+	void jituroku(machine_config &config);
+	void mmehyou(machine_config &config);
+	void bakuhatu(machine_config &config);
+	void ultramhm(machine_config &config);
+	void otatidai(machine_config &config);
+
+	void init_nbmj9195();
+
+private:
 	required_device<tmpz84c011_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -98,7 +138,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dipswbitsel_w);
 	DECLARE_WRITE8_MEMBER(mscoutm_inputportsel_w);
 
-	void init_nbmj9195();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -115,38 +154,6 @@ public:
 	int dipsw_r();
 	void postload();
 
-	void NBMJDRV1_base(machine_config &config);
-	void NBMJDRV1(machine_config &config);
-	void NBMJDRV2(machine_config &config);
-	void NBMJDRV3(machine_config &config);
-	void patimono(machine_config &config);
-	void mjuraden(machine_config &config);
-	void psailor1(machine_config &config);
-	void ngpgal(machine_config &config);
-	void mjgottsu(machine_config &config);
-	void mkeibaou(machine_config &config);
-	void gal10ren(machine_config &config);
-	void mscoutm(machine_config &config);
-	void imekura(machine_config &config);
-	void mkoiuraa(machine_config &config);
-	void mjkoiura(machine_config &config);
-	void janbari(machine_config &config);
-	void mjlaman(machine_config &config);
-	void yosimotm(machine_config &config);
-	void cmehyou(machine_config &config);
-	void sailorwr(machine_config &config);
-	void koinomp(machine_config &config);
-	void sailorws(machine_config &config);
-	void mjegolf(machine_config &config);
-	void renaiclb(machine_config &config);
-	void psailor2(machine_config &config);
-	void yosimoto(machine_config &config);
-	void pachiten(machine_config &config);
-	void jituroku(machine_config &config);
-	void mmehyou(machine_config &config);
-	void bakuhatu(machine_config &config);
-	void ultramhm(machine_config &config);
-	void otatidai(machine_config &config);
 	void cmehyou_io_map(address_map &map);
 	void gal10ren_io_map(address_map &map);
 	void imekura_io_map(address_map &map);
@@ -180,6 +187,8 @@ public:
 	void sailorws_sound_map(address_map &map);
 	void yosimotm_io_map(address_map &map);
 	void yosimoto_io_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_NBMJ9195_H

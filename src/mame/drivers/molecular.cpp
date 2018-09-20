@@ -67,6 +67,9 @@ public:
 			m_filecpu(*this, "filecpu")
 	{ }
 
+	void molecula(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_filecpu;
 
@@ -94,12 +97,11 @@ public:
 
 	DECLARE_PALETTE_INIT(molecula);
 
-	void molecula(machine_config &config);
 	void molecula_app_io(address_map &map);
 	void molecula_app_map(address_map &map);
 	void molecula_file_io(address_map &map);
 	void molecula_file_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

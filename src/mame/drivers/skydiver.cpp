@@ -98,8 +98,6 @@
 
 #include "skydiver.lh"
 
-#define MASTER_CLOCK (XTAL(12'096'000))
-
 
 
 
@@ -350,44 +348,42 @@ GFXDECODE_END
 MACHINE_CONFIG_START(skydiver_state::skydiver)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800,MASTER_CLOCK/16)     /* ???? */
+	MCFG_DEVICE_ADD("maincpu", M6800, 12.096_MHz_XTAL / 16)     /* ???? */
 	MCFG_DEVICE_PROGRAM_MAP(skydiver_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(skydiver_state, interrupt,  5*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)    // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);    // 128V clocks the same as VBLANK
 
-	MCFG_DEVICE_ADD("latch1", F9334, 0) // F12
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, skydiver_state, lamp_s_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, skydiver_state, lamp_k_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, skydiver_state, start_lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, skydiver_state, start_lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, skydiver_state, lamp_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, skydiver_state, lamp_d_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_SOUND_EN>))
-	MCFG_DEVICE_ADD("latch2", F9334, 0) // H12
-	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, skydiver_state, jump1_lamps_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, skydiver_state, coin_lockout_w))
-	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, skydiver_state, jump2_lamps_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, skydiver_state, nmion_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, skydiver_state, width_w))
-	MCFG_DEVICE_ADD("latch3", F9334, 0) // A11
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, skydiver_state, lamp_i_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, skydiver_state, lamp_v_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, skydiver_state, lamp_e_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, skydiver_state, lamp_r_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_NOISE_RST>))
+	f9334_device &latch1(F9334(config, "latch1")); // F12
+	latch1.q_out_cb<0>().set(FUNC(skydiver_state::lamp_s_w));
+	latch1.q_out_cb<1>().set(FUNC(skydiver_state::lamp_k_w));
+	latch1.q_out_cb<2>().set(FUNC(skydiver_state::start_lamp_1_w));
+	latch1.q_out_cb<3>().set(FUNC(skydiver_state::start_lamp_2_w));
+	latch1.q_out_cb<4>().set(FUNC(skydiver_state::lamp_y_w));
+	latch1.q_out_cb<5>().set(FUNC(skydiver_state::lamp_d_w));
+	latch1.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_SOUND_EN>));
+
+	f9334_device &latch2(F9334(config, "latch2")); // H12
+	//latch2.q_out_cb<0>().set(FUNC(skydiver_state::jump1_lamps_w));
+	latch2.q_out_cb<1>().set(FUNC(skydiver_state::coin_lockout_w));
+	//latch2.q_out_cb<3>().set(FUNC(skydiver_state::jump2_lamps_w));
+	latch2.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_WHISTLE1_EN>));
+	latch2.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_WHISTLE2_EN>));
+	latch2.q_out_cb<6>().set(FUNC(skydiver_state::nmion_w));
+	latch2.q_out_cb<7>().set(FUNC(skydiver_state::width_w));
+
+	f9334_device &latch3(F9334(config, "latch3")); // A11
+	latch3.q_out_cb<1>().set(FUNC(skydiver_state::lamp_i_w));
+	latch3.q_out_cb<2>().set(FUNC(skydiver_state::lamp_v_w));
+	latch3.q_out_cb<3>().set(FUNC(skydiver_state::lamp_e_w));
+	latch3.q_out_cb<4>().set(FUNC(skydiver_state::lamp_r_w));
+	latch3.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_OCT1_EN>));
+	latch3.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_OCT2_EN>));
+	latch3.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_NOISE_RST>));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

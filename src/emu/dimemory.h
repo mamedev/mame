@@ -123,16 +123,13 @@ public:
 		assert((0 <= spacenum) && (max_space_count() > spacenum));
 		m_addrspace.resize(std::max<std::size_t>(m_addrspace.size(), spacenum + 1));
 		assert(!m_addrspace[spacenum]);
-		m_addrspace[spacenum] = std::make_unique<Space>(manager, *this, spacenum);
+		m_addrspace[spacenum] = std::make_unique<Space>(manager, *this, spacenum, space_config(spacenum)->addr_width());
 	}
 	void prepare_maps() { for (auto const &space : m_addrspace) { if (space) { space->prepare_map(); } } }
 	void populate_from_maps() { for (auto const &space : m_addrspace) { if (space) { space->populate_from_map(); } } }
 	void allocate_memory() { for (auto const &space : m_addrspace) { if (space) { space->allocate_memory(); } } }
 	void locate_memory() { for (auto const &space : m_addrspace) { if (space) { space->locate_memory(); } } }
 	void set_log_unmap(bool log) { for (auto const &space : m_addrspace) { if (space) { space->set_log_unmap(log); } } }
-
-	// diagnostic functions
-	void dump(FILE *file) const;
 
 protected:
 	using space_config_vector = std::vector<std::pair<int, const address_space_config *>>;

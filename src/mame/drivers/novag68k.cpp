@@ -47,6 +47,10 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void diablo68k(machine_config &config);
+	void scorpio68k(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
 
@@ -57,12 +61,10 @@ public:
 	DECLARE_READ8_MEMBER(diablo68k_input1_r);
 	DECLARE_READ8_MEMBER(diablo68k_input2_r);
 	void diablo68k_map(address_map &map);
-	void diablo68k(machine_config &config);
 
 	// Scorpio 68000
 	DECLARE_WRITE8_MEMBER(scorpio68k_control_w);
 	void scorpio68k_map(address_map &map);
-	void scorpio68k(machine_config &config);
 };
 
 
@@ -242,10 +244,10 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)) // active for 1.1us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag68k_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -263,7 +265,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_diablo68k)
+	config.set_default_layout(layout_novag_diablo68k);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -278,7 +280,7 @@ MACHINE_CONFIG_START(novag68k_state::scorpio68k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(scorpio68k_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
+	config.set_default_layout(layout_novag_scorpio68k);
 MACHINE_CONFIG_END
 
 

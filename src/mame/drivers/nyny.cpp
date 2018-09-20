@@ -114,6 +114,9 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch3(*this, "soundlatch3") { }
 
+	void nyny(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram1;
 	required_shared_ptr<uint8_t> m_colorram1;
@@ -158,7 +161,6 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_END_UPDATE(crtc_end_update);
-	void nyny(machine_config &config);
 	void nyny_audio_1_map(address_map &map);
 	void nyny_audio_2_map(address_map &map);
 	void nyny_main_map(address_map &map);
@@ -606,7 +608,7 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_DEVICE_ADD("audio2", M6802, AUDIO_CPU_2_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(nyny_audio_2_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -623,27 +625,27 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic48_1", ttl74123_device, a_w))
 
 	/* 74LS123 */
-	MCFG_DEVICE_ADD("ic48_1", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, nyny_state, ic48_1_74123_output_changed))
+	TTL74123(config, m_ic48_1, 0);
+	m_ic48_1->set_connection_type(TTL74123_GROUNDED);   /* the hook up type */
+	m_ic48_1->set_resistor_value(RES_K(22));            /* resistor connected to RCext */
+	m_ic48_1->set_capacitor_value(CAP_U(0.01));         /* capacitor connected to Cext and RCext */
+	m_ic48_1->set_a_pin_value(1);                       /* A pin - driven by the CRTC */
+	m_ic48_1->set_b_pin_value(1);                       /* B pin - pulled high */
+	m_ic48_1->set_clear_pin_value(1);                   /* Clear pin - pulled high */
+	m_ic48_1->out_cb().set(FUNC(nyny_state::ic48_1_74123_output_changed));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, nyny_state, main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, nyny_state, main_cpu_irq))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set_ioport("IN0");
+	m_pia1->readpb_handler().set_ioport("IN1");
+	m_pia1->irqa_handler().set(FUNC(nyny_state::main_cpu_irq));
+	m_pia1->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, nyny_state,pia_2_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, nyny_state,pia_2_port_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, nyny_state,flipscreen_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, nyny_state,main_cpu_firq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, nyny_state,main_cpu_irq))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->writepa_handler().set(FUNC(nyny_state::pia_2_port_a_w));
+	m_pia2->writepb_handler().set(FUNC(nyny_state::pia_2_port_b_w));
+	m_pia2->ca2_handler().set(FUNC(nyny_state::flipscreen_w));
+	m_pia2->irqa_handler().set(FUNC(nyny_state::main_cpu_firq));
+	m_pia2->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

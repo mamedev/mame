@@ -24,6 +24,9 @@ public:
 		m_bgvideoram(*this, "bgvideoram")
 	{ }
 
+	void vulgus(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -54,7 +57,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void vulgus(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

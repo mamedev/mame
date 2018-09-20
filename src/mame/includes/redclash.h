@@ -28,13 +28,15 @@ public:
 		, m_stars(*this, "stars")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-	void init_redclash();
 	void redclash(machine_config &config);
 	void zerohour(machine_config &config);
 
-protected:
+	void init_redclash();
+
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_redclash);
 	DECLARE_WRITE8_MEMBER(redclash_videoram_w);
 	DECLARE_WRITE8_MEMBER(redclash_gfxbank_w);
@@ -55,7 +57,6 @@ protected:
 	void redclash_map(address_map &map);
 	void zerohour_map(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;

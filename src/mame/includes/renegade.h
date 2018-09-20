@@ -26,6 +26,12 @@ public:
 	{
 	}
 
+	void renegade(machine_config &config);
+	void kuniokunb(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<taito68705_mcu_device> m_mcu;
@@ -57,7 +63,6 @@ public:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(scroll_lsb_w);
 	DECLARE_WRITE8_MEMBER(scroll_msb_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(adpcm_start_w);
 	DECLARE_WRITE8_MEMBER(adpcm_addr_w);
 	DECLARE_WRITE8_MEMBER(adpcm_stop_w);
@@ -74,8 +79,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void renegade(machine_config &config);
-	void kuniokunb(machine_config &config);
+
 	void renegade_map(address_map &map);
 	void renegade_nomcu_map(address_map &map);
 	void renegade_sound_map(address_map &map);

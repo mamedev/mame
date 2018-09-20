@@ -9,6 +9,7 @@ Build status for tiny build only, containing just core parts of project:
 | ------------- |:-------------:| 
 |Linux GCC / OSX Clang| [![Build Status](https://travis-ci.org/mamedev/mame.svg?branch=master)](https://travis-ci.org/mamedev/mame) |
 |Windows MinGW | [![Build Status](https://tea-ci.org/api/badges/mamedev/mame/status.svg)](https://tea-ci.org/mamedev/mame) |
+|Windows MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/te0qy56b72tp5kmo?svg=true)](https://ci.appveyor.com/project/startaq/mame) |
 
 Static analysis status for entire build (except for third-party parts of project):
 
@@ -54,12 +55,12 @@ Visual Studio builds are also possible, but you still need [build environment](h
 In order to generate solution and project files just run:
 
 ```
-make vs2015
+make vs2017
 ```
 or use this command to build it directly using msbuild
 
 ```
-make vs2015 MSBUILD=1
+make vs2017 MSBUILD=1
 ```
 
 

@@ -36,6 +36,9 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_scrolly(*this, "scrolly") { }
 
+	void sub(machine_config &config);
+
+private:
 	bool m_int_en;
 	bool m_nmi_en;
 
@@ -52,17 +55,14 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(main_irq);
 	INTERRUPT_GEN_MEMBER(sound_irq);
-	void sub(machine_config &config);
 	void subm_io(address_map &map);
 	void subm_map(address_map &map);
 	void subm_sound_io(address_map &map);
 	void subm_sound_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-private:
 	tilemap_t *m_tilemap;
 
 	required_device<cpu_device> m_maincpu;

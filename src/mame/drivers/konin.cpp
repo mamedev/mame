@@ -62,13 +62,15 @@ public:
 		, m_iopit(*this, "iopit")
 	{ }
 
+	void konin(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(picu_b_w);
 	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
 
-	void konin(machine_config &config);
 	void konin_io(address_map &map);
 	void konin_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8214_device> m_picu;
@@ -138,31 +140,31 @@ MACHINE_CONFIG_START(konin_state::konin)
 	MCFG_I8085A_INTE(WRITELINE("picu", i8214_device, inte_w))
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
-	MCFG_DEVICE_ADD("intlatch", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(GND)
-	MCFG_I8212_DI_CALLBACK(READ8("picu", i8214_device, vector_r))
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
+	i8212_device &intlatch(I8212(config, "intlatch", 0));
+	intlatch.md_rd_callback().set_constant(0);
+	intlatch.di_rd_callback().set(m_picu, FUNC(i8214_device::vector_r));
+	intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE);
 
-	MCFG_DEVICE_ADD("picu", I8214, XTAL(4'000'000))
-	MCFG_I8214_INT_CALLBACK(WRITELINE("intlatch", i8212_device, stb_w))
+	I8214(config, m_picu, XTAL(4'000'000));
+	m_picu->int_wr_callback().set("intlatch", FUNC(i8212_device::stb_w));
 
-	MCFG_DEVICE_ADD("mainpit", PIT8253, 0)
+	pit8253_device &mainpit(PIT8253(config, "mainpit", 0));
 	// wild guess at UART clock and source
-	MCFG_PIT8253_CLK0(1536000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	mainpit.set_clk<0>(1536000);
+	mainpit.out_handler<0>().set("uart", FUNC(i8251_device::write_txc));
+	mainpit.out_handler<0>().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("mainppi", I8255, 0)
+	I8255(config, "mainppi", 0);
 
-	MCFG_DEVICE_ADD("iopit", PIT8253, 0)
+	PIT8253(config, m_iopit, 0);
 
-	MCFG_DEVICE_ADD("ioppi", I8255, 0)
+	I8255(config, m_ioppi, 0);
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, konin_state, picu_r3_w))
+	i8251_device &uart(I8251(config, "uart", 0));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.rxrdy_handler().set(FUNC(konin_state::picu_r3_w));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))

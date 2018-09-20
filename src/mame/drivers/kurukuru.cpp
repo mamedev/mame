@@ -399,20 +399,22 @@
 class kurukuru_state : public driver_device
 {
 public:
-	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_v9938(*this, "v9938"),
 		m_adpcm(*this, "adpcm"),
 		m_soundirq(*this, "soundirq"),
 		m_hopper(*this, "hopper"),
 		m_bank1(*this, "bank1")
 	{ }
 
+	void ppj(machine_config &config);
+	void kurukuru(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<v9938_device> m_v9938;
 	required_device<msm5205_device> m_adpcm;
 	required_device<rst_neg_buffer_device> m_soundirq;
 	required_device<ticket_dispenser_device> m_hopper;
@@ -431,8 +433,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
-	void ppj(machine_config &config);
-	void kurukuru(machine_config &config);
 	void kurukuru_audio_io(address_map &map);
 	void kurukuru_audio_map(address_map &map);
 	void kurukuru_io(address_map &map);
@@ -529,7 +529,7 @@ void kurukuru_state::kurukuru_io(address_map &map)
 	map(0x00, 0x00).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_out_latch_w));
 	map(0x10, 0x10).mirror(0x0f).portr("DSW1");
 	map(0x20, 0x20).mirror(0x0f).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x80, 0x83).mirror(0x0c).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x80, 0x83).mirror(0x0c).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0x90, 0x90).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_bankswitch_w));
 	map(0xa0, 0xa0).mirror(0x0f).portr("IN0");
 	map(0xb0, 0xb0).mirror(0x0f).portr("IN1");
@@ -548,7 +548,7 @@ void kurukuru_state::ppj_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_bankswitch_w));
-	map(0x10, 0x13).mirror(0x0c).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x10, 0x13).mirror(0x0c).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0x30, 0x30).mirror(0x0f).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x40, 0x40).mirror(0x0f).portr("DSW1");
 	map(0x50, 0x50).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_out_latch_w));
@@ -852,26 +852,26 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	MCFG_DEVICE_IO_MAP(kurukuru_audio_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MAIN_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(VDP_MEM);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set(m_soundirq, FUNC(rst_neg_buffer_device::rst28_w));
 
 	// latch irq vector is $ef (rst $28)
 	// timer irq vector is $f7 (rst $30)
 	// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("audiocpu", 0))
+	RST_NEG_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ym2149", YM2149, YM2149_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))

@@ -575,8 +575,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("576K") // 64 + 512
+	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601a)

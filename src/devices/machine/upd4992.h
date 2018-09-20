@@ -31,7 +31,7 @@ class upd4992_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

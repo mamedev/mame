@@ -44,7 +44,7 @@ public:
 
 	void gridlee(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(analog_port_r);
 	DECLARE_READ8_MEMBER(random_num_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
@@ -66,7 +66,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;

@@ -77,12 +77,23 @@ instead of magnet sensors.
 class novag6502_state : public novagbase_state
 {
 public:
-	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag),
+	novag6502_state(const machine_config &mconfig, device_type type, const char *tag) :
+		novagbase_state(mconfig, type, tag),
 		m_hlcd0538(*this, "hlcd0538"),
 		m_rombank(*this, "rombank")
 	{ }
 
+	void supercon(machine_config &config);
+	void cforte(machine_config &config);
+	void sforte_map(address_map &map);
+	void sexpert(machine_config &config);
+	void sforte(machine_config &config);
+
+	void init_sexpert();
+
+	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
+
+private:
 	optional_device<hlcd0538_device> m_hlcd0538;
 	optional_memory_bank m_rombank;
 
@@ -95,7 +106,6 @@ public:
 	DECLARE_READ8_MEMBER(supercon_input1_r);
 	DECLARE_READ8_MEMBER(supercon_input2_r);
 	void supercon_map(address_map &map);
-	void supercon(machine_config &config);
 
 	// Constellation Forte
 	void cforte_prepare_display();
@@ -103,7 +113,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cforte_mux_w);
 	DECLARE_WRITE8_MEMBER(cforte_control_w);
 	void cforte_map(address_map &map);
-	void cforte(machine_config &config);
 
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
@@ -113,17 +122,12 @@ public:
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
 	DECLARE_MACHINE_RESET(sexpert);
-	void init_sexpert();
-	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_map(address_map &map);
 	void sexpert_set_cpu_freq();
-	void sexpert(machine_config &config);
 
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
-	void sforte_map(address_map &map);
-	void sforte(machine_config &config);
 };
 
 
@@ -874,10 +878,10 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
 	MCFG_DEVICE_PROGRAM_MAP(supercon_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_supercon)
+	config.set_default_layout(layout_novag_supercon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -894,14 +898,14 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("hlcd0538", HLCD0538, 0)
-	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(*this, novag6502_state, cforte_lcd_output_w))
+	HLCD0538(config, m_hlcd0538, 0);
+	m_hlcd0538->write_cols_callback().set(FUNC(novag6502_state::cforte_lcd_output_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
+	config.set_default_layout(layout_novag_cforte);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -918,17 +922,18 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)) // active for 21.5us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
-	MCFG_DEVICE_ADD("acia", MOS6551, 0) // R65C51P2 - RTS to CTS, DCD to GND
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
-	MCFG_MOS6551_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
+	mos6551_device &acia(MOS6551(config, "acia", 0)); // R65C51P2 - RTS to CTS, DCD to GND
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
+	acia.rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
 
@@ -948,7 +953,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_sexpert)
+	config.set_default_layout(layout_novag_sexpert);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -965,7 +970,7 @@ MACHINE_CONFIG_START(novag6502_state::sforte)
 	MCFG_TIMER_MODIFY("irq_on")
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
 
-	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
+	config.set_default_layout(layout_novag_sforte);
 MACHINE_CONFIG_END
 
 

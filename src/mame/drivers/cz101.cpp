@@ -21,6 +21,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+#define VERBOSE 1
+#include "logmacro.h"
+
 #include "cz101.lh"
 
 
@@ -31,12 +34,13 @@
 class cz101_state : public driver_device
 {
 public:
-	cz101_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cz101_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
 		m_keys(*this, "kc%u", 0),
-		m_port_b(0), m_port_c(0)
+		m_port_b(0),
+		m_port_c(0)
 	{ }
 
 	void cz101(machine_config &config);
@@ -340,8 +344,7 @@ WRITE8_MEMBER( cz101_state::port_a_w )
 
 WRITE8_MEMBER( cz101_state::port_b_w )
 {
-	if (1)
-		logerror("port_b_w: %02x\n", data);
+	LOG("port_b_w: %02x\n", data);
 
 	m_port_b = data;
 }
@@ -357,8 +360,7 @@ WRITE8_MEMBER( cz101_state::port_b_w )
 
 WRITE8_MEMBER( cz101_state::port_c_w )
 {
-	if (1)
-		logerror("port_c_w: %02x\n", data);
+	LOG("port_c_w: %02x\n", data);
 
 	m_port_c = data;
 }
@@ -380,15 +382,14 @@ void cz101_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START( cz101_state::cz101 )
-	MCFG_DEVICE_ADD("maincpu", UPD7810, 10_MHz_XTAL) // actually 7811, but internal ROM disabled
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, cz101_state, port_a_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, cz101_state, port_a_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, cz101_state, port_b_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, cz101_state, port_c_w))
+	UPD7810(config, m_maincpu, 10_MHz_XTAL); // actually 7811, but internal ROM disabled
+	m_maincpu->set_addrmap(AS_PROGRAM, &cz101_state::maincpu_map);
+	m_maincpu->pa_in_cb().set(FUNC(cz101_state::port_a_r));
+	m_maincpu->pa_out_cb().set(FUNC(cz101_state::port_a_w));
+	m_maincpu->pb_out_cb().set(FUNC(cz101_state::port_b_w));
+	m_maincpu->pc_out_cb().set(FUNC(cz101_state::port_c_w));
 
-	MCFG_CLOCK_ADD("midi_clock", 2_MHz_XTAL)
-//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("maincpu", upd7810_device, sck_w)) not supported yet
+	CLOCK(config, "midi_clock", 2_MHz_XTAL)/*.signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w))*/; // not supported yet
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -406,7 +407,7 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	MCFG_HD44780_LCD_SIZE(2, 16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(cz101_state, lcd_pixel_update)
 
-	MCFG_DEFAULT_LAYOUT(layout_cz101)
+	config.set_default_layout(layout_cz101);
 MACHINE_CONFIG_END
 
 

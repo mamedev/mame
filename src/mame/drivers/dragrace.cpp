@@ -278,8 +278,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_DEVICE_PROGRAM_MAP(dragrace_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
 
@@ -303,28 +302,28 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("latch_f5", F9334, 0) // F5
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, dragrace_state, speed1_w)) MCFG_DEVCB_MASK(0x1f) // set 3SPEED1-7SPEED1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_EXPLODE1_EN>)) // Explosion1 enable
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_SCREECH1_EN>)) // Screech1 enable
+	f9334_device &latch_f5(F9334(config, "latch_f5")); // F5
+	latch_f5.parallel_out_cb().set(FUNC(dragrace_state::speed1_w)).mask(0x1f); // set 3SPEED1-7SPEED1
+	latch_f5.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_EXPLODE1_EN>)); // Explosion1 enable
+	latch_f5.q_out_cb<6>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_SCREECH1_EN>)); // Screech1 enable
 
-	MCFG_DEVICE_ADD("latch_a5", F9334, 0) // A5
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_KLEXPL1_EN>)) // KLEXPL1 enable
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_MOTOR1_EN>)) // Motor1 enable
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_ATTRACT_EN>)) // Attract enable
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_LOTONE_EN>)) // LoTone enable
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led0")) // Player 1 Start Lamp
+	f9334_device &latch_a5(F9334(config, "latch_a5")); // A5
+	latch_a5.q_out_cb<1>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_KLEXPL1_EN>)); // KLEXPL1 enable
+	latch_a5.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_MOTOR1_EN>)); // Motor1 enable
+	latch_a5.q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_ATTRACT_EN>)); // Attract enable
+	latch_a5.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_LOTONE_EN>)); // LoTone enable
+	latch_a5.q_out_cb<7>().set_output("led0"); // Player 1 Start Lamp
 
-	MCFG_DEVICE_ADD("latch_h5", F9334, 0) // H5
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, dragrace_state, speed2_w)) MCFG_DEVCB_MASK(0x1f) // set 3SPEED2-7SPEED2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_EXPLODE2_EN>)) // Explosion2 enable
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_SCREECH2_EN>)) // Screech2 enable
+	f9334_device &latch_h5(F9334(config, "latch_h5")); // H5
+	latch_h5.parallel_out_cb().set(FUNC(dragrace_state::speed2_w)).mask(0x1f); // set 3SPEED2-7SPEED2
+	latch_h5.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_EXPLODE2_EN>)); // Explosion2 enable
+	latch_h5.q_out_cb<6>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_SCREECH2_EN>)); // Screech2 enable
 
-	MCFG_DEVICE_ADD("latch_e5", F9334, 0) // E5
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_KLEXPL2_EN>)) // KLEXPL2 enable
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_MOTOR2_EN>)) // Motor2 enable
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<DRAGRACE_HITONE_EN>)) // HiTone enable
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led1")) // Player 2 Start Lamp
+	f9334_device &latch_e5(F9334(config, "latch_e5")); // E5
+	latch_e5.q_out_cb<1>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_KLEXPL2_EN>)); // KLEXPL2 enable
+	latch_e5.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_MOTOR2_EN>)); // Motor2 enable
+	latch_e5.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_HITONE_EN>)); // HiTone enable
+	latch_e5.q_out_cb<7>().set_output("led1"); // Player 2 Start Lamp
 MACHINE_CONFIG_END
 
 

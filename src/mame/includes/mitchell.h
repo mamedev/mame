@@ -37,6 +37,36 @@ public:
 		m_bank1d(*this, "bank1d"),
 		m_soundbank(*this, "soundbank") { }
 
+	void pkladiesbl(machine_config &config);
+	void mstworld(machine_config &config);
+	void mgakuen(machine_config &config);
+	void marukin(machine_config &config);
+	void pang(machine_config &config);
+	void pangba(machine_config &config);
+	void pangnv(machine_config &config);
+	void spangbl(machine_config &config);
+
+	void init_mgakuen2();
+	void init_block();
+	void init_pangb();
+	void init_qtono1();
+	void init_mgakuen();
+	void init_hatena();
+	void init_mstworld();
+	void init_spangbl();
+	void init_pkladiesbl();
+	void init_spang();
+	void init_cworld();
+	void init_spangj();
+	void init_qsangoku();
+	void init_marukin();
+	void init_pang();
+	void init_sbbros();
+	void init_pkladies();
+	void init_blockbl();
+	void init_dokaben();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -104,25 +134,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE8_MEMBER(eeprom_serial_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	void init_mgakuen2();
-	void init_block();
-	void init_pangb();
-	void init_qtono1();
-	void init_mgakuen();
-	void init_hatena();
-	void init_mstworld();
-	void init_spangbl();
-	void init_pkladiesbl();
-	void init_spang();
-	void init_cworld();
-	void init_spangj();
-	void init_qsangoku();
-	void init_marukin();
-	void init_pang();
-	void init_sbbros();
-	void init_pkladies();
-	void init_blockbl();
-	void init_dokaben();
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(mitchell);
 	DECLARE_MACHINE_RESET(mitchell);
@@ -134,14 +146,7 @@ public:
 	void configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size));
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(spangbl_adpcm_int);
-	void pkladiesbl(machine_config &config);
-	void mstworld(machine_config &config);
-	void mgakuen(machine_config &config);
-	void marukin(machine_config &config);
-	void pang(machine_config &config);
-	void pangba(machine_config &config);
-	void pangnv(machine_config &config);
-	void spangbl(machine_config &config);
+
 	void decrypted_opcodes_map(address_map &map);
 	void mgakuen_map(address_map &map);
 	void mitchell_io_map(address_map &map);

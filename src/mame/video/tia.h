@@ -36,13 +36,13 @@ struct player_gfx {
 //**************************************************************************
 
 #define MCFG_TIA_READ_INPUT_PORT_CB(_devcb) \
-	devcb = &downcast<tia_video_device &>(*device).set_read_input_port_callback(DEVCB_##_devcb);
+	downcast<tia_video_device &>(*device).set_read_input_port_callback(DEVCB_##_devcb);
 
 #define MCFG_TIA_DATABUS_CONTENTS_CB(_devcb) \
-	devcb = &downcast<tia_video_device &>(*device).set_databus_contents_callback(DEVCB_##_devcb);
+	downcast<tia_video_device &>(*device).set_databus_contents_callback(DEVCB_##_devcb);
 
 #define MCFG_TIA_VSYNC_CB(_devcb) \
-	devcb = &downcast<tia_video_device &>(*device).set_vsync_callback(DEVCB_##_devcb);
+	downcast<tia_video_device &>(*device).set_vsync_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

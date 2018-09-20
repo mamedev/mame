@@ -658,16 +658,14 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_DEVICE_PROGRAM_MAP(ps4_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
-
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	EEPROM_93C56_8BIT(config, "eeprom").default_value(0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)
 	MCFG_PALETTE_ADD("lpalette", (0x2000/4) + 1) /* palette + clear colour */
 	MCFG_PALETTE_ADD("rpalette", (0x2000/4) + 1)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

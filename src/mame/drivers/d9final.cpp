@@ -45,6 +45,9 @@ public:
 		m_hi_vram(*this, "hi_vram"),
 		m_cram(*this, "cram") { }
 
+	void d9final(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -66,7 +69,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void d9final(machine_config &config);
 	void d9final_io(address_map &map);
 	void d9final_map(address_map &map);
 };
@@ -306,7 +308,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_DEVICE_IO_MAP(d9final_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // Sharp LH5116D-10 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

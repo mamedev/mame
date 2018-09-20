@@ -55,7 +55,7 @@ public:
 	void init_pesadelo();
 	void pesadelo(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void io_mem(address_map &map);
@@ -64,7 +64,6 @@ protected:
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
 
-private:
 	required_device<cpu_device> m_maincpu;
 
 	uint8_t m_input_mask;
@@ -134,11 +133,11 @@ MACHINE_CONFIG_START(forte2_state::pesadelo)
 	MCFG_DEVICE_IO_MAP(io_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL(10'738'635)/2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

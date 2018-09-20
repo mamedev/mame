@@ -28,6 +28,15 @@ public:
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram") { }
 
+	void toki(machine_config &config);
+	void jujuba(machine_config &config);
+	void tokib(machine_config &config);
+
+	void init_tokib();
+	void init_jujuba();
+	void init_toki();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_region_ptr<u8> m_audiocpu_rom;
@@ -63,10 +72,6 @@ public:
 
 	DECLARE_READ8_MEMBER(jujuba_z80_data_decrypt);
 
-	void init_tokib();
-	void init_jujuba();
-	void init_toki();
-
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -77,9 +82,7 @@ public:
 	uint32_t screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void toki(machine_config &config);
-	void jujuba(machine_config &config);
-	void tokib(machine_config &config);
+
 	void jujuba_audio_map(address_map &map);
 	void jujuba_audio_opcodes_map(address_map &map);
 	void toki_audio_map(address_map &map);

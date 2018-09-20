@@ -339,20 +339,20 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3G on 1B1141 I/O (Z80) board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaccaria_state, flip_screen_x_w)) // VCMA
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaccaria_state, flip_screen_y_w)) // HCMA
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("audiopcb", zac1b11142_audio_device, ressound_w)) // RESSOUND
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaccaria_state, coin_w)) // COUNT
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaccaria_state, nmi_mask_w)) // INTST
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3G on 1B1141 I/O (Z80) board
+	mainlatch.q_out_cb<0>().set(FUNC(zaccaria_state::flip_screen_x_w)); // VCMA
+	mainlatch.q_out_cb<1>().set(FUNC(zaccaria_state::flip_screen_y_w)); // HCMA
+	mainlatch.q_out_cb<2>().set("audiopcb", FUNC(zac1b11142_audio_device::ressound_w)); // RESSOUND
+	mainlatch.q_out_cb<6>().set(FUNC(zaccaria_state::coin_w)); // COUNT
+	mainlatch.q_out_cb<7>().set(FUNC(zaccaria_state::nmi_mask_w)); // INTST
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaccaria_state, dsw_sel_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("SYSTEM");
+	ppi.out_pc_callback().set(FUNC(zaccaria_state::dsw_sel_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

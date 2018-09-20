@@ -17,6 +17,7 @@
 #include "bus/vic10/exp.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6510.h"
+#include "machine/input_merger.h"
 #include "machine/mos6526.h"
 #include "machine/ram.h"
 #include "sound/mos6581.h"
@@ -48,12 +49,12 @@ public:
 		m_color_ram(*this, "color_ram"),
 		m_row(*this, "ROW%u", 0),
 		m_restore(*this, "RESTORE"),
-		m_lock(*this, "LOCK"),
-		m_cia_irq(CLEAR_LINE),
-		m_vic_irq(CLEAR_LINE),
-		m_exp_irq(CLEAR_LINE)
+		m_lock(*this, "LOCK")
 	{ }
 
+	void vic10(machine_config &config);
+
+private:
 	required_device<m6510_device> m_maincpu;
 	required_device<mos6566_device> m_vic;
 	required_device<mos6581_device> m_sid;
@@ -71,19 +72,15 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void check_interrupts();
-
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
 
-	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
@@ -91,33 +88,12 @@ public:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
-	// interrupt state
-	int m_cia_irq;
-	int m_vic_irq;
-	int m_exp_irq;
-	void vic10(machine_config &config);
 	void vic10_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
 };
-
-
-//**************************************************************************
-//  INTERRUPTS
-//**************************************************************************
-
-//-------------------------------------------------
-//  check_interrupts -
-//-------------------------------------------------
-
-void vic10_state::check_interrupts()
-{
-	m_maincpu->set_input_line(M6502_IRQ_LINE, m_cia_irq || m_vic_irq || m_exp_irq);
-}
-
 
 
 //**************************************************************************
@@ -376,18 +352,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  vic2_interface vic_intf
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
-{
-	m_vic_irq = state;
-
-	check_interrupts();
-}
-
-
-//-------------------------------------------------
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
@@ -449,13 +413,6 @@ READ8_MEMBER( vic10_state::sid_poty_r )
 //-------------------------------------------------
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER( vic10_state::cia_irq_w )
-{
-	m_cia_irq = state;
-
-	check_interrupts();
-}
 
 READ8_MEMBER( vic10_state::cia_pa_r )
 {
@@ -628,13 +585,6 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 //  VIC10_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic10_state::exp_irq_w )
-{
-	m_exp_irq = state;
-
-	check_interrupts();
-}
-
 WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
 {
 	if (state == ASSERT_LINE)
@@ -666,11 +616,6 @@ void vic10_state::machine_start()
 		m_ram->pointer()[offset] = data;
 		if (!(offset % 64)) data ^= 0xff;
 	}
-
-	// state saving
-	save_item(NAME(m_cia_irq));
-	save_item(NAME(m_vic_irq));
-	save_item(NAME(m_exp_irq));
 }
 
 
@@ -704,13 +649,16 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	MCFG_M6510_PORT_PULLS(0x10, 0x20)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6566_TAG, MOS6566, XTAL(8'000'000)/8)
-	MCFG_MOS6566_CPU(M6510_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, vic10_state, vic_irq_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	mos8566_device &mos8566(MOS8566(config, MOS6566_TAG, XTAL(8'000'000)/8));
+	mos8566.set_cpu(M6510_TAG);
+	mos8566.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	mos8566.set_screen(SCREEN_TAG);
+	mos8566.set_addrmap(0, &vic10_state::vic_videoram_map);
+	mos8566.set_addrmap(1, &vic10_state::vic_colorram_map);
+
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE)
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
@@ -727,7 +675,7 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	// devices
 	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526, XTAL(8'000'000)/8)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, vic10_state, cia_irq_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<0>))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, sp_w))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, vic10_state, cia_pa_r))
@@ -737,18 +685,18 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6566_TAG, mos6566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_DEVICE_ADD(VIC10_EXPANSION_SLOT_TAG, VIC10_EXPANSION_SLOT, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr)
-	MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, vic10_state, exp_irq_w))
-	MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic10_state, exp_reset_w))
-	MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
-	MCFG_VIC10_EXPANSION_SLOT_SP_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, sp_w))
+
+	VIC10_EXPANSION_SLOT(config, m_exp, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr);
+	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
+	m_exp->res_callback().set(FUNC(vic10_state::exp_reset_w));
+	m_exp->cnt_callback().set(m_cia, FUNC(mos6526_device::cnt_w));
+	m_exp->sp_callback().set(m_cia, FUNC(mos6526_device::sp_w));
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic10")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
+	RAM(config, RAM_TAG).set_default_size("4K");
 MACHINE_CONFIG_END
 
 

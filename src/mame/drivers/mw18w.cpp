@@ -33,16 +33,19 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void mw18w(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
 	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
-	void mw18w(machine_config &config);
 	void mw18w_map(address_map &map);
 	void mw18w_portmap(address_map &map);
-private:
+
 	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	output_finder<10> m_digits;
@@ -284,7 +287,7 @@ MACHINE_CONFIG_START(mw18w_state::mw18w)
 	MCFG_DEVICE_PROGRAM_MAP(mw18w_map)
 	MCFG_DEVICE_IO_MAP(mw18w_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* no video! */
 

@@ -107,9 +107,12 @@ public:
 	pangofun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	void init_pangofun();
-	virtual void machine_start() override;
 	void pangofun(machine_config &config);
+
+	void init_pangofun();
+
+private:
+	virtual void machine_start() override;
 	void pcat_io(address_map &map);
 	void pcat_map(address_map &map);
 };

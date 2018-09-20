@@ -71,6 +71,15 @@ public:
 		m_colors(*this, "colors"),
 		m_stars(*this, "stars"){ }
 
+	void enigma2(machine_config &config);
+	void enigma2a(machine_config &config);
+
+	void init_enigma2();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -95,11 +104,8 @@ public:
 	DECLARE_READ8_MEMBER(dip_switch_r);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(enigma2_flip_screen_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(protection_data_w);
-	void init_enigma2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -110,8 +116,6 @@ public:
 	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
 	void create_interrupt_timers(  );
 	void start_interrupt_timers(  );
-	void enigma2(machine_config &config);
-	void enigma2a(machine_config &config);
 	void enigma2_audio_cpu_map(address_map &map);
 	void enigma2_main_cpu_map(address_map &map);
 	void enigma2a_main_cpu_io_map(address_map &map);

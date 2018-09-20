@@ -30,12 +30,6 @@
 class special_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RESET,
-		TIMER_PIT8253_GATES
-	};
-
 	special_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -57,6 +51,22 @@ public:
 		m_io_line(*this, "LINE%u", 0U),
 		m_palette(*this, "palette")  { }
 
+	void special(machine_config &config);
+	void erik(machine_config &config);
+	void specimx(machine_config &config);
+	void specialp(machine_config &config);
+	void specialm(machine_config &config);
+
+	void init_erik();
+	void init_special();
+
+private:
+	enum
+	{
+		TIMER_RESET,
+		TIMER_PIT8253_GATES
+	};
+
 	DECLARE_WRITE8_MEMBER(specimx_select_bank);
 	DECLARE_WRITE8_MEMBER(video_memory_w);
 	DECLARE_WRITE8_MEMBER(specimx_video_color_w);
@@ -76,8 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
-	void init_erik();
-	void init_special();
+
 	DECLARE_MACHINE_RESET(special);
 	DECLARE_VIDEO_START(special);
 	DECLARE_MACHINE_RESET(erik);
@@ -95,17 +104,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
 
-	void special(machine_config &config);
-	void erik(machine_config &config);
-	void specimx(machine_config &config);
-	void specialp(machine_config &config);
-	void specialm(machine_config &config);
 	void erik_io_map(address_map &map);
 	void erik_mem(address_map &map);
 	void specialist_mem(address_map &map);
 	void specialp_mem(address_map &map);
 	void specimx_mem(address_map &map);
-private:
+
 	void specimx_set_bank(offs_t i, uint8_t data);
 	void erik_set_bank();
 	std::unique_ptr<uint8_t[]> m_specimx_colorram;

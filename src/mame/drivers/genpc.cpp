@@ -22,7 +22,6 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	required_device<cpu_device> m_maincpu;
 	void pcega(machine_config &config);
 	void pcvga(machine_config &config);
 	void pccga(machine_config &config);
@@ -30,6 +29,9 @@ public:
 	void pcmda(machine_config &config);
 	void pc8_io(address_map &map);
 	void pc8_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 void genpc_state::pc8_map(address_map &map)
@@ -72,9 +74,7 @@ MACHINE_CONFIG_START(genpc_state::pcmda)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")

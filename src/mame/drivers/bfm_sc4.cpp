@@ -893,16 +893,16 @@ WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 }
 
 MACHINE_CONFIG_START(sc4_state::sc4_common)
-	MCFG_DEVICE_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
-	MCFG_DEVICE_PROGRAM_MAP(sc4_map)
-	MCFG_MC68307_SERIAL_A_TX_CALLBACK(WRITELINE(*this, sc4_state, m68307_duart_txa))
-	MCFG_MC68307_SERIAL_INPORT_CALLBACK(READ8(*this, sc4_state, m68307_duart_input_r))
-	MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(WRITE8(*this, sc4_state, m68307_duart_output_w))
+	M68307(config, m_maincpu, 16000000);    // 68307! (EC000 core)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc4_state::sc4_map);
+	m_maincpu->serial_a_tx_callback().set(FUNC(sc4_state::m68307_duart_txa));
+	m_maincpu->serial_inport_callback().set(FUNC(sc4_state::m68307_duart_input_r));
+	m_maincpu->serial_outport_callback().set(FUNC(sc4_state::m68307_duart_output_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8)
@@ -913,7 +913,7 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
-//  MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
+//  config.set_default_layout(layout_bfm_sc4);
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1262,7 +1262,7 @@ MACHINE_CONFIG_START(sc4_state::sc4dmd)
 	sc4_common(config);
 	/* video hardware */
 
-	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
+	//config.set_default_layout(layout_sc4_dmd);
 	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
 	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, sc4_state, bfmdm01_busy))
 

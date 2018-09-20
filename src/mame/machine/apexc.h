@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 /*
     APEXC RAM loading/saving from cylinder image
@@ -30,12 +29,7 @@ class apexc_cylinder_image_device : public device_t, public device_image_interfa
 {
 public:
 	// construction/destruction
-	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: apexc_cylinder_image_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
@@ -105,12 +99,7 @@ class apexc_tape_puncher_image_device : public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: apexc_tape_puncher_image_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }

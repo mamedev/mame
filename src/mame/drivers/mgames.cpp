@@ -235,6 +235,9 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void mgames(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
@@ -246,10 +249,8 @@ public:
 	DECLARE_WRITE8_MEMBER(outport7_w);
 	DECLARE_PALETTE_INIT(mgames);
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mgames(machine_config &config);
 	void main_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
@@ -649,7 +650,7 @@ MACHINE_CONFIG_START(mgames_state::mgames)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1146,7 +1146,7 @@ void metro_state::mouja_okimap(address_map &map)
 	MCFG_DEVICE_ADD(_tag, PUZZLET_IO, 0)
 
 #define MCFG_PUZZLET_IO_DATA_CALLBACK(_devcb) \
-	devcb = &puzzlet_io_device::set_data_cb(*device, DEVCB_##_devcb);
+	puzzlet_io_device::set_data_cb(*device, DEVCB_##_devcb);
 
 class puzzlet_io_device : public device_t {
 public:
@@ -3215,25 +3215,27 @@ MACHINE_CONFIG_START(metro_state::batlbubl)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(metro_state::metro_upd7810_sound)
-	MCFG_DEVICE_ADD("audiocpu", UPD7810, 24_MHz_XTAL/2)
-	MCFG_UPD7810_RXD(READLINE(*this, metro_state, metro_rxd_r))
-	MCFG_DEVICE_PROGRAM_MAP(metro_sound_map)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, metro_state, metro_porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, metro_state, metro_porta_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, metro_state, metro_portb_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, metro_state, metro_sound_rombank_w))
-MACHINE_CONFIG_END
+void metro_state::metro_upd7810_sound(machine_config &config)
+{
+	upd7810_device &upd(UPD7810(config, m_audiocpu, 24_MHz_XTAL/2));
+	upd.rxd_func().set(FUNC(metro_state::metro_rxd_r));
+	upd.set_addrmap(AS_PROGRAM, &metro_state::metro_sound_map);
+	upd.pa_in_cb().set(FUNC(metro_state::metro_porta_r));
+	upd.pa_out_cb().set(FUNC(metro_state::metro_porta_w));
+	upd.pb_out_cb().set(FUNC(metro_state::metro_portb_w));
+	upd.pc_out_cb().set(FUNC(metro_state::metro_sound_rombank_w));
+}
 
-MACHINE_CONFIG_START(metro_state::daitorid_upd7810_sound)
-	MCFG_DEVICE_ADD("audiocpu", UPD7810, 12_MHz_XTAL)
-	MCFG_UPD7810_RXD(READLINE(*this, metro_state, metro_rxd_r))
-	MCFG_DEVICE_PROGRAM_MAP(metro_sound_map)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, metro_state, metro_porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, metro_state, metro_porta_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, metro_state, daitorid_portb_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, metro_state, daitorid_sound_rombank_w))
-MACHINE_CONFIG_END
+void metro_state::daitorid_upd7810_sound(machine_config &config)
+{
+	upd7810_device &upd(UPD7810(config, m_audiocpu, 12_MHz_XTAL));
+	upd.rxd_func().set(FUNC(metro_state::metro_rxd_r));
+	upd.set_addrmap(AS_PROGRAM, &metro_state::metro_sound_map);
+	upd.pa_in_cb().set(FUNC(metro_state::metro_porta_r));
+	upd.pa_out_cb().set(FUNC(metro_state::metro_porta_w));
+	upd.pb_out_cb().set(FUNC(metro_state::daitorid_portb_w));
+	upd.pc_out_cb().set(FUNC(metro_state::daitorid_sound_rombank_w));
+}
 
 
 MACHINE_CONFIG_START(metro_state::daitorid)
@@ -3444,9 +3446,9 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_DEVICE_PROGRAM_MAP(dokyusp_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_384x224(config);
@@ -3472,9 +3474,9 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_DEVICE_PROGRAM_MAP(gakusai_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_320x240(config);
@@ -3501,9 +3503,9 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_320x240(config);
@@ -3669,7 +3671,7 @@ MACHINE_CONFIG_START(metro_state::mouja)
 	MCFG_DEVICE_PROGRAM_MAP(mouja_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config(config);

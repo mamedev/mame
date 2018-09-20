@@ -18,6 +18,7 @@
 #endif
 #endif
 #ifdef SDLMAME_MACOSX
+#define __ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES 0
 #include <Carbon/Carbon.h>
 #endif
 #endif

@@ -96,18 +96,14 @@ public:
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	DECLARE_READ8_MEMBER(igs_irqack_r);
-	DECLARE_WRITE8_MEMBER(igs_irqack_w);
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(igs_nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(igs_lamps_w);
-	DECLARE_READ8_MEMBER(custom_io_r);
-	DECLARE_WRITE8_MEMBER(custom_io_w);
-	DECLARE_READ8_MEMBER(exp_rom_r);
-	void show_out();
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	void csk234it(machine_config &config);
+	void igs_ncs(machine_config &config);
+	void csk227it(machine_config &config);
+	void igspoker(machine_config &config);
+	void pktetris(machine_config &config);
+	void cpokerpk(machine_config &config);
+	void number10(machine_config &config);
+
 	void init_igs_ncs();
 	void init_number10();
 	void init_pktet346();
@@ -119,25 +115,34 @@ public:
 	void init_igs_ncs2();
 	void init_cpokerpk();
 	void init_kungfu();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
+	DECLARE_READ8_MEMBER(igs_irqack_r);
+	DECLARE_WRITE8_MEMBER(igs_irqack_w);
+	DECLARE_WRITE8_MEMBER(bg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_color_w);
+	DECLARE_WRITE8_MEMBER(igs_nmi_and_coins_w);
+	DECLARE_WRITE8_MEMBER(igs_lamps_w);
+	DECLARE_READ8_MEMBER(custom_io_r);
+	DECLARE_WRITE8_MEMBER(custom_io_w);
+	DECLARE_READ8_MEMBER(exp_rom_r);
+	void show_out();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(cpokerpk);
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
-	void csk234it(machine_config &config);
-	void igs_ncs(machine_config &config);
-	void csk227it(machine_config &config);
-	void igspoker(machine_config &config);
-	void pktetris(machine_config &config);
-	void cpokerpk(machine_config &config);
-	void number10(machine_config &config);
+
 	void cpokerpk_io_map(address_map &map);
 	void igspoker_io_map(address_map &map);
 	void igspoker_prg_map(address_map &map);
 	void number10_io_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1924,10 +1929,10 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_DEVICE_IO_MAP(igspoker_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igspoker_state, igs_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, igspoker_state, igs_nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(igspoker_state::igs_nmi_and_coins_w));
+	ppi.in_pb_callback().set_ioport("SERVICE");
+	ppi.in_pc_callback().set_ioport("COINS");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

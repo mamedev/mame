@@ -219,8 +219,7 @@ void mc1502_state::mc1502_map(address_map &map)
 void mc1502_state::mc1502_io(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0028, 0x0028).rw(m_upd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0029, 0x0029).rw(m_upd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0028, 0x0029).rw(m_upd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw(m_ppi8255n1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0068, 0x006B).rw(m_ppi8255n2, FUNC(i8255_device::read), FUNC(i8255_device::write));    // keyboard poll
@@ -250,26 +249,26 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mc1502_state, mc1502_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portc_w))
+	I8255(config, m_ppi8255n1);
+	m_ppi8255n1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255n1->out_pb_callback().set(FUNC(mc1502_state::mc1502_ppi_portb_w));
+	m_ppi8255n1->in_pc_callback().set(FUNC(mc1502_state::mc1502_ppi_portc_r));
+	m_ppi8255n1->out_pc_callback().set(FUNC(mc1502_state::mc1502_ppi_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255n2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mc1502_state, mc1502_kppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, bus_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portc_w))
+	I8255(config, m_ppi8255n2);
+	m_ppi8255n2->in_pa_callback().set(FUNC(mc1502_state::mc1502_kppi_porta_r));
+	m_ppi8255n2->out_pb_callback().set(FUNC(mc1502_state::mc1502_kppi_portb_w));
+	m_ppi8255n2->in_pc_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+	m_ppi8255n2->out_pc_callback().set(FUNC(mc1502_state::mc1502_kppi_portc_w));
 
-	MCFG_DEVICE_ADD("upd8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, m_upd8251, 0);
+	m_upd8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_upd8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_upd8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	/* XXX RxD data are accessible via PPI port C, bit 7 */
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, mc1502_state, mc1502_i8251_syndet))
+	m_upd8251->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir7_w)); /* default handler does nothing */
+	m_upd8251->txrdy_handler().set("pic8259", FUNC(pic8259_device::ir7_w));
+	m_upd8251->syndet_handler().set(FUNC(mc1502_state::mc1502_i8251_syndet));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251", i8251_device, write_rxd))
@@ -309,9 +308,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("608K")                   /* 96 base + 512 on expansion card */
-	MCFG_RAM_EXTRA_OPTIONS("96K")
+	RAM(config, RAM_TAG).set_default_size("608K").set_extra_options("96K"); /* 96 base + 512 on expansion card */
 MACHINE_CONFIG_END
 
 

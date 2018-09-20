@@ -6,13 +6,13 @@
 #pragma once
 
 #define MCFG_PATINHO_RC_READ_CB(_devcb) \
-	devcb = &downcast<patinho_feio_cpu_device &>(*device).set_rc_read_callback(DEVCB_##_devcb);
+	downcast<patinho_feio_cpu_device &>(*device).set_rc_read_callback(DEVCB_##_devcb);
 #define MCFG_PATINHO_BUTTONS_READ_CB(_devcb) \
-	devcb = &downcast<patinho_feio_cpu_device &>(*device).set_buttons_read_callback(DEVCB_##_devcb);
+	downcast<patinho_feio_cpu_device &>(*device).set_buttons_read_callback(DEVCB_##_devcb);
 #define MCFG_PATINHO_IODEV_READ_CB(devnumber, _devcb) \
-	devcb = &downcast<patinho_feio_cpu_device &>(*device).set_iodev_read_callback(devnumber, DEVCB_##_devcb);
+	downcast<patinho_feio_cpu_device &>(*device).set_iodev_read_callback(devnumber, DEVCB_##_devcb);
 #define MCFG_PATINHO_IODEV_WRITE_CB(devnumber, _devcb) \
-	devcb = &downcast<patinho_feio_cpu_device &>(*device).set_iodev_write_callback(devnumber, DEVCB_##_devcb);
+	downcast<patinho_feio_cpu_device &>(*device).set_iodev_write_callback(devnumber, DEVCB_##_devcb);
 
 /* register IDs */
 enum

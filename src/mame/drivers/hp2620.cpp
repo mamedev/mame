@@ -23,6 +23,9 @@ public:
 		, m_nvram(*this, "nvram")
 	{ }
 
+	void hp2622(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ8_MEMBER(keystat_r);
@@ -32,10 +35,9 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void hp2622(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_nvram;
@@ -96,23 +98,24 @@ void hp2620_state::io_map(address_map &map)
 static INPUT_PORTS_START( hp2622 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(hp2620_state::hp2622)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(25'771'500) / 7) // 3.68 MHz
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void hp2620_state::hp2622(machine_config &config)
+{
+	Z80(config, m_maincpu, 25.7715_MHz_XTAL / 7); // 3.68 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp2620_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &hp2620_state::io_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (A7 tied to GND) + battery (+ wait states)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (A7 tied to GND) + battery (+ wait states)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'771'500), 1035, 0, 720, 415, 0, 390) // 498 total lines in 50 Hz mode
-	MCFG_SCREEN_UPDATE_DRIVER(hp2620_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.7715_MHz_XTAL, 1035, 0, 720, 415, 0, 390); // 498 total lines in 50 Hz mode
+	screen.set_screen_update(FUNC(hp2620_state::screen_update));
 
-	//MCFG_DEVICE_ADD("crtc", DP8367, XTAL(25'771'500))
+	//DP8367(config, "crtc", 25.7715_MHz_XTAL).set_screen("screen");
 
-	MCFG_DEVICE_ADD("acia", MOS6551, 0) // SY6551
-	MCFG_MOS6551_XTAL(XTAL(25'771'500) / 14) // 1.84 MHz
-	MCFG_MOS6551_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-MACHINE_CONFIG_END
+	mos6551_device &acia(MOS6551(config, "acia", 0)); // SY6551
+	acia.set_xtal(25.7715_MHz_XTAL / 14); // 1.84 MHz
+	acia.irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+}
 
 /**************************************************************************************************************
 

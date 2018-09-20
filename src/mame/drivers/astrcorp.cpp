@@ -64,6 +64,16 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void skilldrp(machine_config &config);
+	void showhand(machine_config &config);
+	void speeddrp(machine_config &config);
+	void showhanc(machine_config &config);
+
+	void init_astoneag();
+	void init_showhanc();
+	void init_showhand();
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -88,23 +98,16 @@ public:
 	DECLARE_READ16_MEMBER(astrocorp_unk_r);
 	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
-	void init_astoneag();
-	void init_showhanc();
-	void init_showhand();
 	DECLARE_VIDEO_START(astrocorp);
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void skilldrp(machine_config &config);
-	void showhand(machine_config &config);
-	void speeddrp(machine_config &config);
-	void showhanc(machine_config &config);
+
 	void showhanc_map(address_map &map);
 	void showhand_map(address_map &map);
 	void skilldrp_map(address_map &map);
 	void speeddrp_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
 	output_finder<7> m_lamps;
@@ -527,9 +530,9 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_DEVICE_PROGRAM_MAP(showhand_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(showhand_default_eeprom, sizeof(showhand_default_eeprom))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	EEPROM_93C46_16BIT(config, "eeprom").default_data(showhand_default_eeprom, sizeof(showhand_default_eeprom));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -580,8 +583,8 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_DEVICE_PROGRAM_MAP(skilldrp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )

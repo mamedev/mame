@@ -535,7 +535,7 @@ void via6522_device::output_pb()
     via_r - CPU interface for VIA read
 -------------------------------------------------*/
 
-READ8_MEMBER( via6522_device::read )
+u8 via6522_device::read(offs_t offset)
 {
 	int val = 0;
 	if (machine().side_effects_disabled())
@@ -715,7 +715,7 @@ READ8_MEMBER( via6522_device::read )
     via_w - CPU interface for VIA write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( via6522_device::write )
+void via6522_device::write(offs_t offset, u8 data)
 {
 	offset &=0x0f;
 
@@ -954,7 +954,7 @@ WRITE8_MEMBER( via6522_device::write )
 	}
 }
 
-void via6522_device::write_pa(int line, int state)
+void via6522_device::set_pa_line(int line, int state)
 {
 	if (state)
 		m_in_a |= (1 << line);
@@ -1020,7 +1020,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca2 )
 	}
 }
 
-void via6522_device::write_pb(int line, int state)
+void via6522_device::set_pb_line(int line, int state)
 {
 	if (state)
 		m_in_b |= (1 << line);

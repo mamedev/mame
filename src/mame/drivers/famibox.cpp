@@ -75,7 +75,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu") { }
 
+	void famibox(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
@@ -106,9 +112,6 @@ public:
 	DECLARE_READ8_MEMBER(famibox_IN1_r);
 	DECLARE_READ8_MEMBER(famibox_system_r);
 	DECLARE_WRITE8_MEMBER(famibox_system_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -116,7 +119,6 @@ public:
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
-	void famibox(machine_config &config);
 	void famibox_map(address_map &map);
 };
 

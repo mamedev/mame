@@ -16,13 +16,13 @@
 #include "imagedev/bitbngr.h"
 
 #define MCFG_9845PRT_IRL_HANDLER(_devcb)                                \
-	devcb = &downcast<hp9845_printer_device &>(*device).set_irl_handler(DEVCB_##_devcb);
+	downcast<hp9845_printer_device &>(*device).set_irl_handler(DEVCB_##_devcb);
 
 #define MCFG_9845PRT_FLG_HANDLER(_devcb)                                \
-	devcb = &downcast<hp9845_printer_device &>(*device).set_flg_handler(DEVCB_##_devcb);
+	downcast<hp9845_printer_device &>(*device).set_flg_handler(DEVCB_##_devcb);
 
 #define MCFG_9845PRT_STS_HANDLER(_devcb)                                \
-	devcb = &downcast<hp9845_printer_device &>(*device).set_sts_handler(DEVCB_##_devcb);
+	downcast<hp9845_printer_device &>(*device).set_sts_handler(DEVCB_##_devcb);
 
 class hp9845_printer_device : public device_t
 {

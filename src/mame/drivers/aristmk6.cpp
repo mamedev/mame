@@ -47,7 +47,7 @@ public:
 
 	void aristmk6(machine_config &config);
 
-protected:
+private:
 	void testIrq();
 
 	DECLARE_READ8_MEMBER(irqpend_r);
@@ -62,7 +62,6 @@ protected:
 	void aristmk6_map(address_map &map);
 	void aristmk6_port(address_map &map);
 
-private:
 #if 0
 	u32 m_test_x,m_test_y,m_start_offs;
 	u8 m_type;
@@ -354,8 +353,7 @@ MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 	MCFG_DEVICE_ADD( "uart0", NS16550, 8_MHz_XTAL )
 	MCFG_DEVICE_ADD( "uart1", NS16550, 8_MHz_XTAL )
 
-	MCFG_DEVICE_ADD("eeprom0", EEPROM_SERIAL_93C56_16BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0xFF)
+	EEPROM_93C56_16BIT(config, m_eeprom0).default_value(0xff);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

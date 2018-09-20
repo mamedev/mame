@@ -28,13 +28,15 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void v102(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void v102(machine_config &config);
 	void io_map(address_map &map);
 	void kbd_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -61,8 +63,7 @@ void v102_state::io_map(address_map &map)
 	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
 	map(0x18, 0x19).nopw();
 	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w));
-	map(0x60, 0x60).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x61, 0x61).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x60, 0x61).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
 	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0xbf, 0xbf) ???
@@ -89,13 +90,13 @@ MACHINE_CONFIG_START(v102_state::v102)
 	//MCFG_DEVICE_ADD("vpac", CRT9007, CRTC_CLOCK)
 	//MCFG_CRT9007_CHARACTER_WIDTH(6 or 10)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", XTAL(18'575'000) / 5)); // divider not verified
+	mpsc.out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	i8251_device &usart(I8251(config, "usart", XTAL(18'575'000) / 5)); // divider not verified
+	usart.rxrdy_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))

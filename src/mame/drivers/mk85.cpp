@@ -34,11 +34,13 @@ public:
 	{
 	}
 
+	void mk85(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void mk85(machine_config &config);
 	void mk85_mem(address_map &map);
 };
 

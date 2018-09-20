@@ -77,18 +77,26 @@ class pengo_state : public pacman_state
 {
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	void init_penta();
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+		: pacman_state(mconfig, type, tag)
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_latch(*this, "latch")
+	{ }
 
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void jrpacmbl(machine_config &config);
 	void pengoe(machine_config &config);
 	void pengou(machine_config &config);
 	void pengo(machine_config &config);
+
+	void init_penta();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	optional_device<ls259_device> m_latch;
 	void decrypted_opcodes_map(address_map &map);
 	void jrpacmbl_map(address_map &map);
 	void pengo_map(address_map &map);
@@ -150,7 +158,7 @@ void pengo_state::pengo_map(address_map &map)
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
 	map(0x9000, 0x903f).portr("DSW1");
 	map(0x9040, 0x907f).portr("DSW0");
-	map(0x9040, 0x9047).w("latch", FUNC(ls259_device::write_d0));
+	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
 	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x9080, 0x90bf).portr("IN1");
 	map(0x90c0, 0x90ff).portr("IN0");
@@ -175,7 +183,7 @@ void pengo_state::jrpacmbl_map(address_map &map)
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
 	map(0x9030, 0x9030).w(FUNC(pengo_state::jrpacman_scroll_w));
 	map(0x9040, 0x904f).portr("DSW");
-	map(0x9040, 0x9047).w("latch", FUNC(ls259_device::write_d0));
+	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
 	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x9080, 0x90bf).portr("P2");
 	map(0x90c0, 0x90ff).portr("P1");
@@ -383,17 +391,17 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_DEVICE_PROGRAM_MAP(pengo_map)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // U27
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pengo_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pengo_state, pengo_palettebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pengo_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pengo_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pengo_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pengo_state, pengo_colortablebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pengo_state, pengo_gfxbank_w))
+	LS259(config, m_latch); // U27
+	m_latch->q_out_cb<0>().set(FUNC(pengo_state::irq_mask_w));
+	m_latch->q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+	m_latch->q_out_cb<2>().set(FUNC(pengo_state::pengo_palettebank_w));
+	m_latch->q_out_cb<3>().set(FUNC(pengo_state::flipscreen_w));
+	m_latch->q_out_cb<4>().set(FUNC(pengo_state::coin_counter_1_w));
+	m_latch->q_out_cb<5>().set(FUNC(pengo_state::coin_counter_2_w));
+	m_latch->q_out_cb<6>().set(FUNC(pengo_state::pengo_colortablebank_w));
+	m_latch->q_out_cb<7>().set(FUNC(pengo_state::pengo_gfxbank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pengo)
@@ -440,10 +448,9 @@ MACHINE_CONFIG_START(pengo_state::jrpacmbl)
 	MCFG_DEVICE_PROGRAM_MAP(jrpacmbl_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_DEVICE_MODIFY("latch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pengo_state, jrpacman_bgpriority_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pengo_state, jrpacman_spritebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pengo_state, jrpacman_charbank_w))
+	m_latch->q_out_cb<4>().set(FUNC(pengo_state::jrpacman_bgpriority_w));
+	m_latch->q_out_cb<5>().set(FUNC(pengo_state::jrpacman_spritebank_w));
+	m_latch->q_out_cb<7>().set(FUNC(pengo_state::jrpacman_charbank_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 MACHINE_CONFIG_END

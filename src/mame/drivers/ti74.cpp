@@ -95,6 +95,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void ti74(machine_config &config);
+	void ti95(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
+
+private:
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
@@ -103,19 +109,14 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
 	DECLARE_PALETTE_INIT(ti74);
-	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
-	void ti74(machine_config &config);
-	void ti95(machine_config &config);
 	void main_map(address_map &map);
 
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-private:
 	required_device<tms70c46_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
@@ -525,7 +526,7 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
 	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
-	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
+	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -533,7 +534,7 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(6*31+1, 9*1+1+1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1+1)
-	MCFG_DEFAULT_LAYOUT(layout_ti74)
+	config.set_default_layout(layout_ti74);
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -561,7 +562,7 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
 	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
-	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
+	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -569,7 +570,7 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(200, 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 200-1, 0, 20-1)
-	MCFG_DEFAULT_LAYOUT(layout_ti95)
+	config.set_default_layout(layout_ti95);
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

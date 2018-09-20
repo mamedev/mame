@@ -921,24 +921,24 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/16)
 	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_c_w))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(zaxxon_state::zaxxon_sound_a_w));
+	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::zaxxon_sound_b_w));
+	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::zaxxon_sound_c_w));
 
-	MCFG_DEVICE_ADD("mainlatch1", LS259, 0) // U55 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // COIN EN A
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // COIN EN B
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // SERV EN
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, zaxxon_state, coin_counter_a_w)) // COUNT A
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, zaxxon_state, coin_counter_b_w)) // COUNT B
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, flipscreen_w)) // FLIP
+	LS259(config, m_mainlatch[0]); // U55 on Zaxxon IC Board A
+	m_mainlatch[0]->q_out_cb<0>().set(FUNC(zaxxon_state::coin_enable_w)); // COIN EN A
+	m_mainlatch[0]->q_out_cb<1>().set(FUNC(zaxxon_state::coin_enable_w)); // COIN EN B
+	m_mainlatch[0]->q_out_cb<2>().set(FUNC(zaxxon_state::coin_enable_w)); // SERV EN
+	m_mainlatch[0]->q_out_cb<3>().set(FUNC(zaxxon_state::coin_counter_a_w)); // COUNT A
+	m_mainlatch[0]->q_out_cb<4>().set(FUNC(zaxxon_state::coin_counter_b_w)); // COUNT B
+	m_mainlatch[0]->q_out_cb<6>().set(FUNC(zaxxon_state::flipscreen_w)); // FLIP
 
-	MCFG_DEVICE_ADD("mainlatch2", LS259, 0) // U56 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaxxon_state, int_enable_w)) // INTON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaxxon_state, fg_color_w)) // CREF 1
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, bg_enable_w)) // BEN
+	LS259(config, m_mainlatch[1]); // U56 on Zaxxon IC Board A
+	m_mainlatch[1]->q_out_cb<0>().set(FUNC(zaxxon_state::int_enable_w)); // INTON
+	m_mainlatch[1]->q_out_cb<1>().set(FUNC(zaxxon_state::fg_color_w)); // CREF 1
+	m_mainlatch[1]->q_out_cb<6>().set(FUNC(zaxxon_state::bg_color_w)); // CREF 3
+	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::bg_enable_w)); // BEN
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaxxon)
@@ -1031,8 +1031,7 @@ MACHINE_CONFIG_START(zaxxon_state::ixion)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
-	MCFG_DEVICE_MODIFY("mainlatch1")
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // flip screen not used
+	m_mainlatch[0]->q_out_cb<6>().set_nop(); // flip screen not used
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::congo)
@@ -1041,20 +1040,20 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(congo_map)
 
-	MCFG_DEVICE_REPLACE("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, congo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, congo_sound_c_w))
+	m_ppi->in_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_ppi->out_pa_callback().set_nop();
+	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::congo_sound_b_w));
+	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::congo_sound_c_w));
 
-	MCFG_DEVICE_MODIFY("mainlatch1") // U52 on Control Board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, zaxxon_state, bg_enable_w)) // BEN
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, int_enable_w)) // INTON
+	// U52 on Control Board
+	m_mainlatch[0]->q_out_cb<5>().set(FUNC(zaxxon_state::bg_enable_w)); // BEN
+	m_mainlatch[0]->q_out_cb<7>().set(FUNC(zaxxon_state::int_enable_w)); // INTON
 
-	MCFG_DEVICE_MODIFY("mainlatch2") // U53 on Control Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // not used
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, congo_fg_bank_w)) // BS
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, congo_color_bank_w)) // CBS
+	// U53 on Control Board
+	m_mainlatch[1]->q_out_cb<0>().set_nop(); // not used
+	m_mainlatch[1]->q_out_cb<3>().set(FUNC(zaxxon_state::bg_color_w)); // CREF 3
+	m_mainlatch[1]->q_out_cb<6>().set(FUNC(zaxxon_state::congo_fg_bank_w)); // BS
+	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::congo_color_bank_w)); // CBS
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(congo_sound_map)

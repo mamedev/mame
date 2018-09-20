@@ -25,7 +25,12 @@ public:
 		m_pant{ nullptr, nullptr }
 	{ }
 
+	void glass(machine_config &config);
+	void glass_ds5002fp(machine_config &config);
 
+	void init_glass();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -61,7 +66,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 
-	void init_glass();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -72,8 +76,6 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void ROM16_split_gfx( const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2 );
-	void glass(machine_config &config);
-	void glass_ds5002fp(machine_config &config);
 	void glass_map(address_map &map);
 	void mcu_hostmem_map(address_map &map);
 	void oki_map(address_map &map);

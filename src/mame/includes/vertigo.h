@@ -39,7 +39,7 @@ public:
 
 	void vertigo(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
 	DECLARE_READ16_MEMBER(vertigo_io_convert);
 	DECLARE_READ16_MEMBER(vertigo_coin_r);
@@ -51,7 +51,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(sound_command_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq3_w);
-	TTL74148_OUTPUT_CB(update_irq);
+	DECLARE_WRITE8_MEMBER(update_irq);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -60,7 +60,6 @@ protected:
 	void vertigo_motor(address_map &map);
 	void exidy440_audio_map(address_map &map);
 
-private:
 	struct am2901
 	{
 		uint32_t ram[16];   /* internal ram */

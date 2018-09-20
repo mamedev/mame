@@ -101,6 +101,9 @@ public:
 	{
 	}
 
+	void hvyunit(machine_config &config);
+
+private:
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
@@ -157,7 +160,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void hvyunit(machine_config &config);
 	void master_io(address_map &map);
 	void master_memory(address_map &map);
 	void slave_io(address_map &map);

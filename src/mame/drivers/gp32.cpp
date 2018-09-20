@@ -23,7 +23,6 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/volt_reg.h"
 
-#include "rendlay.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -1687,9 +1686,6 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
 	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
 
-	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
-	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
@@ -1698,7 +1694,7 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 

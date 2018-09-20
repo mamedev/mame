@@ -53,8 +53,6 @@ Notes:
 //**************************************************************************
 
 #define WD1015_TAG      "u6"
-#define WD11C00_17_TAG  "u11"
-#define WD2010A_TAG     "u7"
 
 
 
@@ -94,7 +92,7 @@ const tiny_rom_entry *wdxt_gen_device::device_rom_region() const
 
 void wdxt_gen_device::wd1015_io(address_map &map)
 {
-	map(0x00, 0xff).rw(WD11C00_17_TAG, FUNC(wd11c00_17_device::read), FUNC(wd11c00_17_device::write));
+	map(0x00, 0xff).rw(m_host, FUNC(wd11c00_17_device::read), FUNC(wd11c00_17_device::write));
 }
 
 
@@ -139,39 +137,41 @@ WRITE8_MEMBER( wdxt_gen_device::ram_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wdxt_gen_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD1015_TAG, I8049, 5000000)
-	MCFG_DEVICE_IO_MAP(wd1015_io)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(WD11C00_17_TAG, wd11c00_17_device, busy_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, wdxt_gen_device, wd1015_t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, wdxt_gen_device, wd1015_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, wdxt_gen_device, wd1015_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, wdxt_gen_device, wd1015_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, wdxt_gen_device, wd1015_p2_w))
+void wdxt_gen_device::device_add_mconfig(machine_config &config)
+{
+	mcs48_cpu_device &cpu(I8049(config, m_maincpu, 5000000));
+	cpu.set_addrmap(AS_IO, &wdxt_gen_device::wd1015_io);
+	cpu.t0_in_cb().set(m_host, FUNC(wd11c00_17_device::busy_r));
+	cpu.t1_in_cb().set(FUNC(wdxt_gen_device::wd1015_t1_r));
+	cpu.p1_in_cb().set(FUNC(wdxt_gen_device::wd1015_p1_r));
+	cpu.p1_out_cb().set(FUNC(wdxt_gen_device::wd1015_p1_w));
+	cpu.p2_in_cb().set(FUNC(wdxt_gen_device::wd1015_p2_r));
+	cpu.p2_out_cb().set(FUNC(wdxt_gen_device::wd1015_p2_w));
 
-	MCFG_DEVICE_ADD(WD11C00_17_TAG, WD11C00_17, 5000000)
-	MCFG_WD11C00_17_OUT_IRQ5_CB(WRITELINE(*this, wdxt_gen_device, irq5_w))
-	MCFG_WD11C00_17_OUT_DRQ3_CB(WRITELINE(*this, wdxt_gen_device, drq3_w))
-	MCFG_WD11C00_17_OUT_MR_CB(WRITELINE(*this, wdxt_gen_device, mr_w))
-	MCFG_WD11C00_17_OUT_RA3_CB(INPUTLINE(WD1015_TAG, MCS48_INPUT_IRQ))
-	MCFG_WD11C00_17_IN_RD322_CB(READ8(*this, wdxt_gen_device, rd322_r))
-	MCFG_WD11C00_17_IN_RAMCS_CB(READ8(*this, wdxt_gen_device, ram_r))
-	MCFG_WD11C00_17_OUT_RAMWR_CB(WRITE8(*this, wdxt_gen_device, ram_w))
-	MCFG_WD11C00_17_IN_CS1010_CB(READ8(WD2010A_TAG, wd2010_device, read))
-	MCFG_WD11C00_17_OUT_CS1010_CB(WRITE8(WD2010A_TAG, wd2010_device, write))
-	MCFG_DEVICE_ADD(WD2010A_TAG, WD2010, 5000000)
-	MCFG_WD2010_OUT_BCR_CB(WRITELINE(WD11C00_17_TAG, wd11c00_17_device, clct_w))
-	MCFG_WD2010_IN_BCS_CB(READ8(WD11C00_17_TAG, wd11c00_17_device, read))
-	MCFG_WD2010_OUT_BCS_CB(WRITE8(WD11C00_17_TAG, wd11c00_17_device, write))
-	MCFG_WD2010_IN_DRDY_CB(VCC)
-	MCFG_WD2010_IN_INDEX_CB(VCC)
-	MCFG_WD2010_IN_WF_CB(VCC)
-	MCFG_WD2010_IN_TK000_CB(VCC)
-	MCFG_WD2010_IN_SC_CB(VCC)
+	WD11C00_17(config, m_host, 5000000);
+	m_host->out_irq5_callback().set(FUNC(wdxt_gen_device::irq5_w));
+	m_host->out_drq3_callback().set(FUNC(wdxt_gen_device::drq3_w));
+	m_host->out_mr_callback().set(FUNC(wdxt_gen_device::mr_w));
+	m_host->out_ra3_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_host->in_rd322_callback().set(FUNC(wdxt_gen_device::rd322_r));
+	m_host->in_ramcs_callback().set(FUNC(wdxt_gen_device::ram_r));
+	m_host->out_ramwr_callback().set(FUNC(wdxt_gen_device::ram_w));
+	m_host->in_cs1010_callback().set(m_hdc, FUNC(wd2010_device::read));
+	m_host->out_cs1010_callback().set(m_hdc, FUNC(wd2010_device::write));
 
-	MCFG_HARDDISK_ADD("hard0")
-	MCFG_HARDDISK_ADD("hard1")
-MACHINE_CONFIG_END
+	WD2010(config, m_hdc, 5000000);
+	m_hdc->out_bcr_callback().set(m_host, FUNC(wd11c00_17_device::clct_w));
+	m_hdc->in_bcs_callback().set(m_host, FUNC(wd11c00_17_device::read));
+	m_hdc->out_bcs_callback().set(m_host, FUNC(wd11c00_17_device::write));
+	m_hdc->in_drdy_callback().set_constant(1);
+	m_hdc->in_index_callback().set_constant(1);
+	m_hdc->in_wf_callback().set_constant(1);
+	m_hdc->in_tk000_callback().set_constant(1);
+	m_hdc->in_sc_callback().set_constant(1);
+
+	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hard1", 0);
+}
 
 
 //**************************************************************************
@@ -186,8 +186,8 @@ wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, ISA8_WDXT_GEN, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_maincpu(*this, WD1015_TAG)
-	, m_host(*this, WD11C00_17_TAG)
-	, m_hdc(*this, WD2010A_TAG)
+	, m_host(*this, "u11")
+	, m_hdc(*this, "u7")
 {
 }
 

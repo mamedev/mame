@@ -124,6 +124,19 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void grancapi(machine_config &config);
+	void tv_ncf(machine_config &config);
+	void ciclone(machine_config &config);
+	void nyjoker(machine_config &config);
+	void magicbom(machine_config &config);
+	void brasil(machine_config &config);
+	void fashion(machine_config &config);
+	void newmcard(machine_config &config);
+	void record(machine_config &config);
+	void tv_tcf(machine_config &config);
+	void tv_vcf(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_blit_ram;
 	optional_memory_bank m_mainbank;
 
@@ -162,17 +175,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 	required_device<palette_device> m_palette;
-	void grancapi(machine_config &config);
-	void tv_ncf(machine_config &config);
-	void ciclone(machine_config &config);
-	void nyjoker(machine_config &config);
-	void magicbom(machine_config &config);
-	void brasil(machine_config &config);
-	void fashion(machine_config &config);
-	void newmcard(machine_config &config);
-	void record(machine_config &config);
-	void tv_tcf(machine_config &config);
-	void tv_vcf(machine_config &config);
+
 	void brasil_io(address_map &map);
 	void brasil_map(address_map &map);
 	void ciclone_io(address_map &map);
@@ -1210,7 +1213,7 @@ MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 	MCFG_DEVICE_IO_MAP(tv_vcf_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1295,7 +1298,7 @@ MACHINE_CONFIG_START(highvdeo_state::brasil)
 	MCFG_DEVICE_IO_MAP(brasil_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1325,7 +1328,7 @@ MACHINE_CONFIG_START(highvdeo_state::grancapi)
 	MCFG_DEVICE_IO_MAP(grancapi_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1349,7 +1352,7 @@ MACHINE_CONFIG_START(highvdeo_state::magicbom)
 	MCFG_DEVICE_IO_MAP(magicbom_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -25,15 +25,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 		{ }
 
+	void terak(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(terak_fdc_status_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_command_w);
 	DECLARE_READ16_MEMBER(terak_fdc_data_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void terak(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_unit;
 	uint8_t m_cmd;
 	virtual void machine_reset() override;

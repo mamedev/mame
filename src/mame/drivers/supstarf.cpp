@@ -27,6 +27,9 @@ public:
 	{
 	}
 
+	void supstarf(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(psg_latch_r);
 	DECLARE_WRITE8_MEMBER(psg_latch_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
@@ -38,15 +41,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lights_a_w);
 	DECLARE_WRITE8_MEMBER(lights_b_w);
 
-	void supstarf(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device_array<ay8910_device, 2> m_psg;
@@ -186,13 +187,13 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, supstarf_state, port2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, supstarf_state, phase_detect_r))
 
-	MCFG_DEVICE_ADD("soundlatch1", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(GND)
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	I8212(config, m_soundlatch[0], 0);
+	m_soundlatch[0]->md_rd_callback().set_constant(0);
+	m_soundlatch[0]->int_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
 
-	MCFG_DEVICE_ADD("soundlatch2", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(GND)
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
+	I8212(config, m_soundlatch[1], 0);
+	m_soundlatch[1]->md_rd_callback().set_constant(0);
+	m_soundlatch[1]->int_wr_callback().set_inputline("soundcpu", MCS48_INPUT_IRQ);
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
 	SPEAKER(config, "mono").front_center();

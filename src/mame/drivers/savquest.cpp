@@ -69,6 +69,9 @@ public:
 	{
 	}
 
+	void savquest(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
 	std::unique_ptr<uint32_t[]> m_bios_e0000_ram;
 	std::unique_ptr<uint32_t[]> m_bios_e4000_ram;
@@ -113,15 +116,12 @@ public:
 	DECLARE_READ8_MEMBER(smram_r);
 	DECLARE_WRITE8_MEMBER(smram_w);
 
-	void savquest(machine_config &config);
 	void savquest_io(address_map &map);
 	void savquest_map(address_map &map);
-protected:
-
 
 	// driver_device overrides
 //  virtual void video_start();
-public:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -827,11 +827,11 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, savquest_state, intel82371ab_pci_r, intel82371ab_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(13, DEVICE_SELF, savquest_state, pci_3dfx_r, pci_3dfx_w)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir7_w))
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	/* sound hardware */
 

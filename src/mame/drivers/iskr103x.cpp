@@ -35,9 +35,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void iskr1030m(machine_config &config);
 	void iskr1031(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void iskr1031_io(address_map &map);
 	void iskr1031_map(address_map &map);
 };
@@ -86,9 +88,7 @@ MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 //  MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iskr103x_state::iskr1031)

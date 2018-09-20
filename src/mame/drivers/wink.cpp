@@ -33,6 +33,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
+	void wink(machine_config &config);
+
+	void init_wink();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -60,7 +65,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void init_wink();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -68,7 +72,6 @@ public:
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
-	void wink(machine_config &config);
 	void wink_io(address_map &map);
 	void wink_map(address_map &map);
 	void wink_sound_io(address_map &map);
@@ -385,22 +388,22 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_DEVICE_PROGRAM_MAP(wink_map)
 	MCFG_DEVICE_IO_MAP(wink_io)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wink_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wink_state, player_mux_w))      //??? no mux on the pcb.
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wink_state, tile_banking_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)                //?
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                //cab Knocker like in q-bert!
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<2>))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(wink_state::nmi_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(wink_state::player_mux_w)); //??? no mux on the pcb.
+	mainlatch.q_out_cb<2>().set(FUNC(wink_state::tile_banking_w));
+	mainlatch.q_out_cb<3>().set_nop();                //?
+	mainlatch.q_out_cb<4>().set_nop();                //cab Knocker like in q-bert!
+	mainlatch.q_out_cb<5>().set(FUNC(wink_state::coin_counter_w<0>));
+	mainlatch.q_out_cb<6>().set(FUNC(wink_state::coin_counter_w<1>));
+	mainlatch.q_out_cb<7>().set(FUNC(wink_state::coin_counter_w<2>));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000 / 8)
 	MCFG_DEVICE_PROGRAM_MAP(wink_sound_map)
 	MCFG_DEVICE_IO_MAP(wink_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -69,6 +69,9 @@ public:
 		m_joykeymap(*this, "JOYKEYMAP%u", 0)
 	{ }
 
+	void mc1000(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	optional_device<mc6845_device> m_crtc;
@@ -122,7 +125,6 @@ public:
 
 	void init_mc1000();
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
-	void mc1000(machine_config &config);
 	void mc1000_banking_mem(address_map &map);
 	void mc1000_io(address_map &map);
 	void mc1000_mem(address_map &map);
@@ -585,9 +587,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("48K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("48K");
 MACHINE_CONFIG_END
 
 /* ROMs */

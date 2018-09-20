@@ -115,8 +115,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void amusco(machine_config &config);
+	void draw88pkr(machine_config &config);
+
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
+
+private:
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE8_MEMBER(output_a_w);
@@ -130,14 +135,9 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_PALETTE_INIT(amusco);
 
-	void amusco(machine_config &config);
-	void draw88pkr(machine_config &config);
-
-protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
-private:
 	void amusco_mem_map(address_map &map);
 	void amusco_io_map(address_map &map);
 
@@ -548,27 +548,27 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_PIT8253_CLK1(PIT_CLOCK1)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
 
-	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amusco_state, output_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, amusco_state, output_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amusco_state, output_c_w))
+	i8255_device &ppi_outputs(I8255(config, "ppi_outputs"));
+	ppi_outputs.out_pa_callback().set(FUNC(amusco_state::output_a_w));
+	ppi_outputs.out_pb_callback().set(FUNC(amusco_state::output_b_w));
+	ppi_outputs.out_pc_callback().set(FUNC(amusco_state::output_c_w));
 
-	MCFG_DEVICE_ADD("ppi_inputs", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi_inputs(I8255(config, "ppi_inputs"));
+	ppi_inputs.in_pa_callback().set_ioport("IN0");
+	ppi_inputs.in_pb_callback().set_ioport("IN1");
+	ppi_inputs.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("lpt_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, lpt_data_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(*this, amusco_state, lpt_status_r))
+	i8155_device &i8155a(I8155(config, "lpt_interface", 0));
+	i8155a.out_pa_callback().set(FUNC(amusco_state::lpt_data_w));
+	i8155a.in_pb_callback().set(FUNC(amusco_state::lpt_status_r));
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
 	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, rtc_control_w))
-	MCFG_I8155_IN_PORTC_CB(READ8("rtc", msm5832_device, data_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8("rtc", msm5832_device, data_w))
+	i8155_device &i8155b(I8155(config, "rtc_interface", 0));
+	i8155b.out_pa_callback().set(FUNC(amusco_state::rtc_control_w));
+	i8155b.in_pc_callback().set("rtc", FUNC(msm5832_device::data_r));
+	i8155b.out_pc_callback().set("rtc", FUNC(msm5832_device::data_w));
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 

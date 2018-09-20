@@ -18,6 +18,15 @@ public:
 		m_textram(*this, "textram"),
 		m_videoram(*this, "videoram")  { }
 
+	void shootouj(machine_config &config);
+	void shootouk(machine_config &config);
+	void shootout(machine_config &config);
+
+	void init_shootout();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -41,10 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(textram_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-	void init_shootout();
-
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -56,9 +61,7 @@ public:
 	uint32_t screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits );
-	void shootouj(machine_config &config);
-	void shootouk(machine_config &config);
-	void shootout(machine_config &config);
+
 	void shootouj_map(address_map &map);
 	void shootout_map(address_map &map);
 	void shootout_sound_map(address_map &map);

@@ -149,12 +149,19 @@ CN1 standard DB15 VGA connector (15KHz)
 class pntnpuzl_state : public driver_device
 {
 public:
-	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_via(*this, "via")
 	{ }
 
+	void pntnpuzl(machine_config &config);
+
+	void init_pip();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	uint16_t m_pntpzl_200000;
 	uint16_t m_serial;
 	uint16_t m_serial_out;
@@ -169,10 +176,7 @@ public:
 	DECLARE_READ16_MEMBER(irq1_ack_r);
 	DECLARE_READ16_MEMBER(irq2_ack_r);
 	DECLARE_READ16_MEMBER(irq4_ack_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	void init_pip();
 	required_device<via6522_device> m_via;
-	void pntnpuzl(machine_config &config);
 	void mcu_map(address_map &map);
 	void pntnpuzl_map(address_map &map);
 };
@@ -222,7 +226,7 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 	if (data & 0x2000)
 		m_serial |= 0x400;
 
-	m_via->write(space, 0x18/2, data >> 8);
+	m_via->write(0x18/2, data >> 8);
 }
 
 READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
@@ -230,7 +234,7 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
 
-	(void)m_via->read(space, 0x14/2);
+	(void)m_via->read(0x14/2);
 
 	if (m_serial_out == 0x11)
 	{
@@ -353,14 +357,14 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(pntnpuzl_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(12'000'000) / 10)
-	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	VIA6522(config, m_via, 12_MHz_XTAL / 10);
+	m_via->readpa_handler().set_ioport("IN2");
+	m_via->readpb_handler().set_ioport("IN1");
+	m_via->writepb_handler().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(4);
+	m_via->writepb_handler().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(6);
+	m_via->writepb_handler().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
 	// CB2 used for serial communication with 8798
 
 	MCFG_DEVICE_ADD("mcu", P8098, XTAL(12'000'000))

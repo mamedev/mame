@@ -59,37 +59,37 @@
 //**************************************************************************
 
 #define MCFG_POKEY_POT0_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<0>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT1_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<1>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT2_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<2>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT3_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<3>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT4_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<4>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<4>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT5_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<5>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<5>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT6_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<6>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<6>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT7_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<7>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<7>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_ALLPOT_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_allpot_r_callback(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_allpot_r_callback(DEVCB_##_devcb);
 
 #define MCFG_POKEY_SERIN_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_serin_r_callback(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_serin_r_callback(DEVCB_##_devcb);
 
 #define MCFG_POKEY_SEROUT_W_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_serout_w_callback(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_serout_w_callback(DEVCB_##_devcb);
 
 /* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 /* all are, in contrast to actual hardware, ACTIVE_HIGH */
@@ -214,6 +214,10 @@ public:
 	template <class Object> devcb_base &set_allpot_r_callback(Object &&cb) { return m_allpot_r_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_serin_r_callback(Object &&cb) { return m_serin_r_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_serout_w_callback(Object &&cb) { return m_serout_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto pot_r() { return m_pot_r_cb[N].bind(); }
+	auto allpot_r() { return m_allpot_r_cb.bind(); }
+	auto serin_r() { return m_serin_r_cb.bind(); }
+	auto serout_w() { return m_serout_w_cb.bind(); }
 
 	template <typename Object> void set_keyboard_callback(Object &&cb) { m_keyboard_r = std::forward<Object>(cb); }
 	template <typename Object> void set_interrupt_callback(Object &&cb) { m_irq_f = std::forward<Object>(cb); }

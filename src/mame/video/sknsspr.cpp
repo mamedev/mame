@@ -288,6 +288,8 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 	int sprite_flip;
 	int sprite_x_scroll;
 	int sprite_y_scroll;
+	/* galpani3 uses sprite trail effect (disable clearing sprite bitmap) */
+	int clear_bitmap = (~sprite_regs[0x04/4] & 0x04); // RWR1
 	int disabled = sprite_regs[0x04/4] & 0x08; // RWR1
 	int xsize,ysize, size, xpos=0,ypos=0, pri=0, romoffset, colour=0, xflip,yflip, joint;
 	int sx,sy;
@@ -295,6 +297,10 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 	int grow;
 	uint16_t zoomx_m, zoomx_s, zoomy_m, zoomy_s;
 
+	if (clear_bitmap)
+	{
+		bitmap.fill(0x0000, cliprect);
+	}
 
 	if ((!disabled)){
 		group_enable    = (sprite_regs[0x00/4] & 0x0040) >> 6; // RWR0

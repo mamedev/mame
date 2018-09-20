@@ -38,15 +38,15 @@ public:
 		m_pwr(*this, "PWR")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
-
 	void noki3330(machine_config &config);
 	void noki3410(machine_config &config);
 	void noki7110(machine_config &config);
 	void noki6210(machine_config &config);
 	void noki3310(machine_config &config);
 
-protected:
+	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -71,7 +71,6 @@ protected:
 
 	void noki3310_map(address_map &map);
 
-private:
 	void assert_fiq(int num);
 	void assert_irq(int num);
 	void ack_fiq(uint16_t mask);
@@ -721,15 +720,14 @@ MACHINE_CONFIG_START(noki3310_state::noki3310)
 	MCFG_PCD8544_ADD("pcd8544")
 	MCFG_PCD8544_SCREEN_UPDATE_CALLBACK(noki3310_state, pcd8544_screen_update)
 
-	MCFG_INTEL_TE28F160_ADD("flash")
+	INTEL_TE28F160(config, "flash");
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(noki3310_state::noki3330)
 	noki3310(config);
 
-	MCFG_DEVICE_REMOVE("flash")
-	MCFG_INTEL_TE28F320_ADD("flash")
+	INTEL_TE28F320(config.replace(), "flash");
 
 MACHINE_CONFIG_END
 

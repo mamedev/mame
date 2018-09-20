@@ -131,6 +131,8 @@ public:
 		m_m6502_reset = 0;
 	}
 
+	void supracan(machine_config &config);
+
 private:
 	DECLARE_READ16_MEMBER(_68k_soundram_r);
 	DECLARE_WRITE16_MEMBER(_68k_soundram_w);
@@ -237,8 +239,6 @@ private:
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
-public:
-	void supracan(machine_config &config);
 };
 
 

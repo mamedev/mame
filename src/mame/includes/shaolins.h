@@ -16,6 +16,9 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram")   { }
 
+	void shaolins(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -43,6 +46,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	void shaolins(machine_config &config);
 	void shaolins_map(address_map &map);
 };

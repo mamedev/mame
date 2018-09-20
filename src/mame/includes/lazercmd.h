@@ -40,6 +40,13 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void bbonk(machine_config &config);
+	void medlanes(machine_config &config);
+	void lazercmd(machine_config &config);
+
+	void init_lazercmd();
+
+private:
 	/* device */
 	required_device<s2650_device> m_maincpu;
 	optional_device<dac_bit_interface> m_dac0;
@@ -69,7 +76,6 @@ public:
 	DECLARE_WRITE8_MEMBER(medlanes_hardware_w);
 	DECLARE_WRITE8_MEMBER(bbonk_hardware_w);
 	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
-	void init_lazercmd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(lazercmd);
@@ -78,9 +84,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bbonk_timer);
 	int vert_scale(int data);
 	void plot_pattern( bitmap_ind16 &bitmap, int x, int y );
-	void bbonk(machine_config &config);
-	void medlanes(machine_config &config);
-	void lazercmd(machine_config &config);
 	void bbonk_map(address_map &map);
 	void lazercmd_map(address_map &map);
 	void lazercmd_portmap(address_map &map);

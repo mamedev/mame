@@ -89,6 +89,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void srmp6(machine_config &config);
+private:
 	std::unique_ptr<uint16_t[]> m_tileram;
 	required_shared_ptr<uint16_t> m_sprram;
 	required_shared_ptr<uint16_t> m_chrram;
@@ -103,6 +105,9 @@ public:
 	unsigned short m_lastb;
 	unsigned short m_lastb2;
 	int m_destl;
+
+	void init_INIT();
+
 	DECLARE_WRITE16_MEMBER(srmp6_input_select_w);
 	DECLARE_READ16_MEMBER(srmp6_inputs_r);
 	DECLARE_WRITE16_MEMBER(video_regs_w);
@@ -112,7 +117,6 @@ public:
 	DECLARE_WRITE16_MEMBER(tileram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
-	void init_INIT();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -121,7 +125,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void srmp6(machine_config &config);
 	void srmp6_map(address_map &map);
 };
 

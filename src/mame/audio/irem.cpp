@@ -20,14 +20,14 @@ DEFINE_DEVICE_TYPE(IREM_M52_LARGE_AUDIO,  m52_large_audio_device,  "m52_large_au
 
 irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_cpu(*this, "iremsound")
+	, m_adpcm1(*this, "msm1")
+	, m_adpcm2(*this, "msm2")
 	, m_port1(0)
 	, m_port2(0)
 	, m_soundlatch(0)
-	, m_cpu(*this, "iremsound")
 	, m_ay_45L(*this, "ay_45l")
 	, m_ay_45M(*this, "ay_45m")
-	, m_adpcm1(*this, "msm1")
-	, m_adpcm2(*this, "msm2")
 	, m_audio_BD(*this, "snd_nl:ibd")
 	, m_audio_SD(*this, "snd_nl:isd")
 	, m_audio_OH(*this, "snd_nl:ioh")
@@ -431,15 +431,15 @@ MACHINE_CONFIG_START(m62_audio_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 4)
 	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 5)
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("msm2", msm5205_device, vclk_w)) // the first MSM5205 clocks the second
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 6)
+	MSM5205(config, m_adpcm1, 384_kHz_XTAL); // verified on PCB
+	m_adpcm1->vck_callback().set_inputline(m_cpu, INPUT_LINE_NMI); // driven through NPN inverter
+	m_adpcm1->vck_callback().append(m_adpcm2, FUNC(msm5205_device::vclk_w)); // the first MSM5205 clocks the second
+	m_adpcm1->set_prescaler_selector(msm5205_device::S96_4B); // default to 4KHz, but can be changed at run time
+	m_adpcm1->add_route(0, "snd_nl", 1.0, 6);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 7)
+	MSM5205(config, m_adpcm2, 384_kHz_XTAL); // verified on PCB
+	m_adpcm2->set_prescaler_selector(msm5205_device::SEX_4B); // default to 4KHz, but can be changed at run time, slave
+	m_adpcm2->add_route(0, "snd_nl", 1.0, 7);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
@@ -530,15 +530,15 @@ MACHINE_CONFIG_START(m52_large_audio_device::device_add_mconfig)  /* 10 yard fig
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, irem_audio_device, ay8910_45L_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("msm2", msm5205_device, vclk_w)) // the first MSM5205 clocks the second
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MSM5205(config, m_adpcm1, 384_kHz_XTAL); // verified on PCB
+	m_adpcm1->vck_callback().set_inputline(m_cpu, INPUT_LINE_NMI); // driven through NPN inverter
+	m_adpcm1->vck_callback().append(m_adpcm2, FUNC(msm5205_device::vclk_w)); // the first MSM5205 clocks the second
+	m_adpcm1->set_prescaler_selector(msm5205_device::S96_4B); // default to 4KHz, but can be changed at run time
+	m_adpcm1->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MSM5205(config, m_adpcm2, 384_kHz_XTAL); // verified on PCB
+	m_adpcm2->set_prescaler_selector(msm5205_device::SEX_4B); // default to 4KHz, but can be changed at run time, slave
+	m_adpcm2->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 MACHINE_CONFIG_END
 

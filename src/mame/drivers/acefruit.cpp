@@ -23,11 +23,6 @@ Inputs and Dip Switches by Stephh
 class acefruit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_ACEFRUIT_REFRESH
-	};
-
 	acefruit_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -44,15 +39,20 @@ public:
 		m_refresh_timer(nullptr)
 	{ }
 
+	void acefruit(machine_config &config);
+
 	void init_sidewndr();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
 
-	void acefruit(machine_config &config);
+private:
+	enum
+	{
+		TIMER_ACEFRUIT_REFRESH
+	};
 
-protected:
 	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
 	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
 	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
@@ -71,7 +71,6 @@ protected:
 	void acefruit_io(address_map &map);
 	void acefruit_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -634,7 +633,7 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	MCFG_DEVICE_IO_MAP(acefruit_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acefruit)
 
@@ -650,7 +649,7 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(acefruit_state, acefruit)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* sound hardware */

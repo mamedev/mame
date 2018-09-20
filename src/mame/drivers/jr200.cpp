@@ -51,6 +51,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void jr200(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	required_shared_ptr<uint8_t> m_mn1271_ram;
@@ -76,9 +79,8 @@ public:
 	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
-	void jr200(machine_config &config);
 	void jr200_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_memory_region m_pcg;

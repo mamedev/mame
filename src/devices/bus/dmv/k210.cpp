@@ -74,25 +74,25 @@ void dmv_k210_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(dmv_k210_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, dmv_k210_device, porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, dmv_k210_device, portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, dmv_k210_device, portc_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dmv_k210_device, porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dmv_k210_device, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dmv_k210_device, portc_w))
+	I8255(config, m_ppi, 0);
+	m_ppi->in_pa_callback().set(FUNC(dmv_k210_device::porta_r));
+	m_ppi->in_pb_callback().set(FUNC(dmv_k210_device::portb_r));
+	m_ppi->in_pc_callback().set(FUNC(dmv_k210_device::portc_r));
+	m_ppi->out_pa_callback().set(FUNC(dmv_k210_device::porta_w));
+	m_ppi->out_pb_callback().set(FUNC(dmv_k210_device::portb_w));
+	m_ppi->out_pc_callback().set(FUNC(dmv_k210_device::portc_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, dmv_k210_device, cent_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, dmv_k210_device, cent_busy_w))
-	MCFG_CENTRONICS_SELECT_IN_HANDLER(WRITELINE(*this, dmv_k210_device, cent_slct_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, dmv_k210_device, cent_pe_w))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, dmv_k210_device, cent_fault_w))
-	MCFG_CENTRONICS_AUTOFD_HANDLER(WRITELINE(*this, dmv_k210_device, cent_autofd_w))
-	MCFG_CENTRONICS_INIT_HANDLER(WRITELINE(*this, dmv_k210_device, cent_init_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer(m_cent_data_in);
+	m_centronics->ack_handler().set(FUNC(dmv_k210_device::cent_ack_w));
+	m_centronics->busy_handler().set(FUNC(dmv_k210_device::cent_busy_w));
+	m_centronics->select_in_handler().set(FUNC(dmv_k210_device::cent_slct_w));
+	m_centronics->perror_handler().set(FUNC(dmv_k210_device::cent_pe_w));
+	m_centronics->fault_handler().set(FUNC(dmv_k210_device::cent_fault_w));
+	m_centronics->autofd_handler().set(FUNC(dmv_k210_device::cent_autofd_w));
+	m_centronics->init_handler().set(FUNC(dmv_k210_device::cent_init_w));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_data_in);
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 

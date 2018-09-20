@@ -905,7 +905,6 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_DEVICE_IO_MAP(hx20_sub_io)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -930,8 +929,9 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 4.194304_MHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, hx20_state, rtc_irq_w))
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
+	m_rtc->irq().set(FUNC(hx20_state::rtc_irq_w));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
@@ -939,9 +939,7 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// optional rom
 	MCFG_GENERIC_SOCKET_ADD("optrom", generic_plain_slot, "opt_rom")

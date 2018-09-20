@@ -22,6 +22,12 @@ public:
 			m_dmdtype3(*this, "decodmd")
 	{ }
 
+	void detest(machine_config &config);
+	void de_3b(machine_config &config);
+
+	void init_de_3b();
+
+private:
 	// devices
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<decodmd_type3_device> m_dmdtype3;
@@ -41,22 +47,11 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
-	void detest(machine_config &config);
-	void de_3b(machine_config &config);
-protected:
-
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_de_3b();
 
-	uint8_t m_strobe;
 	uint8_t m_kbdrow;
-	uint8_t m_diag;
-	bool m_ca1;
-	bool m_irq_active;
 	uint8_t m_sound_data;
-
 };
 
 

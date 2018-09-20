@@ -8,38 +8,42 @@
     Based on early work by David Haywood
 
     CPU Board quick layout:
-    |------------------------------------|
-    |    68000P8             DSW  DSW    |
-    |                                  J|--|
-    |                          uPD4701? |--|
-    |    x   x        TMS32025 uPD4701? |--|
-    |                                   |--|
-    |                        TC0060DCA? |--|
-    |A                                  |--|
-    |                                   |--|
-    |                                   |--|
-    |                                   |--|
-    |                                    |
-    | XTAL       x    YM2151           R |
-    |B           x                       |
-    |    x   x   x    5205 5205          |
-    |    x   x   x                       |
-    |    x   x   x           x           |
-    |                        PC060HA     |
-    |                                    |
-    |                 x      Z80 CTC     |
-    |    68000P8      Z80                |
-    |------------------------------------|
-        * A, B, R are flatcable connectors, and J is for Jamma
-        * XTAL is assumed to be around 32MHz
-        * x are ROM chips, PCB photo was too small to determine which
+    |----------------------------------------|
+    |    68000CP8        PAL     DSW  DSW    |
+    |    *   *                             J|--|
+    |    22  23   5165              uPD4701 |--|
+    |   6264 6264 5165     TMS32020 uPD4701 |--|
+    |                                       |--|
+    |                              PC050CM  |--|
+    |A                          MB3731 x 3  |--|
+    |    5165 5165              VR1 VR2 VR3 |--|
+    | PAL                                   |--|
+    | PAL               PAL                 |--|
+    |                                        |
+    | 16.000MHz   30   YM2151              R |
+    |B    *   *   31    384KHz               |
+    |     24  25  32   5205 5205             |
+    | #   26  27  33                         |
+    |     28  29  34                         |
+    |                              36        |
+    |                PAL           PC060HA   |
+    |PAL             PAL     35    Z80 CTC   |
+    |    68000CP8    PAL     Z80             |
+    |----------------------------------------|
+
+        A, B, R are flatcable connectors, and J is for Jamma
+        All numbered roms are prefixed with B09
+        XTALs are 16.0000MHz, 384KHz
+        VR1, VR2 & VR3 are sound pots
+        # denotes a MB3771 Power Supply Monitor
+        * denotes unpopulated ROM sockets
 
 
     To do:
-        * Find Japanese version
-        * Determine correct CPU and video timings
+        * Determine correct video timing
         * Unknown sound writes (volume and body sonic control?)
         * Better document mecha drive CPU
+        * Use TMS32020(currently unemulated) device instead of TMS32025
 
 ****************************************************************************/
 
@@ -70,15 +74,8 @@
 class mlanding_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DMA_COMPLETE
-	};
-
-	static const uint32_t c_dma_bank_words = 0x2000;
-
-	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mlanding_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_dsp(*this, "dsp"),
@@ -97,6 +94,21 @@ public:
 		m_power_ram(*this, "power_ram"),
 		m_palette(*this, "palette")
 	{ }
+
+	void mlanding(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	enum
+	{
+		TIMER_DMA_COMPLETE
+	};
+
+	static const uint32_t c_dma_bank_words = 0x2000;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -130,9 +142,6 @@ public:
 	uint8_t   m_msm2_vck;
 	uint8_t   m_msm2_vck2;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_WRITE16_MEMBER(dma_start_w);
 	DECLARE_WRITE16_MEMBER(dma_stop_w);
 	DECLARE_WRITE16_MEMBER(output_w);
@@ -161,11 +170,10 @@ public:
 
 	DECLARE_READ8_MEMBER(motor_r);
 
-	uint32_t screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
-	void mlanding(machine_config &config);
 	void audio_map_io(address_map &map);
 	void audio_map_prog(address_map &map);
 	void dsp_map_data(address_map &map);
@@ -173,8 +181,6 @@ public:
 	void main_map(address_map &map);
 	void mecha_map_prog(address_map &map);
 	void sub_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -231,7 +237,7 @@ void mlanding_state::machine_reset()
  *
  *************************************/
 
-uint32_t mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
 
@@ -260,7 +266,7 @@ uint32_t mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_in
 WRITE16_MEMBER(mlanding_state::dma_start_w)
 {
 	m_dma_cpu_bank ^= 1;
-	membank("dma_ram")->set_entry(m_dma_cpu_bank);
+	m_dma_bank->set_entry(m_dma_cpu_bank);
 
 	uint32_t pixels = exec_dma();
 
@@ -588,7 +594,8 @@ void mlanding_state::msm5205_update(int chip)
 
 WRITE_LINE_MEMBER(mlanding_state::msm5205_1_vck)
 {
-	msm5205_update(0);
+	if (state)
+		msm5205_update(0);
 }
 
 
@@ -721,9 +728,9 @@ void mlanding_state::main_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 	map(0x080000, 0x08ffff).ram();
-	map(0x100000, 0x17ffff).ram().share("g_ram");
-	map(0x180000, 0x1bffff).ram().share("cha_ram");
-	map(0x1c0000, 0x1c3fff).bankrw("dma_ram");
+	map(0x100000, 0x17ffff).ram().share(m_g_ram);
+	map(0x180000, 0x1bffff).ram().share(m_cha_ram);
+	map(0x1c0000, 0x1c3fff).bankrw(m_dma_bank);
 	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
 	map(0x1d0000, 0x1d0001).w(FUNC(mlanding_state::dma_start_w));
 	map(0x1d0002, 0x1d0003).w(FUNC(mlanding_state::dma_stop_w));
@@ -759,10 +766,10 @@ void mlanding_state::sub_map(address_map &map)
 	map(0x040000, 0x043fff).ram();
 	map(0x050000, 0x0503ff).ram().share("dsp_prog");
 	map(0x060000, 0x060001).w(FUNC(mlanding_state::dsp_control_w));
-	map(0x1c0000, 0x1c3fff).bankrw("dma_ram");
+	map(0x1c0000, 0x1c3fff).bankrw(m_dma_bank);
 	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
 	map(0x200000, 0x2007ff).ram();
-	map(0x200800, 0x203fff).ram().share("dot_ram");
+	map(0x200800, 0x203fff).ram().share(m_dot_ram);
 }
 
 
@@ -780,7 +787,7 @@ void mlanding_state::dsp_map_prog(address_map &map)
 
 void mlanding_state::dsp_map_data(address_map &map)
 {
-	map(0x0400, 0x1fff).ram().share("dot_ram");
+	map(0x0400, 0x1fff).ram().share(m_dot_ram);
 }
 
 /*************************************
@@ -826,7 +833,7 @@ void mlanding_state::mecha_map_prog(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8fff).ram().share("power_ram");
+	map(0x8800, 0x8fff).ram().share(m_power_ram);
 	map(0x9000, 0x9003).nopw();
 	map(0x9800, 0x9805).r(FUNC(mlanding_state::motor_r));
 }
@@ -917,6 +924,14 @@ static INPUT_PORTS_START( mlanding )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mlandingj )
+	PORT_INCLUDE(mlanding)
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) ) PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -924,70 +939,67 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mlanding_state::mlanding)
-
+void mlanding_state::mlanding(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mlanding_state, irq6_line_hold)
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // TS68000CP8
+	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mlanding_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, 16_MHz_XTAL / 2); // TS68000CP8
+	m_subcpu->set_addrmap(AS_PROGRAM, &mlanding_state::sub_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(audio_map_prog)
-	MCFG_DEVICE_IO_MAP(audio_map_io)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // Z08040004PSC
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mlanding_state::audio_map_prog);
+	m_audiocpu->set_addrmap(AS_IO, &mlanding_state::audio_map_io);
 
-	MCFG_DEVICE_ADD("mechacpu", Z80, 4000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(mecha_map_prog)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mlanding_state, irq0_line_hold)
+	Z80(config, m_mechacpu, 4000000); // ?
+	m_mechacpu->set_addrmap(AS_PROGRAM, &mlanding_state::mecha_map_prog);
+	m_mechacpu->set_vblank_int("screen", FUNC(mlanding_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("dsp", TMS32025, 32000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(dsp_map_prog)
-	MCFG_DEVICE_DATA_MAP(dsp_map_data)
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, mlanding_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
+	tms32025_device& dsp(TMS32025(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
+	dsp.set_addrmap(AS_PROGRAM, &mlanding_state::dsp_map_prog);
+	dsp.set_addrmap(AS_DATA, &mlanding_state::dsp_map_data);
+	dsp.hold_in_cb().set(FUNC(mlanding_state::dsp_hold_signal_r));
+	dsp.hold_ack_out_cb().set_nop();
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, mlanding_state, z80ctc_to0))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
+	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag("maincpu");
+	ciu.set_slave_tag("audiocpu");
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	TAITOIO_YOKE(config, m_yoke, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(16_MHz_XTAL, 640, 0, 512, 462, 0, 400); // Estimated
+	screen.set_screen_update(FUNC(mlanding_state::screen_update));
+	screen.set_palette(m_palette);
 
-	// Estimated
-	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(mlanding_state, screen_update_mlanding)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, mlanding_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.port_write_handler().set(FUNC(mlanding_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mlanding_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MSM5205(config, m_msm1, 384_kHz_XTAL);
+	m_msm1->vck_callback().set(FUNC(mlanding_state::msm5205_1_vck)); // VCK function
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B); // 8 kHz, 4-bit
+	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm2, 384_kHz_XTAL);
+	m_msm2->set_prescaler_selector(msm5205_device::SEX_4B); // Slave mode, 4-bit
+	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.10);
+}
 
 
 
@@ -999,35 +1011,63 @@ MACHINE_CONFIG_END
 
 ROM_START( mlanding )
 	ROM_REGION( 0x60000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ml_b0929.epr", 0x00000, 0x10000, CRC(ab3f38f3) SHA1(4357112ca11a8e7bfe08ba99ac3bddac046c230a))
-	ROM_LOAD16_BYTE( "ml_b0928.epr", 0x00001, 0x10000, CRC(21e7a8f6) SHA1(860d3861d4375866cd27d426d546ddb2894a6629) )
-	ROM_LOAD16_BYTE( "ml_b0927.epr", 0x20000, 0x10000, CRC(b02f1805) SHA1(b8050f955c7070dc9b962db329b5b0ee8b2acb70) )
-	ROM_LOAD16_BYTE( "ml_b0926.epr", 0x20001, 0x10000, CRC(d57ff428) SHA1(8ff1ab666b06fb873f1ba9b25edf4cd49b9861a1) )
-	ROM_LOAD16_BYTE( "ml_b0925.epr", 0x40000, 0x10000, CRC(ff59f049) SHA1(aba490a28aba03728415f34d321fd599c31a5fde) )
-	ROM_LOAD16_BYTE( "ml_b0924.epr", 0x40001, 0x10000, CRC(9bc3e1b0) SHA1(6d86804327df11a513a0f06dceb57b83b34ac007) )
+	ROM_LOAD16_BYTE( "b09_29.ic44", 0x00000, 0x10000, CRC(ab3f38f3) SHA1(4357112ca11a8e7bfe08ba99ac3bddac046c230a) ) // label needs verifying
+	ROM_LOAD16_BYTE( "b09_28.ic27", 0x00001, 0x10000, CRC(21e7a8f6) SHA1(860d3861d4375866cd27d426d546ddb2894a6629) ) // label needs verifying
+	ROM_LOAD16_BYTE( "b09_27.ic45", 0x20000, 0x10000, CRC(b02f1805) SHA1(b8050f955c7070dc9b962db329b5b0ee8b2acb70) )
+	ROM_LOAD16_BYTE( "b09_26.ic28", 0x20001, 0x10000, CRC(d57ff428) SHA1(8ff1ab666b06fb873f1ba9b25edf4cd49b9861a1) )
+	ROM_LOAD16_BYTE( "b09_25.ic46", 0x40000, 0x10000, CRC(ff59f049) SHA1(aba490a28aba03728415f34d321fd599c31a5fde) )
+	ROM_LOAD16_BYTE( "b09_24.ic29", 0x40001, 0x10000, CRC(9bc3e1b0) SHA1(6d86804327df11a513a0f06dceb57b83b34ac007) )
 
 	ROM_REGION( 0x20000, "subcpu", 0 )
-	ROM_LOAD16_BYTE( "ml_b0923.epr", 0x00000, 0x10000, CRC(81b2c871) SHA1(a085bc528c63834079469db6ae263a5b9b984a7c) )
-	ROM_LOAD16_BYTE( "ml_b0922.epr", 0x00001, 0x10000, CRC(36923b42) SHA1(c31d7c45a563cfc4533379f69f32889c79562534) )
+	ROM_LOAD16_BYTE( "b09_23.ic56", 0x00000, 0x10000, CRC(81b2c871) SHA1(a085bc528c63834079469db6ae263a5b9b984a7c) )
+	ROM_LOAD16_BYTE( "b09_22.ic39", 0x00001, 0x10000, CRC(36923b42) SHA1(c31d7c45a563cfc4533379f69f32889c79562534) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ml_b0935.epr", 0x00000, 0x08000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
+	ROM_LOAD( "b09_35.ic80", 0x00000, 0x08000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
 
 	ROM_REGION( 0x10000, "mechacpu", 0 )
-	ROM_LOAD( "ml_b0937.epr", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) )
+	ROM_LOAD( "b09_37.epr", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) )
 
 	ROM_REGION( 0x80000, "adpcm1", 0 )
-	ROM_LOAD( "ml_b0934.epr", 0x00000, 0x10000, CRC(0899666f) SHA1(032e3ddd4caa48f82592570616e16c084de91f3e) )
-	ROM_LOAD( "ml_b0933.epr", 0x10000, 0x10000, CRC(f5cac954) SHA1(71abdc545e0196ad4d357af22dd6312d10a1323f) )
-	ROM_LOAD( "ml_b0932.epr", 0x20000, 0x10000, CRC(4721dc59) SHA1(faad75d577344e9ba495059040a2cf0647567426) )
-	ROM_LOAD( "ml_b0931.epr", 0x30000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
-	ROM_LOAD( "ml_b0930.epr", 0x40000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
+	ROM_LOAD( "b09_34.ic62", 0x00000, 0x10000, CRC(0899666f) SHA1(032e3ddd4caa48f82592570616e16c084de91f3e) )
+	ROM_LOAD( "b09_33.ic63", 0x10000, 0x10000, CRC(f5cac954) SHA1(71abdc545e0196ad4d357af22dd6312d10a1323f) )
+	ROM_LOAD( "b09_32.ic64", 0x20000, 0x10000, CRC(4721dc59) SHA1(faad75d577344e9ba495059040a2cf0647567426) )
+	ROM_LOAD( "b09_31.ic65", 0x30000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
+	ROM_LOAD( "b09_30.ic66", 0x40000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
 
 	ROM_REGION( 0x2000, "adpcm2", 0 )
-	ROM_LOAD( "ml_b0936.epr", 0x00000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
+	ROM_LOAD( "b09_36.ic111", 0x00000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
 ROM_END
 
+ROM_START( mlandingj )
+	ROM_REGION( 0x60000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "b09_29-2.ic44", 0x00000, 0x10000, CRC(c78d55cd) SHA1(0126524310048a55f4c0c361a1673cc259e461ba) ) // 27512
+	ROM_LOAD16_BYTE( "b09_28-3.ic27", 0x00001, 0x10000, CRC(7098c18d) SHA1(ee5b386fed9df5edfd19cb967fd01e9e7fd9ad08) ) // 27512
+	ROM_LOAD16_BYTE( "b09_27.ic45",   0x20000, 0x10000, CRC(b02f1805) SHA1(b8050f955c7070dc9b962db329b5b0ee8b2acb70) )
+	ROM_LOAD16_BYTE( "b09_26.ic28",   0x20001, 0x10000, CRC(d57ff428) SHA1(8ff1ab666b06fb873f1ba9b25edf4cd49b9861a1) )
+	ROM_LOAD16_BYTE( "b09_25.ic46",   0x40000, 0x10000, CRC(ff59f049) SHA1(aba490a28aba03728415f34d321fd599c31a5fde) )
+	ROM_LOAD16_BYTE( "b09_24.ic29",   0x40001, 0x10000, CRC(9bc3e1b0) SHA1(6d86804327df11a513a0f06dceb57b83b34ac007) )
 
+	ROM_REGION( 0x20000, "subcpu", 0 )
+	ROM_LOAD16_BYTE( "b09_23.ic56", 0x00000, 0x10000, CRC(81b2c871) SHA1(a085bc528c63834079469db6ae263a5b9b984a7c) )
+	ROM_LOAD16_BYTE( "b09_22.ic39", 0x00001, 0x10000, CRC(36923b42) SHA1(c31d7c45a563cfc4533379f69f32889c79562534) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b09_35.ic80", 0x00000, 0x08000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
+
+	ROM_REGION( 0x10000, "mechacpu", 0 )
+	ROM_LOAD( "b09_37.epr", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) )
+
+	ROM_REGION( 0x80000, "adpcm1", 0 )
+	ROM_LOAD( "b09_34.ic62", 0x00000, 0x10000, CRC(0899666f) SHA1(032e3ddd4caa48f82592570616e16c084de91f3e) )
+	ROM_LOAD( "b09_33.ic63", 0x10000, 0x10000, CRC(f5cac954) SHA1(71abdc545e0196ad4d357af22dd6312d10a1323f) )
+	ROM_LOAD( "b09_32.ic64", 0x20000, 0x10000, CRC(4721dc59) SHA1(faad75d577344e9ba495059040a2cf0647567426) )
+	ROM_LOAD( "b09_31.ic65", 0x30000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
+	ROM_LOAD( "b09_30.ic66", 0x40000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
+
+	ROM_REGION( 0x2000, "adpcm2", 0 )
+	ROM_LOAD( "b09_36.ic111", 0x00000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
+ROM_END
 
 /*************************************
  *
@@ -1035,4 +1075,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mlanding,         0, mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan)",   MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.

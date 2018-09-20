@@ -27,7 +27,7 @@
 //**************************************************************************
 
 #define MCFG_APRICOT_KEYBOARD_TXD_CALLBACK(_write) \
-	devcb = &downcast<apricot_keyboard_device &>(*device).set_tcd_wr_callback(DEVCB_##_write);
+	downcast<apricot_keyboard_device &>(*device).set_tcd_wr_callback(DEVCB_##_write);
 
 
 

@@ -105,6 +105,10 @@ public:
 		, m_floppy_connector(*this, WDFDC_TAG":%u", 0U)
 	{ }
 
+	void pt68k2(machine_config &config);
+	void pt68k4(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(hiram_r);
 	DECLARE_WRITE8_MEMBER(hiram_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -125,11 +129,9 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void pt68k2(machine_config &config);
-	void pt68k4(machine_config &config);
 	void pt68k2_mem(address_map &map);
 	void pt68k4_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
@@ -419,7 +421,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
-	MCFG_DEVICE_ADD(WDFDC_TAG, WD1772, 16_MHz_XTAL / 2)
+	WD1772(config, m_wdfdc, 16_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 

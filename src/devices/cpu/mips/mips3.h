@@ -2,10 +2,10 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mips3.h
+mips3.h
 
-    Interface file for the universal machine language-based
-    MIPS III/IV emulator.
+Interface file for the universal machine language-based
+MIPS III/IV emulator.
 
 ***************************************************************************/
 
@@ -18,39 +18,42 @@
 #include "divtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+#include "ps2vu.h"
 
-
+DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
+DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
+DECLARE_DEVICE_TYPE(R4400BE, r4400be_device)
+DECLARE_DEVICE_TYPE(R4400LE, r4400le_device)
 // NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
-DECLARE_DEVICE_TYPE(VR4300BE,  vr4300be_device)
-DECLARE_DEVICE_TYPE(VR4300LE,  vr4300le_device)
+DECLARE_DEVICE_TYPE(VR4300BE, vr4300be_device)
+DECLARE_DEVICE_TYPE(VR4300LE, vr4300le_device)
 // VR4310 = VR4300 with different speed bin
-DECLARE_DEVICE_TYPE(VR4310BE,  vr4310be_device)
-DECLARE_DEVICE_TYPE(VR4310LE,  vr4310le_device)
-DECLARE_DEVICE_TYPE(R4600BE,   r4600be_device)
-DECLARE_DEVICE_TYPE(R4600LE,   r4600le_device)
-DECLARE_DEVICE_TYPE(R4650BE,   r4650be_device)
-DECLARE_DEVICE_TYPE(R4650LE,   r4650le_device)
-DECLARE_DEVICE_TYPE(R4700BE,   r4700be_device)
-DECLARE_DEVICE_TYPE(R4700LE,   r4700le_device)
-DECLARE_DEVICE_TYPE(TX4925BE,  tx4925be_device)
-DECLARE_DEVICE_TYPE(TX4925LE,  tx4925le_device)
-DECLARE_DEVICE_TYPE(R5000BE,   r5000be_device)
-DECLARE_DEVICE_TYPE(R5000LE,   r5000le_device)
-DECLARE_DEVICE_TYPE(VR5500BE,  vr5500be_device)
-DECLARE_DEVICE_TYPE(VR5500LE,  vr5500le_device)
+DECLARE_DEVICE_TYPE(VR4310BE, vr4310be_device)
+DECLARE_DEVICE_TYPE(VR4310LE, vr4310le_device)
+DECLARE_DEVICE_TYPE(R4600BE, r4600be_device)
+DECLARE_DEVICE_TYPE(R4600LE, r4600le_device)
+DECLARE_DEVICE_TYPE(R4650BE, r4650be_device)
+DECLARE_DEVICE_TYPE(R4650LE, r4650le_device)
+DECLARE_DEVICE_TYPE(R4700BE, r4700be_device)
+DECLARE_DEVICE_TYPE(R4700LE, r4700le_device)
+DECLARE_DEVICE_TYPE(TX4925BE, tx4925be_device)
+DECLARE_DEVICE_TYPE(TX4925LE, tx4925le_device)
+DECLARE_DEVICE_TYPE(R5000BE, r5000be_device)
+DECLARE_DEVICE_TYPE(R5000LE, r5000le_device)
+DECLARE_DEVICE_TYPE(VR5500BE, vr5500be_device)
+DECLARE_DEVICE_TYPE(VR5500LE, vr5500le_device)
 DECLARE_DEVICE_TYPE(QED5271BE, qed5271be_device)
 DECLARE_DEVICE_TYPE(QED5271LE, qed5271le_device)
-DECLARE_DEVICE_TYPE(RM7000BE,  rm7000be_device)
-DECLARE_DEVICE_TYPE(RM7000LE,  rm7000le_device)
-DECLARE_DEVICE_TYPE(R5900LE,   r5900le_device)
+DECLARE_DEVICE_TYPE(RM7000BE, rm7000be_device)
+DECLARE_DEVICE_TYPE(RM7000LE, rm7000le_device)
+DECLARE_DEVICE_TYPE(R5900LE, r5900le_device)
 
 
 /***************************************************************************
-    REGISTER ENUMERATION
+REGISTER ENUMERATION
 ***************************************************************************/
 
-enum
-{
+enum {
 	MIPS3_PC = STATE_GENPC,
 	MIPS3_R0 = 1,
 	MIPS3_R1,
@@ -195,14 +198,46 @@ enum
 	MIPS3_ENTRYLO1,
 	MIPS3_PAGEMASK,
 	MIPS3_WIRED,
-	MIPS3_BADVADDR
+	MIPS3_BADVADDR,
+	MIPS3_R0H,
+	MIPS3_R1H,
+	MIPS3_R2H,
+	MIPS3_R3H,
+	MIPS3_R4H,
+	MIPS3_R5H,
+	MIPS3_R6H,
+	MIPS3_R7H,
+	MIPS3_R8H,
+	MIPS3_R9H,
+	MIPS3_R10H,
+	MIPS3_R11H,
+	MIPS3_R12H,
+	MIPS3_R13H,
+	MIPS3_R14H,
+	MIPS3_R15H,
+	MIPS3_R16H,
+	MIPS3_R17H,
+	MIPS3_R18H,
+	MIPS3_R19H,
+	MIPS3_R20H,
+	MIPS3_R21H,
+	MIPS3_R22H,
+	MIPS3_R23H,
+	MIPS3_R24H,
+	MIPS3_R25H,
+	MIPS3_R26H,
+	MIPS3_R27H,
+	MIPS3_R28H,
+	MIPS3_R29H,
+	MIPS3_R30H,
+	MIPS3_R31H,
 };
 
 #define MIPS3_MAX_FASTRAM       3
 #define MIPS3_MAX_HOTSPOTS      16
 
 /***************************************************************************
-    INTERRUPT CONSTANTS
+INTERRUPT CONSTANTS
 ***************************************************************************/
 
 #define MIPS3_IRQ0      0       /* IRQ0 */
@@ -215,12 +250,11 @@ enum
 
 
 /***************************************************************************
-    STRUCTURES
+STRUCTURES
 ***************************************************************************/
 
 /* MIPS3 TLB entry */
-struct mips3_tlb_entry
-{
+struct mips3_tlb_entry {
 	uint64_t          page_mask;
 	uint64_t          entry_hi;
 	uint64_t          entry_lo[2];
@@ -240,16 +274,16 @@ struct mips3_tlb_entry
 
 class mips3_frontend;
 
-class mips3_device : public cpu_device, public device_vtlb_interface
-{
+class mips3_device : public cpu_device, public device_vtlb_interface {
 	friend class mips3_frontend;
 
 protected:
 	/* MIPS flavors */
-	enum mips3_flavor
-	{
+	enum mips3_flavor {
 		/* MIPS III variants */
 		MIPS3_TYPE_MIPS_III,
+		MIPS3_TYPE_R4000,
+		MIPS3_TYPE_R4400,
 		MIPS3_TYPE_VR4300,
 		MIPS3_TYPE_R4600,
 		MIPS3_TYPE_R4650,
@@ -267,7 +301,7 @@ protected:
 
 public:
 	// construction/destruction
-	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes);
+	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes, uint32_t data_bits);
 
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
@@ -308,13 +342,25 @@ protected:
 
 	void invalid_instruction(uint32_t op);
 
-private:
-	struct internal_mips3_state
-	{
+	virtual bool RBYTE(offs_t address, uint32_t *result);
+	virtual bool RHALF(offs_t address, uint32_t *result);
+	virtual bool RWORD(offs_t address, uint32_t *result);
+	virtual bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask);
+	virtual bool RDOUBLE(offs_t address, uint64_t *result);
+	virtual bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask);
+	virtual void WBYTE(offs_t address, uint8_t data);
+	virtual void WHALF(offs_t address, uint16_t data);
+	virtual void WWORD(offs_t address, uint32_t data);
+	virtual void WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask);
+	virtual void WDOUBLE(offs_t address, uint64_t data);
+	virtual void WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask);
+
+	struct internal_mips3_state {
 		/* core registers */
 		uint32_t        pc;
 		int             icount;
 		uint64_t        r[35];
+		uint32_t        sa;
 
 		/* upper 64 bits of 128-bit GPRs (R5900 only) */
 		uint64_t        rh[35];
@@ -323,14 +369,24 @@ private:
 		uint64_t        cpr[3][32];
 		uint64_t        ccr[3][32];
 		uint32_t        llbit;
+		float           acc;
 
 		/* VU0 registers (R5900 only) */
-		float           vfr[32][4];
+		float           vfr[32][4]; // 0..3 = x..w
 		uint32_t        vcr[32];
+		float           vumem[0x1000];
+		float*          vfmem;
+		uint32_t*       vimem;
+		float           vacc[4];
+		float           p;
+
+		uint32_t*       vr;
+		float*          i;
+		float*          q;
 
 		uint32_t        mode;                       /* current global mode */
 
-		/* parameters for subroutines */
+													/* parameters for subroutines */
 		uint64_t        numcycles;                  /* return value from gettotalcycles */
 		const char *    format;                     /* format string for print_debug */
 		uint32_t        arg0;                       /* print_debug argument 1 */
@@ -341,11 +397,11 @@ private:
 		uint32_t        jmpdest;                    /* destination jump target */
 	};
 
-	address_space_config m_program_config;
-	mips3_flavor    m_flavor;
-
 	/* core state */
 	internal_mips3_state *m_core;
+
+	address_space_config m_program_config;
+	mips3_flavor    m_flavor;
 
 	/* internal stuff */
 	uint32_t        m_ppc;
@@ -371,7 +427,8 @@ private:
 	loadstore_func  m_sdr;
 
 	address_space * m_program;
-	std::function<u32 (offs_t)> m_pr32;
+	uint32_t        m_data_bits;
+	std::function<u32(offs_t)> m_pr32;
 	std::function<const void * (offs_t)> m_prptr;
 	uint32_t        c_system_clock;
 	uint32_t        m_cpu_clock;
@@ -396,8 +453,7 @@ private:
 
 	/* fast RAM */
 	uint32_t        m_fastram_select;
-	struct
-	{
+	struct {
 		offs_t      start;                      /* start of the RAM block */
 		offs_t      end;                        /* end of the RAM block */
 		bool        readonly;                   /* true if read-only */
@@ -415,17 +471,17 @@ private:
 	std::unique_ptr<mips3_frontend>    m_drcfe; /* pointer to the DRC front-end state */
 	uint32_t        m_drcoptions;               /* configurable DRC options */
 
-	/* internal stuff */
+												/* internal stuff */
 	uint8_t         m_cache_dirty;              /* true if we need to flush the cache */
 
-	/* tables */
+												/* tables */
 	uint8_t         m_fpmode[4];                /* FPU mode table */
 
-	/* register mappings */
+												/* register mappings */
 	uml::parameter  m_regmap[34];               /* parameter to register mappings for all 32 integer registers */
 	uml::parameter  m_regmaplo[34];             /* parameter to register mappings for all 32 integer registers */
 
-	/* subroutines */
+												/* subroutines */
 	uml::code_handle *   m_entry;                      /* entry point */
 	uml::code_handle *   m_nocode;                     /* nocode exception handler */
 	uml::code_handle *   m_out_of_cycles;              /* out of cycles exception handler */
@@ -445,10 +501,9 @@ private:
 	uml::code_handle *   m_exception[18/*EXCEPTION_COUNT*/]; /* array of exception handlers */
 	uml::code_handle *   m_exception_norecover[18/*EXCEPTION_COUNT*/];   /* array of no-recover exception handlers */
 
-	/* hotspots */
+																		 /* hotspots */
 	uint32_t        m_hotspot_select;
-	struct
-	{
+	struct {
 		offs_t      pc;                         /* PC to consider */
 		uint32_t    opcode;                     /* required opcode at that PC */
 		uint32_t    cycles;                     /* number of cycles to eat when hit */
@@ -473,19 +528,6 @@ private:
 	void tlb_map_entry(int tlbindex);
 	void tlb_write_common(int tlbindex);
 
-	bool RBYTE(offs_t address, uint32_t *result);
-	bool RHALF(offs_t address, uint32_t *result);
-	bool RWORD(offs_t address, uint32_t *result);
-	bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask);
-	bool RDOUBLE(offs_t address, uint64_t *result);
-	bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask);
-	void WBYTE(offs_t address, uint8_t data);
-	void WHALF(offs_t address, uint16_t data);
-	void WWORD(offs_t address, uint32_t data);
-	void WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask);
-	void WDOUBLE(offs_t address, uint64_t data);
-	void WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask);
-
 	uint64_t get_cop0_reg(int idx);
 	void set_cop0_reg(int idx, uint64_t val);
 	uint64_t get_cop0_creg(int idx);
@@ -503,18 +545,25 @@ private:
 	void handle_cop1x_fr0(uint32_t op);
 	void handle_cop1x_fr1(uint32_t op);
 
-	uint64_t get_cop2_reg(int idx);
-	void set_cop2_reg(int idx, uint64_t val);
-	uint64_t get_cop2_creg(int idx);
-	void set_cop2_creg(int idx, uint64_t val);
+	virtual uint64_t get_cop2_reg(int idx);
+	virtual void set_cop2_reg(int idx, uint64_t val);
+	virtual uint64_t get_cop2_creg(int idx);
+	virtual void set_cop2_creg(int idx, uint64_t val);
 	void handle_cop2(uint32_t op);
 
 	void handle_special(uint32_t op);
 	void handle_regimm(uint32_t op);
+	virtual void handle_extra_base(uint32_t op);
 	virtual void handle_extra_special(uint32_t op);
 	virtual void handle_extra_regimm(uint32_t op);
+	virtual void handle_extra_cop0(uint32_t op);
+	virtual void handle_extra_cop1(uint32_t op);
 	virtual void handle_extra_cop2(uint32_t op);
 	virtual void handle_idt(uint32_t op);
+	virtual void handle_ldc2(uint32_t op);
+	virtual void handle_sdc2(uint32_t op);
+	virtual void handle_dmfc2(uint32_t op);
+	virtual void handle_dmtc2(uint32_t op);
 
 	void lwl_be(uint32_t op);
 	void lwr_be(uint32_t op);
@@ -544,8 +593,7 @@ public:
 	void func_unimplemented();
 private:
 	/* internal compiler state */
-	struct compiler_state
-	{
+	struct compiler_state {
 		compiler_state &operator=(compiler_state &) = delete;
 
 		uint32_t         cycles;                     /* accumulated cycles */
@@ -587,211 +635,290 @@ private:
 	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
+	void load_elf();
 };
 
 
-class vr4300be_device : public mips3_device
-{
+class r4000be_device : public mips3_device {
+public:
+	// construction/destruction
+	r4000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4000BE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_BIG, 32)
+	{
+	}
+};
+
+class r4000le_device : public mips3_device {
+public:
+	// construction/destruction
+	r4000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4000LE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_LITTLE, 32)
+	{
+	}
+};
+
+class r4400be_device : public mips3_device {
+public:
+	// construction/destruction
+	r4400be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 32)
+	{
+	}
+};
+
+class r4400le_device : public mips3_device {
+public:
+	// construction/destruction
+	r4400le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4400LE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_LITTLE, 32)
+	{
+	}
+};
+
+class vr4300be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4300be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4300BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, VR4300BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class vr4300le_device : public mips3_device
-{
+class vr4300le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4300le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4300LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, VR4300LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class vr4310be_device : public mips3_device
-{
+class vr4310be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4310be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4310BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, VR4310BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class vr4310le_device : public mips3_device
-{
+class vr4310le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4310le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4310LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, VR4310LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class r4600be_device : public mips3_device
-{
+class r4600be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4600be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4600BE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, R4600BE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class r4600le_device : public mips3_device
-{
+class r4600le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4600le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4600LE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, R4600LE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class r4650be_device : public mips3_device
-{
+class r4650be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4650be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4650BE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, R4650BE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class r4650le_device : public mips3_device
-{
+class r4650le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4650le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4650LE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, R4650LE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class r4700be_device : public mips3_device
-{
+class r4700be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4700be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4700BE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, R4700BE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class r4700le_device : public mips3_device
-{
+class r4700le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4700le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4700LE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, R4700LE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class tx4925be_device : public mips3_device
-{
+class tx4925be_device : public mips3_device {
 public:
 	// construction/destruction
 	tx4925be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, TX4925BE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, TX4925BE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class tx4925le_device : public mips3_device
-{
+class tx4925le_device : public mips3_device {
 public:
 	// construction/destruction
 	tx4925le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, TX4925LE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, TX4925LE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class r5000be_device : public mips3_device
-{
+class r5000be_device : public mips3_device {
 public:
 	// construction/destruction
 	r5000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5000BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, R5000BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class r5000le_device : public mips3_device
-{
+class r5000le_device : public mips3_device {
 public:
 	// construction/destruction
 	r5000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class vr5500be_device : public mips3_device
-{
+class vr5500be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) {
+	}
 };
 
-class vr5500le_device : public mips3_device
-{
+class vr5500le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class r5900le_device : public mips3_device
-{
+class r5900le_device : public mips3_device {
 public:
 	// construction/destruction
+	template <typename T>
+	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vu0_tag)
+		: r5900le_device(mconfig, tag, owner, clock)
+	{
+		m_vu0.set_tag(std::forward<T>(vu0_tag));
+	}
+
 	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5900LE, tag, owner, clock, MIPS3_TYPE_R5900, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, R5900LE, tag, owner, clock, MIPS3_TYPE_R5900, ENDIANNESS_LITTLE, 64)
+		, m_vu0(*this, finder_base::DUMMY_TAG)
+	{
+	}
 
 protected:
+	virtual void device_start() override;
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	bool RBYTE(offs_t address, uint32_t *result) override;
+	bool RHALF(offs_t address, uint32_t *result) override;
+	bool RWORD(offs_t address, uint32_t *result) override;
+	bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask) override;
+	bool RDOUBLE(offs_t address, uint64_t *result) override;
+	bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask) override;
+	void WBYTE(offs_t address, uint8_t data) override;
+	void WHALF(offs_t address, uint16_t data) override;
+	void WWORD(offs_t address, uint32_t data) override;
+	void WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask) override;
+	void WDOUBLE(offs_t address, uint64_t data) override;
+	void WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask) override;
+
+	bool RQUAD(offs_t address, uint64_t *result_hi, uint64_t *result_lo);
+	void WQUAD(offs_t address, uint64_t data_hi, uint64_t data_lo);
+
+	uint64_t get_cop2_reg(int idx) override;
+	void set_cop2_reg(int idx, uint64_t val) override;
+	uint64_t get_cop2_creg(int idx) override;
+	void set_cop2_creg(int idx, uint64_t val) override;
+
+	void handle_extra_base(uint32_t op) override;
 	void handle_extra_special(uint32_t op) override;
 	void handle_extra_regimm(uint32_t op) override;
+	void handle_extra_cop0(uint32_t op) override;
+	void handle_extra_cop1(uint32_t op) override;
 	void handle_extra_cop2(uint32_t op) override;
 	void handle_idt(uint32_t op) override;
+	void handle_mmi0(uint32_t op);
+	void handle_mmi1(uint32_t op);
+	void handle_mmi2(uint32_t op);
+	void handle_mmi3(uint32_t op);
+	void handle_ldc2(uint32_t op) override;
+	void handle_sdc2(uint32_t op) override;
+	void handle_dmfc2(uint32_t op) override;
+	void handle_dmtc2(uint32_t op) override;
+
+	required_device<sonyvu0_device> m_vu0;
 };
 
-class qed5271be_device : public mips3_device
-{
+class qed5271be_device : public mips3_device {
 public:
 	// construction/destruction
 	qed5271be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, QED5271BE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, QED5271BE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class qed5271le_device : public mips3_device
-{
+class qed5271le_device : public mips3_device {
 public:
 	// construction/destruction
 	qed5271le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, QED5271LE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, QED5271LE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
-class rm7000be_device : public mips3_device
-{
+class rm7000be_device : public mips3_device {
 public:
 	// construction/destruction
 	rm7000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, RM7000BE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_BIG)
-	{ }
+		: mips3_device(mconfig, RM7000BE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_BIG, 32) // checkme
+	{
+	}
 };
 
-class rm7000le_device : public mips3_device
-{
+class rm7000le_device : public mips3_device {
 public:
 	// construction/destruction
 	rm7000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE)
-	{ }
+		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // checkme
+	{
+	}
 };
 
 
 
-class mips3_frontend : public drc_frontend
-{
+class mips3_frontend : public drc_frontend {
 public:
 	// construction/destruction
 	mips3_frontend(mips3_device *mips3, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
@@ -816,7 +943,7 @@ private:
 
 
 /***************************************************************************
-    COMPILER-SPECIFIC OPTIONS
+COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
 
 /* fix me -- how do we make this work?? */

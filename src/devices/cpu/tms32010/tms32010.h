@@ -18,7 +18,7 @@
 
 
 #define MCFG_TMS32010_BIO_IN_CB(_devcb) \
-	devcb = &downcast<tms32010_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
+	downcast<tms32010_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
 
 
 #define TMS32010_INT_PENDING    0x80000000

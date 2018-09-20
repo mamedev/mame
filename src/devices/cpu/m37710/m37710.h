@@ -202,9 +202,9 @@ private:
 	static const int m37710_irq_vectors[M37710_LINE_MAX];
 	static const char *const m37710_rnames[128];
 	static const char *const m37710_tnames[8];
-	static const opcode_func *m37710i_opcodes[4];
-	static const opcode_func *m37710i_opcodes2[4];
-	static const opcode_func *m37710i_opcodes3[4];
+	static const opcode_func *const m37710i_opcodes[4];
+	static const opcode_func *const m37710i_opcodes2[4];
+	static const opcode_func *const m37710i_opcodes3[4];
 	static const get_reg_func m37710i_get_reg[4];
 	static const set_reg_func m37710i_set_reg[4];
 	static const set_line_func m37710i_set_line[4];

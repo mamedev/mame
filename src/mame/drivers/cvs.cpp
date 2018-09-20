@@ -1549,23 +1549,23 @@ ROM_END
  *
  *************************************/
 
+READ8_MEMBER(cvs_state::huncholy_prot_r)
+{
+	if (offset == 1)
+	{
+		m_protection_counter++;
+		if ((m_protection_counter & 0x0f) == 0x01) return 0x00;
+		return 0xff;
+	}
+
+	return 0; // offset 0
+}
+
 void cvs_state::init_huncholy()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(FUNC(cvs_state::huncholy_prot_r),this));
 
-	/* patch out protection */
-	ROM[0x0082] = 0xc0;
-	ROM[0x0083] = 0xc0;
-	ROM[0x0084] = 0xc0;
-	ROM[0x00b7] = 0xc0;
-	ROM[0x00b8] = 0xc0;
-	ROM[0x00b9] = 0xc0;
-	ROM[0x00d9] = 0xc0;
-	ROM[0x00da] = 0xc0;
-	ROM[0x00db] = 0xc0;
-	ROM[0x4456] = 0xc0;
-	ROM[0x4457] = 0xc0;
-	ROM[0x4458] = 0xc0;
+	save_item(NAME(m_protection_counter));
 }
 
 
@@ -1578,57 +1578,50 @@ void cvs_state::init_hunchbaka()
 }
 
 
+READ8_MEMBER(cvs_state::superbik_prot_r)
+{
+	m_protection_counter++;
+	if ((m_protection_counter & 0x0f) == 0x02) return 0;
+	return 0xff;
+}
+
 void cvs_state::init_superbik()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	m_protection_counter = 0;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(FUNC(cvs_state::superbik_prot_r),this));
 
-	/* patch out protection */
-	ROM[0x0079] = 0xc0;
-	ROM[0x007a] = 0xc0;
-	ROM[0x007b] = 0xc0;
-	ROM[0x0081] = 0xc0;
-	ROM[0x0082] = 0xc0;
-	ROM[0x0083] = 0xc0;
-	ROM[0x00b6] = 0xc0;
-	ROM[0x00b7] = 0xc0;
-	ROM[0x00b8] = 0xc0;
-	ROM[0x0168] = 0xc0;
-	ROM[0x0169] = 0xc0;
-	ROM[0x016a] = 0xc0;
-
-	ROM[0x413f] = 0xc0;
-	ROM[0x4140] = 0xc0;
-	ROM[0x4141] = 0xc0;
-
-	/* and speed up the protection check */
-	ROM[0x0099] = 0xc0;
-	ROM[0x009a] = 0xc0;
-	ROM[0x009b] = 0xc0;
-	ROM[0x00bb] = 0xc0;
-	ROM[0x00bc] = 0xc0;
-	ROM[0x00bd] = 0xc0;
+	save_item(NAME(m_protection_counter));
 }
 
 
+READ8_MEMBER(cvs_state::hero_prot_r)
+{
+	u8 *ROM = memregion("maincpu")->base() + 0x73f0;
+
+	switch (offset + 0x73f0)
+	{
+		case 0x73f0: // pc: 7d, ab9
+			return 0xff; // 0x03 at this address in ROM
+
+		case 0x73f1: // pc: 83, read and then overwritten by 0x73f2 read
+			return 0; // 0x02 at this address in ROM
+
+		case 0x73f2: // pc: 86, needs to match read from 0x73f0
+			return 0xff & 0x7e; // 0x04 at this address in ROM
+
+		case 0x73f9: // pc: A9f, not sure what this is suppose to do?
+			return 0x00; // 0x1e at this address in ROM
+
+		case 0x73fe: // aa8
+			return 0xff; // 0x5e at this address in ROM
+	}
+
+	return ROM[offset];
+}
+
 void cvs_state::init_hero()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	/* patch out protection */
-	ROM[0x0087] = 0xc0;
-	ROM[0x0088] = 0xc0;
-	ROM[0x0aa1] = 0xc0;
-	ROM[0x0aa2] = 0xc0;
-	ROM[0x0aa3] = 0xc0;
-	ROM[0x0aaf] = 0xc0;
-	ROM[0x0ab0] = 0xc0;
-	ROM[0x0ab1] = 0xc0;
-	ROM[0x0abd] = 0xc0;
-	ROM[0x0abe] = 0xc0;
-	ROM[0x0abf] = 0xc0;
-	ROM[0x4de0] = 0xc0;
-	ROM[0x4de1] = 0xc0;
-	ROM[0x4de2] = 0xc0;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8_delegate(FUNC(cvs_state::hero_prot_r),this));
 }
 
 
@@ -1672,8 +1665,8 @@ GAME( 1982, diggerc,   0,        cvs, diggerc,  cvs_state, empty_init,     ROT90
 GAME( 1983, heartatk,  0,        cvs, heartatk, cvs_state, empty_init,     ROT90, "Century Electronics", "Heart Attack", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbak,  0,        cvs, hunchbak, cvs_state, empty_init,     ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbaka, hunchbak, cvs, hunchbak, cvs_state, init_hunchbaka, ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
 GAME( 1984, hero,      0,        cvs, hero,     cvs_state, init_hero,      ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
 GAME( 1984, huncholy,  0,        cvs, huncholy, cvs_state, init_huncholy,  ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

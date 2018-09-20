@@ -50,6 +50,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void lbeach(machine_config &config);
+
+private:
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_bg_vram;
@@ -80,7 +83,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lbeach);
 	uint32_t screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void lbeach(machine_config &config);
 	void lbeach_map(address_map &map);
 };
 
@@ -334,7 +336,7 @@ MACHINE_CONFIG_START(lbeach_state::lbeach)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
 	MCFG_DEVICE_PROGRAM_MAP(lbeach_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -355,7 +355,7 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, cardline_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, cardline_state, vsync_changed))
 
-	MCFG_DEFAULT_LAYOUT(layout_cardline)
+	config.set_default_layout(layout_cardline);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -36,6 +36,11 @@ public:
 		m_has_coinlock(true)
 	{ }
 
+	void toramich(machine_config &config);
+	void tigeroad(machine_config &config);
+	void f1dream_comad(machine_config &config);
+
+protected:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_ram16;
@@ -60,9 +65,6 @@ public:
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void toramich(machine_config &config);
-	void tigeroad(machine_config &config);
-	void f1dream_comad(machine_config &config);
 	void comad_sound_io_map(address_map &map);
 	void comad_sound_map(address_map &map);
 	void main_map(address_map &map);
@@ -70,7 +72,6 @@ public:
 	void sample_port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_port_map(address_map &map);
-protected:
 	/* misc */
 	bool m_has_coinlock;
 };
@@ -92,6 +93,10 @@ public:
 		m_has_coinlock = false;
 	}
 
+	void pushman(machine_config &config);
+	void bballs(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(mcu_comm_r);
 	DECLARE_WRITE16_MEMBER(pushman_mcu_comm_w);
 	DECLARE_WRITE16_MEMBER(bballs_mcu_comm_w);
@@ -100,11 +105,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_pb_w);
 	DECLARE_WRITE8_MEMBER(mcu_pc_w);
 
-	void pushman(machine_config &config);
-	void bballs(machine_config &config);
 	void bballs_map(address_map &map);
 	void pushman_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
 	required_device<m68705u_device> m_mcu;
@@ -126,10 +129,11 @@ public:
 	}
 
 	void f1dream(machine_config &config);
+
+private:
 	void f1dream_map(address_map &map);
 	void f1dream_mcu_io(address_map &map);
 
-private:
 	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(out3_w);
 

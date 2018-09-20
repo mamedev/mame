@@ -19,9 +19,11 @@ public:
 	{ }
 
 	void aaa(machine_config &config);
+
+private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };

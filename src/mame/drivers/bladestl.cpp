@@ -89,7 +89,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 {
 	// bits 3-5 = ROM bank select
-	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
+	m_upd7759->set_rom_bank((data & 0x38) >> 3);
 
 	// bit 2 = SSG-C rc filter enable
 	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -349,9 +349,9 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	   called at initialization time */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, M6809_IRQ_LINE))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD(m_upd7759, UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

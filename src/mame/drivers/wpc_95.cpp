@@ -29,16 +29,7 @@ public:
 			out(*this, "out")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(firq_src_r);
-	DECLARE_READ8_MEMBER(zc_r);
-	DECLARE_READ8_MEMBER(dcs_data_r);
-	DECLARE_WRITE8_MEMBER(dcs_data_w);
-	DECLARE_READ8_MEMBER(dcs_ctrl_r);
-	DECLARE_WRITE8_MEMBER(dcs_reset_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	void wpc_95(machine_config &config);
 
 	void init();
 	void init_tf95();
@@ -57,12 +48,23 @@ public:
 	void init_cp();
 	void init_ttt();
 
+private:
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(firq_src_r);
+	DECLARE_READ8_MEMBER(zc_r);
+	DECLARE_READ8_MEMBER(dcs_data_r);
+	DECLARE_WRITE8_MEMBER(dcs_data_w);
+	DECLARE_READ8_MEMBER(dcs_ctrl_r);
+	DECLARE_WRITE8_MEMBER(dcs_reset_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_95(machine_config &config);
 	void wpc_95_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_wpc_device> dcs;
@@ -2261,7 +2263,7 @@ MACHINE_CONFIG_START(wpc_95_state::wpc_95)
 	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
 	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_95_state, scanline_irq))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_WPC, 0)
 MACHINE_CONFIG_END
 
@@ -2854,6 +2856,16 @@ ROM_START(sc_14)
 	ROM_LOAD16_BYTE("safsnds4.rom", 0x400000, 0x100000, CRC(9c8a23eb) SHA1(a0ee1174c8af0f262f9bec950da588cc9eb8747d))
 ROM_END
 
+ROM_START(sc_10)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("g11-10.rom", 0x00000, 0x80000, CRC(752a00f7) SHA1(86dbd0203f2a651382179f433fa49ca92d9828ae))
+	ROM_RELOAD(0x80000, 0x80000)
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("safsnds2.rom", 0x000000, 0x100000, CRC(20e14c63) SHA1(61b1c000a7afe5d0e9c31093e3fa963d6a594d54))
+	ROM_LOAD16_BYTE("safsnds3.rom", 0x200000, 0x100000, CRC(99e318e7) SHA1(918f9013da82b29a559cb474bce93fb4ce88b731))
+	ROM_LOAD16_BYTE("safsnds4.rom", 0x400000, 0x100000, CRC(9c8a23eb) SHA1(a0ee1174c8af0f262f9bec950da588cc9eb8747d))
+ROM_END
+
 ROM_START(sc_091)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD("sc_091.bin", 0x00000, 0x80000, CRC(b6f5307b) SHA1(93fab74db3aa62c2dd70d3a1d5664716c6548284))
@@ -3067,10 +3079,11 @@ GAME(1997,  ngg_p06,    ngg_13,     wpc_95, ngg,    wpc_95_state,   init_ngg,   
 GAME(1997,  ngg_10,     ngg_13,     wpc_95, ngg,    wpc_95_state,   init_ngg,    ROT0, "Williams",             "No Good Gofers (1.0)",                   MACHINE_MECHANICAL)
 GAME(1998,  sc_18,      0,          wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8)",                     MACHINE_MECHANICAL)
 GAME(1998,  sc_18n,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8N)",                    MACHINE_MECHANICAL)
-GAME(1998,  sc_18s2,    sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8 alternate sound)",     MACHINE_MECHANICAL)
+GAME(1998,  sc_18s2,    sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.8 German sound)",        MACHINE_MECHANICAL)
 GAME(1996,  sc_17,      sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.7)",                     MACHINE_MECHANICAL)
 GAME(1996,  sc_17n,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.7N)",                    MACHINE_MECHANICAL)
 GAME(1996,  sc_14,      sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.4)",                     MACHINE_MECHANICAL)
+GAME(1996,  sc_10,      sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (1.0)",                     MACHINE_MECHANICAL)
 GAME(1996,  sc_091,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,     ROT0, "Bally",                "Safe Cracker (0.91)",                    MACHINE_MECHANICAL)
 GAME(1996,  ss_15,      0,          wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.5)",                     MACHINE_MECHANICAL)
 GAME(1996,  ss_14,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.4)",                     MACHINE_MECHANICAL)

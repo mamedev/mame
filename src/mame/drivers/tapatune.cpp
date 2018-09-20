@@ -30,7 +30,9 @@
     - many connectors for I/O
 
     The sound and I/O board is used by other redemption games such as
-    Colorama and Wheel 'Em In, Super Rock and Bowl
+    Colorama, Wheel 'Em In, Super Rock and Bowl, Feed Big Bertha and Sonic
+    the Hedgehog (Redemption). The CPU location is marked "68A09" on the
+    PCB; some games have a 68B09E here, but others use a Z80 instead.
 
 ****************************************************************************/
 
@@ -61,6 +63,10 @@ public:
 		m_bsmt(*this, "bsmt"),
 		m_videoram(*this, "videoram") {}
 
+	void tapatune(machine_config &config);
+	void tapatune_base(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_videocpu;
 	required_device<bsmt2000_device> m_bsmt;
@@ -106,8 +112,7 @@ public:
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void tapatune(machine_config &config);
-	void tapatune_base(machine_config &config);
+
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
 	void video_map(address_map &map);
@@ -524,7 +529,7 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	MCFG_DEVICE_IO_MAP(maincpu_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert, XTAL(24'000'000) / 4 / 4 / 4096)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 

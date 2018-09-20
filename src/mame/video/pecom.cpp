@@ -101,7 +101,7 @@ MACHINE_CONFIG_START(pecom_state::pecom_video)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(pecom_state, pecom_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(pecom_state, pecom_char_ram_r)
 	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(pecom_state, pecom_char_ram_w)
-	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(CONSTANT(1))
 	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(*this, pecom_state, pecom_prd_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);

@@ -55,7 +55,7 @@ public:
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -76,7 +76,6 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<uint8_t> m_main_ram;
@@ -437,7 +436,7 @@ ROM_START( quizshow )
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x0200, "user1", 0 ) // gfx1
-	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) ) // from Atari's source archive, may have some bad bits
+	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) )
 	ROM_LOAD_NIB_LOW ( "005466-02.n2", 0x0000, 0x0200, CRC(cd554367) SHA1(04da83eb6e2f86f88a3495072b98fbdaca485ae8) )
 
 	ROM_REGION( 0x0200, "proms", 0 )

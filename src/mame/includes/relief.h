@@ -28,10 +28,11 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
-	void init_relief();
 	void relief(machine_config &config);
 
-protected:
+	void init_relief();
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void update_interrupts() override;
@@ -45,7 +46,6 @@ protected:
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
 
-private:
 	required_device<atari_vad_device> m_vad;
 	required_device<okim6295_device> m_oki;
 	required_device<ym2413_device> m_ym2413;

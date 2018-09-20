@@ -413,7 +413,11 @@
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+#include "bus/sunmouse/sunmouse.h"
+#include "bus/sbus/sbus.h"
+#include "bus/sbus/bwtwo.h"
 #include "cpu/sparc/sparc.h"
+#include "machine/am79c90.h"
 #include "machine/bankdev.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
@@ -421,7 +425,6 @@
 #include "machine/nscsi_hd.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "machine/timekpr.h"
 #include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
@@ -434,16 +437,17 @@
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 
-
 #define SUN4_LOG_FCODES (0)
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
 #define KEYBOARD_TAG    "keyboard"
+#define MOUSE_TAG       "mouseport"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define FDC_TAG         "fdc"
+#define LANCE_TAG       "lance"
 
 #define ENA_NOTBOOT     (0x80)
 #define ENA_SDVMA       (0x20)
@@ -487,6 +491,13 @@
 #define DMA_ADDR        (1)
 #define DMA_BYTE_COUNT  (2)
 #define DMA_XTAL        (25_MHz_XTAL)
+
+#define AUXIO_DENSITY	(0x20)
+#define AUXIO_DISK_CHG	(0x10)
+#define AUXIO_DRIVE_SEL	(0x08)
+#define AUXIO_TC		(0x04)
+#define AUXIO_EJECT		(0x02)
+#define AUXIO_LED		(0x01)
 
 namespace
 {
@@ -540,18 +551,30 @@ public:
 		, m_scc1(*this, SCC1_TAG)
 		, m_scc2(*this, SCC2_TAG)
 		, m_fdc(*this, FDC_TAG)
+		, m_floppy(*this, FDC_TAG":0")
+		, m_lance(*this, LANCE_TAG)
 		, m_scsibus(*this, "scsibus")
-		, m_scsi(*this, "scsibus:7:ncr5390")
+		, m_scsi(*this, "scsibus:7:ncr53c90a")
+		, m_sbus(*this, "sbus")
 		, m_type0space(*this, "type0")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "user1")
-		, m_bw2_vram(*this, "bw2_vram")
 		, m_rom_ptr(nullptr)
 		, m_system_enable(0)
 	{
 	}
 
+	void sun4c(machine_config &config);
+	void sun4_40(machine_config &config);
+	void sun4_60(machine_config &config);
+	void sun4(machine_config &config);
+
+	void init_sun4();
+	void init_sun4c();
+	void init_ss2();
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -566,16 +589,22 @@ public:
 	DECLARE_WRITE32_MEMBER( sun4c_mmu_w );
 	DECLARE_READ32_MEMBER( ram_r );
 	DECLARE_WRITE32_MEMBER( ram_w );
+	DECLARE_READ32_MEMBER( timeout_r );
+	DECLARE_WRITE32_MEMBER( timeout_w );
 	DECLARE_READ32_MEMBER( ss1_sl0_id );
-	DECLARE_READ32_MEMBER( ss1_sl3_id );
 	DECLARE_READ32_MEMBER( timer_r );
 	DECLARE_WRITE32_MEMBER( timer_w );
 	DECLARE_READ8_MEMBER( irq_r );
 	DECLARE_WRITE8_MEMBER( irq_w );
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
+	DECLARE_READ8_MEMBER( auxio_r );
+	DECLARE_WRITE8_MEMBER( auxio_w );
 	DECLARE_READ32_MEMBER( dma_r );
 	DECLARE_WRITE32_MEMBER( dma_w );
+	DECLARE_READ32_MEMBER( lance_dma_r ); // TODO: Should be 16 bits
+	DECLARE_WRITE32_MEMBER( lance_dma_w );
+	DECLARE_WRITE32_MEMBER( buserr_w );
 
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
 	DECLARE_WRITE_LINE_MEMBER( scsi_drq );
@@ -583,56 +612,64 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( scc1_int );
 	DECLARE_WRITE_LINE_MEMBER( scc2_int );
 
-	void init_sun4();
-	void init_sun4c();
-	void init_ss2();
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void ncr53c90a(device_t *device);
 
-	void ncr5390(device_t *device);
-	void sun4c(machine_config &config);
-	void sun4(machine_config &config);
 	void sun4_mem(address_map &map);
 	void sun4c_mem(address_map &map);
 	void type0space_map(address_map &map);
 	void type1space_map(address_map &map);
+	void type1space_sbus_map(address_map &map);
 	void type1space_s4_map(address_map &map);
-protected:
+
+	enum sun4_arch
+	{
+		SUN4 = 0,
+		SUN4C = 1
+	};
+
 	required_device<mb86901_device> m_maincpu;
 
-	required_device<mk48t12_device> m_timekpr;
+	required_device<m48t02_device> m_timekpr;
 
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 
-	required_device<n82077aa_device> m_fdc;
+	required_device<i82072_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+	required_device<am79c90_device> m_lance;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr5390_device> m_scsi;
+	required_device<ncr53c90a_device> m_scsi;
 
-	optional_device<address_map_bank_device> m_type0space, m_type1space;
+	optional_device<sbus_device> m_sbus;
+	optional_device<address_map_bank_device> m_type0space;
+	optional_device<address_map_bank_device> m_type1space;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint32_t> m_bw2_vram;
 
 	uint32_t *m_rom_ptr;
 	uint32_t m_context;
 	uint8_t m_system_enable;
+	uint8_t m_auxio;
 	uint32_t m_buserr[4];
 	uint32_t m_counter[4];
 	uint32_t m_dma[4];
+	bool m_dma_irq;
 	bool m_dma_tc_read;
 	uint32_t m_dma_pack_register;
 	int m_scsi_irq;
+	int m_fdc_irq;
 
-private:
 	uint32_t *m_ram_ptr;
 	uint8_t m_segmap[16][4096];
 	uint32_t m_pagemap[16384];
 	uint32_t m_cachetags[0x4000];
 	uint32_t m_cachedata[0x4000];
-	uint32_t m_ram_size, m_ram_size_words;
+	uint32_t m_ram_size;
+	uint32_t m_ram_size_words;
 	uint8_t m_ctx_mask;   // SS2 is sun4c but has 16 contexts; most have 8
 	uint8_t m_pmeg_mask;  // SS2 is sun4c but has 16384 PTEs; most have 8192
 	uint8_t m_irq_reg;    // IRQ control
@@ -658,35 +695,6 @@ private:
 	void l2p_command(int ref, const std::vector<std::string> &params);
 	void fcodes_command(int ref, const std::vector<std::string> &params);
 };
-
-uint32_t sun4_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-	static const uint32_t palette[2] = { 0xffffff, 0 };
-	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
-
-	for (y = 0; y < 900; y++)
-	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1152/8; x++)
-		{
-			pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
-
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
-		}
-	}
-
-	return 0;
-}
 
 uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32_t offset, uint32_t mem_mask)
 {
@@ -718,7 +726,10 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 			return m_type1space->read32(space, tmp, mem_mask);
 
 		default:
-			printf("sun4c: access to memory type not defined in sun4c\n");
+			logerror("sun4c: access to memory type not defined in sun4c\n");
+			m_maincpu->set_mae();
+			m_buserr[0] = 0x20;
+			m_buserr[1] = offset << 2;
 			return 0;
 		}
 	}
@@ -726,10 +737,26 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	{
 		if (!machine().side_effects_disabled())
 		{
-			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x88;   // read, invalid PTE
-			//m_buserr[1] = offset<<2;
+			logerror("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			m_maincpu->set_mae();
+			m_buserr[0] |= 0x80;    // invalid PTE
+			m_buserr[0] &= ~0x8000; // read
+			m_buserr[1] = offset<<2;
+			if (mem_mask != ~0 && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+			{
+				if (mem_mask == 0x0000ffff || mem_mask == 0x0000ff00)
+				{
+					m_buserr[1] |= 2;
+				}
+				else if (mem_mask == 0x00ff0000)
+				{
+					m_buserr[1] |= 1;
+				}
+				else if (mem_mask == 0x000000ff)
+				{
+					m_buserr[1] |= 3;
+				}
+			}
 		}
 		return 0;
 	}
@@ -745,10 +772,10 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 	{
 		if ((!(m_pagemap[entry] & PM_WRITEMASK)) || ((m_pagemap[entry] & PM_SYSMASK) && !(asi & 1)))
 		{
-			printf("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
-			m_buserr[0] = 0x8040;   // write, protection error
+			logerror("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
+			m_buserr[0] |= 0x8040;   // write, protection error
 			m_buserr[1] = offset<<2;
-			m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
+			m_maincpu->set_mae();
 			return;
 		}
 
@@ -770,16 +797,34 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 			m_type1space->write32(space, tmp, data, mem_mask);
 			return;
 		default:
-			printf("sun4c: access to memory type not defined\n");
+			logerror("sun4c: access to memory type not defined\n");
+			m_maincpu->set_mae();
+			m_buserr[0] = 0x8020;
+			m_buserr[1] = offset << 2;
 			return;
 		}
 	}
 	else
 	{
-		printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-		//m_buserr[0] = 0x8;    // invalid PTE
-		//m_buserr[1] = offset<<2;
+		logerror("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
+        m_maincpu->set_mae();
+		m_buserr[0] |= 0x8080;    // write cycle, invalid PTE
+		m_buserr[1] = offset<<2;
+		if (mem_mask != ~0 && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+		{
+			if (mem_mask == 0x0000ffff || mem_mask == 0x0000ff00)
+			{
+				m_buserr[1] |= 2;
+			}
+			else if (mem_mask == 0x00ff0000)
+			{
+				m_buserr[1] |= 1;
+			}
+			else if (mem_mask == 0x000000ff)
+			{
+				m_buserr[1] |= 3;
+			}
+		}
 	}
 }
 
@@ -812,8 +857,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 				return m_system_enable<<24;
 
 			case 6: // bus error register
-				printf("sun4c: read buserror, PC=%x (mask %08x)\n", m_maincpu->pc(), mem_mask);
-				m_maincpu->set_input_line(SPARC_MAE, CLEAR_LINE);
+				//printf("sun4c: read buserror %08x, PC=%x (mask %08x)\n", 0x60000000 | (offset << 2), m_maincpu->pc(), mem_mask);
 				retval = m_buserr[offset & 0xf];
 				m_buserr[offset & 0xf] = 0; // clear on reading
 				return retval;
@@ -837,7 +881,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 
 			case 0: // IDPROM - TODO: SPARCstation-1 does not have an ID prom and a timeout should occur.
 			default:
-				printf("sun4c: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
+				logerror("sun4c: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
 				return 0;
 		}
 		break;
@@ -870,11 +914,11 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		return read_insn_data_4c(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().side_effects_disabled()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effects_disabled()) logerror("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
-	printf("sun4c: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
+	logerror("sun4c: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
 
 	return 0;
 }
@@ -903,7 +947,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 				{
 					m_reset_timer->adjust(attotime::from_usec(1));
 					m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
-					printf("Asserting reset line\n");
+					logerror("%s: Asserting reset line\n", machine().describe_context());
 				}
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 				if (m_system_enable & ENA_RESET)
@@ -915,7 +959,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 				return;
 
 			case 6: // bus error
-				printf("%08x to bus error @ %x, mask %08x\n", data, offset, mem_mask);
+				logerror("%08x to bus error @ %x, mask %08x\n", data, offset, mem_mask);
 				m_buserr[offset & 0xf] = data;
 				return;
 
@@ -940,7 +984,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 
 			case 0: // IDPROM
 			default:
-				printf("sun4c: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x, shift %x)\n", data, offset<<2, mem_mask, m_maincpu->pc(), offset>>26);
+				logerror("sun4c: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x, shift %x)\n", data, offset<<2, mem_mask, m_maincpu->pc(), offset>>26);
 				return;
 		}
 		break;
@@ -952,7 +996,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			else if (mem_mask == 0xff000000) segdata = (data >> 24) & 0xff;
 			else logerror("sun4c: writing segment map with unknown mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
 
-			//printf("sun4: %08x to segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, m_context, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
+			//printf("sun4c: %08x to segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, m_context, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
 			m_segmap[m_context & m_ctx_mask][(offset>>16) & 0xfff] = segdata;   // only 7 bits of the segment are necessary
 		}
 		return;
@@ -960,7 +1004,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 	case 4: // page map
 		page = (m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask) << 6;   // get the PMEG
 		page += (offset >> 10) & 0x3f;  // add the offset
-		//printf("sun4: %08x to page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", data, offset << 2, page, mem_mask, m_maincpu->pc());
+		//printf("sun4c: %08x to page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", data, offset << 2, page, mem_mask, m_maincpu->pc());
 		COMBINE_DATA(&m_pagemap[page]);
 		m_pagemap[page] &= 0xff00ffff;  // these 8 bits are cleared when written and tested as such
 		return;
@@ -972,9 +1016,14 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 		write_insn_data_4c(asi, space, offset, data, mem_mask);
 		return;
 
+	case 12: // Flush Cache (Segment)
+	case 13: // Flush Cache (Page)
+	case 14: // Flush Cache (Context)
+		// Ignored
+		return;
 	}
 
-	printf("sun4c: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
+	logerror("sun4c: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
 }
 
 // -----------------------------------------------------------------
@@ -1009,7 +1058,7 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 			return m_type1space->read32(space, tmp, mem_mask);
 
 		default:
-			printf("sun4: access to unhandled memory type\n");
+			logerror("sun4: access to unhandled memory type\n");
 			return 0;
 		}
 	}
@@ -1017,10 +1066,26 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	{
 		if (!machine().side_effects_disabled())
 		{
-			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x88;   // read, invalid PTE
-			//m_buserr[1] = offset<<2;
+			logerror("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			m_maincpu->set_mae();
+			m_buserr[0] |= 0x80;    // invalid PTE
+			m_buserr[0] &= ~0x8000; // read
+			m_buserr[1] = offset<<2;
+			if (mem_mask != ~0 && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+			{
+				if (mem_mask == 0x0000ffff || mem_mask == 0x0000ff00)
+				{
+					m_buserr[1] |= 2;
+				}
+				else if (mem_mask == 0x00ff0000)
+				{
+					m_buserr[1] |= 1;
+				}
+				else if (mem_mask == 0x000000ff)
+				{
+					m_buserr[1] |= 3;
+				}
+			}
 		}
 		return 0;
 	}
@@ -1053,13 +1118,13 @@ void sun4_state::write_insn_data(uint8_t asi, address_space &space, uint32_t off
 			return;
 
 		default:
-			printf("sun4: access to memory type not defined in sun4c\n");
+			logerror("sun4: access to memory type not defined in sun4c\n");
 			return;
 		}
 	}
 	else
 	{
-		printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+		logerror("sun4: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry, m_pagemap[entry], data, offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
 		//m_buserr[0] = 0x8;    // invalid PTE
 		//m_buserr[1] = offset<<2;
@@ -1115,7 +1180,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 
 			case 0:
 			default:
-				printf("sun4: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
+				logerror("sun4: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
 				return 0;
 		}
 		break;
@@ -1151,11 +1216,11 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		return read_insn_data(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().side_effects_disabled()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effects_disabled()) logerror("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
-	printf("sun4: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
+	logerror("sun4: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
 
 	return 0;
 }
@@ -1184,6 +1249,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				{
 					m_reset_timer->adjust(attotime::from_usec(1));
 					m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
+					logerror("%s: Asserting reset line\n", machine().describe_context());
 				}
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 				if (m_system_enable & ENA_RESET)
@@ -1233,7 +1299,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 
 			case 0: // IDPROM
 			default:
-				printf("sun4: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x)\n", data, offset<<2, mem_mask, m_maincpu->pc());
+				logerror("sun4: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x)\n", data, offset<<2, mem_mask, m_maincpu->pc());
 				return;
 		}
 		break;
@@ -1345,14 +1411,16 @@ void sun4_state::sun4c_mem(address_map &map)
 static INPUT_PORTS_START( sun4 )
 INPUT_PORTS_END
 
-
 void sun4_state::machine_reset()
 {
 	m_context = 0;
 	m_system_enable = 0;
+	m_auxio = 0xc0;
 	m_irq_reg = 0;
 	m_scc1_int = m_scc2_int = 0;
 	m_scsi_irq = 0;
+	m_fdc_irq = 0;
+	m_dma_irq = false;
 	m_dma_tc_read = false;
 	m_dma_pack_register = 0;
 
@@ -1385,6 +1453,21 @@ void sun4_state::machine_start()
 	// allocate timer for system reset
 	m_reset_timer = timer_alloc(TIMER_RESET);
 	m_reset_timer->adjust(attotime::never);
+}
+
+READ32_MEMBER( sun4_state::timeout_r )
+{
+	m_buserr[0] = 0x20; // read timeout
+	m_buserr[1] = 0x04000000 + (offset << 2);
+	m_maincpu->set_mae();
+	return ~0;
+}
+
+WRITE32_MEMBER( sun4_state::timeout_w )
+{
+	m_buserr[0] = 0x8020; // write timeout
+	m_buserr[1] = 0x04000000 + (offset << 2);
+	m_maincpu->set_mae();
 }
 
 READ32_MEMBER( sun4_state::ram_r )
@@ -1465,6 +1548,7 @@ WRITE32_MEMBER( sun4_state::ram_w )
 void sun4_state::type0space_map(address_map &map)
 {
 	map(0x00000000, 0x03ffffff).rw(FUNC(sun4_state::ram_r), FUNC(sun4_state::ram_w));
+	map(0x04000000, 0x0fffffff).rw(FUNC(sun4_state::timeout_r), FUNC(sun4_state::timeout_w));
 }
 
 void sun4_state::type1space_map(address_map &map)
@@ -1476,11 +1560,17 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x05000000, 0x05000003).rw(FUNC(sun4_state::irq_r), FUNC(sun4_state::irq_w));
 	map(0x06000000, 0x0607ffff).rom().region("user1", 0);
 	map(0x07200000, 0x07200003).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
+	map(0x07400003, 0x07400003).rw(FUNC(sun4_state::auxio_r), FUNC(sun4_state::auxio_w));
 	map(0x08000000, 0x08000003).r(FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
 	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
-	map(0x08800000, 0x0880001f).m(m_scsi, FUNC(ncr5390_device::map)).umask32(0xff000000);
-	map(0x0e000000, 0x0e000003).r(FUNC(sun4_state::ss1_sl3_id));    // slot 3 contains video board
-	map(0x0e800000, 0x0e8fffff).ram().share("bw2_vram");
+	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr53c90a_device::map)).umask32(0xff000000);
+	map(0x08c00000, 0x08c00003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+}
+
+void sun4_state::type1space_sbus_map(address_map &map)
+{
+	type1space_map(map);
+	map(0x0a000000, 0x0fffffff).rw(m_sbus, FUNC(sbus_device::read), FUNC(sbus_device::write));
 }
 
 void sun4_state::type1space_s4_map(address_map &map)
@@ -1498,11 +1588,9 @@ READ8_MEMBER( sun4_state::fdc_r )
 	{
 		case 0: // Main Status (R)
 			return m_fdc->msr_r(space, 0, 0xff);
-			break;
 
 		case 1: // FIFO Data Port (R)
 			return m_fdc->fifo_r(space, 0, 0xff);
-			break;
 
 		default:
 			break;
@@ -1528,6 +1616,27 @@ WRITE8_MEMBER( sun4_state::fdc_w )
 	}
 }
 
+READ8_MEMBER( sun4_state::auxio_r )
+{
+	logerror("%s: auxio_r: %02x\n", machine().describe_context(), m_auxio);
+	return m_auxio;
+}
+
+WRITE8_MEMBER( sun4_state::auxio_w )
+{
+	logerror("%s: auxio_w: %02x, drive_sel:%d tc:%d eject:%d LED:%d\n", machine().describe_context(), data, BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+	m_auxio = (m_auxio & 0xf0) | (data & 0x0f);
+	if (!(m_auxio & AUXIO_DRIVE_SEL))
+	{
+		m_auxio &= ~(AUXIO_DENSITY | AUXIO_DISK_CHG);
+	}
+	else
+	{
+		m_auxio |= AUXIO_DISK_CHG; // Report no disk inserted
+		m_fdc->tc_w(data & AUXIO_TC);
+	}
+}
+
 READ8_MEMBER( sun4_state::irq_r )
 {
 	return m_irq_reg;
@@ -1535,16 +1644,45 @@ READ8_MEMBER( sun4_state::irq_r )
 
 WRITE8_MEMBER( sun4_state::irq_w )
 {
-	//printf("%02x to IRQ\n", data);
-
+	const uint8_t old_irq = m_irq_reg;
 	m_irq_reg = data;
+	const uint8_t changed = old_irq ^ data;
 
-	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
+	logerror("%02x to IRQ, %02x changed\n", data, changed);
+
+	if (!changed)
+		return;
+
+	if (BIT(changed, 0))
+	{
+		if (BIT(m_irq_reg, 7) && BIT(m_counter[2] | m_counter[3], 31))
+			m_maincpu->set_input_line(SPARC_IRQ14, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(m_irq_reg, 5) && BIT(m_counter[0] | m_counter[1], 31))
+			m_maincpu->set_input_line(SPARC_IRQ10, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(m_irq_reg, 3))
+			m_maincpu->set_input_line(SPARC_IRQ6, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(m_irq_reg, 2))
+			m_maincpu->set_input_line(SPARC_IRQ4, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(m_irq_reg, 1))
+			m_maincpu->set_input_line(SPARC_IRQ1, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else if (BIT(m_irq_reg, 0))
+	{
+		if (BIT(changed, 7) && BIT(m_counter[2] | m_counter[3], 31))
+			m_maincpu->set_input_line(SPARC_IRQ14, BIT(m_irq_reg, 7) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(changed, 5) && BIT(m_counter[0] | m_counter[1], 31))
+			m_maincpu->set_input_line(SPARC_IRQ10, BIT(m_irq_reg, 5) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(changed, 3))
+			m_maincpu->set_input_line(SPARC_IRQ6, BIT(m_irq_reg, 3) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(changed, 2))
+			m_maincpu->set_input_line(SPARC_IRQ4, BIT(m_irq_reg, 2) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(changed, 1))
+			m_maincpu->set_input_line(SPARC_IRQ1, BIT(m_irq_reg, 1) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER( sun4_state::scc1_int )
 {
-	printf("scc1 int: %d\n", state);
 	m_scc1_int = state;
 
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1552,7 +1690,6 @@ WRITE_LINE_MEMBER( sun4_state::scc1_int )
 
 WRITE_LINE_MEMBER( sun4_state::scc2_int )
 {
-	printf("scc2 int: %d\n", state);
 	m_scc2_int = state;
 
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1591,7 +1728,7 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		case TIMER_RESET:
 			m_reset_timer->adjust(attotime::never);
 			m_maincpu->set_input_line(SPARC_RESET, CLEAR_LINE);
-			printf("Clearing reset line\n");
+			//printf("Clearing reset line\n");
 			break;
 	}
 }
@@ -1685,19 +1822,19 @@ void sun4_state::dma_check_interrupts()
 
 	int irq_or_err_pending = (m_dma[DMA_CTRL] & (DMA_INT_PEND | DMA_ERR_PEND)) ? 1 : 0;
 	int irq_enabled = (m_dma[DMA_CTRL] & DMA_INT_EN) ? 1 : 0;
-	if (irq_or_err_pending && irq_enabled)
+	bool old_irq = m_dma_irq;
+	m_dma_irq = irq_or_err_pending && irq_enabled;
+	if (old_irq != m_dma_irq)
 	{
-		m_maincpu->set_input_line(SPARC_IRQ3, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(SPARC_IRQ3, CLEAR_LINE);
+		//logerror("m_dma_irq %d because irq_or_err_pending:%d and irq_enabled:%d\n", m_dma_irq ? 1 : 0, irq_or_err_pending, irq_enabled);
+		logerror("dma\n");
+		m_maincpu->set_input_line(SPARC_IRQ3, m_dma_irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 void sun4_state::dma_transfer_write()
 {
-	logerror("DMAing from device to RAM\n");
+	//logerror("DMAing from device to RAM\n");
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1706,16 +1843,16 @@ void sun4_state::dma_transfer_write()
 	{
 		int bit_index = (3 - pack_cnt) * 8;
 		uint8_t dma_value = m_scsi->dma_r();
-		logerror("Read from device: %02x\n", dma_value);
+		//logerror("Read from device: %02x, pack count %d\n", dma_value, pack_cnt);
 		m_dma_pack_register |= dma_value << bit_index;
 
-		if ((m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
+		if (m_dma[DMA_CTRL] & DMA_EN_CNT)
 			m_dma[DMA_BYTE_COUNT]--;
 
 		pack_cnt++;
 		if (pack_cnt == 4)
 		{
-			logerror("Writing pack register %08x\n", m_dma_pack_register);
+			//logerror("Writing pack register %08x to %08x\n", m_dma_pack_register, m_dma[DMA_ADDR]);
 			if (m_arch == ARCH_SUN4C)
 			{
 				write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
@@ -1727,6 +1864,7 @@ void sun4_state::dma_transfer_write()
 
 			pack_cnt = 0;
 			m_dma_pack_register = 0;
+			m_dma[DMA_ADDR] += 4;
 		}
 	}
 
@@ -1736,7 +1874,7 @@ void sun4_state::dma_transfer_write()
 
 void sun4_state::dma_transfer_read()
 {
-	logerror("DMAing from RAM to device\n");
+	//logerror("DMAing from RAM to device\n");
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1754,20 +1892,21 @@ void sun4_state::dma_transfer_read()
 			{
 				current_word = read_insn_data(11, space, m_dma[DMA_ADDR] >> 2, ~0);
 			}
-			logerror("Current word: %08x\n", current_word);
+			word_cached = true;
+			//logerror("Current word: %08x\n", current_word);
 		}
 
 		int bit_index = (3 - (m_dma[DMA_ADDR] & 3)) * 8;
 		uint8_t dma_value(current_word >> bit_index);
-		logerror("Write to device: %02x\n", dma_value);
+		//logerror("Write to device: %02x\n", dma_value);
 		m_scsi->dma_w(dma_value);
-
-		m_dma[DMA_ADDR]++;
-		if ((m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
-			m_dma[DMA_BYTE_COUNT]--;
 
 		if ((m_dma[DMA_ADDR] & 3) == 3)
 			word_cached = false;
+
+		m_dma[DMA_ADDR]++;
+		if (m_dma[DMA_CTRL] & DMA_EN_CNT)
+			m_dma[DMA_BYTE_COUNT]--;
 	}
 }
 
@@ -1782,7 +1921,7 @@ void sun4_state::dma_transfer()
 		dma_transfer_read();
 	}
 
-	if (m_dma[DMA_BYTE_COUNT] == 0 && (m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
+	if (m_dma[DMA_BYTE_COUNT] == 0 && (m_dma[DMA_CTRL] & DMA_EN_CNT))
 	{
 		m_dma[DMA_CTRL] |= DMA_TC;
 		m_dma_tc_read = false;
@@ -1807,18 +1946,37 @@ WRITE32_MEMBER( sun4_state::dma_w )
 		case DMA_CTRL:
 		{
 			// clear write-only bits
-			logerror("dma_w: ctrl: %08x\n", data);
+			//logerror("dma_w: ctrl: %08x\n", data);
 
 			mem_mask &= (DMA_READ_WRITE);
 			COMBINE_DATA(&m_dma[DMA_CTRL]);
 
 			if (data & DMA_RESET)
+			{
+				//logerror("dma_w: reset\n");
 				m_dma[DMA_CTRL] &= ~(DMA_ERR_PEND | DMA_PACK_CNT | DMA_INT_EN | DMA_FLUSH | DMA_DRAIN | DMA_WRITE | DMA_EN_DMA | DMA_REQ_PEND | DMA_EN_CNT | DMA_TC);
+			}
 			else if (data & DMA_FLUSH)
 			{
+				//logerror("dma_w: flush\n");
 				m_dma[DMA_CTRL] &= ~(DMA_PACK_CNT | DMA_ERR_PEND | DMA_TC);
 
 				dma_check_interrupts();
+			}
+			else if (data & DMA_DRAIN)
+			{
+				m_dma[DMA_CTRL] &= ~DMA_DRAIN;
+				const uint8_t pack_cnt = (m_dma[DMA_CTRL] & DMA_PACK_CNT) >> DMA_PACK_CNT_SHIFT;
+				for (uint8_t i = 0; i < pack_cnt; i++)
+				{
+					const uint32_t bit_index = (3 - i) * 8;
+					//const uint32_t value = m_dma_pack_register & (0xff << bit_index);
+					//logerror("dma_w: draining %02x to RAM address %08x & %08x\n", value >> bit_index, m_dma[DMA_ADDR], 0xff << (24 - bit_index));
+					write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, m_dma_pack_register, 0xff << bit_index);
+					m_dma[DMA_ADDR]++;
+				}
+				m_dma_pack_register = 0;
+				m_dma[DMA_CTRL] &= ~DMA_PACK_CNT;
 			}
 			// TODO: DMA_DRAIN
 
@@ -1828,12 +1986,12 @@ WRITE32_MEMBER( sun4_state::dma_w )
 		}
 
 		case DMA_ADDR:
-			logerror("dma_w: addr: %08x\n", data);
+			//logerror("dma_w: addr: %08x\n", data);
 			m_dma[offset] = data;
 			break;
 
 		case DMA_BYTE_COUNT:
-			logerror("dma_w: byte_count: %08x\n", data);
+			//logerror("dma_w: byte_count: %08x\n", data);
 			m_dma[offset] = data;
 			break;
 
@@ -1844,36 +2002,67 @@ WRITE32_MEMBER( sun4_state::dma_w )
 
 WRITE_LINE_MEMBER( sun4_state::scsi_irq )
 {
+	int old_irq = m_scsi_irq;
 	m_scsi_irq = state;
-	dma_check_interrupts();
+	if (m_scsi_irq != old_irq)
+	{
+		//logerror("scsi_irq %d, checking interrupts\n", state);
+		dma_check_interrupts();
+	}
 }
 
 WRITE_LINE_MEMBER( sun4_state::scsi_drq )
 {
-	logerror("scsi_drq %d\n", state);
+	//logerror("scsi_drq %d\n", state);
 	m_dma[DMA_CTRL] &= ~DMA_REQ_PEND;
 	if (state)
 	{
-		logerror("scsi_drq, DMA pending\n");
+		//logerror("scsi_drq, DMA pending\n");
 		m_dma[DMA_CTRL] |= DMA_REQ_PEND;
-		if (m_dma[DMA_CTRL] & DMA_EN_DMA)
+		if (m_dma[DMA_CTRL] & DMA_EN_DMA/* && m_dma[DMA_BYTE_COUNT]*/)
 		{
-			logerror("DMA enabled, starting dma\n");
+			//logerror("DMA enabled, starting dma\n");
 			dma_transfer();
 		}
 	}
+}
+
+WRITE_LINE_MEMBER( sun4_state::fdc_irq )
+{
+	int old_irq = m_fdc_irq;
+	m_fdc_irq = state;
+	if (old_irq != m_fdc_irq)
+	{
+		logerror("fdc_irq %d\n", state);
+		m_maincpu->set_input_line(SPARC_IRQ11, state ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+READ32_MEMBER( sun4_state::lance_dma_r )
+{
+	if (m_arch == ARCH_SUN4)
+		return read_insn_data(11, m_maincpu->space(AS_PROGRAM), offset, mem_mask);
+	else
+		return read_insn_data_4c(11, m_maincpu->space(AS_PROGRAM), offset, mem_mask);
+}
+
+WRITE32_MEMBER( sun4_state::lance_dma_w )
+{
+	if (m_arch == ARCH_SUN4)
+		write_insn_data(11, m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
+	else
+		write_insn_data_4c(11, m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
+}
+
+WRITE32_MEMBER( sun4_state::buserr_w )
+{
+	COMBINE_DATA(&m_buserr[offset]);
 }
 
 // indicate 4/60 SCSI/DMA/Ethernet card exists
 READ32_MEMBER( sun4_state::ss1_sl0_id )
 {
 	return 0xfe810101;
-}
-
-// indicate 4/60 color video card exists
-READ32_MEMBER( sun4_state::ss1_sl3_id )
-{
-	return 0xfe010101;
 }
 
 FLOPPY_FORMATS_MEMBER( sun4_state::floppy_formats )
@@ -1885,14 +2074,20 @@ static void sun_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
+static void sun4_cdrom(device_t *device)
+{
+	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
+}
+
 static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5390", NCR5390);
+	device.option_add_internal("ncr53c90a", NCR53C90A);
+	device.set_option_machine_config("cdrom", sun4_cdrom);
 }
 
-void sun4_state::ncr5390(device_t *device)
+void sun4_state::ncr53c90a(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
@@ -1903,121 +2098,118 @@ void sun4_state::ncr5390(device_t *device)
 
 MACHINE_CONFIG_START(sun4_state::sun4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MB86901, 16670000)
+	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
 
-	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
+	M48T02(config, TIMEKEEPER_TAG, 0);
 
-	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
+	I82072(config, m_fdc, 24_MHz_XTAL);
+	m_fdc->set_ready_line_connected(false);
+	m_fdc->intrq_wr_callback().set(FUNC(sun4_state::fdc_irq));
+	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", sun4_state::floppy_formats);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(type0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, m_type0space).set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(type1space_s4_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_s4_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// Ethernet
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
+	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
 
 	// Keyboard/mouse
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	m_scc1->out_int_callback().set(FUNC(sun4_state::scc1_int));
+	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type4hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type4hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	// RS232 serial ports
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc2_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	m_scc2->out_int_callback().set(FUNC(sun4_state::scc2_int));
+	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:2", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:3", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
+	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MB86901, 16670000)
+	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4c_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
 
-	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, MK48T12, 0)
+	M48T02(config, TIMEKEEPER_TAG, 0);
 
-	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
+	I82072(config, m_fdc, 24_MHz_XTAL);
+	m_fdc->set_ready_line_connected(false);
+	m_fdc->intrq_wr_callback().set(FUNC(sun4_state::fdc_irq));
+	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", sun4_state::floppy_formats);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(type0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, m_type0space).set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(type1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// Ethernet
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
+	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
 
 	// Keyboard/mouse
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	m_scc1->out_int_callback().set(FUNC(sun4_state::scc1_int));
+	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	// no mouse TxD connection - replaced with soft power request input
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type5hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type5hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	// RS232 serial ports
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc2_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	m_scc2->out_int_callback().set(FUNC(sun4_state::scc2_int));
+	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
@@ -2027,15 +2219,36 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
-
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun4_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
 MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(sun4_state::sun4_40)
+	sun4c(config);
+
+	m_type1space->set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// SBus
+	SBUS(config, m_sbus, 16670000, "maincpu", "type1");
+	SBUS_SLOT(config, "slot1", 16'670'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot2", 16'670'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot3", 16'670'000, m_sbus, sbus_cards, "bwtwo");
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(sun4_state::sun4_60)
+	sun4c(config);
+
+	m_maincpu->set_clock(20'000'000);
+
+	m_type1space->set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+
+	// SBus
+	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
+	SBUS_SLOT(config, "slot1", 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot2", 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, "slot3", 20'000'000, m_sbus, sbus_cards, nullptr);
+MACHINE_CONFIG_END
+
 
 /*
 Boot PROM
@@ -2145,16 +2358,6 @@ ROM_START( sun4_300 )
 	ROM_LOAD32_BYTE( "1036-09.rom", 0x00000, 0x10000, CRC(cb3d45a7) SHA1(9d5da09ff87ec52dc99ffabd1003d30811eafdb0))
 	ROM_LOAD32_BYTE( "1037-09.rom", 0x00001, 0x10000, CRC(4f005bea) SHA1(db3f6133ea7c497ba440bc797123dde41abea6fd))
 	ROM_LOAD32_BYTE( "1038-09.rom", 0x00002, 0x10000, CRC(1e429d31) SHA1(498ce4d34a74ea6e3e369bb7eb9c2b87e12bd080))
-
-	ROM_REGION( 0x10000, "devices", ROMREGION_ERASEFF )
-	// CG3 Color frame buffer (cgthree)
-	ROM_LOAD( "sunw,501-1415.bin", 0x0000, 0x0800, CRC(d1eb6f4d) SHA1(9bef98b2784b6e70167337bb27cd07952b348b5a))
-
-	// BW2 frame buffer (bwtwo)
-	ROM_LOAD( "sunw,501-1561.bin", 0x0800, 0x0800, CRC(e37a3314) SHA1(78761bd2369cb0c58ef1344c697a47d3a659d4bc))
-
-	// TurboGX 8-Bit Color Frame Buffer
-	ROM_LOAD( "sunw,501-2325.bin", 0x1000, 0x8000, CRC(bbdc45f8) SHA1(e4a51d78e199cd57f2fcb9d45b25dfae2bd537e4))
 ROM_END
 
 ROM_START( sun4_400 )
@@ -2314,10 +2517,10 @@ COMP( 1987, sun4_300, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  
 COMP( 198?, sun4_400, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  "Sun Microsystems", "Sun 4/4x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4c
-COMP( 1990, sun4_40,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_40,  sun4_300, 0,      sun4_40, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1991, sun4_50,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 199?, sun4_20,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1989, sun4_60,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, sun4_60,  sun4_300, 0,      sun4_60, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1990, sun4_65,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1990, sun4_75,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation 2 (Sun 4/75)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

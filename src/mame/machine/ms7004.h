@@ -17,10 +17,10 @@
 //**************************************************************************
 
 #define MCFG_MS7004_TX_HANDLER(_cb) \
-	devcb = &downcast<ms7004_device &>(*device).set_tx_handler(DEVCB_##_cb);
+	downcast<ms7004_device &>(*device).set_tx_handler(DEVCB_##_cb);
 
 #define MCFG_MS7004_RTS_HANDLER(_cb) \
-	devcb = &downcast<ms7004_device &>(*device).set_rts_handler(DEVCB_##_cb);
+	downcast<ms7004_device &>(*device).set_rts_handler(DEVCB_##_cb);
 
 
 //**************************************************************************

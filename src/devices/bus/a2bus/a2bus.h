@@ -33,13 +33,13 @@
 	downcast<a2bus_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_A2BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<a2bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<a2bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_A2BUS_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<a2bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	downcast<a2bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_A2BUS_OUT_INH_CB(_devcb) \
-	devcb = &downcast<a2bus_device &>(*device).set_out_inh_callback(DEVCB_##_devcb);
+	downcast<a2bus_device &>(*device).set_out_inh_callback(DEVCB_##_devcb);
 
 // 7M = XTAL(14'318'181) / 2 or XTAL(28'636'363) / 4 (for IIgs)
 static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
@@ -103,6 +103,11 @@ public:
 	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_inh_callback(Object &&cb) { return m_out_inh_cb.set_callback(std::forward<Object>(cb)); }
+
+	// devcb3
+	auto irq_w() { return m_out_irq_cb.bind(); }
+	auto nmi_w() { return m_out_nmi_cb.bind(); }
+	auto inh_w() { return m_out_inh_cb.bind(); }
 
 	void add_a2bus_card(int slot, device_a2bus_card_interface *card);
 	device_a2bus_card_interface *get_a2bus_card(int slot);

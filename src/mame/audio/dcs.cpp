@@ -729,7 +729,8 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_external_program_ram(nullptr),
 	m_internal_data_ram(nullptr),
 	m_dram_in_mb(0),
-	m_iram(*this, "iram")
+	m_iram(*this, "iram"),
+	m_maincpu(*this, ":maincpu")
 {
 	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = nullptr;
 	memset(m_control_regs, 0, sizeof(m_control_regs));
@@ -1642,6 +1643,10 @@ void dcs_audio_device::ack_w()
 
 uint16_t dcs_audio_device::data_r()
 {
+	// If the cpu is reading empty data it is probably polling so eat some cyles
+	if IS_OUTPUT_EMPTY()
+		m_maincpu->eat_cycles(4444);
+
 	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
 	if (m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 0);
@@ -2675,12 +2680,7 @@ MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
 	MCFG_DEVICE_DATA_MAP(dsio_data_map)
 	MCFG_DEVICE_IO_MAP(dsio_io_map)
 
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dsio_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_dsio_device::dsio_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
@@ -2714,12 +2714,7 @@ MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
 	MCFG_DEVICE_DATA_MAP(denver_data_map)
 	MCFG_DEVICE_IO_MAP(denver_io_map)
 
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(denver_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)

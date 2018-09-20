@@ -34,13 +34,13 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
-
 	void xsleena(machine_config &config);
 	void xsleenab(machine_config &config);
 
-protected:
+	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(cpuA_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpuB_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(main_irq_w);

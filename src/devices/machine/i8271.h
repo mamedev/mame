@@ -8,17 +8,6 @@
 #include "imagedev/floppy.h"
 #include "fdc_pll.h"
 
-#define MCFG_I8271_IRQ_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8271_DRQ_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8271_HDL_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8271_OPT_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_opt_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     MACROS
@@ -29,11 +18,13 @@ class i8271_device : public device_t
 public:
 	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hdl_wr_callback(Object &&cb) { return hdl_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_opt_wr_callback(Object &&cb) { return opt_cb.set_callback(std::forward<Object>(cb)); }
+	auto intrq_wr_callback() { return intrq_cb.bind(); }
+	auto drq_wr_callback() { return drq_cb.bind(); }
+	auto hdl_wr_callback() { return hdl_cb.bind(); }
+	auto opt_wr_callback() { return opt_cb.bind(); }
 
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER (data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 

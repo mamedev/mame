@@ -32,6 +32,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void hyperspt(machine_config &config);
+	void roadf(machine_config &config);
+	void hypersptb(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll;
@@ -74,9 +79,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void hyperspt(machine_config &config);
-	void roadf(machine_config &config);
-	void hypersptb(machine_config &config);
 	void common_map(address_map &map);
 	void common_sound_map(address_map &map);
 	void hyperspt_map(address_map &map);

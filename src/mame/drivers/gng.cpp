@@ -41,16 +41,6 @@ WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 		membank("bank1")->set_entry((data & 0x03));
 }
 
-WRITE_LINE_MEMBER(gng_state::coin_counter_1_w)
-{
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-WRITE_LINE_MEMBER(gng_state::coin_counter_2_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
 WRITE_LINE_MEMBER(gng_state::ym_reset_w)
 {
 	if (!state)
@@ -399,12 +389,12 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(gng_state, irq0_line_hold, 4*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 9B on A board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gng_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gng_state, ym_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gng_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gng_state, coin_counter_2_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 9B on A board
+	mainlatch.q_out_cb<0>().set(FUNC(gng_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set_inputline("audiocpu", INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<1>().append(FUNC(gng_state::ym_reset_w));
+	mainlatch.q_out_cb<2>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	mainlatch.q_out_cb<3>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)

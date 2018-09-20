@@ -14,7 +14,7 @@
 #include "bus/centronics/ctronics.h"
 
 #define MCFG_PC_LPT_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<pc_lpt_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<pc_lpt_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

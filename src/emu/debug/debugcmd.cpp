@@ -294,7 +294,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* set up the initial debugscript if specified */
 	const char* name = m_machine.options().debug_script();
 	if (name[0] != 0)
-		m_cpu.source_script(name);
+		m_console.source_script(name);
 
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
 }
@@ -1400,7 +1400,7 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 	address_space *space;
 	const char *action = nullptr;
 	u64 address, length;
-	int type;
+	read_or_write type;
 	int wpnum;
 
 	/* CPU is implicit */
@@ -1417,11 +1417,11 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 
 	/* param 3 is the type */
 	if (params[2] == "r")
-		type = WATCHPOINT_READ;
+		type = read_or_write::READ;
 	else if (params[2] == "w")
-		type = WATCHPOINT_WRITE;
+		type = read_or_write::WRITE;
 	else if (params[2] == "rw" || params[2] == "wr")
-		type = WATCHPOINT_READWRITE;
+		type = read_or_write::READWRITE;
 	else
 	{
 		m_console.printf("Invalid watchpoint type: expected r, w, or rw\n");
@@ -1527,20 +1527,20 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
 		for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
-			if (device.debug()->watchpoint_first(spacenum) != nullptr)
+			if (!device.debug()->watchpoint_vector(spacenum).empty())
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
 				m_console.printf("Device '%s' %s space watchpoints:\n", device.tag(),
-																						device.debug()->watchpoint_first(spacenum)->space().name());
+								 device.debug()->watchpoint_vector(spacenum).front()->space().name());
 
 				/* loop over the watchpoints */
-				for (device_debug::watchpoint *wp = device.debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
+				for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
 				{
 					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
 							wp->space().addrchars(), wp->address(),
 							wp->space().addrchars(), wp->address() + wp->length() - 1,
-							types[wp->type() & 3]);
+							types[int(wp->type())]);
 					if (std::string(wp->condition()).compare("1") != 0)
 						buffer.append(string_format(" if %s", wp->condition()));
 					if (std::string(wp->action()).compare("") != 0)
@@ -3001,9 +3001,6 @@ void debugger_commands::execute_trackmem(int ref, const std::vector<std::string>
 	// Inform the CPU it's time to start tracking memory writes
 	cpu->debug()->set_track_mem(turnOn);
 
-	// Use the watchpoint system to catch memory writes
-	space->enable_write_watchpoints(true);
-
 	// Clear out the existing data if requested
 	if (clear)
 		space->device().debug()->track_mem_data_clear();
@@ -3097,7 +3094,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 
 void debugger_commands::execute_source(int ref, const std::vector<std::string> &params)
 {
-	m_cpu.source_script(params[0].c_str());
+	m_console.source_script(params[0].c_str());
 }
 
 
@@ -3127,7 +3124,7 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 		taddress = address & space->addrmask();
 		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
-			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
+			std::string mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
 					"%7s: %0*X logical == %0*X physical -> %s\n",
 					intnames[intention & 3],
@@ -3158,8 +3155,31 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 	if (file)
 	{
 		memory_interface_iterator iter(m_machine.root_device());
-		for (device_memory_interface &memory : iter)
-			memory.dump(file);
+		for (device_memory_interface &memory : iter) {
+			for (int space = 0; space != memory.max_space_count(); space++)
+				if (memory.has_space(space))
+				{
+					address_space &sp = memory.space(space);
+					bool octal = sp.is_octal();
+					int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
+
+					std::vector<memory_entry> entries[2];
+					sp.dump_maps(entries[0], entries[1]);
+					for (int mode = 0; mode < 2; mode ++)
+					{
+						fprintf(file, "  device %s space %s %s:\n", memory.device().tag(), sp.name(), mode ? "write" : "read");
+						for (memory_entry &entry : entries[mode])
+						{
+							if (octal)
+								fprintf(file, "%0*o - %0*o", nc, entry.start, nc, entry.end);
+							else
+								fprintf(file, "%0*x - %0*x", nc, entry.start, nc, entry.end);
+							fprintf(file, ": %s\n", entry.entry->name().c_str());
+						}
+						fprintf(file, "\n");
+					}
+				}
+		}
 		fclose(file);
 	}
 }

@@ -24,7 +24,11 @@ public:
 		, nvram_bank(*this, "nvram_bank")
 	{ }
 
+	void stratos(machine_config &config);
+
 	void init_stratos();
+
+private:
 	DECLARE_WRITE8_MEMBER(p2000_w);
 	DECLARE_READ8_MEMBER(p2200_r);
 	DECLARE_WRITE8_MEMBER(p2200_w);
@@ -37,9 +41,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void stratos(machine_config &config);
 	void stratos_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, led_latch_control;
 	uint32_t individual_leds;
@@ -80,7 +83,7 @@ void stratos_state::machine_reset()
 
 void stratos_state::show_leds()
 {
-	static const char *led_pos[18] = {
+	static char const *const led_pos[18] = {
 		nullptr, nullptr, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", nullptr, nullptr, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", nullptr, nullptr
 	};
 	char str_red[64];
@@ -358,7 +361,7 @@ MACHINE_CONFIG_START(stratos_state::stratos)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", stratos_state, irq_timer, attotime::from_hz(1000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( stratos )

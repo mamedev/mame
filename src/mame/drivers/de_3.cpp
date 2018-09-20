@@ -37,7 +37,7 @@ public:
 	void de_3_dmd1(machine_config &config);
 	void de_3_dmd2(machine_config &config);
 
-protected:
+private:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -82,9 +82,6 @@ protected:
 //  output_finder<32> m_digits;
 //  output_finder<> m_diag_digit;
 
-	bool m_nmi_enable;
-
-private:
 //  uint32_t m_segment1;
 //  uint32_t m_segment2;
 	uint8_t m_strobe;

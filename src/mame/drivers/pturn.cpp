@@ -89,16 +89,22 @@ ROMS: All ROM labels say only "PROM" and a number.
 class pturn_state : public driver_device
 {
 public:
-	pturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pturn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	void pturn(machine_config &config);
+
+	void init_pturn();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -135,7 +141,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void init_pturn();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -144,7 +149,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
-	void pturn(machine_config &config);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 };
@@ -522,14 +526,14 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pturn_state, flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pturn_state, nmi_main_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pturn_state, bgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pturn_state, fgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // toggles frequently during gameplay
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
+	mainlatch.q_out_cb<1>().set(FUNC(pturn_state::nmi_main_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(pturn_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(pturn_state::coin_counter_2_w));
+	mainlatch.q_out_cb<4>().set(FUNC(pturn_state::bgbank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(pturn_state::fgbank_w));
+	mainlatch.q_out_cb<6>().set_nop(); // toggles frequently during gameplay
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

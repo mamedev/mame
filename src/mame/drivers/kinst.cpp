@@ -191,8 +191,8 @@ Notes:
 class kinst_state : public driver_device
 {
 public:
-	kinst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kinst_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_rambase2(*this, "rambase2"),
 		m_control(*this, "control"),
@@ -727,9 +727,8 @@ MACHINE_CONFIG_START(kinst_state::kinst)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
-
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(INPUTLINE(m_maincpu, 1))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set_inputline("maincpu", 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

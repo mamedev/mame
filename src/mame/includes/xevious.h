@@ -23,6 +23,12 @@ public:
 		m_samples(*this, "samples"),
 		m_subcpu3(*this, "sub3") { }
 
+	void xevious(machine_config &config);
+
+	void init_xevious();
+	void init_xevios();
+
+protected:
 	required_shared_ptr<uint8_t> m_xevious_sr1;
 	required_shared_ptr<uint8_t> m_xevious_sr2;
 	required_shared_ptr<uint8_t> m_xevious_sr3;
@@ -33,8 +39,7 @@ public:
 	optional_device<samples_device> m_samples;
 
 	int32_t m_xevious_bs[2];
-	void init_xevious();
-	void init_xevios();
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_VIDEO_START(xevious);
@@ -51,7 +56,7 @@ public:
 	DECLARE_READ8_MEMBER( xevious_bb_r );
 
 	optional_device<cpu_device> m_subcpu3;
-	void xevious(machine_config &config);
+
 	void xevious_map(address_map &map);
 };
 

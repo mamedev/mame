@@ -468,7 +468,6 @@ configuration { "vs*" }
 	flags {
 		"NoPCH",
 		"ExtraWarnings",
-		"NoEditAndContinue",
 	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
@@ -480,12 +479,14 @@ configuration { "vs*" }
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
-		"NoIncrementalLink",
+		"NoMultiProcessorCompilation",
 	}
 
 configuration { "Release", "vs*" }
 	flags {
 		"Optimize",
+		"NoEditAndContinue",
+		"NoIncrementalLink",
 	}
 
 -- Force VS2015/17 targets to use bundled SDL2
@@ -1017,6 +1018,11 @@ end
 					"-Wno-ignored-qualifiers"
 				}
 			end
+			if (version >= 60000) then
+				buildoptions {
+					"-Wno-pragma-pack" -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
+				}
+			end
 		else
 			if (version < 50000) then
 				print("GCC version 5.0 or later needed")
@@ -1272,6 +1278,7 @@ end
 			"/wd4510", -- warning C4510: 'xxx' : default constructor could not be generated
 			"/wd4512", -- warning C4512: 'xxx' : assignment operator could not be generated
 			"/wd4514", -- warning C4514: 'xxx' : unreferenced inline function has been removed
+			"/wd4521", -- warning C4521: 'xxx' : multiple copy constructors specified
 			"/wd4571", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4610", -- warning C4619: #pragma warning : there is no warning number 'xxx'
 			"/wd4611", -- warning C4571: Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught

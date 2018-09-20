@@ -82,6 +82,9 @@ public:
 	{
 	}
 
+	void v6809(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
@@ -94,9 +97,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	void v6809(machine_config &config);
 	void v6809_mem(address_map &map);
-private:
+
 	uint16_t m_video_address;
 	bool m_speaker_en;
 	uint8_t m_video_index;
@@ -312,39 +314,39 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, v6809_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, v6809_state, pa_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpb_handler().set(FUNC(v6809_state::pb_r));
+	m_pia0->writepa_handler().set(FUNC(v6809_state::pa_w));
+	m_pia0->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 // no idea what this does
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 16_MHz_XTAL / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, v6809_state, speaker_w))
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ptm6840_device &ptm(PTM6840(config, "ptm", 16_MHz_XTAL / 4));
+	ptm.set_external_clocks(4000000/14, 4000000/14, 4000000/14/8);
+	ptm.o1_callback().set(FUNC(v6809_state::speaker_w));
+	ptm.o2_callback().set(FUNC(v6809_state::speaker_en_w));
+	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
+	ACIA6850(config, "acia0", 0);
 
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
+	ACIA6850(config, "acia1", 0);
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia0", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	acia_clock.signal_handler().set("acia0", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia0", FUNC(acia6850_device::write_rxc));
+	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
 // this is all guess
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_DEVICE_ADD("fdc", MB8876, 16_MHz_XTAL / 16)
+	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

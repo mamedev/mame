@@ -12,7 +12,6 @@
 
     - strobed I/O
     - expose register file to disassembler
-    - decimal adjust instruction
     - timer Tin/Tout modes
     - serial
     - instruction pipeline
@@ -158,6 +157,7 @@ enum
 DEFINE_DEVICE_TYPE(Z8601,   z8601_device,   "z8601",   "Zilog Z8601")
 DEFINE_DEVICE_TYPE(UB8830D, ub8830d_device, "ub8830d", "UB8830D")
 DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Zilog Z8611")
+DEFINE_DEVICE_TYPE(Z8671,   z8671_device,   "z8671",   "Zilog Z8671")
 DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
 
 
@@ -165,50 +165,69 @@ DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
     ADDRESS MAPS
 ***************************************************************************/
 
-void z8_device::program_2kb(address_map &map)
+void z8_device::program_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rom();
+	if (m_rom_size > 0)
+		map(0x0000, m_rom_size - 1).rom().region(DEVICE_SELF, 0);
 }
 
-void z8_device::program_4kb(address_map &map)
+void z8_device::preprogrammed_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();
+	map(0x0000, m_rom_size - 1).rom().region("internal", 0);
 }
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, map)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, preprogrammed ? address_map_constructor(FUNC(z8_device::preprogrammed_map), this) : address_map_constructor(FUNC(z8_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_input_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_rom_size(rom_size)
 {
+	assert(((rom_size - 1) & rom_size) == 0);
 }
 
 
 z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, address_map_constructor(FUNC(z8601_device::program_2kb), this))
+	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, false)
 {
 }
 
 
 ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, address_map_constructor(FUNC(ub8830d_device::program_2kb), this))
+	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, false)
 {
 }
 
 
 z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, address_map_constructor(FUNC(z8611_device::program_4kb), this))
+	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, false)
 {
+}
+
+
+z8671_device::z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z8671, tag, owner, clock, 0x800, true)
+{
+}
+
+ROM_START(z8671)
+	ROM_REGION(0x0800, "internal", 0)
+	ROM_LOAD("z8671.bin", 0x0000, 0x0800, CRC(3fceeb76) SHA1(290a24c77debd2e280fe31380287838c5fb7cabd))
+ROM_END
+
+const tiny_rom_entry *z8671_device::device_rom_region() const
+{
+	return ROM_NAME(z8671);
 }
 
 
 z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8681, tag, owner, clock, 0, address_map_constructor())
+	: z8_device(mconfig, Z8681, tag, owner, clock, 0, false)
 {
 }
+
 
 std::unique_ptr<util::disasm_interface> z8_device::create_disassembler()
 {
@@ -302,16 +321,28 @@ uint8_t z8_device::register_read(uint8_t offset)
 	case Z8_REGISTER_P0:
 		switch (P01M & Z8_P01M_P0L_MODE_MASK)
 		{
-		case Z8_P01M_P0L_MODE_OUTPUT:   data = m_output[offset] & 0x0f;     break;
-		case Z8_P01M_P0L_MODE_INPUT:    mask = 0x0f;                                break;
-		default: /* A8...A11 */         data = 0x0f;                                break;
+		case Z8_P01M_P0L_MODE_OUTPUT:
+			data = m_output[offset] & 0x0f;
+			break;
+		case Z8_P01M_P0L_MODE_INPUT:
+			mask = 0x0f;
+			break;
+		default: /* A8...A11 */
+			data = 0x0f;
+			break;
 		}
 
 		switch (P01M & Z8_P01M_P0H_MODE_MASK)
 		{
-		case Z8_P01M_P0H_MODE_OUTPUT:   data |= m_output[offset] & 0xf0;    break;
-		case Z8_P01M_P0H_MODE_INPUT:    mask |= 0xf0;                               break;
-		default: /* A12...A15 */        data |= 0xf0;                               break;
+		case Z8_P01M_P0H_MODE_OUTPUT:
+			data |= m_output[offset] & 0xf0;
+			break;
+		case Z8_P01M_P0H_MODE_INPUT:
+			mask |= 0xf0;
+			break;
+		default: /* A12...A15 */
+			data |= 0xf0;
+			break;
 		}
 
 		if (!(P3M & Z8_P3M_P0_STROBED))
@@ -325,9 +356,15 @@ uint8_t z8_device::register_read(uint8_t offset)
 	case Z8_REGISTER_P1:
 		switch (P01M & Z8_P01M_P1_MODE_MASK)
 		{
-		case Z8_P01M_P1_MODE_OUTPUT:    data = m_output[offset];            break;
-		case Z8_P01M_P1_MODE_INPUT:     mask = 0xff;                                break;
-		default: /* AD0..AD7 */         data = 0xff;                                break;
+		case Z8_P01M_P1_MODE_OUTPUT:
+			data = m_output[offset];
+            break;
+		case Z8_P01M_P1_MODE_INPUT:
+			mask = 0xff;
+			break;
+		default: /* AD0..AD7 */
+			data = 0xff;
+			break;
 		}
 
 		if ((P3M & Z8_P3M_P33_P34_MASK) != Z8_P3M_P33_P34_DAV1_RDY1)
@@ -351,10 +388,10 @@ uint8_t z8_device::register_read(uint8_t offset)
 
 	case Z8_REGISTER_P3:
 		// TODO: special port 3 modes
-		if (!(P3M & 0x7c))
-		{
+		//if (!(P3M & 0x7c))
+		//{
 			mask = 0x0f;
-		}
+		//}
 
 		if (mask) m_input[offset] = m_input_cb[3](0, mask);
 
@@ -420,10 +457,10 @@ void z8_device::register_write(uint8_t offset, uint8_t data)
 		m_output[offset] = data;
 
 		// TODO: special port 3 modes
-		if (!(P3M & 0x7c))
-		{
+		//if (!(P3M & 0x7c))
+		//{
 			mask = 0xf0;
-		}
+		//}
 
 		if (mask) m_output_cb[3](0, data & mask, mask);
 		break;
@@ -503,7 +540,7 @@ uint8_t z8_device::get_intermediate_register(int offset)
 
 void z8_device::stack_push_byte(uint8_t src)
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 1 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 1;
@@ -525,7 +562,7 @@ void z8_device::stack_push_byte(uint8_t src)
 
 void z8_device::stack_push_word(uint16_t src)
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 2 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 2;
@@ -547,7 +584,7 @@ void z8_device::stack_push_word(uint16_t src)
 
 uint8_t z8_device::stack_pop_byte()
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
 		uint8_t sp = register_read(Z8_REGISTER_SPL);
@@ -573,7 +610,7 @@ uint8_t z8_device::stack_pop_byte()
 
 uint16_t z8_device::stack_pop_word()
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
 		uint8_t sp = register_read(Z8_REGISTER_SPL);

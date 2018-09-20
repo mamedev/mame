@@ -59,7 +59,7 @@ public:
 
 	void tomcat(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
 	DECLARE_WRITE16_MEMBER(main_latch_w);
@@ -81,7 +81,6 @@ protected:
 	void sound_map(address_map &map);
 	void tomcat_map(address_map &map);
 
-private:
 	required_device<tms5220_device> m_tms;
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t m_nvram[0x800];
@@ -323,9 +322,9 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_DEVICE_DISABLE()
 	MCFG_DEVICE_PROGRAM_MAP( sound_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 12.096_MHz_XTAL / 16)
-	MCFG_ADC0808_IN0_CB(IOPORT("STICKY"))
-	MCFG_ADC0808_IN1_CB(IOPORT("STICKX"))
+	ADC0809(config, m_adc, 12.096_MHz_XTAL / 16);
+	m_adc->in_callback<0>().set_ioport("STICKY");
+	m_adc->in_callback<1>().set_ioport("STICKX");
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, 14.318181_MHz_XTAL / 8)
 	/*
@@ -345,19 +344,19 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tomcat_state, mres_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tomcat_state, sndres_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tomcat_state, lnkmode_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tomcat_state, err_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tomcat_state, ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tomcat_state, txbuff_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set_output("led1").invert();
+	m_mainlatch->q_out_cb<1>().set_output("led2").invert();
+	m_mainlatch->q_out_cb<2>().set(FUNC(tomcat_state::mres_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(tomcat_state::sndres_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(tomcat_state::lnkmode_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(tomcat_state::err_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(tomcat_state::ack_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(tomcat_state::txbuff_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 

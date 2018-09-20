@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	MCFG_DEVICE_IO_MAP(rmhaihai_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

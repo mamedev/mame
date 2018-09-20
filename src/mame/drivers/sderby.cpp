@@ -605,7 +605,7 @@ MACHINE_CONFIG_START(sderby_state::sderby)
 	MCFG_DEVICE_PROGRAM_MAP(sderby_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(sderby_state::sderbya)
 	MCFG_DEVICE_PROGRAM_MAP(sderbya_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(sderby_state::luckboom)
 	MCFG_DEVICE_PROGRAM_MAP(luckboom_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -680,7 +680,7 @@ MACHINE_CONFIG_START(sderby_state::spacewin)
 	MCFG_DEVICE_PROGRAM_MAP(spacewin_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -705,7 +705,7 @@ MACHINE_CONFIG_START(sderby_state::shinygld)
 	MCFG_DEVICE_PROGRAM_MAP(shinygld_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state, irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.47) // measured on PCB
@@ -730,7 +730,7 @@ MACHINE_CONFIG_START(sderby_state::pmroulet)
 	MCFG_DEVICE_PROGRAM_MAP(roulette_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby_state,  irq2_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

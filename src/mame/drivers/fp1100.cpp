@@ -70,6 +70,14 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
+	void fp1100(machine_config &config);
+
+	void init_fp1100();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(main_bank_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(main_to_sub_w);
@@ -87,16 +95,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void init_fp1100();
-	DECLARE_MACHINE_RESET(fp1100);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	required_device<palette_device> m_palette;
-	void fp1100(machine_config &config);
 	void io_map(address_map &map);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
-private:
+
 	uint8_t m_irq_mask;
 	uint8_t m_main_latch;
 	uint8_t m_sub_latch;
@@ -594,7 +599,7 @@ INTERRUPT_GEN_MEMBER( fp1100_state::vblank_irq )
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
 
-MACHINE_RESET_MEMBER( fp1100_state, fp1100 )
+void fp1100_state::machine_reset()
 {
 	int i;
 	uint8_t slot_type;
@@ -640,16 +645,14 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fp1100_state, vblank_irq)
 
-	MCFG_DEVICE_ADD( "sub", UPD7801, MAIN_CLOCK/4 )
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, fp1100_state, porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, fp1100_state, portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, fp1100_state, portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fp1100_state, portc_w))
-	MCFG_UPD7810_TXD(WRITELINE(*this, fp1100_state, cass_w))
-
-	MCFG_MACHINE_RESET_OVERRIDE(fp1100_state, fp1100)
+	upd7801_device &sub(UPD7801(config, m_subcpu, MAIN_CLOCK/4));
+	sub.set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
+	sub.pa_out_cb().set(FUNC(fp1100_state::porta_w));
+	sub.pb_in_cb().set(FUNC(fp1100_state::portb_r));
+	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	sub.pc_in_cb().set(FUNC(fp1100_state::portc_r));
+	sub.pc_out_cb().set(FUNC(fp1100_state::portc_w));
+	sub.txd_func().set(FUNC(fp1100_state::cass_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -663,8 +666,8 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) // inside the keyboard
+	BEEP(config, "beeper", 950) // guess
+			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
 	/* CRTC */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/8)   /* hand tuned to get ~60 fps */

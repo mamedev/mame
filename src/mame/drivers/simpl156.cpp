@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_DEVICE_PROGRAM_MAP(chainrec_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93C45
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -179,8 +179,8 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				/* a new vscroll latches the offset into a counter; we must adjust for this */
 				int offset = scanline;
 				const rectangle &visible_area = screen.visible_area();
-				if (offset > visible_area.max_y)
-					offset -= visible_area.max_y + 1;
+				if (offset > visible_area.bottom())
+					offset -= visible_area.bottom() + 1;
 
 				if (m_playfield_yscroll != ((data - offset) & 0x1ff))
 				{
@@ -213,11 +213,11 @@ uint32_t vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_in
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
 					/* partially verified via schematics (there are a lot of PALs involved!):
@@ -253,11 +253,11 @@ uint32_t vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_in
 
 	/* now go back and process the upper bit of MO priority */
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
 					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;

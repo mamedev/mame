@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_PACMAN_H
+#define MAME_INCLUDES_PACMAN_H
+
+#pragma once
+
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -16,6 +22,7 @@ public:
 	pacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainlatch(*this, "mainlatch")
 		, m_namco_sound(*this, "namco")
 		, m_watchdog(*this, "watchdog")
 		, m_spriteram(*this, "spriteram")
@@ -60,6 +67,7 @@ public:
 	void woodpek_map(address_map &map);
 	void writeport(address_map &map);
 protected:
+	optional_device<ls259_device> m_mainlatch;
 	optional_device<namco_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;
@@ -222,7 +230,7 @@ public:
 	void crush4(machine_config &config);
 	void bigbucks(machine_config &config);
 	void porky(machine_config &config);
-	void pacman(machine_config &config);
+	void pacman(machine_config &config, bool latch = true);
 	void _8bpm(machine_config &config);
 	void maketrax(machine_config &config);
 	void korosuke(machine_config &config);
@@ -240,3 +248,5 @@ private:
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
 };
+
+#endif // MAME_INCLUDES_PACMAN_H

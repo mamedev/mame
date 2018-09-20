@@ -273,19 +273,21 @@ MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* DMA Controller - Intel P8237A-5 */
 	/* Channel 0: uPD765a Floppy Disk Controller */
 	/* Channel 1: M68K main system memory */
-	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL(10'000'000) / 2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pdc_device, i8237_hreq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, pdc_device, i8237_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, pdc_device, i8237_dma_mem_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, pdc_device, i8237_dma_mem_w))
-	MCFG_I8237_IN_IOR_0_CB(READ8(*this, pdc_device, i8237_fdc_dma_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, pdc_device, i8237_fdc_dma_w))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, pdc_device, m68k_dma_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, pdc_device, m68k_dma_w))
+	AM9517A(config, m_dma8237, 10_MHz_XTAL / 2);
+	m_dma8237->out_hreq_callback().set(FUNC(pdc_device::i8237_hreq_w));
+	m_dma8237->out_eop_callback().set(FUNC(pdc_device::i8237_eop_w));
+	m_dma8237->in_memr_callback().set(FUNC(pdc_device::i8237_dma_mem_r));
+	m_dma8237->out_memw_callback().set(FUNC(pdc_device::i8237_dma_mem_w));
+	m_dma8237->in_ior_callback<0>().set(FUNC(pdc_device::i8237_fdc_dma_r));
+	m_dma8237->out_iow_callback<0>().set(FUNC(pdc_device::i8237_fdc_dma_w));
+	m_dma8237->in_ior_callback<1>().set(FUNC(pdc_device::m68k_dma_r));
+	m_dma8237->out_iow_callback<1>().set(FUNC(pdc_device::m68k_dma_w));
 
 	/* Hard Disk Controller - HDC9224 */
-	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
+	// TODO: connect the HDC lines
+	HDC9224(config, HDC_TAG, 0);
+	MFM_HD_CONNECTOR(config, "h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+
 MACHINE_CONFIG_END
 
 ioport_constructor pdc_device::device_input_ports() const
@@ -319,6 +321,10 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
+	/* Resolve callbacks */
+	m_m68k_r_cb.resolve_safe(0);
+	m_m68k_w_cb.resolve_safe();
+
 	/* Save States */
 	save_item(NAME(reg_p0));
 	save_item(NAME(reg_p1));
@@ -346,10 +352,6 @@ void pdc_device::device_reset()
 
 	/* Reset CPU */
 	m_pdccpu->reset();
-
-	/* Resolve callbacks */
-	m_m68k_r_cb.resolve_safe(0);
-	m_m68k_w_cb.resolve_safe();
 
 	m_fdc->set_rate(500000) ;
 }

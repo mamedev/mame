@@ -862,14 +862,14 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_DEVICE_ADD(m_subcpu2, Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(z8002_map_2)
 
-	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
-	MCFG_NAMCO_51XX_SCREEN("screen")
-	MCFG_NAMCO_51XX_INPUT_0_CB(IOPORT("IN0")) MCFG_DEVCB_MASK(0x0f)
-	MCFG_NAMCO_51XX_INPUT_1_CB(IOPORT("IN0")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO_51XX_INPUT_2_CB(IOPORT("DSWB")) MCFG_DEVCB_MASK(0x0f)
-	MCFG_NAMCO_51XX_INPUT_3_CB(IOPORT("DSWB")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(*this, polepos_state,out_0))
-	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(*this, polepos_state,out_1))
+	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
+	n51xx.set_screen_tag(m_screen);
+	n51xx.input_callback<0>().set_ioport("IN0").mask(0x0f);
+	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
+	n51xx.input_callback<2>().set_ioport("DSWB").mask(0x0f);
+	n51xx.input_callback<3>().set_ioport("DSWB").rshift(4);
+	n51xx.output_callback<0>().set(FUNC(polepos_state::out_0));
+	n51xx.output_callback<1>().set(FUNC(polepos_state::out_1));
 
 	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
 	MCFG_NAMCO_52XX_DISCRETE("discrete")
@@ -877,12 +877,12 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_NAMCO_52XX_ROMREAD_CB(READ8(*this, polepos_state,namco_52xx_rom_r))
 	MCFG_NAMCO_52XX_SI_CB(READ8(*this, polepos_state,namco_52xx_si_r))
 
-	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
-	MCFG_NAMCO_53XX_K_CB(READ8(*this, polepos_state,namco_53xx_k_r))
-	MCFG_NAMCO_53XX_INPUT_0_CB(READ8(*this, polepos_state,steering_changed_r))
-	MCFG_NAMCO_53XX_INPUT_1_CB(READ8(*this, polepos_state,steering_delta_r))
-	MCFG_NAMCO_53XX_INPUT_2_CB(IOPORT("DSWA")) MCFG_DEVCB_MASK(0x0f)
-	MCFG_NAMCO_53XX_INPUT_3_CB(IOPORT("DSWA")) MCFG_DEVCB_RSHIFT(4)
+	namco_53xx_device &n53xx(NAMCO_53XX(config, "53xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
+	n53xx.k_port_callback().set(FUNC(polepos_state::namco_53xx_k_r));
+	n53xx.input_callback<0>().set(FUNC(polepos_state::steering_changed_r));
+	n53xx.input_callback<1>().set(FUNC(polepos_state::steering_delta_r));
+	n53xx.input_callback<2>().set_ioport("DSWA").mask(0x0f);
+	n53xx.input_callback<3>().set_ioport("DSWA").rshift(4);
 
 	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2)  /* 1.536 MHz */
 	MCFG_NAMCO_54XX_DISCRETE("discrete")
@@ -897,25 +897,24 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_NAMCO_06XX_WRITE_2_CB(WRITE8("52xx", namco_52xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD(m_latch, LS259, 0) // at 8E on polepos
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE(m_maincpu, 0)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, polepos_state, iosel_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m_namco_sound, namco_device, sound_enable_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("polepos", polepos_sound_device, clson_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, polepos_state, gasel_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE(m_subcpu, INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE(m_subcpu2, INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, polepos_state, sb0_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, polepos_state, chacl_w))
+	LS259(config, m_latch); // at 8E on polepos
+	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
+	m_latch->q_out_cb<1>().set(FUNC(polepos_state::iosel_w));
+	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
+	m_latch->q_out_cb<2>().set("polepos", FUNC(polepos_sound_device::clson_w));
+	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));
+	m_latch->q_out_cb<4>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
+	m_latch->q_out_cb<5>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
+	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
+	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -926,7 +925,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_polepos)
 	MCFG_PALETTE_ADD(m_palette, 0x0f00)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_DEFAULT_LAYOUT(layout_polepos)
+	config.set_default_layout(layout_polepos);
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 
@@ -996,37 +995,35 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_DEVICE_ADD(m_subcpu2, Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(z8002_map_2)
 
-	/* TODO, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.. */
-	/* doesn't exist on the bootleg, but required for now or the game only boots in test mode!
-	   they probably simulate some of the logic */
-	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2)       /* 1.536 MHz */
-	MCFG_NAMCO_51XX_SCREEN("screen")
-	MCFG_NAMCO_51XX_INPUT_1_CB(IOPORT("IN0")) MCFG_DEVCB_RSHIFT(4)
+	// TODO, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.
+	// doesn't exist on the bootleg, but required for now or the game only boots in test mode!  they probably simulate some of the logic
+	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
+	n51xx.set_screen_tag(m_screen);
+	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
 	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD(m_latch, LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE(m_maincpu, 0)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, polepos_state, iosel_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m_namco_sound, namco_device, sound_enable_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("polepos", polepos_sound_device, clson_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, polepos_state, gasel_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE(m_subcpu, INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE(m_subcpu2, INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, polepos_state, sb0_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, polepos_state, chacl_w))
+	LS259(config, m_latch);
+	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
+	m_latch->q_out_cb<1>().set(FUNC(polepos_state::iosel_w));
+	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
+	m_latch->q_out_cb<2>().set("polepos", FUNC(polepos_sound_device::clson_w));
+	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));
+	m_latch->q_out_cb<4>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
+	m_latch->q_out_cb<5>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
+	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
+	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -1037,7 +1034,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_polepos)
 	MCFG_PALETTE_ADD(m_palette, 0x0f00)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_DEFAULT_LAYOUT(layout_topracer)
+	config.set_default_layout(layout_topracer);
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 
@@ -1063,21 +1060,22 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(polepos_state::polepos2bi)
+void polepos_state::polepos2bi(machine_config &config)
+{
 	topracern(config);
 
-	MCFG_DEVICE_ADD(m_sound_z80, Z80, MASTER_CLOCK/8) /*? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_z80_bootleg_map)
-	MCFG_DEVICE_IO_MAP(sound_z80_bootleg_iomap)
+	Z80(config, m_sound_z80, MASTER_CLOCK/8); /*? MHz */
+	m_sound_z80->set_addrmap(AS_PROGRAM, &polepos_state::sound_z80_bootleg_map);
+	m_sound_z80->set_addrmap(AS_IO, &polepos_state::sound_z80_bootleg_iomap);
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_sound_z80, INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_sound_z80, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, 600000) /* ? Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	TMS5220(config, "tms", 600000) /* ? Mhz */
+			.add_route(ALL_OUTPUTS, "lspeaker", 0.80)
+			.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
 

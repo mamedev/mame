@@ -6,9 +6,9 @@
 #pragma once
 
 #define MCFG_TC0180VCU_INTH_CALLBACK(_write) \
-	devcb = &downcast<tc0180vcu_device &>(*device).set_inth_callback(DEVCB_##_write);
+	downcast<tc0180vcu_device &>(*device).set_inth_callback(DEVCB_##_write);
 #define MCFG_TC0180VCU_INTL_CALLBACK(_write) \
-	devcb = &downcast<tc0180vcu_device &>(*device).set_intl_callback(DEVCB_##_write);
+	downcast<tc0180vcu_device &>(*device).set_intl_callback(DEVCB_##_write);
 
 class tc0180vcu_device : public device_t, public device_gfx_interface, public device_video_interface
 {
@@ -31,7 +31,6 @@ public:
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void tc0180vcu_memrw(address_map &map);
 protected:
@@ -47,6 +46,7 @@ private:
 	};
 
 	void vblank_callback(screen_device &screen, bool state);
+	void vblank_update();
 
 	// internal state
 

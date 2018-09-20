@@ -72,7 +72,7 @@ enum
  * *************************************************************************/
 
 #if LOG_ADB
-static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
+static char const *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 #endif
 
 int mac_state::adb_pollkbd(int update)
@@ -1223,7 +1223,7 @@ void mac_state::adb_reset()
 WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 {
 	int dtime = 0;
-/*    static const char *states[] =
+/*    static char const *const states[] =
     {
         "idle",
         "attention",

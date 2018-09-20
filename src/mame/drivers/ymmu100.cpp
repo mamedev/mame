@@ -122,7 +122,6 @@
 #include "video/hd44780.h"
 
 #include "debugger.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -152,12 +151,6 @@ INPUT_PORTS_END
 class mu100_state : public driver_device
 {
 public:
-	enum {
-		P2_LCD_RS     = 0x01,
-		P2_LCD_RW     = 0x02,
-		P2_LCD_ENABLE = 0x04
-	};
-
 	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -165,6 +158,18 @@ public:
 			m_ioport_p7(*this, "P7"),
 			m_ioport_p8(*this, "P8")
 	{ }
+
+	void mu100(machine_config &config);
+
+protected:
+	virtual DECLARE_READ16_MEMBER(adc7_r);
+
+private:
+	enum {
+		P2_LCD_RS     = 0x01,
+		P2_LCD_RW     = 0x02,
+		P2_LCD_ENABLE = 0x04
+	};
 
 	required_device<h8s2655_device> m_maincpu;
 	required_device<hd44780_device> m_lcd;
@@ -179,7 +184,6 @@ public:
 	DECLARE_READ16_MEMBER(adc2_r);
 	DECLARE_READ16_MEMBER(adc4_r);
 	DECLARE_READ16_MEMBER(adc6_r);
-	virtual DECLARE_READ16_MEMBER(adc7_r);
 
 	DECLARE_WRITE16_MEMBER(p1_w);
 	DECLARE_READ16_MEMBER(p1_r);
@@ -199,7 +203,6 @@ public:
 	float lightlevel(const uint8_t *src, const uint8_t *render);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
-	void mu100(machine_config &config);
 	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
 };
@@ -210,6 +213,7 @@ public:
 		: mu100_state(mconfig, type, tag)
 	{ }
 
+private:
 	virtual DECLARE_READ16_MEMBER(adc7_r) override;
 };
 
@@ -450,7 +454,6 @@ MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_SCREEN_UPDATE_DRIVER(mu100_state, screen_update)
 	MCFG_SCREEN_SIZE(900, 241)
 	MCFG_SCREEN_VISIBLE_AREA(0, 899, 0, 240)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

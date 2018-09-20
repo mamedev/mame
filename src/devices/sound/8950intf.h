@@ -7,21 +7,23 @@
 
 
 #define MCFG_Y8950_IRQ_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_irq_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_KEYBOARD_READ_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_keyboard_read_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_keyboard_read_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_KEYBOARD_WRITE_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_keyboard_write_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_keyboard_write_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_IO_READ_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_io_read_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_io_read_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_IO_WRITE_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_io_write_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_io_write_handler((DEVCB_##cb));
 
-class y8950_device : public device_t, public device_sound_interface
+class y8950_device : public device_t,
+	public device_sound_interface,
+	public device_rom_interface
 {
 public:
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -44,8 +46,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+
+	virtual void rom_bank_updated() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -61,6 +66,9 @@ private:
 	void port_handler_w(unsigned char data) { m_io_write_handler(offs_t(0), data); }
 	unsigned char keyboard_handler_r() { return m_keyboard_read_handler(0); }
 	void keyboard_handler_w(unsigned char data) { m_keyboard_write_handler(offs_t(0), data); }
+
+	static uint8_t static_read_byte(device_t *param, offs_t offset) { return downcast<y8950_device *>(param)->read_byte(offset); }
+	static void static_write_byte(device_t *param, offs_t offset, uint8_t data) { return downcast<y8950_device *>(param)->space().write_byte(offset, data); }
 
 	static void static_irq_handler(device_t *param, int irq) { downcast<y8950_device *>(param)->irq_handler(irq); }
 	static void static_timer_handler(device_t *param, int c, const attotime &period) { downcast<y8950_device *>(param)->timer_handler(c, period); }
@@ -80,7 +88,6 @@ private:
 	devcb_write8 m_keyboard_write_handler;
 	devcb_read8 m_io_read_handler;
 	devcb_write8 m_io_write_handler;
-	required_memory_region m_region;
 };
 
 DECLARE_DEVICE_TYPE(Y8950, y8950_device)

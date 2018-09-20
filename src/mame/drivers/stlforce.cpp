@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_DEVICE_PROGRAM_MAP(stlforce_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stlforce_state, irq4_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

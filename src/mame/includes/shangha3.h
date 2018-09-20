@@ -22,6 +22,15 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
+	void shangha3(machine_config &config);
+	void heberpop(machine_config &config);
+	void blocken(machine_config &config);
+
+	void init_shangha3();
+	void init_heberpop();
+	void init_blocken();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
@@ -59,15 +68,10 @@ public:
 	// blocken specific
 	DECLARE_WRITE8_MEMBER(blocken_coinctrl_w);
 
-	void init_shangha3();
-	void init_heberpop();
-	void init_blocken();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void shangha3(machine_config &config);
-	void heberpop(machine_config &config);
-	void blocken(machine_config &config);
+
 	void blocken_map(address_map &map);
 	void blocken_oki_map(address_map &map);
 	void heberpop_map(address_map &map);

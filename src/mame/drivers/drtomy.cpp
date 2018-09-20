@@ -29,6 +29,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+		void drtomy(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram_fg;
 	required_shared_ptr<uint16_t> m_videoram_bg;
@@ -54,7 +57,6 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void drtomy(machine_config &config);
 	void drtomy_map(address_map &map);
 };
 

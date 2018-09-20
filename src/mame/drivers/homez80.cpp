@@ -36,14 +36,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 		{ }
 
+	void homez80(machine_config &config);
+
+private:
+
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void homez80(machine_config &config);
 	void homez80_io(address_map &map);
 	void homez80_mem(address_map &map);
-private:
+
 	bool m_irq;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

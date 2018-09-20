@@ -345,7 +345,6 @@ Boards:
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "screen.h"
@@ -1006,7 +1005,7 @@ void pacman_state::pacman_map(address_map &map)
 	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(addressable_latch_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(addressable_latch_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1027,7 +1026,7 @@ void pacman_state::birdiy_map(address_map &map)
 //  AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5080, 0x509f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x50a0, 0x50af).mirror(0xaf00).writeonly().share("spriteram2");
 //  AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
@@ -1051,7 +1050,7 @@ void pacman_state::mspacman_map(address_map &map)
 	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1082,7 +1081,7 @@ void pacman_state::woodpek_map(address_map &map)
 	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1110,7 +1109,7 @@ void pacman_state::numcrash_map(address_map &map)
 
 	map(0x4c00, 0x4fef).ram();
 	map(0x4ff0, 0x4fff).ram().share("spriteram");
-	map(0x5000, 0x5007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).writeonly().share("spriteram2");
 //  AM_RANGE(0x5070, 0x507f) AM_WRITENOP
@@ -1158,7 +1157,7 @@ void pacman_state::dremshpr_map(address_map &map)
 	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4800, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1184,7 +1183,7 @@ void pacman_state::epos_map(address_map &map)
 	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1206,7 +1205,7 @@ void pacman_state::s2650games_map(address_map &map)
 	map(0x1490, 0x149f).mirror(0x6000).writeonly().share("s2650_spriteram");
 	map(0x14a0, 0x14bf).mirror(0x6000).w(FUNC(pacman_state::s2650games_tilesbank_w)).share("s2650_tileram");
 	map(0x14c0, 0x14ff).mirror(0x6000).writeonly();
-	map(0x1500, 0x1507).mirror(0x6000).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1500, 0x1507).mirror(0x6000).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x1508, 0x155f).mirror(0x6000).writeonly();
 	map(0x1560, 0x156f).mirror(0x6000).writeonly().share("spriteram2");
 	map(0x1570, 0x157f).mirror(0x6000).writeonly();
@@ -1231,7 +1230,7 @@ void pacman_state::rocktrv2_map(address_map &map)
 	map(0x4000, 0x43ff).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
 	map(0x4400, 0x47ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram();
-	map(0x5000, 0x5007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x5fe0, 0x5fe3).w(FUNC(pacman_state::rocktrv2_prot_data_w)).share("rocktrv2_prot");
@@ -1256,7 +1255,7 @@ void pacman_state::bigbucks_map(address_map &map)
 	map(0x4000, 0x43ff).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
 	map(0x4400, 0x47ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram();
-	map(0x5000, 0x5007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x5000, 0x503f).portr("IN0");
@@ -1277,7 +1276,7 @@ void pacman_state::mschamp_map(address_map &map)
 	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1298,7 +1297,7 @@ void pacman_state::superabc_map(address_map &map)
 	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4800, 0x4fef).mirror(0xa000).ram().share("28c16.u17"); // nvram
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5002, 0x5002).mirror(0xaf3c).w(FUNC(pacman_state::superabc_bank_w));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
@@ -1322,7 +1321,7 @@ void pacman_state::crushs_map(address_map &map)
 	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).nopw(); // doesn't use pacman sound hw
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1347,7 +1346,7 @@ void pacman_state::pengojpm_map(address_map &map)
 //  AM_RANGE(0x8800, 0x8bff) AM_READ(pacman_read_nop) AM_WRITENOP
 	map(0x8c00, 0x8fef).ram();
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
-	map(0x9000, 0x9007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x9000, 0x9007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x9040, 0x905f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x9060, 0x906f).writeonly().share("spriteram2");
 	map(0x9070, 0x907f).nopw();
@@ -3519,48 +3518,53 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(pacman_state::pacman)
-
+void pacman_state::pacman(machine_config &config, bool latch)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(pacman_map)
-	MCFG_DEVICE_IO_MAP(writeport)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::pacman_map);
+	m_maincpu->set_addrmap(AS_IO, &pacman_state::writeport);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 74LS259 at 8K or 4099 at 7K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pacman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
-	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
-	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
-// The Pacman code uses $5004 and $5005 for LED's and $5007 for coin lockout.  This hardware does not
-// exist on any Pacman or Puckman board I have seen.  DW
+	if (latch)
+	{
+		LS259(config, m_mainlatch); // 74LS259 at 8K or 4099 at 7K
+		m_mainlatch->q_out_cb<0>().set(FUNC(pacman_state::irq_mask_w));
+		m_mainlatch->q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+		m_mainlatch->q_out_cb<3>().set(FUNC(pacman_state::flipscreen_w));
+		m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+		// NOTE(dwidel): The Pacman code uses $5004 and $5005 for LEDs and $5007 for coin lockout.  This hardware does not
+		// exist on any Pacman or Puckman board I have seen.
+		//m_mainlatch->q_out_cb<4>().set_output("led0");
+		//m_mainlatch->q_out_cb<5>().set_output("led1");
+		//m_mainlatch->q_out_cb<6>().set(FUNC(pacman_state::coin_lockout_global_w));
+	}
+
+	WATCHDOG_TIMER(config, m_watchdog);
+	m_watchdog->set_vblank_count("screen", 16);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacman)
-	MCFG_PALETTE_ADD("palette", 128*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(pacman_state,pacman)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pacman);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_pacman)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_irq))
+	PALETTE(config, m_palette, 128*4);
+	m_palette->set_indirect_entries(32);
+	m_palette->set_init(DEVICE_SELF, FUNC(pacman_state::palette_init_pacman));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(pacman_state::screen_update_pacman));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(pacman_state::vblank_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 MACHINE_CONFIG_START(pacman_state::maketrax)
 	pacman(config);
@@ -3569,8 +3573,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::korosuke)
 	maketrax(config);
-	MCFG_DEVICE_MODIFY("mainlatch") // 8K on original boards
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // outputs 4-7 go to protection chip at 6P
+	// 8K on original boards
+	m_mainlatch->q_out_cb<7>().set_nop(); // outputs 4-7 go to protection chip at 6P
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::pengojpm)
@@ -3588,14 +3592,11 @@ MACHINE_CONFIG_START(pacman_state::birdiy)
 	MCFG_DEVICE_PROGRAM_MAP(birdiy_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pacman_state, irq_mask_w))
-	//MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
-	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
-	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
+	// 74LS259 at 8K or 4099 at 7K
+	m_mainlatch->q_out_cb<0>().set_nop();
+	m_mainlatch->q_out_cb<1>().set(FUNC(pacman_state::irq_mask_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(pacman_state::flipscreen_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,birdiy)
 MACHINE_CONFIG_END
@@ -3628,8 +3629,7 @@ MACHINE_CONFIG_START(pacman_state::mspacman)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mspacman_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
+	m_mainlatch->q_out_cb<6>().set(FUNC(pacman_state::coin_lockout_global_w));
 MACHINE_CONFIG_END
 
 
@@ -3648,30 +3648,28 @@ MACHINE_CONFIG_START(pacman_state::numcrash)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(numcrash_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // ???
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // ???
+	m_mainlatch->q_out_cb<3>().set_nop(); // ???
+	m_mainlatch->q_out_cb<7>().set_nop(); // ???
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pacman_state::alibaba)
-	pacman(config);
+void pacman_state::alibaba(machine_config &config)
+{
+	pacman(config, false);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(alibaba_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::alibaba_map);
 
-	MCFG_DEVICE_REMOVE("mainlatch")
-	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
-	MCFG_DEVICE_ADD("latch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pacman_state, irq_mask_w))
-MACHINE_CONFIG_END
+	ls259_device &latch1(LS259(config, "latch1"));
+	latch1.q_out_cb<4>().set_output("led0");
+	latch1.q_out_cb<5>().set_output("led1");
+	latch1.q_out_cb<6>().set(FUNC(pacman_state::coin_lockout_global_w));
+	latch1.q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
+	ls259_device &latch2(LS259(config, "latch2"));
+	latch2.q_out_cb<0>().set("namco", FUNC(namco_device::sound_enable_w));
+	latch2.q_out_cb<1>().set(FUNC(pacman_state::flipscreen_w));
+	latch2.q_out_cb<2>().set(FUNC(pacman_state::irq_mask_w));
+}
 
 MACHINE_CONFIG_START(pacman_state::dremshpr)
 	pacman(config);
@@ -3689,8 +3687,7 @@ MACHINE_CONFIG_START(pacman_state::dremshpr)
 	MCFG_DEVICE_ADD("ay8910", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP)
+	m_mainlatch->q_out_cb<1>().set_nop();
 MACHINE_CONFIG_END
 
 
@@ -3755,8 +3752,7 @@ MACHINE_CONFIG_START(pacman_state::vanvan)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP)
+	m_mainlatch->q_out_cb<1>().set_nop();
 MACHINE_CONFIG_END
 
 
@@ -3772,8 +3768,7 @@ MACHINE_CONFIG_START(pacman_state::bigbucks)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) /*?*/
+	m_mainlatch->q_out_cb<7>().set_nop(); /*?*/
 MACHINE_CONFIG_END
 
 
@@ -3781,20 +3776,19 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", S2650, MASTER_CLOCK/6/2)    /* 2H */
-	MCFG_DEVICE_PROGRAM_MAP(s2650games_map)
-	MCFG_DEVICE_DATA_MAP(s2650games_dataport)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT
+	s2650_device &maincpu(S2650(config.replace(), m_maincpu, MASTER_CLOCK/6/2));    /* 2H */
+	maincpu.set_addrmap(AS_PROGRAM, &pacman_state::s2650games_map);
+	maincpu.set_addrmap(AS_DATA, &pacman_state::s2650games_dataport);
+	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)).invert();
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
+	m_mainlatch->q_out_cb<0>().set_nop();
+	m_mainlatch->q_out_cb<1>().set_nop();
+	m_mainlatch->q_out_cb<2>().set_nop();
+	m_mainlatch->q_out_cb<3>().set(FUNC(pacman_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set_nop();
+	m_mainlatch->q_out_cb<5>().set_nop();
+	m_mainlatch->q_out_cb<6>().set_nop();
+	m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_s2650games)
 
@@ -3873,7 +3867,7 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(superabc_map)
 
-	MCFG_NVRAM_ADD_0FILL("28c16.u17")
+	NVRAM(config, "28c16.u17", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
@@ -5918,12 +5912,12 @@ ROM_START( eyesb )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "9.bin",           0x0000, 0x0800, CRC(342c0653) SHA1(d07e3d4528b72e54a1b5dbed009cce765a5a086f) )
-	ROM_LOAD( "11.bin",          0x0800, 0x0800, CRC(aaa7a537) SHA1(571d981ed2aad62d7c7f2798e9084228d45523d4) )
+	ROM_LOAD( "12.bin",          0x0800, 0x0800, CRC(99af4b30) SHA1(6a0939ff2fa7ae39a960dd4d9f9b7c01f57647c5) )
 	ROM_LOAD( "10.bin",          0x1000, 0x0800, CRC(b247b82c) SHA1(8c10a8ef5e79b0b5fefad6eb77bfa68a0ca18035) )
-	ROM_LOAD( "12.bin",          0x1800, 0x0800, CRC(99af4b30) SHA1(6a0939ff2fa7ae39a960dd4d9f9b7c01f57647c5) )
+	ROM_LOAD( "11.bin",          0x1800, 0x0800, CRC(aaa7a537) SHA1(571d981ed2aad62d7c7f2798e9084228d45523d4) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "7051.bin",        0x0000, 0x0020, CRC(0dad2ccb) SHA1(f42c5ee7084e5702b5b0c8c1d86b0a41a6e1821d) )
+	ROM_LOAD( "7051.bin",        0x0000, 0x0020, CRC(2c3cc909) SHA1(32d68d4cfdf9f3e7351353428d268c763e809c63) ) // fixed 3x bytes with inverse second half
 	ROM_LOAD( "7051-3.bin",      0x0020, 0x0100, CRC(d8d78829) SHA1(19820d1651423210083a087fb70ebea73ad34951) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */

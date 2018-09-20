@@ -36,15 +36,17 @@ public:
 	{
 	}
 
+	void pv9234(machine_config &config);
+
+private:
 	DECLARE_WRITE32_MEMBER(debug_w);
 	DECLARE_WRITE32_MEMBER(debug1_w);
 	DECLARE_WRITE32_MEMBER(debug2_w);
 
 	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pv9234(machine_config &config);
 	void pv9234_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

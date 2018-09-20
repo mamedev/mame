@@ -5,13 +5,13 @@
 #define MAME_AUDIO_RAD_EU3A05GPIO_H
 
 #define MCFG_RADICA6502_GPIO_READ_PORT0_CB(_devcb) \
-	devcb = &downcast<radica6502_gpio_device &>(*device).set_gpio_read_0_callback(DEVCB_##_devcb);
+	downcast<radica6502_gpio_device &>(*device).set_gpio_read_0_callback(DEVCB_##_devcb);
 
 #define MCFG_RADICA6502_GPIO_READ_PORT1_CB(_devcb) \
-	devcb = &downcast<radica6502_gpio_device &>(*device).set_gpio_read_1_callback(DEVCB_##_devcb);
+	downcast<radica6502_gpio_device &>(*device).set_gpio_read_1_callback(DEVCB_##_devcb);
 
 #define MCFG_RADICA6502_GPIO_READ_PORT2_CB(_devcb) \
-	devcb = &downcast<radica6502_gpio_device &>(*device).set_gpio_read_2_callback(DEVCB_##_devcb);
+	downcast<radica6502_gpio_device &>(*device).set_gpio_read_2_callback(DEVCB_##_devcb);
 
 
 class radica6502_gpio_device : public device_t

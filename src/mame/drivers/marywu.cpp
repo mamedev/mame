@@ -33,6 +33,9 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void marywu(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(display_7seg_data_w);
 	DECLARE_WRITE8_MEMBER(multiplex_7seg_w);
 	DECLARE_WRITE8_MEMBER(ay1_port_a_w);
@@ -40,10 +43,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_port_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_port_b_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	void marywu(machine_config &config);
 	void io_map(address_map &map);
 	void program_map(address_map &map);
-private:
+
 	uint8_t m_selected_7seg_module;
 	virtual void machine_start() override;
 	output_finder<32> m_digits;
@@ -192,13 +194,13 @@ MACHINE_CONFIG_START(marywu_state::marywu)
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
 	/* Keyboard & display interface */
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, marywu_state, multiplex_7seg_w))          // select  block of 7seg modules by multiplexing the SL scan lines
-	MCFG_I8279_IN_RL_CB(READ8(*this, marywu_state, keyboard_r))                  // keyboard Return Lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, marywu_state, display_7seg_data_w))
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635)));		// should it be perhaps a fraction of the XTAL clock ?
+	kbdc.out_sl_callback().set(FUNC(marywu_state::multiplex_7seg_w));	// select  block of 7seg modules by multiplexing the SL scan lines
+	kbdc.in_rl_callback().set(FUNC(marywu_state::keyboard_r));			// keyboard Return Lines
+	kbdc.out_disp_callback().set(FUNC(marywu_state::display_7seg_data_w));
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_marywu)
+	config.set_default_layout(layout_marywu);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

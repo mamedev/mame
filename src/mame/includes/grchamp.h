@@ -35,6 +35,9 @@ public:
 		m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void grchamp(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(cpu0_outputs_w);
 	DECLARE_WRITE8_MEMBER(led_board_w);
 	DECLARE_WRITE8_MEMBER(cpu1_outputs_w);
@@ -72,14 +75,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, uint8_t *objdata);
-	void grchamp(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void sub_portmap(address_map &map);
 
-private:
 	uint8_t       m_cpu0_out[16];
 	uint8_t       m_cpu1_out[16];
 

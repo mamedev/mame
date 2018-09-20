@@ -28,6 +28,17 @@ public:
 		, swarray(*this, "SW.%u", 0)
 	{ }
 
+	void wpc_dcs(machine_config &config);
+
+	void init();
+	void init_dm();
+	void init_ij();
+	void init_jd();
+	void init_pop();
+	void init_sttng();
+	void init_afv();
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
@@ -41,20 +52,11 @@ public:
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_WRITE8_MEMBER(switches_w);
 
-	void init();
-	void init_dm();
-	void init_ij();
-	void init_jd();
-	void init_pop();
-	void init_sttng();
-	void init_afv();
-
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_dcs(machine_config &config);
 	void wpc_dcs_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_8k_device> dcs;
@@ -68,7 +70,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 
-private:
 	uint8_t firq_src, zc, switch_col;
 	uint16_t rtc_base_day;
 };
@@ -437,7 +438,7 @@ MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
 	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
 	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_dcs_state, scanline_irq))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 

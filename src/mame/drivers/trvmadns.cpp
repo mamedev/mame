@@ -107,6 +107,9 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
+	void trvmadns(machine_config &config);
+
+private:
 	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<uint8_t> m_gfxram;
 	required_shared_ptr<uint8_t> m_tileram;
@@ -125,7 +128,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
-	void trvmadns(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };

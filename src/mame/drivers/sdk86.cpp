@@ -48,14 +48,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sdk86(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
-	void sdk86(machine_config &config);
 	void sdk86_io(address_map &map);
 	void sdk86_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
@@ -71,8 +73,7 @@ void sdk86_state::sdk86_mem(address_map &map)
 void sdk86_state::sdk86_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xfff0, 0xfff0).mirror(4).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfff2, 0xfff2).mirror(4).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfff0, 0xfff3).mirror(4).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xffe8, 0xffeb).mirror(4).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
 	map(0xfff8, 0xffff).rw("port1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0xfff8, 0xffff).rw("port2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -151,29 +152,29 @@ MACHINE_CONFIG_START(sdk86_state::sdk86)
 	MCFG_DEVICE_IO_MAP(sdk86_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sdk86)
+	config.set_default_layout(layout_sdk86);
 
 	/* Devices */
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_cts))
+	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	i8251.rts_handler().set(I8251_TAG, FUNC(i8251_device::write_cts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(14'745'600)/3/16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_TAG, i8251_device, write_rxc))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(14'745'600)/3/16));
+	usart_clock.signal_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(I8251_TAG, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk86_state, scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk86_state, digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, sdk86_state, kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(GND)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(GND)
+	i8279_device &kbdc(I8279(config, "i8279", 2500000));		// based on divider
+	kbdc.out_sl_callback().set(FUNC(sdk86_state::scanlines_w));	// scan SL lines
+	kbdc.out_disp_callback().set(FUNC(sdk86_state::digit_w));	// display A&B
+	kbdc.in_rl_callback().set(FUNC(sdk86_state::kbd_r));		// kbd RL lines
+	kbdc.in_shift_callback().set_constant(0);					// Shift key
+	kbdc.in_ctrl_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD("port1", I8255A, 0)
 	MCFG_DEVICE_ADD("port2", I8255A, 0)

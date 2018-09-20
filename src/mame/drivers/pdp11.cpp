@@ -93,18 +93,21 @@
 #include "machine/terminal.h"
 #include "machine/rx01.h"
 
-#define TERMINAL_TAG "terminal"
 
 class pdp11_state : public driver_device
 {
 public:
 	pdp11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
+	void pdp11ub2(machine_config &config);
+	void pdp11(machine_config &config);
+	void pdp11qb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( teletype_ctrl_r );
@@ -116,9 +119,6 @@ public:
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
-	void pdp11ub2(machine_config &config);
-	void pdp11(machine_config &config);
-	void pdp11qb(machine_config &config);
 	void pdp11_mem(address_map &map);
 	void pdp11qb_mem(address_map &map);
 };
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(pdp11_state::pdp11)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pdp11_state, kbd_put))
 
 	MCFG_RX01_ADD("rx01")

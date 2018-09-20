@@ -28,6 +28,7 @@
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "mips3dsm.h"
+#include "ps2vu.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"

@@ -39,6 +39,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void horse(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inp_matrix;
@@ -54,7 +57,6 @@ public:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void horse(machine_config &config);
 	void horse_io_map(address_map &map);
 	void horse_map(address_map &map);
 };
@@ -197,10 +199,10 @@ MACHINE_CONFIG_START(horse_state::horse)
 	MCFG_DEVICE_PROGRAM_MAP(horse_map)
 	MCFG_DEVICE_IO_MAP(horse_io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 4) // port A input, B output, C output but unused
-	MCFG_I8155_IN_PORTA_CB(READ8(*this, horse_state, input_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, horse_state, output_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	i8155_device &i8155(I8155(config, "i8155", XTAL(12'000'000) / 4)); // port A input, B output, C output but unused
+	i8155.in_pa_callback().set(FUNC(horse_state::input_r));
+	i8155.out_pb_callback().set(FUNC(horse_state::output_w));
+	i8155.out_to_callback().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

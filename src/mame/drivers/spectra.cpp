@@ -59,7 +59,7 @@ public:
 
 	void spectra(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
@@ -68,7 +68,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 	void spectra_map(address_map &map);
 
-private:
 	uint8_t m_porta;
 	uint8_t m_portb;
 	uint8_t m_t_c;
@@ -235,20 +234,20 @@ MACHINE_CONFIG_START(spectra_state::spectra)
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)  // actually a M6503
 	MCFG_DEVICE_PROGRAM_MAP(spectra_map)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, spectra_state, porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, spectra_state, porta_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(*this, spectra_state, portb_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, spectra_state, portb_w))
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	riot6532_device &riot(RIOT6532(config, "riot", XTAL(3'579'545)/4));
+	riot.in_pa_callback().set(FUNC(spectra_state::porta_r));
+	riot.out_pa_callback().set(FUNC(spectra_state::porta_w));
+	riot.in_pb_callback().set(FUNC(spectra_state::portb_r));
+	riot.out_pb_callback().set(FUNC(spectra_state::portb_w));
+	riot.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", spectra_state, nmitimer, attotime::from_hz(120))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_spectra)
+	config.set_default_layout(layout_spectra);
 
 	/* Sound */
 	genpin_audio(config);

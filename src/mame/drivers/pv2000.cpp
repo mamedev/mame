@@ -52,6 +52,9 @@ public:
 		m_last_state(0)
 	{ }
 
+	void pv2000(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -70,7 +73,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
-	void pv2000(machine_config &config);
 	void pv2000_io_map(address_map &map);
 	void pv2000_map(address_map &map);
 };
@@ -392,11 +394,11 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_DEVICE_IO_MAP(pv2000_io_map)
 
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, pv2000_state, pv2000_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(pv2000_state::pv2000_vdp_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -148,7 +148,7 @@ void ecb_grip21_device::grip_io(address_map &map)
 //  AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
 	map(0x16, 0x16).w(FUNC(ecb_grip21_device::flash_w));
 	map(0x17, 0x17).w(FUNC(ecb_grip21_device::vol1_w));
-	map(0x20, 0x2f).rw(Z80STI_TAG, FUNC(z80sti_device::read), FUNC(z80sti_device::write));
+	map(0x20, 0x2f).rw(m_sti, FUNC(z80sti_device::read), FUNC(z80sti_device::write));
 	map(0x30, 0x30).rw(FUNC(ecb_grip21_device::lrs_r), FUNC(ecb_grip21_device::lrs_w));
 	map(0x40, 0x40).r(FUNC(ecb_grip21_device::stat_r));
 	map(0x50, 0x50).w(MC6845_TAG, FUNC(mc6845_device::address_w));
@@ -312,7 +312,7 @@ WRITE8_MEMBER( ecb_grip21_device::ppi_pc_w )
 	m_sti->i7_w(m_ia);
 
 	// PROF-80 handshaking
-	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->pa_r() & 0x3f);
+	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->read_pa() & 0x3f);
 }
 
 //-------------------------------------------------
@@ -407,10 +407,10 @@ void ecb_grip21_device::kb_w(uint8_t data)
 
 MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_Z80_DAISY_CHAIN(grip_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(grip_mem)
-	MCFG_DEVICE_IO_MAP(grip_io)
+	z80_device& z80(Z80(config, Z80_TAG, XTAL(16'000'000)/4));
+	z80.set_daisy_config(grip_daisy_chain);
+	z80.set_addrmap(AS_PROGRAM, &ecb_grip21_device::grip_mem);
+	z80.set_addrmap(AS_IO, &ecb_grip21_device::grip_io);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::white())
@@ -433,23 +433,23 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ecb_grip21_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(Z80STI_TAG, z80sti_device, i1_w))
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE(Z80STI_TAG, z80sti_device, i1_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(m_sti, z80sti_device, i1_w))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(m_sti, z80sti_device, i1_w))
 
 //  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL(16'000'000)/4)
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecb_grip21_device, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecb_grip21_device, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecb_grip21_device, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecb_grip21_device, ppi_pc_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(ecb_grip21_device::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(ecb_grip21_device::ppi_pa_w));
+	m_ppi->in_pb_callback().set(FUNC(ecb_grip21_device::ppi_pb_r));
+	m_ppi->out_pc_callback().set(FUNC(ecb_grip21_device::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(Z80STI_TAG, Z80STI, XTAL(16'000'000)/4)
-	MCFG_Z80STI_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80STI_IN_GPIO_CB(READ8(*this, ecb_grip21_device, sti_gpio_r))
-	MCFG_Z80STI_OUT_TBO_CB(WRITELINE(*this, ecb_grip21_device, speaker_w))
-	MCFG_Z80STI_OUT_TCO_CB(WRITELINE(Z80STI_TAG, z80sti_device, tc_w))
-	MCFG_Z80STI_OUT_TDO_CB(WRITELINE(Z80STI_TAG, z80sti_device, tc_w))
+	Z80STI(config, m_sti, XTAL(16'000'000)/4);
+	m_sti->out_int_cb().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	m_sti->in_gpio_cb().set(FUNC(ecb_grip21_device::sti_gpio_r));
+	m_sti->out_tbo_cb().set(FUNC(ecb_grip21_device::speaker_w));
+	m_sti->out_tco_cb().set(m_sti, FUNC(z80sti_device::tc_w));
+	m_sti->out_tdo_cb().set(m_sti, FUNC(z80sti_device::tc_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ecb_grip21_device, write_centronics_busy))

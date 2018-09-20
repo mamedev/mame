@@ -74,8 +74,8 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	// d5: d7756 reset pin(?)
 	if (m_d7756 != nullptr)
 	{
-		m_d7756->reset_w(~data & 0x20);
-		m_d7756->start_w(~data & 0x10);
+		m_d7756->reset_w(!BIT(data, 5));
+		m_d7756->start_w(!BIT(data, 4));
 	}
 	if (m_samples != nullptr)
 	{
@@ -100,7 +100,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 	m_sample = data;
 
 	if (m_d7756 != nullptr)
-		m_d7756->port_w(space, 0, data);
+		m_d7756->port_w(data);
 }
 
 void homerun_state::homerun_memmap(address_map &map)
@@ -358,10 +358,10 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_DEVICE_IO_MAP(homerun_iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, homerun_state, homerun_scrollhi_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, homerun_state, homerun_scrolly_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, homerun_state, homerun_scrollx_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(homerun_state::homerun_scrollhi_w));
+	ppi.out_pb_callback().set(FUNC(homerun_state::homerun_scrolly_w));
+	ppi.out_pc_callback().set(FUNC(homerun_state::homerun_scrollx_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

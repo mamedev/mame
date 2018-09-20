@@ -25,6 +25,9 @@ public:
 		m_k053251(*this, "k053251"),
 		m_palette(*this, "palette") { }
 
+	void surpratk(machine_config &config);
+
+private:
 	/* video-related */
 	int        m_layer_colorbase[3];
 	int        m_sprite_colorbase;
@@ -48,7 +51,6 @@ public:
 	K05324X_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
-	void surpratk(machine_config &config);
 	void bank0000_map(address_map &map);
 	void surpratk_map(address_map &map);
 };

@@ -982,9 +982,9 @@ MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_4k)
 	MCFG_DEVICE_DATA_MAP(data_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 7J on CCG-1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, cinemat_state, coin_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, cinemat_state, vector_control_w))
+	LS259(config, m_outlatch); // 7J on CCG-1
+	m_outlatch->q_out_cb<5>().set(FUNC(cinemat_state::coin_reset_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(cinemat_state::vector_control_w));
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -1077,8 +1077,7 @@ MACHINE_CONFIG_START(cinemat_state::tailg)
 	cinemat_nojmi_8k(config);
 	tailg_sound(config);
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, mux_select_w))
+	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
 MACHINE_CONFIG_END
 
 
@@ -1118,8 +1117,7 @@ MACHINE_CONFIG_START(cinemat_color_state::boxingb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, mux_select_w))
+	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
 MACHINE_CONFIG_END
 
 

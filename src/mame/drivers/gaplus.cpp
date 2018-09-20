@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_NAMCO_62XX_ADD("62xx", 24576000 / 6 / 2)  /* totally made up - TODO: fix */
 	//MCFG_NAMCO_62XX_INPUT_0_CB(IOPORT("IN0L"))
@@ -538,15 +538,15 @@ MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
 	//MCFG_NAMCO_62XX_OUTPUT_1_CB(WRITE8(*this, gaplus_base_state,out_1))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36 * 8, 28 * 8)
-	MCFG_SCREEN_VISIBLE_AREA(0 * 8, 36 * 8 - 1, 0 * 8, 28 * 8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaplus_base_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gaplus_base_state, screen_vblank))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaplus_base_state, vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.606060);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(36 * 8, 28 * 8);
+	m_screen->set_visarea(0 * 8, 36 * 8 - 1, 0 * 8, 28 * 8 - 1);
+	m_screen->set_screen_update(FUNC(gaplus_base_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(gaplus_base_state::screen_vblank));
+	m_screen->screen_vblank().append(FUNC(gaplus_base_state::vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaplus)
 	MCFG_PALETTE_ADD("palette", 64 * 4 + 64 * 8)
@@ -604,9 +604,8 @@ MACHINE_CONFIG_START(gapluso_state::gapluso)
 	gaplus_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gaplus_base_state, screen_vblank))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gapluso_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(gaplus_base_state::screen_vblank));
+	m_screen->screen_vblank().append(FUNC(gapluso_state::vblank_irq));
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))

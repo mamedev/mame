@@ -78,6 +78,12 @@ public:
 		m_zoomram(*this, "zoomtable")
 	{ }
 
+	void hammer(machine_config &config);
+	void livequiz(machine_config &config);
+
+	void init_livequiz();
+
+private:
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
 	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
@@ -86,7 +92,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
-	void init_livequiz();
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -105,8 +110,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
 
-	void hammer(machine_config &config);
-	void livequiz(machine_config &config);
 	void hammer_map(address_map &map);
 	void livequiz_map(address_map &map);
 };
@@ -636,7 +639,7 @@ MACHINE_CONFIG_START(midas_state::livequiz)
 	MCFG_DEVICE_PROGRAM_MAP(livequiz_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -665,7 +668,7 @@ MACHINE_CONFIG_START(midas_state::hammer)
 	MCFG_DEVICE_PROGRAM_MAP(hammer_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TICKET_DISPENSER_ADD("prize1", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("prize2", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )

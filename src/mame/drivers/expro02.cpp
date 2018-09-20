@@ -235,6 +235,19 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
+	void supmodel(machine_config &config);
+	void zipzap(machine_config &config);
+	void fantasia(machine_config &config);
+	void fantsia2(machine_config &config);
+	void comad(machine_config &config);
+	void comad_noview2(machine_config &config);
+	void smissw(machine_config &config);
+	void galhustl(machine_config &config);
+	void expro02(machine_config &config);
+
+	void init_expro02();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -248,7 +261,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(expro02_6295_bankswitch_w);
 
-	void init_expro02();
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(expro02);
 
@@ -260,15 +272,6 @@ public:
 	// comad
 	READ16_MEMBER(comad_timer_r);
 	READ8_MEMBER(comad_okim6295_r);
-	void supmodel(machine_config &config);
-	void zipzap(machine_config &config);
-	void fantasia(machine_config &config);
-	void fantsia2(machine_config &config);
-	void comad(machine_config &config);
-	void comad_noview2(machine_config &config);
-	void smissw(machine_config &config);
-	void galhustl(machine_config &config);
-	void expro02(machine_config &config);
 	void comad_map(address_map &map);
 	void expro02_map(address_map &map);
 	void expro02_video_base_map(address_map &map);
@@ -947,8 +950,7 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -973,8 +975,7 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	MCFG_KANEKO_TMAP_INVERT_FLIP(1)
 	MCFG_KANEKO_TMAP_OFFSET(-256, -216, 256, 224)
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::comad_noview2)

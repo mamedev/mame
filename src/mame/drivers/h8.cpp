@@ -72,6 +72,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void h8(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(portf0_r);
 	DECLARE_WRITE8_MEMBER(portf0_w);
 	DECLARE_WRITE8_MEMBER(portf1_w);
@@ -82,10 +85,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 
-	void h8(machine_config &config);
 	void h8_io(address_map &map);
 	void h8_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	uint8_t m_segment;
 	uint8_t m_irq_ctl;
@@ -195,11 +197,9 @@ void h8_state::h8_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf0, 0xf0).rw(FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
 	map(0xf1, 0xf1).w(FUNC(h8_state::portf1_w));
-	map(0xf8, 0xf8).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf9, 0xf9).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf8, 0xf9).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// optional connection to a serial terminal @ 600 baud
-	//AM_RANGE(0xfa, 0xfa) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	//AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	//map(0xfa, 0xfb).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(h8_state::h8)
 	MCFG_I8085A_INTE(WRITELINE(*this, h8_state, h8_inte_callback))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h8)
+	config.set_default_layout(layout_h8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -327,12 +327,12 @@ MACHINE_CONFIG_START(h8_state::h8)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, h8_state, txdata_callback))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(FUNC(h8_state::txdata_callback));
 
-	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 4800)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &cassette_clock(CLOCK(config, "cassette_clock", 4800));
+	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

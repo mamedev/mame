@@ -24,8 +24,7 @@
 
 // ======================> epson_lx800_device
 
-class epson_lx800_device :  public device_t,
-						public device_centronics_peripheral_interface
+class epson_lx800_device :  public device_t, public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction
@@ -71,7 +70,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(EPSON_LX800, epson_lx800_device)
-
-
 
 #endif // MAME_BUS_CENTRONICS_EPSON_LX800_H

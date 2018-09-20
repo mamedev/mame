@@ -102,6 +102,11 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void pasha2(machine_config &config);
+
+	void init_pasha2();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_wram;
 	required_shared_ptr<uint16_t> m_paletteram;
@@ -127,7 +132,6 @@ public:
 	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
 	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bank_w);
-	void init_pasha2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -136,7 +140,6 @@ public:
 	required_device<at89c52_device> m_audiocpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
-	void pasha2(machine_config &config);
 	void pasha2_io(address_map &map);
 	void pasha2_map(address_map &map);
 };
@@ -406,7 +409,7 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_DEVICE_ADD("audiocpu", AT89C52, 12000000)     /* clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

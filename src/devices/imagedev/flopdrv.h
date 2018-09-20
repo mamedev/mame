@@ -11,6 +11,11 @@
 #include "formats/flopimg.h"
 #include "softlist_dev.h"
 
+#define FLOPPY_0 "floppy0"
+#define FLOPPY_1 "floppy1"
+#define FLOPPY_2 "floppy2"
+#define FLOPPY_3 "floppy3"
+
 #define FLOPPY_TYPE_REGULAR 0
 #define FLOPPY_TYPE_APPLE   1
 #define FLOPPY_TYPE_SONY    2
@@ -53,7 +58,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> floppy_type_t
+DECLARE_DEVICE_TYPE(LEGACY_FLOPPY, legacy_floppy_image_device)
 
 struct floppy_type_t
 {
@@ -88,18 +93,32 @@ struct chrn_id
 #define FLOPPY_DRIVE_INDEX                      0x0020
 
 #define MCFG_LEGACY_FLOPPY_IDX_CB(_devcb) \
-	devcb = &downcast<legacy_floppy_image_device &>(*device).set_out_idx_func(DEVCB_##_devcb);
+	downcast<legacy_floppy_image_device &>(*device).set_out_idx_func(DEVCB_##_devcb);
 
 class legacy_floppy_image_device :  public device_t,
 									public device_image_interface
 {
 public:
 	// construction/destruction
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const floppy_interface *config)
+		: legacy_floppy_image_device(mconfig, tag, owner, clock)
+	{
+		set_floppy_config(config);
+	}
+
 	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~legacy_floppy_image_device();
 
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
 	template<class Object> devcb_base &set_out_idx_func(Object &&cb) { return m_out_idx_func.set_callback(std::forward<Object>(cb)); }
+
+	static void add_4drives(machine_config &mconfig, const floppy_interface *config)
+	{
+		LEGACY_FLOPPY(mconfig, FLOPPY_0, 0, config);
+		LEGACY_FLOPPY(mconfig, FLOPPY_1, 0, config);
+		LEGACY_FLOPPY(mconfig, FLOPPY_2, 0, config);
+		LEGACY_FLOPPY(mconfig, FLOPPY_3, 0, config);
+	}
 
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
@@ -226,11 +245,6 @@ protected:
 	char            m_extension_list[256];
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(LEGACY_FLOPPY, legacy_floppy_image_device)
-
-
-
 legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive);
 legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
 int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype);
@@ -240,10 +254,6 @@ int floppy_get_count(running_machine &machine);
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define FLOPPY_0 "floppy0"
-#define FLOPPY_1 "floppy1"
-#define FLOPPY_2 "floppy2"
-#define FLOPPY_3 "floppy3"
 
 
 #define MCFG_LEGACY_FLOPPY_CONFIG(_config) \

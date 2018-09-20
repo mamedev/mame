@@ -17,7 +17,6 @@
 #include "video/hd44780.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,6 +37,9 @@ public:
 	{
 	}
 
+	void fb01(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
@@ -50,10 +52,9 @@ public:
 	DECLARE_PALETTE_INIT(fb01);
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
-	void fb01(machine_config &config);
 	void fb01_io(address_map &map);
 	void fb01_mem(address_map &map);
-private:
+
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
 	required_device<midi_port_device> m_midi_thru;
@@ -81,8 +82,7 @@ void fb01_state::fb01_io(address_map &map)
 	map(0x01, 0x01).rw("ym2164", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 
 	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
-	map(0x10, 0x10).rw(m_upd71051, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).rw(m_upd71051, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw(m_upd71051, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	// 20     PANEL SWITCH
 	map(0x20, 0x20).portr("PANEL");
@@ -190,11 +190,10 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_fb01 )
+	config.set_default_layout(layout_fb01);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(fb01_state, fb01)
@@ -203,10 +202,10 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16
 	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_state,fb01_pixel_update)
 
-	MCFG_DEVICE_ADD("upd71051", I8251, XTAL(4'000'000))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, fb01_state, upd71051_rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, fb01_state, upd71051_txrdy_w))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	I8251(config, m_upd71051, XTAL(4'000'000));
+	m_upd71051->rxrdy_handler().set(FUNC(fb01_state::upd71051_rxrdy_w));
+	m_upd71051->txrdy_handler().set(FUNC(fb01_state::upd71051_txrdy_w));
+	m_upd71051->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, fb01_state, write_usart_clock))
@@ -225,7 +224,7 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 

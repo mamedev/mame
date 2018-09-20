@@ -47,6 +47,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
+	void slotcarn(machine_config &config);
+
+private:
 	pen_t m_pens[NUM_PENS];
 	required_shared_ptr<uint8_t> m_backup_ram;
 	required_shared_ptr<uint8_t> m_ram_attr;
@@ -60,7 +63,6 @@ public:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	void slotcarn(machine_config &config);
 	void slotcarn_map(address_map &map);
 	void spielbud_io_map(address_map &map);
 };
@@ -548,17 +550,17 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_DEVICE_PROGRAM_MAP(slotcarn_map)
 	MCFG_DEVICE_IO_MAP(spielbud_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set_ioport("IN3");
+	ppi2.in_pb_callback().set_ioport("IN4");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

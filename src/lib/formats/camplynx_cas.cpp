@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert,Nigel Barnes
 /********************************************************************
 
 Support for Camputers Lynx cassette images
@@ -82,52 +82,91 @@ static int camplynx_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
 	uint32_t sample_count = 0;
 	uint32_t byte_count = 0;
+	uint32_t data_size = 0;
 	uint32_t i;
+	uint8_t file_type;
+	std::string pgmname = "";
 
-	/* header zeroes */
-	for (i=0; i<555; i++)
-		sample_count += camplynx_output_byte(buffer, sample_count, 0);
-
-	if (bytes[0] == 0x22)
+	while (byte_count < camplynx_image_size)
 	{
-		std::string pgmname = " LOAD \"";
-		byte_count++;
+		/* initial SYNC + A5 applies to all file types */
+		for (i = 0; i < 555; i++)
+			sample_count += camplynx_output_byte(buffer, sample_count, 0);
 		sample_count += camplynx_output_byte(buffer, sample_count, 0xA5);
-		sample_count += camplynx_output_byte(buffer, sample_count, 0x22);
 
-		/* program name - include protection in case tape is corrupt */
-		for (i=1; bytes[i]!=0x22; i++)
+		/* some TAPs have a spurious A5 at the start, ignore */
+		while (bytes[byte_count] == 0xA5)
+			byte_count++;
+
+		if (bytes[byte_count] == 0x22)
+		{
+			pgmname = " LOAD \"";
+			byte_count++;
+			sample_count += camplynx_output_byte(buffer, sample_count, 0x22);
+
+			/* output program name - include protection in case tape is corrupt */
+			for (i = byte_count; bytes[i] != 0x22; i++)
+			{
+				if (i < camplynx_image_size)
+				{
+					sample_count += camplynx_output_byte(buffer, sample_count, bytes[i]);
+					pgmname.append(1, (char)bytes[i]);
+				}
+				else
+					return sample_count;
+				byte_count++;
+			}
+
+			pgmname.append(1, (char)0x22);
+			sample_count += camplynx_output_byte(buffer, sample_count, bytes[byte_count++]); // should be 0x22
+
+			/* read file type letter, should be 'B' or 'M' */
+			file_type = bytes[byte_count];
+
+			/* if a machine-language program, say to use MLOAD */
+			if (file_type == 'M') pgmname[0] = 'M';
+
+			/* tell user how to load the tape */
+			if (buffer)
+				osd_printf_info("%s\n", pgmname.c_str());
+
+			/* second SYNC + A5 */
+			for (i = 0; i < 555; i++)
+				sample_count += camplynx_output_byte(buffer, sample_count, 0);
+			sample_count += camplynx_output_byte(buffer, sample_count, 0xA5);
+		}
+
+		/* read file type letter, should be 'A', 'B' or 'M' */
+		file_type = bytes[byte_count];
+
+		/* determine the data size (as recorded in the file) + extra bytes per file type */
+		switch (file_type)
+		{
+		case 'A':
+			data_size = 5 + ((bytes[byte_count + 4]) << 8 | bytes[byte_count + 3]) + 12;
+			break;
+		case 'B':
+			data_size = 3 + ((bytes[byte_count + 2]) << 8 | bytes[byte_count + 1]) + 3;
+			break;
+		case 'M':
+			data_size = 3 + ((bytes[byte_count + 2]) << 8 | bytes[byte_count + 1]) + 7;
+			break;
+		}
+
+		/* output data  - include protection in case tape is corrupt */
+		for (i = byte_count; i < byte_count + data_size; i++)
 		{
 			if (i < camplynx_image_size)
 			{
 				sample_count += camplynx_output_byte(buffer, sample_count, bytes[i]);
-				pgmname.append(1, (char)bytes[i]);
 			}
-			else
-				return sample_count;
-			byte_count++;
 		}
+		byte_count += data_size;
 
-		pgmname.append(1, (char)0x22);
-		sample_count += camplynx_output_byte(buffer, sample_count, bytes[byte_count++]); // should be 0x22
-
-		// if a machine-language program, say to use MLOAD
-		if (bytes[byte_count] == 0x4D)
-			pgmname[0] = (char)0x4D;
-
-		// Tell user how to load the tape
-		osd_printf_info("%s",pgmname.c_str());
-
-		/* data zeroes */
-		for (i=0; i<555; i++)
-			sample_count += camplynx_output_byte(buffer, sample_count, 0);
-
-		sample_count += camplynx_output_byte(buffer, sample_count, 0xA5);
+		/* some TAPs have a spurious 00 at the end, ignore */
+		while (bytes[byte_count] == 0x00)
+			byte_count++;
 	}
-
-	/* data */
-	for (i=byte_count; i<camplynx_image_size; i++)
-		sample_count += camplynx_output_byte(buffer, sample_count, bytes[i]);
 
 	return sample_count;
 }
@@ -156,23 +195,23 @@ static int camplynx_cassette_calculate_size_in_samples(const uint8_t *bytes, int
 static const struct CassetteLegacyWaveFiller lynx48k_legacy_fill_wave =
 {
 	camplynx_cassette_fill_wave,                 /* fill_wave */
-	-1,                                     /* chunk_size */
-	0,                                      /* chunk_samples */
+	-1,                                          /* chunk_size */
+	0,                                           /* chunk_samples */
 	camplynx_cassette_calculate_size_in_samples, /* chunk_sample_calc */
-	LYNX48K_WAV_FREQUENCY,                      /* sample_frequency */
-	0,                                      /* header_samples */
-	0                                       /* trailer_samples */
+	LYNX48K_WAV_FREQUENCY,                       /* sample_frequency */
+	0,                                           /* header_samples */
+	0                                            /* trailer_samples */
 };
 
 static const struct CassetteLegacyWaveFiller lynx128k_legacy_fill_wave =
 {
 	camplynx_cassette_fill_wave,                 /* fill_wave */
-	-1,                                     /* chunk_size */
-	0,                                      /* chunk_samples */
+	-1,                                          /* chunk_size */
+	0,                                           /* chunk_samples */
 	camplynx_cassette_calculate_size_in_samples, /* chunk_sample_calc */
 	LYNX128K_WAV_FREQUENCY,                      /* sample_frequency */
-	0,                                      /* header_samples */
-	0                                       /* trailer_samples */
+	0,                                           /* header_samples */
+	0                                            /* trailer_samples */
 };
 
 static cassette_image::error lynx48k_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)

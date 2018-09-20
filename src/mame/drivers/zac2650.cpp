@@ -233,18 +233,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(zac2650_state::tinvader)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, 3800000/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT
+	s2650_device &maincpu(S2650(config, m_maincpu, 3800000/4));
+	maincpu.set_addrmap(AS_PROGRAM, &zac2650_state::main_map);
+	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1041))
-	MCFG_SCREEN_SIZE(30*24, 32*24)
-	MCFG_SCREEN_VISIBLE_AREA(0, 719, 0, 767)
-	MCFG_SCREEN_UPDATE_DRIVER(zac2650_state, screen_update_tinvader)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(55);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1041));
+	m_screen->set_size(30*24, 32*24);
+	m_screen->set_visarea(0, 719, 0, 767);
+	m_screen->set_screen_update(FUNC(zac2650_state::screen_update_tinvader));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tinvader)
 	MCFG_PALETTE_ADD("palette", 4)
@@ -253,8 +253,8 @@ MACHINE_CONFIG_START(zac2650_state::tinvader)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("s2636", S2636, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636, 0);
+	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 WRITE8_MEMBER(zac2650_state::tinvader_sound_w)

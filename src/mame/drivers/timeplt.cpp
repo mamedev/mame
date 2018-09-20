@@ -431,17 +431,17 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
 	MCFG_DEVICE_PROGRAM_MAP(timeplt_main_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, timeplt_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, timeplt_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, timeplt_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, timeplt_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, timeplt_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // PAY OUT - not used
+	LS259(config, m_mainlatch); // B3
+	m_mainlatch->q_out_cb<0>().set(FUNC(timeplt_state::nmi_enable_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(timeplt_state::flipscreen_w));
+	m_mainlatch->q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
+	m_mainlatch->q_out_cb<3>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(timeplt_state::video_enable_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(timeplt_state::coin_counter_1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(timeplt_state::coin_counter_2_w));
+	m_mainlatch->q_out_cb<7>().set_nop(); // PAY OUT - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -473,11 +473,10 @@ MACHINE_CONFIG_START(timeplt_state::psurge)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
+	m_mainlatch->q_out_cb<0>().set_nop();
+	m_mainlatch->q_out_cb<4>().set_nop();
+	m_mainlatch->q_out_cb<5>().set_nop();
+	m_mainlatch->q_out_cb<6>().set_nop();
 
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END

@@ -34,10 +34,10 @@ DEFINE_DEVICE_TYPE(POFO_HPC101, pofo_hpc101_device, "pofo_hpc101", "Atari Portfo
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pofo_hpc101_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M82C55A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_ctrl_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, bus_r))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->out_pb_callback().set("cent_ctrl_out", FUNC(output_latch_device::bus_w));
+	m_ppi->in_pc_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
 
 	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))

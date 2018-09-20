@@ -78,7 +78,8 @@ public:
 	void midearth(machine_config &config);
 	void atari_s1(machine_config &config);
 	void atarians(machine_config &config);
-protected:
+
+private:
 	DECLARE_READ8_MEMBER(m1080_r);
 	DECLARE_WRITE8_MEMBER(m1080_w);
 	DECLARE_READ8_MEMBER(m1084_r);
@@ -97,7 +98,7 @@ protected:
 	void atari_s1_map(address_map &map);
 	void atarians_map(address_map &map);
 	void midearth_map(address_map &map);
-private:
+
 	bool m_audiores;
 	uint8_t m_timer_s[3];
 	uint8_t m_vol;
@@ -454,7 +455,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLK)
 	MCFG_DEVICE_PROGRAM_MAP(atari_s1_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* Sound */
 	genpin_audio(config);
@@ -465,7 +466,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_atari_s1)
+	config.set_default_layout(layout_atari_s1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi", atari_s1_state, nmi, attotime::from_hz(NMI_INT))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s1_state, timer_s, attotime::from_hz(AUDIO_CLK))

@@ -28,6 +28,11 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void spdodgeb(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm1;
@@ -84,11 +89,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
 
 	void mcu63705_update_inputs();
 	void spd_adpcm_int(msm5205_device *device, int chip);
-	void spdodgeb(machine_config &config);
 	void spdodgeb_map(address_map &map);
 	void spdodgeb_sound_map(address_map &map);
 };

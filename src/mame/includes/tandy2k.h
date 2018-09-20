@@ -105,6 +105,10 @@ public:
 		}
 	}
 
+	void tandy2k_hd(machine_config &config);
+	void tandy2k(machine_config &config);
+
+private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_i8255a;
@@ -228,8 +232,7 @@ public:
 	int m_centronics_select;
 	int m_centronics_perror;
 	int m_centronics_busy;
-	void tandy2k_hd(machine_config &config);
-	void tandy2k(machine_config &config);
+
 	void tandy2k_hd_io(address_map &map);
 	void tandy2k_io(address_map &map);
 	void tandy2k_mem(address_map &map);

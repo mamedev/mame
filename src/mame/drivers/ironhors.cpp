@@ -15,7 +15,6 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -25,11 +24,11 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
 {
 	int scanline = param;
 
-	if (scanline == 240)
+	if (scanline == 240 && (m_screen->frame_number() & 1) == 0)
 	{
 		if (*m_interrupt_enable & 4)
 			m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -384,7 +383,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, ironhors_scanline_tick, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)
@@ -393,10 +392,12 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(61)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(18432000/4,296,8,256-8,255,16,240) // pixel clock is a guesswork
+
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -423,7 +424,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 {
 	int scanline = param;
 
@@ -450,7 +451,7 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_master_map)
 	MCFG_DEVICE_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_irq)
+	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_scanline_tick)
 
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)

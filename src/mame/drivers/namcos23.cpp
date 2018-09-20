@@ -1435,6 +1435,16 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void timecrs2v4a(machine_config &config);
+	void ss23e2(machine_config &config);
+	void gorgon(machine_config &config);
+	void ss23(machine_config &config);
+	void s23(machine_config &config);
+	void gmen(machine_config &config);
+	void timecrs2(machine_config &config);
+
+	void init_s23();
+
 	render_t m_render;
 	const uint16_t *m_tmlrom;
 	const uint8_t *m_tmhrom;
@@ -1442,6 +1452,7 @@ public:
 	uint32_t m_tileid_mask;
 	uint32_t m_tile_mask;
 
+private:
 	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
 
@@ -1491,7 +1502,7 @@ public:
 	DECLARE_READ16_MEMBER(iob_analog_r);
 	DECLARE_WRITE16_MEMBER(c435_state_pio_w);
 	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
-	void init_s23();
+
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
 	DECLARE_MACHINE_RESET(gmen);
@@ -1530,13 +1541,7 @@ public:
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
-	void timecrs2v4a(machine_config &config);
-	void ss23e2(machine_config &config);
-	void gorgon(machine_config &config);
-	void ss23(machine_config &config);
-	void s23(machine_config &config);
-	void gmen(machine_config &config);
-	void timecrs2(machine_config &config);
+
 	void gmen_mips_map(address_map &map);
 	void gmen_sh2_map(address_map &map);
 	void gorgon_map(address_map &map);
@@ -1547,7 +1552,6 @@ public:
 	void s23iobrdmap(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -3572,13 +3576,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R4650BE, BUSCLOCK*4)
+	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
 	MCFG_DEVICE_PROGRAM_MAP(gorgon_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_DEVICE_ADD("subcpu", H83002, H8CLOCK )
+	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
 	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
@@ -3586,7 +3590,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
-	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_ADD(m_iocpu, H83334, JVSCLOCK )
 	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
 	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
@@ -3599,15 +3603,16 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
+	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3639,13 +3644,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::s23)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R4650BE, BUSCLOCK*4)
+	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
 	MCFG_DEVICE_PROGRAM_MAP(s23_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_DEVICE_ADD("subcpu", H83002, H8CLOCK )
+	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
 	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
@@ -3653,7 +3658,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
-	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_ADD(m_iocpu, H83334, JVSCLOCK )
 	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
 	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
@@ -3666,15 +3671,16 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
+	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3728,13 +3734,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R4650BE, BUSCLOCK*5)
+	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*5)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
 	MCFG_DEVICE_PROGRAM_MAP(s23_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_DEVICE_ADD("subcpu", H83002, H8CLOCK )
+	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
 	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
@@ -3746,15 +3752,16 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
+	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -43,23 +43,22 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_tube_6502_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("m6502", M65C02, XTAL(12'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(tube_6502_mem)
+void bbc_tube_6502_device::device_add_mconfig(machine_config &config)
+{
+	M65C02(config, m_m6502, 12_MHz_XTAL / 4);
+	m_m6502->set_addrmap(AS_PROGRAM, &bbc_tube_6502_device::tube_6502_mem);
 
-	MCFG_TUBE_ADD("ula")
-	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("m6502", M65C02_NMI_LINE))
-	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("m6502", M65C02_IRQ_LINE))
+	TUBE(config, m_ula);
+	m_ula->pnmi_handler().set_inputline(m_m6502, M65C02_NMI_LINE);
+	m_ula->pirq_handler().set_inputline(m_m6502, M65C02_IRQ_LINE);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_6502", "bbc_flop_6502")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_65c102", "bbc_flop_65c102")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_6502").set_original("bbc_flop_6502");
+	SOFTWARE_LIST(config, "flop_ls_65c102").set_original("bbc_flop_65c102");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

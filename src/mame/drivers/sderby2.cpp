@@ -52,11 +52,15 @@ public:
 		m_proms(*this, "proms"),
 		m_palette(*this, "palette") { }
 
+	void sderby2(machine_config &config);
+
+	void init_sderby2();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void init_sderby2();
 	DECLARE_PALETTE_INIT(sderby2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -79,7 +83,6 @@ public:
 	uint8_t sub_data;
 	uint8_t main_data;
 	uint8_t host_io_40;
-	void sderby2(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sub_io_map(address_map &map);

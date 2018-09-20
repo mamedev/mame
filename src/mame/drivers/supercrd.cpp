@@ -184,6 +184,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void supercrd(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -195,7 +198,6 @@ public:
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void supercrd(machine_config &config);
 	void supercrd_map(address_map &map);
 };
 
@@ -421,7 +423,7 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_DEVICE_PROGRAM_MAP(supercrd_map)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 //  MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 //  MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)

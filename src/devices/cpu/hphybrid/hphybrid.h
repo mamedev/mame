@@ -45,7 +45,7 @@
 
 // PA changed callback
 #define MCFG_HPHYBRID_PA_CHANGED(_devcb) \
-	devcb = &downcast<hp_hybrid_cpu_device &>(*device).set_pa_changed_func(DEVCB_##_devcb);
+	downcast<hp_hybrid_cpu_device &>(*device).set_pa_changed_func(DEVCB_##_devcb);
 
 class hp_hybrid_cpu_device : public cpu_device
 {

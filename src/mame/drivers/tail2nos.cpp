@@ -244,10 +244,10 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	MCFG_DEVICE_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2608 */
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("link", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_3);
+	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

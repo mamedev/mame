@@ -370,21 +370,21 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 	MCFG_DEVICE_ADD(m_maincpu, I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	MCFG_DEVICE_PROGRAM_MAP(meyc8088_map)
 
-	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL(15'000'000) / (3*1))
+	i8155_device &i8155_1(I8155(config, "i8155_1", XTAL(15'000'000) / (3*1)));
 	// all ports set to input
-	MCFG_I8155_IN_PORTA_CB(READ8(*this, meyc8088_state, input_r))
-	MCFG_I8155_IN_PORTB_CB(IOPORT("SW"))
-	MCFG_I8155_IN_PORTC_CB(READ8(*this, meyc8088_state, status_r))
+	i8155_1.in_pa_callback().set(FUNC(meyc8088_state::input_r));
+	i8155_1.in_pb_callback().set_ioport("SW");
+	i8155_1.in_pc_callback().set(FUNC(meyc8088_state::status_r));
 	// i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 
-	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL(15'000'000) / (3*32))
+	i8155_device &i8155_2(I8155(config, "i8155_2", XTAL(15'000'000) / (3*32)));
 	// all ports set to output
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, meyc8088_state, lights2_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, meyc8088_state, lights1_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, meyc8088_state, common_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("dac", dac_bit_interface, write))
+	i8155_2.out_pa_callback().set(FUNC(meyc8088_state::lights2_w));
+	i8155_2.out_pb_callback().set(FUNC(meyc8088_state::lights1_w));
+	i8155_2.out_pc_callback().set(FUNC(meyc8088_state::common_w));
+	i8155_2.out_to_callback().set("dac", FUNC(dac_bit_interface::write));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD("heartbeat", meyc8088_state, heartbeat_callback)
 

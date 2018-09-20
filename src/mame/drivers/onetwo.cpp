@@ -68,6 +68,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void onetwo(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_paletteram2;
@@ -94,7 +97,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_color(int offset);
-	void onetwo(machine_config &config);
 	void main_cpu(address_map &map);
 	void main_cpu_io(address_map &map);
 	void sound_cpu(address_map &map);
@@ -370,7 +372,7 @@ MACHINE_CONFIG_START(onetwo_state::onetwo)
 	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 	MCFG_DEVICE_IO_MAP(sound_cpu_io)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

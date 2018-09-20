@@ -77,6 +77,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void dderby(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_scroll_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_dderby_vidchars;
@@ -99,7 +102,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void dderby(machine_config &config);
 	void dderby_sound_map(address_map &map);
 	void memmap(address_map &map);
 };
@@ -540,7 +542,7 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	MCFG_DEVICE_PROGRAM_MAP(dderby_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

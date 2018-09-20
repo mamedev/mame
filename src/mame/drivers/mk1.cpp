@@ -58,18 +58,17 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void mk1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
-	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
-	void mk1(machine_config &config);
 	void mk1_io(address_map &map);
 	void mk1_mem(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
-private:
 	uint8_t m_f8[2];
 	uint8_t m_led_data[4];
 	required_device<cpu_device> m_maincpu;
@@ -185,25 +184,19 @@ void mk1_state::machine_start()
 }
 
 
-F3853_INTERRUPT_REQ_CB(mk1_state::mk1_interrupt)
-{
-	m_maincpu->set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr);
-	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE);
-}
-
 MACHINE_CONFIG_START(mk1_state::mk1)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
 	MCFG_DEVICE_PROGRAM_MAP(mk1_mem)
 	MCFG_DEVICE_IO_MAP(mk1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("f3853", f3853_device, int_acknowledge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
-	MCFG_DEVICE_ADD("f3853", F3853, MAIN_CLOCK)
-	MCFG_F3853_EXT_INPUT_CB(mk1_state, mk1_interrupt)
+	f3853_device &f3853(F3853(config, "f3853", MAIN_CLOCK));
+	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk1)
+	config.set_default_layout(layout_mk1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk1_state, mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END

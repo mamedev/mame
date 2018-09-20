@@ -288,11 +288,11 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(irobot_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MAIN_CLOCK / 16)
-	MCFG_ADC0808_IN0_CB(IOPORT("AN0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("AN1"))
+	adc0809_device &adc(ADC0809(config, "adc", MAIN_CLOCK / 16));
+	adc.in_callback<0>().set_ioport("AN0");
+	adc.in_callback<1>().set_ioport("AN1");
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram")
+	X2212(config, "nvram").set_auto_save(true);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

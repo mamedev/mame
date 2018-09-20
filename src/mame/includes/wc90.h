@@ -31,10 +31,16 @@ public:
 		m_scroll1yhi(*this, "scroll1yhi"),
 		m_scroll2ylo(*this, "scroll2ylo"),
 		m_scroll2yhi(*this, "scroll2yhi"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_mainbank(*this, "mainbank"),
+		m_subbank(*this, "subbank")
 	{ }
 
+	void wc90t(machine_config &config);
+	void wc90(machine_config &config);
+	void pac90(machine_config &config);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -59,6 +65,9 @@ public:
 	required_shared_ptr<uint8_t> m_scroll2yhi;
 	required_shared_ptr<uint8_t> m_spriteram;
 
+	required_memory_bank m_mainbank;
+	required_memory_bank m_subbank;
+
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -80,9 +89,7 @@ public:
 	DECLARE_VIDEO_START(wc90t);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void wc90t(machine_config &config);
-	void wc90(machine_config &config);
-	void pac90(machine_config &config);
+
 	void sound_map(address_map &map);
 	void wc90_map_1(address_map &map);
 	void wc90_map_2(address_map &map);

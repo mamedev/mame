@@ -35,11 +35,6 @@
 class mbee_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_MBEE_NEWKB
-	};
-
 	mbee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
@@ -64,6 +59,32 @@ public:
 		, m_io_config(*this, "CONFIG")
 		, m_screen(*this, "screen")
 	{ }
+
+	void mbee56(machine_config &config);
+	void mbeeppc(machine_config &config);
+	void mbee128(machine_config &config);
+	void mbee256(machine_config &config);
+	void mbee(machine_config &config);
+	void mbeett(machine_config &config);
+	void mbeeic(machine_config &config);
+	void mbeepc(machine_config &config);
+	void mbee128p(machine_config &config);
+
+	void init_mbeepc85();
+	void init_mbee256();
+	void init_mbee56();
+	void init_mbeett();
+	void init_mbeeppc();
+	void init_mbee();
+	void init_mbeepc();
+	void init_mbeeic();
+	void init_mbee128();
+
+private:
+	enum
+	{
+		TIMER_MBEE_NEWKB
+	};
 
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
@@ -93,15 +114,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_READ8_MEMBER(fdc_status_r);
 	DECLARE_WRITE8_MEMBER(fdc_motor_w);
-	void init_mbeepc85();
-	void init_mbee256();
-	void init_mbee56();
-	void init_mbeett();
-	void init_mbeeppc();
-	void init_mbee();
-	void init_mbeepc();
-	void init_mbeeic();
-	void init_mbee128();
 	DECLARE_MACHINE_RESET(mbee);
 	DECLARE_VIDEO_START(mono);
 	DECLARE_VIDEO_START(standard);
@@ -123,15 +135,6 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	required_device<palette_device> m_palette;
-	void mbee56(machine_config &config);
-	void mbeeppc(machine_config &config);
-	void mbee128(machine_config &config);
-	void mbee256(machine_config &config);
-	void mbee(machine_config &config);
-	void mbeett(machine_config &config);
-	void mbeeic(machine_config &config);
-	void mbeepc(machine_config &config);
-	void mbee128p(machine_config &config);
 	void mbee128_io(address_map &map);
 	void mbee256_io(address_map &map);
 	void mbee256_mem(address_map &map);
@@ -147,7 +150,7 @@ public:
 	void mbeeppc_mem(address_map &map);
 	void mbeett_io(address_map &map);
 	void mbeett_mem(address_map &map);
-private:
+
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_gfxram;
 	uint8_t *m_p_colorram;
@@ -177,7 +180,7 @@ private:
 	void oldkb_matrix_r(uint16_t offs);
 	void machine_reset_common();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
 	required_device<wave_device> m_wave;

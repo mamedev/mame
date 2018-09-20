@@ -11,10 +11,10 @@
 #pragma once
 
 #define MCFG_S24TILE_XHOUT_CALLBACK(_write) \
-	devcb = &downcast<segas24_tile_device &>(*device).set_xhout_write_callback(DEVCB_##_write);
+	downcast<segas24_tile_device &>(*device).set_xhout_write_callback(DEVCB_##_write);
 
 #define MCFG_S24TILE_XVOUT_CALLBACK(_write) \
-	devcb = &downcast<segas24_tile_device &>(*device).set_xvout_write_callback(DEVCB_##_write);
+	downcast<segas24_tile_device &>(*device).set_xvout_write_callback(DEVCB_##_write);
 
 
 class segas24_tile_device : public device_t, public device_gfx_interface

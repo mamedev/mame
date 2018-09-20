@@ -285,17 +285,17 @@ uint32_t apollo_graphics_15i::bt458::get_rgb(uint8_t index)
 
 const char *apollo_graphics_15i::cr_text(offs_t offset, uint8_t data, uint8_t rw)
 {
-	static const char *cr0[8] =
+	static char const *const cr0[8] =
 	{ "cr0 mode=0 CPU dest BLT", "cr0 mode=1 Alternating BLT",
 			"cr0 mode=2 Vector mode", "cr0 mode=3 CPU Source BLT",
 			"cr0 mode=4 Double access BLT ", "cr0 mode=5 ???",
 			"cr0 mode=6 ???", "cr0 mode=7 Normal" };
 
-	static const char *cr2[4] =
+	static char const *const cr2[4] =
 			{ "cr2 Constant access", "cr2 Pixel access", "cr2 ???",
 					"cr2 Plane access" };
 
-	static const char *cr2b[4] =
+	static char const *const cr2b[4] =
 	{ "cr2b Constant access", "cr2b Pixel access", "cr2b ???",
 			"cr2b Plane access" };
 
@@ -1704,8 +1704,7 @@ void apollo_graphics_15i::register_vblank_callback()
 	MLOG1(("register_vblank_callback"));
 
 	/* register for VBLANK callbacks */
-	screen_device *screen = (screen_device *)machine().device(VIDEO_SCREEN_TAG);
-	screen->register_vblank_callback(vblank_state_delegate(&apollo_graphics_15i::vblank_state_changed,this));
+	m_screen->register_vblank_callback(vblank_state_delegate(&apollo_graphics_15i::vblank_state_changed,this));
 }
 
 
@@ -1714,7 +1713,7 @@ void apollo_graphics_15i::register_vblank_callback()
  ***************************************************************************/
 
 MACHINE_CONFIG_START(apollo_state::apollo_graphics)
-	MCFG_DEFAULT_LAYOUT( layout_apollo_15i )
+	config.set_default_layout(layout_apollo_15i);
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(68000000, 1346, 0, 1024, 841, 0, 800)
@@ -1725,6 +1724,7 @@ DEFINE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i, "apollo_graphics_15i", 
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, tag, owner, clock),
+	m_screen(*this, "^" VIDEO_SCREEN_TAG),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {
@@ -1732,6 +1732,7 @@ apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const cha
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_screen(*this, "^" VIDEO_SCREEN_TAG),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {
@@ -1884,7 +1885,7 @@ void apollo_graphics_15i::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(apollo_state::apollo_mono19i)
-	MCFG_DEFAULT_LAYOUT( layout_apollo )
+	config.set_default_layout(layout_apollo);
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

@@ -110,6 +110,10 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void apfm1000(machine_config &config);
+	void apfimag(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_READ8_MEMBER(pia0_porta_r);
 	DECLARE_WRITE8_MEMBER(pia0_portb_w);
@@ -121,11 +125,9 @@ public:
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
 
-	void apfm1000(machine_config &config);
-	void apfimag(machine_config &config);
 	void apfimag_map(address_map &map);
 	void apfm1000_map(address_map &map);
-private:
+
 	uint8_t m_latch;
 	uint8_t m_keyboard_data;
 	uint8_t m_pad_data;
@@ -538,13 +540,13 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia0_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apf_state, pia0_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, apf_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set(FUNC(apf_state::pia0_porta_r));
+	m_pia0->writepb_handler().set(FUNC(apf_state::pia0_portb_w));
+	m_pia0->ca2_handler().set(FUNC(apf_state::pia0_ca2_w));
+	m_pia0->cb2_handler().set("speaker", FUNC(speaker_sound_device::level_w));
+	m_pia0->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, nullptr)
 
@@ -558,23 +560,21 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_DEVICE_PROGRAM_MAP( apfimag_map)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia1_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, apf_state, pia1_portb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apf_state, pia1_portb_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(apf_state::pia1_porta_r));
+	m_pia1->readpb_handler().set(FUNC(apf_state::pia1_portb_r));
+	m_pia1->writepb_handler().set(FUNC(apf_state::pia1_portb_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(apf_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("apf_cass")
 
-	MCFG_DEVICE_ADD("fdc", FD1771, 1000000) // guess
+	FD1771(config, m_fdc, 1000000); // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)

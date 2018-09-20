@@ -54,9 +54,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_ay8910(*this, "ay8910") { }
 
-void init_dynadice();
+	void dynadice(machine_config &config);
 
-void dynadice(machine_config &config);
+	void init_dynadice();
 
 protected:
 	virtual void machine_start() override;
@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_DEVICE_IO_MAP(dynadice_sound_io_map)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

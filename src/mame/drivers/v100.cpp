@@ -40,6 +40,9 @@ public:
 		, m_key_row(*this, "ROW%u", 0)
 	{ }
 
+	void v100(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(earom_r);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -52,10 +55,9 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void v100(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -216,10 +218,8 @@ void v100_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x0f).w(m_vtac, FUNC(crt5037_device::write));
 	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
-	map(0x12, 0x12).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x13, 0x13).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x14, 0x14).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x15, 0x15).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x12, 0x13).rw("usart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x14, 0x15).rw("usart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x16, 0x16).w("brg2", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x20).r(FUNC(v100_state::earom_r));
 	map(0x30, 0x30).w(FUNC(v100_state::port30_w));
@@ -349,41 +349,41 @@ MACHINE_CONFIG_START(v100_state::v100)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v100_state, irq_ack)
 
-	MCFG_DEVICE_ADD("usart1", I8251, XTAL(47'736'000) / 12) // divider not verified
+	I8251(config, m_usart[0], XTAL(47'736'000) / 12); // divider not verified
 
-	MCFG_DEVICE_ADD("brg1", COM8116, 5068800) // TODO: clock and divisors for this customized variant
-	MCFG_COM8116_FR_HANDLER(WRITELINE("usart1", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("usart1", i8251_device, write_txc))
+	com8116_device &brg1(COM8116(config, "brg1", 5068800)); // TODO: clock and divisors for this customized variant
+	brg1.fr_handler().set(m_usart[0], FUNC(i8251_device::write_rxc));
+	brg1.ft_handler().set(m_usart[0], FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_ADD("usart2", I8251, XTAL(47'736'000) / 12)
+	I8251(config, m_usart[1], XTAL(47'736'000) / 12);
 
-	MCFG_DEVICE_ADD("brg2", COM8116, 5068800)
-	MCFG_COM8116_FR_HANDLER(WRITELINE("usart2", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("usart2", i8251_device, write_txc))
+	com8116_device &brg2(COM8116(config, "brg2", 5068800));
+	brg2.fr_handler().set(m_usart[1], FUNC(i8251_device::write_rxc));
+	brg2.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * CHAR_WIDTH, 0, 132 * CHAR_WIDTH, 312, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
 
-	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(47'736'000) / CHAR_WIDTH)
-	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_TMS9927_HSYN_CALLBACK(WRITELINE(*this, v100_state, picu_r_w<7>)) MCFG_DEVCB_INVERT
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(*this, v100_state, picu_r_w<6>)) MCFG_DEVCB_INVERT
+	CRT5037(config, m_vtac, XTAL(47'736'000) / CHAR_WIDTH);
+	m_vtac->set_char_width(CHAR_WIDTH);
+	m_vtac->set_screen("screen");
+	m_vtac->hsyn_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
+	m_vtac->vsyn_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
 
-	MCFG_DEVICE_ADD("picu", I8214, XTAL(47'736'000) / 12)
-	MCFG_I8214_INT_CALLBACK(ASSERTLINE("maincpu", 0))
+	I8214(config, m_picu, XTAL(47'736'000) / 12);
+	m_picu->int_wr_callback().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v100_state, ppi_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITELINE("earom", er1400_device, c3_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, c2_w)) MCFG_DEVCB_BIT(5) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, c1_w)) MCFG_DEVCB_BIT(4) MCFG_DEVCB_INVERT
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE("earom", er1400_device, data_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, clock_w)) MCFG_DEVCB_BIT(0) MCFG_DEVCB_INVERT
+	i8255_device &ppi(I8255(config, "ppi", 0));
+	ppi.out_pa_callback().set(FUNC(v100_state::ppi_porta_w));
+	ppi.out_pb_callback().set(m_earom, FUNC(er1400_device::c3_w)).bit(6).invert();
+	ppi.out_pb_callback().append(m_earom, FUNC(er1400_device::c2_w)).bit(5).invert();
+	ppi.out_pb_callback().append(m_earom, FUNC(er1400_device::c1_w)).bit(4).invert();
+	ppi.out_pc_callback().set(m_earom, FUNC(er1400_device::data_w)).bit(6).invert();
+	ppi.out_pc_callback().append(m_earom, FUNC(er1400_device::clock_w)).bit(0).invert();
 
-	MCFG_DEVICE_ADD("earom", ER1400, 0)
+	ER1400(config, m_earom);
 MACHINE_CONFIG_END
 
 

@@ -38,6 +38,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
+		, m_ppi(*this, "ppi%u", 1U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_gfx0_vram(*this, "gfx0_vram")
 		, m_gfx0_cram(*this, "gfx0_cram")
@@ -49,12 +50,35 @@ public:
 		, m_mainbank(*this, "mainbank")
 	{ }
 
+	void witch(machine_config &config);
+
+	void init_witch();
+
+	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
+	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
+	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
+	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
+	DECLARE_READ8_MEMBER(gfx1_vram_r);
+	DECLARE_READ8_MEMBER(gfx1_cram_r);
+	DECLARE_READ8_MEMBER(read_a000);
+	DECLARE_WRITE8_MEMBER(write_a002);
+	DECLARE_WRITE8_MEMBER(write_a006);
+	DECLARE_WRITE8_MEMBER(main_write_a008);
+	DECLARE_WRITE8_MEMBER(sub_write_a008);
+	DECLARE_READ8_MEMBER(prot_read_700x);
+	DECLARE_WRITE8_MEMBER(xscroll_w);
+	DECLARE_WRITE8_MEMBER(yscroll_w);
+
+protected:
+	void common_map(address_map &map);
+
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
 	tilemap_t *m_gfx1_tilemap;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device_array<i8255_device, 2> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_gfx0_vram;
@@ -72,21 +96,7 @@ public:
 	int m_scrolly;
 	uint8_t m_reg_a002;
 	uint8_t m_motor_active;
-	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
-	DECLARE_READ8_MEMBER(gfx1_vram_r);
-	DECLARE_READ8_MEMBER(gfx1_cram_r);
-	DECLARE_READ8_MEMBER(read_a000);
-	DECLARE_WRITE8_MEMBER(write_a002);
-	DECLARE_WRITE8_MEMBER(write_a006);
-	DECLARE_WRITE8_MEMBER(main_write_a008);
-	DECLARE_WRITE8_MEMBER(sub_write_a008);
-	DECLARE_READ8_MEMBER(prot_read_700x);
-	DECLARE_WRITE8_MEMBER(xscroll_w);
-	DECLARE_WRITE8_MEMBER(yscroll_w);
-	void init_witch();
+
 	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
@@ -94,13 +104,11 @@ public:
 	uint32_t screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
-	void witch(machine_config &config);
-	void common_map(address_map &map);
+
 	void witch_common_map(address_map &map);
 	void witch_main_map(address_map &map);
 	void witch_sub_map(address_map &map);
 
-protected:
 	void video_common_init();
 	bool has_spr_rom_bank;
 	uint8_t m_spr_bank;
@@ -114,22 +122,21 @@ public:
 		m_paletteram(*this, "paletteram")
 	{ }
 
+	void keirinou(machine_config &config);
+
+private:
 	void keirinou_common_map(address_map &map);
 	void keirinou_main_map(address_map &map);
 	void keirinou_sub_map(address_map &map);
 
-	void keirinou(machine_config &config);
 	DECLARE_WRITE8_MEMBER(write_keirinou_a002);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	TILE_GET_INFO_MEMBER(get_keirinou_gfx1_tile_info);
 
-protected:
 	virtual void video_start() override;
 
-private:
 	uint8_t m_bg_bank;
 	required_shared_ptr<uint8_t> m_paletteram;
-
 };
 
 

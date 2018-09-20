@@ -122,33 +122,33 @@ MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_DEVICE_ADD(m_pit8253, PIT8253, 0)
-	MCFG_PIT8253_CLK0(A2BUS_7M_CLOCK / 6.0) // heartbeat IRQ
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_pic8259, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(A2BUS_7M_CLOCK / 6.0) // dram refresh
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, a2bus_pcxporter_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(A2BUS_7M_CLOCK / 6.0) // pio port c pin 4, and speaker polling enough
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, a2bus_pcxporter_device, pc_pit8253_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(A2BUS_7M_CLOCK / 6.0); // heartbeat IRQ
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(A2BUS_7M_CLOCK / 6.0); // DRAM refresh
+	m_pit8253->out_handler<1>().set(FUNC(a2bus_pcxporter_device::pc_pit8253_out1_changed));
+	m_pit8253->set_clk<2>(A2BUS_7M_CLOCK / 6.0); // PIO port C pin 4, and speaker polling enough
+	m_pit8253->out_handler<2>().set(FUNC(a2bus_pcxporter_device::pc_pit8253_out2_changed));
 
-	MCFG_DEVICE_ADD(m_dma8237, PCXPORT_DMAC, A2BUS_7M_CLOCK / 2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dma8237_out_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, a2bus_pcxporter_device, pc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, a2bus_pcxporter_device, pc_dma_write_byte))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, a2bus_pcxporter_device, pc_dma8237_1_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, a2bus_pcxporter_device, pc_dma8237_2_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(*this, a2bus_pcxporter_device, pc_dma8237_3_dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, a2bus_pcxporter_device, pc_dma8237_0_dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, a2bus_pcxporter_device, pc_dma8237_1_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, a2bus_pcxporter_device, pc_dma8237_2_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, a2bus_pcxporter_device, pc_dma8237_3_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dack3_w))
+	PCXPORT_DMAC(config, m_dma8237, A2BUS_7M_CLOCK / 2);
+	m_dma8237->out_hreq_callback().set(FUNC(a2bus_pcxporter_device::pc_dma_hrq_changed));
+	m_dma8237->out_eop_callback().set(FUNC(a2bus_pcxporter_device::pc_dma8237_out_eop));
+	m_dma8237->in_memr_callback().set(FUNC(a2bus_pcxporter_device::pc_dma_read_byte));
+	m_dma8237->out_memw_callback().set(FUNC(a2bus_pcxporter_device::pc_dma_write_byte));
+	m_dma8237->in_ior_callback<1>().set(FUNC(a2bus_pcxporter_device::pc_dma8237_1_dack_r));
+	m_dma8237->in_ior_callback<2>().set(FUNC(a2bus_pcxporter_device::pc_dma8237_2_dack_r));
+	m_dma8237->in_ior_callback<3>().set(FUNC(a2bus_pcxporter_device::pc_dma8237_3_dack_r));
+	m_dma8237->out_iow_callback<0>().set(FUNC(a2bus_pcxporter_device::pc_dma8237_0_dack_w));
+	m_dma8237->out_iow_callback<1>().set(FUNC(a2bus_pcxporter_device::pc_dma8237_1_dack_w));
+	m_dma8237->out_iow_callback<2>().set(FUNC(a2bus_pcxporter_device::pc_dma8237_2_dack_w));
+	m_dma8237->out_iow_callback<3>().set(FUNC(a2bus_pcxporter_device::pc_dma8237_3_dack_w));
+	m_dma8237->out_dack_callback<0>().set(FUNC(a2bus_pcxporter_device::pc_dack0_w));
+	m_dma8237->out_dack_callback<1>().set(FUNC(a2bus_pcxporter_device::pc_dack1_w));
+	m_dma8237->out_dack_callback<2>().set(FUNC(a2bus_pcxporter_device::pc_dack2_w));
+	m_dma8237->out_dack_callback<3>().set(FUNC(a2bus_pcxporter_device::pc_dack3_w));
 
-	MCFG_DEVICE_ADD(m_pic8259, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(m_v30, 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_v30, 0);
 
 	MCFG_DEVICE_ADD(m_isabus, ISA8, 0)
 	MCFG_ISA8_CPU(m_v30)
@@ -169,8 +169,7 @@ MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "cga", true) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "fdc_xt", true)

@@ -67,6 +67,11 @@ public:
 		m_p1_unknown = 0x00;
 	}
 
+	void splus(machine_config &config);
+
+	void init_splus();
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
@@ -85,12 +90,10 @@ public:
 	DECLARE_READ8_MEMBER(splus_registers_r);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(splus_reel_optics_r);
-	void init_splus();
-	void splus(machine_config &config);
+
 	void splus_iomap(address_map &map);
 	void splus_map(address_map &map);
 
-private:
 	// EEPROM States
 	int m_sda_dir;
 
@@ -682,8 +685,8 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
 
 	// Fill NVRAM
-	MCFG_NVRAM_ADD_0FILL("cmosl")
-	MCFG_NVRAM_ADD_0FILL("cmosh")
+	NVRAM(config, "cmosl", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "cmosh", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware (ALL FAKE, NO VIDEO)
 	MCFG_PALETTE_ADD("palette", 16*16)

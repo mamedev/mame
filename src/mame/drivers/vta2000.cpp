@@ -190,27 +190,27 @@ PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 
 MACHINE_CONFIG_START(vta2000_state::vta2000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD(m_maincpu, I8080, XTAL(4'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("mainpit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(500'000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vta2000_state, speaker_w))
+	PIT8253(config, m_mainpit, 0);
+	m_mainpit->set_clk<0>(500'000);
+	m_mainpit->out_handler<0>().set(FUNC(vta2000_state::speaker_w));
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_IN_SP_CB(GND)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	pic8259_device &pic(PIC8259(config, "pic", 0));
+	pic.in_sp_callback().set_constant(0);
+	pic.out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("usart", I8251, XTAL(4'000'000) / 4)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic", pic8259_device, ir4_w))
+	i8251_device &usart(I8251(config, "usart", XTAL(4'000'000) / 4));
+	usart.rxrdy_handler().set("pic", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("brgpit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1228800) // maybe
-	MCFG_PIT8253_CLK1(1228800)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("usart", i8251_device, write_rxc))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("usart", i8251_device, write_txc)) // or vice versa?
+	pit8253_device &brgpit(PIT8253(config, "brgpit", 0));
+	brgpit.set_clk<0>(1'228'800); // maybe
+	brgpit.set_clk<1>(1'228'800);
+	brgpit.out_handler<0>().set("usart", FUNC(i8251_device::write_rxc));
+	brgpit.out_handler<1>().set("usart", FUNC(i8251_device::write_txc)); // or vice versa?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

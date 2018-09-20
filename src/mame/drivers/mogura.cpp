@@ -26,6 +26,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void mogura(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
@@ -42,7 +45,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mogura);
 	uint32_t screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mogura(machine_config &config);
 	void mogura_io_map(address_map &map);
 	void mogura_map(address_map &map);
 };

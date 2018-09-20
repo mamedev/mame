@@ -30,6 +30,9 @@ public:
 		m_palette(*this, "palette"),
 		m_k054321(*this, "k054321") { }
 
+	void gijoe(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_workram;
@@ -68,7 +71,6 @@ public:
 	void gijoe_objdma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void gijoe(machine_config &config);
 	void gijoe_map(address_map &map);
 	void sound_map(address_map &map);
 };

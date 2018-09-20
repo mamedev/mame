@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(barata_state::barata)
 	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, barata_state, port2_w))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, barata_state, fpga_w))
 
-	MCFG_DEFAULT_LAYOUT( layout_barata )
+	config.set_default_layout(layout_barata);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

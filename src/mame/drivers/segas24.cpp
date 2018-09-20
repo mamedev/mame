@@ -1873,17 +1873,17 @@ MACHINE_CONFIG_START(segas24_state::system24)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, VIDEO_CLOCK/2)
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas24_state, hotrod_lamps_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas24_state, cnt1))
-	MCFG_315_5296_OUT_CNT2_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
+	sega_315_5296_device &io(SEGA_315_5296(config, "io", VIDEO_CLOCK/2));
+	io.in_pa_callback().set_ioport("P1");
+	io.in_pb_callback().set_ioport("P2");
+	io.in_pc_callback().set_ioport("P3");
+	io.out_pd_callback().set(FUNC(segas24_state::hotrod_lamps_w));
+	io.in_pe_callback().set_ioport("SERVICE");
+	io.in_pf_callback().set_ioport("COINAGE");
+	io.in_pg_callback().set_ioport("DSW");
+	io.out_ph_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	io.out_cnt1_callback().set(FUNC(segas24_state::cnt1));
+	io.out_cnt2_callback().set("ymsnd", FUNC(ym2151_device::reset_w));
 
 	MCFG_TIMER_DRIVER_ADD("irq_timer", segas24_state, irq_timer_cb)
 	MCFG_TIMER_DRIVER_ADD("irq_timer_clear", segas24_state, irq_timer_clear_cb)
@@ -1916,18 +1916,20 @@ MACHINE_CONFIG_START(segas24_state::system24)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segas24_state::mahmajn)
+void segas24_state::mahmajn(machine_config &config)
+{
 	system24(config);
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(*this, segas24_state, mahmajn_input_line_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segas24_state, mahmajn_inputs_r))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas24_state, mahmajn_mux_w))
-MACHINE_CONFIG_END
+	sega_315_5296_device &io(*subdevice<sega_315_5296_device>("io"));
+	io.in_pa_callback().set(FUNC(segas24_state::mahmajn_input_line_r));
+	io.in_pc_callback().set(FUNC(segas24_state::mahmajn_inputs_r));
+	io.out_pd_callback().set(FUNC(segas24_state::mahmajn_mux_w));
+}
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy)
+void segas24_state::system24_floppy(machine_config &config)
+{
 	system24(config);
-	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "floppy_nvram", nvram_device::DEFAULT_NONE);
+}
 
 MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
 	system24_floppy(config);
@@ -1972,19 +1974,21 @@ MACHINE_CONFIG_START(segas24_state::system24_floppy_fd_upd)
 	MCFG_UPD4701_PORTY("DIAL2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segas24_state::dcclub)
+void segas24_state::dcclub(machine_config &config)
+{
 	system24(config);
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(*this, segas24_state, dcclub_p1_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segas24_state, dcclub_p3_r))
-MACHINE_CONFIG_END
+	sega_315_5296_device &io(*subdevice<sega_315_5296_device>("io"));
+	io.in_pa_callback().set(FUNC(segas24_state::dcclub_p1_r));
+	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
+}
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy_dcclub)
+void segas24_state::system24_floppy_dcclub(machine_config &config)
+{
 	system24_floppy_fd1094(config);
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_IN_PORTA_CB(READ8(*this, segas24_state, dcclub_p1_r))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segas24_state, dcclub_p3_r))
-MACHINE_CONFIG_END
+	sega_315_5296_device &io(*subdevice<sega_315_5296_device>("io"));
+	io.in_pa_callback().set(FUNC(segas24_state::dcclub_p1_r));
+	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
+}
 
 
 /*************************************

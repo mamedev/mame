@@ -235,17 +235,17 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_DEVICE_PROGRAM_MAP(gunbustr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("EXTRA"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("SPECIAL"))
-	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, gunbustr_state, coin_word_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("EXTRA");
+	tc0510nio.read_2_callback().set_ioport("INPUTS");
+	tc0510nio.read_3_callback().set_ioport("SPECIAL");
+	tc0510nio.write_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(gunbustr_state::coin_word_w));
+	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

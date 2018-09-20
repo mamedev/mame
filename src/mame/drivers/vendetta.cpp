@@ -435,27 +435,16 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, vendetta_state, banking_callback))
 
-	MCFG_DEVICE_ADD("videobank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(videobank0_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
-	MCFG_DEVICE_ADD("videobank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(videobank1_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "videobank0").set_map(&vendetta_state::videobank0_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
+	ADDRESS_MAP_BANK(config, "videobank1").set_map(&vendetta_state::videobank1_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified with PCB */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* interrupts are triggered by the main CPU */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -518,8 +507,7 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	MCFG_DEVICE_MODIFY("k053246")
 	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
-	MCFG_K053252_OFFSETS(12*8, 1*8)
+	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
 MACHINE_CONFIG_END
 
 

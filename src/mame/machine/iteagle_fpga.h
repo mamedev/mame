@@ -13,12 +13,6 @@
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 
-#define MCFG_ITEAGLE_FPGA_INIT(_version, _seq_init) \
-	downcast<iteagle_fpga_device &>(*device).set_init_info(_version, _seq_init);
-
-#define MCFG_ITEAGLE_EEPROM_INIT(_sw_version, _hw_version) \
-	downcast<iteagle_eeprom_device &>(*device).set_info(_sw_version, _hw_version);
-
 // Functional emulation of AMD AM85C30 serial controller
 // Two channels, A & B
 class iteagle_am85c30
@@ -60,6 +54,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_update);
 	DECLARE_WRITE8_MEMBER(serial_rx_w);
 
+	enum { IO_SYSTEM, IO_IN1, IO_SW5, IO_NUM };
+	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
+	auto trackx_callback() { return m_trackx_cb.bind(); }
+	auto tracky_callback() { return m_tracky_cb.bind(); }
+	auto gunx_callback() { return m_gunx_cb.bind(); }
+	auto guny_callback() { return m_guny_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -71,9 +72,14 @@ private:
 	optional_device<nvram_device> m_e1_nvram;
 	required_device<scc85c30_device> m_scc1;
 	required_device<screen_device> m_screen;
+	required_device<device_execute_interface> m_cpu;
+	devcb_read16 m_in_cb[3];
+	devcb_read8 m_trackx_cb;
+	devcb_read8 m_tracky_cb;
+	devcb_read16 m_gunx_cb;
+	devcb_read16 m_guny_cb;
 
 	emu_timer *     m_timer;
-	required_device<device_execute_interface> m_cpu;
 	int m_irq_num;
 	int m_serial_irq_num;
 

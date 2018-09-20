@@ -20,13 +20,13 @@
 #define ESRIP_DRAW(name) int name(int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 
 #define MCFG_ESRIP_FDT_R_CALLBACK(_read) \
-	devcb = &downcast<esrip_device &>(*device).set_fdt_r_callback(DEVCB_##_read);
+	downcast<esrip_device &>(*device).set_fdt_r_callback(DEVCB_##_read);
 
 #define MCFG_ESRIP_FDT_W_CALLBACK(_write) \
-	devcb = &downcast<esrip_device &>(*device).set_fdt_w_callback(DEVCB_##_write);
+	downcast<esrip_device &>(*device).set_fdt_w_callback(DEVCB_##_write);
 
 #define MCFG_ESRIP_STATUS_IN_CALLBACK(_read) \
-	devcb = &downcast<esrip_device &>(*device).set_status_in_callback(DEVCB_##_read);
+	downcast<esrip_device &>(*device).set_status_in_callback(DEVCB_##_read);
 
 #define MCFG_ESRIP_DRAW_CALLBACK_OWNER(_class, _method) \
 	downcast<esrip_device &>(*device).set_draw_callback(esrip_device::draw_delegate(&_class::_method, #_class "::" #_method, this));

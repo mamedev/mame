@@ -1052,11 +1052,10 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(TMS9928A_TAG, TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, adam_state, vdc_int_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC(SCREEN_TAG)
-	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
+	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
+	m_vdc->set_vram_size(0x4000);
+	m_vdc->int_callback().set(FUNC(adam_state::vdc_int_w));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1097,8 +1096,7 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy2_irq_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")

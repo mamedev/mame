@@ -83,6 +83,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
+	void ttchamp(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
@@ -142,7 +145,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
-	void ttchamp(machine_config &config);
 	void ttchamp_io(address_map &map);
 	void ttchamp_map(address_map &map);
 };
@@ -661,7 +663,7 @@ MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 
-	MCFG_NVRAM_ADD_0FILL("backram")
+	NVRAM(config, "backram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 

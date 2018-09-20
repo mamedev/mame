@@ -55,16 +55,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void k1003(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(disp_1_w);
 	DECLARE_WRITE8_MEMBER(disp_2_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 
-	void k1003(machine_config &config);
 	void k1003_io(address_map &map);
 	void k1003_mem(address_map &map);
-private:
+
 	uint8_t m_disp_1;
 	uint8_t m_disp_2;
 	uint8_t bit_to_dec(uint8_t val);
@@ -152,7 +154,7 @@ MACHINE_CONFIG_START(k1003_state::k1003)
 	MCFG_DEVICE_IO_MAP(k1003_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_k1003)
+	config.set_default_layout(layout_k1003);
 MACHINE_CONFIG_END
 
 

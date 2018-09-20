@@ -79,16 +79,22 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_double{0, 0}
 	, m_spl{false, false}
 	, m_dbl1(0)
-	, m_buffer(0), m_linecounter(0), m_address(0), m_start1change(0)
+	, m_char_buffer(0), m_attr_buffer(0)
+	, m_linecounter(0), m_address(0), m_start1change(0)
 	, m_scanline_timer(nullptr)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_char_space(nullptr), m_attr_space(nullptr)
+	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
 {
 }
 
 device_memory_interface::space_config_vector scn2674_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
+	return has_configured_map(1) ? space_config_vector {
+		std::make_pair(0, &m_char_space_config),
+		std::make_pair(1, &m_attr_space_config)
+	} : space_config_vector {
+		std::make_pair(0, &m_char_space_config)
 	};
 }
 
@@ -99,6 +105,10 @@ void scn2674_device::device_start()
 	m_intr_cb.resolve_safe();
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 	screen().register_screen_bitmap(m_bitmap);
+
+	m_char_space = &space(0);
+	if (has_space(1))
+		m_attr_space = &space(1);
 
 	save_item(NAME(m_address));
 	save_item(NAME(m_linecounter));
@@ -146,7 +156,9 @@ void scn2674_device::device_start()
 	save_item(NAME(m_double));
 	save_item(NAME(m_spl));
 	save_item(NAME(m_dbl1));
-	save_item(NAME(m_buffer));
+	save_item(NAME(m_char_buffer));
+	if (m_attr_space != nullptr)
+		save_item(NAME(m_attr_buffer));
 	save_item(NAME(m_start1change));
 }
 
@@ -195,7 +207,7 @@ void scn2674_device::device_reset()
 	m_double[0] = m_double[1] = 0;
 	m_spl[0] = m_spl[1] = false;
 	m_dbl1 = 0;
-	m_buffer = 0;
+	m_char_buffer = m_attr_buffer = 0;
 	m_linecounter = 0;
 	m_IR_pointer = 0;
 	m_address = 0;
@@ -580,16 +592,22 @@ void scn2674_device::write_interrupt_mask(bool enabled, uint8_t bits)
 
 	LOGMASKED(LOG_INTR, "%s: %s interrupts %02x by mask\n", machine().describe_context(), enabled ? "Enable" : "Disable", bits);
 
-	if (BIT(bits, 0))
-		LOGMASKED(LOG_INTR, "Split 2 IRQ %s%s\n", BIT(changed_bits, 0) ? "" : "already ", enabled ? "enabled" : "disabled");
-	if (BIT(bits, 1))
-		LOGMASKED(LOG_INTR, "Ready IRQ %s%s\n", BIT(changed_bits, 1) ? "" : "already ", enabled ? "enabled" : "disabled");
-	if (BIT(bits, 2))
-		LOGMASKED(LOG_INTR, "Split 1 IRQ %s%s\n", BIT(changed_bits, 2) ? "" : "already ", enabled ? "enabled" : "disabled");
-	if (BIT(bits, 3))
-		LOGMASKED(LOG_INTR, "Line Zero IRQ %s%s\n", BIT(changed_bits, 3) ? "" : "already ", enabled ? "enabled" : "disabled");
-	if (BIT(bits, 4))
-		LOGMASKED(LOG_INTR, "V-Blank IRQ %s%s\n", BIT(changed_bits, 4) ? "" : "already ", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 0))
+		LOGMASKED(LOG_INTR, "Split 2 IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 1))
+		LOGMASKED(LOG_INTR, "Ready IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 2))
+		LOGMASKED(LOG_INTR, "Split 1 IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 3))
+		LOGMASKED(LOG_INTR, "Line Zero IRQ %s\n", enabled ? "enabled" : "disabled");
+	if (BIT(changed_bits, 4))
+	{
+		LOGMASKED(LOG_INTR, "V-Blank IRQ %s\n", enabled ? "enabled" : "disabled");
+
+		// hack to allow PC-X to get its first interrupt
+		if (BIT(bits, 4) && !m_display_enabled)
+			recompute_parameters();
+	}
 }
 
 void scn2674_device::write_delayed_command(uint8_t data)
@@ -603,19 +621,25 @@ void scn2674_device::write_delayed_command(uint8_t data)
 	{
 	case 0xa4:
 		// read at pointer address
-		m_buffer = space().read_byte(m_screen2_address);
+		m_char_buffer = m_char_space->read_byte(m_screen2_address);
+		if (m_attr_space != nullptr)
+			m_attr_buffer = m_attr_space->read_byte(m_screen2_address);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED read at pointer address %02x\n", machine().describe_context(), data);
 		break;
 
 	case 0xa2:
 		// write at pointer address
-		space().write_byte(m_screen2_address, m_buffer);
+		m_char_space->write_byte(m_screen2_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_screen2_address, m_attr_buffer);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at pointer address %02x\n", machine().describe_context(), data);
 		break;
 
 	case 0xa6:  // used by the Octopus
 		// write at pointer address
-		space().write_byte(m_display_pointer_address, m_buffer);
+		m_char_space->write_byte(m_display_pointer_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_display_pointer_address, m_attr_buffer);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at display pointer address %02x\n", machine().describe_context(), data);
 		break;
 
@@ -627,19 +651,25 @@ void scn2674_device::write_delayed_command(uint8_t data)
 
 	case 0xac:
 		// read at cursor address
-		m_buffer = space().read_byte(m_cursor_address);
+		m_char_buffer = m_char_space->read_byte(m_cursor_address);
+		if (m_attr_space != nullptr)
+			m_attr_buffer = m_attr_space->read_byte(m_cursor_address);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED read at cursor address %02x\n", machine().describe_context(), data);
 		break;
 
 	case 0xaa:
 		// write at cursor address
-		space().write_byte(m_cursor_address, m_buffer);
+		m_char_space->write_byte(m_cursor_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_cursor_address, m_attr_buffer);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at cursor address %02x\n", machine().describe_context(), data);
 		break;
 
 	case 0xad:
 		// read at cursor address + increment
-		m_buffer = space().read_byte(m_cursor_address);
+		m_char_buffer = m_char_space->read_byte(m_cursor_address);
+		if (m_attr_space != nullptr)
+			m_attr_buffer = m_attr_space->read_byte(m_cursor_address);
 		m_cursor_address++;
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED read at cursor address+increment %02x\n", machine().describe_context(), data);
 		break;
@@ -647,7 +677,9 @@ void scn2674_device::write_delayed_command(uint8_t data)
 	case 0xab:
 	case 0xaf:  // LSI Octopus sends command 0xAF
 		// write at cursor address + increment
-		space().write_byte(m_cursor_address, m_buffer);
+		m_char_space->write_byte(m_cursor_address, m_char_buffer);
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(m_cursor_address, m_attr_buffer);
 		m_cursor_address++;
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at cursor address+increment %02x\n", machine().describe_context(), data);
 		break;
@@ -656,8 +688,14 @@ void scn2674_device::write_delayed_command(uint8_t data)
 		// write from cursor address to pointer address
 		// TODO: transfer only during blank
 		for (i = m_cursor_address; i != m_screen2_address; i = ((i + 1) & 0xffff))
-			space().write_byte(i, m_buffer);
-		space().write_byte(i, m_buffer); // get the last
+		{
+			m_char_space->write_byte(i, m_char_buffer);
+			if (m_attr_space != nullptr)
+				m_attr_space->write_byte(i, m_attr_buffer);
+		}
+		m_char_space->write_byte(i, m_char_buffer); // get the last
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(i, m_attr_buffer);
 		m_cursor_address = m_screen2_address;
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write from cursor address to pointer address %02x\n", machine().describe_context(), data);
 		break;
@@ -671,8 +709,14 @@ void scn2674_device::write_delayed_command(uint8_t data)
 		// write from cursor address to pointer address
 		// TODO: transfer only during blank
 		for (i = m_cursor_address; i != m_display_pointer_address; i = (i + 1) & 0xffff)
-			space().write_byte(i, m_buffer);
-		space().write_byte(i, m_buffer); // get the last
+		{
+			m_char_space->write_byte(i, m_char_buffer);
+			if (m_attr_space != nullptr)
+				m_attr_space->write_byte(i, m_attr_buffer);
+		}
+		m_char_space->write_byte(i, m_char_buffer); // get the last
+		if (m_attr_space != nullptr)
+			m_attr_space->write_byte(i, m_attr_buffer);
 		m_cursor_address = m_display_pointer_address;
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write from cursor address to pointer address %02x\n", machine().describe_context(), data);
 		break;
@@ -881,9 +925,10 @@ WRITE8_MEMBER( scn2674_device::write )
 
 void scn2674_device::recompute_parameters()
 {
-	int horiz_pix_total = ((m_equalizing_constant + (m_horz_sync_width << 1)) << 1) * m_hpixels_per_column;
+	int horiz_chars_total = (m_equalizing_constant + (m_horz_sync_width << 1)) << 1;
+	int horiz_pix_total = horiz_chars_total * m_hpixels_per_column;
 	int vert_pix_total = m_rows_per_screen * m_scanline_per_char_row + m_vert_front_porch + m_vert_back_porch + m_vsync_width;
-	attoseconds_t refresh = screen().frame_period().attoseconds();
+	attoseconds_t refresh = screen().frame_period().as_attoseconds();
 	int max_visible_x = (m_character_per_row * m_hpixels_per_column) - 1;
 	int max_visible_y = (m_rows_per_screen * m_scanline_per_char_row) - 1;
 
@@ -893,10 +938,10 @@ void scn2674_device::recompute_parameters()
 		return;
 	}
 
-	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	//attoseconds_t refresh = clocks_to_attotime(horiz_chars_total * vert_pix_total).as_attoseconds();
+	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, ATTOSECONDS_TO_HZ(refresh));
 
-	rectangle visarea;
-	visarea.set(0, max_visible_x, 0, max_visible_y);
+	rectangle visarea(0, max_visible_x, 0, max_visible_y);
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	m_scanline_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
@@ -983,7 +1028,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				if (!charrow)
 				{
 					uint16_t addr = m_screen2_address;
-					uint16_t line = space().read_word(addr);
+					uint16_t line = m_char_space->read_word(addr);
 					m_screen1_address = line;
 					if (m_double_ht_wd)
 					{
@@ -1017,7 +1062,8 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 									i * m_hpixels_per_column,
 									m_linecounter,
 									tilerow,
-									space().read_byte(address),
+									m_char_space->read_byte(address),
+									m_attr_space != nullptr ? m_attr_space->read_byte(address) : 0,
 									address,
 									(charrow >= m_cursor_first_scanline) && (charrow <= m_cursor_last_scanline) && cursor_on,
 									dw != 0,

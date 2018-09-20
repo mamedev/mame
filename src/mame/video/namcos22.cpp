@@ -307,11 +307,11 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	int cy = 240 + node->data.quad.vy;
 	m_clipx = cx;
 	m_clipy = cy;
-	m_cliprect.set(cx + node->data.quad.vw, cx - node->data.quad.vw, cy + node->data.quad.vh, cy - node->data.quad.vh);
-	if (m_cliprect.min_x < 0)   m_cliprect.min_x = 0;
-	if (m_cliprect.max_x > 639) m_cliprect.max_x = 639;
-	if (m_cliprect.min_y < 0)   m_cliprect.min_y = 0;
-	if (m_cliprect.max_y > 479) m_cliprect.max_y = 479;
+	m_cliprect.set(
+			std::max<s32>(cx + node->data.quad.vw, 0),
+			std::min<s32>(cx - node->data.quad.vw, 639),
+			std::max<s32>(cy + node->data.quad.vh, 0),
+			std::min<s32>(cy - node->data.quad.vh, 479));
 
 	// non-direct case: project and z-clip
 	if (!direct)
@@ -583,11 +583,11 @@ void namcos22_renderer::poly3d_drawsprite(
 void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node)
 {
 	// scene clip
-	m_cliprect.set(node->data.sprite.cx_min, node->data.sprite.cx_max, node->data.sprite.cy_min, node->data.sprite.cy_max);
-	if (m_cliprect.min_x < 0)   m_cliprect.min_x = 0;
-	if (m_cliprect.max_x > 639) m_cliprect.max_x = 639;
-	if (m_cliprect.min_y < 0)   m_cliprect.min_y = 0;
-	if (m_cliprect.max_y > 479) m_cliprect.max_y = 479;
+	m_cliprect.set(
+			std::max<s32>(node->data.sprite.cx_min, 0),
+			std::min<s32>(node->data.sprite.cx_max, 639),
+			std::max<s32>(node->data.sprite.cy_min, 0),
+			std::min<s32>(node->data.sprite.cy_max, 479));
 
 	int offset = 0;
 
@@ -602,20 +602,19 @@ void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitma
 				code += nthword(&m_state.m_spriteram[0x800/4], offset + node->data.sprite.linktype*4);
 
 			poly3d_drawsprite(
-				screen,
-				bitmap,
-				code,
-				node->data.sprite.color,
-				node->data.sprite.flipx,
-				node->data.sprite.flipy,
-				node->data.sprite.xpos + col * node->data.sprite.sizex,
-				node->data.sprite.ypos + row * node->data.sprite.sizey,
-				(node->data.sprite.sizex << 16) / 32,
-				(node->data.sprite.sizey << 16) / 32,
-				node->data.sprite.cz,
-				node->data.sprite.pri,
-				0xff - node->data.sprite.translucency
-			);
+					screen,
+					bitmap,
+					code,
+					node->data.sprite.color,
+					node->data.sprite.flipx,
+					node->data.sprite.flipy,
+					node->data.sprite.xpos + col * node->data.sprite.sizex,
+					node->data.sprite.ypos + row * node->data.sprite.sizey,
+					(node->data.sprite.sizex << 16) / 32,
+					(node->data.sprite.sizey << 16) / 32,
+					node->data.sprite.cz,
+					node->data.sprite.pri,
+					0xff - node->data.sprite.translucency);
 			offset++;
 		}
 	}
@@ -1895,12 +1894,12 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 	rgbaint_t fade_color(0, m_screen_fade_r, m_screen_fade_g, m_screen_fade_b);
 
 	// mix textlayer with poly/sprites
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		src = &m_mix_bitmap->pix16(y);
 		dest = &bitmap.pix32(y);
 		pri = &screen.priority().pix8(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// skip if transparent or under poly/sprite
 			if (pri[x] == prival)
@@ -1970,12 +1969,12 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 	};
 
 	// mix textlayer with poly/sprites
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		src = &m_mix_bitmap->pix16(y);
 		dest = &bitmap.pix32(y);
 		pri = &screen.priority().pix8(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint32_t pixel = dest[x];
 
@@ -2314,10 +2313,10 @@ uint32_t namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_r
 	const uint8_t *rlut = (const uint8_t *)&m_mixer[0x100/4];
 	const uint8_t *glut = (const uint8_t *)&m_mixer[0x200/4];
 	const uint8_t *blut = (const uint8_t *)&m_mixer[0x300/4];
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t *dest = &bitmap.pix32(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int rgb = dest[x];
 			int r = rlut[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ ((rgb >> 16) & 0xff)];

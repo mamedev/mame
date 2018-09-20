@@ -558,11 +558,11 @@ MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(tx1_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, tx1_sound_device, z80_irq,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
-	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, tx1_sound_device, tx1_ppi_porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, tx1_sound_device, tx1_ppi_portb_r))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tx1_sound_device, tx1_coin_cnt_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(tx1_sound_device::tx1_ppi_porta_r));
+	m_ppi->in_pb_callback().set(FUNC(tx1_sound_device::tx1_ppi_portb_r));
+	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
+	m_ppi->out_pc_callback().set(FUNC(tx1_sound_device::tx1_coin_cnt_w));
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
@@ -575,6 +575,7 @@ MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
 
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END
@@ -1064,11 +1065,11 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
 	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
 
-	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
+	I8255A(config, m_ppi);
 	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("PPI_PORTA"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, buggyboy_sound_device, bb_coin_cnt_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
+	m_ppi->in_pa_callback().set_ioport("PPI_PORTA");
+	m_ppi->out_pb_callback().set(FUNC(buggyboy_sound_device::bb_coin_cnt_w));
+	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
@@ -1084,6 +1085,7 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END
@@ -1109,6 +1111,7 @@ MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END

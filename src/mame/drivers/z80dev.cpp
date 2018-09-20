@@ -36,7 +36,7 @@ public:
 
 	void z80dev(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER( display_w );
 	DECLARE_READ8_MEMBER( test_r );
 
@@ -45,7 +45,6 @@ protected:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;
 };
@@ -131,7 +130,7 @@ MACHINE_CONFIG_START(z80dev_state::z80dev)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_z80dev)
+	config.set_default_layout(layout_z80dev);
 MACHINE_CONFIG_END
 
 /* ROM definition */

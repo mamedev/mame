@@ -50,7 +50,7 @@
 //**************************************************************************
 
 #define MCFG_NCR5385_INT_CB(_int) \
-	devcb = &downcast<ncr5385_device &>(*device).set_int_callback(DEVCB_##_int);
+	downcast<ncr5385_device &>(*device).set_int_callback(DEVCB_##_int);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

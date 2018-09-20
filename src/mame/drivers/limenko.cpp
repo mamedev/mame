@@ -55,6 +55,18 @@ public:
 	{
 	}
 
+	void limenko(machine_config &config);
+	void spotty(machine_config &config);
+
+	void init_common();
+	void init_sb2003();
+	void init_dynabomb();
+	void init_legendoh();
+	void init_spotty();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -95,14 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
-
-	void init_common();
-	void init_sb2003();
-	void init_dynabomb();
-	void init_legendoh();
-	void init_spotty();
-
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -112,8 +116,6 @@ public:
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(const rectangle &cliprect);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
-	void limenko(machine_config &config);
-	void spotty(machine_config &config);
 	void limenko_io_map(address_map &map);
 	void limenko_map(address_map &map);
 	void spotty_io_map(address_map &map);
@@ -709,7 +711,7 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_DEVICE_IO_MAP(limenko_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -754,7 +756,7 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

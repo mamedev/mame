@@ -125,6 +125,10 @@ public:
 		std::fill(std::begin(m_old_linescroll), std::end(m_old_linescroll), 0);
 	}
 
+	void baryon(machine_config &config);
+	void dreamwld(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr_array<uint32_t, 2> m_vram;
@@ -163,8 +167,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void baryon(machine_config &config);
-	void dreamwld(machine_config &config);
 	void baryon_map(address_map &map);
 	void dreamwld_map(address_map &map);
 	void oki1_map(address_map &map);
@@ -334,17 +336,20 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 7;
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				tmptilemap[layer]->set_scroll_rows(((64*16) >> size) >> tile_rowscroll);
+				for (int i = 0; i < 2; i++)
+				{
+					m_tilemap[layer][i]->set_scroll_rows(((64*16) >> i));
+				}
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 			uint16_t* linebase = &m_lineram16[(layer * 0x200) / 2];
-			for (int i = 0; i < (256 >> tile_rowscroll); i++)   /* 256 screen lines */
+			for (int i = 0; i < 256; i++)   /* 256 screen lines */
 			{
 				/* per-line rowscroll */
-				int x0 = linebase[(i+32)&0xff];
+				int x0 = linebase[((i+32)&0xff) >> tile_rowscroll];
 
 				tmptilemap[layer]->set_scrollx(
-						(i + scrolly[layer]) & (row_mask >> tile_rowscroll),
+						(i + scrolly[layer]) & row_mask,
 						scrollx[layer] + x0 );
 			}
 		}
@@ -352,7 +357,10 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 		{
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				tmptilemap[layer]->set_scroll_rows(1);
+				for (int i = 0; i < 2; i++)
+				{
+					m_tilemap[layer][i]->set_scroll_rows(1);
+				}
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 

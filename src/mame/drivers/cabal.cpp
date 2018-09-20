@@ -86,10 +86,10 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 
 
-WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
+void cabal_state::sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_seibu_sound->main_w(space, 4, data & 0x00ff);
+		m_seibu_sound->main_w(4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	m_maincpu->spin_until_time(attotime::from_usec(50));
@@ -511,6 +511,7 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")

@@ -45,15 +45,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(port1a_w);
-	void init_dsb46();
-	DECLARE_MACHINE_RESET(dsb46);
-
 	void dsb46(machine_config &config);
+
+	void init_dsb46();
+
+private:
+	DECLARE_WRITE8_MEMBER(port1a_w);
+	DECLARE_MACHINE_RESET(dsb46);
 	void dsb46_io(address_map &map);
 	void dsb46_mem(address_map &map);
-private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 };
 
 void dsb46_state::dsb46_mem(address_map &map)
@@ -109,35 +110,35 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(dsb46_state::dsb46)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
-	MCFG_DEVICE_PROGRAM_MAP(dsb46_mem)
-	MCFG_DEVICE_IO_MAP(dsb46_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dsb46_state::dsb46_mem);
+	m_maincpu->set_addrmap(AS_IO, &dsb46_state::dsb46_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dsb46_state, dsb46)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(1'843'200))
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc1", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg2))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1.8432_MHz_XTAL));
+	ctc_clock.signal_handler().set("ctc1", FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append("ctc1", FUNC(z80ctc_device::trg2));
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(24'000'000) / 6)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	z80sio_device& sio(Z80SIO(config, "sio", 24_MHz_XTAL / 6));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(24'000'000) / 6)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("sio", z80sio_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txcb_w))
+	z80ctc_device &ctc1(Z80CTC(config, "ctc1", 24_MHz_XTAL / 6));
+	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc1.zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
+	ctc1.zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
+	ctc1.zc_callback<2>().set("sio", FUNC(z80sio_device::rxcb_w));
+	ctc1.zc_callback<2>().append("sio", FUNC(z80sio_device::txcb_w));
 MACHINE_CONFIG_END
 
 ROM_START( dsb46 )

@@ -41,7 +41,7 @@ READ8_MEMBER(cpc_ssa1_device::ssa1_r)
 
 WRITE8_MEMBER(cpc_ssa1_device::ssa1_w)
 {
-	m_sp0256_device->ald_w(space, 0, data);
+	m_sp0256_device->ald_w(data);
 }
 
 READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
@@ -58,7 +58,7 @@ READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
 
 WRITE8_MEMBER(cpc_dkspeech_device::dkspeech_w)
 {
-	m_sp0256_device->ald_w(space, 0, data & 0x3f);
+	m_sp0256_device->ald_w(data & 0x3f);
 }
 
 WRITE_LINE_MEMBER(cpc_ssa1_device::lrq_cb)
@@ -117,10 +117,10 @@ const tiny_rom_entry *cpc_dkspeech_device::device_rom_region() const
 // device machine config
 MACHINE_CONFIG_START(cpc_ssa1_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sp0256",SP0256,XTAL(3'120'000))
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, cpc_ssa1_device, lrq_cb))
-	MCFG_SP0256_STANDBY_CB(WRITELINE(*this, cpc_ssa1_device, sby_cb))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SP0256(config, m_sp0256_device, XTAL(3'120'000));
+	m_sp0256_device->data_request_callback().set(FUNC(cpc_ssa1_device::lrq_cb));
+	m_sp0256_device->standby_callback().set(FUNC(cpc_ssa1_device::sby_cb));
+	m_sp0256_device->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
@@ -128,15 +128,14 @@ MACHINE_CONFIG_START(cpc_ssa1_device::device_add_mconfig)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cpc_dkspeech_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sp0256",SP0256,XTAL(4'000'000))  // uses the CPC's clock from pin 50 of the expansion port
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, cpc_dkspeech_device, lrq_cb))
-	MCFG_SP0256_STANDBY_CB(WRITELINE(*this, cpc_dkspeech_device, sby_cb))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SP0256(config, m_sp0256_device, XTAL(4'000'000));  // uses the CPC's clock from pin 50 of the expansion port
+	m_sp0256_device->data_request_callback().set(FUNC(cpc_dkspeech_device::lrq_cb));
+	m_sp0256_device->standby_callback().set(FUNC(cpc_dkspeech_device::sby_cb));
+	m_sp0256_device->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
@@ -144,7 +143,6 @@ MACHINE_CONFIG_START(cpc_dkspeech_device::device_add_mconfig)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-
 MACHINE_CONFIG_END
 
 
@@ -180,8 +178,6 @@ void cpc_ssa1_device::device_start()
 
 	m_rom = memregion("sp0256")->base();
 
-//  m_sp0256_device = subdevice("sp0256");
-
 	space.install_readwrite_handler(0xfaee,0xfaee,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
 	space.install_readwrite_handler(0xfbee,0xfbee,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
 }
@@ -193,8 +189,6 @@ void cpc_dkspeech_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
 	m_rom = memregion("sp0256")->base();
-
-//  m_sp0256_device = subdevice("sp0256");
 
 	space.install_readwrite_handler(0xfbfe,0xfbfe,read8_delegate(FUNC(cpc_dkspeech_device::dkspeech_r),this),write8_delegate(FUNC(cpc_dkspeech_device::dkspeech_w),this));
 }

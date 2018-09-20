@@ -84,7 +84,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	return m_fdc->gen_r(offset & 0x03);
+	return m_fdc->read(offset & 0x03);
 }
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
@@ -98,7 +98,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	return m_fdc->gen_w(offset & 0x03, data);
+	return m_fdc->write(offset & 0x03, data);
 }
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, SAMCOUPE_XTAL_X1/3)
+	WD1772(config, m_fdc, SAMCOUPE_XTAL_X1/3);
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
@@ -555,9 +555,7 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K");
 MACHINE_CONFIG_END
 
 

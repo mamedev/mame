@@ -66,6 +66,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void instruct(machine_config &config);
+
+private:
+
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
@@ -78,11 +82,10 @@ public:
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
-	void instruct(machine_config &config);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;
@@ -429,7 +432,7 @@ MACHINE_CONFIG_START(instruct_state::instruct)
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, instruct_state, flag_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_instruct)
+	config.set_default_layout(layout_instruct);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", instruct_state, instruct, "pgm", 1)

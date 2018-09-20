@@ -412,7 +412,7 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 
 void menu::item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type)
 {
-	if (state & FLAG_DISABLE)
+	if (flags & FLAG_DISABLE)
 		ref = nullptr;
 	else
 		flags |= state ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW;

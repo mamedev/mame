@@ -26,6 +26,9 @@ public:
 	{
 	}
 
+	void ultraman(machine_config &config);
+
+private:
 	int        m_bank[3];
 
 	/* devices */
@@ -45,7 +48,6 @@ public:
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051316_CB_MEMBER(zoom_callback_3);
 	K051960_CB_MEMBER(sprite_callback);
-	void ultraman(machine_config &config);
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);

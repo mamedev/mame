@@ -107,6 +107,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void stuntair(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -144,7 +147,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
-	void stuntair(machine_config &config);
 	void stuntair_map(address_map &map);
 	void stuntair_sound_map(address_map &map);
 	void stuntair_sound_portmap(address_map &map);
@@ -525,19 +527,19 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_DEVICE_IO_MAP(stuntair_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type and location not verified
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // set but never cleared
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, stuntair_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // cleared at start
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, stuntair_state, spritebank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // cleared at start
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, stuntair_state, spritebank0_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // cleared at start
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // cleared at start
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // type and location not verified
+	mainlatch.q_out_cb<0>().set_nop(); // set but never cleared
+	mainlatch.q_out_cb<1>().set(FUNC(stuntair_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set_nop(); // cleared at start
+	mainlatch.q_out_cb<3>().set(FUNC(stuntair_state::spritebank1_w));
+	mainlatch.q_out_cb<4>().set_nop(); // cleared at start
+	mainlatch.q_out_cb<5>().set(FUNC(stuntair_state::spritebank0_w));
+	mainlatch.q_out_cb<6>().set_nop(); // cleared at start
+	mainlatch.q_out_cb<7>().set_nop(); // cleared at start
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -21,9 +21,9 @@ public:
 	nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_rom0_tag(const char *tag) { m_tag0 = tag; }
-	void set_rom1_tag(const char *tag) { m_tag1 = tag; }
-	void set_page_mask(uint8_t mask) { m_page_mask = ~mask; }
+	template <typename T> nmk112_device &set_rom0_tag(T &&tag) { m_rom0.set_tag(std::forward<T>(tag)); return *this; }
+	template <typename T> nmk112_device &set_rom1_tag(T &&tag) { m_rom1.set_tag(std::forward<T>(tag)); return *this; }
+	nmk112_device &set_page_mask(uint8_t mask) { m_page_mask = ~mask; return *this; }
 
 	DECLARE_WRITE8_MEMBER( okibank_w );
 
@@ -31,10 +31,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	void do_bankswitch( int offset, int data );
-	void postload_bankswitch();
 
 	// internal state
 
@@ -43,8 +43,7 @@ private:
 
 	uint8_t m_current_bank[8];
 
-	const char *m_tag0, *m_tag1;
-	uint8_t *m_rom0, *m_rom1;
+	optional_region_ptr<uint8_t> m_rom0, m_rom1;
 	int   m_size0, m_size1;
 };
 

@@ -628,8 +628,7 @@ void tandy200_state::tandy200_io(address_map &map)
 	map(0x90, 0x9f).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xc0, 0xc0).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(tandy200_state::bank_r), FUNC(tandy200_state::bank_w));
 	map(0xe0, 0xe0).mirror(0x0f).rw(FUNC(tandy200_state::stbk_r), FUNC(tandy200_state::stbk_w));
 	map(0xf0, 0xf0).mirror(0x0e).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w));
@@ -1363,18 +1362,19 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8155_TAG, I8155, XTAL(4'915'200)/2)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, kc85_state, i8155_pa_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, kc85_state, i8155_pb_w))
-	MCFG_I8155_IN_PORTC_CB(READ8(*this, kc85_state, i8155_pc_r))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, kc85_state, i8155_to_w))
+	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
+	i8155.out_pa_callback().set(FUNC(kc85_state::i8155_pa_w));
+	i8155.out_pb_callback().set(FUNC(kc85_state::i8155_pb_w));
+	i8155.in_pc_callback().set(FUNC(kc85_state::i8155_pc_r));
+	i8155.out_to_callback().set(FUNC(kc85_state::i8155_to_w));
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	IM6402(config, m_uart, 0, 0);
+	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
@@ -1391,9 +1391,7 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8201_state::pc8201)
@@ -1413,18 +1411,19 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8155_TAG, I8155, XTAL(4'915'200)/2)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, kc85_state, i8155_pa_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, kc85_state, i8155_pb_w))
-	MCFG_I8155_IN_PORTC_CB(READ8(*this, kc85_state, i8155_pc_r))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, kc85_state, i8155_to_w))
+	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
+	i8155.out_pa_callback().set(FUNC(kc85_state::i8155_pa_w));
+	i8155.out_pb_callback().set(FUNC(kc85_state::i8155_pb_w));
+	i8155.in_pc_callback().set(FUNC(kc85_state::i8155_pc_r));
+	i8155.out_to_callback().set(FUNC(kc85_state::i8155_to_w));
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	IM6402(config, m_uart, 0, 0);
+	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
@@ -1445,17 +1444,14 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc8201")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,64K,96K")
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K,64K,96K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pc8201_state::pc8300)
+void pc8201_state::pc8300(machine_config &config)
+{
 	pc8201(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K,96K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("32K").set_extra_options("64K,96K");
+}
 
 MACHINE_CONFIG_START(trsm100_state::trsm100)
 	/* basic machine hardware */
@@ -1474,18 +1470,19 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8155_TAG, I8155, XTAL(4'915'200)/2)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, kc85_state, i8155_pa_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, kc85_state, i8155_pb_w))
-	MCFG_I8155_IN_PORTC_CB(READ8(*this, kc85_state, i8155_pc_r))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, kc85_state, i8155_to_w))
+	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
+	i8155.out_pa_callback().set(FUNC(kc85_state::i8155_pa_w));
+	i8155.out_pb_callback().set(FUNC(kc85_state::i8155_pb_w));
+	i8155.in_pc_callback().set(FUNC(kc85_state::i8155_pc_r));
+	i8155.out_to_callback().set(FUNC(kc85_state::i8155_to_w));
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	IM6402(config, m_uart, 0, 0);
+	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
@@ -1501,17 +1498,14 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
+	RAM(config, m_ram).set_default_size("8K").set_extra_options("16K,24K,32K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(trsm100_state::tandy102)
+void trsm100_state::tandy102(machine_config &config)
+{
 	trsm100(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("24K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("24K").set_extra_options("32K");
+}
 
 MACHINE_CONFIG_START(tandy200_state::tandy200)
 	/* basic machine hardware */
@@ -1534,18 +1528,18 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 //  MCFG_TCM5089_ADD(TCM5089_TAG, XTAL(3'579'545))
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8155_TAG, I8155, XTAL(4'915'200)/2)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, tandy200_state, i8155_pa_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, tandy200_state, i8155_pb_w))
-	MCFG_I8155_IN_PORTC_CB(READ8(*this, tandy200_state, i8155_pc_r))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, tandy200_state, i8155_to_w))
+	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
+	i8155.out_pa_callback().set(FUNC(tandy200_state::i8155_pa_w));
+	i8155.out_pb_callback().set(FUNC(tandy200_state::i8155_pb_w));
+	i8155.in_pc_callback().set(FUNC(tandy200_state::i8155_pc_r));
+	i8155.out_to_callback().set(FUNC(tandy200_state::i8155_to_w));
 
 	MCFG_DEVICE_ADD(RP5C01A_TAG, RP5C01, XTAL(32'768))
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0) /*XTAL(4'915'200)/2,*/
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &i8251(I8251(config, I8251_TAG, 0)); /*XTAL(4'915'200)/2,*/
+	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
@@ -1569,9 +1563,7 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tandy200")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("24K")
-	MCFG_RAM_EXTRA_OPTIONS("48K,72K")
+	RAM(config, m_ram).set_default_size("24K").set_extra_options("48K,72K");
 MACHINE_CONFIG_END
 
 /* ROMs */

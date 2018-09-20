@@ -31,10 +31,8 @@ public:
 	void gng(machine_config &config);
 	void diamond(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(ym_reset_w);
 	DECLARE_READ8_MEMBER(diamond_hack_r);
 	DECLARE_WRITE8_MEMBER(gng_fgvideoram_w);
@@ -54,7 +52,6 @@ protected:
 	void gng_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<uint8_t> m_fgvideoram;

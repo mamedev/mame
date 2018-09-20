@@ -116,11 +116,6 @@ DONE:
 class notetaker_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_FIFOCLK,
-	};
-
 	notetaker_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
 		m_iop_cpu(*this, "iop_cpu"),
@@ -136,6 +131,17 @@ public:
 		m_floppy(nullptr)
 	{
 	}
+
+	void notetakr(machine_config &config);
+
+	void init_notetakr();
+
+private:
+	enum
+	{
+		TIMER_FIFOCLK,
+	};
+
 // devices
 	required_device<cpu_device> m_iop_cpu;
 	required_device<pic8259_device> m_iop_pic;
@@ -172,7 +178,6 @@ public:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iop_r);
 	DECLARE_WRITE16_MEMBER(iop_w);
-	void init_notetakr();
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -228,12 +233,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void notetakr(machine_config &config);
 	void iop_io(address_map &map);
 	void iop_mem(address_map &map);
 	void ep_io(address_map &map);
 	void ep_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -677,7 +681,7 @@ WRITE16_MEMBER(notetaker_state::EPConReg_w)
 	m_EP_LED3 = (data&0x20)?1:0;
 	m_EP_LED4 = (data&0x10)?1:0;
 	m_EP_LED_SelROM_q = (data&0x08)?1:0; // this doesn't appear to be hooked anywhere, andjust drives an LED
-	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision
+	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision in favor of having the IOP write the boot vectors for the EP to the shared ram instead. See below for how the top two address bits are disconnected to allow this to work with the way the shared ram is mapped.
 	m_EP_ProcLock = (data&0x04)?1:0; // bus lock for this processor (hold other processor in wait state)
 	m_EP_SetParity_q = (data&0x02)?1:0; // enable parity checking on local ram if low
 	m_EP_DisLMem_q = (data&0x01)?1:0; // if low, the low 8k of local memory is disabled and accesses the shared memory instead.
@@ -686,7 +690,7 @@ WRITE16_MEMBER(notetaker_state::EPConReg_w)
 
 /*
 Emulator cpu mem map:
-(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the processor when /reset is de-asserted by the iop)
+(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the ep processor when /reset is de-asserted by the iop)
 a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   DisLMem_q
 x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
 x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
@@ -827,7 +831,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (36_MHz_XTAL / 4) / 8) // See below
+	CRT5027(config, m_crtc, (36_MHz_XTAL / 4) / 8); // See below
 	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
 	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
 	   means divide by 1; documentation at
@@ -837,21 +841,23 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	   on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is
 	   written with 101, changing the divider to (36mhz/4)/8 */
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
-	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
+	m_crtc->set_char_width(8); //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	m_crtc->vsyn_callback().set("iop_pic8259", FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
+	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	AY31015(config, m_kbduart); // HD6402, == AY-3-1015D
+	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	m_kbduart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
 
-	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	AY31015(config, m_eiauart); // HD6402, == AY-3-1015D
+	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	m_eiauart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
 
 	/* Floppy */
-	MCFG_DEVICE_ADD("wd1791", FD1791, (((24_MHz_XTAL/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	FD1791(config, m_fdc, (((24_MHz_XTAL/3)/2)/2)); // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */

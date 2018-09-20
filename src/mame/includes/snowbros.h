@@ -23,6 +23,29 @@ public:
 		m_bootleg_spriteram16(*this, "spriteram16b")
 		{ }
 
+	void _4in1(machine_config &config);
+	void semiprot(machine_config &config);
+	void semicom_mcu(machine_config &config);
+	void yutnori(machine_config &config);
+	void snowbros(machine_config &config);
+	void semicom(machine_config &config);
+	void twinadv(machine_config &config);
+	void wintbob(machine_config &config);
+	void honeydol(machine_config &config);
+	void snowbro3(machine_config &config);
+	void finalttr(machine_config &config);
+
+	void init_pzlbreak();
+	void init_snowbro3();
+	void init_cookbib3();
+	void init_4in1boot();
+	void init_3in1semi();
+	void init_cookbib2();
+	void init_toto();
+	void init_hyperpac();
+	void init_yutnori();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
@@ -54,15 +77,6 @@ public:
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 	DECLARE_READ16_MEMBER(toto_read);
 
-	void init_pzlbreak();
-	void init_snowbro3();
-	void init_cookbib3();
-	void init_4in1boot();
-	void init_3in1semi();
-	void init_cookbib2();
-	void init_toto();
-	void init_hyperpac();
-	void init_yutnori();
 	DECLARE_MACHINE_RESET(semiprot);
 	DECLARE_MACHINE_RESET(finalttr);
 
@@ -78,17 +92,7 @@ public:
 
 	void sb3_play_music(int data);
 	void sb3_play_sound(int data);
-	void _4in1(machine_config &config);
-	void semiprot(machine_config &config);
-	void semicom_mcu(machine_config &config);
-	void yutnori(machine_config &config);
-	void snowbros(machine_config &config);
-	void semicom(machine_config &config);
-	void twinadv(machine_config &config);
-	void wintbob(machine_config &config);
-	void honeydol(machine_config &config);
-	void snowbro3(machine_config &config);
-	void finalttr(machine_config &config);
+
 	void finalttr_map(address_map &map);
 	void honeydol_map(address_map &map);
 	void honeydol_sound_io_map(address_map &map);

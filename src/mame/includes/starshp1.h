@@ -63,11 +63,12 @@ public:
 		m_led(*this, "led0")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(starshp1_analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
 	void starshp1(machine_config &config);
 
-protected:
+	DECLARE_CUSTOM_INPUT_MEMBER(starshp1_analog_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
+
+private:
 	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
 	DECLARE_WRITE8_MEMBER(starshp1_analog_in_w);

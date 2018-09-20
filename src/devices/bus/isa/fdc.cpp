@@ -164,8 +164,7 @@ MACHINE_CONFIG_START( isa8_ec1841_0003_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
 
-	MCFG_DEVICE_ADD("bus_mouse", BUS_MOUSE, 0)
-	MCFG_BUS_MOUSE_EXTINT_CALLBACK(WRITELINE(*this, isa8_ec1841_0003_device, aux_irq_w))
+	BUS_MOUSE(config, "bus_mouse", 0).extint_callback().set(FUNC(isa8_ec1841_0003_device::aux_irq_w));
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(ISA8_FDC_XT,      isa8_fdc_xt_device,      "isa8_fdc_xt",      "ISA 8bits XT FDC hookup")

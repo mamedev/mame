@@ -56,14 +56,13 @@ public:
 
 	void jungleyo(machine_config &config);
 
-public:
+private:
 	/* video-related */
 	virtual void video_start() override;
 	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jungleyo_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };

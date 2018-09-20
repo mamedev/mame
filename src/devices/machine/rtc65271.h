@@ -15,7 +15,7 @@
 //**************************************************************************
 
 #define MCFG_RTC65271_INTERRUPT_CB(cb) \
-	devcb = &downcast<rtc65271_device &>(*device).set_interrupt_callback(DEVCB_##cb);
+	downcast<rtc65271_device &>(*device).set_interrupt_callback(DEVCB_##cb);
 
 
 // ======================> rtc65271_device
@@ -28,6 +28,7 @@ public:
 	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_interrupt_callback(Object &&cb) { return m_interrupt_cb.set_callback(std::forward<Object>(cb)); }
+	auto interrupt_cb() { return m_interrupt_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_READ8_MEMBER( xram_r );

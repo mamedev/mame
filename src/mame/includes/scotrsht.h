@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -19,6 +19,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll")  { }
 
+	void scotrsht(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -52,7 +55,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void scotrsht(machine_config &config);
 	void scotrsht_map(address_map &map);
 	void scotrsht_sound_map(address_map &map);
 	void scotrsht_sound_port(address_map &map);

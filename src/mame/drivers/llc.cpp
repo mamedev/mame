@@ -202,10 +202,10 @@ GFXDECODE_END
 /* Machine driver */
 MACHINE_CONFIG_START(llc_state::llc1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'000'000))
-	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(llc1_mem)
-	MCFG_DEVICE_IO_MAP(llc1_io)
+	Z80(config, m_maincpu, XTAL(3'000'000));
+	m_maincpu->set_daisy_config(llc1_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &llc_state::llc1_mem);
+	m_maincpu->set_addrmap(AS_IO, &llc_state::llc1_io);
 
 	MCFG_MACHINE_START_OVERRIDE(llc_state, llc1 )
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc1 )
@@ -221,24 +221,24 @@ MACHINE_CONFIG_START(llc_state::llc1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEFAULT_LAYOUT(layout_llc1)
+	config.set_default_layout(layout_llc1);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, llc_state, llc1_port1_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, llc_state, llc1_port1_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, llc_state, llc1_port1_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
+	pio1.in_pa_callback().set(FUNC(llc_state::llc1_port1_a_r));
+	pio1.out_pa_callback().set(FUNC(llc_state::llc1_port1_a_w));
+	pio1.out_pb_callback().set(FUNC(llc_state::llc1_port1_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, llc_state, llc1_port2_a_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, llc_state, llc1_port2_b_r))
+	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
+	pio2.in_pa_callback().set(FUNC(llc_state::llc1_port2_a_r));
+	pio2.in_pb_callback().set(FUNC(llc_state::llc1_port2_b_r));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(3'000'000)));
 	// timer 0 irq does digit display, and timer 3 irq does scan of the
 	// monitor keyboard.
 	// No idea how the CTC is connected, so guessed.
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<1>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(llc_state, kbd_put))
@@ -246,10 +246,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(llc_state::llc2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'000'000))
-	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(llc2_mem)
-	MCFG_DEVICE_IO_MAP(llc2_io)
+	Z80(config, m_maincpu, XTAL(3'000'000));
+	m_maincpu->set_daisy_config(llc2_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &llc_state::llc2_mem);
+	m_maincpu->set_addrmap(AS_IO, &llc_state::llc2_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc2 )
 
@@ -270,21 +270,20 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, llc_state, llc2_port1_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, llc_state, llc2_port1_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
+	pio1.in_pa_callback().set(K7659_KEYBOARD_TAG, FUNC(k7659_keyboard_device::read));
+	pio1.in_pb_callback().set(FUNC(llc_state::llc2_port1_b_r));
+	pio1.out_pb_callback().set(FUNC(llc_state::llc2_port1_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, llc_state, llc2_port2_a_r))
+	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
+	pio2.in_pa_callback().set(FUNC(llc_state::llc2_port2_a_r));
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 
 	MCFG_K7659_KEYBOARD_ADD()
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 /* ROM definition */
 

@@ -156,8 +156,23 @@ class snesb_state : public snes_state
 {
 public:
 	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag) { }
+		: snes_state(mconfig, type, tag)
+	{ }
 
+	void mk3snes(machine_config &config);
+	void ffight2b(machine_config &config);
+	void kinstb(machine_config &config);
+
+	void init_iron();
+	void init_denseib();
+	void init_kinstb();
+	void init_sblast2b();
+	void init_ffight2b();
+	void init_endless();
+	void init_mk3snes();
+	void init_legendsb();
+
+private:
 	std::unique_ptr<int8_t[]> m_shared_ram;
 	uint8_t m_cnt;
 	std::unique_ptr<int8_t[]> m_shared_ram2;
@@ -176,18 +191,7 @@ public:
 	DECLARE_READ8_MEMBER(snesb_coin_r);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	void init_iron();
-	void init_denseib();
-	void init_kinstb();
-	void init_sblast2b();
-	void init_ffight2b();
-	void init_endless();
-	void init_mk3snes();
-	void init_legendsb();
 	DECLARE_MACHINE_RESET(ffight2b);
-	void mk3snes(machine_config &config);
-	void ffight2b(machine_config &config);
-	void kinstb(machine_config &config);
 	void mcu_io_map(address_map &map);
 	void snesb_map(address_map &map);
 	void spc_mem(address_map &map);
@@ -712,9 +716,9 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
-	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SNES_PPU(config, m_ppu, 0);
+	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
+	m_ppu->set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

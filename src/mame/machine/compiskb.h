@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &downcast<compis_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
+	downcast<compis_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
 
 
 

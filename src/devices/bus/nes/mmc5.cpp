@@ -18,9 +18,6 @@
 #include "emu.h"
 #include "mmc5.h"
 
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
-#include "sound/nes_apu.h"  // temp hack to pass the additional sound regs to APU...
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -470,7 +467,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 	if ((offset >= 0x1000) && (offset <= 0x1015))
 	{
-		m_sound->write(space, offset & 0x1f, data);
+		m_sound->write(offset & 0x1f, data);
 		return;
 	}
 

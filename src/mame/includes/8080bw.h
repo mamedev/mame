@@ -40,6 +40,48 @@ public:
 		m_guny(*this, "GUNY")
 	{ }
 
+	void indianbtbr(machine_config &config);
+	void claybust(machine_config &config);
+	void shuttlei(machine_config &config);
+	void spcewarla(machine_config &config);
+	void escmars(machine_config &config);
+	void lrescue(machine_config &config);
+	void invmulti(machine_config &config);
+	void yosakdon(machine_config &config);
+	void polaris(machine_config &config);
+	void attackfc(machine_config &config);
+	void astropal(machine_config &config);
+	void rollingc(machine_config &config);
+	void vortex(machine_config &config);
+	void invrvnge(machine_config &config);
+	void sflush(machine_config &config);
+	void invadpt2(machine_config &config);
+	void lupin3a(machine_config &config);
+	void indianbt(machine_config &config);
+	void starw1(machine_config &config);
+	void cosmo(machine_config &config);
+	void spcewars(machine_config &config);
+	void cosmicmo(machine_config &config);
+	void darthvdr(machine_config &config);
+	void ballbomb(machine_config &config);
+	void spacecom(machine_config &config);
+	void crashrd(machine_config &config);
+	void schasercv(machine_config &config);
+	void lupin3(machine_config &config);
+	void spacerng(machine_config &config);
+	void steelwkr(machine_config &config);
+	void schaser(machine_config &config);
+
+	void init_invmulti();
+	void init_spacecom();
+	void init_vortex();
+	void init_attackfc();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
+	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
+	DECLARE_CUSTOM_INPUT_MEMBER(claybust_gun_on_r);
+
+private:
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
@@ -64,10 +106,6 @@ public:
 	uint8_t m_schaser_background_disable;
 	uint8_t m_schaser_background_select;
 	uint16_t m_claybust_gun_pos;
-
-	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
-	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
-	DECLARE_CUSTOM_INPUT_MEMBER(claybust_gun_on_r);
 
 	DECLARE_READ8_MEMBER(indianbt_r);
 	DECLARE_READ8_MEMBER(polaris_port00_r);
@@ -124,11 +162,6 @@ public:
 	DECLARE_READ8_MEMBER(schaser_scattered_colorram_r);
 	DECLARE_WRITE8_MEMBER(schaser_scattered_colorram_w);
 
-	void init_invmulti();
-	void init_spacecom();
-	void init_vortex();
-	void init_attackfc();
-
 	DECLARE_MACHINE_START(extra_8080bw);
 	DECLARE_MACHINE_START(rollingc);
 	DECLARE_MACHINE_START(sflush);
@@ -172,37 +205,7 @@ public:
 	inline void set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, int color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
-	void indianbtbr(machine_config &config);
-	void claybust(machine_config &config);
-	void shuttlei(machine_config &config);
-	void spcewarla(machine_config &config);
-	void escmars(machine_config &config);
-	void lrescue(machine_config &config);
-	void invmulti(machine_config &config);
-	void yosakdon(machine_config &config);
-	void polaris(machine_config &config);
-	void attackfc(machine_config &config);
-	void astropal(machine_config &config);
-	void rollingc(machine_config &config);
-	void vortex(machine_config &config);
-	void invrvnge(machine_config &config);
-	void sflush(machine_config &config);
-	void invadpt2(machine_config &config);
-	void lupin3a(machine_config &config);
-	void indianbt(machine_config &config);
-	void starw1(machine_config &config);
-	void cosmo(machine_config &config);
-	void spcewars(machine_config &config);
-	void cosmicmo(machine_config &config);
-	void darthvdr(machine_config &config);
-	void ballbomb(machine_config &config);
-	void spacecom(machine_config &config);
-	void crashrd(machine_config &config);
-	void schasercv(machine_config &config);
-	void lupin3(machine_config &config);
-	void spacerng(machine_config &config);
-	void steelwkr(machine_config &config);
-	void schaser(machine_config &config);
+
 	void astropal_io_map(address_map &map);
 	void attackfc_io_map(address_map &map);
 	void ballbomb_io_map(address_map &map);

@@ -796,7 +796,7 @@ WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 WRITE8_MEMBER(bfm_sc2_state::nec_reset_w)
 {
 	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data);
+	m_upd7759->reset_w(data != 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -808,9 +808,9 @@ WRITE8_MEMBER(bfm_sc2_state::nec_latch_w)
 	if ( data & 0x80 )         bank |= 0x01;
 	if ( m_expansion_latch & 2 ) bank |= 0x02;
 
-	m_upd7759->set_bank_base(bank*0x20000);
+	m_upd7759->set_rom_bank(bank);
 
-	m_upd7759->port_w(space, 0, data&0x3F);    // setup sample
+	m_upd7759->port_w(data & 0x3f);    // setup sample
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -2284,15 +2284,14 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_vid_state, timer_irq,  1000)           // generate 1000 IRQ's per second
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_vid_state, e2ram_init)
-	MCFG_DEFAULT_LAYOUT(layout_sc2_vid)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
+	config.set_default_layout(layout_sc2_vid);
 
 	MCFG_BFM_ADDER2_ADD("adder2")
 
@@ -3754,8 +3753,7 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_awp_state, timer_irq,  1000)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
@@ -3767,11 +3765,11 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_awp_state, e2ram_init)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_awp_state::e2ram_init));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
+	config.set_default_layout(layout_sc2_vfd);
 
 	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<0>))
@@ -3814,8 +3812,7 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_dmd_state, timer_irq,  1000)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
@@ -3824,11 +3821,11 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_dmd_state, e2ram_init)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_dmd_state::e2ram_init));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
+	config.set_default_layout(layout_sc2_dmd);
 	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
 	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, bfm_sc2_dmd_state, bfmdm01_busy))
 

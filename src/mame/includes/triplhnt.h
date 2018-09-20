@@ -29,11 +29,6 @@
 class triplhnt_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_HIT
-	};
-
 	triplhnt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -52,14 +47,16 @@ public:
 		m_lamp(*this, "lamp0")
 	{ }
 
-	void init_triplhnt();
 	void triplhnt(machine_config &config);
 
-protected:
-	DECLARE_WRITE_LINE_MEMBER(ram_2_w);
-	DECLARE_WRITE_LINE_MEMBER(sprite_zoom_w);
-	DECLARE_WRITE_LINE_MEMBER(sprite_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
+	void init_triplhnt();
+
+private:
+	enum
+	{
+		TIMER_HIT
+	};
+
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(tape_control_w);
 
@@ -80,7 +77,6 @@ protected:
 	virtual void machine_start() override;
 	void triplhnt_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<f9334_device> m_latch;
 	required_device<watchdog_timer_device> m_watchdog;

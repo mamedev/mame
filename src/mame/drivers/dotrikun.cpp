@@ -49,6 +49,10 @@ public:
 		m_scanline_off_timer(*this, "scanline_off")
 	{ }
 
+	void dotrikun(machine_config &config);
+
+protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
@@ -67,7 +71,6 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void dotrikun(machine_config &config);
 	void dotrikun_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -229,7 +232,7 @@ ROM_END
 
 ROM_START( dotrikun2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "14479.mpr",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
+	ROM_LOAD( "epr-13141.ic2",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
 ROM_END
 
 ROM_START( dotriman )

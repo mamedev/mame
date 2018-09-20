@@ -29,7 +29,7 @@ public:
 
 	void tvboyii(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -38,7 +38,6 @@ protected:
 	void rom_map(address_map &map);
 	void tvboy_mem(address_map &map);
 
-private:
 	required_memory_bank m_crom;
 	required_region_ptr<uint8_t> m_rom;
 };
@@ -108,12 +107,12 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, tvboy_state, switch_B_w))
 	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, tvboy_state, irq_callback))
 #else
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, tvboy_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, tvboy_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(*this, tvboy_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, tvboy_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, tvboy_state, irq_callback))
+	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
+	m_riot->in_pa_callback().set(FUNC(tvboy_state::switch_A_r));
+	m_riot->out_pa_callback().set(FUNC(tvboy_state::switch_A_w));
+	m_riot->in_pb_callback().set(FUNC(tvboy_state::riot_input_port_8_r));
+	m_riot->out_pb_callback().set(FUNC(tvboy_state::switch_B_w));
+	m_riot->irq_callback().set(FUNC(tvboy_state::irq_callback));
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")

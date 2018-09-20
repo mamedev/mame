@@ -46,6 +46,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void locomotp(machine_config &config);
+	void zac_1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ctrl_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ_LINE_MEMBER(serial_r);
@@ -54,15 +58,14 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_int_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
-	void locomotp(machine_config &config);
-	void zac_1(machine_config &config);
+
 	void locomotp_data(address_map &map);
 	void locomotp_io(address_map &map);
 	void locomotp_map(address_map &map);
 	void zac_1_data(address_map &map);
 	void zac_1_io(address_map &map);
 	void zac_1_map(address_map &map);
-private:
+
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	uint8_t m_input_line;
@@ -264,13 +267,13 @@ MACHINE_CONFIG_START(zac_1_state::zac_1)
 	MCFG_DEVICE_DATA_MAP(zac_1_data)
 	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_1_state, serial_r))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_1_state, serial_w))
-	MCFG_NVRAM_ADD_0FILL("ram")
+	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_inttimer", zac_1_state, zac_1_inttimer, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_outtimer", zac_1_state, zac_1_outtimer, attotime::from_hz(187500))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_zac_1)
+	config.set_default_layout(layout_zac_1);
 
 	/* Sound */
 	genpin_audio(config);

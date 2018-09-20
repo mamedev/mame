@@ -38,6 +38,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void fp6000(machine_config &config);
+
+private:
 	uint8_t *m_char_rom;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_vram;
@@ -63,7 +66,6 @@ public:
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void fp6000(machine_config &config);
 	void fp6000_io(address_map &map);
 	void fp6000_map(address_map &map);
 };

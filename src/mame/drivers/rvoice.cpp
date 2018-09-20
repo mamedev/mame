@@ -16,10 +16,6 @@
 //#include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/terminal.h"
 
-/* Defines */
-
-#define TERMINAL_TAG "terminal"
-
 /* Components */
 
 struct hd63701y0_t
@@ -77,18 +73,24 @@ class rvoice_state : public driver_device
 {
 public:
 	rvoice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+			{ }
 
+	void rvoicepc(machine_config &config);
+
+	void init_rvoicepc();
+
+private:
 	hd63701y0_t m_hd63701y0;
 	rvoicepc_t m_rvoicepc;
 	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
-	void init_rvoicepc();
 	virtual void machine_reset() override;
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
-	void rvoicepc(machine_config &config);
+	required_device<generic_terminal_device> m_terminal;
 	void hd63701_main_io(address_map &map);
 	void hd63701_main_mem(address_map &map);
 };
@@ -375,14 +377,13 @@ MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	//MCFG_DEVICE_IO_MAP(hd63701_slave_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("acia65c51", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	mos6551_device &acia(MOS6551(config, "acia65c51", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(rvoice_state, null_kbd_put))
 
 MACHINE_CONFIG_END

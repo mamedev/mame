@@ -252,6 +252,7 @@ cosmic.cpp
 cps1.cpp
 cps2.cpp
 cps3.cpp
+cpzodiac.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
@@ -266,6 +267,7 @@ cultures.cpp
 cupidon.cpp
 cv1k.cpp
 cvs.cpp
+cwheel.cpp
 cyberbal.cpp
 cybertnk.cpp
 cybstorm.cpp
@@ -312,6 +314,7 @@ divebomb.cpp
 diverboy.cpp
 djboy.cpp
 djmain.cpp
+dkmb.cpp
 dkong.cpp
 dlair.cpp
 dlair2.cpp
@@ -834,6 +837,7 @@ nexus3d.cpp
 nibble.cpp
 nichild.cpp
 nightgal.cpp
+nightmare.cpp
 ninjakd2.cpp
 ninjaw.cpp
 nitedrvr.cpp
@@ -1311,8 +1315,10 @@ vendetta.cpp
 vertigo.cpp
 vicdual.cpp
 victory.cpp
+video21.cpp
 videopin.cpp
 videopkr.cpp
+videosaa.cpp
 vigilant.cpp
 vindictr.cpp
 viper.cpp

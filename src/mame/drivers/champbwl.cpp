@@ -165,13 +165,14 @@ Notes:
 class champbwl_state : public driver_device
 {
 public:
-	champbwl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	champbwl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
 		m_x1(*this, "x1snd"),
 		m_hopper(*this, "hopper"),
+		m_mainbank(*this, "mainbank"),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY") { }
 
@@ -182,6 +183,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
 	optional_device<ticket_dispenser_device> m_hopper;
+	optional_memory_bank m_mainbank;
 
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;
@@ -202,7 +204,7 @@ public:
 	void champbwl(machine_config &config);
 	void doraemon(machine_config &config);
 	void champbwl_map(address_map &map);
-	void doraemon(address_map &map);
+	void doraemon_map(address_map &map);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
@@ -247,13 +249,13 @@ WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
 	machine().bookkeeping().coin_lockout_w(0, ~data & 8);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 4);
 
-	membank("bank1")->set_entry((data & 0x30) >> 4);
+	m_mainbank->set_entry((data & 0x30) >> 4);
 }
 
 void champbwl_state::champbwl_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("maincpu", 0x10000);
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
+	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
 	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
@@ -285,15 +287,15 @@ WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));    // coin lockout
 	m_hopper->motor_w(BIT(~data, 2));  // gift out motor
 
-	membank("bank1")->set_entry((data & 0x30) >> 4);
+	m_mainbank->set_entry((data & 0x30) >> 4);
 
 //  popmessage("%02x", data);
 }
 
-void champbwl_state::doraemon(address_map &map)
+void champbwl_state::doraemon_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
 	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
@@ -455,7 +457,7 @@ MACHINE_START_MEMBER(champbwl_state,champbwl)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_mainbank->configure_entries(0, 4, &ROM[0], 0x4000);
 
 	save_item(NAME(m_screenflip));
 	save_item(NAME(m_last_trackball_val));
@@ -476,7 +478,7 @@ uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_in
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -495,7 +497,7 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_DEVICE_PROGRAM_MAP(champbwl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(champbwl_state,champbwl)
 	MCFG_MACHINE_RESET_OVERRIDE(champbwl_state,champbwl)
@@ -537,7 +539,7 @@ uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_in
 	m_seta001->set_bg_yoffsets( 0x00, 0x01 );
 	m_seta001->set_fg_yoffsets( 0x00, 0x10 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -551,17 +553,17 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank_doraemon)
 MACHINE_START_MEMBER(champbwl_state,doraemon)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_mainbank->configure_entries(0, 4, &ROM[0], 0x4000);
 }
 
 MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/4)
-	MCFG_DEVICE_PROGRAM_MAP(doraemon)
+	MCFG_DEVICE_PROGRAM_MAP(doraemon_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
@@ -592,8 +594,8 @@ MACHINE_CONFIG_END
 
 
 ROM_START( champbwl )
-	ROM_REGION( 0x20000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "ab001001.u1",  0x10000, 0x10000, CRC(6c6f7675) SHA1(19834f25f2644ae5d156c1e1bbb3fc50cae10fd2) )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "ab001001.u1",  0x00000, 0x10000, CRC(6c6f7675) SHA1(19834f25f2644ae5d156c1e1bbb3fc50cae10fd2) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "ab001007.u22", 0x00000, 0x20000, CRC(1ee9f6b1) SHA1(1a67e969b1f471ec7ada294b89185c15cde8c1ab) )
@@ -692,9 +694,8 @@ Notes:
 */
 
 ROM_START( doraemon )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "u1.bin", 0x00000, 0x20000, CRC(d338b9ca) SHA1(5f59c994db81577dc6074362c8b6b93f8fe592f6) )
-	ROM_RELOAD(         0x10000, 0x20000 )      /* banked at 4000-7fff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "u22.bin", 0x00000, 0x20000, CRC(b264ac2d) SHA1(0529fd1b88ba61dcf72019c7b01e9b939b6e3f2e) )

@@ -61,6 +61,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void wyvernf0(machine_config &config);
+
+private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -109,7 +112,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void wyvernf0(machine_config &config);
+
 	void sound_map(address_map &map);
 	void wyvernf0_map(address_map &map);
 };

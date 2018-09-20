@@ -25,7 +25,7 @@ public:
 
 	void lb186(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(sio_out_w);
 	DECLARE_WRITE8_MEMBER(drive_sel_w);
 	DECLARE_READ8_MEMBER(scsi_dack_r);
@@ -35,7 +35,6 @@ protected:
 	void lb186_io(address_map &map);
 	void lb186_map(address_map &map);
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
 	required_device<ncr5380n_device> m_scsi;
@@ -149,9 +148,9 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int2_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats)

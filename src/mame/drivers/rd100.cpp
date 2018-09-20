@@ -33,13 +33,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void rd100(machine_config &config);
+
 	void init_rd100();
+
+private:
 	DECLARE_MACHINE_RESET(rd100);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void rd100(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 

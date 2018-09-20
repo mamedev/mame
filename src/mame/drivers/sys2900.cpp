@@ -54,26 +54,28 @@ Status:
 class sys2900_state : public driver_device
 {
 public:
+	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void sys2900(machine_config &config);
+
+	void init_sys2900();
+
+private:
 	enum
 	{
 		TIMER_BOOT
 	};
-
-	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
-
-	void init_sys2900();
 	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sys2900(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -156,10 +158,10 @@ MACHINE_CONFIG_START(sys2900_state::sys2900)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
-	MCFG_DEVICE_ADD("sio1", Z80SIO, 0)
-	MCFG_DEVICE_ADD("sio2", Z80SIO, 0)
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
+	Z80SIO(config, "sio1", 0);
+	Z80SIO(config, "sio2", 0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

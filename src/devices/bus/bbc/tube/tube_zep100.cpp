@@ -57,30 +57,31 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_tube_zep100_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("z80", Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tube_zep100_mem)
-	MCFG_DEVICE_IO_MAP(tube_zep100_io)
+void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_z80, XTAL(4'000'000));
+	m_z80->set_addrmap(AS_PROGRAM, &bbc_tube_zep100_device::tube_zep100_mem);
+	m_z80->set_addrmap(AS_IO, &bbc_tube_zep100_device::tube_zep100_io);
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 2)
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bbc_tube_zep100_device, via_pb_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE("ppi", i8255_device, pc2_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE("ppi", i8255_device, pc6_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
+	VIA6522(config, m_via, XTAL(4'000'000) / 2);
+	m_via->writepb_handler().set(FUNC(bbc_tube_zep100_device::via_pb_w));
+	m_via->cb2_handler().set(m_ppi, FUNC(i8255_device::pc2_w));
+	m_via->ca2_handler().set(m_ppi, FUNC(i8255_device::pc6_w));
+	m_via->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("via", via6522_device, write_pa))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, bbc_tube_zep100_device, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bbc_tube_zep100_device, ppi_pc_w))
+	I8255A(config, m_ppi, 0);
+	m_ppi->out_pa_callback().set(m_via, FUNC(via6522_device::write_pa));
+	m_ppi->in_pb_callback().set(FUNC(bbc_tube_zep100_device::ppi_pb_r));
+	m_ppi->out_pc_callback().set(FUNC(bbc_tube_zep100_device::ppi_pc_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram);
+	m_ram->set_default_size("64K");
+	m_ram->set_default_value(0x00);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_torch", "bbc_flop_torch")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_torch").set_type("bbc_flop_torch", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -139,7 +140,7 @@ void bbc_tube_zep100_device::device_reset()
 
 READ8_MEMBER(bbc_tube_zep100_device::host_r)
 {
-	return m_via->read(space, offset & 0x0f);
+	return m_via->read(offset & 0x0f);
 }
 
 WRITE8_MEMBER(bbc_tube_zep100_device::host_w)
@@ -147,7 +148,7 @@ WRITE8_MEMBER(bbc_tube_zep100_device::host_w)
 	if (offset & 0x10)
 		m_z80->reset();
 
-	m_via->write(space, offset & 0x0f, data);
+	m_via->write(offset & 0x0f, data);
 }
 
 

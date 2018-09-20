@@ -17,7 +17,7 @@
 //**************************************************************************
 
 #define MCFG_SVISION_SOUND_IRQ_CALLBACK(_devcb) \
-	devcb = &downcast<svision_sound_device&>(*device).set_irq_cb(DEVCB_##_devcb);
+	downcast<svision_sound_device&>(*device).set_irq_cb(DEVCB_##_devcb);
 
 // ======================> svision_sound_device
 

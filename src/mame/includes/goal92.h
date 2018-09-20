@@ -27,6 +27,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void goal92(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg_data;
 	required_shared_ptr<uint16_t> m_fg_data;
@@ -73,7 +76,6 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(goal92_adpcm_int);
-	void goal92(machine_config &config);
 	void goal92_map(address_map &map);
 	void sound_cpu(address_map &map);
 };

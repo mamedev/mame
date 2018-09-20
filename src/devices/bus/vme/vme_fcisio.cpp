@@ -277,7 +277,7 @@ ROM_END
 
 MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68010, CPU_CLOCK / 2)
+	MCFG_DEVICE_ADD("maincpu", M68010, CPU_CLOCK / 2)
 	MCFG_DEVICE_PROGRAM_MAP (fcisio1_mem)
 
 	/* DUSCC channels */
@@ -300,11 +300,11 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
 	/* RS232 for DUSCC 0 */
-	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD(RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc0", duscc68562_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc0", duscc68562_device, ctsa_w))
 
-	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc0", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc0", duscc68562_device, ctsb_w))
 
@@ -318,11 +318,11 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
 	/* RS232 for DUSCC 1 */
-	MCFG_DEVICE_ADD (RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc1", duscc68562_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc1", duscc68562_device, ctsa_w))
 
-	MCFG_DEVICE_ADD (RS232P4_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232P4_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc1", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc1", duscc68562_device, ctsb_w))
 
@@ -336,11 +336,11 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P6_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P6_TAG, rs232_port_device, write_rts))
 	/* RS232 for DUSCC 2 */
-	MCFG_DEVICE_ADD (RS232P5_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232P5_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsa_w))
 
-	MCFG_DEVICE_ADD (RS232P6_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232P6_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsb_w))
 
@@ -354,18 +354,18 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P8_TAG, rs232_port_device, write_dtr))
 	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P8_TAG, rs232_port_device, write_rts))
 	/* RS232 for DUSCC 4 */
-	MCFG_DEVICE_ADD (RS232P7_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc3", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc3", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232P7_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE ("duscc3", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE ("duscc3", duscc68562_device, ctsa_w))
 
-	MCFG_DEVICE_ADD (RS232P8_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc3", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc3", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232P8_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE ("duscc3", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE ("duscc3", duscc68562_device, ctsb_w))
 
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(20'000'000) / 2)
-	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, vme_fcisio1_card_device, config_rd))
+	PIT68230(config, m_pit, XTAL(20'000'000) / 2);
+	m_pit->pb_in_callback().set(FUNC(vme_fcisio1_card_device::config_rd));
 
-	MCFG_MC68153_ADD("bim", XTAL(20'000'000) / 2)
+	MC68153(config, "bim", XTAL(20'000'000) / 2);
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const

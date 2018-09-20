@@ -83,7 +83,7 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		m_gfxdecode->gfx(m_sprite_zoom)->opaque(m_helper,cliprect,
 			2 * code + m_sprite_bank, 0, code & 8, 0,
-			rect.min_x, rect.min_y);
+			rect.left(), rect.top());
 
 		rect &= cliprect;
 
@@ -93,9 +93,9 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int x;
 			int y;
 
-			for (x = rect.min_x; x <= rect.max_x; x++)
+			for (x = rect.left(); x <= rect.right(); x++)
 			{
-				for (y = rect.min_y; y <= rect.max_y; y++)
+				for (y = rect.top(); y <= rect.bottom(); y++)
 				{
 					pen_t a = m_helper.pix16(y, x);
 					pen_t b = bitmap.pix16(y, x);

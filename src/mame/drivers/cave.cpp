@@ -2103,7 +2103,7 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2143,7 +2143,7 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2182,7 +2182,7 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2228,7 +2228,7 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2270,7 +2270,7 @@ MACHINE_CONFIG_START(cave_state::gaia)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2307,7 +2307,7 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2349,7 +2349,7 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_DEVICE_IO_MAP(hotdogst_sound_portmap)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2398,7 +2398,7 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2446,11 +2446,10 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_DEVICE_PROGRAM_MAP(mazinger_sound_map)
 	MCFG_DEVICE_IO_MAP(mazinger_sound_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2502,11 +2501,10 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_DEVICE_PROGRAM_MAP(metmqstr_sound_map)
 	MCFG_DEVICE_IO_MAP(metmqstr_sound_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)    /* start with the watchdog armed */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2550,19 +2548,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::pacslot)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(pacslot_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C46_16BIT(config, "eeprom", eeprom_serial_streaming::ENABLE);
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2615,11 +2612,10 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_DEVICE_PROGRAM_MAP(ppsatan_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(1));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_lev2", cave_state, timer_lev2_cb, attotime::from_hz(60))
 
@@ -2651,7 +2647,7 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppsatan)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,ppsatan)
-	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
+	config.set_default_layout(layout_ppsatan);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
@@ -2683,7 +2679,7 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_DEVICE_IO_MAP(pwrinst2_sound_portmap)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2758,7 +2754,7 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2804,19 +2800,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::tekkencw)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(tekkencw_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C46_16BIT(config, "eeprom", eeprom_serial_streaming::ENABLE);
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2858,19 +2853,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::tjumpman)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(tjumpman_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C46_16BIT(config, "eeprom", eeprom_serial_streaming::ENABLE);
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2911,7 +2905,7 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	MCFG_DEVICE_PROGRAM_MAP(uopoko_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 

@@ -31,10 +31,10 @@ DECLARE_DEVICE_TYPE(DL1416T, dl1416_device)
 ***************************************************************************/
 
 #define MCFG_DL1414_UPDATE_HANDLER(_devcb) \
-	devcb = &downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
+	downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
 
 #define MCFG_DL1416_UPDATE_HANDLER(_devcb) \
-	devcb = &downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
+	downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
 
 
 /***************************************************************************

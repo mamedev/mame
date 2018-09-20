@@ -609,21 +609,21 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_DEVICE_ADD("cpu3", Z80, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(docastle_map3)
 
-	MCFG_DEVICE_ADD("inp1", TMS1025, 0)
-	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2"))
-	MCFG_TMS1025_READ_PORT_CB(PORT2, IOPORT("DSW1"))
-	MCFG_TMS1025_READ_PORT_CB(PORT3, IOPORT("JOYS"))
-	MCFG_TMS1025_READ_PORT_CB(PORT5, IOPORT("BUTTONS"))
-	MCFG_TMS1025_READ_PORT_CB(PORT7, IOPORT("SYSTEM"))
+	TMS1025(config, m_inp[0]);
+	m_inp[0]->read_port1_callback().set_ioport("DSW2");
+	m_inp[0]->read_port2_callback().set_ioport("DSW1");
+	m_inp[0]->read_port3_callback().set_ioport("JOYS");
+	m_inp[0]->read_port5_callback().set_ioport("BUTTONS");
+	m_inp[0]->read_port7_callback().set_ioport("SYSTEM");
 
-	MCFG_DEVICE_ADD("inp2", TMS1025, 0)
-	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(PORT2, IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(PORT3, IOPORT("JOYS")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(PORT5, IOPORT("BUTTONS")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(PORT7, IOPORT("SYSTEM")) MCFG_DEVCB_RSHIFT(4)
+	TMS1025(config, m_inp[1]);
+	m_inp[1]->read_port1_callback().set_ioport("DSW2").rshift(4);
+	m_inp[1]->read_port2_callback().set_ioport("DSW1").rshift(4);
+	m_inp[1]->read_port3_callback().set_ioport("JOYS").rshift(4);
+	m_inp[1]->read_port5_callback().set_ioport("BUTTONS").rshift(4);
+	m_inp[1]->read_port7_callback().set_ioport("SYSTEM").rshift(4);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(9'828'000) / 16)
@@ -686,11 +686,9 @@ MACHINE_CONFIG_START(docastle_state::idsoccer)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(idsoccer_map)
 
-	MCFG_DEVICE_MODIFY("inp1")
-	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT"))
+	m_inp[0]->read_port4_callback().set_ioport("JOYS_RIGHT");
 
-	MCFG_DEVICE_MODIFY("inp2")
-	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT")) MCFG_DEVCB_RSHIFT(4)
+	m_inp[1]->read_port4_callback().set_ioport("JOYS_RIGHT").rshift(4);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)

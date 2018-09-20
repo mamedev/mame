@@ -75,6 +75,13 @@ public:
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void jackie(machine_config &config);
+
+	void init_jackie();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);
@@ -97,22 +104,18 @@ public:
 	void unk_reg_hi_w( int offset, uint8_t data, int reg );
 	void show_out();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
-	void init_jackie();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void jackie(machine_config &config);
 	void jackie_io_map(address_map &map);
 	void jackie_prg_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -619,14 +622,14 @@ MACHINE_CONFIG_START(jackie_state::jackie)
 	MCFG_DEVICE_IO_MAP(jackie_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0) // D8255AC
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jackie_state, nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi1(I8255A(config, "ppi1")); // D8255AC
+	ppi1.out_pa_callback().set(FUNC(jackie_state::nmi_and_coins_w));
+	ppi1.in_pb_callback().set_ioport("SERVICE");
+	ppi1.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0) // D8255AC
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jackie_state, lamps_w))
+	i8255_device &ppi2(I8255A(config, "ppi2")); // D8255AC
+	ppi2.in_pa_callback().set_ioport("BUTTONS1");
+	ppi2.out_pb_callback().set(FUNC(jackie_state::lamps_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

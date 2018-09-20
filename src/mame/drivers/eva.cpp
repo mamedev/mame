@@ -39,6 +39,11 @@ public:
 		m_tms6100(*this, "tms6100")
 	{ }
 
+	void tms5110_route(machine_config &config);
+	void eva11(machine_config &config);
+	void eva24(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tms5110_device> m_tms5100;
@@ -56,11 +61,6 @@ public:
 	DECLARE_WRITE16_MEMBER(eva11_write_o);
 	DECLARE_WRITE16_MEMBER(eva11_write_r);
 
-	void tms5110_route(machine_config &config);
-	void eva11(machine_config &config);
-	void eva24(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

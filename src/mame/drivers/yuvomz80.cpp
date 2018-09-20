@@ -50,12 +50,14 @@ public:
 
 	void goldhexa(machine_config &config);
 	void hexapres(machine_config &config);
+
+private:
 	void audio_io_map(address_map &map);
 	void audio_mem_map(address_map &map);
 	void hexapres_audio_io_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -17,11 +17,6 @@
 class vendetta_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_Z80_NMI
-	};
-
 	vendetta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -35,6 +30,14 @@ public:
 		m_videobank0(*this, "videobank0"),
 		m_videobank1(*this, "videobank1") { }
 
+	void esckids(machine_config &config);
+	void vendetta(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_Z80_NMI
+	};
 
 	/* video-related */
 	int        m_layer_colorbase[3];
@@ -77,13 +80,11 @@ public:
 	DECLARE_WRITE8_MEMBER(banking_callback);
 	K053246_CB_MEMBER(sprite_callback);
 
-	void esckids(machine_config &config);
-	void vendetta(machine_config &config);
 	void esckids_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void videobank0_map(address_map &map);
 	void videobank1_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

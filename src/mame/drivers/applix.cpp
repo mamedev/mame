@@ -101,6 +101,11 @@ public:
 		m_expansion(*this, "expansion"),
 		m_palette(*this, "palette"){ }
 
+	void applix(machine_config &config);
+
+	void init_applix();
+
+private:
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(analog_latch_w);
@@ -135,7 +140,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
-	void init_applix();
+
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
@@ -144,13 +149,13 @@ public:
 	DECLARE_PALETTE_INIT(applix);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
-	void applix(machine_config &config);
+
 	void applix_mem(address_map &map);
 	void keytronic_pc3270_io(address_map &map);
 	void keytronic_pc3270_program(address_map &map);
 	void subcpu_io(address_map &map);
 	void subcpu_mem(address_map &map);
-private:
+
 	uint8_t m_pb;
 	uint8_t m_analog_latch;
 	uint8_t m_dac_latch;
@@ -205,7 +210,7 @@ private:
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
 	required_shared_ptr<uint16_t> m_expansion;
-public:
+
 	required_device<palette_device> m_palette;
 };
 
@@ -888,14 +893,14 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, applix_state, vsync_w))
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, 30_MHz_XTAL / 4 / 10) // VIA uses 68000 E clock
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, applix_state, applix_pb_r))
+	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
+	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));
 	// in CB1 kbd clk
 	// in CA2 vsync
 	// in CB2 kdb data
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, applix_state, applix_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, applix_state, applix_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
+	m_via->writepa_handler().set(FUNC(applix_state::applix_pa_w));
+	m_via->writepb_handler().set(FUNC(applix_state::applix_pb_w));
+	m_via->irq_handler().set_inputline("maincpu", M68K_IRQ_2);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
@@ -906,7 +911,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2) //connected to Z80H clock pin
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", applix_floppies, "35dd", applix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", applix_floppies, "35dd", applix_state::floppy_formats)

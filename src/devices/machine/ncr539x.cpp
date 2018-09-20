@@ -56,7 +56,7 @@ enum
 #define CR2_GENERATE_REGISTER_PARITY    0x02
 #define CR2_GENERATE_DATA_PARITY    0x01
 
-static const char *rdregs[16] = {
+static char const *const rdregs[16] = {
 	"Transfer count LSB",   // 0
 	"Transfer count MSB",   // 1
 	"FIFO",                 // 2
@@ -75,7 +75,7 @@ static const char *rdregs[16] = {
 	"0xF"
 };
 
-static const char *wrregs[16] = {
+static char const *const wrregs[16] = {
 	"Start Transfer count LSB",
 	"Start Transfer count MSB",
 	"FIFO",

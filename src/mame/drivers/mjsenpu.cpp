@@ -65,6 +65,11 @@ public:
 	{
 	}
 
+	void mjsenpu(machine_config &config);
+
+	void init_mjsenpu();
+
+private:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -94,14 +99,12 @@ public:
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);
 
-	void init_mjsenpu();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
-	void mjsenpu(machine_config &config);
 	void mjsenpu_32bit_map(address_map &map);
 	void mjsenpu_io(address_map &map);
 };
@@ -468,7 +471,7 @@ MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 	MCFG_DEVICE_IO_MAP(mjsenpu_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// more likely coins out?
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)

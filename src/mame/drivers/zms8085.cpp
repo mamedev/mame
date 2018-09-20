@@ -32,6 +32,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void zephyr(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(special_r);
@@ -39,10 +42,9 @@ public:
 
 	virtual void machine_start() override;
 
-	void zephyr(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ay51013_device> m_uart;
 	required_device<rs232_port_device> m_rs232;
@@ -64,7 +66,7 @@ u32 zms8085_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			u8 code = m_mainram[(ch + pos) & 0xfff];
 			u8 data = m_p_chargen[(code & 0x7f) * 16 + y % 10];
 			for (int bit = 7; bit >= 0; bit--)
-				bitmap.pix(y, x++) = BIT(data, bit) ? rgb_t::black() : rgb_t::green();
+				bitmap.pix(y, x++) = BIT(data, bit) ? rgb_t::black() : rgb_t::white();
 			bitmap.pix(y, x++) = rgb_t::black();
 			bitmap.pix(y, x++) = rgb_t::black();
 			bitmap.pix(y, x++) = rgb_t::black();
@@ -127,15 +129,15 @@ MACHINE_CONFIG_START(zms8085_state::zephyr)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'582'000), 980, 0, 800, 265, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(zms8085_state, screen_update)
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // SMC COM2017
-	MCFG_AY51013_TX_CLOCK(153600) // should actually be configurable somehow
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_AY51013_WRITE_DAV_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_AY51013_AUTO_RDAV(true)
+	AY51013(config, m_uart); // SMC COM2017
+	m_uart->set_tx_clock(153600); // should actually be configurable somehow
+	m_uart->set_rx_clock(153600);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->write_dav_callback().set_inputline("maincpu", I8085_RST65_LINE);
+	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

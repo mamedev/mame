@@ -115,6 +115,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void vpoker(machine_config &config);
+
+private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_blit_ram[8];
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -125,7 +128,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void vpoker(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -634,7 +636,7 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 MACHINE_CONFIG_START(vpoker_state::vpoker)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6809,XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
 
@@ -653,9 +655,9 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(4'000'000))
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, vpoker_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(4'000'000) / 4));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.irq_callback().set(FUNC(vpoker_state::ptm_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

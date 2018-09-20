@@ -34,7 +34,7 @@
 	downcast<upd72065_device *>(device)->set_select_lines_connected(_select);
 
 #define MCFG_I82072_ADD(_tag, _ready)   \
-	MCFG_DEVICE_ADD(_tag, I82072, 0)    \
+	MCFG_DEVICE_ADD(_tag, I82072, 24_MHz_XTAL) \
 	downcast<i82072_device *>(device)->set_ready_line_connected(_ready);
 
 #define MCFG_SMC37C78_ADD(_tag) \
@@ -63,16 +63,16 @@
 	MCFG_DEVICE_ADD(_tag, TC8566AF, 0)
 
 #define MCFG_MCS3201_INPUT_HANDLER(_devcb) \
-	devcb = &downcast<mcs3201_device &>(*device).set_input_handler(DEVCB_##_devcb);
+	downcast<mcs3201_device &>(*device).set_input_handler(DEVCB_##_devcb);
 
 #define MCFG_UPD765_INTRQ_CALLBACK(_write) \
-	devcb = &downcast<upd765_family_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<upd765_family_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD765_DRQ_CALLBACK(_write) \
-	devcb = &downcast<upd765_family_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<upd765_family_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD765_HDL_CALLBACK(_write) \
-	devcb = &downcast<upd765_family_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
+	downcast<upd765_family_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
 
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
@@ -104,6 +104,9 @@ public:
 	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_hdl_wr_callback(Object &&cb) { return hdl_cb.set_callback(std::forward<Object>(cb)); }
+	auto intrq_wr_callback() { return intrq_cb.bind(); }
+	auto drq_wr_callback() { return drq_cb.bind(); }
+	auto hdl_wr_callback() { return hdl_cb.bind(); }
 
 	virtual void map(address_map &map) override = 0;
 
@@ -346,8 +349,8 @@ protected:
 	emu_timer *poll_timer;
 
 	static std::string tts(attotime t);
-	std::string results();
-	std::string ttsn();
+	std::string results() const;
+	std::string ttsn() const;
 
 	enum {
 		C_CONFIGURE,
@@ -431,10 +434,19 @@ protected:
 
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
+
+	virtual u8 get_drive_busy() const { return 0; }
+	virtual void clr_drive_busy() { };
 };
 
 class upd765a_device : public upd765_family_device {
 public:
+	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, bool ready, bool select)
+		: upd765a_device(mconfig, tag, owner, 0U)
+	{
+		set_ready_line_connected(ready);
+		set_select_lines_connected(select);
+	}
 	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
@@ -476,11 +488,16 @@ protected:
 	virtual void execute_command(int cmd) override;
 	virtual void command_end(floppy_info &fi, bool data_completion) override;
 	virtual void index_callback(floppy_image_device *floppy, int state) override;
+	virtual u8 get_drive_busy() const override { return drive_busy; };
+	virtual void clr_drive_busy() override { drive_busy = 0; };
 
 	void motor_control(int fid, bool start_motor);
 
+private:
 	u8 motor_off_counter;
 	u8 motor_on_counter;
+	u8 drive_busy;
+	int delayed_command;
 };
 
 class smc37c78_device : public upd765_family_device {
@@ -492,9 +509,17 @@ public:
 
 class upd72065_device : public upd765_family_device {
 public:
+	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready, bool select)
+		: upd72065_device(mconfig, tag, owner, clock)
+	{
+		set_ready_line_connected(ready);
+		set_select_lines_connected(select);
+	}
+
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+	DECLARE_WRITE8_MEMBER(auxcmd_w);
 };
 
 class n82077aa_device : public upd765_family_device {

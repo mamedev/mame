@@ -534,10 +534,10 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kyugo_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kyugo_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(kyugo_state::nmi_mask_w));
+	mainlatch.q_out_cb<1>().set(FUNC(kyugo_state::flipscreen_w));
+	mainlatch.q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -566,7 +566,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kyugo_state::gyrodine)
 	kyugo_base(config);
 	/* add watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gyrodine_main_map)
 MACHINE_CONFIG_END

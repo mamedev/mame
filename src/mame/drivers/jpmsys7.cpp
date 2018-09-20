@@ -34,8 +34,9 @@ public:
 	{ }
 
 	void jpmsys7(machine_config &config);
+
+private:
 	void jpmsys7_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

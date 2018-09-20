@@ -133,7 +133,7 @@ Example:
 
 .. _mame-commandline-listroms:
 
-**-listroms** [<*pattern*>]
+**-listroms** / **-lr** [<*pattern*>]
 
 	Displays a list of ROM images referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
 
@@ -174,13 +174,13 @@ Example:
 
 .. _mame-commandline-listslots:
 
-**-listslots** [<*pattern*>]
+**-listslots** / **-lslot** [<*pattern*>]
 
         Show available slots and options for each slot (if available). Primarily used for MAME to allow control over internal plug-in cards, much like PCs needing video, sound and other expansion cards.
 		
 		If slots are populated with devices, any additional slots those devices provide will be visible with **-listslots** as well. For instance, installing a floppy controller into a PC will expose the disk drive slots.
 		
-        The slot name (e.g. **ctrl1**) can be used from the command line (**-ctrl1** in this case) 
+        The slot name (e.g. **ctrl1**) can be used from the command line (**-ctrl1** in this case)
 
 .. _mame-commandline-listmedia:
 
@@ -190,25 +190,25 @@ Example:
 
 .. _mame-commandline-listsoftware:
 
-**-listsoftware** [<*pattern*>]
+**-listsoftware** / **-lsoft** [<*pattern*>]
 
         Posts to screen all software lists which can be used by the entered *pattern* or system. Note that this is simply a copy/paste of the .XML file which reside in the HASH folder which are allowed to be used.
 
 .. _mame-commandline-verifysoftware:
 
-**-verifysoftware** [<*pattern*>]
+**-verifysoftware** / **-vsoft** [<*pattern*>]
 
 	Checks for invalid or missing ROM images in your software lists. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific driver name or *pattern* after the -verifysoftware command.
 
 .. _mame-commandline-getsoftlist:
 
-**-getsoftlist** [<*pattern*>]
+**-getsoftlist** / **-glist** [<*pattern*>]
 
         Posts to screen a specific software list which matches with the system name provided.
 
 .. _mame-commandline-verifysoftlist:
 
-**-verifysoftlist** [softwarelistname]
+**-verifysoftlist** / **-vlist** [softwarelistname]
 
 	Checks a specified software list for missing ROM images if files exist for issued softwarelistname. By default, all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific softwarelistname (without .XML) after the -verifysoftlist command.
 
@@ -539,13 +539,13 @@ Core State/Playback Options
 
 **-snapname** *<name>*
 
-	Describes how MAME should name files for snapshots. <name> is a string that provides a template that is used to generate a filename. 
+	Describes how MAME should name files for snapshots. <name> is a string that provides a template that is used to generate a filename.
 	
 	Three simple substitutions are provided: the / character represents the path separator on any target platform (even Windows); the string %g represents the driver name of the current system; and the string %i represents an incrementing index. If %i is omitted, then each snapshot taken will overwrite the previous one; otherwise, MAME will find the next empty value for %i and use that for a filename.
 	
 	The default is %g/%i, which creates a separate folder for each system, and names the snapshots under it starting with 0000 and increasing from there.
 	
-	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use. 
+	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use.
 	
 	A few examples: if you use 'mame robby -snapname foo/%g%i' snapshots will be saved as 'snaps\\foo\\robby0000.png' , 'snaps\\foo\\robby0001.png' and so on; if you use 'mame nes -cart robby -snapname %g/%d_cart' snapshots will be saved as 'snaps\\nes\\robby.png' ; if you use 'mame c64 -flop1 robby -snapname %g/%d_flop1/%i' snapshots will be saved as 'snaps\\c64\\robby\\0000.png'.
 
@@ -579,7 +579,7 @@ Core State/Playback Options
 	
 	The default is %g, which creates a separate folder for each system.
 	
-	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use. 
+	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use.
 	
 	A few examples: if you use 'mame robby -statename foo/%g' save states will be stored inside 'sta\\foo\\robby\\' ; if you use 'mame nes -cart robby -statename %g/%d_cart' save states will be stored inside 'sta\\nes\\robby\\' ; if you use 'mame c64 -flop1 robby -statename %g/%d_flop1' save states will be stored inside 'sta\\c64\\robby\\'.
 
@@ -671,7 +671,7 @@ Core Rotation Options
 
 | **-[no]ror**
 | **-[no]rol**
-| 
+|
 |
 |	Rotate the system screen to the right (clockwise) or left (counter-clockwise) relative to either its normal state (if **-rotate** is specified) or its native state (if **-norotate** is specified). The default for both of these options is OFF (*-noror -norol*).
 |
@@ -684,7 +684,7 @@ Core Rotation Options
 
 | **-[no]autoror**
 | **-[no]autorol**
-| 
+|
 |
 |	These options are designed for use with pivoting screens that only pivot in a single direction. If your screen only pivots clockwise, use -autorol to ensure that the system will fill the screen either horizontally or vertically in one of the directions you can handle. If your screen only pivots counter-clockwise, use **-autoror**.
 |
@@ -697,7 +697,7 @@ Core Rotation Options
 
 | **-[no]flipx**
 | **-[no]flipy**
-| 
+|
 |
 |	Flip (mirror) the system screen either horizontally (-flipx) or vertically (-flipy). The flips are applied after the -rotate and -ror/-rol options are applied. The default for both of these options is OFF (*-noflipx -noflipy*).
 |
@@ -825,7 +825,7 @@ NOTE:  **Multiple Screens may fail to work correctly on some Mac machines as of 
 |
 |	Specifies which physical monitor on your system you wish to have each window use by default. In order to use multiple windows, you must have increased the value of the **-numscreens** option. The name of each display in your system can be determined by running MAME with the -verbose option. The display names are typically in the format of: *\\\\.\\DISPLAYn*, where 'n' is a number from 1 to the number of connected monitors. The default value for these options is '*auto*', which means that the first window is placed on the first display, the second window on the second display, etc.
 |
-|	The **-screen0**, **-screen1**, **-screen2**, **-screen3** parameters apply to the specific window. The **-screen** parameter applies to all windows. The window-specific options override values from the all window option. 
+|	The **-screen0**, **-screen1**, **-screen2**, **-screen3** parameters apply to the specific window. The **-screen** parameter applies to all windows. The window-specific options override values from the all window option.
 |
 |
 
@@ -1184,7 +1184,7 @@ Core Input Options
  +-------------------------------------------------------------------------------------------+
  | 777888999.777888999.777888999.444555666.444555666.444555666.111222333.111222333.111222333 |
  +-------------------------------------------------------------------------------------------+
- 
+
 	However, this can be reduced using several shorthands supported by the <map> parameter. If information about a row is missing, then it is assumed that any missing data in columns 5-9 are left/right symmetric with data in columns 0-4; and any missing data in columns 0-4 is assumed to be copies of the previous data. The same logic applies to missing rows, except that up/down symmetry is assumed.
 
 	By using these shorthands, the 81 character map can be simply specified by this 11 character string: 7778...4445
@@ -1446,7 +1446,7 @@ Core Misc Options
 
 **-autoboot_command** *"<command>"*
 
-	Command string to execute after machine boot (in quotes " "). To issue a quote to the emulation, use """ in the string. Using **\\n** will issue a create a new line, issuing what was typed prior as a command. 
+	Command string to execute after machine boot (in quotes " "). To issue a quote to the emulation, use """ in the string. Using **\\n** will issue a create a new line, issuing what was typed prior as a command.
 
 	Example:  -autoboot_command "load """$""",8,1\\n"
 

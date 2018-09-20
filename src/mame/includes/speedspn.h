@@ -20,6 +20,9 @@ public:
 		m_okibank(*this, "okibank"),
 		m_attram(*this, "attram") { }
 
+	void speedspn(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
@@ -49,7 +52,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void speedspn(machine_config &config);
+
 	void io_map(address_map &map);
 	void oki_map(address_map &map);
 	void program_map(address_map &map);

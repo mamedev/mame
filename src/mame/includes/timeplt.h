@@ -28,6 +28,14 @@ public:
 		m_spriteram2(*this, "spriteram2")
 	{ }
 
+	void timeplt(machine_config &config);
+	void chkun(machine_config &config);
+	void psurge(machine_config &config);
+	void bikkuric(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<tc8830f_device> m_tc8830f;
 	required_device<ls259_device> m_mainlatch;
@@ -65,7 +73,6 @@ public:
 	DECLARE_READ8_MEMBER(psurge_protection_r);
 
 	/* chkun */
-	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(chkun_sound_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -82,10 +89,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void timeplt(machine_config &config);
-	void chkun(machine_config &config);
-	void psurge(machine_config &config);
-	void bikkuric(machine_config &config);
+
 	void chkun_main_map(address_map &map);
 	void psurge_main_map(address_map &map);
 	void timeplt_main_map(address_map &map);

@@ -30,31 +30,6 @@ void triplhnt_state::set_collision(int code)
 }
 
 
-WRITE_LINE_MEMBER(triplhnt_state::ram_2_w)
-{
-	if (state)
-		m_cmos[m_cmos_latch] = m_da_latch;
-}
-
-
-WRITE_LINE_MEMBER(triplhnt_state::sprite_zoom_w)
-{
-	m_sprite_zoom = state;
-}
-
-
-WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
-{
-	m_sprite_bank = state;
-}
-
-
-WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
-{
-	m_lamp = state ? 1 : 0;
-}
-
-
 WRITE_LINE_MEMBER(triplhnt_state::coin_lockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
@@ -303,21 +278,21 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_DEVICE_PROGRAM_MAP(triplhnt_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // battery-backed 74C89 at J5
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery-backed 74C89 at J5
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // J7
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // unused
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, triplhnt_state, lamp1_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_LAMP_EN>)) // Lamp is used to reset noise
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_SCREECH_EN>)) // screech
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, triplhnt_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, triplhnt_state, sprite_zoom_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, triplhnt_state, ram_2_w)) // CMOS write
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, triplhnt_state, tape_control_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, triplhnt_state, sprite_bank_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_BEAR_EN>)) // bear
+	F9334(config, m_latch); // J7
+	m_latch->q_out_cb<0>().set_nop(); // unused
+	m_latch->q_out_cb<1>().set([this] (int state) { m_lamp = state ? 1 : 0; });
+	m_latch->q_out_cb<1>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_LAMP_EN>)); // Lamp is used to reset noise
+	m_latch->q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_SCREECH_EN>)); // screech
+	m_latch->q_out_cb<3>().set(FUNC(triplhnt_state::coin_lockout_w));
+	m_latch->q_out_cb<4>().set([this] (int state) { m_sprite_zoom = state; });
+	m_latch->q_out_cb<5>().set([this] (int state) { if (state) m_cmos[m_cmos_latch] = m_da_latch; }); // CMOS write
+	m_latch->q_out_cb<6>().set(FUNC(triplhnt_state::tape_control_w));
+	m_latch->q_out_cb<7>().set([this] (int state) { m_sprite_bank = state; });
+	m_latch->q_out_cb<7>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_BEAR_EN>)); // bear
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

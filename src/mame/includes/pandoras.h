@@ -5,14 +5,18 @@
     Pandora's Palace
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PANDORAS_H
+#define MAME_INCLUDES_PANDORAS_H
+
+#pragma once
 
 #include "emupal.h"
 
 class pandoras_state : public driver_device
 {
 public:
-	pandoras_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pandoras_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -21,7 +25,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -76,3 +81,5 @@ public:
 	void pandoras_slave_map(address_map &map);
 	void pandoras_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PANDORAS_H

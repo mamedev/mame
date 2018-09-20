@@ -65,6 +65,11 @@ public:
 	{
 	}
 
+	void tv990(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(color);
+
+private:
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_fontram;
@@ -91,10 +96,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
 
 	INTERRUPT_GEN_MEMBER(vblank);
-	DECLARE_INPUT_CHANGED_MEMBER(color);
-	void tv990(machine_config &config);
 	void tv990_mem(address_map &map);
-private:
+
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;
@@ -384,17 +387,17 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD( UART0_TAG, NS16450, XTAL(3'686'400) )
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart0_irq))
+	NS16450(config, m_uart0, XTAL(3'686'400));
+	m_uart0->out_dtr_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart0->out_rts_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart0->out_tx_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart0->out_int_callback().set(FUNC(tv990_state::uart0_irq));
 
-	MCFG_DEVICE_ADD( UART1_TAG, NS16450, XTAL(3'686'400) )
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart1_irq))
+	NS16450(config, m_uart1, XTAL(3'686'400));
+	m_uart1->out_dtr_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart1->out_rts_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart1->out_tx_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart1->out_int_callback().set(FUNC(tv990_state::uart1_irq));
 
 	MCFG_DEVICE_ADD(LPT_TAG, PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, tv990_state, lpt_irq))
@@ -409,11 +412,11 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(UART1_TAG, ns16450_device, dcd_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(UART1_TAG, ns16450_device, cts_w))
 
-	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(INPUTLINE("maincpu", M68K_IRQ_2))
+	KBDC8042(config, m_kbdc);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	m_kbdc->input_buffer_full_callback().set_inputline("maincpu", M68K_IRQ_2);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000); //whats the freq?

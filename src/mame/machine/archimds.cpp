@@ -733,7 +733,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					if (m_fdc)
 					{
 						//printf("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-						return m_fdc->gen_r((ioc_addr >> 2) & 0x03);
+						return m_fdc->read((ioc_addr >> 2) & 0x03);
 					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
@@ -796,7 +796,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 						if (m_fdc)
 						{
 							//printf("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-							m_fdc->gen_w((ioc_addr >> 2) & 0x03, data);
+							m_fdc->write((ioc_addr >> 2) & 0x03, data);
 							return;
 						}
 						else
@@ -884,22 +884,18 @@ void archimedes_state::vidc_dynamic_res_change()
 			(m_vidc_regs[VIDC_HBER] >= m_vidc_regs[VIDC_HBSR]) &&
 			(m_vidc_regs[VIDC_VBER] >= m_vidc_regs[VIDC_VBSR]))
 		{
-			rectangle visarea;
-			attoseconds_t refresh;
-
-			visarea.min_x = 0;
-			visarea.min_y = 0;
-			visarea.max_x = m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1;
-			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
+			rectangle const visarea(
+					0, m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1,
+					0, (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace + 1));
 
 			m_vidc_vblank_time = m_vidc_regs[VIDC_VBER] * (m_vidc_interlace+1);
 			//logerror("Configuring: htotal %d vtotal %d border %d x %d display origin %d x %d vblank = %d\n",
 			//  m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
-			//  visarea.max_x, visarea.max_y,
+			//  visarea.right(), visarea.bottom(),
 			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1,
 			//  m_vidc_vblank_time);
 
-			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
+			attoseconds_t const refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
 
 			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR] * (m_vidc_interlace+1), visarea, refresh);
 		}

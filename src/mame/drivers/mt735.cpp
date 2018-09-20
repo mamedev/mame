@@ -13,6 +13,9 @@ class mt735_state : public driver_device
 public:
 	mt735_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void mt735(machine_config &config);
+
+private:
 	required_device<m68000_device> m_cpu;
 
 	DECLARE_READ8_MEMBER(p4_r);
@@ -20,7 +23,6 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void mt735(machine_config &config);
 	void mt735_map(address_map &map);
 };
 

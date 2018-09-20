@@ -55,7 +55,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(fp_analog_bit_r);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -97,7 +97,6 @@ protected:
 		void render_alphablend(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
 	};
 
-private:
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
 	required_shared_ptr<uint16_t> m_m68k_ram_base;
 	required_shared_ptr<uint16_t> m_tms_comm_base;

@@ -20,9 +20,11 @@ public:
 //      ,m_maincpu(*this, "maincpu")
 		{ }
 
+	void scm_500(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void scm_500(machine_config &config);
 //  required_device<cpu_device> m_maincpu;
 };
 

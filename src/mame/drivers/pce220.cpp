@@ -34,7 +34,6 @@
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -55,6 +54,16 @@ public:
 			m_serial(*this, PCE220SERIAL_TAG)
 		{ }
 
+	void pce220(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
+
+	DECLARE_PALETTE_INIT(pce220);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beep;
@@ -100,11 +109,7 @@ public:
 	DECLARE_READ8_MEMBER( irq_status_r );
 	DECLARE_WRITE8_MEMBER( irq_ack_w );
 	DECLARE_WRITE8_MEMBER( irq_mask_w );
-	DECLARE_PALETTE_INIT(pce220);
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
-	void pce220(machine_config &config);
+
 	void pce220_io(address_map &map);
 	void pce220_mem(address_map &map);
 };
@@ -116,6 +121,10 @@ public:
 		: pce220_state(mconfig, type, tag)
 		{ }
 
+	void pcg850v(machine_config &config);
+	void pcg815(machine_config &config);
+
+private:
 	uint8_t m_g850v_bank_num;
 	uint8_t m_lcd_effects;
 	uint8_t m_lcd_contrast;
@@ -130,8 +139,6 @@ public:
 	DECLARE_WRITE8_MEMBER( g850v_lcd_control_w );
 	DECLARE_READ8_MEMBER( g850v_lcd_data_r );
 	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
-	void pcg850v(machine_config &config);
-	void pcg815(machine_config &config);
 	void pcg850v_io(address_map &map);
 };
 
@@ -954,7 +961,6 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -963,11 +969,10 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
@@ -990,7 +995,6 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -999,11 +1003,10 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
@@ -1026,7 +1029,6 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1035,11 +1037,10 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -8,18 +9,32 @@
 class funybubl_state : public driver_device
 {
 public:
-	funybubl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
+	funybubl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_tilemapram(*this, "tilemapram"),
+		m_spriteram(*this, "spriteram"),
+		m_mainbank(*this, "mainbank"),
+		m_okibank(*this, "okibank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_vrambank(*this, "vrambank") { }
 
+	void funybubl(machine_config &config);
+
+private:
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_tilemapram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	required_memory_bank m_mainbank;
+	required_memory_bank m_okibank;
+
+	/* video-related */
+	tilemap_t     *m_tilemap;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -28,20 +43,24 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<address_map_bank_device> m_vrambank;
 
 	/* memory */
-	uint8_t      m_banked_vram[0x2000];
-	DECLARE_WRITE8_MEMBER(funybubl_vidram_bank_w);
-	DECLARE_WRITE8_MEMBER(funybubl_cpurombank_w);
-	DECLARE_WRITE8_MEMBER(funybubl_soundcommand_w);
-	DECLARE_WRITE8_MEMBER(funybubl_paldatawrite);
-	DECLARE_WRITE8_MEMBER(funybubl_oki_bank_sw);
+	DECLARE_WRITE8_MEMBER(vidram_bank_w);
+	DECLARE_WRITE8_MEMBER(cpurombank_w);
+	DECLARE_WRITE8_MEMBER(oki_bank_w);
+
+	DECLARE_PALETTE_DECODER(funybubl_R6B6G6);
+	DECLARE_WRITE8_MEMBER(tilemap_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	uint32_t screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void funybubl(machine_config &config);
 	void funybubl_map(address_map &map);
 	void io_map(address_map &map);
+	void oki_map(address_map &map);
 	void sound_map(address_map &map);
+	void vrambank_map(address_map &map);
 };

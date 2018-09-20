@@ -35,7 +35,6 @@
 #define M6532_0_TAG     "uc1"
 #define M6532_1_TAG     "ue1"
 #define M6504_TAG       "uh3"
-#define M6522_TAG       "um3"
 #define M6530_TAG       "uk3"
 #define FDC_TAG         "fdc"
 
@@ -207,14 +206,14 @@ void c8050_device::c8050_main_mem(address_map &map)
 void c8050_device::c8050_fdc_mem(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x003f).mirror(0x0300).m(M6530_TAG, FUNC(mos6530_new_device::ram_map));
-	map(0x0040, 0x004f).mirror(0x0330).m(M6522_TAG, FUNC(via6522_device::map));
-	map(0x0080, 0x008f).mirror(0x0330).m(M6530_TAG, FUNC(mos6530_new_device::io_map));
+	map(0x0000, 0x003f).mirror(0x0300).m(m_miot, FUNC(mos6530_new_device::ram_map));
+	map(0x0040, 0x004f).mirror(0x0330).m(m_via, FUNC(via6522_device::map));
+	map(0x0080, 0x008f).mirror(0x0330).m(m_miot, FUNC(mos6530_new_device::io_map));
 	map(0x0400, 0x07ff).ram().share("share1");
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");
 	map(0x1000, 0x13ff).ram().share("share4");
-	map(0x1c00, 0x1fff).m(M6530_TAG, FUNC(mos6530_new_device::rom_map));
+	map(0x1c00, 0x1fff).m(m_miot, FUNC(mos6530_new_device::rom_map));
 }
 
 
@@ -225,9 +224,9 @@ void c8050_device::c8050_fdc_mem(address_map &map)
 void c8050_device::c8250lp_fdc_mem(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x003f).mirror(0x0300).m(M6530_TAG, FUNC(mos6530_new_device::ram_map));
-	map(0x0040, 0x004f).mirror(0x0330).m(M6522_TAG, FUNC(via6522_device::map));
-	map(0x0080, 0x008f).mirror(0x0330).m(M6530_TAG, FUNC(mos6530_new_device::io_map));
+	map(0x0000, 0x003f).mirror(0x0300).m(m_miot, FUNC(mos6530_new_device::ram_map));
+	map(0x0040, 0x004f).mirror(0x0330).m(m_via, FUNC(via6522_device::map));
+	map(0x0080, 0x008f).mirror(0x0330).m(m_miot, FUNC(mos6530_new_device::io_map));
 	map(0x0400, 0x07ff).ram().share("share1");
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");
@@ -243,9 +242,9 @@ void c8050_device::c8250lp_fdc_mem(address_map &map)
 void c8050_device::sfd1001_fdc_mem(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x003f).mirror(0x0300).m(M6530_TAG, FUNC(mos6530_new_device::ram_map));
-	map(0x0040, 0x004f).mirror(0x0330).m(M6522_TAG, FUNC(via6522_device::map));
-	map(0x0080, 0x008f).mirror(0x0330).m(M6530_TAG, FUNC(mos6530_new_device::io_map));
+	map(0x0000, 0x003f).mirror(0x0300).m(m_miot, FUNC(mos6530_new_device::ram_map));
+	map(0x0040, 0x004f).mirror(0x0330).m(m_via, FUNC(via6522_device::map));
+	map(0x0080, 0x008f).mirror(0x0330).m(m_miot, FUNC(mos6530_new_device::io_map));
 	map(0x0400, 0x07ff).ram().share("share1");
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");
@@ -529,189 +528,95 @@ FLOPPY_FORMATS_MEMBER( sfd1001_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(c8050_device::device_add_mconfig)
+void c8050_device::add_common_devices(machine_config &config)
+{
 	// DOS
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(c8050_main_mem)
+	M6502(config, m_maincpu, XTAL(12'000'000)/12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c8050_device::c8050_main_mem);
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, dio_w))
+	MOS6532_NEW(config, m_riot0, XTAL(12'000'000)/12);
+	m_riot0->pa_rd_callback().set(FUNC(c8050_device::dio_r));
+	m_riot0->pb_wr_callback().set(FUNC(c8050_device::dio_w));
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, c8050_device, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, c8050_device, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, riot1_pb_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
+	MOS6532_NEW(config, m_riot1, XTAL(12'000'000)/12);
+	m_riot1->pa_rd_callback().set(FUNC(c8050_device::riot1_pa_r));
+	m_riot1->pa_wr_callback().set(FUNC(c8050_device::riot1_pa_w));
+	m_riot1->pb_rd_callback().set(FUNC(c8050_device::riot1_pb_r));
+	m_riot1->pb_wr_callback().set(FUNC(c8050_device::riot1_pb_w));
+	m_riot1->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// controller
-	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(c8050_fdc_mem)
+	M6504(config, m_fdccpu, XTAL(12'000'000)/12);
 
-	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL(12'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(FDC_TAG, c8050_fdc_device, read))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c8050_device, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, mode_sel_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, rw_sel_w))
+	VIA6522(config, m_via, XTAL(12'000'000)/12);
+	m_via->readpa_handler().set(m_fdc, FUNC(c8050_fdc_device::read));
+	m_via->writepb_handler().set(FUNC(c8050_device::via_pb_w));
+	m_via->ca2_handler().set(m_fdc, FUNC(c8050_fdc_device::mode_sel_w));
+	m_via->cb2_handler().set(m_fdc, FUNC(c8050_fdc_device::rw_sel_w));
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(FDC_TAG, c8050_fdc_device, write))
-	MCFG_MOS6530n_OUT_PB0_CB(WRITELINE(FDC_TAG, c8050_fdc_device, drv_sel_w))
-	MCFG_MOS6530n_OUT_PB1_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds0_w))
-	MCFG_MOS6530n_OUT_PB2_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds1_w))
-	MCFG_MOS6530n_IN_PB3_CB(READLINE(FDC_TAG, c8050_fdc_device, wps_r))
-	MCFG_MOS6530n_IN_PB6_CB(VCC) // SINGLE SIDED
-	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
+	MOS6530_NEW(config, m_miot, XTAL(12'000'000)/12);
+	m_miot->pa_wr_callback().set(m_fdc, FUNC(c8050_fdc_device::write));
+	m_miot->pb_wr_callback<1>().set(m_fdc, FUNC(c8050_fdc_device::ds0_w));
+	m_miot->pb_wr_callback<2>().set(m_fdc, FUNC(c8050_fdc_device::ds1_w));
+	m_miot->pb_rd_callback<3>().set(m_fdc, FUNC(c8050_fdc_device::wps_r));
+	m_miot->pb_rd_callback<6>().set_constant(1); // SINGLE SIDED
+	m_miot->pb_wr_callback<7>().set_inputline(m_fdccpu, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(FDC_TAG, C8050_FDC, XTAL(12'000'000)/2)
-	MCFG_C8050_SYNC_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_pb7))
-	MCFG_C8050_READY_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_ca1))
-	MCFG_C8050_BRDY_CALLBACK(INPUTLINE(M6504_TAG, M6502_SET_OVERFLOW)) MCFG_DEVCB_XOR(1)
-	MCFG_C8050_ERROR_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", c8050_floppies, "525ssqd", c8050_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", c8050_floppies, "525ssqd", c8050_device::floppy_formats)
-MACHINE_CONFIG_END
+	C8050_FDC(config, m_fdc, XTAL(12'000'000)/2);
+	m_fdc->sync_wr_callback().set(m_via, FUNC(via6522_device::write_pb7));
+	m_fdc->ready_wr_callback().set(m_via, FUNC(via6522_device::write_ca1));
+	m_fdc->brdy_wr_callback().set_inputline(m_fdccpu, M6502_SET_OVERFLOW).invert();
+	m_fdc->error_wr_callback().set(m_via, FUNC(via6522_device::write_cb1));
+}
 
+void c8050_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_fdccpu->set_addrmap(AS_PROGRAM, &c8050_device::c8050_fdc_mem);
 
-MACHINE_CONFIG_START(c8250_device::device_add_mconfig)
-	// DOS
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(c8050_main_mem)
+	m_miot->pb_wr_callback<0>().set(m_fdc, FUNC(c8050_fdc_device::drv_sel_w));
+	m_miot->pb_rd_callback<6>().set_constant(1); // SINGLE SIDED
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, dio_w))
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8050_floppies, "525ssqd", c8050_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8050_floppies, "525ssqd", c8050_device::floppy_formats);
+}
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, c8050_device, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, c8050_device, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, riot1_pb_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
+void c8250_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_fdccpu->set_addrmap(AS_PROGRAM, &c8250_device::c8050_fdc_mem);
 
-	// controller
-	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(c8050_fdc_mem)
+	m_miot->pb_wr_callback<0>().set(m_fdc, FUNC(c8050_fdc_device::drv_sel_w));
+	m_miot->pb_wr_callback<4>().set(m_fdc, FUNC(c8050_fdc_device::odd_hd_w));
+	m_miot->pb_rd_callback<6>().set_constant(0); // DOUBLE SIDED
 
-	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL(12'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(FDC_TAG, c8050_fdc_device, read))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c8050_device, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, mode_sel_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, rw_sel_w))
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8250_floppies, "525qd", c8250_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8250_floppies, "525qd", c8250_device::floppy_formats);
+}
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(FDC_TAG, c8050_fdc_device, write))
-	MCFG_MOS6530n_OUT_PB0_CB(WRITELINE(FDC_TAG, c8050_fdc_device, drv_sel_w))
-	MCFG_MOS6530n_OUT_PB1_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds0_w))
-	MCFG_MOS6530n_OUT_PB2_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds1_w))
-	MCFG_MOS6530n_IN_PB3_CB(READLINE(FDC_TAG, c8050_fdc_device, wps_r))
-	MCFG_MOS6530n_OUT_PB4_CB(WRITELINE(FDC_TAG, c8050_fdc_device, odd_hd_w))
-	MCFG_MOS6530n_IN_PB6_CB(GND) // DOUBLE SIDED
-	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
+void c8250lp_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_fdccpu->set_addrmap(AS_PROGRAM, &c8250lp_device::c8250lp_fdc_mem);
 
-	MCFG_DEVICE_ADD(FDC_TAG, C8050_FDC, XTAL(12'000'000)/2)
-	MCFG_C8050_SYNC_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_pb7))
-	MCFG_C8050_READY_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_ca1))
-	MCFG_C8050_BRDY_CALLBACK(INPUTLINE(M6504_TAG, M6502_SET_OVERFLOW)) MCFG_DEVCB_XOR(1)
-	MCFG_C8050_ERROR_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", c8250_floppies, "525qd", c8250_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", c8250_floppies, "525qd", c8250_device::floppy_formats)
-MACHINE_CONFIG_END
+	m_miot->pb_wr_callback<0>().set(m_fdc, FUNC(c8050_fdc_device::drv_sel_w));
+	m_miot->pb_wr_callback<4>().set(m_fdc, FUNC(c8050_fdc_device::odd_hd_w));
+	m_miot->pb_rd_callback<6>().set_constant(0); // DOUBLE SIDED
 
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8250_floppies, "525qd", c8250lp_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8250_floppies, "525qd", c8250lp_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(c8250lp_device::device_add_mconfig)
-	// DOS
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(c8050_main_mem)
+void sfd1001_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_fdccpu->set_addrmap(AS_PROGRAM, &sfd1001_device::sfd1001_fdc_mem);
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, dio_w))
+	m_miot->pb_wr_callback<4>().set(m_fdc, FUNC(c8050_fdc_device::odd_hd_w));
+	m_miot->pb_rd_callback<6>().set_constant(0); // DOUBLE SIDED
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, c8050_device, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, c8050_device, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, riot1_pb_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-
-	// controller
-	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(c8250lp_fdc_mem)
-
-	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL(12'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(FDC_TAG, c8050_fdc_device, read))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c8050_device, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, mode_sel_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, rw_sel_w))
-
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(FDC_TAG, c8050_fdc_device, write))
-	MCFG_MOS6530n_OUT_PB0_CB(WRITELINE(FDC_TAG, c8050_fdc_device, drv_sel_w))
-	MCFG_MOS6530n_OUT_PB1_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds0_w))
-	MCFG_MOS6530n_OUT_PB2_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds1_w))
-	MCFG_MOS6530n_IN_PB3_CB(READLINE(FDC_TAG, c8050_fdc_device, wps_r))
-	MCFG_MOS6530n_OUT_PB4_CB(WRITELINE(FDC_TAG, c8050_fdc_device, odd_hd_w))
-	MCFG_MOS6530n_IN_PB6_CB(GND) // DOUBLE SIDED
-	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
-
-	MCFG_DEVICE_ADD(FDC_TAG, C8050_FDC, XTAL(12'000'000)/2)
-	MCFG_C8050_SYNC_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_pb7))
-	MCFG_C8050_READY_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_ca1))
-	MCFG_C8050_BRDY_CALLBACK(INPUTLINE(M6504_TAG, M6502_SET_OVERFLOW)) MCFG_DEVCB_XOR(1)
-	MCFG_C8050_ERROR_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", c8250_floppies, "525qd", c8250lp_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", c8250_floppies, "525qd", c8250lp_device::floppy_formats)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(sfd1001_device::device_add_mconfig)
-	// DOS
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(c8050_main_mem)
-
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, dio_w))
-
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, c8050_device, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, c8050_device, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, c8050_device, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, c8050_device, riot1_pb_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-
-	// controller
-	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(12'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(sfd1001_fdc_mem)
-
-	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL(12'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(FDC_TAG, c8050_fdc_device, read))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c8050_device, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, mode_sel_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(FDC_TAG, c8050_fdc_device, rw_sel_w))
-
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530_NEW, XTAL(12'000'000)/12)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(FDC_TAG, c8050_fdc_device, write))
-	MCFG_MOS6530n_OUT_PB1_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds0_w))
-	MCFG_MOS6530n_OUT_PB2_CB(WRITELINE(FDC_TAG, c8050_fdc_device, ds1_w))
-	MCFG_MOS6530n_IN_PB3_CB(READLINE(FDC_TAG, c8050_fdc_device, wps_r))
-	MCFG_MOS6530n_OUT_PB4_CB(WRITELINE(FDC_TAG, c8050_fdc_device, odd_hd_w))
-	MCFG_MOS6530n_IN_PB6_CB(GND) // DOUBLE SIDED
-	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
-
-	MCFG_DEVICE_ADD(FDC_TAG, C8050_FDC, XTAL(12'000'000)/2)
-	MCFG_C8050_SYNC_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_pb7))
-	MCFG_C8050_READY_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_ca1))
-	MCFG_C8050_BRDY_CALLBACK(INPUTLINE(M6504_TAG, M6502_SET_OVERFLOW)) MCFG_DEVCB_XOR(1)
-	MCFG_C8050_ERROR_CALLBACK(WRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", sfd1001_floppies, "525qd", sfd1001_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", sfd1001_floppies, "525qd", sfd1001_device::floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -779,7 +684,7 @@ c8050_device::c8050_device(const machine_config &mconfig, device_type type, cons
 	m_riot0(*this, M6532_0_TAG),
 	m_riot1(*this, M6532_1_TAG),
 	m_miot(*this, M6530_TAG),
-	m_via(*this, M6522_TAG),
+	m_via(*this, "um3"),
 	m_floppy0(*this, FDC_TAG ":0"),
 	m_floppy1(*this, FDC_TAG ":1"),
 	m_fdc(*this, FDC_TAG),

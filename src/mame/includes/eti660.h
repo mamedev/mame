@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_ETI660_H
 #define MAME_INCLUDES_ETI660_H
+
+#pragma once
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -39,6 +39,9 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void eti660(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
 	DECLARE_WRITE8_MEMBER( colorram_w );
@@ -55,10 +58,9 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
 	required_shared_ptr<uint8_t> m_p_videoram;
 
-	void eti660(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<pia6821_device> m_pia;

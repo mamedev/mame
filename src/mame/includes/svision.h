@@ -54,18 +54,6 @@ public:
 		, m_bank2(*this, "bank2")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
-	DECLARE_READ8_MEMBER(svision_r);
-	DECLARE_WRITE8_MEMBER(svision_w);
-	DECLARE_READ8_MEMBER(tvlink_r);
-	DECLARE_WRITE8_MEMBER(tvlink_w);
-	void init_svisions();
-	void init_svision();
-	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(frame_int_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
-
 	void svisionp(machine_config &config);
 	void svisions(machine_config &config);
 	void tvlinkp(machine_config &config);
@@ -73,7 +61,21 @@ public:
 	void svisionn(machine_config &config);
 	void svision_base(machine_config &config);
 
-protected:
+	void init_svisions();
+	void init_svision();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
+	DECLARE_READ8_MEMBER(svision_r);
+	DECLARE_WRITE8_MEMBER(svision_w);
+	DECLARE_READ8_MEMBER(tvlink_r);
+	DECLARE_WRITE8_MEMBER(tvlink_w);
+
+	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(frame_int_w);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

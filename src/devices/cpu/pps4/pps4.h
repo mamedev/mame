@@ -29,13 +29,13 @@ enum
 //**************************************************************************
 
 #define MCFG_PPS4_DISCRETE_INPUT_A_CB(_devcb) \
-	devcb = &downcast<pps4_device &>(*device).set_dia_cb(DEVCB_##_devcb);
+	downcast<pps4_device &>(*device).set_dia_cb(DEVCB_##_devcb);
 
 #define MCFG_PPS4_DISCRETE_INPUT_B_CB(_devcb) \
-	devcb = &downcast<pps4_device &>(*device).set_dib_cb(DEVCB_##_devcb);
+	downcast<pps4_device &>(*device).set_dib_cb(DEVCB_##_devcb);
 
 #define MCFG_PPS4_DISCRETE_OUTPUT_CB(_devcb) \
-	devcb = &downcast<pps4_device &>(*device).set_do_cb(DEVCB_##_devcb);
+	downcast<pps4_device &>(*device).set_do_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  DEVICE TYPE DEFINITIONS

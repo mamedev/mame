@@ -47,6 +47,11 @@ public:
 		m_display_maxx(0)
 	{ }
 
+	void k28(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_on);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tms6100_device> m_tms6100;
@@ -89,12 +94,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_p2_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_prog_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
 
-	void k28(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -463,7 +464,7 @@ MACHINE_CONFIG_START(k28_state::k28)
 	MCFG_TIMER_ADD_NONE("on_button")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", k28_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_k28)
+	config.set_default_layout(layout_k28);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

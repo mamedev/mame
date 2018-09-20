@@ -540,21 +540,36 @@ class taitotz_state : public driver_device
 public:
 	taitotz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_screen(*this, "screen"),
 		m_maincpu(*this, "maincpu"),
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ata(*this, "ata"),
-		m_screen(*this, "screen")
+		m_ata(*this, "ata")
 	{
 	}
 
+	void taitotz(machine_config &config);
+	void landhigh(machine_config &config);
+
+	void init_batlgr2a();
+	void init_batlgr2();
+	void init_pwrshovl();
+	void init_batlgear();
+	void init_landhigh();
+	void init_landhigha();
+	void init_raizpin();
+	void init_raizpinj();
+	void init_styphp();
+
+	required_device<screen_device> m_screen;
+
+private:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_shared_ptr<uint64_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
-	required_device<screen_device> m_screen;
 
 	DECLARE_READ64_MEMBER(ppc_common_r);
 	DECLARE_WRITE64_MEMBER(ppc_common_w);
@@ -575,7 +590,7 @@ public:
 	uint32_t m_video_reg;
 	uint32_t m_scr_base;
 
-	uint64_t m_video_fifo_mem[4];
+	//uint64_t m_video_fifo_mem[4];
 
 	uint16_t m_io_share_ram[0x2000];
 
@@ -590,18 +605,9 @@ public:
 
 
 	uint32_t m_reg105;
-	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
-	void init_batlgr2a();
-	void init_batlgr2();
-	void init_pwrshovl();
-	void init_batlgear();
-	void init_landhigh();
-	void init_landhigha();
-	void init_raizpin();
-	void init_raizpinj();
-	void init_styphp();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -617,8 +623,7 @@ public:
 	void video_reg_w(uint32_t reg, uint32_t data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
-	void taitotz(machine_config &config);
-	void landhigh(machine_config &config);
+
 	void landhigh_tlcs900h_mem(address_map &map);
 	void ppc603e_mem(address_map &map);
 	void tlcs900h_mem(address_map &map);
@@ -2593,10 +2598,10 @@ MACHINE_CONFIG_START(taitotz_state::taitotz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, taitotz_state, ide_interrupt))
+	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
+	ata.irq_handler().set(FUNC(taitotz_state::ide_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

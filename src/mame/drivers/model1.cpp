@@ -838,7 +838,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	}
 }
 
-MACHINE_RESET_MEMBER(model1_state,model1)
+void model1_state::machine_reset()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
@@ -938,8 +938,7 @@ void model1_state::model1_mem(address_map &map)
 
 	map(0xc00000, 0xc00fff).r(FUNC(model1_state::dpram_r)).w(m_dpram, FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
 
-	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc40000, 0xc40003).rw(m_m1uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 
 	map(0xd00000, 0xd00001).rw(FUNC(model1_state::v60_copro_ram_adr_r), FUNC(model1_state::v60_copro_ram_adr_w));
 	map(0xd20000, 0xd20003).w(FUNC(model1_state::v60_copro_ram_w));
@@ -1400,7 +1399,7 @@ ROM_START( swa )
 	ROM_LOAD32_WORD( "mpr-16480.30", 0x800000, 0x200000, CRC(3185547a) SHA1(9871937372c2c755717802117a3ad39e1a11410e) )
 	ROM_LOAD32_WORD( "mpr-16481.31", 0x800002, 0x200000, CRC(ce8d76fe) SHA1(0406f0500d19d6707515627b4143f92a9a5db769) )
 
-	ROM_REGION32_LE( 0x200000, "tgp_data", 0 ) /* TGP data roms */
+	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-16472.39", 0x000000, 0x80000, CRC(5a0d7553) SHA1(ba8e08e5a0c6b7fbc10084ad7ad3edf61efb0d70) )
 	ROM_LOAD32_BYTE( "mpr-16473.40", 0x000001, 0x80000, CRC(876c5399) SHA1(be7e40c77a385600941f11c24852cd73c71696f0) )
 	ROM_LOAD32_BYTE( "mpr-16474.41", 0x000002, 0x80000, CRC(5864a26f) SHA1(be0c22dfff37408f6b401b1970f7fcc6fc7fbcd2) )
@@ -1453,13 +1452,22 @@ ROM_START( wingwar )
 	ROM_LOAD32_WORD( "mpr-16749.32", 0xc00000, 0x200000, CRC(0e36dc1a) SHA1(4939177a6ac51ca57d0acd118ff14af4f4e438bb) )
 	ROM_LOAD32_WORD( "mpr-16750.33", 0xc00002, 0x200000, CRC(e4f0b98d) SHA1(e69de2e5ccea2834fb8326bdd61fc6b517bc60b7) )
 
-	ROM_REGION32_LE( 0x200000, "tgp_data", 0 ) /* TGP data roms */
+	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-16741.39", 0x000000, 0x80000, CRC(84b2ffd8) SHA1(0eba3855d20b88567c6fa08046e12429664d87cb) )
 	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
 	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
 ROM_END
 
+/*
+wing War (US)
+
+        Sega game ID# 833-10844-91-01
+   Sega ROM board ID# 834-10845-91-01
+Driver/Control BD ID# 837-10859 with EPR-16891
+837-8679 MODEL-1 SOUND BD + 837-8680 SOUND BD OPTION daughterboard with ID# 837-10858
+838-10141-04 Sound AMP board
+*/
 ROM_START( wingwaru )
 	MODEL1_CPU_BOARD
 
@@ -1505,7 +1513,7 @@ ROM_START( wingwaru )
 	ROM_LOAD32_WORD( "mpr-16749.32", 0xc00000, 0x200000, CRC(0e36dc1a) SHA1(4939177a6ac51ca57d0acd118ff14af4f4e438bb) )
 	ROM_LOAD32_WORD( "mpr-16750.33", 0xc00002, 0x200000, CRC(e4f0b98d) SHA1(e69de2e5ccea2834fb8326bdd61fc6b517bc60b7) )
 
-	ROM_REGION32_LE( 0x200000, "tgp_data", 0 ) /* TGP data roms */
+	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-16741.39", 0x000000, 0x80000, CRC(84b2ffd8) SHA1(0eba3855d20b88567c6fa08046e12429664d87cb) )
 	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
@@ -1557,7 +1565,7 @@ ROM_START( wingwarj )
 	ROM_LOAD32_WORD( "mpr-16749.32", 0xc00000, 0x200000, CRC(0e36dc1a) SHA1(4939177a6ac51ca57d0acd118ff14af4f4e438bb) )
 	ROM_LOAD32_WORD( "mpr-16750.33", 0xc00002, 0x200000, CRC(e4f0b98d) SHA1(e69de2e5ccea2834fb8326bdd61fc6b517bc60b7) )
 
-	ROM_REGION32_LE( 0x200000, "tgp_data", 0 ) /* TGP data roms */
+	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-16741.39", 0x000000, 0x80000, CRC(84b2ffd8) SHA1(0eba3855d20b88567c6fa08046e12429664d87cb) )
 	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
@@ -1573,9 +1581,9 @@ ROM_START( wingwar360 )
 	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
 	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
 
-	ROM_LOAD( "ic4_17052.bin", 0xfc0000, 0x20000, CRC(0f4743e7) SHA1(cc47fd1d25808728ed05d95d510733b8bd011b41) )
+	ROM_LOAD( "epr-17052.4", 0xfc0000, 0x20000, CRC(0f4743e7) SHA1(cc47fd1d25808728ed05d95d510733b8bd011b41) )
 	ROM_RELOAD(          0x000000, 0x20000 )
-	ROM_LOAD( "ic5_17053.bin", 0xfe0000, 0x20000, CRC(83af2415) SHA1(46dfee9db95171a3942cd32c851ec75c3d9e03da) )
+	ROM_LOAD( "epr-17053.5", 0xfe0000, 0x20000, CRC(83af2415) SHA1(46dfee9db95171a3942cd32c851ec75c3d9e03da) )
 	ROM_RELOAD(          0x020000, 0x20000 )
 
 	ROM_LOAD16_BYTE( "ic6_17056.bin",  0x1000000, 0x80000, CRC(5216de4d) SHA1(1463311d3f96ca7c46b8f676ee3963caddeec9e2) )
@@ -1611,7 +1619,7 @@ ROM_START( wingwar360 )
 	ROM_LOAD32_WORD( "mpr-16749.32", 0xc00000, 0x200000, CRC(0e36dc1a) SHA1(4939177a6ac51ca57d0acd118ff14af4f4e438bb) )
 	ROM_LOAD32_WORD( "mpr-16750.33", 0xc00002, 0x200000, CRC(e4f0b98d) SHA1(e69de2e5ccea2834fb8326bdd61fc6b517bc60b7) )
 
-	ROM_REGION32_LE( 0x200000, "tgp_data", 0 ) /* TGP data roms */
+	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-16741.39", 0x000000, 0x80000, CRC(84b2ffd8) SHA1(0eba3855d20b88567c6fa08046e12429664d87cb) )
 	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
 	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
@@ -1659,7 +1667,7 @@ ROM_START( netmerc )
 	ROM_LOAD32_WORD( "mpr-18132.ic30", 0x800000, 0x200000, CRC(a17e3ac2) SHA1(19827c06ebc3e9de63668ef07675224e169d853e) )
 	ROM_LOAD32_WORD( "mpr-18133.ic31", 0x800002, 0x200000, CRC(f56354dd) SHA1(2ef1fe8b4995a67b70b565adf8f0ea0ad6e10094) )
 
-	ROM_REGION32_LE( 0x200000, "tgp_data", ROMREGION_ERASE00 ) // IC39-IC42 unpopulated
+	ROM_REGION32_LE( 0x200000, "copro_data", ROMREGION_ERASE00 ) // IC39-IC42 unpopulated
 
 	ROM_REGION( 0x8000, "polhemus", 0 ) /* POLHEMUS board */
 	ROM_LOAD16_BYTE( "u1", 0x0000, 0x4000, CRC(7073a312) SHA1(d2582f9520b8c8c051708dd372633112af59206e) )
@@ -1685,16 +1693,13 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_rf_map)
 #endif
 
-	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
-	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN.0");
+	ioboard.in_callback<1>().set_ioport("IN.1");
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
-	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO_IN0_CB(IOPORT("IN.0"))
-	MCFG_MODEL1IO_IN1_CB(IOPORT("IN.1"))
-
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MB8421(config, m_dpram, 0);
 
 	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
 	MCFG_GFX_PALETTE("palette")
@@ -1708,17 +1713,15 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
+	SEGAM1AUDIO(config, m_m1audio, 0);
+	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));
 
-	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("m1uart", i8251_device, write_rxd))
+	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
+	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
-
-	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("m1uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("m1uart", i8251_device, write_rxc))
+	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
+	m1uart_clock.signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::model1_hle)
@@ -1727,64 +1730,64 @@ MACHINE_CONFIG_START(model1_state::model1_hle)
 	MCFG_DEVICE_REMOVE("tgp_copro")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model1_state::vf)
+void model1_state::vf(machine_config &config)
+{
 	model1_hle(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_DEVICE_BIOS("epr14869b");
-	MCFG_MODEL1IO_IN2_CB(IOPORT("IN.2"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vf_outputs_w))
-MACHINE_CONFIG_END
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.set_default_bios_tag("epr14869b");
+	ioboard.in_callback<2>().set_ioport("IN.2");
+	ioboard.output_callback().set(FUNC(model1_state::vf_outputs_w));
+}
 
-MACHINE_CONFIG_START(model1_state::vr)
+void model1_state::vr(machine_config &config)
+{
 	model1(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vr_outputs_w))
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.an_callback<0>().set_ioport("WHEEL");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15112");
-MACHINE_CONFIG_END
+	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+}
 
-MACHINE_CONFIG_START(model1_state::vformula)
+void model1_state::vformula(machine_config &config)
+{
 	model1(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vr_outputs_w))
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.an_callback<0>().set_ioport("WHEEL");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15624");
-MACHINE_CONFIG_END
+	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
+}
 
-MACHINE_CONFIG_START(model1_state::swa)
+void model1_state::swa(machine_config &config)
+{
 	model1_hle(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_DEVICE_BIOS("epr14869b");
-	MCFG_MODEL1IO_AN0_CB(IOPORT("STICK1X"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("STICK1Y"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_MODEL1IO_AN4_CB(IOPORT("STICK2X"))
-	MCFG_MODEL1IO_AN5_CB(IOPORT("STICK2Y"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, swa_outputs_w))
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.set_default_bios_tag("epr14869b");
+	ioboard.an_callback<0>().set_ioport("STICK1X");
+	ioboard.an_callback<1>().set_ioport("STICK1Y");
+	ioboard.an_callback<2>().set_ioport("THROTTLE");
+	ioboard.an_callback<4>().set_ioport("STICK2X");
+	ioboard.an_callback<5>().set_ioport("STICK2Y");
+	ioboard.output_callback().set(FUNC(model1_state::swa_outputs_w));
 
 	SPEAKER(config, "dleft").front_left();
 	SPEAKER(config, "dright").front_right();
-	MCFG_DSBZ80_ADD(DSBZ80_TAG)
-	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
-	MCFG_SOUND_ROUTE(1, "dright", 1.0)
+	DSBZ80(config, m_dsbz80, 0);
+	m_dsbz80->add_route(0, "dleft", 1.0);
+	m_dsbz80->add_route(1, "dright", 1.0);
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
-	MCFG_DEVICE_MODIFY(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("m1uart", i8251_device, write_rxd))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
-MACHINE_CONFIG_END
+	m_m1audio->rxd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
+}
 
 MACHINE_CONFIG_START(model1_state::wingwar)
 	model1_hle(config);
@@ -1792,35 +1795,33 @@ MACHINE_CONFIG_START(model1_state::wingwar)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(model1_comm_mem)
 
-	MCFG_DEVICE_REMOVE("ioboard")
+	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
+	ioboard.set_default_bios_tag("epr16891");
+	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN.0");
+	ioboard.in_callback<1>().set_ioport("IN.1");
+	ioboard.an_callback<0>().set_ioport("STICKX");
+	ioboard.an_callback<1>().set_ioport("STICKY");
+	ioboard.an_callback<2>().set_ioport("THROTTLE");
+	ioboard.output_callback().set(FUNC(model1_state::wingwar_outputs_w));
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
-	MCFG_DEVICE_BIOS("epr16891");
-	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN.0"))
-	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN.1"))
-	MCFG_MODEL1IO2_AN0_CB(IOPORT("STICKX"))
-	MCFG_MODEL1IO2_AN1_CB(IOPORT("STICKY"))
-	MCFG_MODEL1IO2_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model1_state, wingwar_outputs_w))
+	config.set_default_layout(layout_model1io2);
 
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
-
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15112");
+	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model1_state::wingwar360)
+void model1_state::wingwar360(machine_config &config)
+{
 	wingwar(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO2_IN2_CB(READ8(*this, model1_state, r360_r))
-	MCFG_MODEL1IO2_DRIVE_WRITE_CB(WRITE8(*this, model1_state, r360_w))
-	MCFG_MODEL1IO2_AN2_CB(NOOP)
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model1_state, wingwar360_outputs_w))
+	model1io2_device &ioboard(*subdevice<model1io2_device>("ioboard"));
+	ioboard.in_callback<2>().set(FUNC(model1_state::r360_r));
+	ioboard.drive_write_callback().set(FUNC(model1_state::r360_w));
+	ioboard.an_callback<2>().set_constant(0);
+	ioboard.output_callback().set(FUNC(model1_state::wingwar360_outputs_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
+	config.set_default_layout(layout_model1io2);
 MACHINE_CONFIG_END
 
 void model1_state::polhemus_map(address_map &map)
@@ -1835,18 +1836,17 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 	MCFG_DEVICE_ADD("polhemus", I386SX, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(polhemus_map)
 
-	MCFG_DEVICE_REMOVE("ioboard")
+	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
+	ioboard.set_default_bios_tag("epr18021");
+	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN.0");
+	ioboard.in_callback<1>().set_ioport("IN.1");
+	ioboard.an_callback<0>().set_ioport("STICKX");
+	ioboard.an_callback<2>().set_ioport("STICKY");
+	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
-	MCFG_DEVICE_BIOS("epr18021");
-	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN.0"))
-	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN.1"))
-	MCFG_MODEL1IO2_AN0_CB(IOPORT("STICKX"))
-	MCFG_MODEL1IO2_AN2_CB(IOPORT("STICKY"))
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model1_state, netmerc_outputs_w))
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
+	config.set_default_layout(layout_model1io2);
 MACHINE_CONFIG_END
 
 

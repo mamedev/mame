@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 /***************************************************************************
 
  GX545 Scooter Shooter - (c) 1985 Konami
@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_DEVICE_PROGRAM_MAP(scotrsht_sound_map)
 	MCFG_DEVICE_IO_MAP(scotrsht_sound_port)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

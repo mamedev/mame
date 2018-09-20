@@ -173,11 +173,6 @@ FLOPPY_FORMATS_MEMBER( econet_e01_device::floppy_formats_afs )
 	FLOPPY_AFS_FORMAT
 FLOPPY_FORMATS_END0
 
-static void e01_floppies(device_slot_interface &device)
-{
-	device.option_add("35dd", FLOPPY_35_DD); // NEC FD1036 A
-}
-
 WRITE_LINE_MEMBER( econet_e01_device::fdc_irq_w )
 {
 	m_fdc_irq = state;
@@ -243,55 +238,67 @@ void econet_e01_device::e01_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(econet_e01_device::device_add_mconfig)
+void econet_e01_device::device_add_mconfig(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(R65C102_TAG, M65C02, XTAL(8'000'000)/4) // Rockwell R65C102P3
-	MCFG_DEVICE_PROGRAM_MAP(e01_mem)
+	M65C02(config, m_maincpu, XTAL(8'000'000)/4); // Rockwell R65C102P3
+	m_maincpu->set_addrmap(AS_PROGRAM, &econet_e01_device::e01_mem);
 
-	MCFG_DEVICE_ADD(HD146818_TAG, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, econet_e01_device, rtc_irq_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(FUNC(econet_e01_device::rtc_irq_w));
 
 	// devices
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 8_MHz_XTAL / 4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, econet_e01_device, via_irq_w))
+	via6522_device &via(VIA6522(config, R6522_TAG, 8_MHz_XTAL / 4));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.irq_handler().set(FUNC(econet_e01_device::via_irq_w));
 
-	MCFG_DEVICE_ADD(MC6854_TAG, MC6854, 0)
-	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, econet_e01_device, adlc_irq_w))
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(*this, econet_e01_device, econet_data_w))
+	MC6854(config, m_adlc, 0);
+	m_adlc->out_irq_cb().set(FUNC(econet_e01_device::adlc_irq_w));
+	m_adlc->out_txd_cb().set(FUNC(econet_e01_device::econet_data_w));
 
-	MCFG_DEVICE_ADD(WD2793_TAG, WD2793, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, econet_e01_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, econet_e01_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_formats_afs)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", floppy_formats_afs)
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_e01", "e01_flop")
+	WD2793(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(econet_e01_device::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(econet_e01_device::fdc_drq_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
+	for (int i = 0; i < 2; i++)
+	{
+		FLOPPY_CONNECTOR(config, m_floppy[i]);
+		m_floppy[i]->option_add("35dd", FLOPPY_35_DD);
+		m_floppy[i]->set_default_option("35dd");
+		m_floppy[i]->set_formats(floppy_formats_afs);
+	}
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	software_list_device &softlist(SOFTWARE_LIST(config, "flop_ls_e01"));
+	softlist.set_type("e01_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE(*this, econet_e01_device, scsi_bsy_w)) // bit1
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+
+	SCSI_PORT(config, m_scsibus);
+	m_scsibus->set_data_input_buffer(m_scsi_data_in);
+	m_scsibus->msg_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit0));
+	m_scsibus->bsy_handler().set(FUNC(econet_e01_device::scsi_bsy_w)); // bit1
 	// bit 2 0
 	// bit 3 0
 	// bit 4 NIRQ
-	MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, econet_e01_device, scsi_req_w)) // bit5
-	MCFG_SCSI_IO_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	m_scsibus->req_handler().set(FUNC(econet_e01_device::scsi_req_w)); // bit5
+	m_scsibus->io_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit6));
+	m_scsibus->cd_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit7));
+	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SCSIBUS_TAG)
-	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
+	OUTPUT_LATCH(config, m_scsi_data_out);
+	m_scsibus->set_output_latch(*m_scsi_data_out);
+
+	INPUT_BUFFER(config, m_scsi_data_in);
+	INPUT_BUFFER(config, m_scsi_ctrl_in);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("64K");
+}
 
 
 //-------------------------------------------------
@@ -390,8 +397,7 @@ econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type 
 	, m_scsi_data_out(*this, "scsi_data_out")
 	, m_scsi_data_in(*this, "scsi_data_in")
 	, m_scsi_ctrl_in(*this, "scsi_ctrl_in")
-	, m_floppy0(*this, WD2793_TAG":0")
-	, m_floppy1(*this, WD2793_TAG":1")
+	, m_floppy(*this, WD2793_TAG":%u", 0U)
 	, m_rom(*this, R65C102_TAG)
 	, m_centronics(*this, CENTRONICS_TAG)
 	, m_adlc_ie(0)
@@ -521,8 +527,8 @@ WRITE8_MEMBER( econet_e01_device::floppy_w )
 	// floppy select
 	floppy_image_device *floppy = nullptr;
 
-	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (!BIT(data, 0)) floppy = m_floppy[0]->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy[1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 

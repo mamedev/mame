@@ -17,7 +17,7 @@
 		downcast<namco_c117_device &>(*device).set_cpu_tags(_maincpu, _subcpu);
 
 #define MCFG_CUS117_SUBRES_CB(_devcb) \
-		devcb = &downcast<namco_c117_device &>(*device).set_subres_cb(DEVCB_##_devcb);
+		downcast<namco_c117_device &>(*device).set_subres_cb(DEVCB_##_devcb);
 
 
 //***************************************************************************

@@ -108,30 +108,32 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void flower(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(audio_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(bgvram_w);
 	DECLARE_WRITE8_MEMBER(fgvram_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void flower(machine_config &config);
 	void audio_map(address_map &map);
 	void shared_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<cpu_device> m_audiocpu;

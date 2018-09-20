@@ -53,7 +53,7 @@ public:
 
 	void skydiver(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(wram_r);
@@ -84,7 +84,6 @@ protected:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void skydiver_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<f9334_device> m_latch3;

@@ -73,6 +73,11 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sklflite(machine_config &config);
+	void play_3(machine_config &config);
+	void megaaton(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(megaaton_port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
@@ -92,16 +97,13 @@ public:
 	DECLARE_READ8_MEMBER(port02_a_r);
 	DECLARE_READ_LINE_MEMBER(clear_a_r);
 
-	void sklflite(machine_config &config);
-	void play_3(machine_config &config);
-	void megaaton(machine_config &config);
 	void megaaton_io(address_map &map);
 	void play_3_audio_io(address_map &map);
 	void play_3_audio_map(address_map &map);
 	void play_3_io(address_map &map);
 	void play_3_map(address_map &map);
 	void sklflite_io(address_map &map);
-private:
+
 	u16 m_clockcnt;
 	u16 m_resetcnt;
 	u16 m_resetcnt_a;
@@ -475,61 +477,56 @@ WRITE_LINE_MEMBER( play_3_state::q4013a_w )
 
 MACHINE_CONFIG_START(play_3_state::play_3)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CDP1802, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(play_3_map)
-	MCFG_DEVICE_IO_MAP(play_3_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_3_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, play_3_state, ef1_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, play_3_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE("4013a", ttl7474_device, clear_w))
+	CDP1802(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_3_state::play_3_map);
+	m_maincpu->set_addrmap(AS_IO, &play_3_state::play_3_io);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(play_3_state::clear_r));
+	m_maincpu->ef1_cb().set(FUNC(play_3_state::ef1_r));
+	m_maincpu->ef4_cb().set(FUNC(play_3_state::ef4_r));
+	m_maincpu->q_cb().set("4013a", FUNC(ttl7474_device::clear_w));
+	m_maincpu->tpb_cb().set(FUNC(play_3_state::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_3)
+	config.set_default_layout(layout_play_3);
 
 	// Devices
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(3'579'545) / 8) // TPB line from CPU
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_3_state, clock_w))
-
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_3_state, clock2_w))
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	MCFG_DEVICE_ADD("4013a", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, play_3_state, q4013a_w))
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE("4013a", ttl7474_device, d_w))
+	TTL7474(config, m_4013a, 0);
+	m_4013a->output_cb().set(FUNC(play_3_state::q4013a_w));
+	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
 
-	MCFG_DEVICE_ADD("4013b", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE("maincpu", cosmac_device, ef2_w)) MCFG_DEVCB_INVERT // inverted
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // inverted
+	TTL7474(config, m_4013b, 0);
+	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w)).invert(); // inverted
+	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // inverted
 
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_DEVICE_ADD("audiocpu", CDP1802, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(play_3_audio_map)
-	MCFG_DEVICE_IO_MAP(play_3_audio_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_3_state, clear_a_r))
+	CDP1802(config, m_audiocpu, 3.579545_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &play_3_state::play_3_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &play_3_state::play_3_audio_io);
+	m_audiocpu->wait_cb().set_constant(1);
+	m_audiocpu->clear_cb().set(FUNC(play_3_state::clear_a_r));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(3'579'545) / 2)
+	MCFG_DEVICE_ADD("aysnd1", AY8910, 3.579545_MHz_XTAL / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(3'579'545) / 2)
+	MCFG_DEVICE_ADD("aysnd2", AY8910, 3.579545_MHz_XTAL / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_3_state::megaaton)
 	play_3(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(2'950'000))
-	MCFG_DEVICE_IO_MAP(megaaton_io)
 
-	MCFG_DEVICE_MODIFY("tpb_clock")
-	MCFG_DEVICE_CLOCK(XTAL(2'950'000) / 8) // TPB line from CPU
+	m_maincpu->set_clock(2.95_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_IO, &play_3_state::megaaton_io);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_3_state::sklflite)

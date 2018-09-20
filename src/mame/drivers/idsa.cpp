@@ -46,6 +46,10 @@ public:
 		, m_ppi(*this, "ppi%u", 1)
 		{ }
 
+	void bsktbllp(machine_config &config);
+	void idsa(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_READ8_MEMBER(portb0_r);
 	DECLARE_WRITE8_MEMBER(port80_w);
@@ -63,11 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_b_w);
 
-	void bsktbllp(machine_config &config);
-	void idsa(machine_config &config);
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 
 	uint16_t m_irqcnt;
@@ -231,7 +233,7 @@ INPUT_PORTS_END
 // This came from pinmame, even though there's no spb640 chip
 READ8_MEMBER( idsa_state::portb0_r )
 {
-	uint16_t data = m_speech->spb640_r(space, offset / 2);
+	uint16_t data = m_speech->spb640_r(offset / 2);
 	return offset % 2 ? (uint8_t)(data >> 8) : (uint8_t)(data & 0xff);
 }
 
@@ -346,8 +348,8 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 	genpin_audio(config);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("speech", SP0256, 3120000) // unknown variant
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
+	SP0256(config, m_speech, 3120000); // unknown variant
+	m_speech->add_route(ALL_OUTPUTS, "lspeaker", 1.5);
 
 	MCFG_DEVICE_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -366,14 +368,15 @@ MACHINE_CONFIG_START(idsa_state::bsktbllp)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ppi_control_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ppi_data_w))
 
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi1_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi1_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi1_c_w))
-	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi2_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi2_c_w))
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->out_pa_callback().set(FUNC(idsa_state::ppi1_a_w));
+	m_ppi[0]->out_pb_callback().set(FUNC(idsa_state::ppi1_b_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(idsa_state::ppi1_c_w));
+
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->out_pa_callback().set(FUNC(idsa_state::ppi2_a_w));
+	m_ppi[1]->out_pb_callback().set(FUNC(idsa_state::ppi2_b_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(idsa_state::ppi2_c_w));
 MACHINE_CONFIG_END
 
 

@@ -46,7 +46,7 @@
 	downcast<a8sio_slot_device &>(*device).set_a8sio_slot(_nbtag, _tag);
 
 #define MCFG_A8SIO_DATA_IN_CB(_devcb) \
-	devcb = &downcast<a8sio_device &>(*device).set_data_in_callback(DEVCB_##_devcb);
+	downcast<a8sio_device &>(*device).set_data_in_callback(DEVCB_##_devcb);
 
 
 class a8sio_slot_device : public device_t,

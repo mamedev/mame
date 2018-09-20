@@ -118,8 +118,8 @@ void atetris_state::machine_start()
 void atetris_state::machine_reset()
 {
 	/* reset the slapstic */
-	m_slapstic_device->slapstic_reset();
-	m_current_bank = m_slapstic_device->slapstic_bank() & 1;
+	m_slapstic->slapstic_reset();
+	m_current_bank = m_slapstic->slapstic_bank() & 1;
 	reset_bank();
 
 	/* start interrupts going (32V clocked by 16V) */
@@ -137,7 +137,7 @@ void atetris_state::machine_reset()
 READ8_MEMBER(atetris_state::slapstic_r)
 {
 	int result = m_slapstic_base[0x2000 + offset];
-	int new_bank = m_slapstic_device->slapstic_tweak(space, offset) & 1;
+	int new_bank = m_slapstic->slapstic_tweak(space, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != m_current_bank)
@@ -341,103 +341,88 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atetris_state::atetris)
-
+void atetris_state::atetris_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_state::main_map);
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 101, false)
+	SLAPSTIC(config, m_slapstic, 101, false);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_PARALLEL_2804, 0)
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atetris)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_atetris);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRGGGBB)
+	PALETTE(config, "palette", 256).set_format(PALETTE_FORMAT_RRRGGGBB);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
+	m_screen->set_raw(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(atetris_state::screen_update));
+	m_screen->set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+}
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+void atetris_state::atetris(machine_config &config)
+{
+	atetris_base(config);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
+
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/8));
+	pokey1.allpot_r().set_ioport("IN0");
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/8));
+	pokey2.allpot_r().set_ioport("IN1");
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(atetris_state::atetrisb2)
-	atetris(config);
+void atetris_state::atetrisb2(machine_config &config)
+{
+	atetris_base(config);
+
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(BOOTLEG_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(atetrisb2_map)
+	m_maincpu->set_clock(BOOTLEG_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_state::atetrisb2_map);
 
-	MCFG_DEVICE_REMOVE("pokey1")
-	MCFG_DEVICE_REMOVE("pokey2")
-
-	MCFG_DEVICE_ADD("sn1", SN76489A, BOOTLEG_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn2", SN76489A, BOOTLEG_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn3", SN76489, BOOTLEG_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn1", BOOTLEG_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn2", BOOTLEG_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn3", BOOTLEG_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(atetris_mcu_state::atetrisb3)
-	atetris(config);
+void atetris_mcu_state::atetrisb3(machine_config &config)
+{
+	atetris_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atetrisb3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_mcu_state::atetrisb3_map);
 
-	MCFG_DEVICE_REPLACE("eeprom", EEPROM_PARALLEL_2816, 0)
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_DEVICE_REMOVE("pokey1")
-	MCFG_DEVICE_REMOVE("pokey2")
+	I8749(config, m_mcu, 10_MHz_XTAL);
+	m_mcu->bus_in_cb().set(FUNC(atetris_mcu_state::mcu_bus_r));
+	m_mcu->bus_out_cb().set(m_soundlatch[0], FUNC(generic_latch_8_device::acknowledge_w));
+	m_mcu->p2_out_cb().set(FUNC(atetris_mcu_state::mcu_p2_w));
 
-	MCFG_DEVICE_ADD("mcu", I8749, 10_MHz_XTAL)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, atetris_mcu_state, mcu_bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8("soundlatch1", generic_latch_8_device, acknowledge_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, atetris_mcu_state, mcu_p2_w))
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_mcu, MCS48_INPUT_IRQ);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", MCS48_INPUT_IRQ))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-
-	MCFG_DEVICE_ADD("sn1", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn2", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn3", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn4", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	for (int i = 0; i < 4; i++)
+	{
+		SN76489A(config, m_sn[i], 4000000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	}
+}
 
 
 
@@ -589,7 +574,7 @@ void atetris_state::init_atetris()
 {
 	uint8_t *rgn = memregion("maincpu")->base();
 
-	m_slapstic_device->slapstic_init();
+	m_slapstic->slapstic_init();
 	m_slapstic_source = &rgn[0x10000];
 	m_slapstic_base = &rgn[0x04000];
 }

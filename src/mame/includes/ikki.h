@@ -24,6 +24,9 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void ikki(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	/* memory pointers */
@@ -51,7 +54,6 @@ public:
 	uint32_t screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ikki_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void ikki(machine_config &config);
 	void ikki_cpu1(address_map &map);
 	void ikki_cpu2(address_map &map);
 };

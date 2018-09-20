@@ -48,14 +48,15 @@ public:
 	{
 	}
 
-	void init_common();
-	void init_banbam();
-	void init_pettanp();
-
 	void markham(machine_config &config);
 	void strnskil(machine_config &config);
 	void banbam(machine_config &config);
 
+	void init_common();
+	void init_banbam();
+	void init_pettanp();
+
+private:
 	void base_master_map(address_map &map);
 	void markham_master_map(address_map &map);
 	void strnskil_master_map(address_map &map);
@@ -63,7 +64,6 @@ public:
 	void markham_slave_map(address_map &map);
 	void strnskil_slave_map(address_map &map);
 
-protected:
 	DECLARE_WRITE8_MEMBER(coin_output_w);
 	template<int Bit> DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -95,7 +95,6 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(strnskil_scanline);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_mcu;

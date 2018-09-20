@@ -17,6 +17,10 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void m52(machine_config &config);
+	void alpha1v(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -50,8 +54,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void m52(machine_config &config);
-	void alpha1v(machine_config &config);
 	void alpha1v_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);

@@ -21,8 +21,8 @@
 class polepos_state : public driver_device
 {
 public:
-	polepos_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	polepos_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
@@ -36,7 +36,8 @@ public:
 		m_view16_memory(*this, "view16_memory"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
 

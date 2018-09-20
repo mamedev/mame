@@ -745,7 +745,6 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	{
 		// switch between microcomputer/boot loader and microprocessor modes
 		m_mcbl_mode = (state == ASSERT_LINE);
-		m_cache->force_update();
 		return;
 	}
 

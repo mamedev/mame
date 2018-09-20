@@ -32,7 +32,7 @@
 //**************************************************************************
 
 #define MCFG_RP5C01_OUT_ALARM_CB(_devcb) \
-	devcb = &downcast<rp5c01_device &>(*device).set_out_alarm_callback(DEVCB_##_devcb);
+	downcast<rp5c01_device &>(*device).set_out_alarm_callback(DEVCB_##_devcb);
 
 // include this macro if the chip is not battery backed
 #define MCFG_RP5C01_REMOVE_BATTERY() \

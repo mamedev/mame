@@ -429,17 +429,17 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 
 	MCFG_DEVICE_ADD("earom", ER2055, 0)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LED1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LED2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // TBSWP
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // SPARE
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, liberatr_state, trackball_reset_w)) // CTRLD
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, liberatr_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, liberatr_state, coin_counter_left_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, liberatr_state, planet_select_w))
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set_output("led0").invert(); // START LED1
+	m_outlatch->q_out_cb<1>().set_output("led1").invert(); // START LED2
+	m_outlatch->q_out_cb<2>().set_nop(); // TBSWP
+	m_outlatch->q_out_cb<3>().set_nop(); // SPARE
+	m_outlatch->q_out_cb<4>().set(FUNC(liberatr_state::trackball_reset_w)); // CTRLD
+	m_outlatch->q_out_cb<5>().set(FUNC(liberatr_state::coin_counter_right_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(liberatr_state::coin_counter_left_w));
+	m_outlatch->q_out_cb<7>().set([this] (int state) { m_planet_select = state; });
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

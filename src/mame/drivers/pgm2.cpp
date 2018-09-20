@@ -91,6 +91,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/pgm2.h"
 
 // checked on startup, or doesn't boot
@@ -779,8 +780,7 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
 	MCFG_TIMER_DRIVER_ADD("mcu_timer", pgm2_state, igs_interrupt2)
 
-	MCFG_ARM_AIC_ADD("arm_aic")
-	MCFG_IRQ_LINE_CB(WRITELINE(*this, pgm2_state, irq))
+	ARM_AIC(config, "arm_aic", 0).irq_callback().set(FUNC(pgm2_state::irq));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_PALETTE_ADD("bg_palette", 0x2000/4) // bg
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

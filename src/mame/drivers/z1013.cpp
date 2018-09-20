@@ -71,6 +71,10 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void z1013k76(machine_config &config);
+	void z1013(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
@@ -78,11 +82,9 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(z1013);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z1013k76(machine_config &config);
-	void z1013(machine_config &config);
 	void z1013_io(address_map &map);
 	void z1013_mem(address_map &map);
-private:
+
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
 	virtual void machine_reset() override;
@@ -392,9 +394,9 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, z1013_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, z1013_state, port_b_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(1'000'000)));
+	pio.in_pb_callback().set(FUNC(z1013_state::port_b_r));
+	pio.out_pb_callback().set(FUNC(z1013_state::port_b_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -404,9 +406,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z1013_state::z1013k76)
 	z1013(config);
-	MCFG_DEVICE_REMOVE("z80pio")
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, z1013_state, k7659_port_b_r))
+
+	z80pio_device &pio(*subdevice<z80pio_device>("z80pio"));
+	pio.in_pb_callback().set(FUNC(z1013_state::k7659_port_b_r));
+	pio.out_pb_callback().set_nop();
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,Jarek Parchanski
+#ifndef MAME_INCLUDES_GSWORD_H
+#define MAME_INCLUDES_GSWORD_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
@@ -151,3 +155,5 @@ private:
 	u8      m_mcu1_p2;
 	u8      m_mcu2_p1;
 };
+
+#endif // MAME_INCLUDES_GSWORD_H

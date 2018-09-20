@@ -134,6 +134,13 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void greatgun(machine_config &config);
+	void mazerbla(machine_config &config);
+
+	void init_mazerbla();
+	void init_greatgun();
+
+private:
 	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
 	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
 	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
@@ -150,8 +157,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	void init_mazerbla();
-	void init_greatgun();
 	DECLARE_PALETTE_INIT(mazerbla);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -159,8 +164,6 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void greatgun(machine_config &config);
-	void mazerbla(machine_config &config);
 	void greatgun_cpu3_io_map(address_map &map);
 	void greatgun_io_map(address_map &map);
 	void greatgun_sound_map(address_map &map);
@@ -171,7 +174,6 @@ public:
 	void mazerbla_io_map(address_map &map);
 	void mazerbla_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -998,7 +1000,7 @@ MACHINE_CONFIG_START(mazerbla_state::mazerbla)
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1041,7 +1043,7 @@ MACHINE_CONFIG_START(mazerbla_state::greatgun)
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

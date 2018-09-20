@@ -81,7 +81,7 @@ void validity_checker::validate_tag(const char *tag)
 		osd_printf_error("Invalid generic tag '%s' used\n", tag);
 
 	// scan for invalid characters
-	static const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
+	static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
 	for (const char *p = tag; *p != 0; p++)
 	{
 		// only lower-case permitted
@@ -1945,12 +1945,6 @@ void validity_checker::validate_devices()
 
 		// validate auto-finders
 		device.findit(true);
-
-		// validate callbacks
-		for (auto &cb : device.input_callbacks())
-			cb->validity_check(*this);
-		for (auto &cb : device.output_callbacks())
-			cb->validity_check(*this);
 
 		// validate the device tag
 		validate_tag(device.basetag());

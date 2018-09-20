@@ -33,6 +33,9 @@ public:
 		m_palette(*this, "palette"),
 		m_fdc(*this, "fdc")  { }
 
+	void ax20(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -45,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tc_w);
 	DECLARE_WRITE8_MEMBER(ctl_w);
-	void ax20(machine_config &config);
+
 	void ax20_io(address_map &map);
 	void ax20_map(address_map &map);
 };

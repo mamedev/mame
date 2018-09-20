@@ -217,16 +217,18 @@ public:
 		, m_sq1vfd(*this, "sq1vfd")
 	{ }
 
+	void mr(machine_config &config);
+
+	void init_mr();
+
+private:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_device<esq2x40_sq1_device> m_sq1vfd;
 
 	virtual void machine_reset() override;
 
-public:
-	void init_mr();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
-	void mr(machine_config &config);
 	void mr_map(address_map &map);
 };
 

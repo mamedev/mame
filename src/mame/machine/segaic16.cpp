@@ -621,6 +621,7 @@ void sega_315_5195_mapper_device::update_mapping()
 	if (LOG_MEMORY_MAP) osd_printf_debug("----\nRemapping:\n");
 
 	// first reset everything back to the beginning
+	m_space->unmap_readwrite(0x000000, 0xffffff);
 	m_space->install_readwrite_handler(0x000000, 0xffffff, read8_delegate(FUNC(sega_315_5195_mapper_device::read), this), write8_delegate(FUNC(sega_315_5195_mapper_device::write), this), 0x00ff);
 
 	// loop over the regions

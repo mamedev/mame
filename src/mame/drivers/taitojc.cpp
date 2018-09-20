@@ -1095,15 +1095,15 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
-	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
-	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
-	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
-	MCFG_TC0640FIO_READ_3_CB(IOPORT("UNUSED"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, taitojc_state, coin_control_w))
-	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
+	TC0640FIO(config, m_tc0640fio, 0);
+	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
+	m_tc0640fio->read_1_callback().set_ioport("COINS");
+	m_tc0640fio->read_2_callback().set_ioport("START");
+	m_tc0640fio->read_3_callback().set_ioport("UNUSED");
+	m_tc0640fio->write_4_callback().set(FUNC(taitojc_state::coin_control_w));
+	m_tc0640fio->read_7_callback().set_ioport("BUTTONS");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 

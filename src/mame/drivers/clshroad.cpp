@@ -283,11 +283,11 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, clshroad_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<1>().set(FUNC(clshroad_state::main_irq_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(clshroad_state::sound_irq_mask_w));
+	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -324,11 +324,11 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // never writes here?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, clshroad_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // never writes here?
+	mainlatch.q_out_cb<1>().set(FUNC(clshroad_state::main_irq_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(clshroad_state::sound_irq_mask_w));
+	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

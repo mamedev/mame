@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_CCLIMBER_H
+#define MAME_INCLUDES_CCLIMBER_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
@@ -9,8 +13,8 @@
 class cclimber_state : public driver_device
 {
 public:
-	cclimber_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cclimber_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -27,7 +31,7 @@ public:
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
 		m_toprollr_bg_coloram(*this, "bg_coloram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -142,3 +146,5 @@ public:
 	void yamato_map(address_map &map);
 	void yamato_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CCLIMBER_H

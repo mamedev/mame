@@ -71,11 +71,13 @@ void bt459_device::device_start()
 	save_item(NAME(m_palette_ram));
 
 	save_item(NAME(m_blink_start));
+	save_item(NAME(m_contrast));
 }
 
 void bt459_device::device_reset()
 {
 	m_blink_start = -1;
+	m_contrast = 0xff;
 }
 
 /*
@@ -123,7 +125,7 @@ u8 bt459_device::get_component(rgb_t *arr, int index)
 	return 0;
 }
 
-void bt459_device::set_component(rgb_t *arr, int index, u8 data)
+void bt459_device::set_component(rgb_t *const arr, const int index, const u8 data)
 {
 	switch (m_address_rgb)
 	{
@@ -631,11 +633,17 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 							// check for dual-cursor mode and combine with cross-hair data
 							if (ch_cursor_enable)
 								if (((x >= 31 - ch_thickness) && (x <= 31 + ch_thickness)) || ((y >= 31 - ch_thickness) && (y <= 31 + ch_thickness)))
-									data = (m_cursor_command & CR43) ? data | ch_cursor_enable : data ^ ch_cursor_enable;
+									data = (m_cursor_command & CR43) ? (data | ch_cursor_enable) : (data ^ ch_cursor_enable);
 
 							// write cursor data to screen (normal or X Window mode)
 							if (data && !((m_command_2 & CR21) && data == 1))
-								bitmap.pix(ypos, xpos) = m_cursor_color[data - 1];
+							{
+								rgb_t rgb = m_cursor_color[data - 1];
+								if (m_contrast != 0xff)
+									rgb.scale8(m_contrast + 1);
+
+								bitmap.pix(ypos, xpos) = rgb;
+							}
 						}
 					}
 				}
@@ -646,7 +654,9 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		if (ch_cursor_enable)
 		{
 			// get the cross hair cursor color
-			const rgb_t ch_color = m_cursor_color[ch_cursor_enable - 1];
+			rgb_t ch_color = m_cursor_color[ch_cursor_enable - 1];
+			if (m_contrast != 0xff)
+				ch_color.scale8(m_contrast + 1);
 
 			/*
 			 * The window (x) value to be written is calculated as follows:

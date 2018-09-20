@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/ripple_counter.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
@@ -29,10 +30,15 @@ public:
 		m_ay8910(*this, "ay%u", 1),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_latch(*this, "latch%u", 1U)
 	{
 	}
 
+	void rougien(machine_config &config);
+	void mermaid(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -69,6 +75,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device_array<ls259_device, 2> m_latch;
 
 	uint8_t    m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);
@@ -103,7 +110,5 @@ public:
 	uint8_t collision_check( rectangle& rect );
 	void collision_update();
 	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
-	void rougien(machine_config &config);
-	void mermaid(machine_config &config);
 	void mermaid_map(address_map &map);
 };

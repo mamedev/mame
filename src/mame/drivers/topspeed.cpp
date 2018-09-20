@@ -582,8 +582,8 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_DEVICE_PROGRAM_MAP(z80_prg)
 	MCFG_DEVICE_IO_MAP(z80_io)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, topspeed_state, z80ctc_to0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
+	ctc.intr_callback().set(FUNC(topspeed_state::z80ctc_to0));
 
 	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
 	MCFG_PC080SN_GFX_REGION(1)
@@ -599,13 +599,13 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 
-	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
-	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, topspeed_state, coins_w))
-	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
+	TC0040IOC(config, m_tc0040ioc, 0);
+	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0040ioc->read_2_callback().set_ioport("IN0");
+	m_tc0040ioc->read_3_callback().set_ioport("IN1");
+	m_tc0040ioc->write_4_callback().set(FUNC(topspeed_state::coins_w));
+	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -624,11 +624,11 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000) / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("sndbank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)
-	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set_membank("sndbank").mask(0x03);
+	ymsnd.add_route(0, "filter1l", 1.0);
+	ymsnd.add_route(1, "filter1r", 1.0);
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, topspeed_state, msm5205_1_vck)) // VCK function

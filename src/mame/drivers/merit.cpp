@@ -95,34 +95,11 @@ public:
 		, m_ram_video(*this, "ravideo")
 		, m_backup_ram(*this, "backup_ram")
 		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi8255_%u", 0U)
 		, m_screen(*this, "screen")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
-	DECLARE_READ8_MEMBER(questions_r);
-	DECLARE_WRITE8_MEMBER(low_offset_w);
-	DECLARE_WRITE8_MEMBER(med_offset_w);
-	DECLARE_WRITE8_MEMBER(high_offset_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(casino5_bank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE8_MEMBER(led1_w);
-	DECLARE_WRITE8_MEMBER(led2_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(misc_couple_w);
-	void init_couple();
-	void init_key_5();
-	void init_key_4();
-	void init_key_7();
-	void init_key_0();
-	void init_key_2();
-	void init_dtrvwz5();
-	DECLARE_MACHINE_START(casino5);
-	MC6845_BEGIN_UPDATE(crtc_begin_update);
-	MC6845_UPDATE_ROW(crtc_update_row);
 	void misdraw(machine_config &config);
 	void couple(machine_config &config);
 	void phrcraze(machine_config &config);
@@ -134,6 +111,35 @@ public:
 	void trvwhziv(machine_config &config);
 	void bigappg(machine_config &config);
 	void pitboss(machine_config &config);
+
+	void init_couple();
+	void init_key_5();
+	void init_key_4();
+	void init_key_7();
+	void init_key_0();
+	void init_key_2();
+	void init_dtrvwz5();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
+
+private:
+	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
+	DECLARE_READ8_MEMBER(questions_r);
+	DECLARE_WRITE8_MEMBER(low_offset_w);
+	DECLARE_WRITE8_MEMBER(med_offset_w);
+	DECLARE_WRITE8_MEMBER(high_offset_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(casino5_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE8_MEMBER(led1_w);
+	DECLARE_WRITE8_MEMBER(led2_w);
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(misc_couple_w);
+
+	DECLARE_MACHINE_START(casino5);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	void bigappg_map(address_map &map);
 	void casino5_map(address_map &map);
 	void couple_map(address_map &map);
@@ -149,7 +155,6 @@ public:
 	void trvwhiz_map(address_map &map);
 	void trvwhziv_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
 	pen_t m_pens[NUM_PENS];
@@ -162,6 +167,7 @@ protected:
 	int m_decryption_key;
 	optional_shared_ptr<uint8_t> m_backup_ram;
 	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 2> m_ppi;
 	required_device<screen_device> m_screen;
 	output_finder<10> m_leds;
 };
@@ -414,8 +420,8 @@ void merit_state::pitboss_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram();
-	map(0xa000, 0xa003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc000, 0xc003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc000, 0xc003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
@@ -431,8 +437,8 @@ void merit_state::casino5_map(address_map &map)
 	map(0x6000, 0x6fff).ram().share("nvram");
 	map(0x7000, 0x7000).w(FUNC(merit_state::casino5_bank_w));
 	map(0x7001, 0x7fff).ram();
-	map(0xa000, 0xa003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc000, 0xc003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc000, 0xc003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
@@ -444,8 +450,8 @@ void merit_state::bigappg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xbfff).ram().share("nvram");
-	map(0xc004, 0xc007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc008, 0xc00b).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
@@ -458,8 +464,8 @@ void merit_state::misdraw_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xbfff).ram().share("nvram");
 	map(0xb000, 0xb7ff).ram().share("cpunvram"); // overlays other NVRAM? or is it banked?
-	map(0xc004, 0xc007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // swapped compared to other set?
-	map(0xc008, 0xc00b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write)); // swapped compared to other set?
+	map(0xc008, 0xc00b).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
@@ -471,8 +477,8 @@ void merit_state::dodge_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xbfff).ram().share("nvram");
-	map(0xc004, 0xc007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc008, 0xc00b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
@@ -492,8 +498,8 @@ void merit_state::trvwhiz_map(address_map &map)
 	map(0x5400, 0x54ff).w(FUNC(merit_state::low_offset_w));
 	map(0x5800, 0x58ff).w(FUNC(merit_state::med_offset_w));
 	map(0x6000, 0x67ff).ram();
-	map(0xa000, 0xa003).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc000, 0xc003).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa003).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc000, 0xc003).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
@@ -512,8 +518,8 @@ void merit_state::phrcraze_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xbfff).ram();
-	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc00c, 0xc00f).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc00c, 0xc00f).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
 	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
 	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
@@ -535,8 +541,8 @@ void merit_state::tictac_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
 	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
 	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
@@ -558,8 +564,8 @@ void merit_state::trvwhziv_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xbfff).ram();
-	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
 	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
 	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
@@ -575,8 +581,8 @@ void merit_state::dtrvwz5_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram().share("nvram");
 	map(0xb000, 0xb0ff).rom(); /* protection? code jumps here */
-	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).mirror(0x1df0).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).mirror(0x1df0).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
 	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
 	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
@@ -592,8 +598,8 @@ void merit_state::couple_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram().share("backup_ram");
-	map(0xc004, 0xc007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc008, 0xc00b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
@@ -1408,15 +1414,15 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 	MCFG_DEVICE_PROGRAM_MAP(pitboss_map)
 	MCFG_DEVICE_IO_MAP(trvwhiz_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, merit_state, led1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, merit_state, misc_w))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("DSW");
+	m_ppi[1]->out_pb_callback().set(FUNC(merit_state::led1_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(merit_state::misc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1445,7 +1451,7 @@ MACHINE_CONFIG_START(merit_state::casino5)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(casino5_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(merit_state,casino5)
 MACHINE_CONFIG_END
@@ -1457,7 +1463,7 @@ MACHINE_CONFIG_START(merit_state::bigappg)
 	MCFG_DEVICE_PROGRAM_MAP(bigappg_map)
 	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::misdraw)
@@ -1466,7 +1472,7 @@ MACHINE_CONFIG_START(merit_state::misdraw)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(misdraw_map)
 
-	MCFG_NVRAM_ADD_0FILL("cpunvram")
+	NVRAM(config, "cpunvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::dodge)
@@ -1476,7 +1482,7 @@ MACHINE_CONFIG_START(merit_state::dodge)
 	MCFG_DEVICE_PROGRAM_MAP(dodge_map)
 	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(merit_state::dodge_nvram_init));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::tictac)
@@ -1526,11 +1532,7 @@ MACHINE_CONFIG_START(merit_state::couple)
 	MCFG_DEVICE_PROGRAM_MAP(couple_map)
 	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, merit_state, led1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, merit_state, misc_couple_w))
+	m_ppi[1]->out_pc_callback().set(FUNC(merit_state::misc_couple_w));
 MACHINE_CONFIG_END
 
 

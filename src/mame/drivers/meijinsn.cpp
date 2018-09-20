@@ -84,7 +84,9 @@ public:
 
 	void meijinsn(machine_config &config);
 
-protected:
+	void meijinsn_map(address_map &map);
+
+private:
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ16_MEMBER(alpha_mcu_r);
 	DECLARE_PALETTE_INIT(meijinsn);
@@ -94,11 +96,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void meijinsn_map(address_map &map);
 	void meijinsn_sound_io_map(address_map &map);
 	void meijinsn_sound_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	/* memory pointers */

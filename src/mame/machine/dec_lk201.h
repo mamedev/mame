@@ -38,7 +38,7 @@
 //**************************************************************************
 
 #define MCFG_LK201_TX_HANDLER(_cb) \
-	devcb = &downcast<lk201_device &>(*device).set_tx_handler(DEVCB_##_cb);
+	downcast<lk201_device &>(*device).set_tx_handler(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

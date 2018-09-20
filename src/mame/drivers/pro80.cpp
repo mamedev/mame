@@ -41,15 +41,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pro80(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w);
 	DECLARE_READ8_MEMBER(kp_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
-	void pro80(machine_config &config);
 	void pro80_io(address_map &map);
 	void pro80_mem(address_map &map);
-private:
+
 	uint8_t m_digit_sel;
 	uint8_t m_cass_in;
 	uint16_t m_cass_data[4];
@@ -180,7 +182,7 @@ MACHINE_CONFIG_START(pro80_state::pro80)
 	MCFG_DEVICE_IO_MAP(pro80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pro80)
+	config.set_default_layout(layout_pro80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -188,7 +190,7 @@ MACHINE_CONFIG_START(pro80_state::pro80)
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000) / 2)
+	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", pro80_state, timer_p, attotime::from_hz(40000)) // cass read
 MACHINE_CONFIG_END
 

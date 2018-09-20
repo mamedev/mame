@@ -200,7 +200,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
-	MCFG_DEFAULT_LAYOUT(layout_abc1600)
+	config.set_default_layout(layout_abc1600);
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)

@@ -43,10 +43,10 @@ DECLARE_DEVICE_TYPE(TI8X_LINK_PORT, ti8x_link_port_device)
 
 
 #define MCFG_TI8X_LINK_TIP_HANDLER(cb) \
-	devcb = &downcast<ti8x_link_port_device &>(*device).set_tip_handler(DEVCB_##cb);
+	downcast<ti8x_link_port_device &>(*device).set_tip_handler(DEVCB_##cb);
 
 #define MCFG_TI8X_LINK_RING_HANDLER(cb) \
-	devcb = &downcast<ti8x_link_port_device &>(*device).set_ring_handler(DEVCB_##cb);
+	downcast<ti8x_link_port_device &>(*device).set_ring_handler(DEVCB_##cb);
 
 
 class device_ti8x_link_port_interface;

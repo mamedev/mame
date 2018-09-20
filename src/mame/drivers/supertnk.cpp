@@ -118,10 +118,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void init_supertnk();
 	void supertnk(machine_config &config);
 
-protected:
+	void init_supertnk();
+
+private:
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
 	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
@@ -138,7 +139,6 @@ protected:
 	void supertnk_io_map(address_map &map);
 	void supertnk_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_videoram[3];
 	uint8_t m_rom_bank;
 	uint8_t m_bitplane_select;
@@ -436,10 +436,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(supertnk_state::supertnk)
 
 	// CPU TMS9980A; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supertnk_state,  supertnk_interrupt)
+	TMS9980A(config, m_maincpu, 2598750);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::supertnk_map);
+	m_maincpu->set_addrmap(AS_IO, &supertnk_state::supertnk_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(supertnk_state::supertnk_interrupt));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 

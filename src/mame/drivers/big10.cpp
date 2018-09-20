@@ -69,7 +69,6 @@ class big10_state : public driver_device
 public:
 	big10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_v9938(*this, "v9938")
 		, m_maincpu(*this, "maincpu")
 		, m_hopper(*this, "hopper")
 		, m_in(*this, "IN%u", 1)
@@ -87,7 +86,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(mux_w);
 
 private:
-	required_device<v9938_device> m_v9938;
 	uint8_t m_mux_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
@@ -139,7 +137,7 @@ void big10_state::main_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(big10_state::mux_r));         /* present in test mode */
 	map(0x02, 0x02).portr("SYSTEM"); /* coins and service */
-	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r)); /* Dip-Switches routes here. */
 }
@@ -237,12 +235,14 @@ MACHINE_CONFIG_START(big10_state::big10)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IO_MAP(main_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(VDP_MEM);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -259,11 +259,6 @@ WRITE8_MEMBER(fitfight_state::snd_portc_w)
 	//logerror("PC W %x %s\n",data,machine().describe_context());
 }
 
-INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
-{
-	device.execute().pulse_input_line(UPD7810_INTF2, device.execute().minimum_quantum_time());
-}
-
 
 // #define PRIORITY_EASINESS_TO_PLAY
 
@@ -731,25 +726,25 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	MCFG_DEVICE_PROGRAM_MAP(fitfight_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", UPD7810, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(snd_mem)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, fitfight_state, snd_porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, fitfight_state, snd_porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, fitfight_state, snd_portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, fitfight_state, snd_portb_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, fitfight_state, snd_portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fitfight_state, snd_portc_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
+	upd7810_device &audiocpu(UPD7810(config, m_audiocpu, 12000000));
+	audiocpu.set_addrmap(AS_PROGRAM, &fitfight_state::snd_mem);
+	audiocpu.pa_in_cb().set(FUNC(fitfight_state::snd_porta_r));
+	audiocpu.pa_out_cb().set(FUNC(fitfight_state::snd_porta_w));
+	audiocpu.pb_in_cb().set(FUNC(fitfight_state::snd_portb_r));
+	audiocpu.pb_out_cb().set(FUNC(fitfight_state::snd_portb_w));
+	audiocpu.pc_in_cb().set(FUNC(fitfight_state::snd_portc_r));
+	audiocpu.pc_out_cb().set(FUNC(fitfight_state::snd_portc_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fitfight)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 39*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(2*8, 39*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(fitfight_state::screen_update_fitfight));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF2, m_audiocpu->minimum_quantum_time()); });
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

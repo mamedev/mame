@@ -35,6 +35,9 @@ public:
 			m_analog_x(*this, "ANALOGX"),
 			m_analog_y(*this, "ANALOGY") { }
 
+	void xtheball(machine_config &config);
+
+private:
 	required_device<tms34010_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tlc34076_device> m_tlc34076;
@@ -57,7 +60,6 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void xtheball(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -302,23 +304,23 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("latch1", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("ticket", ticket_dispenser_device, motor_w))
+	hc259_device &latch1(HC259(config, "latch1"));
+	latch1.q_out_cb<7>().set("ticket", FUNC(ticket_dispenser_device::motor_w));
 	// Q4 = meter, Q6 = tickets, Q7 = tickets?
 
-	MCFG_DEVICE_ADD("latch2", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // start lamp
+	hc259_device &latch2(HC259(config, "latch2"));
+	latch2.q_out_cb<0>().set_output("led0"); // start lamp
 	// Q1-Q7 = more lamps?
 
-	MCFG_DEVICE_ADD("latch3", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, xtheball_state, foreground_mode_w))
+	hc259_device &latch3(HC259(config, "latch3"));
+	latch3.q_out_cb<3>().set(FUNC(xtheball_state::foreground_mode_w));
 	// Q3 = video foreground control?
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

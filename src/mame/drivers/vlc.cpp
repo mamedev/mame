@@ -168,6 +168,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
+	void nevada(machine_config &config);
+
+	void init_nevada();
+
+private:
 	required_device_array<mc68681_device, 3> m_duart;
 	required_device<msm6242_device> m_rtc;
 
@@ -204,11 +209,9 @@ public:
 	DECLARE_WRITE16_MEMBER( vram_w );
 
 	DECLARE_MACHINE_START(nevada);
-	void init_nevada();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void nevada(machine_config &config);
 	void nevada_map(address_map &map);
 };
 
@@ -587,12 +590,11 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CPU)
 	MCFG_DEVICE_PROGRAM_MAP(nevada_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(150));   /* 150ms Ds1232 TD to Ground */
 
 	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", nevada_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -209,7 +209,7 @@ public:
 
 	void mpu5(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ32_MEMBER(mpu5_mem_r);
 	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
 
@@ -224,7 +224,6 @@ protected:
 	virtual void machine_start() override;
 	void mpu5_map(address_map &map);
 
-private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 	SEC sec;
@@ -551,7 +550,7 @@ MACHINE_CONFIG_START(mpu5_state::mpu5)
 	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_DEVICE_PROGRAM_MAP(mpu5_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_mpu5)
+	config.set_default_layout(layout_mpu5);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

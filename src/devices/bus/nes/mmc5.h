@@ -7,9 +7,9 @@
 
 #include "nxrom.h"
 
+#include "sound/nes_apu.h"  // temp hack to pass the additional sound regs to APU...
+#include "video/ppu2c0x.h"  // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
-class ppu2c0x_device;
-class nesapu_device;
 
 // ======================> nes_exrom_device
 

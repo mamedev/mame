@@ -49,6 +49,9 @@ public:
 		m_ttlrom_offset(0)
 	{ }
 
+	void quickpick5(machine_config &config);
+
+private:
 	uint32_t screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K05324X_CB_MEMBER(sprite_callback);
@@ -80,14 +83,12 @@ public:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 
-	void quickpick5(machine_config &config);
 	void quickpick5_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<k05324x_device> m_k053245;
@@ -405,10 +406,10 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	MCFG_DEVICE_PROGRAM_MAP(quickpick5_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", quickpick5_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) /* K053252, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, quickpick5_state, vbl_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, quickpick5_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(*this, quickpick5_state, ccu_int_time_w))
+	K053252(config, m_k053252, XTAL(32'000'000)/4); /* K053252, xtal verified, divider not verified */
+	m_k053252->int1_ack().set(FUNC(quickpick5_state::vbl_ack_w));
+	m_k053252->int2_ack().set(FUNC(quickpick5_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(quickpick5_state::ccu_int_time_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -430,7 +431,7 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

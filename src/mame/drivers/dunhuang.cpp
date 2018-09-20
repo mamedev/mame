@@ -80,6 +80,9 @@ public:
 		m_dsw(*this, {"DSW1", "DSW2", "DSW3", "DSW4", "DSW5"}),
 		m_service(*this, "SERVICE") { }
 
+	void dunhuang(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(pos_x_w);
 	DECLARE_WRITE8_MEMBER(pos_y_w);
 	DECLARE_WRITE8_MEMBER(tile_w);
@@ -103,16 +106,13 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dunhuang(machine_config &config);
 	void dunhuang_io_map(address_map &map);
 	void dunhuang_map(address_map &map);
 	void ramdac_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-private:
 
 	/* video-related */
 	tilemap_t         *m_tmap;
@@ -812,8 +812,7 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_DEVICE_IO_MAP(dunhuang_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(5));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

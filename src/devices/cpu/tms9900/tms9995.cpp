@@ -151,6 +151,8 @@ enum
 
 #include "logmacro.h"
 
+constexpr int tms9995_device::AS_SETOFFSET;
+
 /****************************************************************************
     Constructor
 ****************************************************************************/
@@ -167,8 +169,10 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		PC(0),
 		PC_debug(0),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
+		m_setoffset_config("setoffset", ENDIANNESS_BIG, 8, 16),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
 		m_prgspace(nullptr),
+		m_sospace(nullptr),
 		m_cru(nullptr),
 		m_external_operation(*this),
 		m_iaq_line(*this),
@@ -193,7 +197,8 @@ void tms9995_device::device_start()
 {
 	// TODO: Restore save state suport
 
-	m_prgspace = &space(AS_PROGRAM);                        // dimemory.h
+	m_prgspace = &space(AS_PROGRAM);
+	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
@@ -300,7 +305,7 @@ void tms9995_device::device_start()
 	// save_item(NAME(m_first_cycle)); // only for log output
 }
 
-const char* tms9995_device::s_statename[20] =
+char const *const tms9995_device::s_statename[20] =
 {
 	"PC",  "WP",  "ST",  "IR",
 	"R0",  "R1",  "R2",  "R3",
@@ -379,7 +384,7 @@ void tms9995_device::state_export(const device_state_entry &entry)
 */
 void tms9995_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	static const char *statestr = "LAECOPX-----IIII";
+	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
 	memset(flags, 0x00, ARRAY_LENGTH(flags));
 	uint16_t val = 0x8000;
@@ -440,10 +445,17 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 
 device_memory_interface::space_config_vector tms9995_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+	if (has_configured_map(AS_SETOFFSET))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
 }
 
 /**************************************************************************
@@ -1783,12 +1795,13 @@ void tms9995_device::mem_read()
 
 	if ((m_address & 0xfffe)==0xfffa && !m_mp9537)
 	{
-		LOGMASKED(LOG_DEC, "read decrementer\n");
+		LOGMASKED(LOG_DEC, "read dec=%04x\n", m_decrementer_value);
 		// Decrementer mapped into the address space
 		m_current_value = m_decrementer_value;
 		if (m_byteop)
 		{
-			if ((m_address & 1)!=1) m_current_value <<= 8;
+			// When reading FFFB, return the lower byte
+			if ((m_address & 1)==1) m_current_value <<= 8;
 			m_current_value &= 0xff00;
 		}
 		pulse_clock(1);
@@ -1838,7 +1851,8 @@ void tms9995_device::mem_read()
 
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & ~1);
-			m_prgspace->set_address(address);
+			if (m_sospace)
+				m_sospace->read_byte(address);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1852,7 +1866,8 @@ void tms9995_device::mem_read()
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			m_prgspace->set_address(m_address | 1);
+			if (m_sospace)
+				m_sospace->read_byte(m_address | 1);
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1928,7 +1943,7 @@ void tms9995_device::mem_write()
 		{
 			m_starting_count_storage_register = m_decrementer_value = m_current_value;
 		}
-		LOGMASKED(LOG_DEC, "Setting decrementer to %04x, PC=%04x\n", m_current_value, PC);
+		LOGMASKED(LOG_DEC, "Setting dec=%04x [PC=%04x]\n", m_current_value, PC);
 		pulse_clock(1);
 		return;
 	}
@@ -1970,7 +1985,8 @@ void tms9995_device::mem_write()
 
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
-			m_prgspace->set_address(address);
+			if (m_sospace)
+				m_sospace->read_byte(address);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -1983,7 +1999,8 @@ void tms9995_device::mem_write()
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			m_prgspace->set_address(m_address | 1);
+			if (m_sospace)
+				m_sospace->read_byte(m_address | 1);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -2218,9 +2235,9 @@ void tms9995_device::trigger_decrementer()
 	if (m_starting_count_storage_register>0) // null will turn off the decrementer
 	{
 		m_decrementer_value--;
+		LOGMASKED(LOG_DEC, "dec=%04x\n", m_decrementer_value);
 		if (m_decrementer_value==0)
 		{
-			LOGMASKED(LOG_DEC, "decrementer reached 0\n");
 			m_decrementer_value = m_starting_count_storage_register;
 			if (m_flag[1]==true)
 			{

@@ -46,6 +46,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void sealy(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -53,7 +56,6 @@ public:
 	// screen updates
 	DECLARE_PALETTE_INIT(sealy);
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sealy(machine_config &config);
 	void sealy_map(address_map &map);
 };
 

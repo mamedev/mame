@@ -33,6 +33,10 @@ public:
 		m_keyboard(*this, "keyboard"),
 		m_z8000_apb(*this, "z8000_apb")
 	{ }
+
+	void olivetti(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<cpu_device> m_kbc;
@@ -56,7 +60,6 @@ public:
 	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 	static void cfg_m20_format(device_t *device);
-	void olivetti(machine_config &config);
 	void kbc_map(address_map &map);
 	void m24_io(address_map &map);
 	void m24_map(address_map &map);
@@ -273,9 +276,7 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	MCFG_DEVICE_ADD("kbc", TMS7000, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(kbc_map)
@@ -291,10 +292,8 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 
 	MCFG_DEVICE_ADD("z8000_apb", M24_Z8000, 0)
 	MCFG_M24_Z8000_HALT(WRITELINE(*this, m24_state, halt_i86_w))
-	MCFG_DEVICE_MODIFY("mb:dma8237")
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, m24_state, dma_hrq_w))
-	MCFG_DEVICE_MODIFY("mb:pic8259")
-	devcb = &downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_WRITELINE(*this, m24_state, int_w));
+	subdevice<am9517a_device>("mb:dma8237")->out_hreq_callback().set(FUNC(m24_state::dma_hrq_w));
+	subdevice<pic8259_device>("mb:pic8259")->out_int_callback().set(FUNC(m24_state::int_w));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")

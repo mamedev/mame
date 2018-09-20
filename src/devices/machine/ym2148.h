@@ -19,19 +19,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_YM2148_TXD_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_txd_handler(DEVCB_##_devcb);
-
-#define MCFG_YM2148_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
-
-#define MCFG_YM2148_PORT_READ_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_port_read_handler(DEVCB_##_devcb);
-
-#define MCFG_YM2148_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-
 class ym2148_device : public device_t, public device_serial_interface
 {
 public:
@@ -39,10 +26,10 @@ public:
 	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_write_handler(Object &&cb) { return m_port_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_read_handler(Object &&cb) { return m_port_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto txd_handler() { return m_txd_handler.bind(); }
+	auto port_write_handler() { return m_port_write_handler.bind(); }
+	auto port_read_handler() { return m_port_read_handler.bind(); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

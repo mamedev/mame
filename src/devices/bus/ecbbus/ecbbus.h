@@ -70,10 +70,10 @@
 
 
 #define MCFG_ECBBUS_IRQ_CALLBACK(_write) \
-	devcb = &downcast<ecbbus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<ecbbus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_ECBBUS_NMI_CALLBACK(_write) \
-	devcb = &downcast<ecbbus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<ecbbus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 
 

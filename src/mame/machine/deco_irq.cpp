@@ -108,14 +108,14 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 	}
 
 	// lightgun?
-	if (m_lightgun_latch >= visible.min_y && m_lightgun_latch <= visible.max_y && y == m_lightgun_latch)
+	if (m_lightgun_latch >= visible.top() && m_lightgun_latch <= visible.bottom() && y == m_lightgun_latch)
 	{
 		m_lightgun_irq = true;
 		m_lightgun_irq_cb(ASSERT_LINE);
 	}
 
 	// vblank-in?
-	if (y == (visible.max_y + 1))
+	if (y == (visible.bottom() + 1))
 	{
 		m_vblank_irq = true;
 		m_vblank_irq_cb(ASSERT_LINE);

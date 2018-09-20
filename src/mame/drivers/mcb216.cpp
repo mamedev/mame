@@ -46,6 +46,10 @@ public:
 		, m_tms5501(*this, "tms5501")
 	{ }
 
+	void mcb216(machine_config &config);
+	void cb308(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(tms5501_status_r);
 
 	DECLARE_MACHINE_RESET(mcb216);
@@ -53,12 +57,10 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void mcb216(machine_config &config);
-	void cb308(machine_config &config);
 	void cb308_mem(address_map &map);
 	void mcb216_io(address_map &map);
 	void mcb216_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<tms5501_device> m_tms5501;
 };
@@ -126,9 +128,9 @@ MACHINE_CONFIG_START(mcb216_state::mcb216)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
-	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
-	MCFG_TMS5501_XMT_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+	TMS5501(config, m_tms5501, 8_MHz_XTAL / 4);
+	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_tms5501->int_callback().set_inputline("maincpu", 0);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("tms5501", tms5501_device, rcv_w))
@@ -143,9 +145,9 @@ MACHINE_CONFIG_START(mcb216_state::cb308)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
-	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
-	MCFG_TMS5501_XMT_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+	TMS5501(config, m_tms5501, 8_MHz_XTAL / 4);
+	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_tms5501->int_callback().set_inputline("maincpu", 0);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("tms5501", tms5501_device, rcv_w))

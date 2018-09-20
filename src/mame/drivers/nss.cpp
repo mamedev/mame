@@ -318,6 +318,13 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void nss(machine_config &config);
+
+	void init_nss();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
+
+private:
 	required_device<cpu_device> m_bioscpu;
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
@@ -343,15 +350,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port_04_w);
 	DECLARE_WRITE8_MEMBER(port_07_w);
 
-	void init_nss();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	void nss(machine_config &config);
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void snes_map(address_map &map);
@@ -849,7 +852,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 	MCFG_RP5H01_ADD("rp5h01")
-	MCFG_M6M80011AP_ADD("m6m80011ap")
+	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -860,7 +863,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -868,9 +871,9 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
 
-	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SNES_PPU(config, m_ppu, 0);
+	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
+	m_ppu->set_screen("screen");
 
 	// NSS
 	MCFG_SCREEN_ADD("osd", RASTER)

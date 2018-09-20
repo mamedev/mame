@@ -275,15 +275,15 @@ MACHINE_CONFIG_START(thoop2_state::thoop2)
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) // 12MHz verified
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, thoop2_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, thoop2_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, thoop2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, thoop2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // unknown. Sound related?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // unknown
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(thoop2_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(thoop2_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(thoop2_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(thoop2_state::coin2_counter_w));
+	m_outlatch->q_out_cb<4>().set_nop(); // unknown. Sound related?
+	m_outlatch->q_out_cb<5>().set_nop(); // unknown
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

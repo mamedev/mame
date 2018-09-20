@@ -32,20 +32,22 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
+	void mc8020(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mc8020(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_ioport_array<7> m_keyboard;
 };
 
@@ -297,10 +299,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(mc8020_state::mc8020)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(2'457'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc8020_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mc8020_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -314,18 +316,18 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(2'457'600))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8020_state, port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8020_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8020_state, port_b_w))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(2'457'600)));
+	pio.out_pa_callback().set(FUNC(mc8020_state::port_a_w));
+	pio.in_pb_callback().set(FUNC(mc8020_state::port_b_r));
+	pio.out_pb_callback().set(FUNC(mc8020_state::port_b_w));
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(2'457'600) / 64) // guess
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(2'457'600))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg0))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", XTAL(2'457'600)));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().append("ctc", FUNC(z80ctc_device::trg0));
 MACHINE_CONFIG_END
 
 

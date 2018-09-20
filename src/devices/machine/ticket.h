@@ -59,7 +59,13 @@ class ticket_dispenser_device : public device_t
 {
 public:
 	// construction/destruction
-	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, const attotime &period, uint8_t motor_sense, uint8_t status_sense)
+		: ticket_dispenser_device(mconfig, tag, owner, 0)
+	{
+		set_period(period);
+		set_senses(motor_sense, status_sense, false);
+	}
+	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~ticket_dispenser_device();
 
 	// inline configuration helpers

@@ -114,7 +114,12 @@ public:
 		m_rtc(*this, "rtc"),
 		m_io_analog(*this, "AN.%u", 0)
 	{ }
+
+	void mwskins(machine_config &config);
+
 	void init_mwskins();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -183,7 +188,7 @@ public:
 
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
-	void mwskins(machine_config &config);
+
 	void map0(address_map &map);
 	void map1(address_map &map);
 	void map2(address_map &map);
@@ -807,89 +812,85 @@ DEVICE_INPUT_DEFAULTS_END
 MACHINE_CONFIG_START(atlantis_state::mwskins)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, VR4310LE, 166666666)    // clock is TRUSTED
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(66666666)
+	VR4310LE(config, m_maincpu, 166666666);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(66666666);
 
-	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
-	MCFG_DEVICE_ADD(PCI_ID_NILE, VRC4373, 0, m_maincpu)
-	MCFG_VRC4373_SET_RAM(0x00800000)
-	MCFG_DEVICE_ADD(PCI_ID_9050, PCI9050, 0)
-	MCFG_PCI9050_SET_MAP(0, atlantis_state::map0)
-	MCFG_PCI9050_SET_MAP(1, atlantis_state::map1)
-	MCFG_PCI9050_SET_MAP(2, atlantis_state::map2)
-	MCFG_PCI9050_SET_MAP(3, atlantis_state::map3)
-	MCFG_PCI9050_USER_OUTPUT_CALLBACK(WRITE32(*this, atlantis_state, user_io_output))
-	MCFG_PCI9050_USER_INPUT_CALLBACK(READ32(*this, atlantis_state, user_io_input))
+	PCI_ROOT(config, ":pci", 0);
 
-	MCFG_DEVICE_ADD(m_rtc, M48T37, 0)
-	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, atlantis_state, watchdog_reset))
-	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, atlantis_state, watchdog_irq))
+	vrc4373_device &vrc4373(VRC4373(config, PCI_ID_NILE, 0, m_maincpu));
+	vrc4373.set_ram_size(0x00800000);
 
-	MCFG_DEVICE_ADD(m_ide, IDE_PCI, 0, 0x10950646, 0x07, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(WRITELINE(*this, atlantis_state, ide_irq))
-	// The pci-ide by default expects the system controller to be pci:00.0 so need to fix here
-	MCFG_DEVICE_MODIFY(PCI_ID_IDE":ide")
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(PCI_ID_NILE, AS_DATA)
-	MCFG_DEVICE_MODIFY(PCI_ID_IDE":ide2")
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(PCI_ID_NILE, AS_DATA)
+	pci9050_device &pci9050(PCI9050(config, PCI_ID_9050, 0));
+	pci9050.set_map(0, address_map_constructor(&atlantis_state::map0, "map0", this), this);
+	pci9050.set_map(1, address_map_constructor(&atlantis_state::map1, "map1", this), this);
+	pci9050.set_map(2, address_map_constructor(&atlantis_state::map2, "map2", this), this);
+	pci9050.set_map(3, address_map_constructor(&atlantis_state::map3, "map3", this), this);
+	pci9050.user_output_callback().set(FUNC(atlantis_state::user_io_output));
+	pci9050.user_input_callback().set(FUNC(atlantis_state::user_io_input));
+
+	M48T37(config, m_rtc);
+	m_rtc->reset_cb().set(FUNC(atlantis_state::watchdog_reset));
+	m_rtc->irq_cb().set(FUNC(atlantis_state::watchdog_irq));
+
+	IDE_PCI(config, m_ide, 0, 0x10950646, 0x07, 0x0, PCI_ID_NILE, AS_DATA).irq_handler().set(FUNC(atlantis_state::ide_irq));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_zeus, ZEUS2, ZEUS2_VIDEO_CLOCK)
-	MCFG_ZEUS2_FLOAT_MODE(1)
-	MCFG_ZEUS2_IRQ_CB(WRITELINE(*this, atlantis_state, zeus_irq))
-	MCFG_ZEUS2_VBLANK_CB(WRITELINE(*this, atlantis_state, vblank_irq))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	ZEUS2(config, m_zeus, ZEUS2_VIDEO_CLOCK);
+	m_zeus->set_float_mode(1);
+	m_zeus->irq_callback().set(FUNC(atlantis_state::zeus_irq));
+	m_zeus->vblank_callback().set(FUNC(atlantis_state::vblank_irq));
+	m_zeus->set_screen(m_screen);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
+	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_dcs, DCS2_AUDIO_DENVER_2CH, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0xe33)
+	DCS2_AUDIO_DENVER_2CH(config, m_dcs, 0);
+	m_dcs->set_dram_in_mb(4);
+	m_dcs->set_polling_offset(0xe33);
 
-	MCFG_DEVICE_ADD(m_ioasic, MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_UPPER(342) //  325
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, atlantis_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->set_upper(342); // 325
+	m_ioasic->irq_handler().set(FUNC(atlantis_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
 	if DEBUG_CONSOLE {
-		MCFG_MIDWAY_IOASIC_OUT_TX_CB(WRITE8(m_uart0, generic_terminal_device, write))
+		m_ioasic->serial_tx_handler().set(m_uart0, FUNC(generic_terminal_device::write));
 		MCFG_DEVICE_ADD(m_uart0, GENERIC_TERMINAL, 0)
 		MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("ioasic", midway_ioasic_device, serial_rx_w))
 	}
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("com1", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("com1", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("com1", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, atlantis_state, duart_irq_callback))
+	NS16550(config, m_uart1, XTAL(1'843'200));
+	m_uart1->out_tx_callback().set("com1", FUNC(rs232_port_device::write_txd));
+	m_uart1->out_dtr_callback().set("com1", FUNC(rs232_port_device::write_dtr));
+	m_uart1->out_rts_callback().set("com1", FUNC(rs232_port_device::write_rts));
+	m_uart1->out_int_callback().set(FUNC(atlantis_state::duart_irq_callback));
 
-	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("com2", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("com2", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("com2", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, atlantis_state, duart_irq_callback))
+	NS16550(config, m_uart2, XTAL(1'843'200));
+	m_uart2->out_tx_callback().set("com2", FUNC(rs232_port_device::write_txd));
+	m_uart2->out_dtr_callback().set("com2", FUNC(rs232_port_device::write_dtr));
+	m_uart2->out_rts_callback().set("com2", FUNC(rs232_port_device::write_rts));
+	m_uart2->out_int_callback().set(FUNC(atlantis_state::duart_irq_callback));
 
-	MCFG_DEVICE_ADD("com1", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart1, ins8250_uart_device, cts_w))
+	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
+	com1.rxd_handler().set(m_uart1, FUNC(ins8250_uart_device::rx_w));
+	com1.dcd_handler().set(m_uart1, FUNC(ins8250_uart_device::dcd_w));
+	com1.dsr_handler().set(m_uart1, FUNC(ins8250_uart_device::dsr_w));
+	com1.ri_handler().set(m_uart1, FUNC(ins8250_uart_device::ri_w));
+	com1.cts_handler().set(m_uart1, FUNC(ins8250_uart_device::cts_w));
 	//MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("com1", mwskins_comm)
 
-	MCFG_DEVICE_ADD("com2", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, cts_w))
+	rs232_port_device &com2(RS232_PORT(config, "com2", default_rs232_devices, nullptr));
+	com2.rxd_handler().set(m_uart2, FUNC(ins8250_uart_device::rx_w));
+	com2.dcd_handler().set(m_uart2, FUNC(ins8250_uart_device::dcd_w));
+	com2.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
+	com2.ri_handler().set(m_uart2, FUNC(ins8250_uart_device::ri_w));
+	com2.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
 MACHINE_CONFIG_END
 
 

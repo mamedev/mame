@@ -247,12 +247,6 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 }
 
 
-template<int C> WRITE_LINE_MEMBER(ccastles_state::ccounter_w)
-{
-	machine().bookkeeping().coin_counter_w(C, state);
-}
-
-
 READ8_MEMBER(ccastles_state::leta_r)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
@@ -440,25 +434,24 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ccastles_state::ccastles)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccastles_state::main_map);
 
-	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // 8N
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ccastles_state, nvram_store_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ccastles_state, nvram_store_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ccastles_state, ccounter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ccastles_state, ccounter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(MEMBANK("bank1"))
+	LS259(config, m_outlatch[0]); // 8N
+	m_outlatch[0]->q_out_cb<0>().set_output("led0").invert();
+	m_outlatch[0]->q_out_cb<1>().set_output("led1").invert();
+	m_outlatch[0]->q_out_cb<2>().set(FUNC(ccastles_state::nvram_store_w));
+	m_outlatch[0]->q_out_cb<3>().set(FUNC(ccastles_state::nvram_store_w));
+	m_outlatch[0]->q_out_cb<5>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	m_outlatch[0]->q_out_cb<6>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
+	m_outlatch[0]->q_out_cb<7>().set_membank("bank1");
 
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 6P
+	LS259(config, m_outlatch[1]); // 6P
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4b")
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
+	X2212(config, "nvram_4b").set_auto_save(true);
+	X2212(config, "nvram_4a").set_auto_save(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ccastles)

@@ -32,6 +32,13 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void kchamp(machine_config &config);
+	void kchampvs(machine_config &config);
+
+	void init_kchampvs();
+	void init_kchampvs2();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -66,8 +73,6 @@ public:
 	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	void init_kchampvs();
-	void init_kchampvs2();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -82,8 +87,6 @@ public:
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
-	void kchamp(machine_config &config);
-	void kchampvs(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void kchamp_io_map(address_map &map);
 	void kchamp_map(address_map &map);

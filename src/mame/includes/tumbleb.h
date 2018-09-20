@@ -25,6 +25,37 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void tumblepb(machine_config &config);
+	void tumblepba(machine_config &config);
+	void bcstory(machine_config &config);
+	void pangpang(machine_config &config);
+	void semibase(machine_config &config);
+	void tumbleb2(machine_config &config);
+	void cookbib(machine_config &config);
+	void metlsavr(machine_config &config);
+	void fncywld(machine_config &config);
+	void suprtrio(machine_config &config);
+	void htchctch(machine_config &config);
+	void sdfight(machine_config &config);
+	void chokchok(machine_config &config);
+	void cookbib_mcu(machine_config &config);
+	void jumpkids(machine_config &config);
+
+	void init_dquizgo();
+	void init_jumpkids();
+	void init_htchctch();
+	void init_wlstar();
+	void init_suprtrio();
+	void init_tumblepb();
+	void init_tumblepba();
+	void init_bcstory();
+	void init_wondl96();
+	void init_tumbleb2();
+	void init_chokchok();
+	void init_fncywld();
+	void init_carket();
+
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -80,19 +111,7 @@ public:
 	DECLARE_WRITE16_MEMBER(pangpang_pf1_data_w);
 	DECLARE_WRITE16_MEMBER(pangpang_pf2_data_w);
 	DECLARE_WRITE16_MEMBER(tumbleb2_soundmcu_w);
-	void init_dquizgo();
-	void init_jumpkids();
-	void init_htchctch();
-	void init_wlstar();
-	void init_suprtrio();
-	void init_tumblepb();
-	void init_tumblepba();
-	void init_bcstory();
-	void init_wondl96();
-	void init_tumbleb2();
-	void init_chokchok();
-	void init_fncywld();
-	void init_carket();
+
 	TILEMAP_MAPPER_MEMBER(tumblep_scan);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
@@ -135,20 +154,7 @@ public:
 	void tumblepb_gfx_rearrange(int rgn);
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();
-	void tumblepb(machine_config &config);
-	void bcstory(machine_config &config);
-	void pangpang(machine_config &config);
-	void semibase(machine_config &config);
-	void tumbleb2(machine_config &config);
-	void cookbib(machine_config &config);
-	void metlsavr(machine_config &config);
-	void fncywld(machine_config &config);
-	void suprtrio(machine_config &config);
-	void htchctch(machine_config &config);
-	void sdfight(machine_config &config);
-	void chokchok(machine_config &config);
-	void cookbib_mcu(machine_config &config);
-	void jumpkids(machine_config &config);
+
 	void fncywld_main_map(address_map &map);
 	void htchctch_main_map(address_map &map);
 	void jumpkids_main_map(address_map &map);
@@ -158,4 +164,5 @@ public:
 	void suprtrio_main_map(address_map &map);
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
+	void tumblepopba_main_map(address_map &map);
 };

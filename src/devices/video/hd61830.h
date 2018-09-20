@@ -19,7 +19,7 @@
 //**************************************************************************
 
 #define MCFG_HD61830_RD_CALLBACK(_read) \
-	devcb = &downcast<hd61830_device &>(*device).set_rd_rd_callback(DEVCB_##_read);
+	downcast<hd61830_device &>(*device).set_rd_rd_callback(DEVCB_##_read);
 
 
 

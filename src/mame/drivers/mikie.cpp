@@ -267,15 +267,15 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	MCFG_DEVICE_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 6I
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_1_w)) // COIN1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_2_w)) // COIN2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mikie_state, sh_irqtrigger_w)) // SOUNDON
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // END (not used?)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mikie_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mikie_state, irq_mask_w)) // INT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 6I
+	mainlatch.q_out_cb<0>().set(FUNC(mikie_state::coin_counter_1_w)); // COIN1
+	mainlatch.q_out_cb<1>().set(FUNC(mikie_state::coin_counter_2_w)); // COIN2
+	mainlatch.q_out_cb<2>().set(FUNC(mikie_state::sh_irqtrigger_w)); // SOUNDON
+	mainlatch.q_out_cb<3>().set_nop(); // END (not used?)
+	mainlatch.q_out_cb<6>().set(FUNC(mikie_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<7>().set(FUNC(mikie_state::irq_mask_w)); // INT
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

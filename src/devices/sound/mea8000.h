@@ -14,7 +14,7 @@
 #pragma once
 
 #define MCFG_MEA8000_REQ_CALLBACK(_write) \
-	devcb = &downcast<mea8000_device &>(*device).set_reqwr_callback(*device, DEVCB_##_write);
+	downcast<mea8000_device &>(*device).set_reqwr_callback(*device, DEVCB_##_write);
 
 /* define to use double instead of int (slow but useful for debugging) */
 #undef MEA8000_FLOAT_MODE

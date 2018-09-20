@@ -34,7 +34,6 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "machine/docg3.h"
 #include "machine/s3c2440.h"
 #include "video/gf4500.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -53,12 +52,17 @@ public:
 		m_gf4500(*this, "gf4500")
 		{ }
 
+	void gizmondo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+
+	void init_gizmondo();
+
+private:
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	void init_gizmondo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
@@ -66,7 +70,6 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
 
 	bitmap_rgb32 m_bitmap;
-	void gizmondo(machine_config &config);
 	void gizmondo_map(address_map &map);
 };
 
@@ -198,8 +201,6 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("gf4500", gf4500_device, screen_update)
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_GF4500_ADD("gf4500")
 

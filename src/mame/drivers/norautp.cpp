@@ -732,8 +732,8 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 	m_ppi8255[2]->pc6_w(param);
 	if (param == 0)
 	{
-		uint8_t np_addr = m_ppi8255[2]->pb_r();
-		uint8_t vram_data = m_ppi8255[2]->pa_r();
+		uint8_t const np_addr = m_ppi8255[2]->read_pb();
+		uint8_t const vram_data = m_ppi8255[2]->read_pa();
 		m_np_vram[np_addr] = vram_data;
 	}
 }
@@ -1247,25 +1247,25 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 	MCFG_DEVICE_PROGRAM_MAP(norautp_map)
 	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   /* doesn't work if placed at derivative drivers */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   /* doesn't work if placed at derivative drivers */
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	I8255(config, m_ppi8255[0], 0);
 	/* (60-63) Mode 0 - Port A set as input */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, norautp_state, mainlamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, norautp_state, counterlamps_w))
+	m_ppi8255[0]->in_pa_callback().set_ioport("DSW1");
+	m_ppi8255[0]->out_pb_callback().set(FUNC(norautp_state::mainlamps_w));
+	m_ppi8255[0]->out_pc_callback().set(FUNC(norautp_state::counterlamps_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	I8255(config, m_ppi8255[1], 0);
 	/* (a0-a3) Mode 0 - Ports A & B set as input */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, norautp_state, soundlamps_w))
+	m_ppi8255[1]->in_pa_callback().set_ioport("IN0");
+	m_ppi8255[1]->in_pb_callback().set_ioport("IN1");
+	m_ppi8255[1]->out_pc_callback().set(FUNC(norautp_state::soundlamps_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	I8255(config, m_ppi8255[2], 0);
 	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
 	 Group B Mode 0, output;  (see below for lines PC0-PC2) */
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE(*this, norautp_state, ppi2_obf_w)) MCFG_DEVCB_BIT(7)
+	m_ppi8255[2]->in_pc_callback().set_ioport("IN2");
+	m_ppi8255[2]->out_pc_callback().set(FUNC(norautp_state::ppi2_obf_w)).bit(7);
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
 	 It means that port A should be bidirectional and port B just as output.
 	 Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */

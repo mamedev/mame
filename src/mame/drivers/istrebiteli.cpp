@@ -585,15 +585,15 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, istrebiteli_state, sound_w))
+	i8255_device &ppi0(I8255A(config, "ppi0"));
+	ppi0.in_pa_callback().set_ioport("IN1");
+	ppi0.in_pb_callback().set_ioport("IN0");
+	ppi0.out_pc_callback().set(FUNC(istrebiteli_state::sound_w));
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, istrebiteli_state, spr0_ctrl_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, istrebiteli_state, spr1_ctrl_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.out_pa_callback().set(FUNC(istrebiteli_state::spr0_ctrl_w));
+	ppi1.out_pb_callback().set(FUNC(istrebiteli_state::spr1_ctrl_w));
+	ppi1.in_pc_callback().set_ioport("IN2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -617,14 +617,14 @@ MACHINE_CONFIG_START(istrebiteli_state::motogonki)
 	MCFG_DEVICE_PROGRAM_MAP(moto_mem_map)
 	MCFG_DEVICE_IO_MAP(moto_io_map)
 
-	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, istrebiteli_state, spr0_ctrl_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, istrebiteli_state, spr1_ctrl_w))
+	i8255_device &ppi0(I8255A(config, "ppi0"));
+	ppi0.out_pa_callback().set(FUNC(istrebiteli_state::spr0_ctrl_w));
+	ppi0.out_pb_callback().set(FUNC(istrebiteli_state::spr1_ctrl_w));
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, istrebiteli_state, road_ctrl_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.out_pb_callback().set(FUNC(istrebiteli_state::road_ctrl_w));
+	ppi1.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

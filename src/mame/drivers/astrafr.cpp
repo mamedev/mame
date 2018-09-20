@@ -31,6 +31,24 @@ public:
 		fgpa_after_rom_write_addr = 0xffff;
 	}
 
+	void astra_single(machine_config &config);
+	void astra_single_alt(machine_config &config);
+	void astrafr_dual(machine_config &config);
+	void astrafr_dual_alt(machine_config &config);
+	void astrafr_dual_alt_37(machine_config &config);
+	void astra_single_2e(machine_config &config);
+	void astra_single_alt_37(machine_config &config);
+	void astra_single_alt_57(machine_config &config);
+	void astra_single_37(machine_config &config);
+	void astrafr_dual_2e(machine_config &config);
+	void astrafr_dual_37(machine_config &config);
+
+	void init_astradec_sml();
+	void init_astradec();
+	void init_astradec_dual();
+	void init_astradec_sml_dual();
+
+private:
 	uint32_t* m_cpuregion;
 	int  m_cpuregion_size;
 	std::unique_ptr<uint32_t[]> m_mainram;
@@ -110,25 +128,11 @@ public:
 	required_device<m68340_cpu_device> m_maincpu;
 	optional_device<m68340_cpu_device> m_slavecpu;
 
-	void init_astradec_sml();
-	void init_astradec();
-	void init_astradec_dual();
-	void init_astradec_sml_dual();
 	DECLARE_MACHINE_START(astra_common);
 	DECLARE_MACHINE_START(astra_2e);
 	DECLARE_MACHINE_START(astra_37);
 	DECLARE_MACHINE_START(astra_57);
-	void astra_single(machine_config &config);
-	void astra_single_alt(machine_config &config);
-	void astrafr_dual(machine_config &config);
-	void astrafr_dual_alt(machine_config &config);
-	void astrafr_dual_alt_37(machine_config &config);
-	void astra_single_2e(machine_config &config);
-	void astra_single_alt_37(machine_config &config);
-	void astra_single_alt_57(machine_config &config);
-	void astra_single_37(machine_config &config);
-	void astrafr_dual_2e(machine_config &config);
-	void astrafr_dual_37(machine_config &config);
+
 	void astra_map(address_map &map);
 	void astrafr_master_alt_map(address_map &map);
 	void astrafr_master_map(address_map &map);

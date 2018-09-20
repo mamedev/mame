@@ -46,10 +46,13 @@ INPUT_PORTS_END
 class sc55_state : public driver_device
 {
 public:
+	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void sc55(machine_config &config);
+
+private:
 	required_device<i8x9x_device> m_maincpu;
 
-	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
-	void sc55(machine_config &config);
 	void sc55_io(address_map &map);
 	void sc55_map(address_map &map);
 };

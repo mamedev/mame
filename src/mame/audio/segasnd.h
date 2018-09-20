@@ -36,7 +36,7 @@ protected:
 #define SEGASND_SEGASPEECH_REGION "segaspeech:speech"
 
 #define MCFG_SEGASPEECH_INT_CALLBACK(_devcb) \
-	devcb = &downcast<speech_sound_device&>(*device).set_int_cb(DEVCB_##_devcb);
+	downcast<speech_sound_device&>(*device).set_int_cb(DEVCB_##_devcb);
 
 class speech_sound_device : public device_t, public device_sound_interface
 {

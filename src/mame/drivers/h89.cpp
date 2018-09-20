@@ -36,6 +36,9 @@ public:
 	{
 	}
 
+	void h89(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_WRITE8_MEMBER( port_f2_w );
@@ -43,7 +46,6 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
-	void h89(machine_config &config);
 	void h89_io(address_map &map);
 	void h89_mem(address_map &map);
 };
@@ -189,8 +191,8 @@ MACHINE_CONFIG_START(h89_state::h89)
 	MCFG_DEVICE_PROGRAM_MAP(h89_mem)
 	MCFG_DEVICE_IO_MAP(h89_io)
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
+	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))

@@ -25,6 +25,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void gokidetor(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(out4_w);
 	DECLARE_WRITE8_MEMBER(out5_w);
 	DECLARE_WRITE8_MEMBER(out6_w);
@@ -33,13 +36,11 @@ public:
 	DECLARE_WRITE8_MEMBER(out9_w);
 	DECLARE_WRITE8_MEMBER(ym_porta_w);
 
-	void gokidetor(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

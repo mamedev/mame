@@ -29,12 +29,14 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void tvgame(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tvgame(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -121,9 +123,9 @@ MACHINE_CONFIG_START(tvgame_state::tvgame)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// Devices
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("LINE0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tvgame_state, speaker_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("LINE0");
+	ppi.out_pc_callback().set(FUNC(tvgame_state::speaker_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -24,7 +24,6 @@
 #include "video/huc6270.h"
 #include "video/huc6260.h"
 #include "video/huc6202.h"
-#include "sound/c6280.h"
 #include "sound/okim6295.h"
 #include "machine/msm6242.h"
 #include "screen.h"
@@ -40,14 +39,14 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
+	void ggconnie(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	void ggconnie(machine_config &config);
-
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
-private:
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
 };
@@ -78,19 +77,15 @@ void ggconnie_state::sgx_mem(address_map &map)
 	map(0x1f7000, 0x1f7000).portr("SWA");
 	map(0x1f7100, 0x1f7100).portr("SWB");
 	map(0x1f7200, 0x1f7200).portr("SWC");
+	map(0x1f7300, 0x1f7300).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1f7400, 0x1f74ff).w(FUNC(ggconnie_state::oki_bank_w));
+	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x1f7700, 0x1f7700).portr("IN1");
 	map(0x1f7800, 0x1f7800).w(FUNC(ggconnie_state::output_w));
 	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
 	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
 	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
 	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-	map(0x1fe800, 0x1febff).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
-	map(0x1fec00, 0x1fefff).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1f7300, 0x1f7300).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1f7400, 0x1f74ff).w(FUNC(ggconnie_state::oki_bank_w));
-	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x1ff000, 0x1ff000).portr("IN0").w(FUNC(ggconnie_state::lamp_w));
-	map(0x1ff400, 0x1ff7ff).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
 void ggconnie_state::sgx_io(address_map &map)
@@ -269,9 +264,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(sgx_mem)
-	MCFG_DEVICE_IO_MAP(sgx_io)
+	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ggconnie_state::sgx_mem);
+	m_maincpu->set_addrmap(AS_IO, &ggconnie_state::sgx_io);
+	m_maincpu->port_in_cb().set_ioport("IN0");
+	m_maincpu->port_out_cb().set(FUNC(ggconnie_state::lamp_w));
+	m_maincpu->add_route(0, "lspeaker", 1.00);
+	m_maincpu->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -308,10 +307,6 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_C6280_CPU("maincpu")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH) /* unknown clock / pin 7 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
@@ -345,4 +340,4 @@ ROM_START(smf)
 ROM_END
 
 GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

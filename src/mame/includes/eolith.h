@@ -26,8 +26,30 @@ public:
 	{
 	}
 
+	void ironfort(machine_config &config);
+	void eolith50(machine_config &config);
+	void eolith45(machine_config &config);
+	void hidctch3(machine_config &config);
+
+	void init_eolith();
+	void init_landbrk();
+	void init_hidctch2();
+	void init_hidnc2k();
+	void init_landbrka();
+	void init_landbrkb();
+
 	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
 	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
+
+	void speedup_read();
+	void init_speedup();
+
+protected:
+
+	optional_ioport m_eepromoutport;
+	TIMER_DEVICE_CALLBACK_MEMBER(eolith_speedup);
+
+private:
 
 	DECLARE_READ32_MEMBER(eolith_custom_r);
 	DECLARE_WRITE32_MEMBER(systemcontrol_w);
@@ -39,38 +61,22 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_to_qs1000);
 
-	void init_eolith();
-	void init_landbrk();
-	void init_hidctch2();
-	void init_hidnc2k();
-	void init_landbrka();
-	void init_landbrkb();
-
 	DECLARE_MACHINE_RESET(eolith);
 	DECLARE_VIDEO_START(eolith);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(eolith_speedup);
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ironfort(machine_config &config);
-	void eolith50(machine_config &config);
-	void eolith45(machine_config &config);
-	void hidctch3(machine_config &config);
 	void eolith_map(address_map &map);
 	void hidctch3_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_prg_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	// shared with eolith16.cpp, vegaeo.cpp
-	optional_ioport m_eepromoutport;
 
-	void speedup_read();
-	void init_speedup();
 	void patch_mcu_protection(uint32_t address);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8032_device> m_soundcpu;
 	required_device<screen_device> m_screen;

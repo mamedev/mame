@@ -195,10 +195,11 @@ public:
 		, m_ptm2(*this, "ptm_ic2")
 	{ }
 
-	void init_m3hprvpr();
 	void mpu3base(machine_config &config);
 
-protected:
+	void init_m3hprvpr();
+
+private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	DECLARE_WRITE8_MEMBER(characteriser_w);
@@ -238,7 +239,6 @@ protected:
 	virtual void machine_reset() override;
 	void mpu3_basemap(address_map &map);
 
-private:
 	int m_triac_ic3;
 	int m_triac_ic4;
 	int m_triac_ic5;
@@ -847,41 +847,41 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD(m_ptm2, PTM6840, MPU3_MASTER_CLOCK)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, mpu3_state, ic2_o1_callback))
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, mpu3_state, ic2_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, mpu3_state, ic2_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu3_state, cpu0_irq))
+	PTM6840(config, m_ptm2, MPU3_MASTER_CLOCK);
+	m_ptm2->set_external_clocks(0, 0, 0);
+	m_ptm2->o1_callback().set(FUNC(mpu3_state::ic2_o1_callback));
+	m_ptm2->o2_callback().set(FUNC(mpu3_state::ic2_o2_callback));
+	m_ptm2->o3_callback().set(FUNC(mpu3_state::ic2_o3_callback));
+	m_ptm2->irq_callback().set(FUNC(mpu3_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD(m_pia3, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu3_state, pia_ic3_porta_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu3_state, pia_ic3_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu3_state, pia_ic3_ca2_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu3_state, cpu0_irq))
+	PIA6821(config, m_pia3, 0);
+	m_pia3->readpa_handler().set(FUNC(mpu3_state::pia_ic3_porta_r));
+	m_pia3->writepb_handler().set(FUNC(mpu3_state::pia_ic3_portb_w));
+	m_pia3->ca2_handler().set(FUNC(mpu3_state::pia_ic3_ca2_w));
+	m_pia3->irqb_handler().set(FUNC(mpu3_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD(m_pia4, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu3_state, pia_ic4_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu3_state, pia_ic4_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu3_state, pia_ic4_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu3_state, pia_ic4_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu3_state, pia_ic4_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu3_state, cpu0_irq))
+	PIA6821(config, m_pia4, 0);
+	m_pia4->readpa_handler().set(FUNC(mpu3_state::pia_ic4_porta_r));
+	m_pia4->writepa_handler().set(FUNC(mpu3_state::pia_ic4_porta_w));
+	m_pia4->writepb_handler().set(FUNC(mpu3_state::pia_ic4_portb_w));
+	m_pia4->ca2_handler().set(FUNC(mpu3_state::pia_ic4_ca2_w));
+	m_pia4->cb2_handler().set(FUNC(mpu3_state::pia_ic4_cb2_w));
+	m_pia4->irqa_handler().set(FUNC(mpu3_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD(m_pia5, PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mpu3_state, pia_ic5_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu3_state, pia_ic5_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu3_state, pia_ic5_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mpu3_state, pia_ic5_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, mpu3_state, pia_ic5_cb2_w))
+	PIA6821(config, m_pia5, 0);
+	m_pia5->readpb_handler().set(FUNC(mpu3_state::pia_ic5_portb_r));
+	m_pia5->writepa_handler().set(FUNC(mpu3_state::pia_ic5_porta_w));
+	m_pia5->writepb_handler().set(FUNC(mpu3_state::pia_ic5_portb_w));
+	m_pia5->ca2_handler().set(FUNC(mpu3_state::pia_ic5_ca2_w));
+	m_pia5->cb2_handler().set(FUNC(mpu3_state::pia_ic5_cb2_w));
 
-	MCFG_DEVICE_ADD(m_pia6, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu3_state, pia_ic6_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, mpu3_state, pia_ic6_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mpu3_state, pia_ic6_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mpu3_state, pia_ic6_portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, mpu3_state, cpu0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, mpu3_state, cpu0_irq))
+	PIA6821(config, m_pia6, 0);
+	m_pia6->readpa_handler().set(FUNC(mpu3_state::pia_ic6_porta_r));
+	m_pia6->readpb_handler().set(FUNC(mpu3_state::pia_ic6_portb_r));
+	m_pia6->writepa_handler().set(FUNC(mpu3_state::pia_ic6_porta_w));
+	m_pia6->writepb_handler().set(FUNC(mpu3_state::pia_ic6_portb_w));
+	m_pia6->irqa_handler().set(FUNC(mpu3_state::cpu0_irq));
+	m_pia6->irqb_handler().set(FUNC(mpu3_state::cpu0_irq));
 
 	MCFG_DEVICE_ADD("reel0", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<0>))
@@ -895,9 +895,9 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEFAULT_LAYOUT(layout_mpu3)
+	config.set_default_layout(layout_mpu3);
 MACHINE_CONFIG_END
 
 

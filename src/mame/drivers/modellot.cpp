@@ -55,15 +55,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void modellot(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
 	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void modellot(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;

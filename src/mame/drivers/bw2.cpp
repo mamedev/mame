@@ -191,8 +191,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x10, 0x13).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x20, 0x21).m(m_lcdc, FUNC(msm6255_device::map));
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
-	map(0x40, 0x40).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
@@ -550,7 +549,6 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_DEVICE_IO_MAP(bw2_io)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE( MSM6255_TAG, msm6255_device, screen_update )
@@ -561,20 +559,20 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_PALETTE_INIT_OWNER(bw2_state, bw2)
 
 	// devices
-	MCFG_DEVICE_ADD(m_pit, PIT8253, 0)
-	MCFG_PIT8253_CLK0(16_MHz_XTAL / 4) // 8251 USART TXC, RXC
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_uart, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart, i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(11000) // LCD controller
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_pit, pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw2_state, mtron_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(16_MHz_XTAL / 4); // 8251 USART TXC, RXC
+	m_pit->out_handler<0>().set(m_uart, FUNC(i8251_device::write_txc));
+	m_pit->out_handler<0>().append(m_uart, FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<1>(11000); // LCD controller
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+	m_pit->set_clk<2>(0); // Floppy /MTRON
+	m_pit->out_handler<2>().set(FUNC(bw2_state::mtron_w));
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, bw2_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, bw2_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, bw2_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bw2_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.out_pa_callback().set(FUNC(bw2_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(bw2_state::ppi_pb_r));
+	ppi.in_pc_callback().set(FUNC(bw2_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(bw2_state::ppi_pc_w));
 
 	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, 16_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
@@ -585,18 +583,18 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(m_uart, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bw2_state, fdc_drq_w))
+	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_fdc->drq_wr_callback().set(FUNC(bw2_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
@@ -606,9 +604,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");
 MACHINE_CONFIG_END
 
 

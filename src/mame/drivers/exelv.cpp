@@ -81,6 +81,10 @@ public:
 			m_cart(*this, "cartslot")
 	{ }
 
+	void exeltel(machine_config &config);
+	void exl100(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms3556_device> m_tms3556;
 	required_device<tms5220c_device> m_tms5220c;
@@ -116,8 +120,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
-	void exeltel(machine_config &config);
-	void exl100(machine_config &config);
 	void tms7020_mem(address_map &map);
 	void tms7040_mem(address_map &map);
 };
@@ -357,9 +359,8 @@ WRITE8_MEMBER(exelv_state::tms7041_portc_w)
 */
 READ8_MEMBER(exelv_state::tms7041_portd_r)
 {
-	uint8_t data = 0xff;
-	data=m_tms5220c->status_r(space, 0, data);
-	logerror("tms7041_portd_r\n");
+	uint8_t data = m_tms5220c->status_r();
+	logerror("tms7041_portd_r: data = 0x%02x\n", data);
 	return data;
 }
 
@@ -368,7 +369,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 {
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
-	m_tms5220c->data_w(space, 0, data);
+	m_tms5220c->data_w(data);
 	m_tms7041_portd = data;
 }
 

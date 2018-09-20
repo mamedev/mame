@@ -298,7 +298,7 @@ WRITE8_MEMBER(bbc_state::bbcm_acccon_w)
 	}
 	else
 	{
-		space.install_read_handler(0xfc00, 0xfeff, read8_delegate(FUNC(bbc_state::bbcm_r),this));
+		space.install_read_handler(0xfc00, 0xfeff, read8_delegate(FUNC(bbc_state::bbcm_r), this));
 	}
 }
 
@@ -403,21 +403,22 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
 
 READ8_MEMBER(bbc_state::bbcm_r)
 {
-	long myo;
+	uint8_t data = 0xff;
+	uint8_t myo;
 
-	if (offset<=0x0ff) /* FRED */
+	switch (offset >> 8)
 	{
-		return 0xff;
-	};
+	case 0x00: /* FRED */
+		if (m_1mhzbus) return m_1mhzbus->fred_r(space, offset & 0xff);
+		break;
 
-	if ((offset>=0x100) && (offset<=0x1ff)) /* JIM */
-	{
-		return 0xff;
-	};
+	case 0x01: /* JIM */
+		if (m_1mhzbus) return m_1mhzbus->jim_r(space, offset & 0xff);
+		break;
 
-	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
-	{
-		myo = offset-0x200;
+	case 0x02: /* SHEILA */
+		data = 0xfe;
+		myo = offset & 0xff;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) return m_hd6845->status_r(space, myo-0x00);                     /* Video controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      return m_hd6845->register_r(space, myo-0x01);
 		if ((myo>=0x08) && (myo<=0x0f))                   return m_acia ? m_acia->read(space, myo & 0x01) : 0xfe;         /* Serial controller */
@@ -425,15 +426,11 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x18) && (myo<=0x1f))                   return m_upd7002 ? m_upd7002->read(space, myo-0x18) : 0xfe;     /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   return 0xfe;                                                    /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27))                   return bbcm_wd177xl_read(space, myo-0x24);                      /* 177x Control Latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(space, myo-0x28);                         /* 1770 Controller */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(space, myo-0x28);                         /* 1772 Controller */
-		if ((myo>=0x28) && (myo<=0x2f))                   return 0xfe;                                                    /* No Controller */
-		if ((myo>=0x30) && (myo<=0x33))                   return 0xfe;
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     return m_wd1770->read(myo-0x28);                                /* 1770 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     return m_wd1772->read(myo-0x28);                                /* 1772 Controller */
 		if ((myo>=0x34) && (myo<=0x37))                   return bbcm_acccon_r(space, myo-0x34);                          /* ACCCON */
-		if ((myo>=0x38) && (myo<=0x3f))                   return 0xfe;                                                    /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f))                   return m_via6522_0->read(space, myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(space, myo-0x60) : 0xfe;
-		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
+		if ((myo>=0x40) && (myo<=0x5f))                   return m_via6522_0->read(myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f))                   return m_via6522_1 ? m_via6522_1->read(myo-0x60) : 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
 		if ((myo>=0xe0) && (myo<=0xff))
@@ -441,17 +438,27 @@ READ8_MEMBER(bbc_state::bbcm_r)
 			if (m_intube &&  m_acccon_itu)                  return m_intube->host_r(space, myo-0xe0);                       /* Internal TUBE */
 			if (m_extube && !m_acccon_itu)                  return m_extube->host_r(space, myo-0xe0);                       /* External TUBE */
 		}
+		break;
 	}
-	return 0xfe;
+	return data;
 }
 
 WRITE8_MEMBER(bbc_state::bbcm_w)
 {
-	long myo;
+	uint8_t myo;
 
-	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
+	switch (offset >> 8)
 	{
-		myo=offset-0x200;
+	case 0x00: /* FRED */
+		if (m_1mhzbus) m_1mhzbus->fred_w(space, offset & 0xff, data);
+		break;
+
+	case 0x01: /* JIM */
+		if (m_1mhzbus) m_1mhzbus->jim_w(space, offset & 0xff, data);
+		break;
+
+	case 0x02: /* SHEILA */
+		myo = offset & 0xff;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) m_hd6845->address_w(space, myo-0x00, data);                     /* Video Controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      m_hd6845->register_w(space, myo-0x01, data);
 		if ((myo>=0x08) && (myo<=0x0f))                   if (m_acia) m_acia->write(space, myo & 0x01, data);             /* Serial controller */
@@ -459,22 +466,20 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		if ((myo>=0x18) && (myo<=0x1f) && (m_upd7002))    m_upd7002->write(space, myo-0x18, data);                        /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   bbc_videoULA_w(space, myo-0x20, data);                          /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27) && (m_wd1770))     bbcm_wd1770l_write(space, myo-0x24, data);                      /* disc control latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     m_wd1770->write(space, myo-0x28, data);                         /* 1770 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1770))     m_wd1770->write(myo-0x28, data);                                /* 1770 Controller */
 		if ((myo>=0x24) && (myo<=0x27) && (m_wd1772))     bbcm_wd1772l_write(space, myo-0x24, data);                      /* disc control latch */
-		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     m_wd1772->write(space, myo-0x28, data);                         /* 1772 Controller */
+		if ((myo>=0x28) && (myo<=0x2f) && (m_wd1772))     m_wd1772->write(myo-0x28, data);                                /* 1772 Controller */
 		if ((myo>=0x30) && (myo<=0x33))                   page_selectbm_w(space, myo-0x30, data);                         /* ROMSEL */
 		if ((myo>=0x34) && (myo<=0x37))                   bbcm_acccon_w(space, myo-0x34, data);                           /* ACCCON */
-		//if ((myo>=0x38) && (myo<=0x3f))                                                                                 /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f))                   m_via6522_0->write(space, myo-0x40, data);
-		if ((myo>=0x60) && (myo<=0x7f) && (m_via6522_1))  m_via6522_1->write(space, myo-0x60, data);
-		//if ((myo>=0x80) && (myo<=0x9f))
+		if ((myo>=0x40) && (myo<=0x5f))                   m_via6522_0->write(myo-0x40, data);
+		if ((myo>=0x60) && (myo<=0x7f) && (m_via6522_1))  m_via6522_1->write(myo-0x60, data);
 		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
-		//if ((myo>=0xc0) && (myo<=0xdf))
 		if ((myo>=0xe0) && (myo<=0xff))
 		{
 			if (m_intube &&  m_acccon_itu)                  m_intube->host_w(space, myo-0xe0, data);                        /* Internal TUBE */
 			if (m_extube && !m_acccon_itu)                  m_extube->host_w(space, myo-0xe0, data);                        /* External TUBE */
 		}
+		break;
 	}
 }
 
@@ -718,13 +723,13 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
 	}
 	if (m_b1_speech_read == 0)
 	{
-		if (m_tms) m_via_system_porta = m_tms->status_r(space, 0);
+		if (m_tms) m_via_system_porta = m_tms->status_r();
 		//logerror("Doing an unsafe read to the speech chip %d \n",m_via_system_porta);
 	}
 	if (m_b2_speech_write == 0)
 	{
 		//logerror("Doing an unsafe write to the speech chip %d \n",data);
-		if (m_tms) m_tms->data_w(space, 0, m_via_system_porta);
+		if (m_tms) m_tms->data_w(m_via_system_porta);
 	}
 	if (m_b3_keyboard == 0)
 	{
@@ -951,6 +956,13 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 	return ((m_analog ? m_analog->pb_r() : 0x30) | (!vsprdy << 7) | (!vspint << 6));
 }
 
+
+WRITE_LINE_MEMBER(bbc_state::lpstb_w)
+{
+	m_via6522_0->write_cb2(state);
+	if (!state)
+		m_hd6845->assert_light_pen_input();
+}
 
 /**************************************
   BBC Joystick Support
@@ -1270,6 +1282,7 @@ WRITE_LINE_MEMBER(bbc_state::motor_w)
 			con->get_device()->mon_w(!state);
 		}
 	}
+	m_i8271->ready_w(!state);
 }
 
 WRITE_LINE_MEMBER(bbc_state::side_w)
@@ -1482,9 +1495,9 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
 			return image_init_result::FAIL;
 		}
 
-		slot->rom_alloc(size_lo + size_hi, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		memcpy(slot->get_rom_base() + 0,       image.get_software_region("uprom"), size_hi);
-		memcpy(slot->get_rom_base() + size_hi, image.get_software_region("lorom"), size_lo);
+		slot->rom_alloc(0x8000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		memcpy(slot->get_rom_base() + 0x0000, image.get_software_region("lorom"), size_lo);
+		memcpy(slot->get_rom_base() + 0x4000, image.get_software_region("uprom"), size_hi);
 	}
 
 	return image_init_result::PASS;

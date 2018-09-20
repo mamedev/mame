@@ -702,8 +702,7 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, niyanpai_state, tmp68301_parallel_port_w))
 
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -35,6 +35,9 @@ public:
 	{
 	}
 
+	void pc1500(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
@@ -54,7 +57,6 @@ public:
 
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
 	DECLARE_PALETTE_INIT(pc1500);
-	void pc1500(machine_config &config);
 	void pc1500_mem(address_map &map);
 	void pc1500_mem_io(address_map &map);
 };
@@ -282,16 +284,16 @@ MACHINE_CONFIG_START(pc1500_state::pc1500)
 	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_pc1500)
+	config.set_default_layout(layout_pc1500);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
 
-	MCFG_DEVICE_ADD("lh5810", LH5810, 0)
-	MCFG_LH5810_PORTA_R_CB(READ8(*this, pc1500_state, port_a_r))
-	MCFG_LH5810_PORTA_W_CB(WRITE8(*this, pc1500_state, kb_matrix_w))
-	MCFG_LH5810_PORTB_R_CB(READ8(*this, pc1500_state, port_b_r))
-	MCFG_LH5810_PORTC_W_CB(WRITE8(*this, pc1500_state, port_c_w))
-	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
+	lh5810_device &ioports(LH5810(config, "lh5810"));
+	ioports.porta_r().set(FUNC(pc1500_state::port_a_r));
+	ioports.porta_w().set(FUNC(pc1500_state::kb_matrix_w));
+	ioports.portb_r().set(FUNC(pc1500_state::port_b_r));
+	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
+	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
 	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 MACHINE_CONFIG_END

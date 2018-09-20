@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
 
 /* Temporary hack for experimenting with timing. */
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 
 	/* Disabled for now as it can't handle multiple screens */
 //  MCFG_MC6845_ADD("crtc", MC6845, "screen", 6000000 / 16)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
@@ -621,7 +621,7 @@ MACHINE_CONFIG_START(vcombat_state::shadfgtr)
 	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

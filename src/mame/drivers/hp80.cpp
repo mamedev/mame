@@ -127,6 +127,9 @@ class hp85_state : public driver_device
 public:
 	hp85_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp85(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -166,10 +169,9 @@ public:
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
 
-	void hp85(machine_config &config);
 	void cpu_mem_map(address_map &map);
 	void rombank_mem_map(address_map &map);
-protected:
+
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -1334,12 +1336,7 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
 
-	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(HP80_OPTROM_SIZE)
+	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp85_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
 
 	MCFG_SCREEN_ADD("screen" , RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)

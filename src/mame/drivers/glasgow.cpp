@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(glasgow_state::glasgow)
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_glasgow)
+	config.set_default_layout(layout_glasgow);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 44)

@@ -229,22 +229,22 @@ WRITE_LINE_MEMBER(pokechmp_state::sound_irq)
 MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(pokechmp_map)
+	M6502(config, m_maincpu, 4_MHz_XTAL/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pokechmp_state::pokechmp_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(pokechmp_sound_map)
+	M6502(config, m_audiocpu, 4_MHz_XTAL/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pokechmp_state::pokechmp_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pokechmp_state, screen_update_pokechmp)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, pokechmp_state, sound_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pokechmp_state::screen_update_pokechmp));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	screen.screen_vblank().append(FUNC(pokechmp_state::sound_irq));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pokechmp)
 	MCFG_PALETTE_ADD("palette", 0x400)

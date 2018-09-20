@@ -9,7 +9,6 @@
 #include "cpu/upd7810/upd7810.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -22,7 +21,7 @@ void gamepock_state::gamepock_mem(address_map &map)
 	map(0x1000, 0x3fff).noprw();
 	//AM_RANGE(0x4000,0xbfff) AM_ROM        // mapped by the cartslot
 	map(0xc000, 0xc7ff).mirror(0x0800).ram();
-	map(0xff80, 0xffff).ram();              /* 128 bytes microcontroller RAM */
+	map(0xff80, 0xffff).ram();              // 128 bytes microcontroller RAM
 }
 
 
@@ -44,29 +43,26 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(gamepock_state::gamepock)
-	MCFG_DEVICE_ADD("maincpu", UPD78C06, XTAL(6'000'000))    /* uPD78C06AG */
-	MCFG_DEVICE_PROGRAM_MAP( gamepock_mem)
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, gamepock_state, port_a_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, gamepock_state, port_b_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, gamepock_state, port_b_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, gamepock_state, port_c_r))
-	MCFG_UPD7810_TO(WRITELINE(*this, gamepock_state,gamepock_to_w))
+	upd78c06_device &upd(UPD78C06(config, m_maincpu, 6_MHz_XTAL)); // uPD78C06AG
+	upd.set_addrmap(AS_PROGRAM, &gamepock_state::gamepock_mem);
+	upd.pa_out_cb().set(FUNC(gamepock_state::port_a_w));
+	upd.pb_in_cb().set(FUNC(gamepock_state::port_b_r));
+	upd.pb_out_cb().set(FUNC(gamepock_state::port_b_w));
+	upd.pc_in_cb().set(FUNC(gamepock_state::port_c_r));
+	upd.to_func().set(FUNC(gamepock_state::gamepock_to_w));
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_SIZE( 75, 64 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 74, 0, 63 )
-	MCFG_SCREEN_UPDATE_DRIVER(gamepock_state, screen_update_gamepock)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(75, 64);
+	screen.set_visarea(0, 74, 0, 63);
+	screen.set_screen_update(FUNC(gamepock_state::screen_update_gamepock));
+	screen.set_palette("palette");
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gamepock_cart")

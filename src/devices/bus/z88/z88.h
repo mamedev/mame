@@ -139,6 +139,6 @@ DECLARE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device)
 ***************************************************************************/
 
 #define MCFG_Z88CART_SLOT_OUT_FLP_CB(_devcb) \
-	devcb = &downcast<z88cart_slot_device &>(*device).set_out_flp_callback(DEVCB_##_devcb);
+	downcast<z88cart_slot_device &>(*device).set_out_flp_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_Z88_Z88_H

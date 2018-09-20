@@ -38,33 +38,33 @@ DEFINE_DEVICE_TYPE(NUBUS_QUADRALINK, nubus_quadralink_device, "nb_qdlink", "Appl
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(nubus_quadralink_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("scc1", SCC8530N, 3.6864_MHz_XTAL)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("serport0", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("serport1", rs232_port_device, write_txd))
+	SCC8530N(config, m_scc1, 3.6864_MHz_XTAL);
+	m_scc1->out_txda_callback().set("serport0", FUNC(rs232_port_device::write_txd));
+	m_scc1->out_txdb_callback().set("serport1", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("scc2", SCC8530N, 3.6864_MHz_XTAL)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("serport2", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("serport3", rs232_port_device, write_txd))
+	SCC8530N(config, m_scc2, 3.6864_MHz_XTAL);
+	m_scc2->out_txda_callback().set("serport2", FUNC(rs232_port_device::write_txd));
+	m_scc2->out_txdb_callback().set("serport3", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc1", z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc1", z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc1", z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("serport1", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc1", z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc1", z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc1", z80scc_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsb_w))
 
 	MCFG_DEVICE_ADD("serport2", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc2", z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc2", z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc2", z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
 
 	MCFG_DEVICE_ADD("serport3", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc2", z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc2", z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc2", z80scc_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

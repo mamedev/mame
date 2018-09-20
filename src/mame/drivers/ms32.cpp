@@ -85,7 +85,7 @@ ToDo / Notes
 
 Z80 + Sound Bits
 
-Priorities (code in tetrisp2.c doesn't use all of the priority ram.. and doesn't work here)
+Priorities (code in tetrisp2.cpp doesn't use all of the priority ram.. and doesn't work here)
  - some games require completely reversed list processing!
 
 Dip switches/inputs in t2m32 and f1superb
@@ -403,7 +403,7 @@ Notes from Charles MacDonald
  Rotate RAM
  ----------------------------------------------------------------------------
 
- Rotate RAM is 64K, occuping D15-D0 of each word. It is mirrored every
+ Rotate RAM is 64K, occupying D15-D0 of each word. It is mirrored every
  64K-words (128K bytes) in memory.
 
  Remaining data bits return $00FFxxxx or $0000xxxx randomly.
@@ -412,7 +412,7 @@ Notes from Charles MacDonald
  Object RAM
  ----------------------------------------------------------------------------
 
- Object RAM is 128K, occuping D15-D0 of each word. It is mirrored every
+ Object RAM is 128K, occupying D15-D0 of each word. It is mirrored every
  128K-words (256K bytes) in memory.
 
  Remaining data bits return $FFFFxxxx.
@@ -2200,10 +2200,47 @@ ROM_START( hayaosi3 )
 	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "mb93138_32_ver1.5.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
+	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mb93138.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
+	ROM_LOAD( "mr94027.10",  0x200000, 0x200000, CRC(e7cabe41) SHA1(5d903baed690a98856f7581319cf4dbfe1db47bb) )
+
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+ROM_END
+
+ROM_START( hayaosi3a )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
+	ROM_LOAD32_BYTE( "mb93138_25_ver1.2.25", 0x000003, 0x80000, CRC(71b1f51b) SHA1(bd1c4f75c2949a998ce0f5acaf6def7e7069e40b) ) /* uses MB-93138A EB91022-20078-1 rom board */
+	ROM_LOAD32_BYTE( "mb93138_27_ver1.2.27", 0x000002, 0x80000, CRC(2657e8dc) SHA1(efeafe8c890d447ab4584fd7509538fc86fd555b) )
+	ROM_LOAD32_BYTE( "mb93138_29_ver1.2.29", 0x000001, 0x80000, CRC(8999b41b) SHA1(95b94112105bfa2b708bad44bbbdc33616ad2182) )
+	ROM_LOAD32_BYTE( "mb93138_31_ver1.2.31", 0x000000, 0x80000, CRC(f5d4ef54) SHA1(ed208cb6ed171acac312cb282b2fabc8af70610e) )
+
+	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_LOAD32_WORD( "mr94027.01",  0x000000, 0x200000, CRC(c72e5c6e) SHA1(b98cd656c48c775953d00b5d8bafd4ffde76d8df) )
+	ROM_LOAD32_WORD( "mr94027.02",  0x000002, 0x200000, CRC(59976568) SHA1(a280c352d612913834c76b8e23d86c937fd21281) )
+	ROM_LOAD32_WORD( "mr94027.03",  0x400000, 0x200000, CRC(3ff68f4f) SHA1(1e367b92560c32c87e27fc0e99be3bdb5eb0510b) )
+	ROM_LOAD32_WORD( "mr94027.04",  0x400002, 0x200000, CRC(6a16d13a) SHA1(65a7751c248c966fd01149418ce6bedba7a0d48a) )
+	ROM_LOAD32_WORD( "mr94027.05",  0x800000, 0x200000, CRC(59545977) SHA1(2e0a83efd7ae210c0b4360e9572dd7eec38cd974) )
+	ROM_LOAD32_WORD( "mr94027.06",  0x800002, 0x200000, CRC(1618785a) SHA1(3f2698d07a52947429313a78ebcedfdae478efd7) )
+	ROM_LOAD32_WORD( "mr94027.07",  0xc00000, 0x200000, CRC(c66099c4) SHA1(5a6edffa39a98f38cc3cffbad9191fb2e794a812) )
+	ROM_LOAD32_WORD( "mr94027.08",  0xc00002, 0x200000, CRC(753b05e0) SHA1(0424e92b32a73c27ecb549e6e9449446ea938e40) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_LOAD( "mr94027.09",  0x000000, 0x200000, CRC(32ead437) SHA1(b94175cf186b4ebcc180a4c092d2ffcdd9ff3b1d) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_LOAD( "mb93138_21_ver1.0.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
@@ -2580,6 +2617,7 @@ void ms32_state::init_bnstars()
 
 GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3a, hayaosi3, ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -25,6 +25,7 @@
 #include "cpu/m6502/m7501.h"
 #include "imagedev/snapquik.h"
 #include "machine/cbm_snqk.h"
+#include "machine/input_merger.h"
 #include "machine/mos6529.h"
 #include "machine/mos6551.h"
 #include "machine/mos8706.h"
@@ -70,12 +71,14 @@ public:
 		m_c2(*this, "c2"),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
-		m_addr(0),
-		m_ted_irq(CLEAR_LINE),
-		m_acia_irq(CLEAR_LINE),
-		m_exp_irq(CLEAR_LINE)
+		m_addr(0)
 	{ }
 
+	void plus4(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER( cpu_w );
+
+protected:
 	required_device<m7501_device> m_maincpu;
 	required_device<pla_device> m_pla;
 	required_device<mos7360_device> m_ted;
@@ -99,7 +102,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void check_interrupts();
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
 	uint8_t read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
 
@@ -108,9 +110,7 @@ public:
 	DECLARE_READ8_MEMBER( ted_videoram_r );
 
 	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
 
-	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
 	DECLARE_READ8_MEMBER( ted_k_r );
 
 	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
@@ -121,10 +121,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_kb5 ) { if (state) m_kb |= 32; else m_kb &= ~32; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
-
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c16 );
 
@@ -147,15 +143,9 @@ public:
 	// memory state
 	uint8_t m_addr;
 
-	// interrupt state
-	int m_ted_irq;
-	int m_acia_irq;
-	int m_exp_irq;
-
 	// keyboard state
 	uint8_t m_kb;
 
-	void plus4(machine_config &config);
 	void plus4_mem(address_map &map);
 	void ted_videoram_map(address_map &map);
 };
@@ -168,13 +158,15 @@ public:
 		: plus4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
 	void v364(machine_config &config);
 	void c16n(machine_config &config);
 	void c16p(machine_config &config);
 	void c232(machine_config &config);
 	void plus4p(machine_config &config);
 	void plus4n(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER( cpu_r );
 };
 
 
@@ -202,21 +194,6 @@ QUICKLOAD_LOAD_MEMBER( plus4_state, cbm_c16 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
-
-//**************************************************************************
-//  INTERRUPTS
-//**************************************************************************
-
-//-------------------------------------------------
-//  check_interrupts -
-//-------------------------------------------------
-
-void plus4_state::check_interrupts()
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ted_irq || m_acia_irq || m_exp_irq);
-}
-
-
 
 //**************************************************************************
 //  MEMORY MANAGEMENT
@@ -729,13 +706,6 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 //  ted7360_interface ted_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
-{
-	m_ted_irq = state;
-
-	check_interrupts();
-}
-
 READ8_MEMBER( plus4_state::ted_k_r )
 {
 	/*
@@ -788,30 +758,6 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 
 //-------------------------------------------------
-//  MOS6551_INTERFACE( acia_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( plus4_state::acia_irq_w )
-{
-	m_acia_irq = state;
-
-	check_interrupts();
-}
-
-
-//-------------------------------------------------
-//  PLUS4_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( plus4_state::exp_irq_w )
-{
-	m_exp_irq = state;
-
-	check_interrupts();
-}
-
-
-//-------------------------------------------------
 //  SLOT_INTERFACE( cbm_datassette_devices )
 //-------------------------------------------------
 
@@ -844,9 +790,6 @@ void plus4_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_addr));
-	save_item(NAME(m_ted_irq));
-	save_item(NAME(m_acia_irq));
-	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_kb));
 
 	if (m_acia)
@@ -906,35 +849,49 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
 
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
+
 	// video and sound hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(mos7360_device::PAL_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(336, 216)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE(MOS7360_TAG, mos7360_device, screen_update)
+
 	SPEAKER(config, "mono").front_center();
-	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, 0, ted_videoram_map, WRITELINE(*this, plus4_state, ted_irq_w), READ8(*this, plus4_state, ted_k_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MOS7360(config, m_ted, 0);
+	m_ted->set_addrmap(0, &plus4_state::ted_videoram_map);
+	m_ted->set_screen(SCREEN_TAG);
+	m_ted->write_irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_ted->read_k_callback().set(FUNC(plus4_state::ted_k_r));
+	m_ted->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 
-	MCFG_DEVICE_ADD(m_user, PET_USER_PORT, plus4_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p2)) // cassette sense
-	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p3))
-	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p4))
-	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p5))
-	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxc))
-	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p0))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxd))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p7))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(m_acia, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p6))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p1))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(m_acia, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	PET_USER_PORT(config, m_user, plus4_user_port_cards, nullptr);
+	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2)); // cassette sense
+	m_user->p5_handler().set(m_spi_user, FUNC(mos6529_device::write_p3));
+	m_user->p6_handler().set(m_spi_user, FUNC(mos6529_device::write_p4));
+	m_user->p7_handler().set(m_spi_user, FUNC(mos6529_device::write_p5));
+	m_user->p8_handler().set(m_acia, FUNC(mos6551_device::write_rxc));
+	m_user->pb_handler().set(m_spi_user, FUNC(mos6529_device::write_p0));
+	m_user->pc_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	m_user->pf_handler().set(m_spi_user, FUNC(mos6529_device::write_p7));
+	m_user->ph_handler().set(m_acia, FUNC(mos6551_device::write_dcd)).invert(); // TODO: add missing pull up before inverter
+	m_user->pj_handler().set(m_spi_user, FUNC(mos6529_device::write_p6));
+	m_user->pk_handler().set(m_spi_user, FUNC(mos6529_device::write_p1));
+	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert(); // TODO: add missing pull up before inverter
 
-	MCFG_DEVICE_ADD(m_acia, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_RXC_HANDLER(WRITELINE(m_user, pet_user_port_device, write_8))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE(m_user, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE(m_user, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(m_user, pet_user_port_device, write_m))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, plus4_state, acia_irq_w))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->rxc_handler().set(m_user, FUNC(pet_user_port_device::write_8));
+	m_acia->rts_handler().set(m_user, FUNC(pet_user_port_device::write_d)).invert();
+	m_acia->dtr_handler().set(m_user, FUNC(pet_user_port_device::write_e)).invert();
+	m_acia->txd_handler().set(m_user, FUNC(pet_user_port_device::write_m));
+	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_DEVICE_ADD(m_spi_user, MOS6529, 0)
 	MCFG_MOS6529_P0_HANDLER(WRITELINE(m_user, pet_user_port_device, write_b))
@@ -964,7 +921,7 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL(14'318'181)/16, plus4_expansion_cards, nullptr)
-	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, plus4_state, exp_irq_w))
+	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<2>))
 	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, plus4_state, read))
 	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, plus4_state, write))
 	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
@@ -972,8 +929,7 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	MCFG_QUICKLOAD_ADD("quickload", plus4_state, cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1038,9 +994,7 @@ MACHINE_CONFIG_START(c16_state::c16n)
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("16K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 
@@ -1061,21 +1015,15 @@ MACHINE_CONFIG_START(c16_state::c16p)
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("16K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( c232 )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(c16_state::c232)
+void c16_state::c232(machine_config &config)
+{
 	c16p(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("32K");
+}
 
 
 //-------------------------------------------------

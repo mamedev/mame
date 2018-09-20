@@ -28,13 +28,13 @@
 #define MCFG_GIME_FSYNC_CALLBACK    MCFG_MC6847_FSYNC_CALLBACK
 
 #define MCFG_GIME_IRQ_CALLBACK(_write) \
-	devcb = &downcast<gime_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<gime_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_GIME_FIRQ_CALLBACK(_write) \
-	devcb = &downcast<gime_device &>(*device).set_firq_wr_callback(DEVCB_##_write);
+	downcast<gime_device &>(*device).set_firq_wr_callback(DEVCB_##_write);
 
 #define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
-	devcb = &downcast<gime_device &>(*device).set_floating_bus_rd_callback(DEVCB_##_read);
+	downcast<gime_device &>(*device).set_floating_bus_rd_callback(DEVCB_##_read);
 
 
 //**************************************************************************

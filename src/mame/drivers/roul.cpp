@@ -85,6 +85,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void roul(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
@@ -93,17 +96,14 @@ public:
 	DECLARE_PALETTE_INIT(roul);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void roul(machine_config &config);
 	void roul_cpu_io_map(address_map &map);
 	void roul_map(address_map &map);
 	void sound_cpu_io_map(address_map &map);
 	void sound_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* video hardware */

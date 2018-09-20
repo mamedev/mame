@@ -32,6 +32,9 @@ public:
 		m_upd(*this, "upd%u", 1),
 		m_service(*this, "SERVICE") { }
 
+	void ultrsprt(machine_config &config);
+
+private:
 	static const uint32_t VRAM_PAGES      = 2;
 	static const uint32_t VRAM_PAGE_BYTES = 512 * 1024;
 
@@ -53,14 +56,12 @@ public:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ultrsprt(machine_config &config);
 	void sound_map(address_map &map);
 	void ultrsprt_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint32_t m_cpu_vram_page;
 };
@@ -244,7 +245,7 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("P1X")
@@ -266,8 +267,8 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_6);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

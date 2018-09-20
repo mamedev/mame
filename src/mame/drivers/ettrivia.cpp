@@ -49,6 +49,9 @@ public:
 	{
 	}
 
+	void ettrivia(machine_config &config);
+
+private:
 	int m_palreg;
 	int m_gfx_bank;
 	int m_question_bank;
@@ -76,7 +79,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<ay8912_device, 3> m_ay;
-	void ettrivia(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -301,7 +303,7 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

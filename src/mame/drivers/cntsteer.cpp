@@ -938,15 +938,15 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_cntsteer)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, cntsteer_state, subcpu_vblank_irq)) // ?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(cntsteer_state::screen_update_cntsteer));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
+	screen.screen_vblank().append(FUNC(cntsteer_state::subcpu_vblank_irq)); // ?
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_PERFECT_CPU("subcpu")
@@ -979,11 +979,9 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1002,6 +1000,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerotrgt)
 	MCFG_PALETTE_ADD("palette", 256)

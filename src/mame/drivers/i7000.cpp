@@ -67,6 +67,11 @@ public:
 		, m_videoram(*this, "videoram")
 	{ }
 
+	void i7000(machine_config &config);
+
+	void init_i7000();
+
+private:
 	void video_start() override;
 	void machine_start() override;
 
@@ -75,19 +80,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint32_t screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t *m_char_rom;
 	uint8_t m_row;
 	tilemap_t *m_bg_tilemap;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	void init_i7000();
 	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 
 	DECLARE_READ8_MEMBER(i7000_kbd_r);
 	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
-	void i7000(machine_config &config);
 	void i7000_io(address_map &map);
 	void i7000_mem(address_map &map);
 };
@@ -378,11 +380,11 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* Keyboard interface */
-	MCFG_DEVICE_ADD("i8279", I8279, 4000000) /* guessed value. TODO: verify on PCB */
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, i7000_state, i7000_scanlines_w))          // scan SL lines
-	MCFG_I8279_IN_RL_CB(READ8(*this, i7000_state, i7000_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC) // TODO: Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC) // TODO: Ctrl key
+	i8279_device &kbdc(I8279(config, "i8279", 4000000)); /* guessed value. TODO: verify on PCB */
+	kbdc.out_sl_callback().set(FUNC(i7000_state::i7000_scanlines_w));	// scan SL lines
+	kbdc.in_rl_callback().set(FUNC(i7000_state::i7000_kbd_r));			// kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);							// TODO: Shift key
+	kbdc.in_ctrl_callback().set_constant(1);							// TODO: Ctrl key
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")

@@ -67,21 +67,21 @@ MACHINE_CONFIG_START(codata_state::codata)
 	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(16'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("uart", UPD7201_NEW, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs423a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs423a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs423a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs423b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+	upd7201_new_device& uart(UPD7201_NEW(config, "uart", 16_MHz_XTAL / 4));
+	uart.out_txda_callback().set("rs423a", FUNC(rs232_port_device::write_txd));
+	uart.out_dtra_callback().set("rs423a", FUNC(rs232_port_device::write_dtr));
+	uart.out_rtsa_callback().set("rs423a", FUNC(rs232_port_device::write_rts));
+	uart.out_txdb_callback().set("rs423b", FUNC(rs232_port_device::write_txd));
+	uart.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD("timer", AM9513A, XTAL(16'000'000) / 4)
-	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Timer 1 = "Abort/Reset" (watchdog)
-	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // Timer 2
-	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("uart", upd7201_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", upd7201_new_device, txca_w))
-	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("uart", upd7201_new_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", upd7201_new_device, txcb_w))
+	am9513_device &timer(AM9513A(config, "timer", 16_MHz_XTAL / 4));
+	timer.out1_cb().set_nop(); // Timer 1 = "Abort/Reset" (watchdog)
+	timer.out2_cb().set_inputline(m_maincpu, M68K_IRQ_6); // Timer 2
+	timer.out3_cb().set_inputline(m_maincpu, M68K_IRQ_7); // Refresh
+	timer.out4_cb().set("uart", FUNC(upd7201_new_device::rxca_w));
+	timer.out4_cb().append("uart", FUNC(upd7201_new_device::txca_w));
+	timer.out5_cb().set("uart", FUNC(upd7201_new_device::rxcb_w));
+	timer.out5_cb().append("uart", FUNC(upd7201_new_device::txcb_w));
 
 	MCFG_DEVICE_ADD("rs423a", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", upd7201_new_device, rxa_w))

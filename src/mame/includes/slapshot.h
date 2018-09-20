@@ -25,11 +25,6 @@ struct slapshot_tempsprite
 class slapshot_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SLAPSHOT_INTERRUPT6
-	};
-
 	slapshot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -42,9 +37,9 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_spriteext(*this,"spriteext") { }
 
-
 	void opwolf3(machine_config &config);
 	void slapshot(machine_config &config);
+
 	void init_slapshot();
 
 protected:
@@ -53,6 +48,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	enum
+	{
+		TIMER_SLAPSHOT_INTERRUPT6
+	};
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0140syt_device> m_tc0140syt;

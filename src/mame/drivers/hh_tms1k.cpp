@@ -71,6 +71,7 @@
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
+ *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
@@ -135,7 +136,6 @@
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), f3in1(ball), ...
-  - stopthiep: unable to start a game (may be intentional?)
   - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
   - arrball: shot button is unresponsive sometimes, maybe BTANB? no video of game on Youtube
     ROM is good, PLAs are good, input mux is good
@@ -160,7 +160,6 @@
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
-#include "rendlay.h"
 
 // internal artwork
 #include "7in1ss.lh"
@@ -539,7 +538,7 @@ MACHINE_CONFIG_START(matchnum_state::matchnum)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, matchnum_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_matchnum)
+	config.set_default_layout(layout_matchnum);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -639,7 +638,7 @@ MACHINE_CONFIG_START(arrball_state::arrball)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arrball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_arrball)
+	config.set_default_layout(layout_arrball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -820,7 +819,7 @@ MACHINE_CONFIG_START(mathmagi_state::mathmagi)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mathmagi_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mathmagi)
+	config.set_default_layout(layout_mathmagi);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -924,7 +923,7 @@ MACHINE_CONFIG_START(bcheetah_state::bcheetah)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bcheetah_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bcheetah_state, write_o))
 
-	MCFG_DEFAULT_LAYOUT(layout_bcheetah)
+	config.set_default_layout(layout_bcheetah);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -1052,7 +1051,7 @@ MACHINE_CONFIG_START(amaztron_state::amaztron)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, amaztron_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_amaztron)
+	config.set_default_layout(layout_amaztron);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1230,7 +1229,7 @@ MACHINE_CONFIG_START(zodiac_state::zodiac)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, zodiac_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_zodiac)
+	config.set_default_layout(layout_zodiac);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1345,7 +1344,7 @@ MACHINE_CONFIG_START(cqback_state::cqback)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cqback_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cqback)
+	config.set_default_layout(layout_cqback);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1463,7 +1462,7 @@ MACHINE_CONFIG_START(h2hfootb_state::h2hfootb)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hfootb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hfootb)
+	config.set_default_layout(layout_h2hfootb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1606,7 +1605,7 @@ MACHINE_CONFIG_START(h2hhockey_state::h2hhockey)
 	MCFG_TIMER_DRIVER_ADD("cap_empty", h2hhockey_state, cap_empty_callback)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
+	config.set_default_layout(layout_h2hhockey);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1745,7 +1744,7 @@ MACHINE_CONFIG_START(h2hbaseb_state::h2hbaseb)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hbaseb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hbaseb)
+	config.set_default_layout(layout_h2hbaseb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1857,7 +1856,7 @@ MACHINE_CONFIG_START(h2hboxing_state::h2hboxing)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hboxing_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hboxing)
+	config.set_default_layout(layout_h2hboxing);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2028,7 +2027,7 @@ MACHINE_CONFIG_START(quizwizc_state::quizwizc)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, quizwizc_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_quizwizc)
+	config.set_default_layout(layout_quizwizc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2204,7 +2203,7 @@ MACHINE_CONFIG_START(tc4_state::tc4)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tc4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tc4)
+	config.set_default_layout(layout_tc4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2319,7 +2318,7 @@ MACHINE_CONFIG_START(cnbaskb_state::cnbaskb)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnbaskb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cnbaskb)
+	config.set_default_layout(layout_cnbaskb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2432,7 +2431,7 @@ MACHINE_CONFIG_START(cmsport_state::cmsport)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cmsport_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cmsport)
+	config.set_default_layout(layout_cmsport);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2558,7 +2557,7 @@ MACHINE_CONFIG_START(cnfball_state::cnfball)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cnfball)
+	config.set_default_layout(layout_cnfball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2685,7 +2684,7 @@ MACHINE_CONFIG_START(cnfball2_state::cnfball2)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cnfball2)
+	config.set_default_layout(layout_cnfball2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2826,7 +2825,7 @@ MACHINE_CONFIG_START(eleciq_state::eleciq)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, eleciq_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_eleciq)
+	config.set_default_layout(layout_eleciq);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2931,7 +2930,7 @@ MACHINE_CONFIG_START(esoccer_state::esoccer)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esoccer_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_esoccer)
+	config.set_default_layout(layout_esoccer);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3065,7 +3064,7 @@ MACHINE_CONFIG_START(ebball_state::ebball)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ebball)
+	config.set_default_layout(layout_ebball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3188,7 +3187,7 @@ MACHINE_CONFIG_START(ebball2_state::ebball2)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ebball2)
+	config.set_default_layout(layout_ebball2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3368,7 +3367,7 @@ MACHINE_CONFIG_START(ebball3_state::ebball3)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball3_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ebball3)
+	config.set_default_layout(layout_ebball3);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3479,7 +3478,7 @@ MACHINE_CONFIG_START(esbattle_state::esbattle)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esbattle_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_esbattle)
+	config.set_default_layout(layout_esbattle);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3593,7 +3592,7 @@ MACHINE_CONFIG_START(einvader_state::einvader)
 	MCFG_SCREEN_SIZE(939, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 939-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_einvader)
+	config.set_default_layout(layout_einvader);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3708,7 +3707,7 @@ MACHINE_CONFIG_START(efootb4_state::efootb4)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, efootb4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_efootb4)
+	config.set_default_layout(layout_efootb4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3829,7 +3828,7 @@ MACHINE_CONFIG_START(ebaskb2_state::ebaskb2)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebaskb2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ebaskb2)
+	config.set_default_layout(layout_ebaskb2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3968,7 +3967,7 @@ MACHINE_CONFIG_START(raisedvl_state::raisedvl)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, raisedvl_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_raisedvl)
+	config.set_default_layout(layout_raisedvl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4099,7 +4098,7 @@ MACHINE_CONFIG_START(f2pbball_state::f2pbball)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f2pbball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_f2pbball)
+	config.set_default_layout(layout_f2pbball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4236,7 +4235,7 @@ MACHINE_CONFIG_START(f3in1_state::f3in1)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f3in1_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_f3in1)
+	config.set_default_layout(layout_f3in1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4381,7 +4380,7 @@ MACHINE_CONFIG_START(gpoker_state::gpoker)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_gpoker)
+	config.set_default_layout(layout_gpoker);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4494,7 +4493,7 @@ MACHINE_CONFIG_START(gjackpot_state::gjackpot)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_gjackpot)
+	config.set_default_layout(layout_gjackpot);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4603,7 +4602,6 @@ MACHINE_CONFIG_START(ginv1000_state::ginv1000)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(226, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 226-1, 0, 1080-1)
-	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -4739,7 +4737,6 @@ MACHINE_CONFIG_START(ginv2000_state::ginv2000)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(364, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 364-1, 0, 1080-1)
-	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -4878,7 +4875,7 @@ MACHINE_CONFIG_START(fxmcr165_state::fxmcr165)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, fxmcr165_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fxmcr165)
+	config.set_default_layout(layout_fxmcr165);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5007,7 +5004,7 @@ MACHINE_CONFIG_START(elecdet_state::elecdet)
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_elecdet)
+	config.set_default_layout(layout_elecdet);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5134,7 +5131,7 @@ MACHINE_CONFIG_START(starwbc_state::starwbc)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, starwbc_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_starwbc)
+	config.set_default_layout(layout_starwbc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5261,7 +5258,7 @@ MACHINE_CONFIG_START(astro_state::astro)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, astro_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_astro)
+	config.set_default_layout(layout_astro);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -5427,7 +5424,7 @@ MACHINE_CONFIG_START(elecbowl_state::elecbowl)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, elecbowl_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_elecbowl)
+	config.set_default_layout(layout_elecbowl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5585,7 +5582,7 @@ MACHINE_CONFIG_START(horseran_state::horseran)
 	MCFG_DEVICE_ADD("lcd", HLCD0569, 1100) // C=0.022uF
 	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(*this, horseran_state, lcd_output_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_horseran)
+	config.set_default_layout(layout_horseran);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -5762,7 +5759,7 @@ MACHINE_CONFIG_START(mdndclab_state::mdndclab)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mdndclab_state, write_o))
 
 	/* no visual feedback! */
-	MCFG_DEFAULT_LAYOUT(layout_mdndclab) // playing board
+	config.set_default_layout(layout_mdndclab); // playing board
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5866,7 +5863,7 @@ MACHINE_CONFIG_START(comp4_state::comp4)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, comp4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_comp4)
+	config.set_default_layout(layout_comp4);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -6016,7 +6013,7 @@ MACHINE_CONFIG_START(bship_state::bship)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bship_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bship)
+	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
 	// TODO
@@ -6119,7 +6116,7 @@ MACHINE_CONFIG_START(bshipb_state::bshipb)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bshipb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bship)
+	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6236,7 +6233,7 @@ MACHINE_CONFIG_START(simon_state::simon)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, simon_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_simon)
+	config.set_default_layout(layout_simon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6377,7 +6374,7 @@ MACHINE_CONFIG_START(ssimon_state::ssimon)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ssimon_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ssimon)
+	config.set_default_layout(layout_ssimon);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6559,7 +6556,7 @@ MACHINE_CONFIG_START(bigtrak_state::bigtrak)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gearbox", bigtrak_state, gearbox_sim_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bigtrak)
+	config.set_default_layout(layout_bigtrak);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6792,7 +6789,7 @@ MACHINE_CONFIG_START(mbdtower_state::mbdtower)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tower_motor", mbdtower_state, motor_sim_tick, attotime::from_msec(3500/0x80)) // ~3.5sec for a full rotation
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
+	config.set_default_layout(layout_mbdtower);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6902,7 +6899,7 @@ MACHINE_CONFIG_START(arcmania_state::arcmania)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arcmania_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_arcmania)
+	config.set_default_layout(layout_arcmania);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7021,7 +7018,7 @@ MACHINE_CONFIG_START(cnsector_state::cnsector)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnsector_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cnsector)
+	config.set_default_layout(layout_cnsector);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -7135,7 +7132,7 @@ MACHINE_CONFIG_START(merlin_state::merlin)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, merlin_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_merlin)
+	config.set_default_layout(layout_merlin);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7200,7 +7197,7 @@ MACHINE_CONFIG_START(mmerlin_state::mmerlin)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mmerlin_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mmerlin)
+	config.set_default_layout(layout_mmerlin);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7222,6 +7219,7 @@ MACHINE_CONFIG_END
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
   the ON button. Otherwise, it is in test-mode where you can hear all sounds.
+  For the patent romset, it needs to be turned off and on to exit test mode.
 
 ***************************************************************************/
 
@@ -7316,7 +7314,7 @@ MACHINE_CONFIG_START(stopthief_state::stopthief)
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_stopthief)
+	config.set_default_layout(layout_stopthief);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7429,7 +7427,7 @@ MACHINE_CONFIG_START(bankshot_state::bankshot)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bankshot_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bankshot)
+	config.set_default_layout(layout_bankshot);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7546,7 +7544,7 @@ MACHINE_CONFIG_START(splitsec_state::splitsec)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, splitsec_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_splitsec)
+	config.set_default_layout(layout_splitsec);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7664,7 +7662,7 @@ MACHINE_CONFIG_START(lostreas_state::lostreas)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, lostreas_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_lostreas)
+	config.set_default_layout(layout_lostreas);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7787,7 +7785,7 @@ MACHINE_CONFIG_START(alphie_state::alphie)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("arm_position", alphie_state, show_arm_position, attotime::from_msec(50))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_alphie)
+	config.set_default_layout(layout_alphie);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7896,7 +7894,7 @@ MACHINE_CONFIG_START(tcfball_state::tcfball)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tcfball)
+	config.set_default_layout(layout_tcfball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7962,7 +7960,7 @@ MACHINE_CONFIG_START(tcfballa_state::tcfballa)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfballa_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tcfballa)
+	config.set_default_layout(layout_tcfballa);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8126,7 +8124,7 @@ MACHINE_CONFIG_START(tandy12_state::tandy12)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tandy12_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tandy12)
+	config.set_default_layout(layout_tandy12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8234,7 +8232,7 @@ MACHINE_CONFIG_START(monkeysee_state::monkeysee)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, monkeysee_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_monkeysee)
+	config.set_default_layout(layout_monkeysee);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8383,7 +8381,7 @@ MACHINE_CONFIG_START(speechp_state::speechp)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, speechp_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_speechp)
+	config.set_default_layout(layout_speechp);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8465,7 +8463,7 @@ MACHINE_CONFIG_START(timaze_state::timaze)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, timaze_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_timaze)
+	config.set_default_layout(layout_timaze);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -8567,7 +8565,7 @@ MACHINE_CONFIG_START(copycat_state::copycat)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycat_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_copycat)
+	config.set_default_layout(layout_copycat);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8643,7 +8641,7 @@ MACHINE_CONFIG_START(copycatm2_state::copycatm2)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycatm2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_copycatm2)
+	config.set_default_layout(layout_copycatm2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8714,7 +8712,7 @@ MACHINE_CONFIG_START(ditto_state::ditto)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ditto_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ditto)
+	config.set_default_layout(layout_ditto);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8830,7 +8828,7 @@ MACHINE_CONFIG_START(ss7in1_state::ss7in1)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ss7in1_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_7in1ss)
+	config.set_default_layout(layout_7in1ss);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9032,7 +9030,7 @@ MACHINE_CONFIG_START(tbreakup_state::tbreakup)
 	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, tbreakup_state, expander_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tbreakup)
+	config.set_default_layout(layout_tbreakup);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9156,7 +9154,7 @@ MACHINE_CONFIG_START(phpball_state::phpball)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, phpball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	config.set_default_layout(layout_hh_tms1k_test);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9292,7 +9290,7 @@ MACHINE_CONFIG_START(ssports4_state::ssports4)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ssports4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ssports4)
+	config.set_default_layout(layout_ssports4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9461,7 +9459,7 @@ MACHINE_CONFIG_START(xl25_state::xl25)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, xl25_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_xl25)
+	config.set_default_layout(layout_xl25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10082,7 +10080,7 @@ ROM_END
 
 ROM_START( stopthief )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
+	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(b9c9d64a) SHA1(481f8653064c142fe5d9314b750bcd73797b92b2) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -10377,7 +10375,7 @@ CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  emp
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
-CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splitsec,   0,         0, splitsec,  splitsec,  splitsec_state,  empty_init, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, mmerlin,    0,         0, mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

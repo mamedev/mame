@@ -125,6 +125,11 @@ public:
 			m_st0016_bank(*this, "st0016_bank")
 			{ }
 
+	void speglsht(machine_config &config);
+
+	void init_speglsht();
+
+private:
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -144,14 +149,13 @@ public:
 	DECLARE_WRITE32_MEMBER(cop_w);
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
-	void init_speglsht();
+
 	DECLARE_MACHINE_RESET(speglsht);
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
 	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
-	void speglsht(machine_config &config);
 	void speglsht_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);

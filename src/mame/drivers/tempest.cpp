@@ -281,7 +281,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-#include "machine/atari_vg.h"
+#include "machine/er2055.h"
 #include "sound/pokey.h"
 #include "screen.h"
 #include "speaker.h"
@@ -304,6 +304,7 @@ public:
 		m_mathbox(*this, "mathbox"),
 		m_watchdog(*this, "watchdog"),
 		m_avg(*this, "avg"),
+		m_earom(*this, "earom"),
 		m_rom(*this, "maincpu"),
 		m_knob_p1(*this, TEMPEST_KNOB_P1_TAG),
 		m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
@@ -314,10 +315,11 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void tempest(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	void tempest(machine_config &config);
 
 protected:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
@@ -326,16 +328,20 @@ protected:
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
+
 	DECLARE_READ8_MEMBER(rom_ae1f_r);
 
 	virtual void machine_start() override;
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<avg_tempest_device> m_avg;
+	required_device<er2055_device> m_earom;
 	required_region_ptr<uint8_t> m_rom;
 
 	required_ioport m_knob_p1;
@@ -433,6 +439,32 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
 
 /*************************************
  *
+ *  High score EAROM
+ *
+ *************************************/
+
+READ8_MEMBER(tempest_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(tempest_state::earom_write)
+{
+	m_earom->set_address(offset & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(tempest_state::earom_control_w)
+{
+	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
+}
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -461,9 +493,9 @@ void tempest_state::main_map(address_map &map)
 	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
 	map(0x5000, 0x5000).w(FUNC(tempest_state::wdclr_w));
 	map(0x5800, 0x5800).w(m_avg, FUNC(avg_tempest_device::reset_w));
-	map(0x6000, 0x603f).w("earom", FUNC(atari_vg_earom_device::write));
-	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
-	map(0x6050, 0x6050).r("earom", FUNC(atari_vg_earom_device::read));
+	map(0x6000, 0x603f).w(FUNC(tempest_state::earom_write));
+	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w(FUNC(tempest_state::earom_control_w));
+	map(0x6050, 0x6050).r(FUNC(tempest_state::earom_read));
 	map(0x6060, 0x6060).r(m_mathbox, FUNC(mathbox_device::lo_r));
 	map(0x6070, 0x6070).r(m_mathbox, FUNC(mathbox_device::hi_r));
 	map(0x6080, 0x609f).w(m_mathbox, FUNC(mathbox_device::go_w));
@@ -606,10 +638,9 @@ MACHINE_CONFIG_START(tempest_state::tempest)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(CLOCK_3KHZ / 256));
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	MCFG_DEVICE_ADD("earom", ER2055)
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

@@ -35,21 +35,25 @@ lamps?
 class dreambal_state : public driver_device
 {
 public:
-	dreambal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dreambal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_deco104(*this, "ioprot104"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_eeprom(*this, "eeprom")
 	{ }
 
+	void dreambal(machine_config &config);
+
+	void init_dreambal();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<deco104_device> m_deco104;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	void init_dreambal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -73,7 +77,6 @@ public:
 			m_eeprom->cs_write(data&0x4 ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
-	void dreambal(machine_config &config);
 	void dreambal_map(address_map &map);
 };
 
@@ -328,12 +331,12 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93lc46b
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93lc46b
 
-	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	DECO104PROT(config, m_deco104, 0);
+	m_deco104->port_a_cb().set_ioport("INPUTS");
+	m_deco104->port_b_cb().set_ioport("SYSTEM");
+	m_deco104->port_c_cb().set_ioport("DSW");
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)

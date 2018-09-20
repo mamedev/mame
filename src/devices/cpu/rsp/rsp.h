@@ -84,19 +84,19 @@ enum
 #define RSPDRC_STRICT_VERIFY    0x0001          /* verify all instructions */
 
 #define MCFG_RSP_DP_REG_R_CB(_devcb) \
-	devcb = &downcast<rsp_device &>(*device).set_dp_reg_r_callback(DEVCB_##_devcb);
+	downcast<rsp_device &>(*device).set_dp_reg_r_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_DP_REG_W_CB(_devcb) \
-	devcb = &downcast<rsp_device &>(*device).set_dp_reg_w_callback(DEVCB_##_devcb);
+	downcast<rsp_device &>(*device).set_dp_reg_w_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_SP_REG_R_CB(_devcb) \
-	devcb = &downcast<rsp_device &>(*device).set_sp_reg_r_callback(DEVCB_##_devcb);
+	downcast<rsp_device &>(*device).set_sp_reg_r_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_SP_REG_W_CB(_devcb) \
-	devcb = &downcast<rsp_device &>(*device).set_sp_reg_w_callback(DEVCB_##_devcb);
+	downcast<rsp_device &>(*device).set_sp_reg_w_callback(DEVCB_##_devcb);
 
 #define MCFG_RSP_SP_SET_STATUS_CB(_devcb) \
-	devcb = &downcast<rsp_device &>(*device).set_status_callback(DEVCB_##_devcb);
+	downcast<rsp_device &>(*device).set_status_callback(DEVCB_##_devcb);
 
 
 class rsp_device : public cpu_device

@@ -114,6 +114,7 @@ class spg2xx_game_state : public driver_device
 public:
 	spg2xx_game_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_bank(*this, "cart"),
 		m_maincpu(*this, "maincpu"),
 		m_p_ram(*this, "p_ram"),
 		m_p_rowscroll(*this, "p_rowscroll"),
@@ -121,10 +122,32 @@ public:
 		m_p_spriteram(*this, "p_spriteram"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
-		m_io_p3(*this, "P3"),
-		m_bank(*this, "cart")
+		m_io_p3(*this, "P3")
 	{ }
 
+	void spg2xx_base(machine_config &config);
+	void spg2xx_basep(machine_config &config);
+	void batman(machine_config &config);
+
+	void init_walle();
+	void init_batman();
+	void init_wirels60();
+	void init_rad_skat();
+	void init_rad_crik();
+
+protected:
+	void switch_bank(uint32_t bank);
+	uint32_t m_centered_coordinates; // this must be a vreg?
+	void test_centered(uint8_t *ROM);
+
+	virtual void machine_start() override;
+
+	typedef delegate<uint16_t(uint16_t, int)> vii_io_rw_delegate;
+	vii_io_rw_delegate   m_vii_io_rw;
+
+	required_memory_bank m_bank;
+
+private:
 	DECLARE_READ16_MEMBER(video_r);
 	DECLARE_WRITE16_MEMBER(video_w);
 	DECLARE_READ16_MEMBER(audio_r);
@@ -133,12 +156,6 @@ public:
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(rom_r);
 
-	void init_walle();
-	void init_batman();
-	void init_wirels60();
-	void init_rad_skat();
-	void init_rad_crik();
-
 	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vii_vblank);
@@ -146,22 +163,10 @@ public:
 	TIMER_CALLBACK_MEMBER(tmb1_tick);
 	TIMER_CALLBACK_MEMBER(tmb2_tick);
 
-	void spg2xx_base(machine_config &config);
-	void spg2xx_basep(machine_config &config);
-	void batman(machine_config &config);
 	void vii_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-	void switch_bank(uint32_t bank);
-	uint32_t m_centered_coordinates; // this must be a vreg?
-	void test_centered(uint8_t *ROM);
-
-	typedef delegate<uint16_t(uint16_t, int)> vii_io_rw_delegate;
-	vii_io_rw_delegate   m_vii_io_rw;
-private:
 
 	uint16_t do_spg240_rad_skat_io(uint16_t what, int index);
 	uint16_t do_spg243_batman_io(uint16_t what, int index);
@@ -212,9 +217,6 @@ private:
 
 	// temp hack
 	DECLARE_READ16_MEMBER(rad_crik_hack_r);
-
-protected:
-	required_memory_bank m_bank;
 };
 
 
@@ -226,22 +228,21 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
+	void vii(machine_config &config);
+	void vsmile(machine_config &config);
+
 	void init_vii();
 	void init_vsmile();
 
+private:
 	uint16_t do_spg243_vsmile_io(uint16_t what, int index);
 	uint16_t do_spg243_vii_io(uint16_t what, int index);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
 
-	void vii(machine_config &config);
-	void vsmile(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 
-private:
 	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_rom;
 };
@@ -1451,11 +1452,11 @@ MACHINE_CONFIG_START(spg2xx_cart_state::vsmile)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(spg2xx_game_state::batman)
+void spg2xx_game_state::batman(machine_config &config)
+{
 	spg2xx_base(config);
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x200)
-MACHINE_CONFIG_END
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x200);
+}
 
 
 void spg2xx_cart_state::init_vii()

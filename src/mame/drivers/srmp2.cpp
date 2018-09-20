@@ -116,7 +116,7 @@ MACHINE_START_MEMBER(srmp2_state,srmp3)
 	m_iox.protcheck[2] = 0x1c; m_iox.protlatch[2] = 0x04;
 	m_iox.protcheck[3] = 0x45; m_iox.protlatch[3] = 0x00;
 
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_gfx_bank));
 }
@@ -133,7 +133,7 @@ MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 	m_iox.protcheck[2] = -1;   m_iox.protlatch[2] = -1;
 	m_iox.protcheck[3] = -1;   m_iox.protlatch[3] = -1;
 
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_gfx_bank));
 }
@@ -170,8 +170,8 @@ WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
 */
 
 
-	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
-	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
 	m_adpcm_bank = ( (data & 0x20) >> 5 );
 	m_color_bank = ( (data & 0x80) >> 7 );
 }
@@ -184,8 +184,8 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
     ---x ---- : Coin Lock Out
 */
 
-	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
-	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
 }
 
 
@@ -195,7 +195,6 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
     ---- xxxx : ADPCM Bank
     --xx ---- : GFX Bank
 */
-
 
 	m_adpcm_bank = (data & 0x0f);
 	m_gfx_bank = ((data >> 4) & 0x03);
@@ -211,10 +210,8 @@ WRITE8_MEMBER(srmp2_state::adpcm_code_w)
       table and plays the ADPCM for itself.
 */
 
-	uint8_t *ROM = memregion("adpcm")->base();
-
-	m_adpcm_sptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
-	m_adpcm_eptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
+	m_adpcm_sptr = (m_adpcm_rom[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
+	m_adpcm_eptr = (m_adpcm_rom[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
 	m_adpcm_eptr  = (m_adpcm_eptr - 1) & 0x0ffff;
 
 	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
@@ -229,13 +226,11 @@ WRITE8_MEMBER(srmp2_state::adpcm_code_w)
 
 WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 {
-	uint8_t *ROM = memregion("adpcm")->base();
-
 	if (m_adpcm_sptr)
 	{
 		if (m_adpcm_data == -1)
 		{
-			m_adpcm_data = ROM[m_adpcm_sptr];
+			m_adpcm_data = m_adpcm_rom[m_adpcm_sptr];
 
 			if (m_adpcm_sptr >= m_adpcm_eptr)
 			{
@@ -372,7 +367,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
 */
 	m_adpcm_bank = ((data & 0xe0) >> 5);
 
-	membank("bank1")->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & 0x0f);
 }
 
 /**************************************************************************
@@ -462,9 +457,8 @@ WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
     xx-- ---- : GFX Bank
 */
 
-
-	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
-	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
 	m_gfx_bank = (data >> 6) & 0x03;
 }
 
@@ -476,7 +470,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
 void srmp2_state::srmp3_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("bank1");                            /* rom bank */
+	map(0x8000, 0x9fff).bankr("mainbank");                            /* rom bank */
 	map(0xa000, 0xa7ff).ram().share("nvram");   /* work ram */
 	map(0xa800, 0xa800).nopw();                            /* flag ? */
 	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
@@ -503,7 +497,7 @@ void srmp2_state::srmp3_io_map(address_map &map)
 void srmp2_state::rmgoldyh_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("bank1");                            /* rom bank */
+	map(0x8000, 0x9fff).bankr("mainbank");                            /* rom bank */
 	map(0xa000, 0xafff).ram().share("nvram");   /* work ram */
 	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
 	map(0xb300, 0xb303).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r8), FUNC(seta001_device::spritectrl_w8));
@@ -520,7 +514,7 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 */
 	m_adpcm_bank = ((data & 0xe0) >> 5);
 
-	membank("bank1")->set_entry(data & 0x1f);
+	m_mainbank->set_entry(data & 0x1f);
 }
 
 void srmp2_state::rmgoldyh_io_map(address_map &map)
@@ -1150,7 +1144,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1196,7 +1190,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1251,7 +1245,7 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")

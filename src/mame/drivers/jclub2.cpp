@@ -1141,9 +1141,9 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_DEVICE_IO_MAP(st0016_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_S29290_16BIT)
-	MCFG_WATCHDOG_ADD("watchdog")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_S29290_16BIT(config, "eeprom");
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1165,7 +1165,7 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2o)
+	config.set_default_layout(layout_jclub2o);
 MACHINE_CONFIG_END
 
 
@@ -1175,9 +1175,9 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_DEVICE_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT) // 93C46 ( 8 bits)
-	MCFG_WATCHDOG_ADD("watchdog")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_93C46_8BIT(config, "eeprom");
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1201,7 +1201,7 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2o)
+	config.set_default_layout(layout_jclub2o);
 MACHINE_CONFIG_END
 
 
@@ -1210,9 +1210,9 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_DEVICE_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-	MCFG_WATCHDOG_ADD("watchdog")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_93C46_8BIT(config, "eeprom");
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1233,7 +1233,7 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jclub2)
+	config.set_default_layout(layout_jclub2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

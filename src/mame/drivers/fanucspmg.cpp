@@ -585,6 +585,12 @@ public:
 		, m_chargen(*this, CHARGEN_TAG)
 	{ }
 
+	void fanucspmgm(machine_config &config);
+	void fanucspmg(machine_config &config);
+
+	void init_fanucspmg();
+
+private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8085a_cpu_device> m_subcpu;
 	required_device<i8251_device> m_usart0;
@@ -631,17 +637,13 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
 
-	void init_fanucspmg();
-
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
 
-	void fanucspmgm(machine_config &config);
-	void fanucspmg(machine_config &config);
 	void maincpu_io(address_map &map);
 	void maincpu_mem(address_map &map);
 	void subcpu_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	int32_t m_vram_bank;
 	uint8_t m_vbl_ctrl;
@@ -726,14 +728,10 @@ void fanucspmg_state::maincpu_mem(address_map &map)
 	map(0xf0000, 0xf0003).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0xf0004, 0xf0007).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xf0008, 0xf000f).rw(m_pit0, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xf0010, 0xf0010).rw(m_usart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf0012, 0xf0012).rw(m_usart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf0014, 0xf0014).rw(m_usart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf0016, 0xf0016).rw(m_usart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf0018, 0xf0018).rw(m_usart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf001a, 0xf001a).rw(m_usart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf001c, 0xf001c).rw(m_usart3, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf001e, 0xf001e).rw(m_usart3, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf0010, 0xf0013).rw(m_usart0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0014, 0xf0017).rw(m_usart1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0018, 0xf001b).rw(m_usart2, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf001c, 0xf001f).rw(m_usart3, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xf0020, 0xf0029).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0xf0042, 0xf0043).r(FUNC(fanucspmg_state::magic_r));
 	map(0xf0046, 0xf0046).w(FUNC(fanucspmg_state::dma_page_w));
@@ -973,11 +971,11 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
 	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
 
-	MCFG_DEVICE_ADD("i8087", I8087, XTAL(15'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
-	MCFG_I8087_DATA_WIDTH(16)
-	//MCFG_I8087_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))  // TODO: presumably this is connected to the pic
-	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
+	i8087_device &i8087(I8087(config, "i8087", XTAL(15'000'000)/3));
+	i8087.set_addrmap(AS_PROGRAM, &fanucspmg_state::maincpu_mem);
+	i8087.set_data_width(16);
+	//i8087.irq().set_inputline("maincpu", INPUT_LINE_NMI);  // TODO: presumably this is connected to the pic
+	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
 	MCFG_DEVICE_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
 	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
@@ -996,22 +994,22 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12)
 	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
 
-	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL(15'000'000) / 5)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, fanucspmg_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, fanucspmg_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, fanucspmg_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fanucspmg_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(*this, fanucspmg_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, fanucspmg_state, fdcdma_w))
+	I8257(config, m_dmac, XTAL(15'000'000) / 5);
+	m_dmac->out_hrq_cb().set(FUNC(fanucspmg_state::hrq_w));
+	m_dmac->out_tc_cb().set(FUNC(fanucspmg_state::tc_w));
+	m_dmac->in_memr_cb().set(FUNC(fanucspmg_state::memory_read_byte));
+	m_dmac->out_memw_cb().set(FUNC(fanucspmg_state::memory_write_byte));
+	m_dmac->in_ior_cb<0>().set(FUNC(fanucspmg_state::fdcdma_r));
+	m_dmac->out_iow_cb<0>().set(FUNC(fanucspmg_state::fdcdma_w));
 
 	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, fanucspmg_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD(PIC1_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(PIC0_TAG, pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(PIC0_TAG, pic8259_device, ir3_w))

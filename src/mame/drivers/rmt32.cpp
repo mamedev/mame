@@ -192,12 +192,15 @@ INPUT_PORTS_END
 class mt32_state : public driver_device
 {
 public:
+	mt32_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void mt32(machine_config &config);
+
+private:
 	required_device<i8x9x_device> cpu;
 	required_device<ram_device> ram;
 	optional_device<sed1200d0a_device> lcd;
 	required_device<timer_device> midi_timer;
-
-	mt32_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -217,10 +220,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
-	void mt32(machine_config &config);
 	void mt32_io(address_map &map);
 	void mt32_map(address_map &map);
-private:
+
 	uint8_t lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
 	uint8_t midi;
@@ -358,8 +360,7 @@ MACHINE_CONFIG_START(mt32_state::mt32)
 	MCFG_DEVICE_PROGRAM_MAP( mt32_map )
 	MCFG_DEVICE_IO_MAP( mt32_io )
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
+	RAM( config, "ram" ).set_default_size( "32K" );
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)

@@ -55,6 +55,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void fireball(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(io_00_w);
 	DECLARE_READ8_MEMBER(io_00_r);
 	DECLARE_WRITE8_MEMBER(io_02_w);
@@ -69,11 +72,9 @@ public:
 	DECLARE_WRITE8_MEMBER(p3_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
-	void fireball(machine_config &config);
 	void fireball_io_map(address_map &map);
 	void fireball_map(address_map &map);
 
-private:
 	uint8_t m_p1_data;
 	uint8_t m_p3_data;
 	uint8_t int_timing;
@@ -502,7 +503,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, fireball_state, p3_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", fireball_state, int_0, attotime::from_hz(555))  //9ms from scope reading 111Hz take care of this in the handler
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_X24C44_16BIT)
+	EEPROM_X24C44_16BIT(config, "eeprom");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -510,7 +511,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_fireball)
+	config.set_default_layout(layout_fireball);
 MACHINE_CONFIG_END
 
 

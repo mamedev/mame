@@ -709,11 +709,12 @@ void mcpx_ide_device::device_reset()
 	pci_device::device_reset();
 }
 
-MACHINE_CONFIG_START(mcpx_ide_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ide", BUS_MASTER_IDE_CONTROLLER, 0)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, mcpx_ide_device, ide_interrupt))
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
-MACHINE_CONFIG_END
+void mcpx_ide_device::device_add_mconfig(machine_config &config)
+{
+	bus_master_ide_controller_device &ide(BUS_MASTER_IDE_CONTROLLER(config, "ide", 0));
+	ide.irq_handler().set(FUNC(mcpx_ide_device::ide_interrupt));
+	ide.set_bus_master_space("maincpu", AS_PROGRAM);
+}
 
 WRITE_LINE_MEMBER(mcpx_ide_device::ide_interrupt)
 {

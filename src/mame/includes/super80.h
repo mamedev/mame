@@ -57,6 +57,16 @@ public:
 		, m_cass_led(*this, "cass_led")
 	{ }
 
+	void super80m(machine_config &config);
+	void super80(machine_config &config);
+	void super80r(machine_config &config);
+	void super80e(machine_config &config);
+	void super80d(machine_config &config);
+	void super80v(machine_config &config);
+
+	void init_super80();
+
+private:
 	void machine_start() override;
 
 	DECLARE_READ8_MEMBER(super80v_low_r);
@@ -80,7 +90,6 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
-	void init_super80();
 	DECLARE_MACHINE_RESET(super80);
 	DECLARE_MACHINE_RESET(super80r);
 	DECLARE_VIDEO_START(super80);
@@ -97,12 +106,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
-	void super80m(machine_config &config);
-	void super80(machine_config &config);
-	void super80r(machine_config &config);
-	void super80e(machine_config &config);
-	void super80d(machine_config &config);
-	void super80v(machine_config &config);
+
 	void super80_io(address_map &map);
 	void super80_map(address_map &map);
 	void super80e_io(address_map &map);
@@ -110,7 +114,7 @@ public:
 	void super80r_io(address_map &map);
 	void super80v_io(address_map &map);
 	void super80v_map(address_map &map);
-private:
+
 	uint8_t m_s_options;
 	uint8_t m_portf0;
 	uint8_t m_mc6845_cursor[16];
@@ -127,7 +131,7 @@ private:
 	void mc6845_cursor_configure();
 	void super80_cassette_motor(bool data);
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_ram;
 	optional_region_ptr<u8> m_p_chargen;
 	optional_region_ptr<u8> m_p_colorram;

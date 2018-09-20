@@ -189,20 +189,22 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void pluto5(machine_config &config);
+
+	void init_hb();
+
+private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
 
-	void pluto5(machine_config &config);
 	void pluto5_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
-public:
-	void init_hb();
+
 	virtual void machine_start() override;
 };
 

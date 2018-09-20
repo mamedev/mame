@@ -40,6 +40,15 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void psikyo3v1(machine_config &config);
+	void psikyo5(machine_config &config);
+	void psikyo5_240(machine_config &config);
+
+	void init_ps3();
+	void init_ps5();
+	void init_mjgtaste();
+
+private:
 	/* memory pointers */
 	required_device<buffered_spriteram32_device> m_spriteram;
 	required_shared_ptr<uint32_t> m_bgram;
@@ -66,9 +75,6 @@ public:
 	DECLARE_READ32_MEMBER(mjgtaste_input_r);
 	DECLARE_WRITE32_MEMBER(psh_eeprom_w);
 	DECLARE_READ32_MEMBER(psh_eeprom_r);
-	void init_ps3();
-	void init_ps5();
-	void init_mjgtaste();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -84,11 +90,8 @@ public:
 	void psikyosh_prelineblend( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void psikyosh_postlineblend( bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t req_pri );
 	void psikyosh_drawgfxzoom( bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-			uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
-			int alpha, int zoomx, int zoomy, int wide, int high, uint32_t z);
-			void psikyo3v1(machine_config &config);
-			void psikyo5(machine_config &config);
-			void psikyo5_240(machine_config &config);
-			void ps3v1_map(address_map &map);
-			void ps5_map(address_map &map);
+	uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
+	int alpha, int zoomx, int zoomy, int wide, int high, uint32_t z);
+	void ps3v1_map(address_map &map);
+	void ps5_map(address_map &map);
 };

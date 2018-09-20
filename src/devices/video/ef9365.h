@@ -25,7 +25,7 @@
 		downcast<ef9365_device &>(*device).set_display_mode((ef9365_device::display_mode));
 
 #define MCFG_EF936X_IRQ_HANDLER(cb) \
-		devcb = &downcast<ef9365_device &>(*device).set_irq_handler((DEVCB_##cb));
+		downcast<ef9365_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 //**************************************************************************
 //  TYPE DEFINITIONS

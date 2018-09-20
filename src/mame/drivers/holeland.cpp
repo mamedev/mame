@@ -282,13 +282,13 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 3J
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, holeland_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, holeland_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, holeland_state, flipscreen_y_w))
+	LS259(config, m_latch); // 3J
+	m_latch->parallel_out_cb().set(FUNC(holeland_state::pal_offs_w)).mask(0x03);
+	m_latch->q_out_cb<5>().set(FUNC(holeland_state::coin_counter_w));
+	m_latch->q_out_cb<6>().set(FUNC(holeland_state::flipscreen_x_w));
+	m_latch->q_out_cb<7>().set(FUNC(holeland_state::flipscreen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -306,19 +306,19 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 20000000/32) /* verified on PCB */
+	MCFG_DEVICE_ADD("ay1", AY8910, 20000000 / 32) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 20000000/16) /* verified on PCB */
+	MCFG_DEVICE_ADD("ay2", AY8910, 20000000 / 16) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("speech", SP0256, 3355700) /* measured 298ns on PCB */
-	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	sp0256_device &speech(SP0256(config, "speech", 3355700)); /* measured 298ns on PCB */
+	speech.data_request_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	speech.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /*
@@ -363,13 +363,13 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, holeland_state, pal_offs_w)) MCFG_DEVCB_MASK(0x03)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, holeland_state, coin_counter_w))
+	LS259(config, m_latch);
+	m_latch->parallel_out_cb().set(FUNC(holeland_state::pal_offs_w)).mask(0x03);
+	m_latch->q_out_cb<5>().set(FUNC(holeland_state::coin_counter_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

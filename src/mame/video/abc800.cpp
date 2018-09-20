@@ -278,11 +278,12 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc800m_state::abc800m_video)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
-	MCFG_MC6845_UPDATE_ROW_CB(abc800m_state, abc800m_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(Z80DART_TAG, z80dart_device, rib_w)) MCFG_DEVCB_XOR(1)
+	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
+	mc6845.set_screen(SCREEN_TAG);
+	mc6845.set_show_border_area(true);
+	mc6845.set_char_width(ABC800_CHAR_WIDTH);
+	mc6845.set_update_row_callback(FUNC(abc800m_state::abc800m_update_row), this);
+	mc6845.out_vsync_callback().set(m_dart, FUNC(z80dart_device::rib_w)).invert();
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t(0xff, 0xff, 0x00))
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)

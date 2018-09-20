@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_gamecom)
+	config.set_default_layout(layout_gamecom);
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
 

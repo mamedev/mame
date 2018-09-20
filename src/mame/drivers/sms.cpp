@@ -302,8 +302,8 @@ void sms_state::sg1000m3_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
 }
 
@@ -314,8 +314,8 @@ void sms_state::sms_io(address_map &map)
 	map(0x00, 0x00).mirror(0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x01, 0x01).mirror(0x3e).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
 	map(0xc1, 0xc1).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dd_r));
 }
@@ -332,8 +332,8 @@ void sms_state::smskr_io(address_map &map)
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
 	map(0xc1, 0xc1).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dd_r));
 }
@@ -348,8 +348,8 @@ void sms_state::smsj_io(address_map &map)
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
 	map(0xc1, 0xc1).r(FUNC(sms_state::sms_input_port_dd_r));
 	map(0xdc, 0xdc).r(FUNC(sms_state::sms_input_port_dc_r));
@@ -372,8 +372,8 @@ void sms_state::gg_io(address_map &map)
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
 	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::gg_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
 	map(0xc1, 0xc1).r(FUNC(sms_state::sms_input_port_dd_r));
 	map(0xdc, 0xdc).r(FUNC(sms_state::sms_input_port_dc_r));
@@ -609,7 +609,7 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -732,7 +732,7 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -878,7 +878,7 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -992,11 +992,12 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,gamegear)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5378, 0)
-	MCFG_SEGA315_5378_SET_SCREEN("screen")
-	MCFG_SEGA315_5378_IS_PAL(false)
-	MCFG_SEGA315_5378_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5378_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	/* VDP chip of the Gamegear 2 ASIC version */
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5377, 0)
+	MCFG_SEGA315_5377_SET_SCREEN("screen")
+	MCFG_SEGA315_5377_IS_PAL(false)
+	MCFG_SEGA315_5377_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5377_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

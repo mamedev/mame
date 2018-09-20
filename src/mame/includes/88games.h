@@ -21,12 +21,14 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_k051316(*this, "k051316"),
-		m_upd7759_1(*this, "upd1"),
-		m_upd7759_2(*this, "upd2"),
+		m_upd7759(*this, "upd%d", 1),
 		m_bank0000(*this, "bank0000"),
 		m_bank1000(*this, "bank1000"),
 		m_ram(*this, "ram") { }
 
+	void _88games(machine_config &config);
+
+private:
 	/* video-related */
 	int          m_k88games_priority;
 	int          m_videobank;
@@ -39,8 +41,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_device<k051316_device> m_k051316;
-	required_device<upd7759_device> m_upd7759_1;
-	required_device<upd7759_device> m_upd7759_2;
+	required_device_array<upd7759_device, 2> m_upd7759;
 
 	/* memory banks */
 	required_memory_bank m_bank0000;
@@ -65,7 +66,7 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
-	void _88games(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

@@ -12,7 +12,7 @@
 #pragma once
 
 #define MCFG_KC_KEYBOARD_OUT_CALLBACK(_write) \
-	devcb = &downcast<kc_keyboard_device &>(*device).set_out_wr_callback(DEVCB_##_write);
+	downcast<kc_keyboard_device &>(*device).set_out_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     TYPE DEFINITIONS

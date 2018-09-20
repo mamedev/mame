@@ -21,9 +21,10 @@ public:
 	{ }
 
 	void hp700_92(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2681_device> m_duart;
 };
@@ -57,7 +58,7 @@ MACHINE_CONFIG_START(hp700_state::hp700_92)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(29'491'200) / 8) // divider not verified
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))

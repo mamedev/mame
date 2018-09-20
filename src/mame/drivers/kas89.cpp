@@ -212,7 +212,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_v9938(*this, "v9938"),
 		m_soundlatch(*this, "soundlatch"),
 		m_pl1(*this, "PL1"),
 		m_pl2(*this, "PL2"),
@@ -226,6 +225,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void kas89(machine_config &config);
+
+	void init_kas89();
+
+private:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -233,17 +237,13 @@ public:
 	DECLARE_WRITE8_MEMBER(int_ack_w);
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
-	void init_kas89();
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
-	void kas89(machine_config &config);
 	void audio_io(address_map &map);
 	void audio_map(address_map &map);
 	void kas89_io(address_map &map);
 	void kas89_map(address_map &map);
 
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -256,7 +256,6 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<v9938_device> m_v9938;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_pl1;
 	required_ioport m_pl2;
@@ -536,7 +535,7 @@ void kas89_state::kas89_map(address_map &map)
 void kas89_state::kas89_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x43).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x40, 0x43).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0x80, 0x80).w(FUNC(kas89_state::mux_w));
 	map(0x81, 0x81).r(FUNC(kas89_state::mux_r));
 	map(0x82, 0x82).w(FUNC(kas89_state::control_w));    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
@@ -781,12 +780,14 @@ MACHINE_CONFIG_START(kas89_state::kas89)
 	MCFG_DEVICE_IO_MAP(audio_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_snmi", kas89_state, kas89_sound_nmi_cb, attotime::from_hz(138))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(VDP_MEM);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

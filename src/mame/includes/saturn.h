@@ -48,6 +48,20 @@ public:
 	{
 	}
 
+	DECLARE_WRITE8_MEMBER(scsp_irq);
+
+	// SMPC HLE delegates
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
+	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
+
+	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+
+protected:
 	required_region_ptr<uint32_t> m_rom;
 	required_shared_ptr<uint32_t> m_workram_l;
 	required_shared_ptr<uint32_t> m_workram_h;
@@ -133,7 +147,7 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+
 	int m_scsp_last_line;
 
 	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
@@ -424,21 +438,9 @@ public:
 
 	} stv_rbg_cache_data;
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
-
 //  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
 //  DECLARE_READ16_MEMBER(scudsp_dma_r);
 //  DECLARE_WRITE16_MEMBER(scudsp_dma_w);
-
-	// SMPC HLE delegates
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
-	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
-
 
 //  void debug_scudma_command(int ref, const std::vector<std::string> &params);
 //  void debug_scuirq_command(int ref, const std::vector<std::string> &params);

@@ -15,6 +15,7 @@
 #define MAME_INCLUDES_ATARI400_H
 
 #include "machine/6821pia.h"
+#include "machine/ram.h"
 #include "sound/pokey.h"
 #include "video/antic.h"
 #include "video/gtia.h"

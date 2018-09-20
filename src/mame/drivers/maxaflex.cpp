@@ -50,10 +50,11 @@ public:
 	{
 	}
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void maxaflex(machine_config &config);
 
-protected:
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	DECLARE_READ8_MEMBER(mcu_portA_r);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
 	DECLARE_WRITE8_MEMBER(mcu_portB_w);
@@ -70,7 +71,6 @@ protected:
 	bool atari_input_disabled() const { return !BIT(m_portB_out, 7); }
 	void mmu(uint8_t new_mmu);
 
-private:
 	void a600xl_mem(address_map &map);
 
 	uint8_t m_portB_out;
@@ -340,11 +340,11 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, maxaflex_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, maxaflex_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, maxaflex_state, pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, maxaflex_state, pia_cb2_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set(FUNC(maxaflex_state::pia_pa_r));
+	pia.readpb_handler().set(FUNC(maxaflex_state::pia_pb_r));
+	pia.writepb_handler().set(FUNC(maxaflex_state::pia_pb_w));
+	pia.cb2_handler().set(FUNC(maxaflex_state::pia_cb2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(maxaflex_state, atari)
-	MCFG_DEFAULT_LAYOUT(layout_maxaflex)
+	config.set_default_layout(layout_maxaflex);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -370,6 +370,8 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	RAM(config, RAM_TAG).set_default_size("16K");
 MACHINE_CONFIG_END
 
 

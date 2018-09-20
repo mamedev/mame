@@ -471,6 +471,11 @@ public:
 	{
 	}
 
+	void fclown(machine_config &config);
+
+	void init_fclown();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ay8910_device> m_ay8910;
@@ -501,13 +506,12 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
-	void init_fclown();
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(_5clown);
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fclown(machine_config &config);
+
 	void fcaudio_map(address_map &map);
 	void fclown_map(address_map &map);
 };
@@ -1029,18 +1033,18 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
 	MCFG_DEVICE_PROGRAM_MAP(fcaudio_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, _5clown_state, mux_port_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, counters_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set(FUNC(_5clown_state::mux_port_r));
+	pia0.readpb_handler().set(FUNC(_5clown_state::pia0_b_r));
+	pia0.writepb_handler().set(FUNC(_5clown_state::counters_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW4"))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia1_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, _5clown_state, trigsnd_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, mux_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("SW4");
+	pia1.readpb_handler().set(FUNC(_5clown_state::pia1_b_r));
+	pia1.writepa_handler().set(FUNC(_5clown_state::trigsnd_w));
+	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

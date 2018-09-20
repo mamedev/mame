@@ -36,12 +36,16 @@ class superdq_state : public driver_device
 public:
 	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+		m_laserdisc(*this, "laserdisc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void superdq(machine_config &config);
+
+private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	uint8_t m_ld_in_latch;
 	uint8_t m_ld_out_latch;
@@ -63,7 +67,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void superdq(machine_config &config);
 	void superdq_io(address_map &map);
 	void superdq_map(address_map &map);
 };

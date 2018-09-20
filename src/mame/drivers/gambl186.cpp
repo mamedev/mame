@@ -64,6 +64,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "7759") { }
 
+	void gambl186(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<upd7759_device> m_upd7759;
 	int m_comms_state;
@@ -79,7 +82,6 @@ public:
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);
 	DECLARE_WRITE16_MEMBER(upd_w);
-	void gambl186(machine_config &config);
 	void gambl186_io(address_map &map);
 	void gambl186_map(address_map &map);
 };
@@ -475,7 +477,7 @@ MACHINE_CONFIG_START(gambl186_state::gambl186)
 	MCFG_DEVICE_PROGRAM_MAP(gambl186_map)
 	MCFG_DEVICE_IO_MAP(gambl186_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)

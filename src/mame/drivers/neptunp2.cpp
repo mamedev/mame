@@ -24,14 +24,15 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void neptunp2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(test_r);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void neptunp2(machine_config &config);
 	void neptunp2_io(address_map &map);
 	void neptunp2_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

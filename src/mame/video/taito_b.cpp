@@ -32,7 +32,7 @@ void taitob_state::hitice_clear_pixel_bitmap(  )
 		hitice_pixelram_w(space, i, 0, 0xffff);
 }
 
-WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
+WRITE16_MEMBER(taitob_c_state::realpunc_video_ctrl_w)
 {
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
@@ -62,7 +62,7 @@ VIDEO_RESET_MEMBER(taitob_state,hitice)
 }
 
 
-VIDEO_START_MEMBER(taitob_state,realpunc)
+VIDEO_START_MEMBER(taitob_c_state,realpunc)
 {
 	m_realpunc_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
@@ -107,7 +107,7 @@ uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 
 
 
 
-uint32_t taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t taitob_c_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *palette = m_palette->pens();
 	uint8_t const video_control = m_tc0180vcu->get_videoctrl();

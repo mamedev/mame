@@ -107,20 +107,6 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
-	required_shared_ptr<uint32_t> m_physram;
-
-	DECLARE_READ32_MEMBER(aa310_psy_wram_r);
-	DECLARE_WRITE32_MEMBER(aa310_psy_wram_w);
-	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
-	void init_aa310();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-
 	void aa5000a(machine_config &config);
 	void aa305(machine_config &config);
 	void aa310(machine_config &config);
@@ -135,8 +121,27 @@ public:
 	void aa540(machine_config &config);
 	void aa440(machine_config &config);
 	void aa4201(machine_config &config);
+
+	void init_aa310();
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
+
+private:
+	required_shared_ptr<uint32_t> m_physram;
+
+	DECLARE_READ32_MEMBER(aa310_psy_wram_r);
+	DECLARE_WRITE32_MEMBER(aa310_psy_wram_w);
+	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	void aa310_mem(address_map &map);
-protected:
+
 	required_device<ram_device> m_ram;
 };
 
@@ -406,12 +411,11 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 	MCFG_DEVICE_PROGRAM_MAP(aa310_mem)
 	MCFG_ARM_COPRO(VL86C020)
 
-	MCFG_DEVICE_ADD("kart", AAKART, 8000000/256)
-	MCFG_AAKART_OUT_TX_CB(WRITELINE(*this, archimedes_state, a310_kart_tx_w))
-	MCFG_AAKART_OUT_RX_CB(WRITELINE(*this, archimedes_state, a310_kart_rx_w))
+	AAKART(config, m_kart, 8000000/256);
+	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
+	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x100)
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -420,13 +424,12 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, m_ram).set_default_size("1M");
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 8000000 / 1) // TODO: frequency
-	MCFG_WD_FDC_DISABLE_MOTOR_CONTROL
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_drq_w))
+	wd1772_device& fdc(WD1772(config, "fdc", 8000000 / 1)); // TODO: frequency
+	fdc.set_disable_motor_control(true);
+	fdc.intrq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_intrq_w));
+	fdc.drq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats) // rarely had 2nd FDD installed, space was used for HDD
@@ -456,69 +459,62 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 	/* Expansion slots - 2-card backplane */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(aa310_state::aa305)
+void aa310_state::aa305(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K").set_extra_options("1M");
+}
 
-MACHINE_CONFIG_START(aa310_state::aa440)
+void aa310_state::aa440(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	m_ram->set_default_size("4M");
 
 	/* 20MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa3000)
+void aa310_state::aa3000(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1M").set_extra_options("2M");
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4101)
+void aa310_state::aa4101(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M")
+	m_ram->set_default_size("1M").set_extra_options("2M,4M");
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4201)
+void aa310_state::aa4201(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	/* 20MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4401)
+void aa310_state::aa4401(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M")
+	m_ram->set_default_size("4M").set_extra_options("8M");
 
 	/* 50MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(aa310_state::aa540)
 	aa310(config);
 	MCFG_DEVICE_MODIFY("maincpu") // ARM3
 	MCFG_DEVICE_CLOCK(52_MHz_XTAL / 2)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
+	m_ram->set_default_size("4M").set_extra_options("8M,12M,16M");
 
 	/* 100MB HDD */
 
@@ -530,9 +526,7 @@ MACHINE_CONFIG_START(aa310_state::aa5000)
 	MCFG_DEVICE_MODIFY("maincpu") // ARM3
 	MCFG_DEVICE_CLOCK(50_MHz_XTAL / 2)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	/* 80MB HDD */
 
@@ -564,28 +558,24 @@ MACHINE_CONFIG_START(aa310_state::aa3010)
 	MCFG_DEVICE_MODIFY("maincpu") // ARM250
 	MCFG_DEVICE_CLOCK(72_MHz_XTAL / 6)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
+	m_ram->set_default_size("1M").set_extra_options("2M");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(aa310_state::aa3020)
+void aa310_state::aa3020(machine_config &config)
+{
 	aa3010(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("2M").set_extra_options("4M");
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4000)
+void aa310_state::aa4000(machine_config &config)
+{
 	aa3010(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	/* 80MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
 ROM_START( aa305 )
 	ROM_REGION( 0x800000, "maincpu", 0 )

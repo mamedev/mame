@@ -88,7 +88,7 @@ public:
 	void init_rx78();
 	void rx78(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_READ8_MEMBER( cass_r );
 	DECLARE_READ8_MEMBER( vram_r );
@@ -107,7 +107,6 @@ protected:
 	void rx78_io(address_map &map);
 	void rx78_mem(address_map &map);
 
-private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
 	uint8_t m_pal_reg[7];
@@ -497,9 +496,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(rx78_state, rx78_cart)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32k")
-	MCFG_RAM_EXTRA_OPTIONS("16k")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("16K");
 
 	MCFG_CASSETTE_ADD( "cassette" )
 

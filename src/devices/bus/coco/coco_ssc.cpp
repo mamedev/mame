@@ -146,8 +146,6 @@ namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_SSC, device_cococart_interface, coco_ssc_device, "coco_ssc", "CoCo S/SC PAK");
 DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sound Activity Circuit");
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 
 //**************************************************************************
@@ -163,15 +161,13 @@ MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
 	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, coco_ssc_device, ssc_port_d_r))
 	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, coco_ssc_device, ssc_port_d_w))
 
-	MCFG_RAM_ADD("staticram")
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, "staticram").set_default_size("2K").set_default_value(0);
 
 	SPEAKER(config, "ssc_audio").front_center();
 
-	MCFG_DEVICE_ADD(SP0256_TAG, SP0256, XTAL(3'120'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN)
-	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
+	SP0256(config, m_spo, XTAL(3'120'000));
+	m_spo->add_route(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN);
+	m_spo->data_request_callback().set_inputline(m_tms7040, TMS7000_INT1_LINE);
 
 	MCFG_DEVICE_ADD(AY_TAG, AY8913, DERIVED_CLOCK(2, 1))
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
@@ -452,7 +448,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 
 	if( (data & C_ALD) == 0 )
 	{
-		m_spo->ald_w(space, 0, m_tms7000_portd);
+		m_spo->ald_w(m_tms7000_portd);
 	}
 
 	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )

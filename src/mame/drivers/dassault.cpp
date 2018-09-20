@@ -330,8 +330,6 @@ void dassault_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /**********************************************************************************/
@@ -535,15 +533,17 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_DEVICE_PROGRAM_MAP(dassault_sub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(32'220'000)/8);    /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dassault_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
 
-	MCFG_DEVICE_ADD("sharedram", MB8421_MB8431_16BIT, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MB8421_INTR_HANDLER(INPUTLINE("sub", M68K_IRQ_6))
+	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
+	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
+	sharedram.intr_callback().set_inputline("sub", M68K_IRQ_6);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

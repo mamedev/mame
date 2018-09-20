@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "includes/psion.h"
 
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -583,7 +582,6 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)
@@ -596,8 +594,8 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)     // sys_regs
-	MCFG_NVRAM_ADD_0FILL("nvram2")                                      // RAM
+	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
@@ -670,7 +668,7 @@ MACHINE_CONFIG_START(psion_state::psionp350)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionp350_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
+	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psionlz)
@@ -679,7 +677,7 @@ MACHINE_CONFIG_START(psion_state::psionlz)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionlz_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
+	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
 MACHINE_CONFIG_END
 
 /* ROM definition */

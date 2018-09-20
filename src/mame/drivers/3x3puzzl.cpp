@@ -63,6 +63,9 @@ public:
 			m_screen(*this, "screen")
 	{ }
 
+	void _3x3puzzle(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram1;
 	required_shared_ptr<uint16_t> m_videoram2;
@@ -97,9 +100,8 @@ public:
 	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
 	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
-	void _3x3puzzle(machine_config &config);
 	void _3x3puzzle_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

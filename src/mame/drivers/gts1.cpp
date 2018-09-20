@@ -92,7 +92,7 @@ public:
 
 	void gts1(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER (gts1_solenoid_r);
 	DECLARE_WRITE8_MEMBER(gts1_solenoid_w);
 	DECLARE_READ8_MEMBER (gts1_switches_r);
@@ -114,7 +114,6 @@ protected:
 	void gts1_data(address_map &map);
 	void gts1_io(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<3> m_dips;
 	required_ioport_array<5> m_switches;
@@ -707,7 +706,7 @@ MACHINE_CONFIG_START(gts1_state::gts1)
 	MCFG_PPS4_DISCRETE_INPUT_A_CB(READ8(*this, gts1_state, gts1_pa_r))
 	MCFG_PPS4_DISCRETE_OUTPUT_CB(WRITE8(*this, gts1_state, gts1_do_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
 	MCFG_DEVICE_ADD( "u5", RA17XX, 0 )
@@ -736,7 +735,7 @@ MACHINE_CONFIG_START(gts1_state::gts1)
 	MCFG_R10788_UPDATE( WRITE8(*this, gts1_state,gts1_display_w) )
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT( layout_gts1 )
+	config.set_default_layout(layout_gts1);
 
 	/* Sound */
 	genpin_audio(config);

@@ -1127,7 +1127,7 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 	MCFG_DEVICE_PROGRAM_MAP(berzerk_map)
 	MCFG_DEVICE_IO_MAP(berzerk_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
 	MCFG_DEVICE_ADD("ls181_12c", TTL74181)

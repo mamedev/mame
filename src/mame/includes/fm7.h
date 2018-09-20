@@ -112,17 +112,6 @@ struct fm7_alu_t
 class fm7_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_FM7_BEEPER_OFF,
-		TIMER_FM77AV_ENCODER_ACK,
-		TIMER_FM7_IRQ,
-		TIMER_FM7_SUBTIMER_IRQ,
-		TIMER_FM7_KEYBOARD_POLL,
-		TIMER_FM77AV_ALU_TASK_END,
-		TIMER_FM77AV_VSYNC
-	};
-
 	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
@@ -155,7 +144,26 @@ public:
 		m_avbank(*this, "av_bank%u", 1)
 	{
 	}
+
+	void fm16beta(machine_config &config);
+	void fm8(machine_config &config);
+	void fm7(machine_config &config);
+	void fm77av(machine_config &config);
+	void fm11(machine_config &config);
+
 	void init_fm7();
+
+private:
+	enum
+	{
+		TIMER_FM7_BEEPER_OFF,
+		TIMER_FM77AV_ENCODER_ACK,
+		TIMER_FM7_IRQ,
+		TIMER_FM7_SUBTIMER_IRQ,
+		TIMER_FM7_KEYBOARD_POLL,
+		TIMER_FM77AV_ALU_TASK_END,
+		TIMER_FM77AV_VSYNC
+	};
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -268,11 +276,6 @@ public:
 
 	uint32_t screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void fm16beta(machine_config &config);
-	void fm8(machine_config &config);
-	void fm7(machine_config &config);
-	void fm77av(machine_config &config);
-	void fm11(machine_config &config);
 	void fm11_mem(address_map &map);
 	void fm11_sub_mem(address_map &map);
 	void fm11_x86_io(address_map &map);
@@ -286,7 +289,7 @@ public:
 	void fm7_mem(address_map &map);
 	void fm7_sub_mem(address_map &map);
 	void fm8_mem(address_map &map);
-protected:
+
 	optional_shared_ptr<uint8_t> m_shared_ram;
 	optional_shared_ptr<uint8_t> m_boot_ram;
 

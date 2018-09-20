@@ -68,23 +68,23 @@ Priority word (Midres):
 DEFINE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device, "deco_back06", "DECO BAC06 Tilemap")
 
 deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO_BAC06, tag, owner, clock),
-		m_pf_data(nullptr),
-		m_pf_rowscroll(nullptr),
-		m_pf_colscroll(nullptr),
-		m_tile_region_8(0),
-		m_tile_region_16(0),
-		m_supports_8x8(true),
-		m_supports_16x16(true),
-		m_supports_rc_scroll(true),
-		m_gfxcolmask(0),
-		m_rambank(0),
-		m_gfxregion8x8(0),
-		m_gfxregion16x16(0),
-		m_wide(0),
-		m_bppmult(0),
-		m_bppmask(0),
-		m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, DECO_BAC06, tag, owner, clock)
+	, m_pf_data(nullptr)
+	, m_pf_rowscroll(nullptr)
+	, m_pf_colscroll(nullptr)
+	, m_tile_region_8(0)
+	, m_tile_region_16(0)
+	, m_supports_8x8(true)
+	, m_supports_16x16(true)
+	, m_supports_rc_scroll(true)
+	, m_gfxcolmask(0)
+	, m_rambank(0)
+	, m_gfxregion8x8(0)
+	, m_gfxregion16x16(0)
+	, m_wide(0)
+	, m_bppmult(0)
+	, m_bppmask(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	for (int i = 0; i < 8; i++)
 		{
@@ -282,7 +282,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	else
 		src_y = scrolly;
 
-	for (y=0; y<=cliprect.max_y; y++) {
+	for (y=0; y<=cliprect.bottom(); y++) {
 		if (row_scroll_enabled)
 			src_x=scrollx + rowscroll_ptr[(src_y >> (control1[3]&0xf))&(0x1ff>>(control1[3]&0xf))];
 		else
@@ -291,7 +291,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 		if (m_flip_screen)
 			src_x=(src_bitmap.width() - 256) - src_x;
 
-		for (x=0; x<=cliprect.max_x; x++) {
+		for (x=0; x<=cliprect.right(); x++) {
 			if (col_scroll_enabled)
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 

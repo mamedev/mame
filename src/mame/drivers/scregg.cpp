@@ -66,16 +66,20 @@ public:
 	scregg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: btime_state(mconfig, type, tag) { }
 
+	void scregg(machine_config &config);
+	void dommy(machine_config &config);
+
+	void init_rockduck();
+
+private:
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
-	void init_rockduck();
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
-	void scregg(machine_config &config);
-	void dommy(machine_config &config);
 	void dommy_map(address_map &map);
+
 	void eggs_map(address_map &map);
 };
 

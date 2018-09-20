@@ -45,19 +45,19 @@
 //**************************************************************************
 
 #define MCFG_MSM58321_D0_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d0_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d0_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D1_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d1_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d1_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D2_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d2_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d2_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D3_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d3_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d3_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_BUSY_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_busy_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_busy_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_YEAR0(_year0) \
 	downcast<msm58321_device &>(*device).set_year0(_year0);
@@ -81,6 +81,11 @@ public:
 	template <class Object> devcb_base &set_d2_handler(Object &&cb) { return m_d2_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_d3_handler(Object &&cb) { return m_d3_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_busy_handler(Object &&cb) { return m_busy_handler.set_callback(std::forward<Object>(cb)); }
+	auto d0_handler() { return m_d0_handler.bind(); }
+	auto d1_handler() { return m_d1_handler.bind(); }
+	auto d2_handler() { return m_d2_handler.bind(); }
+	auto d3_handler() { return m_d3_handler.bind(); }
+	auto busy_handler() { return m_busy_handler.bind(); }
 	void set_year0(int year0) { m_year0 = year0; }
 	void set_default_24h(bool default_24h) { m_default_24h = default_24h; }
 

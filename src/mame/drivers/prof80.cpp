@@ -40,8 +40,8 @@
 
 void prof80_state::motor(int mon)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(mon);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(mon);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(mon);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(mon);
 
 	m_motor = mon;
 }
@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(prof80_state::motor_w)
 		// trigger floppy motor off NE555 timer
 		int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
-		timer_set(attotime::from_msec(t), TIMER_ID_MOTOR);
+		m_floppy_motor_off_timer->adjust(attotime::from_msec(t));
 	}
 	else
 	{
@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER(prof80_state::motor_w)
 		motor(0);
 
 		// reset floppy motor off NE555 timer
-		timer_set(attotime::never, TIMER_ID_MOTOR);
+		m_floppy_motor_off_timer->adjust(attotime::never);
 	}
 }
 
@@ -114,7 +114,7 @@ WRITE_LINE_MEMBER(prof80_state::mstop_w)
 		motor(1);
 
 		// reset floppy motor off NE555 timer
-		timer_set(attotime::never, TIMER_ID_MOTOR);
+		m_floppy_motor_off_timer->adjust(attotime::never);
 	}
 }
 
@@ -176,7 +176,7 @@ READ8_MEMBER( prof80_state::status_r )
 	data |= m_rs232b->cts_r() << 7;
 
 	// floppy index
-	data |= (m_floppy0->get_device() ? m_floppy0->get_device()->idx_r() : m_floppy1->get_device() ? m_floppy1->get_device()->idx_r() : 1) << 5;
+	data |= (m_floppy[0]->get_device() ? m_floppy[0]->get_device()->idx_r() : m_floppy[1]->get_device() ? m_floppy[1]->get_device()->idx_r() : 1) << 5;
 
 	return data;
 }
@@ -431,6 +431,9 @@ void prof80_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
+	// create timer
+	m_floppy_motor_off_timer = timer_alloc(TIMER_ID_MOTOR);
+
 	// register for state saving
 	save_item(NAME(m_motor));
 	save_item(NAME(m_ready));
@@ -467,25 +470,25 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", prof80_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
 	// DEMUX latches
-	MCFG_DEVICE_ADD(m_flra, LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, data_in_w)) // TDI
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(UPD1990A_TAG, upd1990a_device, c0_w)) // C0
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, c1_w)) // C1
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, c2_w)) // C2
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, prof80_state, ready_w)) // READY
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, clk_w)) // TCK
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, prof80_state, inuse_w)) // IN USE
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, prof80_state, motor_w)) // _MOTOR
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, prof80_state, select_w)) // SELECT
-	MCFG_DEVICE_ADD(m_flrb, LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, prof80_state, resf_w)) // RESF
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, prof80_state, mini_w)) // MINI
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m_rs232a, rs232_port_device, write_rts)) // _RTS
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(m_rs232a, rs232_port_device, write_txd)) // TX
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, prof80_state, mstop_w)) // _MSTOP
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(m_rs232b, rs232_port_device, write_txd)) // TXP
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(UPD1990A_TAG, upd1990a_device, stb_w)) // TSTB
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m_mmu, prof80_mmu_device, mme_w)) // MME
+	LS259(config, m_flra);
+	m_flra->q_out_cb<0>().set(UPD1990A_TAG, FUNC(upd1990a_device::data_in_w)); // TDI
+	m_flra->q_out_cb<0>().append(UPD1990A_TAG, FUNC(upd1990a_device::c0_w)); // C0
+	m_flra->q_out_cb<1>().set(UPD1990A_TAG, FUNC(upd1990a_device::c1_w)); // C1
+	m_flra->q_out_cb<2>().set(UPD1990A_TAG, FUNC(upd1990a_device::c2_w)); // C2
+	m_flra->q_out_cb<3>().set(FUNC(prof80_state::ready_w)); // READY
+	m_flra->q_out_cb<4>().set(UPD1990A_TAG, FUNC(upd1990a_device::clk_w)); // TCK
+	m_flra->q_out_cb<5>().set(FUNC(prof80_state::inuse_w)); // IN USE
+	m_flra->q_out_cb<6>().set(FUNC(prof80_state::motor_w)); // _MOTOR
+	m_flra->q_out_cb<7>().set(FUNC(prof80_state::select_w)); // SELECT
+	LS259(config, m_flrb);
+	m_flrb->q_out_cb<0>().set(FUNC(prof80_state::resf_w)); // RESF
+	m_flrb->q_out_cb<1>().set(FUNC(prof80_state::mini_w)); // MINI
+	m_flrb->q_out_cb<2>().set(m_rs232a, FUNC(rs232_port_device::write_rts)); // _RTS
+	m_flrb->q_out_cb<3>().set(m_rs232a, FUNC(rs232_port_device::write_txd)); // TX
+	m_flrb->q_out_cb<4>().set(FUNC(prof80_state::mstop_w)); // _MSTOP
+	m_flrb->q_out_cb<5>().set(m_rs232b, FUNC(rs232_port_device::write_txd)); // TXP
+	m_flrb->q_out_cb<6>().set(UPD1990A_TAG, FUNC(upd1990a_device::stb_w)); // TSTB
+	m_flrb->q_out_cb<7>().set(m_mmu, FUNC(prof80_mmu_device::mme_w)); // MME
 
 	// ECB bus
 	MCFG_ECBBUS_ADD()
@@ -496,12 +499,11 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", ecbbus_cards, nullptr)
 
 	// V24
-	MCFG_DEVICE_ADD(m_rs232a, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_DEVICE_ADD(m_rs232b, RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof80")

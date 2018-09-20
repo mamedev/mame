@@ -128,30 +128,31 @@ const tiny_rom_entry *model1io_device::device_rom_region() const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( model1io_device::device_add_mconfig )
-	MCFG_DEVICE_ADD("iocpu", Z80, 32_MHz_XTAL/8)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void  model1io_device::device_add_mconfig(machine_config &config)
+{
+	z80_device &iocpu(Z80(config, "iocpu", 32_MHz_XTAL/8));
+	iocpu.set_addrmap(AS_PROGRAM, &model1io_device::mem_map);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) // 93C45
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 32_MHz_XTAL)
-	MCFG_315_5338A_READ_CB(READ8(*this, model1io_device, io_r))
-	MCFG_315_5338A_WRITE_CB(WRITE8(*this, model1io_device, io_w))
-	MCFG_315_5338A_OUT_PA_CB(WRITE8(*this, model1io_device, io_pa_w))
-	MCFG_315_5338A_IN_PB_CB(READ8(*this, model1io_device, io_pb_r))
-	MCFG_315_5338A_IN_PC_CB(READ8(*this, model1io_device, io_pc_r))
-	MCFG_315_5338A_IN_PD_CB(READ8(*this, model1io_device, io_pd_r))
-	MCFG_315_5338A_IN_PE_CB(READ8(*this, model1io_device, io_pe_r))
-	MCFG_315_5338A_OUT_PE_CB(WRITE8(*this, model1io_device, io_pe_w))
-	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, model1io_device, io_pf_w))
-	MCFG_315_5338A_IN_PG_CB(READ8(*this, model1io_device, io_pg_r))
+	sega_315_5338a_device &io(SEGA_315_5338A(config, "io", 32_MHz_XTAL));
+	io.read_callback().set(FUNC(model1io_device::io_r));
+	io.write_callback().set(FUNC(model1io_device::io_w));
+	io.out_pa_callback().set(FUNC(model1io_device::io_pa_w));
+	io.in_pb_callback().set(FUNC(model1io_device::io_pb_r));
+	io.in_pc_callback().set(FUNC(model1io_device::io_pc_r));
+	io.in_pd_callback().set(FUNC(model1io_device::io_pd_r));
+	io.in_pe_callback().set(FUNC(model1io_device::io_pe_r));
+	io.out_pe_callback().set(FUNC(model1io_device::io_pe_w));
+	io.out_pf_callback().set(FUNC(model1io_device::io_pf_w));
+	io.in_pg_callback().set(FUNC(model1io_device::io_pg_r));
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
-	MCFG_MSM6253_IN0_ANALOG_READ(model1io_device, analog0_r)
-	MCFG_MSM6253_IN1_ANALOG_READ(model1io_device, analog1_r)
-	MCFG_MSM6253_IN2_ANALOG_READ(model1io_device, analog2_r)
-	MCFG_MSM6253_IN3_ANALOG_READ(model1io_device, analog3_r)
-MACHINE_CONFIG_END
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_cb<0>(FUNC(model1io_device::analog0_r), this);
+	adc.set_input_cb<1>(FUNC(model1io_device::analog1_r), this);
+	adc.set_input_cb<2>(FUNC(model1io_device::analog2_r), this);
+	adc.set_input_cb<3>(FUNC(model1io_device::analog3_r), this);
+}
 
 
 //**************************************************************************

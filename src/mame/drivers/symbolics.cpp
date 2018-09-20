@@ -26,7 +26,7 @@
     TODO:
     The entire lispcpu half (more like 3/4) of the machine
     Framebuffer 1152x864? 1150x900? (lives on the i/o card)
-    I8274 MPSC (z80dart.cpp) x2
+    I8274 MPSC (z80sio.cpp) x2
     1024x4bit SRAM AM2148-50 x6 @F22-F27
     2048x8bit SRAM @F7 and @G7
     keyboard/mouse (a 68k based console dedicated to this machine; talks through one of the MPSC chips)
@@ -93,8 +93,12 @@ public:
 	{
 	}
 
-	required_device<m68000_base_device> m_maincpu;
+	void symbolics(machine_config &config);
+
 	void init_symbolics();
+
+private:
+	required_device<m68000_base_device> m_maincpu;
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
 	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
@@ -105,10 +109,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void symbolics(machine_config &config);
 	void m68k_mem(address_map &map);
-//protected:
-//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 READ16_MEMBER(symbolics_state::buserror_r)

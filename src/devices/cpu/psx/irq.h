@@ -16,7 +16,7 @@
 DECLARE_DEVICE_TYPE(PSX_IRQ, psxirq_device)
 
 #define MCFG_PSX_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<psxirq_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<psxirq_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class psxirq_device : public device_t
 {

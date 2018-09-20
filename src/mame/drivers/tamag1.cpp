@@ -28,17 +28,17 @@ public:
 		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	void tama(machine_config &config);
 
-protected:
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_PALETTE_INIT(tama);
 	E0C6S46_PIXEL_UPDATE(pixel_update);
 
 	virtual void machine_start() override;
 
-private:
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	output_finder<16, 40> m_out_x;
@@ -148,9 +148,9 @@ MACHINE_CONFIG_START(tamag1_state::tama)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 16-1)
-	MCFG_DEFAULT_LAYOUT(layout_tama)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", e0c6s46_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	config.set_default_layout(layout_tama);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(tamag1_state, tama)

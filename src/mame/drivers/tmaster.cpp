@@ -124,25 +124,27 @@ public:
 		m_duart(*this, "duart68681")
 	{ }
 
+	void tm(machine_config &config);
+	void tmds1204(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(read_rand);
+
+	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
+	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(blitter_irq_callback);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 
 	DECLARE_READ16_MEMBER(rtc_r);
 	DECLARE_WRITE16_MEMBER(rtc_w);
 
-	DECLARE_READ_LINE_MEMBER(read_rand);
-
-	void tm(machine_config &config);
-	void tmds1204(machine_config &config);
 	void tmaster_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -375,7 +377,7 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart68681", mc68681_device, rx_a_w) )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

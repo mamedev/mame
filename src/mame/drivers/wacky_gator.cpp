@@ -50,7 +50,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -76,7 +76,6 @@ protected:
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<pit8253_device> m_pit8253_0;
@@ -293,7 +292,7 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", wackygtr_state, nmi_timer, attotime::from_hz(100))  // FIXME
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wackygtr)
+	config.set_default_layout(layout_wackygtr);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
@@ -305,20 +304,20 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wackygtr_state, status_lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wackygtr_state, alligators_ctrl1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wackygtr_state, alligators_ctrl2_w))
+	i8255_device &ppi0(I8255(config, "i8255_0"));
+	ppi0.out_pa_callback().set(FUNC(wackygtr_state::status_lamps_w));
+	ppi0.out_pb_callback().set(FUNC(wackygtr_state::alligators_ctrl1_w));
+	ppi0.out_pc_callback().set(FUNC(wackygtr_state::alligators_ctrl2_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wackygtr_state, timing_lamps_w<0>))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wackygtr_state, timing_lamps_w<1>))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wackygtr_state, timing_lamps_w<2>))
+	i8255_device &ppi1(I8255(config, "i8255_1"));
+	ppi1.out_pa_callback().set(FUNC(wackygtr_state::timing_lamps_w<0>));
+	ppi1.out_pb_callback().set(FUNC(wackygtr_state::timing_lamps_w<1>));
+	ppi1.out_pc_callback().set(FUNC(wackygtr_state::timing_lamps_w<2>));
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi2(I8255(config, "i8255_2"));
+	ppi2.in_pa_callback().set_ioport("IN0");
+	ppi2.in_pb_callback().set_ioport("IN1");
+	ppi2.in_pc_callback().set_ioport("IN2");
 
 	MCFG_DEVICE_ADD("pit8253_0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess

@@ -20,7 +20,7 @@
 #define CP1610_INT_INTR     INPUT_LINE_NMI      /* Non-Maskable */
 
 #define MCFG_CP1610_BEXT_CALLBACK(_read) \
-	devcb = &downcast<cp1610_cpu_device *>(device)->set_bext_callback(DEVCB_##_read);
+	downcast<cp1610_cpu_device *>(device)->set_bext_callback(DEVCB_##_read);
 
 
 class cp1610_cpu_device :  public cpu_device

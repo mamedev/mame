@@ -5,18 +5,10 @@
     RST interrupt vector buffer
 
 **********************************************************************/
+#ifndef MAME_MACHINE_RSTBUF_H
+#define MAME_MACHINE_RSTBUF_H
 
 #pragma once
-
-#ifndef MAME_DEVICES_MACHINE_RSTBUF_H
-#define MAME_DEVICES_MACHINE_RSTBUF_H
-
-//**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RST_BUFFER_INT_CALLBACK(_devcb) \
-	devcb = &downcast<rst_buffer_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -28,7 +20,7 @@ class rst_buffer_device : public device_t
 {
 public:
 	// configuration
-	template<class Object> devcb_base &set_int_callback(Object &&object) { return m_int_cb.set_callback(std::forward<Object>(object)); }
+	auto int_callback() { return m_int_cb.bind(); }
 
 	// getter (required override)
 	virtual u8 get_vector() const = 0;
@@ -104,4 +96,4 @@ protected:
 DECLARE_DEVICE_TYPE(RST_POS_BUFFER, rst_pos_buffer_device)
 DECLARE_DEVICE_TYPE(RST_NEG_BUFFER, rst_neg_buffer_device)
 
-#endif // MAME_DEVICES_MACHINE_RSTBUF_H
+#endif // MAME_MACHINE_RSTBUF_H

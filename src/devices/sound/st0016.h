@@ -11,7 +11,7 @@
 //**************************************************************************
 
 #define MCFG_ST0016_SOUNDRAM_READ_CB(_devcb) \
-	devcb = &downcast<st0016_device &>(*device).set_soundram_callback(DEVCB_##_devcb);
+	downcast<st0016_device &>(*device).set_soundram_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

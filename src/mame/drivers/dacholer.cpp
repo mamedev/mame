@@ -59,6 +59,12 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void itaten(machine_config &config);
+	void dacholer(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(background_w);
@@ -70,7 +76,6 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_ack_w);
 	DECLARE_WRITE8_MEMBER(snd_irq_w);
 	DECLARE_WRITE8_MEMBER(music_irq_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_PALETTE_INIT(dacholer);
@@ -78,8 +83,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	void itaten(machine_config &config);
-	void dacholer(machine_config &config);
 	void itaten_main_map(address_map &map);
 	void itaten_snd_io_map(address_map &map);
 	void itaten_snd_map(address_map &map);
@@ -88,12 +91,10 @@ public:
 	void snd_io_map(address_map &map);
 	void snd_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

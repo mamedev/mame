@@ -161,15 +161,46 @@ private:
 //============================================================
 
 shaders::shaders() :
-	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false),
-	num_screens(0), curr_screen(0), acc_t(0), delta_t(0), shadow_texture(nullptr), options(nullptr),
-	black_surface(nullptr), black_texture(nullptr), recording_movie(false), render_snap(false),
-	snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
-	snap_width(0), snap_height(0), initialized(false), backbuffer(nullptr), curr_effect(nullptr),
-	default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
-	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr),
-	ntsc_effect(nullptr), bloom_effect(nullptr), downsample_effect(nullptr), vector_effect(nullptr),
-	curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr),
+	d3dintf(nullptr),
+	machine(nullptr),
+	d3d(nullptr),
+	post_fx_enable(false),
+	oversampling_enable(false),
+	num_screens(0),
+	curr_screen(0),
+	acc_t(0),
+	delta_t(0),
+	shadow_texture(nullptr),
+	options(nullptr),
+	black_surface(nullptr),
+	black_texture(nullptr),
+	recording_movie(false),
+	render_snap(false),
+	snap_copy_target(nullptr),
+	snap_copy_texture(nullptr),
+	snap_target(nullptr),
+	snap_texture(nullptr),
+	snap_width(0),
+	snap_height(0),
+	initialized(false),
+	backbuffer(nullptr),
+	curr_effect(nullptr),
+	default_effect(nullptr),
+	prescale_effect(nullptr),
+	post_effect(nullptr),
+	distortion_effect(nullptr),
+	scanline_effect(nullptr),
+	focus_effect(nullptr),
+	phosphor_effect(nullptr),
+	deconverge_effect(nullptr),
+	color_effect(nullptr),
+	ntsc_effect(nullptr),
+	bloom_effect(nullptr),
+	downsample_effect(nullptr),
+	vector_effect(nullptr),
+	curr_texture(nullptr),
+	curr_render_target(nullptr),
+	curr_poly(nullptr),
 	d3dx_create_effect_from_file_ptr(nullptr)
 {
 }
@@ -705,6 +736,7 @@ int shaders::create_resources()
 	prescale_effect = new effect(this, d3d->get_device(), "prescale.fx", fx_dir);
 	phosphor_effect = new effect(this, d3d->get_device(), "phosphor.fx", fx_dir);
 	focus_effect = new effect(this, d3d->get_device(), "focus.fx", fx_dir);
+	scanline_effect = new effect(this, d3d->get_device(), "scanline.fx", fx_dir);
 	deconverge_effect = new effect(this, d3d->get_device(), "deconverge.fx", fx_dir);
 	color_effect = new effect(this, d3d->get_device(), "color.fx", fx_dir);
 	ntsc_effect = new effect(this, d3d->get_device(), "ntsc.fx", fx_dir);
@@ -718,6 +750,7 @@ int shaders::create_resources()
 		!prescale_effect->is_valid() ||
 		!phosphor_effect->is_valid() ||
 		!focus_effect->is_valid() ||
+		!scanline_effect->is_valid() ||
 		!deconverge_effect->is_valid() ||
 		!color_effect->is_valid() ||
 		!ntsc_effect->is_valid() ||
@@ -728,13 +761,16 @@ int shaders::create_resources()
 		return 1;
 	}
 
-	effect *effects[13] = {
+	const int EFFECT_COUNT = 14;
+
+	effect *effects[EFFECT_COUNT] = {
 		default_effect,
 		post_effect,
 		distortion_effect,
 		prescale_effect,
 		phosphor_effect,
 		focus_effect,
+		scanline_effect,
 		deconverge_effect,
 		color_effect,
 		ntsc_effect,
@@ -744,7 +780,7 @@ int shaders::create_resources()
 		vector_effect
 	};
 
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < EFFECT_COUNT; i++)
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
@@ -779,21 +815,22 @@ int shaders::create_resources()
 	deconverge_effect->add_uniform("RadialConvergeX", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_X);
 	deconverge_effect->add_uniform("RadialConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_Y);
 
+	scanline_effect->add_uniform("ScanlineAlpha", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_ALPHA);
+	scanline_effect->add_uniform("ScanlineScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_SCALE);
+	scanline_effect->add_uniform("ScanlineHeight", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_HEIGHT);
+	scanline_effect->add_uniform("ScanlineVariation", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_VARIATION);
+	scanline_effect->add_uniform("ScanlineBrightScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_SCALE);
+	scanline_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);  
+
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
 
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
 
-	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
+        post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
 	post_effect->add_uniform("ShadowUV", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV);
 	post_effect->add_uniform("ShadowUVOffset", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV_OFFSET);
-	post_effect->add_uniform("ShadowDims", uniform::UT_VEC2, uniform::CU_POST_SHADOW_DIMS);
-	post_effect->add_uniform("ScanlineAlpha", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_ALPHA);
-	post_effect->add_uniform("ScanlineScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_SCALE);
-	post_effect->add_uniform("ScanlineHeight", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_HEIGHT);
-	post_effect->add_uniform("ScanlineVariation", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_VARIATION);
-	post_effect->add_uniform("ScanlineBrightScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_SCALE);
-	post_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
+	post_effect->add_uniform("ShadowDims", uniform::UT_VEC2, uniform::CU_POST_SHADOW_DIMS); 
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 
@@ -835,6 +872,7 @@ void shaders::begin_draw()
 	prescale_effect->set_technique("DefaultTechnique");
 	phosphor_effect->set_technique("DefaultTechnique");
 	focus_effect->set_technique("DefaultTechnique");
+	scanline_effect->set_technique("DefaultTechnique");
 	deconverge_effect->set_technique("DefaultTechnique");
 	color_effect->set_technique("DefaultTechnique");
 	ntsc_effect->set_technique("DefaultTechnique");
@@ -1037,6 +1075,38 @@ int shaders::deconverge_pass(d3d_render_target *rt, int source_index, poly_info 
 	next_index = rt->next_index(next_index);
 	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
+	return next_index;
+}
+
+int shaders::scanline_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
+{
+	int next_index = source_index;
+
+	// skip scanline if alpha is 0
+	if (options->scanline_alpha == 0.0f)
+		return next_index;
+
+	auto win = d3d->assert_window();
+	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device *screen = screen_iterator.byindex(curr_screen);
+	render_container &screen_container = screen->container();
+	float xscale = 1.0f / screen_container.xscale();
+	float yscale = 1.0f / screen_container.yscale();
+	float xoffset = -screen_container.xoffset();
+	float yoffset = -screen_container.yoffset();
+	float screen_scale[] = { xscale, yscale };
+	float screen_offset[] = { xoffset, yoffset };
+
+	curr_effect = scanline_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_vector("ScreenScale", 2, screen_scale);
+	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
+	curr_effect->set_float("ScanlineOffset",
+		curr_texture->get_cur_frame() == 0 ?
+		0.0f : options->scanline_jitter);
+	next_index = rt->next_index(next_index);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 	return next_index;
 }
 
@@ -1353,10 +1423,11 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		int next_index = 0;
 
-		next_index = ntsc_pass(rt, next_index, poly, vertnum); // handled in bgfx
-		next_index = color_convolution_pass(rt, next_index, poly, vertnum); // handled in bgfx
-		next_index = prescale_pass(rt, next_index, poly, vertnum); // handled in bgfx
-		next_index = deconverge_pass(rt, next_index, poly, vertnum); // handled in bgfx
+		next_index = ntsc_pass(rt, next_index, poly, vertnum);
+		next_index = color_convolution_pass(rt, next_index, poly, vertnum);
+		next_index = prescale_pass(rt, next_index, poly, vertnum);
+		next_index = deconverge_pass(rt, next_index, poly, vertnum);
+		next_index = scanline_pass(rt, next_index, poly, vertnum);
 		next_index = defocus_pass(rt, next_index, poly, vertnum);
 		next_index = phosphor_pass(rt, next_index, poly, vertnum);
 
@@ -1734,6 +1805,11 @@ void shaders::delete_resources()
 	{
 		delete focus_effect;
 		focus_effect = nullptr;
+	}
+	if (scanline_effect != nullptr)
+	{
+		delete scanline_effect;
+		scanline_effect = nullptr;
 	}
 	if (deconverge_effect != nullptr)
 	{

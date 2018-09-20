@@ -42,6 +42,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void astron(machine_config &config);
+
+	void init_astron();
+
+private:
 	uint8_t m_nmi_enable;
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -63,7 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_COLOR_write);
 	DECLARE_WRITE8_MEMBER(astron_FIX_write);
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
-	void init_astron();
 	virtual void machine_start() override;
 	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
@@ -71,7 +75,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void astron(machine_config &config);
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
 };

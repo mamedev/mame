@@ -35,6 +35,12 @@ public:
 		m_keys(*this, "KEY.%u", 0)
 	{ }
 
+	void ps4big(machine_config &config);
+	void ps4small(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_vidregs;
@@ -67,7 +73,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ps4_screen2_brt_w);
 	DECLARE_WRITE32_MEMBER(ps4_vidregs_w);
 	DECLARE_WRITE32_MEMBER(io_select_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 	DECLARE_WRITE32_MEMBER(ps4_eeprom_w);
 	DECLARE_READ32_MEMBER(ps4_eeprom_r);
 	virtual void machine_start() override;
@@ -77,8 +82,6 @@ public:
 	uint32_t screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
-	void ps4big(machine_config &config);
-	void ps4small(machine_config &config);
 	void ps4_map(address_map &map);
 	void ps4_ymf_map(address_map &map);
 };

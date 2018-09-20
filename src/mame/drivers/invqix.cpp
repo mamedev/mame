@@ -136,6 +136,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void invqix(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(port3_r);
@@ -149,10 +152,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vctl_w);
 
-	void invqix(machine_config &config);
 	void invqix_io_map(address_map &map);
 	void invqix_prg_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -161,7 +163,6 @@ protected:
 	// driver_device overrides
 	virtual void video_start() override;
 
-private:
 	uint16_t m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 
@@ -356,8 +357,7 @@ MACHINE_CONFIG_START(invqix_state::invqix)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 MACHINE_CONFIG_END
 
 ROM_START( invqix )

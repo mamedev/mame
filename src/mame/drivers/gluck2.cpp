@@ -214,6 +214,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram") { }
 
+	void gluck2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -230,7 +233,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gluck2(machine_config &config);
 	void gluck2_map(address_map &map);
 };
 
@@ -487,7 +489,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(gluck2_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

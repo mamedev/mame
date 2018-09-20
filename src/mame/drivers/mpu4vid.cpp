@@ -233,25 +233,11 @@ public:
 	{
 	}
 
-	required_device<m68000_base_device> m_videocpu;
-	optional_device<scn2674_device> m_scn2674;
-	optional_shared_ptr<uint16_t> m_vid_vidram;
-	optional_shared_ptr<uint16_t> m_vid_mainram;
-	required_device<acia6850_device> m_acia_0;
-	required_device<acia6850_device> m_acia_1;
-	required_device<ptm6840_device> m_ptm;
-	optional_ioport m_trackx_port;
-	optional_ioport m_tracky_port;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	struct bt471_t m_bt471;
-
-	//Video
-	uint8_t m_m6840_irq_state;
-	uint8_t m_m6850_irq_state;
-	int m_gfx_index;
-	int8_t m_cur[2];
-
+	void mpu4_vid(machine_config &config);
+	void bwbvid(machine_config &config);
+	void crmaze(machine_config &config);
+	void bwbvid5(machine_config &config);
+	void mating(machine_config &config);
 
 	void init_crmazea();
 	void init_v4barqst2();
@@ -274,6 +260,27 @@ public:
 	void init_skiltrek();
 	void init_crmaze3();
 	void init_cybcas();
+
+private:
+	required_device<m68000_base_device> m_videocpu;
+	optional_device<scn2674_device> m_scn2674;
+	optional_shared_ptr<uint16_t> m_vid_vidram;
+	optional_shared_ptr<uint16_t> m_vid_mainram;
+	required_device<acia6850_device> m_acia_0;
+	required_device<acia6850_device> m_acia_1;
+	required_device<ptm6840_device> m_ptm;
+	optional_ioport m_trackx_port;
+	optional_ioport m_tracky_port;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	struct bt471_t m_bt471;
+
+	//Video
+	uint8_t m_m6840_irq_state;
+	uint8_t m_m6850_irq_state;
+	int m_gfx_index;
+	int8_t m_cur[2];
+
 	DECLARE_MACHINE_START(mpu4_vid);
 	DECLARE_MACHINE_RESET(mpu4_vid);
 	DECLARE_VIDEO_START(mpu4_vid);
@@ -297,11 +304,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( vram_r );
-	void mpu4_vid(machine_config &config);
-	void bwbvid(machine_config &config);
-	void crmaze(machine_config &config);
-	void bwbvid5(machine_config &config);
-	void mating(machine_config &config);
+
 	void bwbvid5_68k_map(address_map &map);
 	void bwbvid_68k_map(address_map &map);
 	void mpu4_68k_map(address_map &map);
@@ -1275,28 +1278,26 @@ void mpu4_state::mpu4_6809_map(address_map &map)
 
 
 MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
-	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
+	MCFG_DEVICE_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(mpu4_6809_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")               /* confirm */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
 	mpu4_common(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE((63*8)+(17*8), (37*8)+17) // note this directly affects the scanline counters used below, and thus the timing of everything
-	MCFG_SCREEN_VISIBLE_AREA(0, (63*8)+(0)-1, 0, (37*8)+0-1)
-
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("scn2674_vid", scn2674_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(VIDEO_MASTER_CLOCK, (63*8)+(17*8), 0, (63*8), (37*8)+17, 0, (37*8));
+	// note this directly affects the scanline counters used below, and thus the timing of everything
+	screen.set_screen_update("scn2674_vid", FUNC(scn2674_device::screen_update));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))
-	MCFG_SCN2674_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
+	SCN2674(config, m_scn2674, VIDEO_MASTER_CLOCK / 8);
+	m_scn2674->intr_callback().set_inputline("video", M68K_IRQ_3);
+	m_scn2674->set_character_width(8);
+	m_scn2674->set_display_callback(FUNC(mpu4vid_state::display_pixels));
+	m_scn2674->set_addrmap(0, &mpu4vid_state::mpu4_vram);
 
 
 	MCFG_DEVICE_ADD("video", M68000, VIDEO_MASTER_CLOCK )
@@ -1313,12 +1314,13 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_EF9369_ADD("ef9369")
 	MCFG_EF9369_COLOR_UPDATE_CB(mpu4vid_state, ef9369_color_update)
 
-	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, mpu4vid_state, vid_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu4vid_state, cpu1_ptm_irq))
+	PTM6840(config, m_ptm, VIDEO_MASTER_CLOCK / 10); /* 68k E clock */
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o1_callback().set(FUNC(mpu4vid_state::vid_o1_callback));
+	m_ptm->o2_callback().set(FUNC(mpu4vid_state::vid_o2_callback));
+	m_ptm->o3_callback().set(FUNC(mpu4vid_state::vid_o3_callback));
+	m_ptm->irq_callback().set(FUNC(mpu4vid_state::cpu1_ptm_irq));
+
 	/* Present on all video cards */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1326,23 +1328,22 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_dcd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, mpu4vid_state, m6809_acia_irq))
+	ACIA6850(config, m_acia_0, 0);
+	m_acia_0->txd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
+	m_acia_0->rts_handler().set("acia6850_1", FUNC(acia6850_device::write_dcd));
+	m_acia_0->irq_handler().set(FUNC(mpu4vid_state::m6809_acia_irq));
 
-	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_dcd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, mpu4vid_state, m68k_acia_irq))
+	ACIA6850(config, m_acia_1, 0);
+	m_acia_1->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
+	m_acia_1->rts_handler().set("acia6850_0", FUNC(acia6850_device::write_dcd));
+	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::crmaze)
 	mpu4_vid(config);
-	MCFG_DEVICE_MODIFY("pia_ic5")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu4vid_state, pia_ic5_porta_track_r))
-	MCFG_PIA_WRITEPA_HANDLER(NOOP)
-	MCFG_PIA_WRITEPB_HANDLER(NOOP)
+	m_pia5->readpa_handler().set(FUNC(mpu4vid_state::pia_ic5_porta_track_r));
+	m_pia5->writepa_handler().set_nop();
+	m_pia5->writepb_handler().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::mating)

@@ -1722,7 +1722,7 @@ MACHINE_CONFIG_START(blitz68k_state::ilpag)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_PALETTE_ADD(m_palette, 0x100)
 
@@ -1784,7 +1784,7 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 
 	// MC68HC705C8P (Sound MCU)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1816,7 +1816,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 
 	// MC68HC705C8P (MCU2)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1846,7 +1846,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 
 	// MC68HC705C8P (MCU)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1875,7 +1875,7 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 
 	// MC68HC705C8P (MCU)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1906,7 +1906,7 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 
 	// MC68HC705C8P (MCU2)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1935,7 +1935,7 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 
 	// MC68HC705C8P (MCU)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1969,7 +1969,7 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 
 	// MC68HC705C8P (MCU3)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -77,7 +77,7 @@ public:
 
 	void uts20(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -96,8 +96,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-private:
-	required_device<cpu_device>     m_maincpu;
+	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
 	required_device<z80ctc_device>  m_ctc;
 	required_device<z80sio_device>  m_uart;
@@ -315,10 +314,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &univac_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -331,26 +330,26 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 2000000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg3))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 2000000));
+	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("uart", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("uart", z80sio_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 4_MHz_XTAL);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<1>().set(m_uart, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().append(m_uart, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<2>().set(m_uart, FUNC(z80sio_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("uart", z80sio_device, rxa_w)) // FIXME: hacked in permanent loopback to pass test
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("uart", z80sio_device, rxb_w)) // FIXME: hacked in permanent loopback to pass test
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE("uart", z80sio_device, dcdb_w)) // FIXME: hacked in permanent loopback to pass test
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", z80sio_device, ctsb_w)) // FIXME: hacked in permanent loopback to pass test
+	Z80SIO(config, m_uart, 4_MHz_XTAL);
+	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_uart->out_txda_callback().set(m_uart, FUNC(z80sio_device::rxa_w)); // FIXME: hacked in permanent loopback to pass test
+	m_uart->out_txdb_callback().set(m_uart, FUNC(z80sio_device::rxb_w)); // FIXME: hacked in permanent loopback to pass test
+	m_uart->out_wrdyb_callback().set(m_uart, FUNC(z80sio_device::dcdb_w)); // FIXME: hacked in permanent loopback to pass test
+	m_uart->out_wrdyb_callback().append(m_uart, FUNC(z80sio_device::ctsb_w)); // FIXME: hacked in permanent loopback to pass test
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

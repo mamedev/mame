@@ -34,7 +34,7 @@ public:
 
 	void potgold(machine_config &config);
 
-protected:
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -42,7 +42,6 @@ protected:
 
 	void potgold_map(address_map &map);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -91,26 +91,20 @@ cfa3000_opt_device::cfa3000_opt_device(const machine_config &mconfig, const char
 
 void cfa3000_opt_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
-
-	space.install_read_handler(0xfcc2, 0xfcc2, read8_delegate(FUNC(cfa3000_opt_device::option_r), this));
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cfa3000_opt_device::device_reset()
-{
-}
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(cfa3000_opt_device::option_r)
+READ8_MEMBER(cfa3000_opt_device::fred_r)
 {
-	return m_opt->read();
+	uint8_t data = 0xff;
+
+	if (offset == 0xc2)
+	{
+		data = m_opt->read();
+	}
+	return data;
 }

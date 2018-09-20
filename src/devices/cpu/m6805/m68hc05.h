@@ -26,31 +26,31 @@ DECLARE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device)
 // ======================> m68hc05_device
 
 #define MCFG_M68HC05_PORTA_R_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<0>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_r<0>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTB_R_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<1>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_r<1>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTC_R_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<2>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_r<2>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTD_R_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<3>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_r<3>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTA_W_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<0>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_w<0>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTB_W_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<1>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_w<1>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTC_W_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<2>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_w<2>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTD_W_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<3>(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_port_cb_w<3>(DEVCB_##obj);
 
 #define MCFG_M68HC05_TCMP_CB(obj) \
-	devcb = &downcast<m68hc05_device &>(*device).set_tcmp_cb(DEVCB_##obj);
+	downcast<m68hc05_device &>(*device).set_tcmp_cb(DEVCB_##obj);
 
 
 class m68hc05_device : public m6805_base_device

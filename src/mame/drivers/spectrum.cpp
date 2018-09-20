@@ -710,15 +710,17 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(spectrum_state::spectrum)
+void spectrum_state::spectrum(machine_config &config)
+{
 	spectrum_common(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)               // This configuration is verified only for the original ZX Spectrum.
-	MCFG_RAM_DEFAULT_SIZE("48K")        // It's likely, but still to be checked, that many clones were produced only
-	MCFG_RAM_EXTRA_OPTIONS("16K")       // in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
-	MCFG_RAM_DEFAULT_VALUE(0xff)        // available via bankswitching.
-MACHINE_CONFIG_END
+	RAM(config, m_ram).set_default_size("48K").set_extra_options("16K").set_default_value(0xff);
+	// This configuration is verified only for the original ZX Spectrum.
+	// It's likely, but still to be checked, that many clones were produced only
+	// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
+	// available via bankswitching.
+}
 
 /***************************************************************************
 
@@ -905,6 +907,12 @@ ROM_END
 
 /* Russian clones */
 
+ROM_START( bk08 )
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "right.bin", 0x0000, 0x2000, CRC(fb253544) SHA1(6b79487e3013d0acdea8d224b21c937e88105a2f) )
+	ROM_LOAD( "left.bin",  0x2000, 0x2000, CRC(a092b5f3) SHA1(06b8d98a398f61daf6604c68bcee4596c283c2cd) )
+ROM_END
+
 ROM_START(blitzs)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("blitz.rom",0x0000,0x4000, CRC(91e535a8) SHA1(14f09d45dc3803cbdb05c33adb28eb12dbad9dd0))
@@ -940,6 +948,11 @@ ROM_START(spektrbk)
 	ROM_LOAD("spektr-bk001.rom", 0x0000, 0x4000, CRC(c011eecc) SHA1(35fdc8cd083e50452655997a997873627b131520))
 ROM_END
 
+ROM_START(sintez2)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "sntez2.bin",   0x000000, 0x004000, CRC(490ded3a) SHA1(a1c6c18e1d93761c0891291ec75191f54929ed7b) )
+ROM_END
+
 ROM_START(zvezda)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD( "2764-near-cpu_red.bin", 0x0000, 0x2000, CRC(a4ae4938) SHA1(ea1763b9dee29381ddcf882fbc4e404ba5366942))
@@ -971,6 +984,7 @@ COMP( 1992, didakm92, spectrum, 0,      spectrum, spec_plus, spectrum_state, ini
 COMP( 1992, didaktk,  spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Kompakt",      0 )
 COMP( 1993, didakm93, spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 93",         0 )
 COMP( 1988, mistrum,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
+COMP( 198?, bk08,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
 COMP( 1990, blitzs,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
 COMP( 1990, byte,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Byte",                  0 )  // no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found
@@ -978,4 +992,5 @@ COMP( 1993, quorum48, spectrum, 0,      spectrum, spectrum,  spectrum_state, ini
 COMP( 1993, magic6,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Magic 6",               MACHINE_NOT_WORKING )   // keyboard should be spectrum, but image was not clear
 COMP( 1990, compani1, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kompanion 1",           0 )  // no keyboard images found
 COMP( 1990, spektrbk, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Spektr BK-001",         0 )
+COMP( 1989, sintez2,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Signal",                "Sintez 2",              0 )
 COMP( 1990, zvezda,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Zvezda",                0 )

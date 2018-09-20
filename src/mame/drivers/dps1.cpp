@@ -33,6 +33,11 @@ public:
 		//, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void dps1(machine_config &config);
+
+	void init_dps1();
+
+private:
 	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE8_MEMBER(portb4_w);
 	DECLARE_WRITE8_MEMBER(portb6_w);
@@ -43,13 +48,10 @@ public:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	void init_dps1();
 	DECLARE_MACHINE_RESET(dps1);
 
-	void dps1(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	bool m_dma_dir;
 	uint16_t m_dma_adr;
 	required_device<cpu_device> m_maincpu;
@@ -195,25 +197,25 @@ static void floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dps1_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dps1_state::io_map);
+
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	mc2661_device &uart(MC2661(config, "uart", XTAL(5'068'800)));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart",mc2661_device,rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart",mc2661_device,cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(uart, FUNC(mc2661_device::rx_w));
+	rs232.dsr_handler().set(uart, FUNC(mc2661_device::dsr_w));
+	rs232.cts_handler().set(uart, FUNC(mc2661_device::cts_w));
 
-	MCFG_DEVICE_ADD("am9519a", AM9519, 0)
-
-	MCFG_DEVICE_ADD("am9519b", AM9519, 0)
+	AM9519(config, "am9519a", 0);
+	AM9519(config, "am9519b", 0);
 
 	// floppy
 	MCFG_UPD765A_ADD("fdc", false, true)

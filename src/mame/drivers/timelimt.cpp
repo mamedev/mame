@@ -237,14 +237,14 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, timelimt_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, timelimt_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // probably flip screen
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // probably flip screen
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC15
+	mainlatch.q_out_cb<0>().set(FUNC(timelimt_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(timelimt_state::coin_lockout_w));
+	mainlatch.q_out_cb<3>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<6>().set_nop(); // probably flip screen
+	mainlatch.q_out_cb<7>().set_nop(); // probably flip screen
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

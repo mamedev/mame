@@ -34,7 +34,7 @@ ROM_END
 
 // device machine config
 MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_DEVICE_ADD(m_pit, PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
 	MCFG_PIT8253_CLK1(2000000)
 	MCFG_PIT8253_CLK2(2000000)
@@ -42,16 +42,16 @@ MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out1_w))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out2_w))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	Z80DART(config, m_dart, XTAL(4'000'000));
+	m_dart->out_txda_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtra_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232",RS232_PORT,default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart",z80dart_device,rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("dart",z80dart_device,dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("dart",z80dart_device,ctsa_w))
-//  MCFG_RS232_RI_HANDLER(WRITELINE("dart",z80dart_device,ria_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart,z80dart_device,rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_dart,z80dart_device,dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_dart,z80dart_device,ctsa_w))
+//  MCFG_RS232_RI_HANDLER(WRITELINE(m_dart,z80dart_device,ria_w))
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)

@@ -30,6 +30,10 @@ public:
 		: n64_state(mconfig, type, tag)
 		{ }
 
+	void n64(machine_config &config);
+	void n64dd(machine_config &config);
+
+private:
 	DECLARE_READ32_MEMBER(dd_null_r);
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
@@ -39,8 +43,6 @@ public:
 	void disk_unload(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
-	void n64(machine_config &config);
-	void n64dd(machine_config &config);
 	void n64_map(address_map &map);
 	void n64dd_map(address_map &map);
 	void rsp_map(address_map &map);

@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	MCFG_DEVICE_IO_MAP(coinmvga_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -30,6 +30,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void yiear(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_spriteram2;
@@ -66,7 +69,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void yiear(machine_config &config);
+
 	void main_map(address_map &map);
 	void vlm_map(address_map &map);
 };

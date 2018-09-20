@@ -70,6 +70,11 @@ public:
 		m_ram_1(*this, "ram_1"),
 		m_ram_2(*this, "ram_2") { }
 
+	void discoboy(machine_config &config);
+
+	void init_discoboy();
+
+private:
 	/* video-related */
 	uint8_t    m_gfxbank;
 	uint8_t    m_port_00;
@@ -102,13 +107,11 @@ public:
 	DECLARE_WRITE8_MEMBER(rambank2_w);
 	DECLARE_READ8_MEMBER(port_06_r);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
-	void init_discoboy();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
-	void discoboy(machine_config &config);
 	void discoboy_map(address_map &map);
 	void io_map(address_map &map);
 	void rambank1_map(address_map &map);
@@ -464,12 +467,7 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/2) /* 5 MHz? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rambank1_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
+	ADDRESS_MAP_BANK(config, "rambank1").set_map(&discoboy_state::rambank1_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -495,8 +493,8 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, discoboy_state, yunsung8_adpcm_int)) /* interrupt function */

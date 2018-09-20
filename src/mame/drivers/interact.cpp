@@ -72,12 +72,15 @@ public:
 		: hec2hrp_state(mconfig, type, tag),
 			m_videoram(*this, "videoram") { }
 
+	void hector1(machine_config &config);
+	void interact(machine_config &config);
+
+private:
+
 	required_shared_ptr<uint8_t> m_videoram;
 	DECLARE_MACHINE_START(interact);
 	DECLARE_MACHINE_RESET(interact);
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void hector1(machine_config &config);
-	void interact(machine_config &config);
 	void interact_mem(address_map &map);
 };
 

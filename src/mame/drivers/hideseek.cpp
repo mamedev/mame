@@ -42,14 +42,17 @@ public:
 	{
 	}
 
+	void hideseek(machine_config &config);
+
 	void init_hideseek();
+
+private:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hideseek);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hideseek(machine_config &config);
 	void mem_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 };
 

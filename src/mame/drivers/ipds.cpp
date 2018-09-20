@@ -27,6 +27,9 @@ public:
 	{
 	}
 
+	void ipds(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
@@ -38,7 +41,6 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	void ipds(machine_config &config);
 	void ipds_io(address_map &map);
 	void ipds_mem(address_map &map);
 };

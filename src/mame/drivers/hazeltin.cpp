@@ -5,7 +5,7 @@
     Hazeltine 1500
     original machine (c) 1977 Hazeltine Corporation
 
-    perliminary driver by Ryan Holtz
+    preliminary driver by Ryan Holtz
 
 TODO (roughly in order of importance):
     - Figure out the correct keyboard decoding.
@@ -136,6 +136,9 @@ public:
 	{
 	}
 
+	void hazl1500(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -166,10 +169,9 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
-	void hazl1500(machine_config &config);
 	void hazl1500_io(address_map &map);
 	void hazl1500_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
 	required_device<netlist_mame_ram_pointer_device> m_u9;
@@ -714,12 +716,12 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
 
-	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay51013_device, write_tcp))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", ay51013_device, write_rcp))
+	com8116_device &baudgen(COM8116(config, BAUDGEN_TAG, XTAL(5'068'800)));
+	baudgen.fr_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
+	baudgen.fr_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 
-	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
-	MCFG_AY51013_WRITE_DAV_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
+	AY51013(config, m_uart);
+	m_uart->write_dav_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)
@@ -760,19 +762,19 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "tvinterq", "tvinterq", hazl1500_state, tvinterq_cb, "")
 
 	/* keyboard controller */
-	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, hazl1500_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, hazl1500_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, hazl1500_state, ay3600_data_ready_w))
+	AY3600(config, m_kbdc, 0);
+	m_kbdc->x0().set_ioport("X0");
+	m_kbdc->x1().set_ioport("X1");
+	m_kbdc->x2().set_ioport("X2");
+	m_kbdc->x3().set_ioport("X3");
+	m_kbdc->x4().set_ioport("X4");
+	m_kbdc->x5().set_ioport("X5");
+	m_kbdc->x6().set_ioport("X6");
+	m_kbdc->x7().set_ioport("X7");
+	m_kbdc->x8().set_ioport("X8");
+	m_kbdc->shift().set(FUNC(hazl1500_state::ay3600_shift_r));
+	m_kbdc->control().set(FUNC(hazl1500_state::ay3600_control_r));
+	m_kbdc->data_ready().set(FUNC(hazl1500_state::ay3600_data_ready_w));
 MACHINE_CONFIG_END
 
 

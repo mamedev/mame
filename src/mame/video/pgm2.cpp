@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "emu.h"
 #include "includes/pgm2.h"
 
 inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal)

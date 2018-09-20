@@ -21,21 +21,22 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	void jvh2(machine_config &config);
+	void common(machine_config &config);
 	void jvh(machine_config &config);
+	void jvh2(machine_config &config);
+
+	void init_jvh();
+
+private:
 	void escape_io(address_map &map);
 	void jvh_map(address_map &map);
 	void jvh_sub_map(address_map &map);
 	void movmastr_io(address_map &map);
-protected:
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_jvh();
 };
 
 
@@ -119,27 +120,30 @@ void jvh_state::init_jvh()
 {
 }
 
-MACHINE_CONFIG_START(jvh_state::jvh)
+void jvh_state::common(machine_config &config)
+{
 	// CPU TMS9980A; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
+	TMS9980A(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jvh_state::jvh_map);
 
-	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
+	m6802_cpu_device &soundcpu(M6802(config, "soundcpu", XTAL(4'000'000)));
+	soundcpu.set_addrmap(AS_PROGRAM, &jvh_state::jvh_sub_map);
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4) // MC6802 E clock
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
-MACHINE_CONFIG_END
+	via6522_device &via(VIA6522(config, "via", XTAL(4'000'000) / 4)); // MC6802 E clock
+	via.irq_handler().set_inputline("soundcpu", M6802_IRQ_LINE);
+}
 
-MACHINE_CONFIG_START(jvh_state::jvh2)
-	// CPU TMS9980At; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
+void jvh_state::jvh(machine_config &config)
+{
+	common(config);
+	m_maincpu->set_addrmap(AS_IO, &jvh_state::escape_io);
+}
 
-	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
-
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
-MACHINE_CONFIG_END
+void jvh_state::jvh2(machine_config &config)
+{
+	common(config);
+	m_maincpu->set_addrmap(AS_IO, &jvh_state::movmastr_io);
+}
 
 
 

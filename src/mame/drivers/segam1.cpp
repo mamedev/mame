@@ -61,6 +61,10 @@ public:
 		, m_ymsnd(*this, "ymsnd")
 	{ }
 
+	void unkm1(machine_config &config);
+	void segam1(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(sound_a0_bank_w);
 
@@ -75,8 +79,6 @@ public:
 	required_device<segas24_tile_device> m_tile;
 	required_device<segas24_mixer_device> m_mixer;
 	required_device<ym3438_device> m_ymsnd;
-	void unkm1(machine_config &config);
-	void segam1(machine_config &config);
 	void segam1_comms_map(address_map &map);
 	void segam1_map(address_map &map);
 	void segam1_sound_io_map(address_map &map);
@@ -233,8 +235,7 @@ void segam1_state::segam1_comms_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0xc000, 0xc000).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc001, 0xc001).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc000, 0xc001).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe003, 0xe003).nopw(); // ???
 }
 
@@ -360,21 +361,21 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	MCFG_DEVICE_ADD("m1comm", Z80, 4000000) // unknown clock
 	MCFG_DEVICE_PROGRAM_MAP(segam1_comms_map)
 
-	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("INA"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("INB"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("INC"))
-	MCFG_315_5296_IN_PORTD_CB(IOPORT("IND"))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("INE"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("INF"))
+	sega_315_5296_device &io1(SEGA_315_5296(config, "io1", 0)); // unknown clock
+	io1.in_pa_callback().set_ioport("INA");
+	io1.in_pb_callback().set_ioport("INB");
+	io1.in_pc_callback().set_ioport("INC");
+	io1.in_pd_callback().set_ioport("IND");
+	io1.in_pe_callback().set_ioport("INE");
+	io1.in_pf_callback().set_ioport("INF");
 
-	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("ING"))
+	sega_315_5296_device &io2(SEGA_315_5296(config, "io2", 0)); // unknown clock
+	io2.in_pg_callback().set_ioport("ING");
 
 	MCFG_DEVICE_ADD("uart", I8251, 4000000) // unknown clock
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("m1comm", 0))
+	mb8421_device &dpram(MB8421(config, "dpram"));
+	dpram.intl_callback().set_inputline("m1comm", 0);
 
 	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
 	MCFG_GFX_PALETTE("palette")

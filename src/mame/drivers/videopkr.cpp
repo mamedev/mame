@@ -315,6 +315,14 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 		{ }
 
+	void babypkr(machine_config &config);
+	void videodad(machine_config &config);
+	void videopkr(machine_config &config);
+	void fortune1(machine_config &config);
+	void blckjack(machine_config &config);
+	void bpoker(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(videopkr_io_r);
 	DECLARE_WRITE8_MEMBER(videopkr_io_w);
 	DECLARE_READ8_MEMBER(videopkr_p1_data_r);
@@ -339,12 +347,7 @@ public:
 	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
 	void count_7dig(unsigned long data, uint8_t index);
-	void babypkr(machine_config &config);
-	void videodad(machine_config &config);
-	void videopkr(machine_config &config);
-	void fortune1(machine_config &config);
-	void blckjack(machine_config &config);
-	void bpoker(machine_config &config);
+
 	void i8039_io_port(address_map &map);
 	void i8039_map(address_map &map);
 	void i8039_sound_mem(address_map &map);
@@ -354,7 +357,6 @@ public:
 	void i8751_io_port(address_map &map);
 	void i8751_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -1257,7 +1259,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
 
@@ -1359,15 +1361,15 @@ MACHINE_CONFIG_START(videopkr_state::bpoker)
 	MCFG_DEVICE_REPLACE("maincpu", I8751, XTAL(6'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(i8751_map)
 	MCFG_DEVICE_IO_MAP(i8751_io_port)
-	MCFG_MCS51_PORT_P0_IN_CB(NOOP) // ???
-	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ???
+	MCFG_MCS51_PORT_P0_IN_CB(CONSTANT(0)) // ???
+	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
 	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	//MCFG_I8255_OUT_PORTA_CB()
-	//MCFG_I8255_IN_PORTB_CB()
-	//MCFG_I8255_OUT_PORTC_CB()
-	//MCFG_I8255_IN_PORTC_CB()
+	I8255A(config, "ppi");
+	//ppi.out_pa_callback()
+	//ppi.in_pb_callback()
+	//ppi.out_pc_callback()
+	//ppi.in_pc_callback()
 MACHINE_CONFIG_END
 
 

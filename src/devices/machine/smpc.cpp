@@ -233,11 +233,12 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(smpc_hle_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_0FILL("smem")
+void smpc_hle_device::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, "smem", nvram_device::DEFAULT_ALL_0);
 
 	// TODO: custom RTC subdevice
-MACHINE_CONFIG_END
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

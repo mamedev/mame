@@ -28,15 +28,15 @@ DECLARE_DEVICE_TYPE(S2650, s2650_device)
 
 
 #define MCFG_S2650_SENSE_INPUT(_devcb) \
-	devcb = &downcast<s2650_device &>(*device).set_sense_handler(DEVCB_##_devcb);
+	downcast<s2650_device &>(*device).set_sense_handler(DEVCB_##_devcb);
 
 #define MCFG_S2650_FLAG_OUTPUT(_devcb) \
-	devcb = &downcast<s2650_device &>(*device).set_flag_handler(DEVCB_##_devcb);
+	downcast<s2650_device &>(*device).set_flag_handler(DEVCB_##_devcb);
 
 #define MCFG_S2650_INTACK_HANDLER(_devcb) \
-	devcb = &downcast<s2650_device &>(*device).set_intack_handler(DEVCB_##_devcb);
+	downcast<s2650_device &>(*device).set_intack_handler(DEVCB_##_devcb);
 
-	class s2650_device : public cpu_device, public s2650_disassembler::config
+class s2650_device : public cpu_device, public s2650_disassembler::config
 {
 public:
 	// construction/destruction
@@ -46,6 +46,9 @@ public:
 	template <class Object> devcb_base &set_sense_handler(Object &&cb) { return m_sense_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_flag_handler(Object &&cb) { return m_flag_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_intack_handler(Object &&cb) { return m_intack_handler.set_callback(std::forward<Object>(cb)); }
+	auto sense_handler() { return m_sense_handler.bind(); }
+	auto flag_handler() { return m_flag_handler.bind(); }
+	auto intack_handler() { return m_intack_handler.bind(); }
 
 protected:
 	// device-level overrides

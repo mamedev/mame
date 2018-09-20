@@ -17,8 +17,7 @@
     CLASS DEFINITIONS
 ***************************************************************************/
 
-class ins8250_uart_device : public device_t,
-							public device_serial_interface
+class ins8250_uart_device : public device_t, public device_serial_interface
 {
 public:
 	template <class Object> devcb_base &set_out_tx_callback(Object &&cb) { return m_out_tx_cb.set_callback(std::forward<Object>(cb)); }
@@ -27,6 +26,12 @@ public:
 	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_out1_callback(Object &&cb) { return m_out_out1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_out2_callback(Object &&cb) { return m_out_out2_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_tx_callback() { return m_out_tx_cb.bind(); }
+	auto out_dtr_callback() { return m_out_dtr_cb.bind(); }
+	auto out_rts_callback() { return m_out_rts_cb.bind(); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
+	auto out_out1_callback() { return m_out_out1_cb.bind(); }
+	auto out_out2_callback() { return m_out_out2_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( ins8250_w );
 	DECLARE_READ8_MEMBER( ins8250_r );
@@ -152,28 +157,5 @@ DECLARE_DEVICE_TYPE(PC16552D, pc16552_device)
 DECLARE_DEVICE_TYPE(INS8250,  ins8250_device)
 DECLARE_DEVICE_TYPE(NS16450,  ns16450_device)
 DECLARE_DEVICE_TYPE(NS16550,  ns16550_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_INS8250_OUT_TX_CB(_devcb) \
-	devcb = &downcast<ins8250_uart_device &>(*device).set_out_tx_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_DTR_CB(_devcb) \
-	devcb = &downcast<ins8250_uart_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_RTS_CB(_devcb) \
-	devcb = &downcast<ins8250_uart_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_INT_CB(_devcb) \
-	devcb = &downcast<ins8250_uart_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_OUT1_CB(_devcb) \
-	devcb = &downcast<ins8250_uart_device &>(*device).set_out_out1_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_OUT2_CB(_devcb) \
-	devcb = &downcast<ins8250_uart_device &>(*device).set_out_out2_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_INS8250_H

@@ -46,6 +46,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void cupsocbl(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -75,17 +78,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 
-	void cupsocbl(machine_config &config);
 	void cupsocbl_mem(address_map &map);
 	void cupsocbl_sound_mem(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	uint16_t m_layer_disable;
 };

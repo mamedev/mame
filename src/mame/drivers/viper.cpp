@@ -387,6 +387,15 @@ public:
 	{
 	}
 
+	void viper(machine_config &config);
+
+	void init_viper();
+	void init_vipercf();
+	void init_viperhd();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
+
+private:
 	DECLARE_READ32_MEMBER(epic_r);
 	DECLARE_WRITE32_MEMBER(epic_w);
 	DECLARE_WRITE64_MEMBER(unk2_w);
@@ -417,25 +426,20 @@ public:
 	DECLARE_READ64_MEMBER(unk_serial_r);
 	DECLARE_WRITE64_MEMBER(unk_serial_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
-	void init_viper();
-	void init_vipercf();
-	void init_viperhd();
+
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	WRITE_LINE_MEMBER(voodoo_pciint);
-	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
 
 	//the following two arrays need to stay public til the legacy PCI bus is removed
 	uint32_t m_voodoo3_pci_reg[0x100];
 	uint32_t m_mpc8240_regs[256/4];
 
-	void viper(machine_config &config);
 	void viper_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
 
@@ -2384,40 +2388,42 @@ void viper_state::machine_reset()
 MACHINE_CONFIG_START(viper_state::viper)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MPC8240, 166666666) // Unknown
-	MCFG_PPC_BUS_FREQUENCY(100000000)
-	MCFG_DEVICE_PROGRAM_MAP(viper_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
+	MPC8240(config, m_maincpu, 166666666); // Unknown
+	m_maincpu->set_bus_frequency(100000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
+	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, viper_state, mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, DEVICE_SELF, viper_state, voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
-	MCFG_VOODOO_FBMEM(8)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, viper_state,voodoo_vblank))
-	MCFG_VOODOO_PCIINT_CB(WRITELINE(*this, viper_state, voodoo_pciint))
+	VOODOO_3(config, m_voodoo, STD_VOODOO_3_CLOCK);
+	m_voodoo->set_fbmem(8);
+	m_voodoo->set_screen_tag("screen");
+	m_voodoo->set_cpu_tag("maincpu");
+	m_voodoo->vblank_callback().set(FUNC(viper_state::voodoo_vblank));
+	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(viper_state, screen_update_viper)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// Screeen size and timing is re-calculated later in voodoo card
+	screen.set_refresh_hz(60);
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 1024 - 1, 0, 768 - 1);
+	screen.set_screen_update(FUNC(viper_state::screen_update_viper));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, "palette", 65536);
 
-	MCFG_TIMER_ADD_NONE("ds2430_timer2")
+	TIMER(config, "ds2430_timer2", 0);
+	//MCFG_TIMER_ADD_NONE("ds2430_timer2")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
+	M48T58(config, "m48t58", 0);
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

@@ -36,15 +36,19 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void init_ccs300();
-	DECLARE_MACHINE_RESET(ccs300);
-	DECLARE_WRITE8_MEMBER(port40_w);
-
 	void ccs300(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<z80_device> m_maincpu;
+
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
-private:
-	required_device<cpu_device> m_maincpu;
+
+	DECLARE_WRITE8_MEMBER(port40_w);
 };
 
 void ccs300_state::ccs300_mem(address_map &map)
@@ -90,13 +94,13 @@ WRITE8_MEMBER( ccs300_state::port40_w )
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }
 
-MACHINE_RESET_MEMBER( ccs300_state, ccs300 )
+void ccs300_state::machine_reset()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-void ccs300_state::init_ccs300()
+void ccs300_state::machine_start()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -105,48 +109,46 @@ void ccs300_state::init_ccs300()
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-// bit 7 needs to be stripped off, we do this by choosing 7 bits and even parity
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(ccs300_state::ccs300)
+void ccs300_state::ccs300(machine_config & config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ccs300_mem)
-	MCFG_DEVICE_IO_MAP(ccs300_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-
-	MCFG_MACHINE_RESET_OVERRIDE(ccs300_state, ccs300)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ccs300_state::ccs300_mem);
+	m_maincpu->set_addrmap(AS_IO, &ccs300_state::ccs300_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153'600));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
+	rs232_port_device& rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be exactly here
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(4'000'000)));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(4'000'000)));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+}
 
 /* ROM definition */
 ROM_START( ccs300 )
@@ -157,4 +159,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY                        FULLNAME         FLAGS */
-COMP( 19??, ccs300, ccs2810, 0,      ccs300,  ccs300, ccs300_state, init_ccs300, "California Computer Systems", "CCS Model 300", MACHINE_IS_SKELETON )
+COMP( 19??, ccs300, ccs2810, 0,      ccs300,  ccs300, ccs300_state, empty_init, "California Computer Systems", "CCS Model 300", MACHINE_IS_SKELETON )

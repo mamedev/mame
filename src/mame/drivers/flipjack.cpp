@@ -109,6 +109,11 @@ public:
 		m_layer = 0;
 	}
 
+	void flipjack(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hd6845_device> m_crtc;
@@ -128,13 +133,11 @@ public:
 	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
 	DECLARE_WRITE8_MEMBER(flipjack_layer_w);
-	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
 	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(flipjack);
 	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void flipjack(machine_config &config);
 	void flipjack_main_io_map(address_map &map);
 	void flipjack_main_map(address_map &map);
 	void flipjack_sound_io_map(address_map &map);
@@ -458,11 +461,11 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	MCFG_DEVICE_IO_MAP(flipjack_sound_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, flipjack_state, flipjack_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("P3");
+	ppi.out_pc_callback().set(FUNC(flipjack_state::flipjack_portc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

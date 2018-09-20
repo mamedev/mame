@@ -19,9 +19,9 @@
 #define MCFG_ES8712_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, ES8712, _clock)
 #define MCFG_ES8712_RESET_HANDLER(_devcb) \
-	devcb = &downcast<es8712_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+	downcast<es8712_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 #define MCFG_ES8712_MSM_WRITE_CALLBACK(_devcb) \
-	devcb = &downcast<es8712_device &>(*device).set_msm_write_callback(DEVCB_##_devcb);
+	downcast<es8712_device &>(*device).set_msm_write_callback(DEVCB_##_devcb);
 #define MCFG_ES8712_MSM_TAG(_msmtag) \
 	downcast<es8712_device &>(*device).set_msm_tag(_msmtag);
 

@@ -73,10 +73,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_UTIL_DELEGATE_H
+#define MAME_UTIL_DELEGATE_H
 
-#ifndef __DELEGATE_H__
-#define __DELEGATE_H__
+#pragma once
 
 // standard C++ includes
 #include <cstring>
@@ -619,5 +619,4 @@ public:
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
-
-#endif  /* __DELEGATE_H__ */
+#endif // MAME_UTIL_DELEGATE_H

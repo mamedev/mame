@@ -32,12 +32,14 @@ public:
 	tek4107a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	void tek4109a(machine_config &config);
+	void tek4107a(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tek4109a(machine_config &config);
-	void tek4107a(machine_config &config);
 	void tek4107a_io(address_map &map);
 	void tek4107a_mem(address_map &map);
 };

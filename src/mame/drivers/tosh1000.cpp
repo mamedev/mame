@@ -72,8 +72,12 @@ public:
 		, m_bram(*this, "bram")
 		{ }
 
-	DECLARE_MACHINE_RESET(tosh1000);
+	void tosh1000(machine_config &config);
+
 	void init_tosh1000();
+
+private:
+	DECLARE_MACHINE_RESET(tosh1000);
 
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
 	DECLARE_READ8_MEMBER(romdos_bank_r);
@@ -82,16 +86,14 @@ public:
 	DECLARE_READ8_MEMBER(bram_r);
 
 	static void cfg_fdc_35(device_t *device);
-	void tosh1000(machine_config &config);
 	void tosh1000_io(address_map &map);
 	void tosh1000_map(address_map &map);
 	void tosh1000_romdos(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<tosh1000_bram_device> m_bram;
 
-private:
 	enum {
 		IDLE, READ_DATA, WRITE_DATA
 	};
@@ -258,12 +260,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	MCFG_DEVICE_IO_MAP(tosh1000_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(tosh1000_romdos)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&tosh1000_state::tosh1000_romdos).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
 
@@ -285,8 +282,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	// uses a 80C50 instead of 8042 for KBDC
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 
 	MCFG_TOSH1000_BRAM_ADD("bram")
 MACHINE_CONFIG_END

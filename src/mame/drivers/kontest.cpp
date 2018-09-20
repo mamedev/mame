@@ -39,6 +39,9 @@ public:
 			m_palette(*this, "palette")
 	{ }
 
+	void kontest(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
@@ -53,16 +56,15 @@ public:
 	// member functions
 	DECLARE_WRITE8_MEMBER(control_w);
 
-	void kontest(machine_config &config);
 	void kontest_io(address_map &map);
 	void kontest_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-public:
+
 	DECLARE_PALETTE_INIT(kontest);
 	INTERRUPT_GEN_MEMBER(kontest_interrupt);
 };

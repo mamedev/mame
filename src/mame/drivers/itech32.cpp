@@ -357,10 +357,8 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32031/tms32031.h"
-#include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/es5506.h"
 
 #include "speaker.h"
 
@@ -381,42 +379,16 @@ Notes:
  *
  *************************************/
 
-inline int itech32_state::determine_irq_state(int vint, int xint, int qint)
-{
-	int level = 0;
-
-
-	/* determine which level is active */
-	if (m_vint_state) level = 1;
-	if (m_xint_state) level = 2;
-	if (m_qint_state) level = 3;
-
-	/* Driver's Edge shifts the interrupts a bit */
-	if (m_is_drivedge && level) level += 2;
-
-	return level;
-}
-
-
-void itech32_state::itech32_update_interrupts(int vint, int xint, int qint)
+void itech32_state::update_interrupts(int vint, int xint, int qint)
 {
 	/* update the states */
 	if (vint != -1) m_vint_state = vint;
 	if (xint != -1) m_xint_state = xint;
 	if (qint != -1) m_qint_state = qint;
 
-	if (m_is_drivedge)
-	{
-		m_maincpu->set_input_line(3, m_vint_state ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(4, m_xint_state ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(5, m_qint_state ? ASSERT_LINE : CLEAR_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(1, m_vint_state ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(2, m_xint_state ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(3, m_qint_state ? ASSERT_LINE : CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(1 + m_irq_base, m_vint_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2 + m_irq_base, m_xint_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(3 + m_irq_base, m_qint_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -425,7 +397,7 @@ WRITE_LINE_MEMBER(itech32_state::generate_int1)
 	if (state)
 	{
 		/* signal the NMI */
-		itech32_update_interrupts(1, -1, -1);
+		update_interrupts(1, -1, -1);
 		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
 	}
 }
@@ -433,7 +405,7 @@ WRITE_LINE_MEMBER(itech32_state::generate_int1)
 
 WRITE16_MEMBER(itech32_state::int1_ack_w)
 {
-	itech32_update_interrupts(0, -1, -1);
+	update_interrupts(0, -1, -1);
 }
 
 
@@ -447,15 +419,15 @@ WRITE16_MEMBER(itech32_state::int1_ack_w)
 void itech32_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 256, memregion("soundcpu")->base() + 0x10000, 0x4000);
-	m_leds.resolve();
+	m_irq_base = 0;
 
 	save_item(NAME(m_vint_state));
 	save_item(NAME(m_xint_state));
 	save_item(NAME(m_qint_state));
+	save_item(NAME(m_irq_base));
 	save_item(NAME(m_sound_data));
 	save_item(NAME(m_sound_return));
 	save_item(NAME(m_sound_int_state));
-	save_item(NAME(m_tms_spinning));
 	save_item(NAME(m_special_result));
 	save_item(NAME(m_p1_effx));
 	save_item(NAME(m_p1_effy));
@@ -476,8 +448,16 @@ void itech32_state::machine_reset()
 	m_sound_int_state = 0;
 }
 
+void drivedge_state::machine_start()
+{
+	itech32_state::machine_start();
 
-MACHINE_RESET_MEMBER(itech32_state,drivedge)
+	m_leds.resolve();
+
+	save_item(NAME(m_tms_spinning));
+}
+
+void drivedge_state::machine_reset()
 {
 	itech32_state::machine_reset();
 
@@ -485,6 +465,8 @@ MACHINE_RESET_MEMBER(itech32_state,drivedge)
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	STOP_TMS_SPINNING(machine(), 0);
 	STOP_TMS_SPINNING(machine(), 1);
+
+	m_irq_base = 2;
 }
 
 
@@ -609,18 +591,17 @@ READ32_MEMBER(itech32_state::trackball32_4bit_combined_r)
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_steering_r)
+READ32_MEMBER(drivedge_state::steering_r)
 {
-	int val = ioport("STEER")->read() * 2 - 0x100;
+	int val = m_steer->read() * 2 - 0x100;
 	if (val < 0) val = 0x100 | (-val);
 	return val << 16;
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_gas_r)
+READ32_MEMBER(drivedge_state::gas_r)
 {
-	int val = ioport("GAS")->read();
-	return val << 16;
+	return m_gas->read() << 16;
 }
 
 
@@ -731,7 +712,7 @@ READ8_MEMBER(itech32_state::sound_data_buffer_r)
  *
  *************************************/
 
-WRITE8_MEMBER(itech32_state::drivedge_portb_out)
+WRITE8_MEMBER(drivedge_state::portb_out)
 {
 //  logerror("PIA port B write = %02x\n", data);
 
@@ -749,7 +730,7 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 }
 
 
-WRITE_LINE_MEMBER(itech32_state::drivedge_turbo_light)
+WRITE_LINE_MEMBER(drivedge_state::turbo_light)
 {
 	m_leds[0] = state ? 1 : 0;
 }
@@ -787,14 +768,14 @@ WRITE8_MEMBER(itech32_state::firq_clear_w)
  *
  *************************************/
 
-WRITE32_MEMBER(itech32_state::tms_reset_assert_w)
+WRITE32_MEMBER(drivedge_state::tms_reset_assert_w)
 {
 	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
-WRITE32_MEMBER(itech32_state::tms_reset_clear_w)
+WRITE32_MEMBER(drivedge_state::tms_reset_clear_w)
 {
 	/* kludge to prevent crash on first boot */
 	if ((m_tms1_ram[0] & 0xff000000) == 0)
@@ -810,7 +791,7 @@ WRITE32_MEMBER(itech32_state::tms_reset_clear_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::tms1_68k_ram_w)
+WRITE32_MEMBER(drivedge_state::tms1_68k_ram_w)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
 	if (offset == 0) COMBINE_DATA(m_tms1_boot);
@@ -820,7 +801,7 @@ WRITE32_MEMBER(itech32_state::tms1_68k_ram_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::tms2_68k_ram_w)
+WRITE32_MEMBER(drivedge_state::tms2_68k_ram_w)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	if (offset == 0x382 && m_tms_spinning[1]) STOP_TMS_SPINNING(machine(), 1);
@@ -829,28 +810,28 @@ WRITE32_MEMBER(itech32_state::tms2_68k_ram_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::tms1_trigger_w)
+WRITE32_MEMBER(drivedge_state::tms1_trigger_w)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
 	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-WRITE32_MEMBER(itech32_state::tms2_trigger_w)
+WRITE32_MEMBER(drivedge_state::tms2_trigger_w)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_tms1_speedup_r)
+READ32_MEMBER(drivedge_state::tms1_speedup_r)
 {
 	if (m_tms1_ram[0x382] == 0 && m_dsp1->pc() == 0xee) START_TMS_SPINNING(0);
 	return m_tms1_ram[0x382];
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_tms2_speedup_r)
+READ32_MEMBER(drivedge_state::tms2_speedup_r)
 {
 	if (m_tms2_ram[0x382] == 0 && m_dsp2->pc() == 0x809808) START_TMS_SPINNING(1);
 	return m_tms2_ram[0x382];
@@ -883,12 +864,15 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	int start = (base == m_main_ram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
 		((uint8_t *)base)[i] = machine().rand();
-
-	// due to accessing uninitialized RAM, we need this hack
-	if (m_is_drivedge)
-		((uint32_t *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
 }
 
+void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
+{
+	itech32_state::nvram_init(nvram, base, length);
+
+	// due to accessing uninitialized RAM, we need this hack
+	((uint32_t *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
+}
 
 /*************************************
  *
@@ -977,7 +961,7 @@ WRITE32_MEMBER(itech32_state::test2_w)
 }
 #endif
 
-void itech32_state::drivedge_map(address_map &map)
+void drivedge_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).mirror(0x40000).ram().share("nvram");
 #if LOG_DRIVEDGE_UNINIT_RAM
@@ -986,36 +970,36 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(it
 #endif
 	map(0x080000, 0x080003).portr("80000");
 	map(0x082000, 0x082003).portr("82000");
-	map(0x084000, 0x084003).rw(FUNC(itech32_state::sound_data32_r), FUNC(itech32_state::sound_data32_w));
+	map(0x084000, 0x084003).rw(FUNC(drivedge_state::sound_data32_r), FUNC(drivedge_state::sound_data32_w));
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
-	map(0x088000, 0x088003).r(FUNC(itech32_state::drivedge_steering_r));
-	map(0x08a000, 0x08a003).r(FUNC(itech32_state::drivedge_gas_r)).nopw();
+	map(0x088000, 0x088003).r(FUNC(drivedge_state::steering_r));
+	map(0x08a000, 0x08a003).r(FUNC(drivedge_state::gas_r)).nopw();
 	map(0x08c000, 0x08c003).portr("8c000");
 	map(0x08e000, 0x08e003).portr("8e000").nopw();
-	map(0x100000, 0x10000f).w(FUNC(itech32_state::drivedge_zbuf_control_w)).share("drivedge_zctl");
-	map(0x180000, 0x180003).w(FUNC(itech32_state::drivedge_color0_w));
+	map(0x100000, 0x10000f).w(FUNC(drivedge_state::zbuf_control_w)).share("zctl");
+	map(0x180000, 0x180003).w(FUNC(drivedge_state::color0_w));
 	map(0x1a0000, 0x1bffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x1c0000, 0x1c0003).nopw();
-	map(0x1e0000, 0x1e0113).rw(FUNC(itech32_state::itech020_video_r), FUNC(itech32_state::itech020_video_w)).share("video");
-	map(0x1e4000, 0x1e4003).w(FUNC(itech32_state::tms_reset_assert_w));
-	map(0x1ec000, 0x1ec003).w(FUNC(itech32_state::tms_reset_clear_w));
+	map(0x1e0000, 0x1e0113).rw(FUNC(drivedge_state::itech020_video_r), FUNC(drivedge_state::itech020_video_w)).share("video");
+	map(0x1e4000, 0x1e4003).w(FUNC(drivedge_state::tms_reset_assert_w));
+	map(0x1ec000, 0x1ec003).w(FUNC(drivedge_state::tms_reset_clear_w));
 	map(0x200000, 0x200003).portr("200000");
-	map(0x280000, 0x280fff).ram().w(FUNC(itech32_state::tms1_68k_ram_w)).share("tms1_ram");
-	map(0x300000, 0x300fff).ram().w(FUNC(itech32_state::tms2_68k_ram_w)).share("tms2_ram");
+	map(0x280000, 0x280fff).ram().w(FUNC(drivedge_state::tms1_68k_ram_w)).share("tms1_ram");
+	map(0x300000, 0x300fff).ram().w(FUNC(drivedge_state::tms2_68k_ram_w)).share("tms2_ram");
 	map(0x380000, 0x380003).nopw(); // AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	map(0x600000, 0x607fff).rom().region("user1", 0).share("main_rom");
 }
 
-void itech32_state::drivedge_tms1_map(address_map &map)
+void drivedge_state::tms1_map(address_map &map)
 {
 	map(0x000000, 0x001fff).ram().share("tms1_boot");
-	map(0x008000, 0x0083ff).mirror(0x400).ram().w(FUNC(itech32_state::tms1_trigger_w)).share("tms1_ram");
+	map(0x008000, 0x0083ff).mirror(0x400).ram().w(FUNC(drivedge_state::tms1_trigger_w)).share("tms1_ram");
 	map(0x080000, 0x0bffff).ram();
 }
 
-void itech32_state::drivedge_tms2_map(address_map &map)
+void drivedge_state::tms2_map(address_map &map)
 {
-	map(0x000000, 0x0003ff).mirror(0x8400).ram().w(FUNC(itech32_state::tms2_trigger_w)).share("tms2_ram");
+	map(0x000000, 0x0003ff).mirror(0x8400).ram().w(FUNC(drivedge_state::tms2_trigger_w)).share("tms2_ram");
 	map(0x080000, 0x08ffff).ram();
 }
 
@@ -1682,137 +1666,126 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(itech32_state::timekill)
+void itech32_state::base_devices(machine_config &config)
+{
+	MC6809(config, m_soundcpu, SOUND_CLOCK/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_map);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(timekill_map)
+	nvram_device &nvram(NVRAM(config, "nvram"));
+	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
 
-	MCFG_DEVICE_ADD("soundcpu", MC6809, SOUND_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", itech32_state, nvram_init)
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	PALETTE(config, m_palette, 8192);
+	m_palette->set_format(PALETTE_FORMAT_GRBX);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(VIDEO_CLOCK, 508, 0, 384, 262, 0, 240); // most games configure the screen this way
+//  m_screen->set_raw(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256); // sftm, wcbowl and shufshot configure it this way
+	m_screen->set_screen_update(FUNC(itech32_state::screen_update_itech32));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(itech32_state::generate_int1));
 
-	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(GRBX)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 240) // most games configure the screen this way
-//  MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256) // sftm, wcbowl and shufshot configure it this way
-	MCFG_SCREEN_UPDATE_DRIVER(itech32_state, screen_update_itech32)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, itech32_state, generate_int1))
-
-	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ensoniq", ES5506, SOUND_CLOCK)
-	MCFG_ES5506_REGION0("ensoniq.0")
-	MCFG_ES5506_REGION1("ensoniq.1")
-	MCFG_ES5506_REGION2("ensoniq.2")
-	MCFG_ES5506_REGION3("ensoniq.3")
-	MCFG_ES5506_CHANNELS(1)               /* channels */
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.1)  /* swapped stereo */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.1)
+	ES5506(config, m_ensoniq, SOUND_CLOCK);
+	m_ensoniq->set_region0("ensoniq.0");
+	m_ensoniq->set_region1("ensoniq.1");
+	m_ensoniq->set_region2("ensoniq.2");
+	m_ensoniq->set_region3("ensoniq.3");
+	m_ensoniq->set_channels(1);               /* channels */
+	m_ensoniq->add_route(0, "rspeaker", 0.1); /* swapped stereo */
+	m_ensoniq->add_route(1, "lspeaker", 0.1);
+}
 
-	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, SOUND_CLOCK/8)
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, itech32_state,pia_portb_out))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-MACHINE_CONFIG_END
+void itech32_state::via(machine_config &config)
+{
+	VIA6522(config, m_via, SOUND_CLOCK/8);
+	m_via->writepb_handler().set(FUNC(itech32_state::pia_portb_out));
+	m_via->irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
+}
 
+void itech32_state::timekill(machine_config &config)
+{
+	M68000(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::timekill_map);
 
-MACHINE_CONFIG_START(itech32_state::bloodstm)
-	timekill(config);
+	base_devices(config);
+	via(config);
+}
+
+void itech32_state::bloodstm(machine_config &config)
+{
+	M68000(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::bloodstm_map);
+
+	base_devices(config);
+
+	m_palette->set_entries(32768);
+	m_palette->set_format(PALETTE_FORMAT_XBGR);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
+
+	via(config);
+}
+
+void drivedge_state::drivedge(machine_config &config)
+{
+	base_devices(config);
 
 	/* basic machine hardware */
+	M68EC020(config, m_maincpu, CPU020_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &drivedge_state::main_map);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bloodstm_map)
+	TMS32031(config, m_dsp1, TMS_CLOCK);
+	m_dsp1->set_addrmap(AS_PROGRAM, &drivedge_state::tms1_map);
 
-	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32768)
-	MCFG_PALETTE_FORMAT(XBGR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-MACHINE_CONFIG_END
+	TMS32031(config, m_dsp2, TMS_CLOCK);
+	m_dsp2->set_addrmap(AS_PROGRAM, &drivedge_state::tms2_map);
 
+	m_palette->set_entries(32768);
+	m_palette->set_format(PALETTE_FORMAT_XBGR);
 
-MACHINE_CONFIG_START(itech32_state::drivedge)
-	timekill(config);
+	via(config);
+	m_via->writepb_handler().set(FUNC(drivedge_state::portb_out));
+	m_via->cb2_handler().set(FUNC(drivedge_state::turbo_light));
 
-	/* basic machine hardware */
+//  M6803(config, "comm", 8000000/4); -- network CPU
 
-	MCFG_DEVICE_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(drivedge_map)
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_DEVICE_ADD("dsp1", TMS32031, TMS_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(drivedge_tms1_map)
-
-	MCFG_DEVICE_ADD("dsp2", TMS32031, TMS_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(drivedge_tms2_map)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32768)
-	MCFG_PALETTE_FORMAT(XBGR)
-
-	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, itech32_state,drivedge_portb_out))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, itech32_state,drivedge_turbo_light))
-
-//  MCFG_DEVICE_ADD("comm", M6803, 8000000/4) -- network CPU
-
-	MCFG_MACHINE_RESET_OVERRIDE(itech32_state,drivedge)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP) // interrupt not used?
+	m_screen->screen_vblank().set_nop(); // interrupt not used?
 
 	SPEAKER(config, "left_back").front_left();
 	SPEAKER(config, "right_back").front_right();
 
-	MCFG_DEVICE_MODIFY("ensoniq")
-	MCFG_ES5506_CHANNELS(2)               /* channels */
-	MCFG_SOUND_ROUTE(2, "right_back", 0.1)  /* swapped stereo */
-	MCFG_SOUND_ROUTE(3, "left_back", 0.1)
-MACHINE_CONFIG_END
+	m_ensoniq->set_channels(2);
+	m_ensoniq->add_route(2, "right_back", 0.1);  /* swapped stereo */
+	m_ensoniq->add_route(3, "left_back", 0.1);
+}
 
+void itech32_state::sftm(machine_config &config)
+{
+	base_devices(config);
 
-MACHINE_CONFIG_START(itech32_state::sftm)
-	timekill(config);
+	M68EC020(config, m_maincpu, CPU020_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::itech020_map);
 
-	/* basic machine hardware */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_020_map);
+	m_soundcpu->set_periodic_int(FUNC(itech32_state::irq1_line_assert), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(itech020_map)
+	m_palette->set_entries(32768);
+	m_palette->set_format(PALETTE_FORMAT_XRGB);
+}
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(sound_020_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(itech32_state, irq1_line_assert, 4*60)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32768)
-	MCFG_PALETTE_FORMAT(XRGB)
-
-	/* via */
-	MCFG_DEVICE_REMOVE("via6522_0")
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(itech32_state::tourny)
+void itech32_state::tourny(machine_config &config)
+{
 	sftm(config);
-
-	/* basic machine hardware */
-
-	MCFG_DEVICE_ADD(m_timekeeper, M48T02, 0)
-MACHINE_CONFIG_END
+	M48T02(config, m_timekeeper);
+}
 
 
 
@@ -4388,7 +4361,6 @@ void itech32_state::init_timekill()
 	init_program_rom();
 	m_vram_height = 512;
 	m_planes = 2;
-	m_is_drivedge = 0;
 }
 
 
@@ -4397,7 +4369,6 @@ void itech32_state::init_hardyard()
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
-	m_is_drivedge = 0;
 }
 
 
@@ -4406,19 +4377,17 @@ void itech32_state::init_bloodstm()
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
-	m_is_drivedge = 0;
 }
 
 
-void itech32_state::init_drivedge()
+void drivedge_state::driver_init()
 {
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
-	m_is_drivedge = 1;
 
-	m_dsp1->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms1_speedup_r),this));
-	m_dsp2->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms2_speedup_r),this));
+	m_dsp1->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms1_speedup_r),this));
+	m_dsp2->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms2_speedup_r),this));
 }
 
 
@@ -4468,7 +4437,6 @@ void itech32_state::init_sftm_common(int prot_addr)
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
-	m_is_drivedge = 0;
 
 	m_itech020_prot_address = prot_addr;
 
@@ -4499,7 +4467,6 @@ void itech32_state::init_shuffle_bowl_common(int prot_addr)
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
-	m_is_drivedge = 0;
 
 	m_itech020_prot_address = prot_addr;
 
@@ -4540,7 +4507,6 @@ void itech32_state::init_gt_common()
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 2;
-	m_is_drivedge = 0;
 
 	m_itech020_prot_address = 0x112f;
 }
@@ -4661,45 +4627,45 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
  *
  *************************************/
 
-GAME( 1992, timekill,     0,        timekill, timekill, itech32_state, init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, timekill132i, timekill, timekill, timekill, itech32_state, init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, timekill131,  timekill, timekill, timekill, itech32_state, init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, timekill121,  timekill, timekill, timekill, itech32_state, init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, timekill121a, timekill, timekill, timekill, itech32_state, init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21, alternate ROM board)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hardyard,     0,        bloodstm, hardyard, itech32_state, init_hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hardyard11,   hardyard, bloodstm, hardyard, itech32_state, init_hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state, init_hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm,     0,        bloodstm, bloodstm, itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm22,   bloodstm, bloodstm, bloodstm, itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm21,   bloodstm, bloodstm, bloodstm, itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm11,   bloodstm, bloodstm, bloodstm, itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm10,   bloodstm, bloodstm, bloodstm, itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pairsred,     0,        bloodstm, pairs,    itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs Redemption (V1.0, 10/25/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pairs,        0,        bloodstm, pairs,    itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1.2, 09/30/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pairsa,       pairs,    bloodstm, pairs,    itech32_state, init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1, 09/07/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hotmemry,     pairs,    bloodstm, pairs,    itech32_state, init_bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.2, Germany, 12/28/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hotmemry11,   pairs,    bloodstm, pairs,    itech32_state, init_bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.1, Germany, 11/30/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, drivedge,     0,        drivedge, drivedge, itech32_state, init_drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge (v1.6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcbowl,       0,        sftm,     wcbowln,  itech32_state, init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.66)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl165,    wcbowl,   sftm,     wcbowlo,  itech32_state, init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl161,    wcbowl,   sftm,     wcbowlo,  itech32_state, init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl16,     wcbowl,   sftm,     wcbowlo,  itech32_state, init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl15,     wcbowl,   bloodstm, wcbowl,   itech32_state, init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl14,     wcbowl,   bloodstm, wcbowl,   itech32_state, init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.4)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl13,     wcbowl,   bloodstm, wcbowl,   itech32_state, init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl13j,    wcbowl,   bloodstm, wcbowlj,  itech32_state, init_wcbowlj,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.3J, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl12,     wcbowl,   bloodstm, wcbowl,   itech32_state, init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl11,     wcbowl,   bloodstm, wcbowl,   itech32_state, init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.1)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl10,     wcbowl,   bloodstm, wcbowl,   itech32_state, init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.0)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, sftm,         0,        sftm,     sftm,     itech32_state, init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftm111,      sftm,     sftm,     sftm,     itech32_state, init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftm110,      sftm,     sftm,     sftm,     itech32_state, init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftmj,        sftm,     sftm,     sftm,     itech32_state, init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1997, shufshot,     0,        sftm,     shufshot, itech32_state, init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, shufshot139,  shufshot, sftm,     shufshot, itech32_state, init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, shufshot137,  shufshot, sftm,     shufshto, itech32_state, init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, wcbowl140,    wcbowldx, tourny,   wcbowldx, itech32_state, init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1999, wcbowldx,     0,        sftm,     wcbowldx, itech32_state, init_shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-4 */
+GAME( 1992, timekill,     0,        timekill, timekill, itech32_state,  init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill132i, timekill, timekill, timekill, itech32_state,  init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill131,  timekill, timekill, timekill, itech32_state,  init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill121,  timekill, timekill, timekill, itech32_state,  init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill121a, timekill, timekill, timekill, itech32_state,  init_timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21, alternate ROM board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard,     0,        bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard11,   hardyard, bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm,     0,        bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm22,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm21,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm11,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm10,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pairsred,     0,        bloodstm, pairs,    itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs Redemption (V1.0, 10/25/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pairs,        0,        bloodstm, pairs,    itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1.2, 09/30/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pairsa,       pairs,    bloodstm, pairs,    itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1, 09/07/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hotmemry,     pairs,    bloodstm, pairs,    itech32_state,  init_bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.2, Germany, 12/28/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hotmemry11,   pairs,    bloodstm, pairs,    itech32_state,  init_bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.1, Germany, 11/30/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drivedge,     0,        drivedge, drivedge, drivedge_state, empty_init,    ROT0, "Strata/Incredible Technologies",   "Driver's Edge (v1.6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcbowl,       0,        sftm,     wcbowln,  itech32_state,  init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.66)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl165,    wcbowl,   sftm,     wcbowlo,  itech32_state,  init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl161,    wcbowl,   sftm,     wcbowlo,  itech32_state,  init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl16,     wcbowl,   sftm,     wcbowlo,  itech32_state,  init_wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl15,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl14,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.4)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl13,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl13j,    wcbowl,   bloodstm, wcbowlj,  itech32_state,  init_wcbowlj,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.3J, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl12,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl11,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.1)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl10,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.0)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, sftm,         0,        sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftm111,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftm110,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftmj,        sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1997, shufshot,     0,        sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot139,  shufshot, sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot137,  shufshot, sftm,     shufshto, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, wcbowl140,    wcbowldx, tourny,   wcbowldx, itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1999, wcbowldx,     0,        sftm,     wcbowldx, itech32_state,  init_shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-4 */
 
 /*
     The following naming conventions are used:

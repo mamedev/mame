@@ -48,6 +48,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void darius(machine_config &config);
+
+private:
+
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_fg_ram;
@@ -131,7 +135,6 @@ public:
 	void update_psg1( int port );
 	void update_da(  );
 	DECLARE_WRITE_LINE_MEMBER(darius_adpcm_int);
-	void darius(machine_config &config);
 	void darius_cpub_map(address_map &map);
 	void darius_map(address_map &map);
 	void darius_sound2_io_map(address_map &map);

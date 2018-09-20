@@ -99,9 +99,21 @@ public:
 		m_printer(*this, "printer")
 	{}
 
-	DECLARE_WRITE8_MEMBER(minidisc_control_w);
+	void hec2mx80(machine_config &config);
+	void hec2hrp(machine_config &config);
+	void hec2hrx(machine_config &config);
+	void hec2mx40(machine_config &config);
+	void hec2mdhrx(machine_config &config);
+	void hec2hr(machine_config &config);
+	void hector_audio(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER(switch_bank_w);
+	void hector_init();
+
+protected:
+	DECLARE_VIDEO_START(hec2hrp);
+	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
+	void hector_reset(int hr, int with_d2);
+
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(sn_2000_w);
@@ -110,6 +122,11 @@ public:
 	DECLARE_WRITE8_MEMBER(sn_3000_w);
 	DECLARE_WRITE8_MEMBER(color_a_w);
 	DECLARE_WRITE8_MEMBER(color_b_w);
+
+private:
+	DECLARE_WRITE8_MEMBER(minidisc_control_w);
+
+	DECLARE_WRITE8_MEMBER(switch_bank_w);
 	DECLARE_READ8_MEMBER(io_8255_r);
 	DECLARE_WRITE8_MEMBER(io_8255_w);
 	DECLARE_WRITE8_MEMBER(mx40_io_port_w);
@@ -127,15 +144,6 @@ public:
 	DECLARE_READ8_MEMBER(  disc2_io50_port_r);
 	DECLARE_WRITE8_MEMBER( disc2_io50_port_w);
 
-	void hec2mx80(machine_config &config);
-	void hec2hrp(machine_config &config);
-	void hec2hrx(machine_config &config);
-	void hec2mx40(machine_config &config);
-	void hec2mdhrx(machine_config &config);
-	void hec2hr(machine_config &config);
-	void hector_audio(machine_config &config);
-
-protected:
 	DECLARE_FLOPPY_FORMATS(minidisc_formats);
 
 	required_device<cpu_device> m_maincpu;
@@ -196,7 +204,6 @@ protected:
 
 	DECLARE_MACHINE_START(hec2hrp);
 	DECLARE_MACHINE_RESET(hec2hrp);
-	DECLARE_VIDEO_START(hec2hrp);
 	DECLARE_MACHINE_START(hec2hrx);
 	DECLARE_MACHINE_RESET(hec2hrx);
 	DECLARE_MACHINE_START(hec2mdhrx);
@@ -213,11 +220,8 @@ protected:
 	void update_state(int Adresse, int Value );
 	void init_sn76477();
 	void update_sound(address_space &space, uint8_t data);
-	void hector_reset(int hr, int with_d2);
-	void hector_init();
 	void init_palette();
 	void hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
-	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	/*----------- defined in machine/hecdisk2.c -----------*/
 
 	void hector_disc2_reset();

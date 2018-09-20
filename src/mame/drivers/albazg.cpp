@@ -61,7 +61,7 @@ public:
 
 	virtual void yumefuda(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -80,7 +80,6 @@ protected:
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_cus_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -368,15 +367,14 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	MCFG_DEVICE_IO_MAP(port_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazg_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, albazg_state, mux_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, albazg_state, mux_r))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.out_pa_callback().set(FUNC(albazg_state::mux_w));
+	ppi.in_pb_callback().set_ioport("SYSTEM");
+	ppi.in_pc_callback().set(FUNC(albazg_state::mux_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

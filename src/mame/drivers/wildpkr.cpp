@@ -192,6 +192,12 @@ public:
 		m_nvram(*this, "nvram")
 	{ }
 
+	void wildpkr(machine_config &config);
+	void tabpkr(machine_config &config);
+
+	void init_wildpkr();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	optional_device<ds2401_device> m_id;
@@ -202,7 +208,6 @@ public:
 
 	u16 m_clock_rate;
 
-	void init_wildpkr();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wildpkr);
@@ -218,8 +223,6 @@ public:
 	DECLARE_WRITE16_MEMBER(clock_rate_w);
 	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
 	IRQ_CALLBACK_MEMBER(tabpkr_irq_ack);
-	void wildpkr(machine_config &config);
-	void tabpkr(machine_config &config);
 	void hd63484_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void tabpkr_map(address_map &map);
@@ -499,7 +502,7 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wildpkr_state, irq3_line_assert, 60*256)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(wildpkr_state, tabpkr_irq_ack)
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // DS1220Y
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // DS1220Y
 
 	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
 	MCFG_MC68681_IRQ_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_2))

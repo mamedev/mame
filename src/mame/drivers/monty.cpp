@@ -54,7 +54,7 @@ public:
 	void monty(machine_config &config);
 	void mmonty(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(ioDisplayWrite_w);
 	DECLARE_WRITE8_MEMBER(ioCommandWrite0_w);
@@ -69,7 +69,6 @@ protected:
 	void monty_io(address_map &map);
 	void monty_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<sed1520_device> m_sed0;     // TODO: This isn't actually a SED1520, it's a SED1503F

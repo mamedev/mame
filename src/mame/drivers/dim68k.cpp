@@ -57,6 +57,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void dim68k(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
 	DECLARE_READ16_MEMBER( dim68k_game_switches_r );
@@ -73,9 +76,8 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void dim68k(machine_config &config);
 	void dim68k_mem(address_map &map);
-private:
+
 	bool m_speaker_bit;
 	u8 m_video_control;
 	u8 m_term_data;

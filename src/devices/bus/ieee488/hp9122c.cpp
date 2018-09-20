@@ -85,6 +85,16 @@ void hp9122c_device::device_start()
 	save_item(NAME(m_index_int));
 	save_item(NAME(m_ds0));
 	save_item(NAME(m_ds1));
+
+	m_motor_timer = timer_alloc(0);
+}
+
+void hp9122c_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	floppy_image_device *floppy0 = m_floppy[0]->get_device();
+	floppy_image_device *floppy1 = m_floppy[1]->get_device();
+	floppy0->mon_w(1);
+	floppy1->mon_w(1);
 }
 
 void hp9122c_device::device_reset()
@@ -287,10 +297,14 @@ WRITE8_MEMBER(hp9122c_device::cmd_w)
 		 floppy0->mon_w(0);
 		 floppy0->ss_w(!(data & REG_CNTL_HEADSEL));
 		 m_fdc->set_floppy(floppy0);
+		 m_motor_timer->reset();
 	 } else if (m_ds1) {
 		 floppy1->mon_w(0);
 		 floppy1->ss_w(!(data & REG_CNTL_HEADSEL));
 		 m_fdc->set_floppy(floppy1);
+		 m_motor_timer->reset();
+	} else {
+		m_motor_timer->adjust(attotime::from_msec(2000));
 	}
 
 	if (data & REG_CNTL_CLOCK_SEL)
@@ -358,21 +372,20 @@ MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
 	// will not work
 	MCFG_QUANTUM_PERFECT_CPU("cpu")
 
-	MCFG_DEVICE_ADD("mb8876", MB8876, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp9122c_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this,hp9122c_device, fdc_drq_w))
+	MB8876(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(hp9122c_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(hp9122c_device::fdc_drq_w));
 
-	MCFG_DEVICE_ADD("i8291a", I8291A, XTAL(2'000'000))
-
-	MCFG_I8291A_EOI_WRITE_CB(WRITELINE(*this, hp9122c_device, i8291a_eoi_w))
-	MCFG_I8291A_DAV_WRITE_CB(WRITELINE(*this, hp9122c_device, i8291a_dav_w))
-	MCFG_I8291A_NRFD_WRITE_CB(WRITELINE(*this, hp9122c_device, i8291a_nrfd_w))
-	MCFG_I8291A_NDAC_WRITE_CB(WRITELINE(*this, hp9122c_device, i8291a_ndac_w))
-	MCFG_I8291A_SRQ_WRITE_CB(WRITELINE(*this, hp9122c_device, i8291a_srq_w))
-	MCFG_I8291A_DIO_WRITE_CB(WRITE8(*this, hp9122c_device, i8291a_dio_w))
-	MCFG_I8291A_DIO_READ_CB(READ8(*this, hp9122c_device, i8291a_dio_r))
-	MCFG_I8291A_INT_WRITE_CB(WRITELINE(*this, hp9122c_device, i8291a_int_w))
-	MCFG_I8291A_DREQ_WRITE_CB(WRITELINE(*this, hp9122c_device, i8291a_dreq_w))
+	I8291A(config, m_i8291a, XTAL(2'000'000));
+	m_i8291a->eoi_write().set(FUNC(hp9122c_device::i8291a_eoi_w));
+	m_i8291a->dav_write().set(FUNC(hp9122c_device::i8291a_dav_w));
+	m_i8291a->nrfd_write().set(FUNC(hp9122c_device::i8291a_nrfd_w));
+	m_i8291a->ndac_write().set(FUNC(hp9122c_device::i8291a_ndac_w));
+	m_i8291a->srq_write().set(FUNC(hp9122c_device::i8291a_srq_w));
+	m_i8291a->dio_write().set(FUNC(hp9122c_device::i8291a_dio_w));
+	m_i8291a->dio_read().set(FUNC(hp9122c_device::i8291a_dio_r));
+	m_i8291a->int_write().set(FUNC(hp9122c_device::i8291a_int_w));
+	m_i8291a->dreq_write().set(FUNC(hp9122c_device::i8291a_dreq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

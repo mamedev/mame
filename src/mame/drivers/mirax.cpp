@@ -125,6 +125,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram")  { }
 
+	void mirax(machine_config &config);
+
+	void init_mirax();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<ay8912_device, 2> m_ay;
@@ -151,7 +156,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 
-	void init_mirax();
 	DECLARE_PALETTE_INIT(mirax);
 	virtual void machine_start() override;
 
@@ -160,7 +164,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void mirax(machine_config &config);
 	void mirax_main_map(address_map &map);
 	void mirax_sound_map(address_map &map);
 };
@@ -487,14 +490,14 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_DEVICE_PROGRAM_MAP(mirax_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // R10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mirax_state, coin_counter0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mirax_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // R10
+	mainlatch.q_out_cb<0>().set(FUNC(mirax_state::coin_counter0_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mirax_state::nmi_mask_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mirax_state::coin_counter1_w)); // only used in 'miraxa' - see notes
 	// One address flips X, the other flips Y, but I can't tell which is which
 	// Since the value is the same for the 2 addresses, it doesn't really matter
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_y_w))
+	mainlatch.q_out_cb<6>().set(FUNC(mirax_state::flip_screen_x_w));
+	mainlatch.q_out_cb<7>().set(FUNC(mirax_state::flip_screen_y_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

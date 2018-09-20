@@ -55,6 +55,11 @@ public:
 		, m_txrdy(0)
 	{ }
 
+	void vixen(machine_config &config);
+
+	void init_vixen();
+
+private:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 	DECLARE_READ8_MEMBER( ieee488_r );
@@ -70,18 +75,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	void init_vixen();
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 	IRQ_CALLBACK_MEMBER(vixen_int_ack);
 	DECLARE_READ8_MEMBER(opram_r);
 	DECLARE_READ8_MEMBER(oprom_r);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void vixen(machine_config &config);
 	void bios_mem(address_map &map);
 	void vixen_io(address_map &map);
 	void vixen_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1797_device> m_fdc;
 	required_device<i8155_device> m_io_i8155;

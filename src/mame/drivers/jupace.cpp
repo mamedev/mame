@@ -98,6 +98,9 @@ public:
 		, m_joy(*this, "JOY")
 	{ }
 
+	void ace(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -129,10 +132,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ald_w);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
 
-	void ace(machine_config &config);
 	void ace_io(address_map &map);
 	void ace_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<z80pio_device> m_z80pio;
@@ -664,7 +666,7 @@ WRITE8_MEMBER(ace_state::ald_w)
 
 	if (!BIT(data, 6))
 	{
-		m_sp0256->ald_w(space, 0, data & 0x3f);
+		m_sp0256->ald_w(data & 0x3f);
 	}
 }
 
@@ -777,11 +779,11 @@ MACHINE_CONFIG_START(ace_state::ace)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SP0256(config, m_sp0256, XTAL(3'000'000));
+	m_sp0256->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_CASSETTE_ADD("cassette")
@@ -791,23 +793,21 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 
-	MCFG_DEVICE_ADD(I8255_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ace_state, sby_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ace_state, ald_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));
+	m_ppi->out_pb_callback().set(FUNC(ace_state::ald_w));
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(6'500'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ace_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ace_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	Z80PIO(config, m_z80pio, XTAL(6'500'000)/2);
+	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80pio->in_pa_callback().set(FUNC(ace_state::pio_pa_r));
+	m_z80pio->out_pa_callback().set(FUNC(ace_state::pio_pa_w));
+	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
+	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "jupace_cass")
 MACHINE_CONFIG_END

@@ -52,10 +52,12 @@ public:
 	{
 	}
 
+	void good(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
 	required_shared_ptr<uint16_t> m_bg_tilemapram;
-	uint16_t *  m_sprites;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -68,7 +70,6 @@ public:
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void good(machine_config &config);
 	void good_map(address_map &map);
 };
 

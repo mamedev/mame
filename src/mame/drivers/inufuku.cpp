@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 								/* IRQs are triggered by the YM2610 */
 
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -18,10 +18,10 @@
 	MCFG_DEVICE_ADD(_tag, TAITO8741_4PACK, 0)
 
 #define MCFG_TAITO8741_PORT_HANDLERS(_devcb0, _devcb1, _devcb2, _devcb3) \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_0_callback(DEVCB_##_devcb0); \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_1_callback(DEVCB_##_devcb1); \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_2_callback(DEVCB_##_devcb2); \
-	devcb = &downcast<taito8741_4pack_device &>(*device).set_port_handler_3_callback(DEVCB_##_devcb3);
+	downcast<taito8741_4pack_device &>(*device).set_port_handler_0_callback(DEVCB_##_devcb0); \
+	downcast<taito8741_4pack_device &>(*device).set_port_handler_1_callback(DEVCB_##_devcb1); \
+	downcast<taito8741_4pack_device &>(*device).set_port_handler_2_callback(DEVCB_##_devcb2); \
+	downcast<taito8741_4pack_device &>(*device).set_port_handler_3_callback(DEVCB_##_devcb3);
 
 #define MCFG_TAITO8741_MODES(_mode0, _mode1, _mode2, _mode3) \
 	downcast<taito8741_4pack_device &>(*device).set_mode(0, _mode0);    \

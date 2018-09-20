@@ -138,6 +138,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void ddealer(machine_config &config);
+
+	void init_ddealer();
+
+private:
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE16_MEMBER(back_vram_w);
 	DECLARE_WRITE16_MEMBER(mcu_shared_w);
@@ -149,16 +154,12 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
 
-	void ddealer(machine_config &config);
 	void ddealer_map(address_map &map);
-	void init_ddealer();
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	// memory pointers
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_left_fg_vram_top;

@@ -15,31 +15,6 @@
 
 #include "diserial.h"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I8251_TXD_HANDLER(_devcb) \
-	devcb = &downcast<i8251_device &>(*device).set_txd_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_DTR_HANDLER(_devcb) \
-	devcb = &downcast<i8251_device &>(*device).set_dtr_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_RTS_HANDLER(_devcb) \
-	devcb = &downcast<i8251_device &>(*device).set_rts_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_RXRDY_HANDLER(_devcb) \
-	devcb = &downcast<i8251_device &>(*device).set_rxrdy_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_TXRDY_HANDLER(_devcb) \
-	devcb = &downcast<i8251_device &>(*device).set_txrdy_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_TXEMPTY_HANDLER(_devcb) \
-	devcb = &downcast<i8251_device &>(*device).set_txempty_handler(DEVCB_##_devcb);
-
-#define MCFG_I8251_SYNDET_HANDLER(_devcb) \
-	devcb = &downcast<i8251_device &>(*device).set_syndet_handler(DEVCB_##_devcb);
-
 class i8251_device :  public device_t,
 	public device_serial_interface
 {
@@ -55,11 +30,21 @@ public:
 	template <class Object> devcb_base &set_txrdy_handler(Object &&cb) { return m_txrdy_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_txempty_handler(Object &&cb) { return m_txempty_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_syndet_handler(Object &&cb) { return m_syndet_handler.set_callback(std::forward<Object>(cb)); }
+	auto txd_handler() { return m_txd_handler.bind(); }
+	auto dtr_handler() { return m_dtr_handler.bind(); }
+	auto rts_handler() { return m_rts_handler.bind(); }
+	auto rxrdy_handler() { return m_rxrdy_handler.bind(); }
+	auto txrdy_handler() { return m_txrdy_handler.bind(); }
+	auto txempty_handler() { return m_txempty_handler.bind(); }
+	auto syndet_handler() { return m_syndet_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	uint8_t data_r();
+	void data_w(uint8_t data);
+	uint8_t status_r();
+	void control_w(uint8_t data);
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
@@ -159,8 +144,8 @@ public:
 	// construction/destruction
 	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_WRITE8_MEMBER(mode_w);
+	void command_w(uint8_t data) { i8251_device::command_w(data); }
+	void mode_w(uint8_t data) { i8251_device::mode_w(data); }
 };
 
 

@@ -112,7 +112,7 @@ private:
 DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)
 
 #define MCFG_MCPX_SMBUS_INTERRUPT_HANDLER(_devcb) \
-	devcb = &downcast<mcpx_smbus_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
+	downcast<mcpx_smbus_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 /*
  * OHCI USB Controller
@@ -151,7 +151,7 @@ private:
 DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
 
 #define MCFG_MCPX_OHCI_INTERRUPT_HANDLER(_devcb) \
-	devcb = &downcast<mcpx_ohci_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
+	downcast<mcpx_ohci_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 /*
  * Ethernet
@@ -295,7 +295,7 @@ private:
 DECLARE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device)
 
 #define MCFG_MCPX_IDE_INTERRUPT_HANDLER(_devcb) \
-	devcb = &downcast<mcpx_ide_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
+	downcast<mcpx_ide_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 /*
  * AGP Bridge
@@ -352,6 +352,6 @@ DECLARE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device)
 #define MCFG_MCPX_NV2A_GPU_CPU(_cpu_tag) \
 	downcast<nv2a_gpu_device *>(device)->set_cpu_tag(_cpu_tag);
 #define MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(_devcb) \
-	devcb = &downcast<nv2a_gpu_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
+	downcast<nv2a_gpu_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 #endif // MAME_INCLUDES_XBOX_PCI_H

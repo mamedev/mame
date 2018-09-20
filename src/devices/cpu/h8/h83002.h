@@ -26,9 +26,9 @@
 #include "h8_watchdog.h"
 
 #define MCFG_H83002_TEND0_CALLBACK(_devcb) \
-	devcb = &downcast<h83002_device &>(*device).set_tend0_callback(DEVCB_##_devcb);
+	downcast<h83002_device &>(*device).set_tend0_callback(DEVCB_##_devcb);
 #define MCFG_H83002_TEND1_CALLBACK(_devcb) \
-	devcb = &downcast<h83002_device &>(*device).set_tend1_callback(DEVCB_##_devcb);
+	downcast<h83002_device &>(*device).set_tend1_callback(DEVCB_##_devcb);
 
 class h83002_device : public h8h_device {
 public:

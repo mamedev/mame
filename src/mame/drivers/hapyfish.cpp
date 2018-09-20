@@ -30,10 +30,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void hapyfish(machine_config &config);
+
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_hapyfish(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void hapyfish(machine_config &config);
 	void hapyfish_map(address_map &map);
 };
 

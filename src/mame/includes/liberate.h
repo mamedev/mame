@@ -21,6 +21,18 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void liberate_base(machine_config &config);
+	void liberate(machine_config &config);
+	void liberatb(machine_config &config);
+	void boomrang(machine_config &config);
+	void prosoccr(machine_config &config);
+	void prosport(machine_config &config);
+
+	void init_yellowcb();
+	void init_liberate();
+	void init_prosport();
+
+private:
 	optional_shared_ptr<uint8_t> m_bg_vram; /* prosport */
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -63,9 +75,6 @@ public:
 	DECLARE_WRITE8_MEMBER(liberate_videoram_w);
 	DECLARE_WRITE8_MEMBER(liberate_colorram_w);
 	DECLARE_WRITE8_MEMBER(prosport_bg_vram_w);
-	void init_yellowcb();
-	void init_liberate();
-	void init_prosport();
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILEMAP_MAPPER_MEMBER(fix_scan);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
@@ -87,12 +96,6 @@ public:
 	void prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void liberate_base(machine_config &config);
-	void liberate(machine_config &config);
-	void liberatb(machine_config &config);
-	void boomrang(machine_config &config);
-	void prosoccr(machine_config &config);
-	void prosport(machine_config &config);
 	void deco16_io_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void liberatb_map(address_map &map);

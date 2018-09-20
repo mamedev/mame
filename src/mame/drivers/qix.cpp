@@ -611,19 +611,19 @@ MACHINE_CONFIG_START(qix_state::qix_base)
 	/* Zookeeper settings and high score table seem especially sensitive to this */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("COIN"))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set_ioport("P1");
+	m_pia0->readpb_handler().set_ioport("COIN");
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SPARE"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set_ioport("SPARE");
+	m_pia1->readpb_handler().set_ioport("IN0");
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, qix_coinctl_w))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->readpa_handler().set_ioport("P2");
+	m_pia2->writepb_handler().set(FUNC(qix_state::qix_coinctl_w));
 
 	/* video hardware */
 	qix_video(config);
@@ -664,12 +664,10 @@ MACHINE_CONFIG_START(qix_state::mcu)
 
 	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPB_HANDLER(READ8(*this, qix_state, qixmcu_coin_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, qixmcu_coin_w))
+	m_pia0->readpb_handler().set(FUNC(qix_state::qixmcu_coin_r));
+	m_pia0->writepb_handler().set(FUNC(qix_state::qixmcu_coin_w));
 
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, qixmcu_coinctrl_w))
+	m_pia2->writepb_handler().set(FUNC(qix_state::qixmcu_coinctrl_w));
 MACHINE_CONFIG_END
 
 
@@ -702,15 +700,13 @@ MACHINE_CONFIG_START(qix_state::slither)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, qix_state, slither_trak_lr_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, slither_76489_0_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	m_pia1->readpa_handler().set(FUNC(qix_state::slither_trak_lr_r));
+	m_pia1->writepb_handler().set(FUNC(qix_state::slither_76489_0_w));
+	m_pia1->readpb_handler().set_constant(0);
 
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, qix_state, slither_trak_ud_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, slither_76489_1_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	m_pia2->readpa_handler().set(FUNC(qix_state::slither_trak_ud_r));
+	m_pia2->writepb_handler().set(FUNC(qix_state::slither_76489_1_w));
+	m_pia2->readpb_handler().set_constant(0);
 
 	/* video hardware */
 	slither_video(config);

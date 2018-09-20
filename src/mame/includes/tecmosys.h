@@ -39,6 +39,13 @@ public:
 	{
 	}
 
+	void tecmosys(machine_config &config);
+
+	void init_tkdensha();
+	void init_deroon();
+	void init_tkdensho();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -87,9 +94,6 @@ public:
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 
-	void init_tkdensha();
-	void init_deroon();
-	void init_tkdensho();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -103,7 +107,7 @@ public:
 	void tilemap_copy_to_compose(uint16_t pri, const rectangle &cliprect);
 	void do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void descramble();
-	void tecmosys(machine_config &config);
+
 	void io_map(address_map &map);
 	void main_map(address_map &map);
 	void oki_map(address_map &map);

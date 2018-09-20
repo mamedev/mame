@@ -25,6 +25,9 @@ public:
 		m_shareram(*this, "shareram")
 	{ }
 
+	void targeth(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -42,17 +45,15 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void targeth(machine_config &config);
 	void main_map(address_map &map);
 	void mcu_hostmem_map(address_map &map);
 	void oki_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

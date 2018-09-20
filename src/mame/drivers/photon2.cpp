@@ -39,6 +39,9 @@ public:
 		m_speaker(*this, "speaker"),
 		m_spectrum_video_ram(*this, "spectrum_vram") { }
 
+	void photon2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
@@ -62,7 +65,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
-	void photon2(machine_config &config);
 	void spectrum_io(address_map &map);
 	void spectrum_mem(address_map &map);
 };

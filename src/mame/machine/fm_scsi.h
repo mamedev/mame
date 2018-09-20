@@ -16,9 +16,9 @@
 	MCFG_DEVICE_ADD(_tag, FMSCSI, 0)
 
 #define MCFG_FMSCSI_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<fmscsi_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<fmscsi_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 #define MCFG_FMSCSI_DRQ_HANDLER(_devcb) \
-	devcb = &downcast<fmscsi_device &>(*device).set_drq_handler(DEVCB_##_devcb);
+	downcast<fmscsi_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 class fmscsi_device : public legacy_scsi_host_adapter
 {

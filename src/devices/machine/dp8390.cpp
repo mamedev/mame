@@ -132,7 +132,9 @@ void dp8390_device::recv(uint8_t *buf, int len) {
 	if(buf[0] & 1) {
 		if(!memcmp((const char *)buf, "\xff\xff\xff\xff\xff\xff", 6)) {
 			if(!(m_regs.rcr & 4)) return;
-		} else return; // multicast
+		} else if (memcmp((const char *)buf, "\x09\x00\x07\xff\xff\xff", 6) != 0) { // not AppleTalk broadcast
+			return; // multicast
+		}
 		m_regs.rsr = 0x20;
 	} else m_regs.rsr = 0;
 	len &= 0xffff;

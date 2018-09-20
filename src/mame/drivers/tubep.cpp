@@ -840,13 +840,13 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tubep_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tubep_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) //something...
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tubep_state, screen_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tubep_state, background_romselect_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tubep_state, colorproms_A4_line_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tubep_state::coin2_counter_w));
+	mainlatch.q_out_cb<5>().set_nop(); //something...
+	mainlatch.q_out_cb<5>().set(FUNC(tubep_state::screen_flip_w));
+	mainlatch.q_out_cb<6>().set(FUNC(tubep_state::background_romselect_w));
+	mainlatch.q_out_cb<7>().set(FUNC(tubep_state::colorproms_A4_line_w));
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,tubep)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
@@ -915,10 +915,10 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tubep_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tubep_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tubep_state, screen_flip_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3A
+	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tubep_state::coin2_counter_w));
+	mainlatch.q_out_cb<5>().set(FUNC(tubep_state::screen_flip_w));
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,rjammer)

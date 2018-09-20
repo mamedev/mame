@@ -27,6 +27,7 @@ void bbc_tube_arm_device::tube_arm_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000000, 0x03fffff).rw(FUNC(bbc_tube_arm_device::ram_r), FUNC(bbc_tube_arm_device::ram_w));
+	map(0x0400000, 0x0ffffff).noprw();
 	map(0x1000000, 0x100001f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask32(0x000000ff);
 	map(0x3000000, 0x3003fff).rom().region("bootstrap", 0).mirror(0xc000);
 }
@@ -50,23 +51,22 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_tube_arm_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("arm", ARM, XTAL(20'000'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(tube_arm_mem)
+void bbc_tube_arm_device::device_add_mconfig(machine_config &config)
+{
+	ARM(config, m_arm, 20_MHz_XTAL / 3);
+	m_arm->set_addrmap(AS_PROGRAM, &bbc_tube_arm_device::tube_arm_mem);
 
-	MCFG_TUBE_ADD("ula")
-	MCFG_TUBE_HIRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
-	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("arm", ARM_FIRQ_LINE))
-	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("arm", ARM_IRQ_LINE))
+	TUBE(config, m_ula);
+	m_ula->hirq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
+	m_ula->pnmi_handler().set_inputline(m_arm, ARM_FIRQ_LINE);
+	m_ula->pirq_handler().set_inputline(m_arm, ARM_IRQ_LINE);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("4M").set_default_value(0);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_flop_arm")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_arm").set_original("bbc_flop_arm");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

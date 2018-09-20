@@ -57,6 +57,30 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void system16a_no7751(machine_config &config);
+	void system16a(machine_config &config);
+	void system16a_fd1089a_no7751(machine_config &config);
+	void system16a_fd1089b_no7751(machine_config &config);
+	void system16a_fd1089a(machine_config &config);
+	void system16a_fd1094(machine_config &config);
+	void system16a_no7751p(machine_config &config);
+	void system16a_fd1094_no7751(machine_config &config);
+	void system16a_i8751(machine_config &config);
+	void system16a_fd1089b(machine_config &config);
+	void aceattaca_fd1094(machine_config &config);
+
+	// game-specific driver init
+	void init_generic();
+	void init_dumpmtmt();
+	void init_quartet();
+	void init_fantzonep();
+	void init_sjryukoa();
+	void init_aceattaca();
+	void init_passsht16a();
+	void init_mjleague();
+	void init_sdi();
+
+private:
 	// PPI read/write callbacks
 	DECLARE_WRITE8_MEMBER( misc_control_w );
 	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
@@ -86,31 +110,9 @@ public:
 	// I8751-related VBLANK interrupt handlers
 	DECLARE_WRITE_LINE_MEMBER(i8751_main_cpu_vblank_w);
 
-	// game-specific driver init
-	void init_generic();
-	void init_dumpmtmt();
-	void init_quartet();
-	void init_fantzonep();
-	void init_sjryukoa();
-	void init_aceattaca();
-	void init_passsht16a();
-	void init_mjleague();
-	void init_sdi();
-
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void system16a_no7751(machine_config &config);
-	void system16a(machine_config &config);
-	void system16a_fd1089a_no7751(machine_config &config);
-	void system16a_fd1089b_no7751(machine_config &config);
-	void system16a_fd1089a(machine_config &config);
-	void system16a_fd1094(machine_config &config);
-	void system16a_no7751p(machine_config &config);
-	void system16a_fd1094_no7751(machine_config &config);
-	void system16a_i8751(machine_config &config);
-	void system16a_fd1089b(machine_config &config);
-	void aceattaca_fd1094(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void sound_decrypted_opcodes_map(address_map &map);
@@ -118,7 +120,7 @@ public:
 	void sound_no7751_portmap(address_map &map);
 	void sound_portmap(address_map &map);
 	void system16a_map(address_map &map);
-protected:
+
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
@@ -201,7 +203,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
 
-protected:
+private:
 	required_ioport     m_accel;
 	required_ioport     m_steer;
 };

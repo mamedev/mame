@@ -411,14 +411,16 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_DEVICE_IO_MAP(audio_portmap)
 
 	MCFG_DEVICE_ADD(m_n7751, N7751, XTAL(6'000'000))
-	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, othello_state, n7751_command_r))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, othello_state, n7751_rom_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, othello_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 
-	MCFG_I8243_ADD(m_i8243, NOOP, WRITE8(*this, othello_state, n7751_rom_control_w))
+	I8243(config, m_i8243);
+	m_i8243->read_handler().set_constant(0);
+	m_i8243->write_handler().set(FUNC(othello_state::n7751_rom_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

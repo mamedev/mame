@@ -72,7 +72,16 @@ public:
 		m_palette(*this, "palette"),
 		m_blitter(*this, "blitter") { }
 
+	void ngalsumr(machine_config &config);
+	void sexygal(machine_config &config);
+	void sweetgal(machine_config &config);
+	void sgaltrop(machine_config &config);
+	void royalqn(machine_config &config);
 
+	void init_ngalsumr();
+	void init_royalqn();
+
+private:
 	emu_timer *m_z80_wait_ack_timer;
 
 	required_shared_ptr<uint8_t> m_comms_ram;
@@ -100,8 +109,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
 	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
 
-	void init_ngalsumr();
-	void init_royalqn();
 	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
 	DECLARE_READ8_MEMBER(ngalsumr_prot_value_r);
 	virtual void machine_start() override;
@@ -110,11 +117,6 @@ public:
 	DECLARE_PALETTE_INIT(nightgal);
 	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ngalsumr(machine_config &config);
-	void sexygal(machine_config &config);
-	void sweetgal(machine_config &config);
-	void sgaltrop(machine_config &config);
-	void royalqn(machine_config &config);
 	void common_nsc_map(address_map &map);
 	void common_sexygal_io(address_map &map);
 	void royalqn_io(address_map &map);
@@ -127,7 +129,7 @@ public:
 	void sgaltrop_io(address_map &map);
 	void sgaltrop_nsc_map(address_map &map);
 	void sweetgal_map(address_map &map);
-protected:
+
 	required_ioport m_io_cr_clear;
 	required_ioport m_io_coins;
 	required_ioport m_io_pl1_1;
@@ -153,7 +155,6 @@ protected:
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
-private:
 	/* video-related */
 	uint8_t m_blit_raw_data[3];
 

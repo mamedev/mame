@@ -398,8 +398,8 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
 	MCFG_MSC1937_ADD("vfd",0)
 
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bfmsys85_state,sys85_data_w))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(FUNC(bfmsys85_state::sys85_data_w));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfmsys85_state, write_acia_clock))
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)          // add AY8912 soundchip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")                       // load/save nv RAM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);                       // load/save nv RAM
 
 	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel0_optic_cb))
@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 
-	MCFG_DEFAULT_LAYOUT(layout_bfmsys85)
+	config.set_default_layout(layout_bfmsys85);
 MACHINE_CONFIG_END
 
 // input ports for system85 board /////////////////////////////////////////

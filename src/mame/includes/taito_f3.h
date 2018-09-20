@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 #include "audio/taito_en.h"
+#include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -51,11 +53,6 @@ enum {
 class taito_f3_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_F3_INTERRUPT3
-	};
-
 	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -66,13 +63,70 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_eeprom(*this, "eeprom"),
 		m_f3_ram(*this,"f3_ram"),
 		m_paletteram32(*this, "paletteram"),
 		m_input(*this, "IN.%u", 0),
 		m_dial(*this, "DIAL.%u", 0),
 		m_eepromin(*this, "EEPROMIN")
-
 	{ }
+
+	void f3_eeprom(machine_config &config);
+	void f3(machine_config &config);
+	void f3_224a(machine_config &config);
+	void bubsympb(machine_config &config);
+	void f3_224b(machine_config &config);
+	void f3_224c(machine_config &config);
+	void f3_224b_eeprom(machine_config &config);
+
+	void init_commandw();
+	void init_pbobble2();
+	void init_puchicar();
+	void init_intcup94();
+	void init_landmakr();
+	void init_twinqix();
+	void init_elvactr();
+	void init_arabianm();
+	void init_bubsympb();
+	void init_ktiger2();
+	void init_lightbr();
+	void init_gekirido();
+	void init_arkretrn();
+	void init_kirameki();
+	void init_qtheater();
+	void init_popnpop();
+	void init_spcinvdj();
+	void init_pbobbl2p();
+	void init_landmkrp();
+	void init_bubblem();
+	void init_ridingf();
+	void init_gseeker();
+	void init_bubsymph();
+	void init_hthero95();
+	void init_gunlock();
+	void init_pbobble4();
+	void init_dariusg();
+	void init_recalh();
+	void init_kaiserkn();
+	void init_spcinv95();
+	void init_trstaroj();
+	void init_ringrage();
+	void init_cupfinal();
+	void init_quizhuhu();
+	void init_pbobble3();
+	void init_cleopatr();
+	void init_scfinals();
+	void init_pbobbl2x();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
+
+protected:
+	enum
+	{
+		TIMER_F3_INTERRUPT3
+	};
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -82,6 +136,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<eeprom_serial_base_device> m_eeprom;
 
 	optional_shared_ptr<uint32_t> m_f3_ram;
 	optional_shared_ptr<uint32_t> m_paletteram32;
@@ -260,47 +315,7 @@ public:
 	DECLARE_READ16_MEMBER(f3_lineram_r);
 	DECLARE_WRITE16_MEMBER(f3_lineram_w);
 	DECLARE_WRITE32_MEMBER(f3_palette_24bit_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
-	void init_commandw();
-	void init_pbobble2();
-	void init_puchicar();
-	void init_intcup94();
-	void init_landmakr();
-	void init_twinqix();
-	void init_elvactr();
-	void init_arabianm();
-	void init_bubsympb();
-	void init_ktiger2();
-	void init_lightbr();
-	void init_gekirido();
-	void init_arkretrn();
-	void init_kirameki();
-	void init_qtheater();
-	void init_popnpop();
-	void init_spcinvdj();
-	void init_pbobbl2p();
-	void init_landmkrp();
-	void init_bubblem();
-	void init_ridingf();
-	void init_gseeker();
-	void init_bubsymph();
-	void init_hthero95();
-	void init_gunlock();
-	void init_pbobble4();
-	void init_dariusg();
-	void init_recalh();
-	void init_kaiserkn();
-	void init_spcinv95();
-	void init_trstaroj();
-	void init_ringrage();
-	void init_cupfinal();
-	void init_quizhuhu();
-	void init_pbobble3();
-	void init_cleopatr();
-	void init_scfinals();
-	void init_pbobbl2x();
+
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info3);
@@ -315,16 +330,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_f3);
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);
 
-	void f3_eeprom(machine_config &config);
-	void f3(machine_config &config);
-	void f3_224a(machine_config &config);
-	void bubsympb(machine_config &config);
-	void f3_224b(machine_config &config);
-	void f3_224c(machine_config &config);
-	void f3_224b_eeprom(machine_config &config);
 	void bubsympb_map(address_map &map);
 	void f3_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -332,7 +340,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load(void) override;
 
-private:
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint16_t *gfx_base);
 	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,int code,int color,int flipx,int flipy,int sx,int sy,uint8_t pri_dst);
 	inline void f3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,int code,int color,int flipx,int flipy,int sx,int sy,int scalex,int scaley,uint8_t pri_dst);

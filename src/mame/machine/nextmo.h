@@ -6,10 +6,10 @@
 #pragma once
 
 #define MCFG_NEXTMO_IRQ_CALLBACK(_write) \
-	devcb = &downcast<nextmo_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<nextmo_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_NEXTMO_DRQ_CALLBACK(_write) \
-	devcb = &downcast<nextmo_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<nextmo_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 class nextmo_device : public device_t
 {

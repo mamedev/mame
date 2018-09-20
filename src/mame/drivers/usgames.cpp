@@ -221,11 +221,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(usgames_state::usg32)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 2000000) /* ?? */
+	MCFG_DEVICE_ADD("maincpu", MC6809, 18_MHz_XTAL / 3) // 68B09P (divider not verified)
 	MCFG_DEVICE_PROGRAM_MAP(usgames_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'000'000) / 16)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18_MHz_XTAL / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 

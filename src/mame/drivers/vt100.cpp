@@ -55,8 +55,6 @@
 #include "vt100.lh"
 
 
-#define RS232_TAG       "rs232"
-
 class vt100_state : public driver_device
 {
 public:
@@ -69,12 +67,19 @@ public:
 		m_pusart(*this, "pusart"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
-		m_rs232(*this, RS232_TAG),
+		m_rs232(*this, "rs232"),
 		m_printer_uart(*this, "printuart"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
 
+	void vt100(machine_config &config);
+	void vt100ac(machine_config &config);
+	void vt101(machine_config &config);
+	void vt102(machine_config &config);
+	void vt180(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
@@ -97,11 +102,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
-	void vt100(machine_config &config);
-	void vt100ac(machine_config &config);
-	void vt101(machine_config &config);
-	void vt102(machine_config &config);
-	void vt180(machine_config &config);
 	void vt100_mem(address_map &map);
 	void vt100_io(address_map &map);
 	void vt102_io(address_map &map);
@@ -190,8 +190,7 @@ void vt100_state::vt100_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	map(0x00, 0x00).rw("pusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw("pusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_pusart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// 0x02 Baud rate generator
 	map(0x02, 0x02).w("dbrg", FUNC(com8116_device::stt_str_w));
 	// 0x22 Modem buffer
@@ -203,7 +202,7 @@ void vt100_state::vt100_io(address_map &map)
 	// 0x62 NVR latch
 	map(0x62, 0x62).w(FUNC(vt100_state::nvr_latch_w));
 	// 0x82 Keyboard UART data
-	map(0x82, 0x82).rw("kbduart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x82, 0x82).rw(m_kbduart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	// 0xA2 Video processor DC012
 	map(0xa2, 0xa2).w(m_crtc, FUNC(vt100_video_device::dc012_w));
 	// 0xC2 Video processor DC011
@@ -329,7 +328,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_vt100)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_vt100 )
+	config.set_default_layout(layout_vt100);
 
 	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, XTAL(24'073'400))
 	MCFG_VT_SET_SCREEN("screen")
@@ -339,31 +338,29 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(*this, vt100_state, uart_clock_w))
 	MCFG_VT_VIDEO_LBA7_CALLBACK(WRITELINE("nvr", er1400_device, clock_w))
 
-	MCFG_DEVICE_ADD("pusart", I8251, XTAL(24'883'200) / 9)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("rstbuf", rst_pos_buffer_device, rst2_w))
+	I8251(config, m_pusart, XTAL(24'883'200) / 9);
+	m_pusart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_pusart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_pusart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
+	m_pusart->rxrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst2_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("pusart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("pusart", i8251_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_pusart, FUNC(i8251_device::write_rxd));
+	m_rs232->dsr_handler().set(m_pusart, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD("dbrg", COM5016_013, XTAL(24'883'200) / 9) // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
-	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
+	com8116_device &dbrg(COM5016_013(config, "dbrg", XTAL(24'883'200) / 9)); // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
+	dbrg.fr_handler().set(m_pusart, FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().set(m_pusart, FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_ADD("nvr", ER1400, 0)
+	ER1400(config, m_nvr);
 
-	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
-	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(WRITELINE("kbduart", ay31015_device, write_si))
+	VT100_KEYBOARD(config, m_keyboard, 0).signal_out_callback().set(m_kbduart, FUNC(ay31015_device::write_si));
 
-	MCFG_DEVICE_ADD("kbduart", AY31015, 0)
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE("rstbuf", rst_pos_buffer_device, rst1_w))
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_kbduart, 0);
+	m_kbduart->write_dav_callback().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst1_w));
+	m_kbduart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rstbuf", RST_POS_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+	RST_POS_BUFFER(config, m_rstbuf, 0).int_callback().set_inputline(m_maincpu, 0);
 MACHINE_CONFIG_END
 
 void vt100_state::stp_mem(address_map &map)
@@ -383,79 +380,79 @@ void vt100_state::stp_io(address_map &map)
 	map(0xd0, 0xd0).rw("stpusart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 }
 
-MACHINE_CONFIG_START(vt100_state::vt100ac)
+void vt100_state::vt100ac(machine_config &config)
+{
 	vt100(config);
-	MCFG_DEVICE_ADD("stpcpu", I8085A, 4915200)
-	MCFG_DEVICE_PROGRAM_MAP(stp_mem)
-	MCFG_DEVICE_IO_MAP(stp_io)
 
-	MCFG_DEVICE_ADD("stpusart0", I8251, 2457600)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<0>))
+	i8085a_cpu_device &stpcpu(I8085A(config, "stpcpu", 4915200));
+	stpcpu.set_addrmap(AS_PROGRAM, &vt100_state::stp_mem);
+	stpcpu.set_addrmap(AS_IO, &vt100_state::stp_io);
 
-	MCFG_DEVICE_ADD("stpusart1", I8251, 2457600)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<1>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<1>))
+	i8251_device &stpusart0(I8251(config, "stpusart0", 2457600));
+	stpusart0.rxrdy_handler().set("stprxint", FUNC(input_merger_device::in_w<0>));
+	stpusart0.txrdy_handler().set("stptxint", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("stpusart2", I8251, 2457600) // for printer?
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<2>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<2>))
+	i8251_device &stpusart1(I8251(config, "stpusart1", 2457600));
+	stpusart1.rxrdy_handler().set("stprxint", FUNC(input_merger_device::in_w<1>));
+	stpusart1.txrdy_handler().set("stptxint", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("stptxint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST55_LINE))
+	i8251_device &stpusart2(I8251(config, "stpusart2", 2457600)); // for printer?
+	stpusart2.rxrdy_handler().set("stprxint", FUNC(input_merger_device::in_w<2>));
+	stpusart2.txrdy_handler().set("stptxint", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("stprxint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST65_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "stptxint").output_handler().set_inputline("stpcpu", I8085_RST55_LINE);
 
-	MCFG_DEVICE_MODIFY("dbrg")
-	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_txc))
-MACHINE_CONFIG_END
+	INPUT_MERGER_ANY_HIGH(config, "stprxint").output_handler().set_inputline("stpcpu", I8085_RST65_LINE);
 
-MACHINE_CONFIG_START(vt100_state::vt180)
+	com8116_device &dbrg(*subdevice<com8116_device>("dbrg"));
+	dbrg.fr_handler().append("stpusart0", FUNC(i8251_device::write_rxc));
+	dbrg.fr_handler().append("stpusart1", FUNC(i8251_device::write_rxc));
+	dbrg.fr_handler().append("stpusart2", FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().append("stpusart0", FUNC(i8251_device::write_txc));
+	dbrg.ft_handler().append("stpusart1", FUNC(i8251_device::write_txc));
+	dbrg.ft_handler().append("stpusart2", FUNC(i8251_device::write_txc));
+}
+
+void vt100_state::vt180(machine_config &config)
+{
 	vt100(config);
-	MCFG_DEVICE_ADD("z80cpu", Z80, XTAL(24'883'200) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(vt180_mem)
-	MCFG_DEVICE_IO_MAP(vt180_io)
-MACHINE_CONFIG_END
+
+	z80_device &z80cpu(Z80(config, "z80cpu", XTAL(24'883'200) / 9));
+	z80cpu.set_memory_map(&vt100_state::vt180_mem);
+	z80cpu.set_io_map(&vt100_state::vt180_io);
+}
 
 MACHINE_CONFIG_START(vt100_state::vt101)
 	vt100(config);
-	MCFG_DEVICE_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
+
+	MCFG_DEVICE_REPLACE(m_maincpu, I8085A, XTAL(24'073'400) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(vt100_mem)
 	MCFG_DEVICE_IO_MAP(vt100_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
 
-	MCFG_DEVICE_MODIFY("pusart")
-	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
-	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE)) // 8085 pin 9, mislabeled RST 7.5 on schematics
+	m_pusart->set_clock(XTAL(24'073'400) / 8);
+	m_pusart->txrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE); // 8085 pin 9, mislabeled RST 7.5 on schematics
 
-	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
-	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
+	com8116_003_device &dbrg(COM8116_003(config.replace(), "dbrg", XTAL(24'073'400) / 4));
+	dbrg.fr_handler().set(m_pusart, FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().set(m_pusart, FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_MODIFY("kbduart")
-	MCFG_AY31015_WRITE_TBMT_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
+	m_kbduart->write_tbmt_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt100_state::vt102)
 	vt101(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(vt102_io)
 
-	MCFG_DEVICE_ADD("printuart", INS8250, XTAL(24'073'400) / 16)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST75_LINE)) // 8085 pin 7, mislabeled RST 5.5 on schematics
+	ins8250_device &printuart(INS8250(config, "printuart", XTAL(24'073'400) / 16));
+	printuart.out_tx_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	printuart.out_int_callback().set_inputline(m_maincpu, I8085_RST75_LINE); // 8085 pin 7, mislabeled RST 5.5 on schematics
 
-	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("printuart", ins8250_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("printuart", ins8250_device, dsr_w))
+	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	printer.rxd_handler().set("printuart", FUNC(ins8250_device::rx_w));
+	printer.dsr_handler().set("printuart", FUNC(ins8250_device::dsr_w));
 MACHINE_CONFIG_END
 
 /* VT1xx models:

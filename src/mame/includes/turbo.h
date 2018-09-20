@@ -45,6 +45,18 @@ public:
 		, m_lamp(*this, "lamp")
 	{ }
 
+	void turbo(machine_config &config);
+	void buckrog(machine_config &config);
+	void buckroge(machine_config &config);
+	void buckrogu(machine_config &config);
+	void subroc3d(machine_config &config);
+	void turbo_samples(machine_config &config);
+	void subroc3d_samples(machine_config &config);
+	void buckrog_samples(machine_config &config);
+
+	void init_turbo_enc();
+	void init_turbo_noenc();
+
 private:
 	/* device/memory pointers */
 	required_device<z80_device> m_maincpu;
@@ -132,7 +144,6 @@ private:
 		uint32_t  step[8];            /* stepping value */
 	};
 
-public:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(turbo_collision_r);
@@ -164,8 +175,7 @@ public:
 	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
 	DECLARE_READ8_MEMBER(spriteram_r);
 	DECLARE_WRITE8_MEMBER(spriteram_w);
-	void init_turbo_enc();
-	void init_turbo_noenc();
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(turbo);
 	DECLARE_PALETTE_INIT(turbo);
@@ -196,14 +206,7 @@ public:
 	void turbo_update_samples();
 	inline void subroc3d_update_volume(int leftchan, uint8_t dis, uint8_t dir);
 	void buckrog_update_samples();
-	void turbo(machine_config &config);
-	void buckrog(machine_config &config);
-	void buckroge(machine_config &config);
-	void buckrogu(machine_config &config);
-	void subroc3d(machine_config &config);
-	void turbo_samples(machine_config &config);
-	void subroc3d_samples(machine_config &config);
-	void buckrog_samples(machine_config &config);
+
 	void buckrog_cpu2_map(address_map &map);
 	void buckrog_cpu2_portmap(address_map &map);
 	void buckrog_map(address_map &map);

@@ -52,18 +52,6 @@ public:
 		: scramble_state(mconfig, type, tag),
 			m_soundram(*this, "soundram") { }
 
-	DECLARE_READ8_MEMBER(scobra_soundram_r);
-	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
-
 	void mimonkey(machine_config &config);
 	void stratgyx(machine_config &config);
 	void type1(machine_config &config);
@@ -78,6 +66,21 @@ public:
 	void tazmani3(machine_config &config);
 	void hustlerb(machine_config &config);
 	void rescuefe(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
+
+private:
+	DECLARE_READ8_MEMBER(scobra_soundram_r);
+	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
+
 	void hustler_map(address_map &map);
 	void hustler_sound_io_map(address_map &map);
 	void hustler_sound_map(address_map &map);
@@ -92,7 +95,7 @@ public:
 	void tazmani3_map(address_map &map);
 	void type1_map(address_map &map);
 	void type2_map(address_map &map);
-private:
+
 	optional_shared_ptr<uint8_t> m_soundram;
 };
 
@@ -873,29 +876,29 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_DEVICE_IO_MAP(scobra_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,scramble_sh_7474_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi8255_0);
+	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
+	m_ppi8255_0->in_pb_callback().set_ioport("IN1");
+	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
+	I8255A(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scobra_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -951,11 +954,11 @@ MACHINE_CONFIG_START(scobra_state::rescuefe)
 	MCFG_DEVICE_PROGRAM_MAP(rescuefe_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(scobra_state::rescueb)
+void scobra_state::rescueb(machine_config &config)
+{
 	rescue(config);
-	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, scobra_state, rescueb_a002_r)) // protection? must return 0xfc or the game jumps to 0x00
-MACHINE_CONFIG_END
+	m_ppi8255_1->in_pc_callback().set(FUNC(scobra_state::rescueb_a002_r)); // protection? must return 0xfc or the game jumps to 0x00
+}
 
 
 MACHINE_CONFIG_START(scobra_state::minefld)
@@ -1013,11 +1016,9 @@ MACHINE_CONFIG_START(scobra_state::stratgyx)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
+	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1053,29 +1054,29 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_DEVICE_IO_MAP(hustler_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,scramble_sh_7474_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scobra_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi8255_0);
+	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
+	m_ppi8255_0->in_pb_callback().set_ioport("IN1");
+	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
+	I8255A(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

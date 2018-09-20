@@ -55,6 +55,9 @@ public:
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")  { }
 
+	void hotblock(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -78,7 +81,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void hotblock(machine_config &config);
 	void hotblock_io(address_map &map);
 	void hotblock_map(address_map &map);
 };

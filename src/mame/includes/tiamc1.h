@@ -20,6 +20,10 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	void kot(machine_config &config);
+	void tiamc1(machine_config &config);
+
+private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t *m_tileram;
 	uint8_t *m_charram;
@@ -62,13 +66,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void kot(machine_config &config);
-	void tiamc1(machine_config &config);
+
 	void kotrybolov_io_map(address_map &map);
 	void kotrybolov_map(address_map &map);
 	void tiamc1_io_map(address_map &map);
 	void tiamc1_map(address_map &map);
-private:
+
 	optional_device<speaker_sound_device> m_speaker;
 	void update_bg_palette();
 };

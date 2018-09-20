@@ -60,6 +60,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void inder(machine_config &config);
+	void brvteam(machine_config &config);
+	void canasta(machine_config &config);
+	void lapbylap(machine_config &config);
+
+	void init_inder();
+	void init_inder1();
+
+private:
 	DECLARE_READ8_MEMBER(ppic_r);
 	DECLARE_WRITE8_MEMBER(ppia_w);
 	DECLARE_WRITE8_MEMBER(ppib_w);
@@ -81,19 +90,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
-	void init_inder();
-	void init_inder1();
-	void inder(machine_config &config);
-	void brvteam(machine_config &config);
-	void canasta(machine_config &config);
-	void lapbylap(machine_config &config);
 	void brvteam_map(address_map &map);
 	void canasta_map(address_map &map);
 	void inder_map(address_map &map);
 	void inder_sub_map(address_map &map);
 	void lapbylap_map(address_map &map);
 	void lapbylap_sub_map(address_map &map);
-private:
+
 	void update_mus();
 	bool m_pc0;
 	uint8_t m_game;
@@ -1360,10 +1363,10 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	MCFG_DEVICE_PROGRAM_MAP(brvteam_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);
@@ -1378,10 +1381,10 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	MCFG_DEVICE_PROGRAM_MAP(canasta_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);
@@ -1399,10 +1402,10 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	MCFG_DEVICE_PROGRAM_MAP(lapbylap_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);
@@ -1423,73 +1426,50 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_DEVICE_PROGRAM_MAP(inder_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_inder)
+	config.set_default_layout(layout_inder);
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "msmvol").front_center();
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("9a", ttl7474_device, clock_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
-
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
+	MSM5205(config, m_msm, 384_kHz_XTAL);
+	m_msm->vck_callback().set(m_9a, FUNC(ttl7474_device::clock_w));
+	m_msm->vck_callback().append(m_9b, FUNC(ttl7474_device::clock_w)); // order of writes is sensitive
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // 4KHz 4-bit
+	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi60a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi60a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi60b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi60b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, sw_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi60c_w))
+	i8255_device &ppi60(I8255A(config, "ppi60"));
+	ppi60.out_pa_callback().set(FUNC(inder_state::ppi60a_w));
+	ppi60.out_pb_callback().set(FUNC(inder_state::ppi60b_w));
+	ppi60.in_pc_callback().set(FUNC(inder_state::sw_r));
 
-	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi64a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi64a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi64b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi64b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi64c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi64c_w))
+	i8255_device &ppi64(I8255A(config, "ppi64"));
+	ppi64.out_pc_callback().set(FUNC(inder_state::ppi64c_w));
 
-	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi68a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi68a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi68b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi68b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi68c_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi68c_w))
+	I8255A(config, "ppi68");
 
-	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi6ca_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi6ca_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi6cb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi6cb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi6cc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi6cc_w))
+	I8255A(config, "ppi6c");
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppia_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppia_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppib_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppic_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(inder_state::ppia_w));
+	ppi.out_pb_callback().set(FUNC(inder_state::ppib_w));
+	ppi.in_pc_callback().set(FUNC(inder_state::ppic_r));
+	ppi.out_pc_callback().set(FUNC(inder_state::ppic_w));
 
-	MCFG_DEVICE_ADD("7a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc7a_w))
+	TTL7474(config, m_7a, 0);
+	m_7a->comp_output_cb().set(FUNC(inder_state::qc7a_w));
 
-	MCFG_DEVICE_ADD("9a", TTL7474, 0) // HCT74
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, inder_state, q9a_w))
+	TTL7474(config, m_9a, 0); // HCT74
+	m_9a->output_cb().set(FUNC(inder_state::q9a_w));
 
-	MCFG_DEVICE_ADD("9b", TTL7474, 0) // HCT74
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc9b_w))
+	TTL7474(config, m_9b, 0); // HCT74
+	m_9b->comp_output_cb().set(FUNC(inder_state::qc9b_w));
 
-	MCFG_DEVICE_ADD("13", HCT157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	HCT157(config, m_13, 0);
+	m_13->out_callback().set("msm", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 

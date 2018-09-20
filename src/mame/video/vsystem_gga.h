@@ -51,7 +51,7 @@
 //**************************************************************************
 
 #define MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(_devcb) \
-	devcb = &downcast<vsystem_gga_device &>(*device).set_write_cb(DEVCB_##_devcb);
+	downcast<vsystem_gga_device &>(*device).set_write_cb(DEVCB_##_devcb);
 
 
 //**************************************************************************

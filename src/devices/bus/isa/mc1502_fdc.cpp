@@ -52,13 +52,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mc1502_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void mc1502_fdc_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq));
+	m_fdc->drq_wr_callback().set(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq));
+	FLOPPY_CONNECTOR(config, "fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -217,14 +218,14 @@ void mc1502_fdc_device::device_start()
 
 	// BIOS 5.0-5.2x
 	m_isa->install_device(0x010c, 0x010f,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_device, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_device, write) );
+						  read8sm_delegate(FUNC(fd1793_device::read), m_fdc.target()),
+						  write8sm_delegate(FUNC(fd1793_device::write), m_fdc.target()));
 	m_isa->install_device(0x0100, 0x010b, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	// BIOS 5.3x
 	m_isa->install_device(0x0048, 0x004b,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_device, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_device, write) );
+						  read8sm_delegate(FUNC(fd1793_device::read), m_fdc.target()),
+						  write8sm_delegate(FUNC(fd1793_device::write), m_fdc.target()));
 	m_isa->install_device(0x004c, 0x004f, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdcv2_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_fdc_device::motor_callback),this));

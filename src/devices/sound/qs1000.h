@@ -24,25 +24,25 @@
 	downcast<qs1000_device &>(*device).set_external_rom(_bool);
 
 #define MCFG_QS1000_IN_P1_CB(_devcb) \
-	devcb = &downcast<qs1000_device &>(*device).set_in_p1_callback(DEVCB_##_devcb);
+	downcast<qs1000_device &>(*device).set_in_p1_callback(DEVCB_##_devcb);
 
 #define MCFG_QS1000_IN_P2_CB(_devcb) \
-	devcb = &downcast<qs1000_device &>(*device).set_in_p2_callback(DEVCB_##_devcb);
+	downcast<qs1000_device &>(*device).set_in_p2_callback(DEVCB_##_devcb);
 
 #define MCFG_QS1000_IN_P3_CB(_devcb) \
-	devcb = &downcast<qs1000_device &>(*device).set_in_p3_callback(DEVCB_##_devcb);
+	downcast<qs1000_device &>(*device).set_in_p3_callback(DEVCB_##_devcb);
 
 #define MCFG_QS1000_OUT_P1_CB(_devcb) \
-	devcb = &downcast<qs1000_device &>(*device).set_out_p1_callback(DEVCB_##_devcb);
+	downcast<qs1000_device &>(*device).set_out_p1_callback(DEVCB_##_devcb);
 
 #define MCFG_QS1000_OUT_P2_CB(_devcb) \
-	devcb = &downcast<qs1000_device &>(*device).set_out_p2_callback(DEVCB_##_devcb);
+	downcast<qs1000_device &>(*device).set_out_p2_callback(DEVCB_##_devcb);
 
 #define MCFG_QS1000_OUT_P3_CB(_devcb) \
-	devcb = &downcast<qs1000_device &>(*device).set_out_p3_callback(DEVCB_##_devcb);
+	downcast<qs1000_device &>(*device).set_out_p3_callback(DEVCB_##_devcb);
 
 /*#define MCFG_QS1000_SERIAL_W_CB(_devcb) \
-    devcb = &downcast<qs1000_device &>(*device).set_serial_w_callback(DEVCB_##_devcb);*/
+    downcast<qs1000_device &>(*device).set_serial_w_callback(DEVCB_##_devcb);*/
 
 //**************************************************************************
 //  TYPE DEFINITIONS

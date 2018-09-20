@@ -7,7 +7,7 @@
 
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
-	devcb = &downcast<lr35902_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
+	downcast<lr35902_cpu_device &>(*device).set_timer_cb(DEVCB_##_devcb);
 
 // The first release of this CPU has a bug where the programcounter
 // is not incremented properly after an interrupt after the halt opcode.
@@ -19,7 +19,7 @@
 // a 16-bit register in the $fe** region.
 // note: oldval is in hiword, newval is in loword
 #define MCFG_LR35902_INCDEC16_CB(_devcb) \
-	devcb = &downcast<lr35902_cpu_device &>(*device).set_incdec16_cb(DEVCB_##_devcb);
+	downcast<lr35902_cpu_device &>(*device).set_incdec16_cb(DEVCB_##_devcb);
 
 
 enum

@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 	MCFG_DEVICE_IO_MAP(epos_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -493,11 +493,11 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	MCFG_DEVICE_IO_MAP(dealer_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, epos_state, i8255_porta_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, epos_state, i8255_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(epos_state::i8255_porta_r));
+	ppi.out_pc_callback().set(FUNC(epos_state::i8255_portc_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 
@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(epos_state, epos)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

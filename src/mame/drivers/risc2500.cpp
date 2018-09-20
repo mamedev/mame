@@ -70,6 +70,7 @@ private:
 	uint32_t  m_p1000;
 	uint16_t  m_vram_addr;
 	uint8_t   m_vram[0x100];
+	emu_timer *m_boot_rom_disable_timer;
 };
 
 
@@ -271,7 +272,7 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 
 READ32_MEMBER(risc2500_state::disable_boot_rom_r)
 {
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(10), timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
+	m_boot_rom_disable_timer->adjust(m_maincpu->cycles_to_attotime(10));
 	return 0;
 }
 
@@ -287,6 +288,8 @@ void risc2500_state::machine_start()
 	m_leds.resolve();
 
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	m_boot_rom_disable_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
 
 	save_item(NAME(m_p1000));
 	save_item(NAME(m_vram_addr));
@@ -313,7 +316,7 @@ void risc2500_state::risc2500_mem(address_map &map)
 
 
 MACHINE_CONFIG_START(risc2500_state::risc2500)
-	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'322'000) / 2)      // VY86C010
+	MCFG_DEVICE_ADD(m_maincpu, ARM, XTAL(28'322'000) / 2)      // VY86C010
 	MCFG_DEVICE_PROGRAM_MAP(risc2500_mem)
 	MCFG_ARM_COPRO(VL86C020)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)
@@ -326,19 +329,17 @@ MACHINE_CONFIG_START(risc2500_state::risc2500)
 	MCFG_SCREEN_UPDATE_DRIVER(risc2500_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_risc2500)
+	config.set_default_layout(layout_risc2500);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K, 1M, 2M")
+	RAM(config, m_ram).set_default_size("2M").set_extra_options("128K, 256K, 512K, 1M, 2M");
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD(m_dac, DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

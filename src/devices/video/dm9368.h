@@ -29,10 +29,10 @@
 //**************************************************************************
 
 #define MCFG_DM9368_UPDATE_CALLBACK(cb) \
-		devcb = &downcast<dm9368_device &>(*device).set_update_callback(DEVCB_##cb);
+		downcast<dm9368_device &>(*device).set_update_callback(DEVCB_##cb);
 
 #define MCFG_DM9368_RBO_CALLBACK(cb) \
-		devcb = &downcast<dm9368_device &>(*device).set_rbo_callback(DEVCB_##cb);
+		downcast<dm9368_device &>(*device).set_rbo_callback(DEVCB_##cb);
 
 
 

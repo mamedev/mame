@@ -47,13 +47,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(vtech_memexp_carts, nullptr, false)
 
 #define MCFG_MEMEXP_SLOT_INT_HANDLER(_devcb) \
-	devcb = &downcast<vtech_memexp_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	downcast<vtech_memexp_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_MEMEXP_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &downcast<vtech_memexp_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	downcast<vtech_memexp_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 #define MCFG_MEMEXP_SLOT_RESET_HANDLER(_devcb) \
-	devcb = &downcast<vtech_memexp_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+	downcast<vtech_memexp_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

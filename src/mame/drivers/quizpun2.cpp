@@ -112,6 +112,10 @@ public:
 		m_bg_ram(*this, "bg_ram")
 	{ }
 
+	void quizpun(machine_config &config);
+	void quizpun2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -164,8 +168,6 @@ public:
 	bool m_mcu_pending;
 	bool m_mcu_written;
 	bool m_mcu_repeat;
-	void quizpun(machine_config &config);
-	void quizpun2(machine_config &config);
 	void quizpun2_cop_map(address_map &map);
 	void quizpun2_io_map(address_map &map);
 	void quizpun2_map(address_map &map);
@@ -596,7 +598,7 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_COP400_WRITE_SO_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 	MCFG_COP400_WRITE_SK_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

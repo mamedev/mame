@@ -1154,10 +1154,9 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_DEVICE_IO_MAP(ampoker2_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(ampoker2_state, nmi_line_pulse, 1536)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* 200 ms, measured */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* 200 ms, measured */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

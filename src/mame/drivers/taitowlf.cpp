@@ -51,13 +51,18 @@ public:
 		m_bank1(*this, "bank1"),
 		m_palette(*this, "palette") { }
 
+	void taitowlf(machine_config &config);
+
+	void init_taitowlf();
+
+private:
 	required_region_ptr<uint8_t> m_bootscreen_rom;
 	required_memory_bank m_bank1;
 	optional_device<palette_device> m_palette;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	void init_taitowlf();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	#if !ENABLE_VGA
@@ -65,7 +70,6 @@ public:
 	#endif
 	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
-	void taitowlf(machine_config &config);
 	void taitowlf_io(address_map &map);
 	void taitowlf_map(address_map &map);
 
@@ -78,7 +82,6 @@ public:
 	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
 	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 
-private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];

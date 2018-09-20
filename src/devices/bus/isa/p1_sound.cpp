@@ -30,9 +30,9 @@ DEFINE_DEVICE_TYPE(P1_SOUND, p1_sound_device, "p1_sound", "Poisk-1 sound card (B
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("midi", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(":isa", isa8_device, irq3_w))
+	I8251(config, m_midi, 0);
+	m_midi->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_midi->rxrdy_handler().set(":isa", FUNC(isa8_device::irq3_w));
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE("midi", i8251_device, write_rxd))
@@ -165,11 +165,11 @@ void p1_sound_device::device_start()
 		write8_delegate(FUNC(p1_sound_device::dac_w), this));
 
 	m_isa->install_memory(0xee000, 0xee000,
-		read8_delegate(FUNC(i8251_device::data_r), (i8251_device*)m_midi),
-		write8_delegate(FUNC(i8251_device::data_w), (i8251_device*)m_midi));
+		read8smo_delegate(FUNC(i8251_device::data_r), m_midi.target()),
+		write8smo_delegate(FUNC(i8251_device::data_w), m_midi.target()));
 	m_isa->install_memory(0xee002, 0xee002,
-		read8_delegate(FUNC(i8251_device::status_r), (i8251_device*)m_midi),
-		write8_delegate(FUNC(i8251_device::control_w), (i8251_device*)m_midi));
+		read8smo_delegate(FUNC(i8251_device::status_r), m_midi.target()),
+		write8smo_delegate(FUNC(i8251_device::control_w), m_midi.target()));
 
 	// sync generator
 	m_isa->install_memory(0xef000, 0xef007,

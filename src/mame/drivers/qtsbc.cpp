@@ -150,10 +150,8 @@ READ8_MEMBER(qtsbc_state::io_r)
 			return 0xff;
 
 		case 6:
-			return m_usart->data_r(space, 0);
-
 		case 7:
-			return m_usart->status_r(space, 0);
+			return m_usart->read(offset & 1);
 		}
 	}
 	else
@@ -192,11 +190,8 @@ WRITE8_MEMBER(qtsbc_state::io_w)
 			break;
 
 		case 6:
-			m_usart->data_w(space, 0, data);
-			break;
-
 		case 7:
-			m_usart->control_w(space, 0, data);
+			m_usart->write(offset & 1, data);
 			break;
 		}
 	}
@@ -486,15 +481,15 @@ MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0) // U9
-	MCFG_PIT8253_CLK0(4_MHz_XTAL / 2) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(4_MHz_XTAL / 2)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit", pit8253_device, write_clk2))
+	PIT8253(config, m_pit, 0); // U9
+	m_pit->set_clk<0>(4_MHz_XTAL / 2); /* Timer 0: baud rate gen for 8251 */
+	m_pit->out_handler<0>().set(m_usart, FUNC(i8251_device::write_txc));
+	m_pit->out_handler<0>().append(m_usart, FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<1>(4_MHz_XTAL / 2);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
-	MCFG_DEVICE_ADD("usart", I8251, 0) // U8
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	I8251(config, m_usart, 0); // U8
+	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))

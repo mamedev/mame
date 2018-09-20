@@ -28,15 +28,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mes(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port08_r);
 
-	void mes(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_term_data;
 	u8 m_port08;
 	virtual void machine_reset() override;
@@ -146,9 +148,9 @@ MACHINE_CONFIG_START(mes_state::mes)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
-	MCFG_DEVICE_ADD("sio", Z80SIO, 0)
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
+	Z80SIO(config, "sio", 0);
 
 	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(mes_state, kbd_put))

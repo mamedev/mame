@@ -149,12 +149,12 @@ WRITE8_MEMBER( mbc55x_state::vram_page_w )
 
 READ8_MEMBER(mbc55x_state::mbc55x_disk_r)
 {
-	return m_fdc->read(space, offset>>1);
+	return m_fdc->read(offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
 {
-	m_fdc->write(space, offset>>1, data);
+	m_fdc->write(offset>>1, data);
 }
 
 
@@ -251,11 +251,11 @@ READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 	switch (offset)
 	{
 		case 0: //logerror("%s read kb_uart\n",machine().describe_context());
-			result = m_kb_uart->data_r(space,0);
+			result = m_kb_uart->data_r();
 			break;
 
 		case 1:
-			result = m_kb_uart->status_r(space,0);
+			result = m_kb_uart->status_r();
 			if (m_keyboard.key_special & KEY_BIT_CTRL)  // Parity error used to flag control down
 				result |= i8251_device::I8251_STATUS_PARITY_ERROR;
 			break;
@@ -270,8 +270,8 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 
 	switch (offset)
 	{
-		case 0  : m_kb_uart->data_w(space, 0, data); break;
-		case 1  : m_kb_uart->control_w(space, 0, data); break;
+		case 0  : m_kb_uart->data_w(data); break;
+		case 1  : m_kb_uart->control_w(data); break;
 	}
 }
 

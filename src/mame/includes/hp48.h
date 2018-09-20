@@ -61,10 +61,27 @@ public:
 		, m_screen(*this, "screen")
 		, m_port(*this, "port%u", 1U) {}
 
+	void hp48s(machine_config &config);
+	void hp48gp(machine_config &config);
+	void hp48sx(machine_config &config);
+	void hp48g(machine_config &config);
+	void hp48gx(machine_config &config);
+	void hp49g(machine_config &config);
+
+	void init_hp48();
+
+	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
+	hp48_module m_modules[6];
+
+	void decode_nibble(uint8_t* dst, uint8_t* src, int size);
+	void encode_nibble(uint8_t* dst, uint8_t* src, int size);
+
+	void apply_modules();
+
+private:
 	virtual void machine_reset() override;
 	void base_machine_start(hp48_models model);
 
-	void init_hp48();
 	DECLARE_PALETTE_INIT(hp48);
 	DECLARE_MACHINE_START(hp49g);
 	DECLARE_MACHINE_START(hp48gx);
@@ -83,15 +100,12 @@ public:
 	TIMER_CALLBACK_MEMBER(timer1_cb);
 	TIMER_CALLBACK_MEMBER(timer2_cb);
 	void update_annunciators();
-	void apply_modules();
 	void pulse_irq(int irq_line);
 	void rs232_start_recv_byte(uint8_t data);
 	void rs232_send_byte();
 	int get_in();
 	void update_kdn();
 	void reset_modules();
-	void decode_nibble(uint8_t* dst, uint8_t* src, int size);
-	void encode_nibble(uint8_t* dst, uint8_t* src, int size);
 
 	/* memory controller */
 	DECLARE_WRITE_LINE_MEMBER(mem_reset);
@@ -109,12 +123,6 @@ public:
 	/* keyboard interrupt system */
 	DECLARE_WRITE_LINE_MEMBER(rsi);
 	void hp48_common(machine_config &config);
-	void hp48s(machine_config &config);
-	void hp48gp(machine_config &config);
-	void hp48sx(machine_config &config);
-	void hp48g(machine_config &config);
-	void hp48gx(machine_config &config);
-	void hp49g(machine_config &config);
 	void hp48(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -131,9 +139,6 @@ public:
 
 	/* keyboard interrupt */
 	uint8_t m_kdn;
-
-	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
-	hp48_module m_modules[6];
 
 	/* RAM/ROM extensions, GX/SX only
 	   port1: SX/GX: 32/128 KB

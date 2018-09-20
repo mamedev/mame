@@ -67,7 +67,11 @@ public:
 		m_sprgen(*this, "spritegen")
 	{ }
 
+	void mirage(machine_config &config);
 
+	void init_mirage();
+
+private:
 	/* misc */
 	uint8_t m_mux_data;
 
@@ -87,13 +91,11 @@ public:
 	DECLARE_READ16_MEMBER(mjmux_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
 	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
-	void init_mirage();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	void mirage(machine_config &config);
 	void mirage_map(address_map &map);
 };
 
@@ -296,7 +298,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93C45
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

@@ -35,16 +35,17 @@ public:
 		, m_colors(*this, "colors")
 	{ }
 
+	void dorachan(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_READ8_MEMBER(v128_r);
 	uint32_t screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void dorachan(machine_config &config);
 	void dorachan_io_map(address_map &map);
 	void dorachan_map(address_map &map);
 
-private:
 	// internal state
 	uint8_t m_flip_screen;
 	uint16_t m_prot_value;

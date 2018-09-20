@@ -326,17 +326,17 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 10B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cloak_state, coin_counter_r_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cloak_state, coin_counter_l_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cloak_state, cocktail_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ???
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LED 2
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LED 1
+	ls259_device &outlatch(LS259(config, "outlatch")); // 10B
+	outlatch.q_out_cb<0>().set(FUNC(cloak_state::coin_counter_r_w));
+	outlatch.q_out_cb<1>().set(FUNC(cloak_state::coin_counter_l_w));
+	outlatch.q_out_cb<3>().set(FUNC(cloak_state::cocktail_w));
+	outlatch.q_out_cb<5>().set_nop();   // ???
+	outlatch.q_out_cb<6>().set_output("led1").invert(); // START LED 2
+	outlatch.q_out_cb<7>().set_output("led0").invert(); // START LED 1
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

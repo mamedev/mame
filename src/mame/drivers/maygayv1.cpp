@@ -223,6 +223,11 @@ public:
 		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
+	void maygayv1(machine_config &config);
+
+	void init_screenpl();
+
+private:
 	DECLARE_WRITE16_MEMBER(i82716_w);
 	DECLARE_READ16_MEMBER(i82716_r);
 	DECLARE_WRITE16_MEMBER(write_odd);
@@ -235,25 +240,21 @@ public:
 	DECLARE_WRITE8_MEMBER(strobe_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	void init_screenpl();
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
-	void maygayv1(machine_config &config);
 	void main_map(address_map &map);
 	void sound_data(address_map &map);
 	void sound_io(address_map &map);
 	void sound_prg(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8052_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
@@ -889,13 +890,13 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, maygayv1_state, data_to_i8031))
 
 	/* U25 ST 2 9148 EF68B21P */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, maygayv1_state, b_read))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, maygayv1_state, b_read))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, maygayv1_state, b_writ))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, maygayv1_state, b_writ))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set(FUNC(maygayv1_state::b_read));
+	pia.readpb_handler().set(FUNC(maygayv1_state::b_read));
+	pia.writepa_handler().set(FUNC(maygayv1_state::b_writ));
+	pia.writepb_handler().set(FUNC(maygayv1_state::b_writ));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* TODO: Use real video timings */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -913,10 +914,10 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygayv1_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, maygayv1_state, duart_txa))
 
-	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, maygayv1_state, strobe_w))      // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygayv1_state, lamp_data_w)) // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, maygayv1_state, kbd_r))                   // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));			// unknown clock
+	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));			// scan SL lines
+	kbdc.out_disp_callback().set(FUNC(maygayv1_state::lamp_data_w));	// display A&B
+	kbdc.in_rl_callback().set(FUNC(maygayv1_state::kbd_r));				// kbd RL lines
 
 	SPEAKER(config, "mono").front_center();
 

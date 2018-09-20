@@ -25,16 +25,57 @@ public:
 	midtunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
 		m_dcs(*this, "dcs"),
+		m_palette(*this, "palette"),
 		m_cvsd_sound(*this, "cvsd"),
 		m_adpcm_sound(*this, "adpcm"),
 		m_nvram(*this, "nvram"),
 		m_gfxrom(*this, "gfxrom") { }
 
+	void tunit_core(machine_config &config);
+	void tunit_adpcm(machine_config &config);
+	void tunit_dcs(machine_config &config);
+
+	void init_mktunit();
+	void init_mkturbo();
+	void init_nbajamte();
+	void init_nbajam();
+	void init_jdreddp();
+	void init_mk2();
+
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
+
+protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	optional_device<dcs_audio_device> m_dcs;
+	required_device<palette_device> m_palette;
+
+	DECLARE_READ16_MEMBER(midtunit_vram_r);
+	DECLARE_WRITE16_MEMBER(midtunit_vram_w);
+	DECLARE_READ16_MEMBER(midtunit_gfxrom_r);
+	DECLARE_WRITE16_MEMBER(midtunit_vram_data_w);
+	DECLARE_WRITE16_MEMBER(midtunit_vram_color_w);
+	DECLARE_READ16_MEMBER(midtunit_vram_data_r);
+	DECLARE_READ16_MEMBER(midtunit_vram_color_r);
+
+	DECLARE_WRITE16_MEMBER(midxunit_paletteram_w);
+	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
+
+	DECLARE_READ16_MEMBER(midtunit_dma_r);
+	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
+
+	DECLARE_READ16_MEMBER(midwunit_gfxrom_r);
+
+	DECLARE_WRITE16_MEMBER(midwunit_control_w);
+	DECLARE_READ16_MEMBER(midwunit_control_r);
+
+	DECLARE_VIDEO_START(midtunit);
+
+	uint8_t m_gfx_rom_large;
+
+private:
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 
@@ -59,35 +100,9 @@ public:
 	DECLARE_WRITE16_MEMBER(nbajam_prot_w);
 	DECLARE_WRITE16_MEMBER(jdredd_prot_w);
 	DECLARE_READ16_MEMBER(jdredd_prot_r);
-	DECLARE_READ16_MEMBER(midtunit_gfxrom_r);
-	DECLARE_READ16_MEMBER(midwunit_gfxrom_r);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_w);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_data_w);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_color_w);
-	DECLARE_READ16_MEMBER(midtunit_vram_r);
-	DECLARE_READ16_MEMBER(midtunit_vram_data_r);
-	DECLARE_READ16_MEMBER(midtunit_vram_color_r);
 	DECLARE_WRITE16_MEMBER(midtunit_control_w);
-	DECLARE_WRITE16_MEMBER(midwunit_control_w);
-	DECLARE_READ16_MEMBER(midwunit_control_r);
-	DECLARE_WRITE16_MEMBER(midxunit_paletteram_w);
-	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
-	DECLARE_READ16_MEMBER(midtunit_dma_r);
-	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
-
-	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
-	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
-	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-
-	void init_mktunit();
-	void init_mkturbo();
-	void init_nbajamte();
-	void init_nbajam();
-	void init_jdreddp();
-	void init_mk2();
 
 	DECLARE_MACHINE_RESET(midtunit);
-	DECLARE_VIDEO_START(midtunit);
 
 	void register_state_saving();
 	void init_tunit_generic(int sound);
@@ -114,12 +129,6 @@ public:
 	uint8_t    m_jdredd_prot_index;
 	uint8_t    m_jdredd_prot_max;
 
-	uint8_t m_gfx_rom_large;
-
-	void tunit_core(machine_config &config);
-	void tunit_adpcm(machine_config &config);
-	void tunit_dcs(machine_config &config);
 	void main_map(address_map &map);
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

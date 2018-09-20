@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
 
@@ -819,7 +819,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
@@ -874,7 +874,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 

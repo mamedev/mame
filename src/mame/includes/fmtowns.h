@@ -91,6 +91,7 @@ class towns_state : public driver_device
 	public:
 	towns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_ram(*this, RAM_TAG)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_pic_master(*this, "pic8259_master")
@@ -99,7 +100,6 @@ class towns_state : public driver_device
 		, m_dma(*this, "dma_%u", 1U)
 		, m_palette(*this, "palette256")
 		, m_palette16(*this, "palette16_%u", 0U)
-		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "fdc")
 		, m_flop(*this, "fdc:%u", 0U)
 		, m_icmemcard(*this, "icmemcard")
@@ -134,6 +134,29 @@ class towns_state : public driver_device
 		, m_serial(*this,"serial")
 	{ }
 
+	void towns_base(machine_config &config);
+	void towns(machine_config &config);
+	void townsftv(machine_config &config);
+	void townshr(machine_config &config);
+	void townssj(machine_config &config);
+
+	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
+
+protected:
+	uint16_t m_towns_machine_id;  // default is 0x0101
+
+	void marty_mem(address_map &map);
+	void pcm_mem(address_map &map);
+	void towns16_io(address_map &map);
+	void towns_io(address_map &map);
+	void towns_mem(address_map &map);
+	void ux_mem(address_map &map);
+
+	virtual void driver_start() override;
+
+	required_device<ram_device> m_ram;
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -143,7 +166,6 @@ class towns_state : public driver_device
 	required_device_array<upd71071_device, 2> m_dma;
 	required_device<palette_device> m_palette;
 	required_device_array<palette_device, 2> m_palette16;
-	required_device<ram_device> m_ram;
 	required_device<mb8877_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_flop;
 	required_device<fmt_icmem_device> m_icmemcard;
@@ -187,7 +209,6 @@ class towns_state : public driver_device
 	uint8_t m_towns_rtc_select;
 	uint8_t m_towns_rtc_data;
 	uint8_t m_towns_timer_mask;
-	uint16_t m_towns_machine_id;  // default is 0x0101
 	uint8_t m_towns_kb_status;
 	uint8_t m_towns_kb_irq1_enable;
 	uint8_t m_towns_kb_output;  // key output
@@ -242,7 +263,6 @@ class towns_state : public driver_device
 	optional_shared_ptr<uint32_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_nvram16;
 
-	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -353,18 +373,6 @@ class towns_state : public driver_device
 	required_memory_region m_user;
 	optional_memory_region m_serial;
 
-	void towns_base(machine_config &config);
-	void towns(machine_config &config);
-	void townsftv(machine_config &config);
-	void townshr(machine_config &config);
-	void townssj(machine_config &config);
-	void marty_mem(address_map &map);
-	void pcm_mem(address_map &map);
-	void towns16_io(address_map &map);
-	void towns_io(address_map &map);
-	void towns_mem(address_map &map);
-	void ux_mem(address_map &map);
-private:
 	static const device_timer_id TIMER_FREERUN = 1;
 	static const device_timer_id TIMER_INTERVAL2 = 2;
 	static const device_timer_id TIMER_KEYBOARD = 3;
@@ -388,8 +396,7 @@ private:
 	bool m_rtc_busy;
 	u8 m_vram_mask[4];
 	u8 m_vram_mask_addr;
-public:
-	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
+
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_sprite_done);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);

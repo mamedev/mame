@@ -61,6 +61,10 @@ public:
 		m_fgattr(*this, "fgattr")
 	{ }
 
+	void toypop(machine_config &config);
+	void liblrabl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_master_cpu;
 	required_device<cpu_device> m_slave_cpu;
 	required_device<cpu_device> m_sound_cpu;
@@ -102,20 +106,19 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
 	DECLARE_READ8_MEMBER(bg_rmw_r);
 	DECLARE_WRITE8_MEMBER(bg_rmw_w);
-	void toypop(machine_config &config);
-	void liblrabl(machine_config &config);
+
 	void master_liblrabl_map(address_map &map);
 	void master_toypop_map(address_map &map);
 	void namcos16_master_base_map(address_map &map);
 	void slave_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	// driver_device overrides
 //  virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 //  virtual void video_start() override;
-private:
+
 	bool m_master_irq_enable;
 	bool m_slave_irq_enable;
 	uint8_t m_pal_bank;

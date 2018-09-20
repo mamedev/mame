@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "includes/kyocera.h"
 
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -56,8 +55,6 @@ MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(kc85_state,kc85)
 
@@ -83,8 +80,6 @@ MACHINE_CONFIG_START(tandy200_state::tandy200_video)
 	MCFG_SCREEN_SIZE(240, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)

@@ -99,6 +99,9 @@ public:
 	{
 	}
 
+	void h19(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
 	DECLARE_WRITE8_MEMBER(h19_bell_w);
 	DECLARE_READ8_MEMBER(kbd_key_r);
@@ -109,10 +112,9 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void h19(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 
@@ -542,8 +544,8 @@ MACHINE_CONFIG_START(h19_state::h19)
 	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
-	MCFG_DEVICE_ADD("ins8250", INS8250, INS8250_CLOCK)
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
+	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, MM5740_CLOCK)
 	MCFG_MM5740_MATRIX_X1(IOPORT("X1"))

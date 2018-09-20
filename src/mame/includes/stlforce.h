@@ -24,6 +24,13 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_okibank(*this, "okibank") { }
 
+	void stlforce(machine_config &config);
+	void twinbrat(machine_config &config);
+
+	void init_twinbrat();
+	void init_stlforce();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -55,9 +62,6 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 
-	void init_twinbrat();
-	void init_stlforce();
-
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
 	TILE_GET_INFO_MEMBER(get_mhigh_tile_info);
@@ -66,8 +70,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void stlforce(machine_config &config);
-	void twinbrat(machine_config &config);
+
 	void stlforce_map(address_map &map);
 	void twinbrat_oki_map(address_map &map);
 };

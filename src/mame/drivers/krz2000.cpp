@@ -36,13 +36,12 @@ public:
 
 	void k2000(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void k2000_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

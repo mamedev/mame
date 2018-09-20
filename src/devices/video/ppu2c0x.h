@@ -107,6 +107,7 @@ public:
 
 	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
 	template <typename Object> devcb_base &set_int_callback(Object &&cb) { return m_int_callback.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return m_int_callback.bind(); }
 
 	/* routines */
 	virtual void init_palette();

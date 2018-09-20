@@ -17,19 +17,19 @@
 //**************************************************************************
 
 #define MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(_devcb) \
-	devcb = &downcast<seibu_crtc_device &>(*device).set_decrypt_key_callback(DEVCB_##_devcb);
+	downcast<seibu_crtc_device &>(*device).set_decrypt_key_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_LAYER_EN_CB(_devcb) \
-	devcb = &downcast<seibu_crtc_device &>(*device).set_layer_en_callback(DEVCB_##_devcb);
+	downcast<seibu_crtc_device &>(*device).set_layer_en_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(_devcb) \
-	devcb = &downcast<seibu_crtc_device &>(*device).set_layer_scroll_callback(DEVCB_##_devcb);
+	downcast<seibu_crtc_device &>(*device).set_layer_scroll_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(_devcb) \
-	devcb = &downcast<seibu_crtc_device &>(*device).set_layer_scroll_base_callback(DEVCB_##_devcb);
+	downcast<seibu_crtc_device &>(*device).set_layer_scroll_base_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_CRTC_REG_1A_CB(_devcb) \
-	devcb = &downcast<seibu_crtc_device &>(*device).set_reg_1a_callback(DEVCB_##_devcb);
+	downcast<seibu_crtc_device &>(*device).set_reg_1a_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

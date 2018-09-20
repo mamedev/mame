@@ -77,6 +77,9 @@ public:
 		, m_sprram(*this, "sprram")
 	{ }
 
+	void sprcros2(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_master_cpu;
 	required_device<cpu_device> m_slave_cpu;
@@ -105,19 +108,17 @@ public:
 	bool m_slave_nmi_enable;
 	bool m_screen_enable;
 	uint8_t m_bg_scrollx, m_bg_scrolly;
-	void sprcros2(machine_config &config);
 	void master_io(address_map &map);
 	void master_map(address_map &map);
 	void slave_io(address_map &map);
 	void slave_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);

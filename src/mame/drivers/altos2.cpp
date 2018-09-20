@@ -38,7 +38,7 @@ public:
 
 	void altos2(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(video_mode_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -47,8 +47,7 @@ protected:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<x2210_device> m_novram;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
@@ -103,31 +102,32 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(altos2_state::altos2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &altos2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &altos2_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 4915200) // ctc & dart connections are guesswork
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4915200)); // ctc & dart connections are guesswork
+	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart1", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart1", z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart1", z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("dart2", z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart2", z80dart_device, txca_w))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<0>().append("dart1", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<1>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<2>().set("dart2", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<2>().append("dart2", FUNC(z80dart_device::txca_w));
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL(4'000'000)) // channel B not used for communications
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("novram", x2210_device, store)) MCFG_DEVCB_INVERT // FIXME: no inverter should be needed
+	z80dart_device &dart1(Z80DART(config, "dart1", 4_MHz_XTAL));
+	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("novram", X2210, 0)
+	z80dart_device &dart2(Z80DART(config, "dart2", 4_MHz_XTAL)); // channel B not used for communications
+	dart2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart2.out_dtrb_callback().set(m_novram, FUNC(x2210_device::store)).invert(); // FIXME: no inverter should be needed
+
+	X2210(config, m_novram, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000) / 2, 960, 0, 800, 347, 0, 325)

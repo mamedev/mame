@@ -6649,7 +6649,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6686,7 +6686,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6720,7 +6720,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -10088,7 +10088,7 @@
 			</dataarea>
 			<dataarea name="ymsnd" size="0x400000">
 				<rom name="nitd-v1.bin" offset="0x000000" size="0x200000" crc="79008868" sha1="90bd6aaefd37341297ab1f4ae7246e52facd87d0" />
-				<rom name="nitd-v2.bin" offset="0x200000" size="0x200000" crc="728558F9" sha1="309aa7c933c199b2e540a601b363e7af8744fe00" />
+				<rom name="nitd-v2.bin" offset="0x200000" size="0x200000" crc="728558f9" sha1="309aa7c933c199b2e540a601b363e7af8744fe00" />
 			</dataarea>
 			<dataarea name="sprites" size="0x800000">
 				<rom loadflag="load16_byte" name="nitd-c1.bin" offset="0x000000" size="0x200000" crc="b4353190" sha1="90d5352e243a05f5c2be4fa7475667bb56e78016" />

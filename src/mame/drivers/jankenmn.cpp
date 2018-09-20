@@ -173,7 +173,7 @@ public:
 
 	void jankenmn(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(lamps3_w);
@@ -183,8 +183,7 @@ protected:
 	void jankenmn_map(address_map &map);
 	void jankenmn_port_map(address_map &map);
 
-private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	output_finder<2> m_digits;
 	output_finder<16> m_lamps;
 };
@@ -386,25 +385,25 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(jankenmn_map)
-	MCFG_DEVICE_IO_MAP(jankenmn_port_map)
+	Z80(config, m_maincpu, MASTER_CLOCK);  /* 2.5 MHz */
+	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jankenmn_state::jankenmn_map);
+	m_maincpu->set_addrmap(AS_IO, &jankenmn_state::jankenmn_port_map);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	i8255_device &ppi0(I8255(config, "ppi8255_0"));
 	/* (10-13) Mode 0 - Ports A & B set as input, high C & low C as output. */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps3_w))
+	ppi0.in_pa_callback().set_ioport("DSW");
+	ppi0.in_pb_callback().set_ioport("IN0");
+	ppi0.out_pc_callback().set(FUNC(jankenmn_state::lamps3_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jankenmn_state, lamps1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps2_w))
+	ppi1.out_pa_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ppi1.out_pb_callback().set(FUNC(jankenmn_state::lamps1_w));
+	ppi1.out_pc_callback().set(FUNC(jankenmn_state::lamps2_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MASTER_CLOCK));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* NO VIDEO */
 

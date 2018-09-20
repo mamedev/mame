@@ -83,6 +83,7 @@ void i8291a_device::device_reset()
 	update_state(m_dt_state, device_trigger_state::DTIS);
 	update_state(m_sh_state, source_handshake_state::SIDS);
 	update_state(m_ah_state, acceptor_handshake_state::AIDS);
+	update_state(m_lp_state, listener_primary_state::LPIS);
 }
 
 void i8291a_device::device_start()
@@ -232,7 +233,10 @@ READ8_MEMBER(i8291a_device::spoll_stat_r)
 
 READ8_MEMBER(i8291a_device::addr_stat_r)
 {
-	LOGMASKED(LOG_REG, "%s = %02X\n", __FUNCTION__, m_address_status);
+	if (!(m_address_status & 0xfe))
+			m_address_status = 0;
+	LOGMASKED(LOG_REG, "[%s] %s = %02X\n", machine().describe_context().c_str(), __FUNCTION__, m_address_status);
+
 	return m_address_status;
 }
 
@@ -516,7 +520,7 @@ void i8291a_device::run_sh_fsm()
 		m_nba = false;
 		if (m_t_state == talker_state::TACS || m_t_state == talker_state::SPAS) {
 			update_state(m_sh_state, source_handshake_state::SGNS);
-			m_ints1 |= REG_INTS1_BO;
+
 		}
 		break;
 
@@ -526,7 +530,13 @@ void i8291a_device::run_sh_fsm()
 		if (m_nba) {
 			update_state(m_sh_state, source_handshake_state::SDYS);
 			m_ints1 &= ~REG_INTS1_BO;
+		} else {
+			if (!m_nrfd)
+				m_ints1 |= REG_INTS1_BO;
+			else
+				m_ints1 &= ~REG_INTS1_BO;
 		}
+
 		break;
 
 	case source_handshake_state::SDYS:
@@ -567,8 +577,9 @@ void i8291a_device::handle_command()
 			break;
 		case IFCMD_SDC:
 			LOGMASKED(LOG_CMD, "SDC\n");
-			if (m_l_state == listener_state::LADS)
+			if (m_l_state == listener_state::LADS) {
 				update_state(m_dc_state, device_clear_state::DCAS);
+			}
 			break;
 		case IFCMD_GET:
 			LOGMASKED(LOG_CMD, "GET\n");
@@ -654,6 +665,8 @@ void i8291a_device::handle_command()
 			update_state(m_tp_state, talker_primary_state::TPAS);
 			if ((m_address_mode & 3) == 1 && m_t_state == talker_state::TIDS)
 				update_state(m_t_state, talker_state::TADS);
+			if ((m_address_mode & 3) == 3)
+				update_state(m_t_state, talker_state::TIDS);
 		} else {
 			update_state(m_tp_state, talker_primary_state::TPIS);
 			update_state(m_t_state, talker_state::TIDS);
@@ -753,6 +766,7 @@ void i8291a_device::run_t_fsm()
 {
 	switch (m_t_state) {
 	case talker_state::TIDS:
+		m_send_eoi = false;
 		m_address_status &= ~REG_ADDRESS_STATUS_TA;
 		break;
 
@@ -830,7 +844,22 @@ void i8291a_device::run_dc_fsm()
 		break;
 	case device_clear_state::DCAS:
 		m_ints1 |= REG_INTS1_DEC;
+		update_int();
+		update_state(m_t_state, talker_state::TIDS);
+		update_state(m_tp_state, talker_primary_state::TPIS);
+		update_state(m_tsp_state, talker_serial_poll_state::SPIS);
+		update_state(m_l_state, listener_state::LIDS);
+		update_state(m_rl_state, remote_local_state::LOCS);
+		update_state(m_pp_state, parallel_poll_state::PPIS);
 		update_state(m_dc_state, device_clear_state::DCIS);
+		update_state(m_dt_state, device_trigger_state::DTIS);
+		update_state(m_sh_state, source_handshake_state::SIDS);
+		update_state(m_ah_state, acceptor_handshake_state::AIDS);
+		update_state(m_lp_state, listener_primary_state::LPIS);
+
+		m_ints1 |= REG_INTS1_DEC;
+		update_int();
+
 		break;
 	}
 }

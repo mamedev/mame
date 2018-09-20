@@ -38,6 +38,11 @@ public:
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321") { }
 
+	void bucky(machine_config &config);
+	void moo(machine_config &config);
+	void moobl(machine_config &config);
+
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_workram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -85,9 +90,6 @@ public:
 	void moo_objdma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void bucky(machine_config &config);
-	void moo(machine_config &config);
-	void moobl(machine_config &config);
 	void bucky_map(address_map &map);
 	void moo_map(address_map &map);
 	void moobl_map(address_map &map);

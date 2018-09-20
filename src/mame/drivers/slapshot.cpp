@@ -453,12 +453,12 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
-	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
-	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
-	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
-	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
+	TC0640FIO(config, m_tc0640fio, 0);
+	m_tc0640fio->read_1_callback().set_ioport("COINS");
+	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
+	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
+	m_tc0640fio->write_4_callback().set(FUNC(slapshot_state::coin_control_w));
+	m_tc0640fio->read_7_callback().set_ioport("JOY");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -515,19 +515,19 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
-	MCFG_ADC0808_IN0_CB(IOPORT("GUN1X"))
-	MCFG_ADC0808_IN1_CB(IOPORT("GUN1Y"))
-	MCFG_ADC0808_IN2_CB(IOPORT("GUN2X"))
-	MCFG_ADC0808_IN3_CB(IOPORT("GUN2Y"))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 3);
+	adc.in_callback<0>().set_ioport("GUN1X");
+	adc.in_callback<1>().set_ioport("GUN1Y");
+	adc.in_callback<2>().set_ioport("GUN2X");
+	adc.in_callback<3>().set_ioport("GUN2Y");
 
-	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
-	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
-	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
-	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
-	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
+	TC0640FIO(config, m_tc0640fio, 0);
+	m_tc0640fio->read_1_callback().set_ioport("COINS");
+	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
+	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
+	m_tc0640fio->write_4_callback().set(FUNC(slapshot_state::coin_control_w));
+	m_tc0640fio->read_7_callback().set_ioport("JOY");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

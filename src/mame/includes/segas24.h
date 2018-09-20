@@ -4,6 +4,10 @@
  * Sega System 24
  *
  */
+#ifndef MAME_INCLUDES_SEGAS24_H
+#define MAME_INCLUDES_SEGAS24_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "video/segaic24.h"
@@ -176,3 +180,5 @@ private:
 	void system24_cpu1_map(address_map &map);
 	void system24_cpu2_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SEGAS24_H

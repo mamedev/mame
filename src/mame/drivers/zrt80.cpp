@@ -29,11 +29,6 @@
 class zrt80_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BEEP_OFF
-	};
-
 	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
@@ -46,16 +41,23 @@ public:
 	{
 	}
 
+	void zrt80(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	DECLARE_READ8_MEMBER(zrt80_10_r);
 	DECLARE_WRITE8_MEMBER(zrt80_30_w);
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void zrt80(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -300,8 +302,9 @@ MACHINE_CONFIG_START(zrt80_state::zrt80)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(zrt80_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, 2457600 )
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	INS8250(config, m_8250, 2457600);
+	m_8250->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(zrt80_state, kbd_put))
 MACHINE_CONFIG_END

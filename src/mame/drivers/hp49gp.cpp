@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/s3c2410.h"
-#include "rendlay.h"
 #include "screen.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -32,14 +31,19 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void hp49gp(machine_config &config);
+
+	void init_hp49gp();
+
+	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+
+private:
 	uint32_t m_port[9];
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<uint32_t> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
-	void init_hp49gp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -48,7 +52,6 @@ public:
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r( int line);
 	required_device<cpu_device> m_maincpu;
-	void hp49gp(machine_config &config);
 	void hp49gp_map(address_map &map);
 };
 
@@ -292,9 +295,6 @@ MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 	MCFG_SCREEN_SIZE(160, 85)
 	MCFG_SCREEN_VISIBLE_AREA(0, 131 - 1, 0, 80 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_S3C2410_PALETTE("palette")

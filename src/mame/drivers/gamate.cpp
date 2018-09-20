@@ -32,6 +32,11 @@ public:
 		, m_bios(*this, "bios")
 	{ }
 
+	void gamate(machine_config &config);
+
+	void init_gamate();
+
+private:
 	DECLARE_READ8_MEMBER(card_available_check);
 	DECLARE_READ8_MEMBER(card_available_set);
 	DECLARE_WRITE8_MEMBER(card_reset);
@@ -42,14 +47,11 @@ public:
 	DECLARE_WRITE8_MEMBER(write_cart);
 	DECLARE_READ8_MEMBER(read_cart);
 
-	void init_gamate();
-
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
-	void gamate(machine_config &config);
 	void gamate_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

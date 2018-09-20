@@ -16,29 +16,29 @@
 
 // read-only on 70x0
 #define MCFG_TMS7000_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(0, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(0, DEVCB_##_devcb);
 
 // write-only
 #define MCFG_TMS7000_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(1, DEVCB_##_devcb);
 
 #define MCFG_TMS7000_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(2, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(2, DEVCB_##_devcb);
 
 #define MCFG_TMS7000_IN_PORTD_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(3, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTD_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(3, DEVCB_##_devcb);
 
 // TMS70C46 only
 #define MCFG_TMS7000_IN_PORTE_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_read_cb(4, DEVCB_##_devcb);
 #define MCFG_TMS7000_OUT_PORTE_CB(_devcb) \
-	devcb = &downcast<tms7000_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
+	downcast<tms7000_device &>(*device).set_port_write_cb(4, DEVCB_##_devcb);
 
 
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST };

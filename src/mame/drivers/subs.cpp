@@ -187,7 +187,7 @@ MACHINE_CONFIG_START(subs_state::subs)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(subs_state, subs)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
@@ -212,16 +212,16 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // C9
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LAMP 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LAMP 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SUBS_SONAR2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SUBS_SONAR1_EN>))
+	ls259_device &latch(LS259(config, "latch")); // C9
+	latch.q_out_cb<0>().set_output("led0").invert(); // START LAMP 1
+	latch.q_out_cb<1>().set_output("led1").invert(); // START LAMP 2
+	latch.q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_SONAR2_EN>));
+	latch.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_SONAR1_EN>));
 	// Schematics show crash and explode reversed.  But this is proper.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SUBS_EXPLODE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SUBS_CRASH_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, subs_state, invert1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, subs_state, invert2_w))
+	latch.q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_EXPLODE_EN>));
+	latch.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_CRASH_EN>));
+	latch.q_out_cb<6>().set(FUNC(subs_state::invert1_w));
+	latch.q_out_cb<7>().set(FUNC(subs_state::invert2_w));
 MACHINE_CONFIG_END
 
 

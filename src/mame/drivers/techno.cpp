@@ -30,6 +30,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void techno(machine_config &config);
+
+private:
 	enum
 	{
 		IRQ_SET_TIMER,
@@ -51,11 +54,9 @@ public:
 	DECLARE_READ8_MEMBER(rd_r) { return 0; }
 	DECLARE_WRITE8_MEMBER(wr_w) {}
 
-	void techno(machine_config &config);
 	void techno_map(address_map &map);
 	void techno_sub_map(address_map &map);
 
-private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -291,13 +292,13 @@ MACHINE_CONFIG_START(techno_state::techno)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(techno_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	//MCFG_DEVICE_ADD("cpu2", TMS7000, XTAL(4'000'000))
 	//MCFG_DEVICE_PROGRAM_MAP(techno_sub_map)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_techno)
+	config.set_default_layout(layout_techno);
 MACHINE_CONFIG_END
 
 ROM_START(xforce)

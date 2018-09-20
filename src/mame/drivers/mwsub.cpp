@@ -32,7 +32,7 @@ public:
 
 	void submar(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(submar_sensor0_r);
@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(submar_state::submar)
 	MCFG_DEVICE_PROGRAM_MAP(submar_map)
 	MCFG_DEVICE_IO_MAP(submar_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* no video! */
 

@@ -187,7 +187,7 @@ MACHINE_CONFIG_START(trucocl_state::trucocl)
 	MCFG_DEVICE_IO_MAP(main_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", trucocl_state,  trucocl_interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

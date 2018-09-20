@@ -447,6 +447,9 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 //  CoCo cartridge slots
 //**************************************************************************
 
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
+
 //-------------------------------------------------
 //  device_cococart_interface - constructor
 //-------------------------------------------------

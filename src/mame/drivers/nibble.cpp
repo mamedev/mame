@@ -67,6 +67,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void nibble(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
@@ -80,7 +83,6 @@ public:
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void nibble(machine_config &config);
 	void nibble_cru_map(address_map &map);
 	void nibble_map(address_map &map);
 };
@@ -309,8 +311,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nibble_state::nibble)
 
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
+	TMS9900(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
+	m_maincpu->set_addrmap(AS_IO, &nibble_state::nibble_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

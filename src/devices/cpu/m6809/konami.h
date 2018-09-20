@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_KONAMICPU_LINE_CB(_devcb) \
-	devcb = &downcast<konami_cpu_device &>(*device).set_line_callback(DEVCB_##_devcb);
+	downcast<konami_cpu_device &>(*device).set_line_callback(DEVCB_##_devcb);
 
 
 // device type definition

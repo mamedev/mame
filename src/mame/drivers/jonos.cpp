@@ -33,14 +33,16 @@ public:
 		, m_p_chargen(*this, "chargen")
 		{ }
 
+	void jonos(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(cursor_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 
-	void jonos(machine_config &config);
 	void jonos_mem(address_map &map);
-private:
+
 	u8 m_framecnt;
 	u8 m_term_data;
 	u8 m_curs_ctrl;

@@ -5,35 +5,35 @@
     Dynax blitter, "revision 2" (TC17G032AP-0246 custom DIP64)
 
 **********************************************************************/
+#ifndef MAME_VIDEO_DYNAX_BLITTER_REV2_H
+#define MAME_VIDEO_DYNAX_BLITTER_REV2_H
 
 #pragma once
 
-#ifndef MAME_VIDEO_DYNAX_BLITTER_REV2_H
-#define MAME_VIDEO_DYNAX_BLITTER_REV2_H
 
 //**************************************************************************
 //  CONFIGURATION MACROS
 //**************************************************************************
 
 #define MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(_devcb) \
-	devcb = &downcast<dynax_blitter_rev2_device &>(*device).set_vram_out_cb(DEVCB_##_devcb);
+	downcast<dynax_blitter_rev2_device &>(*device).set_vram_out_cb(DEVCB_##_devcb);
 #define MCFG_DYNAX_BLITTER_REV2_SCROLLX_CB(_devcb) \
-	devcb = &downcast<dynax_blitter_rev2_device &>(*device).set_scrollx_cb(DEVCB_##_devcb);
+	downcast<dynax_blitter_rev2_device &>(*device).set_scrollx_cb(DEVCB_##_devcb);
 #define MCFG_DYNAX_BLITTER_REV2_SCROLLY_CB(_devcb) \
-	devcb = &downcast<dynax_blitter_rev2_device &>(*device).set_scrolly_cb(DEVCB_##_devcb);
+	downcast<dynax_blitter_rev2_device &>(*device).set_scrolly_cb(DEVCB_##_devcb);
 #define MCFG_DYNAX_BLITTER_REV2_READY_CB(_devcb) \
-	devcb = &downcast<dynax_blitter_rev2_device &>(*device).set_ready_cb(DEVCB_##_devcb);
+	downcast<dynax_blitter_rev2_device &>(*device).set_ready_cb(DEVCB_##_devcb);
 
 #define MCFG_CDRACULA_BLITTER_VRAM_OUT_CB(_devcb) \
-	devcb = &downcast<cdracula_blitter_device &>(*device).set_vram_out_cb(DEVCB_##_devcb);
+	downcast<cdracula_blitter_device &>(*device).set_vram_out_cb(DEVCB_##_devcb);
 #define MCFG_CDRACULA_BLITTER_SCROLLX_CB(_devcb) \
-	devcb = &downcast<cdracula_blitter_device &>(*device).set_scrollx_cb(DEVCB_##_devcb);
+	downcast<cdracula_blitter_device &>(*device).set_scrollx_cb(DEVCB_##_devcb);
 #define MCFG_CDRACULA_BLITTER_SCROLLY_CB(_devcb) \
-	devcb = &downcast<cdracula_blitter_device &>(*device).set_scrolly_cb(DEVCB_##_devcb);
+	downcast<cdracula_blitter_device &>(*device).set_scrolly_cb(DEVCB_##_devcb);
 #define MCFG_CDRACULA_BLITTER_READY_CB(_devcb) \
-	devcb = &downcast<cdracula_blitter_device &>(*device).set_ready_cb(DEVCB_##_devcb);
+	downcast<cdracula_blitter_device &>(*device).set_ready_cb(DEVCB_##_devcb);
 #define MCFG_CDRACULA_BLITTER_DEST_CB(_devcb) \
-	devcb = &downcast<cdracula_blitter_device &>(*device).set_blit_dest_cb(DEVCB_##_devcb);
+	downcast<cdracula_blitter_device &>(*device).set_blit_dest_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -52,6 +52,10 @@ public:
 	template<class Object> devcb_base &set_scrollx_cb(Object &&cb) { return m_scrollx_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_scrolly_cb(Object &&cb) { return m_scrolly_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_ready_cb(Object &&cb) { return m_ready_cb.set_callback(std::forward<Object>(cb)); }
+	auto vram_out_cb() { return m_vram_out_cb.bind(); }
+	auto scrollx_cb() { return m_scrollx_cb.bind(); }
+	auto scrolly_cb() { return m_scrolly_cb.bind(); }
+	auto ready_cb() { return m_ready_cb.bind(); }
 
 	// write handlers
 	DECLARE_WRITE8_MEMBER(pen_w);

@@ -9,6 +9,7 @@
 #ifndef MAME_INCLUDES_SSYSTEM3_H
 #define MAME_INCLUDES_SSYSTEM3_H
 
+#include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "emupal.h"
 
@@ -51,9 +52,13 @@ public:
 		, m_matrix(*this, "matrix.%u", 0)
 	{ }
 
+	void ssystem3(machine_config &config);
+
 	void init_ssystem3();
+
+private:
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ssystem3);
+	void palette_init(palette_device &palette);
 	uint32_t screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(ssystem3_via_write_a);
 	DECLARE_READ8_MEMBER(ssystem3_via_read_a);
@@ -68,15 +73,14 @@ public:
 	void ssystem3_playfield_write(int reset, int signal);
 	void ssystem3_playfield_read(int *on, int *ready);
 
-	void ssystem3(machine_config &config);
 	void ssystem3_map(address_map &map);
-private:
+
 	uint8_t m_porta;
 	std::unique_ptr<uint8_t[]> m_videoram;
 	playfield_t m_playfield;
 	lcd_t m_lcd;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<via6522_device> m_via6522_0;
 	required_ioport m_configuration;

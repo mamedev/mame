@@ -316,13 +316,13 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_DEVICE_IO_MAP(subm_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sub_state, int_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sub_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // same as Q0?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(sub_state::int_mask_w));
+	mainlatch.q_out_cb<1>().set(FUNC(sub_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set_nop(); // same as Q0?
+	mainlatch.q_out_cb<5>().set_nop();
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

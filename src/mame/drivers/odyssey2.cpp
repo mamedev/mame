@@ -37,6 +37,16 @@ public:
 		m_keyboard(*this, "KEY.%u", 0),
 		m_joysticks(*this, "JOY.%u", 0) { }
 
+	void odyssey2_cartslot(machine_config &config);
+	void videopac(machine_config &config);
+	void odyssey2(machine_config &config);
+
+	void init_odyssey2();
+
+	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
 	required_device<o2_cart_slot_device> m_cart;
@@ -45,29 +55,19 @@ public:
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_lum;
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_READ8_MEMBER(bus_read);
-	DECLARE_WRITE8_MEMBER(bus_write);
-	DECLARE_READ8_MEMBER(p1_read);
-	DECLARE_WRITE8_MEMBER(p1_write);
-	DECLARE_READ8_MEMBER(p2_read);
-	DECLARE_WRITE8_MEMBER(p2_write);
+
+
 	DECLARE_READ_LINE_MEMBER(t1_read);
-	void init_odyssey2();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(odyssey2);
-	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
-	void odyssey2_cartslot(machine_config &config);
-	void videopac(machine_config &config);
-	void odyssey2(machine_config &config);
 	void odyssey2_io(address_map &map);
 	void odyssey2_mem(address_map &map);
-protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	/* constants */
 	static const uint8_t P1_BANK_LO_BIT          = 0x01;
 	static const uint8_t P1_BANK_HI_BIT          = 0x02;
@@ -80,6 +80,15 @@ protected:
 
 	required_ioport_array<6> m_keyboard;
 	required_ioport_array<2> m_joysticks;
+
+	DECLARE_READ8_MEMBER(io_read);
+	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ8_MEMBER(bus_read);
+	DECLARE_WRITE8_MEMBER(bus_write);
+	DECLARE_READ8_MEMBER(p1_read);
+	DECLARE_WRITE8_MEMBER(p1_write);
+	DECLARE_READ8_MEMBER(p2_read);
+	DECLARE_WRITE8_MEMBER(p2_write);
 };
 
 class g7400_state : public odyssey2_state
@@ -91,6 +100,10 @@ public:
 		, m_ef9340_1(*this, "ef9340_1")
 	{ }
 
+	void g7400(machine_config &config);
+	void odyssey3(machine_config &config);
+
+private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef9340_1;
 
@@ -103,10 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER(i8243_port_w);
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
-	void g7400(machine_config &config);
-	void odyssey3(machine_config &config);
 	void g7400_io(address_map &map);
-protected:
+
 	uint8_t m_ic674_decode[8];
 	uint8_t m_ic678_decode[8];
 };
@@ -742,12 +753,12 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -755,12 +766,14 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(*this, g7400_state,i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->read_handler().set_constant(0);
+	m_i8243->write_handler().set(FUNC(g7400_state::i8243_port_w));
 
-	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
+	MCFG_I8245_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -783,12 +796,12 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -796,12 +809,14 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(*this, g7400_state,i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->read_handler().set_constant(0);
+	m_i8243->write_handler().set(FUNC(g7400_state::i8243_port_w));
 
-	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
+	MCFG_I8244_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);

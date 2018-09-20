@@ -36,6 +36,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void sm1800(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_ppi;
@@ -51,7 +54,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	void sm1800(machine_config &config);
 	void sm1800_io(address_map &map);
 	void sm1800_mem(address_map &map);
 };
@@ -69,8 +71,7 @@ void sm1800_state::sm1800_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x3c, 0x3d).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
-	map(0x5c, 0x5c).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x5d, 0x5d).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x5c, 0x5d).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x6c, 0x6f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE( 0x74, 0x74 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	//AM_RANGE( 0x75, 0x75 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
@@ -180,11 +181,11 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sm1800_state, sm1800_8255_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sm1800_state, sm1800_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, sm1800_state, sm1800_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sm1800_state, sm1800_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(sm1800_state::sm1800_8255_porta_r));
+	m_ppi->out_pb_callback().set(FUNC(sm1800_state::sm1800_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_w));
 
 	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
 	MCFG_I8275_CHARACTER_WIDTH(8)

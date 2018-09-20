@@ -36,19 +36,21 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void nsm(machine_config &config);
+
+private:
+
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 	DECLARE_WRITE8_MEMBER(oe_w);
-	void nsm(machine_config &config);
 	void nsm_io_map(address_map &map);
 	void nsm_map(address_map &map);
 
-private:
 	uint8_t m_cru_data[9];
 	uint8_t m_cru_count;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	output_finder<60> m_digits;
 };
 
@@ -120,17 +122,18 @@ WRITE8_MEMBER( nsm_state::cru_w )
 void nsm_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(nsm_state::nsm)
 	// CPU TMS9995, standard variant; no line connection
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
+	TMS9995(config, m_maincpu, 11052000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsm_state::nsm_map);
+	m_maincpu->set_addrmap(AS_IO, &nsm_state::nsm_io_map);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_nsm)
+	config.set_default_layout(layout_nsm);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();

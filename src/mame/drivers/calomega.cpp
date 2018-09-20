@@ -644,7 +644,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
-#include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -2577,16 +2576,16 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_DEVICE_PROGRAM_MAP(sys903_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calomega_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state,s903_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state,lamps_903a_w))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, lamps_903b_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, s903_mux_w))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2612,8 +2611,8 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, calomega_state, write_acia_tx))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(FUNC(calomega_state::write_acia_tx));
 
 	MCFG_DEVICE_ADD("aciabaud", CLOCK, UART_CLOCK)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, calomega_state, write_acia_clock))
@@ -2630,7 +2629,7 @@ MACHINE_CONFIG_START(calomega_state::s903mod)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(NOOP)
+	MCFG_AY8910_PORT_A_READ_CB(CONSTANT(0))
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2646,16 +2645,14 @@ MACHINE_CONFIG_START(calomega_state::sys905)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sys905_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state,s905_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state,lamps_905_w))
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, s905_mux_w))
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(NOOP)
+	MCFG_AY8910_PORT_A_READ_CB(CONSTANT(0))
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2671,18 +2668,16 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	MCFG_DEVICE_REPLACE("maincpu", M65C02, CPU_CLOCK)  /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(sys906_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state, pia0_ain_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, calomega_state, pia0_bin_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, pia0_aout_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, pia0_bout_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, calomega_state, pia0_ca2_w))
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::pia0_ain_r));
+	m_pia[0]->readpb_handler().set(FUNC(calomega_state::pia0_bin_r));
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));
+	m_pia[0]->ca2_handler().set(FUNC(calomega_state::pia0_ca2_w));
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state, pia1_ain_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, calomega_state, pia1_bin_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, pia1_aout_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, pia1_bout_w))
+	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));
+	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
+	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
 

@@ -160,6 +160,12 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void mmd1(machine_config &config);
+	void mmd2(machine_config &config);
+
+	void init_mmd2();
+
+private:
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port2_w);
@@ -171,17 +177,13 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	void init_mmd2();
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
-	void mmd1(machine_config &config);
-	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
 
-private:
 	uint8_t m_return_code;
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -500,7 +502,7 @@ MACHINE_CONFIG_START(mmd1_state::mmd1)
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd1)
+	config.set_default_layout(layout_mmd1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmd1_state::mmd2)
@@ -514,15 +516,15 @@ MACHINE_CONFIG_START(mmd1_state::mmd2)
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd2)
+	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, mmd1_state, mmd2_scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, mmd1_state, mmd2_digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, mmd1_state, mmd2_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kbdc(I8279(config, "i8279", 400000));				// based on divider
+	kbdc.out_sl_callback().set(FUNC(mmd1_state::mmd2_scanlines_w));	// scan SL lines
+	kbdc.out_disp_callback().set(FUNC(mmd1_state::mmd2_digit_w));	// display A&B
+	kbdc.in_rl_callback().set(FUNC(mmd1_state::mmd2_kbd_r));		// kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);						// Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 
 MACHINE_CONFIG_END
 

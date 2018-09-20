@@ -31,6 +31,12 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 				CYCLES(CYCLES_CPUID_EAX1);
 				break;
 			}
+
+			default:
+			{
+				logerror("CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
+				break;
+			}
 		}
 	}
 }
@@ -152,14 +158,16 @@ void i386_device::i486_xadd_rm8_r8()   // Opcode 0x0f c0
 	if( modrm >= 0xc0 ) {
 		uint8_t dst = LOAD_RM8(modrm);
 		uint8_t src = LOAD_REG8(modrm);
+		uint8_t sum = ADD8(dst, src);
 		STORE_REG8(modrm, dst);
-		STORE_RM8(modrm, dst + src);
+		STORE_RM8(modrm, sum);
 		CYCLES(CYCLES_XADD_REG_REG);
 	} else {
 		uint32_t ea = GetEA(modrm,1);
 		uint8_t dst = READ8(ea);
 		uint8_t src = LOAD_REG8(modrm);
-		WRITE8(ea, dst + src);
+		uint8_t sum = ADD8(dst, src);
+		WRITE8(ea, sum);
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_XADD_REG_MEM);
 	}
@@ -171,14 +179,16 @@ void i386_device::i486_xadd_rm16_r16() // Opcode 0x0f c1
 	if( modrm >= 0xc0 ) {
 		uint16_t dst = LOAD_RM16(modrm);
 		uint16_t src = LOAD_REG16(modrm);
+		uint16_t sum = ADD16(dst, src);
 		STORE_REG16(modrm, dst);
-		STORE_RM16(modrm, dst + src);
+		STORE_RM16(modrm, sum);
 		CYCLES(CYCLES_XADD_REG_REG);
 	} else {
 		uint32_t ea = GetEA(modrm,1);
 		uint16_t dst = READ16(ea);
 		uint16_t src = LOAD_REG16(modrm);
-		WRITE16(ea, dst + src);
+		uint16_t sum = ADD16(dst, src);
+		WRITE16(ea, sum);
 		STORE_REG16(modrm, dst);
 		CYCLES(CYCLES_XADD_REG_MEM);
 	}
@@ -190,14 +200,16 @@ void i386_device::i486_xadd_rm32_r32() // Opcode 0x0f c1
 	if( modrm >= 0xc0 ) {
 		uint32_t dst = LOAD_RM32(modrm);
 		uint32_t src = LOAD_REG32(modrm);
+		uint32_t sum = ADD32(dst, src);
 		STORE_REG32(modrm, dst);
-		STORE_RM32(modrm, dst + src);
+		STORE_RM32(modrm, sum);
 		CYCLES(CYCLES_XADD_REG_REG);
 	} else {
 		uint32_t ea = GetEA(modrm,1);
 		uint32_t dst = READ32(ea);
 		uint32_t src = LOAD_REG32(modrm);
-		WRITE32(ea, dst + src);
+		uint32_t sum = ADD32(dst, src);
+		WRITE32(ea, sum);
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_XADD_REG_MEM);
 	}
@@ -284,9 +296,9 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 			}
 		case 6:         /* LMSW */
 			{
-				uint16_t b;
 				if(PROTECTED_MODE && m_CPL)
 					FAULT(FAULT_GP,0)
+				uint16_t b;
 				if( modrm >= 0xc0 ) {
 					b = LOAD_RM16(modrm);
 					CYCLES(CYCLES_LMSW_REG);

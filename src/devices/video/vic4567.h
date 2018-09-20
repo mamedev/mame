@@ -244,27 +244,27 @@ DECLARE_DEVICE_TYPE(VIC3, vic3_device)
 	downcast<vic3_device &>(*device).set_vic3_type((vic3_device::vic3_type::type));
 
 #define MCFG_VIC3_DMA_READ_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_dma_read_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_dma_read_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_DMA_READ_COLOR_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_dma_read_color_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_dma_read_color_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_INTERRUPT_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_interrupt_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_interrupt_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_PORT_CHANGED_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_port_changed_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_port_changed_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_LIGHTPEN_BUTTON_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_lightpen_button_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_lightpen_button_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_LIGHTPEN_X_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_lightpen_x_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_lightpen_x_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_LIGHTPEN_Y_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_lightpen_y_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_lightpen_y_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_C64_MEM_R_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_c64_mem_r_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_c64_mem_r_callback((DEVCB_##cb));
 
 #endif // MAME_VIDEO_VIC4567_H

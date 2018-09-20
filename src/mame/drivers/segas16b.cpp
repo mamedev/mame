@@ -1151,8 +1151,8 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 	{
 		// it is important to write in this order: if the /START line goes low
 		// at the same time /RESET goes low, no sample should be started
-		m_upd7759->start_w(data & 0x80);
-		m_upd7759->reset_w(data & 0x40);
+		m_upd7759->start_w(BIT(data, 7));
+		m_upd7759->reset_w(BIT(data, 6));
 
 		// banking depends on the ROM board
 		int bankoffs = 0;
@@ -3726,7 +3726,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK_10MHz)
 	MCFG_SEGA_315_5195_CPU("maincpu")
@@ -3752,6 +3752,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
+	MCFG_UPD7759_MD(0)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas16b_state,upd7759_generate_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
@@ -3791,9 +3792,10 @@ MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
 	// 834-6602 I/O board
 	MCFG_DEVICE_ADD("upd4701a1", UPD4701A, 0)
 	MCFG_DEVICE_ADD("upd4701a2", UPD4701A, 0)
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("HANDX1"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("HANDX2"))
+
+	CXD1095(config, m_cxdio, 0);
+	m_cxdio->in_porta_cb().set_ioport("HANDX1");
+	m_cxdio->in_portb_cb().set_ioport("HANDX2");
 MACHINE_CONFIG_END
 
 
@@ -3813,11 +3815,12 @@ MACHINE_CONFIG_END
 
 // same as the above, but with custom Sega ICs
 
-MACHINE_CONFIG_START(segas16b_state::rom_5797_fragment)
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier")
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_1")
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_2")
-MACHINE_CONFIG_END
+void segas16b_state::rom_5797_fragment(machine_config &config)
+{
+	SEGA_315_5248_MULTIPLIER(config, m_multiplier, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
+}
 
 MACHINE_CONFIG_START(segas16b_state::system16b_5797)
 	system16b(config);
@@ -3926,7 +3929,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_DEVICE_IO_MAP(lockonph_sound_iomap)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)

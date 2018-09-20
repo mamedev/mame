@@ -71,8 +71,13 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_p_chargen(*this, "chargen")
 		, m_io_dsw(*this, "DSW")
-		{ }
+	{ }
 
+	void ts803(machine_config &config);
+
+	void init_ts803();
+
+private:
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_READ8_MEMBER(porta0_r);
@@ -82,20 +87,18 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	void init_ts803();
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ts803(machine_config &config);
 	void ts803_io(address_map &map);
 	void ts803_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
 	bool m_graphics_mode;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -419,10 +422,10 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(ts803_state::ts803)
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ts803_mem)
-	MCFG_DEVICE_IO_MAP(ts803_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ts803_state::ts803_mem);
+	m_maincpu->set_addrmap(AS_IO, &ts803_state::ts803_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -439,28 +442,28 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_MC6845_UPDATE_ROW_CB(ts803_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
 
-	MCFG_DEVICE_ADD("sti_clock", CLOCK, 16_MHz_XTAL / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sti", z80sti_device, tc_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sti", z80sti_device, rc_w))
+	clock_device &sti_clock(CLOCK(config, "sti_clock", 16_MHz_XTAL / 13));
+	sti_clock.signal_handler().set("sti", FUNC(z80sti_device::tc_w));
+	sti_clock.signal_handler().append("sti", FUNC(z80sti_device::rc_w));
 
-	MCFG_DEVICE_ADD("dart_clock", CLOCK, (16_MHz_XTAL / 13) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
+	clock_device &dart_clock(CLOCK(config, "dart_clock", 16_MHz_XTAL / 13 / 8));
+	dart_clock.signal_handler().set("dart", FUNC(z80dart_device::txca_w));
+	dart_clock.signal_handler().append("dart", FUNC(z80dart_device::rxca_w));
 
-	MCFG_DEVICE_ADD("sti", Z80STI, 16_MHz_XTAL / 4)
-	MCFG_Z80STI_OUT_TBO_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))
-	MCFG_Z80STI_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sti_device& sti(Z80STI(config, "sti", 16_MHz_XTAL / 4));
+	sti.out_tbo_cb().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	sti.out_int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	z80dart_device& dart(Z80DART(config, "dart", 16_MHz_XTAL / 4));
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
 
 	/* floppy disk */
-	MCFG_DEVICE_ADD("fdc", FD1793, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("sti", z80sti_device, i7_w))
+	FD1793(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)

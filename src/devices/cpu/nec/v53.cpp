@@ -172,16 +172,9 @@ m_DST = 0x00;
 m_DMK = 0x0f;
 */
 
-device_memory_interface::space_config_vector v53_base_device::memory_space_config() const
-{
-	auto r = nec_common_device::memory_space_config();
-	r.emplace_back(std::make_pair(AS_IO, &m_io_space_config));
-	return r;
-}
-
 void v53_base_device::device_reset()
 {
-	nec_common_device::device_reset();
+	v33_base_device::device_reset();
 
 	m_SCTL = 0x00;
 	m_OPSEL= 0x00;
@@ -198,7 +191,7 @@ void v53_base_device::device_reset()
 
 void v53_base_device::device_start()
 {
-	nec_common_device::device_start();
+	v33_base_device::device_start();
 
 	m_txd_handler.resolve_safe();
 	m_rts_handler.resolve_safe();
@@ -229,6 +222,21 @@ void v53_base_device::device_start()
 	m_out_dack_3_cb.resolve_safe();
 
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pic8259_device::inta_cb), (pic8259_device*)m_v53icu));
+
+	save_item(NAME(m_SCTL));
+	save_item(NAME(m_OPSEL));
+	save_item(NAME(m_SULA));
+	save_item(NAME(m_TULA));
+	save_item(NAME(m_IULA));
+	save_item(NAME(m_DULA));
+	save_item(NAME(m_OPHA));
+
+	save_item(NAME(m_simk));
+}
+
+void v53_base_device::device_post_load()
+{
+	install_peripheral_io();
 }
 
 void v53_base_device::install_peripheral_io()
@@ -269,6 +277,7 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_v53icu), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_v53icu), 0xffff);
 		}
 		else
 		{
@@ -284,6 +293,10 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::tmu_tst0_r), this), write8_delegate(FUNC(v53_base_device::tmu_tct0_w), this), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::tmu_tst1_r), this), write8_delegate(FUNC(v53_base_device::tmu_tct1_w), this), 0xff00);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::tmu_tst2_r), this), write8_delegate(FUNC(v53_base_device::tmu_tct2_w), this), 0x00ff);
+			space(AS_IO).install_write_handler(base+0x02, base+0x03, write8_delegate(FUNC(v53_base_device::tmu_tmd_w), this), 0xff00);
 		}
 		else
 		{
@@ -301,12 +314,16 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::data_r), m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::data_w), m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::status_r),  m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::command_w),  m_v53scu.target()), 0xff00);
+			space(AS_IO).install_write_handler(base+0x02, base+0x03, write8smo_delegate(FUNC(v53_scu_device::mode_w), m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0xff00);
 		}
 		else
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::data_r), (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::data_w), (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_scu_device::status_r),  (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::command_w),  (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8_delegate(FUNC(v53_scu_device::mode_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::data_r), m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::data_w), m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8smo_delegate(FUNC(v53_scu_device::status_r),  m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::command_w),  m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8smo_delegate(FUNC(v53_scu_device::mode_w), m_v53scu.target()), 0x00ff);
 			space(AS_IO).install_readwrite_handler(base+0x06, base+0x07, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0x00ff);
 
 		}
@@ -416,6 +433,7 @@ WRITE_LINE_MEMBER(v53_base_device::hack_w)
 
 void v53_base_device::v53_internal_port_map(address_map &map)
 {
+	v33_internal_port_map(map);
 	map(0xffe0, 0xffe0).w(FUNC(v53_base_device::BSEL_w)); // 0xffe0 // uPD71037 DMA mode bank selection register
 	map(0xffe1, 0xffe1).w(FUNC(v53_base_device::BADR_w)); // 0xffe1 // uPD71037 DMA mode bank register peripheral mapping (also uses OPHA)
 //  AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0x00ff) // 0xffe2
@@ -486,58 +504,52 @@ WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
 }
 
 
-MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
+void v53_base_device::device_add_mconfig(machine_config &config)
+{
+	PIT8254(config, m_v53tcu, 0); // functionality identical to uPD71054
+	m_v53tcu->set_clk<0>(16000000); // manual implicitly claims that these runs at same speed as the CPU
+	m_v53tcu->set_clk<1>(16000000);
+	m_v53tcu->set_clk<2>(16000000);
+	m_v53tcu->out_handler<0>().set([this] (int state) { m_out0_handler(state); });
+	m_v53tcu->out_handler<1>().set([this] (int state) { m_out1_handler(state); });
+	m_v53tcu->out_handler<2>().set([this] (int state) { m_out2_handler(state); });
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
-	MCFG_PIT8253_CLK0(16000000) // manual implicitly claims that these runs at same speed as the CPU
-	MCFG_PIT8253_CLK1(16000000)
-	MCFG_PIT8253_CLK2(16000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE( *this, v53_base_device, tcu_out0_trampoline_cb ))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( *this, v53_base_device, tcu_out1_trampoline_cb ))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( *this, v53_base_device, tcu_out2_trampoline_cb ))
+	V53_DMAU(config, m_v53dmau, 4000000);
+	m_v53dmau->out_hreq_callback().set([this] (int state) { m_out_hreq_cb(state); });
+	m_v53dmau->out_eop_callback().set([this] (int state) { m_out_eop_cb(state); });
+	m_v53dmau->in_memr_callback().set([this] (address_space &space, offs_t offset) { return m_in_memr_cb(space, offset); });
+	m_v53dmau->out_memw_callback().set([this] (address_space &space, offs_t offset, uint8_t data) { m_out_memw_cb(space, offset, data); });
+	m_v53dmau->in_ior_callback<0>().set([this] (address_space &space, offs_t offset) { return m_in_ior_0_cb(space, offset); });
+	m_v53dmau->in_ior_callback<1>().set([this] (address_space &space, offs_t offset) { return m_in_ior_1_cb(space, offset); });
+	m_v53dmau->in_ior_callback<2>().set([this] (address_space &space, offs_t offset) { return m_in_ior_2_cb(space, offset); });
+	m_v53dmau->in_ior_callback<3>().set([this] (address_space &space, offs_t offset) { return m_in_ior_3_cb(space, offset); });
+	m_v53dmau->out_iow_callback<0>().set([this] (address_space &space, offs_t offset, uint8_t data) { m_out_iow_0_cb(space, offset, data); });
+	m_v53dmau->out_iow_callback<1>().set([this] (address_space &space, offs_t offset, uint8_t data) { m_out_iow_1_cb(space, offset, data); });
+	m_v53dmau->out_iow_callback<2>().set([this] (address_space &space, offs_t offset, uint8_t data) { m_out_iow_2_cb(space, offset, data); });
+	m_v53dmau->out_iow_callback<3>().set([this] (address_space &space, offs_t offset, uint8_t data) { m_out_iow_3_cb(space, offset, data); });
+	m_v53dmau->out_dack_callback<0>().set([this] (int state) { m_out_dack_0_cb(state); });
+	m_v53dmau->out_dack_callback<1>().set([this] (int state) { m_out_dack_1_cb(state); });
+	m_v53dmau->out_dack_callback<2>().set([this] (int state) { m_out_dack_2_cb(state); });
+	m_v53dmau->out_dack_callback<3>().set([this] (int state) { m_out_dack_3_cb(state); });
 
+	PIC8259(config, m_v53icu, 0);
+	m_v53icu->out_int_callback().set(FUNC(v53_base_device::internal_irq_w));
+	m_v53icu->in_sp_callback().set_constant(1);
+	m_v53icu->read_slave_ack_callback().set(FUNC(v53_base_device::get_pic_ack));
 
-	MCFG_DEVICE_ADD("upd71071dma", V53_DMAU, 4000000)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, v53_base_device, hreq_trampoline_cb))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, v53_base_device, eop_trampoline_cb))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, v53_base_device, dma_memr_trampoline_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, v53_base_device, dma_memw_trampoline_w))
-	MCFG_AM9517A_IN_IOR_0_CB(READ8(*this, v53_base_device, dma_io_0_trampoline_r))
-	MCFG_AM9517A_IN_IOR_1_CB(READ8(*this, v53_base_device, dma_io_1_trampoline_r))
-	MCFG_AM9517A_IN_IOR_2_CB(READ8(*this, v53_base_device, dma_io_2_trampoline_r))
-	MCFG_AM9517A_IN_IOR_3_CB(READ8(*this, v53_base_device, dma_io_3_trampoline_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(*this, v53_base_device, dma_io_0_trampoline_w))
-	MCFG_AM9517A_OUT_IOW_1_CB(WRITE8(*this, v53_base_device, dma_io_1_trampoline_w))
-	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(*this, v53_base_device, dma_io_2_trampoline_w))
-	MCFG_AM9517A_OUT_IOW_3_CB(WRITE8(*this, v53_base_device, dma_io_3_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(*this, v53_base_device, dma_dack0_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_1_CB(WRITELINE(*this, v53_base_device, dma_dack1_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(*this, v53_base_device, dma_dack2_trampoline_w))
-	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(*this, v53_base_device, dma_dack3_trampoline_w))
-
-
-	MCFG_DEVICE_ADD("upd71059pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, v53_base_device, internal_irq_w))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, v53_base_device, get_pic_ack))
-
-
-
-	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, v53_base_device, scu_txd_trampoline_cb))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, v53_base_device, scu_dtr_trampoline_cb))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, v53_base_device, scu_rts_trampoline_cb))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_rxrdy_trampoline_cb))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_txrdy_trampoline_cb))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, v53_base_device, scu_txempty_trampoline_cb))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, v53_base_device, scu_syndet_trampoline_cb))
-
-MACHINE_CONFIG_END
+	V53_SCU(config, m_v53scu, 0);
+	m_v53scu->txd_handler().set(FUNC(v53_base_device::scu_txd_trampoline_cb));
+	m_v53scu->dtr_handler().set(FUNC(v53_base_device::scu_dtr_trampoline_cb));
+	m_v53scu->rts_handler().set(FUNC(v53_base_device::scu_rts_trampoline_cb));
+	m_v53scu->rxrdy_handler().set(FUNC(v53_base_device::scu_rxrdy_trampoline_cb));
+	m_v53scu->txrdy_handler().set(FUNC(v53_base_device::scu_txrdy_trampoline_cb));
+	m_v53scu->txempty_handler().set(FUNC(v53_base_device::scu_txempty_trampoline_cb));
+	m_v53scu->syndet_handler().set(FUNC(v53_base_device::scu_syndet_trampoline_cb));
+}
 
 
-v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
-	: nec_common_device(mconfig, type, tag, owner, clock, true, prefetch_size, prefetch_cycles, chip_type),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(v53_base_device::v53_internal_port_map), this) ),
+v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	v33_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(v53_base_device::v53_internal_port_map), this)),
 	m_v53tcu(*this, "pit"),
 	m_v53dmau(*this, "upd71071dma"),
 	m_v53icu(*this, "upd71059pic"),
@@ -576,12 +588,12 @@ v53_base_device::v53_base_device(const machine_config &mconfig, device_type type
 
 
 v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53, tag, owner, clock, 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53, tag, owner, clock)
 {
 }
 
 
 v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53A, tag, owner, clock, 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53A, tag, owner, clock)
 {
 }

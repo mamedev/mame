@@ -151,17 +151,9 @@ READ8_MEMBER(pk8020_state::devices_r)
 	{
 		case 0x00: return m_pit8253->read(space, offset & 3);
 		case 0x08: return m_ppi8255_3->read(space,offset & 3);
-		case 0x10: switch(offset & 1) {
-						case 0 : return m_rs232->data_r(space,0);
-						case 1 : return m_rs232->status_r(space,0);
-					}
-					break;
-		case 0x18: return m_wd1793->read(space, offset & 0x03);
-		case 0x20: switch(offset & 1) {
-						case 0 : return m_lan->data_r(space,0);
-						case 1 : return m_lan->status_r(space,0);
-					}
-					break;
+		case 0x10: return m_rs232->read(offset & 1);
+		case 0x18: return m_wd1793->read(offset & 0x03);
+		case 0x20: return m_lan->read(offset & 1);
 		case 0x28: return m_pic8259->read(space, offset & 1);
 		case 0x30: return m_ppi8255_2->read(space,offset & 3);
 		case 0x38: return m_ppi8255_1->read(space,offset & 3);
@@ -175,19 +167,9 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 	{
 		case 0x00: m_pit8253->write(space, offset & 3, data); break;
 		case 0x08: m_ppi8255_3->write(space,offset & 3,data); break;
-		case 0x10: switch(offset & 1) {
-						case 0 : m_rs232->data_w(space,0,data); break;
-						case 1 : m_rs232->control_w(space,0,data); break;
-					}
-					break;
-		case 0x18:
-			m_wd1793->write(space, offset & 0x03, data);
-			break;
-		case 0x20: switch(offset & 1) {
-						case 0 : m_lan->data_w(space,0,data); break;
-						case 1 : m_lan->control_w(space,0,data); break;
-					}
-					break;
+		case 0x10: m_rs232->write(offset & 1, data); break;
+		case 0x18: m_wd1793->write(offset & 0x03, data); break;
+		case 0x20: m_lan->write(offset & 1, data); break;
 		case 0x28: m_pic8259->write(space, offset & 1,data);break;
 		case 0x30: m_ppi8255_2->write(space,offset & 3,data); break;
 		case 0x38: m_ppi8255_1->write(space,offset & 3,data); break;

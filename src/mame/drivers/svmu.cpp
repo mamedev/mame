@@ -39,6 +39,9 @@ public:
 			m_bios(*this, "bios")
 		{ }
 
+	void svmu(machine_config &config);
+
+private:
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
@@ -55,10 +58,9 @@ public:
 	DECLARE_READ8_MEMBER(p7_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
-	void svmu(machine_config &config);
 	void svmu_io_mem(address_map &map);
 	void svmu_mem(address_map &map);
-private:
+
 	uint8_t       m_page;
 };
 
@@ -326,7 +328,7 @@ MACHINE_CONFIG_START(svmu_state::svmu)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", lc8670_cpu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_svmu)
+	config.set_default_layout(layout_svmu);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(svmu_state, svmu)
 
@@ -336,7 +338,7 @@ MACHINE_CONFIG_START(svmu_state::svmu)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_ATMEL_29C010_ADD("flash")
+	ATMEL_29C010(config, "flash");
 	MCFG_QUICKLOAD_ADD("quickload", svmu_state, svmu, "vms,bin", 0)
 	MCFG_QUICKLOAD_INTERFACE("svmu_quik")
 

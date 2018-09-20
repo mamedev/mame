@@ -38,7 +38,7 @@ public:
 
 	void tecnbras(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -50,7 +50,6 @@ protected:
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	output_finder<14 * 7> m_dmds;
 
@@ -134,7 +133,7 @@ MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 */
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tecnbras)
+	config.set_default_layout(layout_tecnbras);
 
 MACHINE_CONFIG_END
 

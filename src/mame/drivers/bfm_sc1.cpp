@@ -617,13 +617,13 @@ READ8_MEMBER(bfm_sc1_state::triac_r)
 WRITE8_MEMBER(bfm_sc1_state::nec_reset_w)
 {
 	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data);
+	m_upd7759->reset_w(data != 0);
 }
 #endif
 /////////////////////////////////////////////////////////////////////////////////////
 WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
 {
-	m_upd7759->port_w (space, 0, data&0x3F);   // setup sample
+	m_upd7759->port_w(data & 0x3f); // setup sample
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);         // start
 }
@@ -1078,8 +1078,7 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_DEVICE_PROGRAM_MAP(sc1_base)                      // setup read and write memorymap
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 
 	MCFG_BFMBD1_ADD("vfd0",0)
@@ -1088,8 +1087,8 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEFAULT_LAYOUT(layout_sc1_vfd)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	config.set_default_layout(layout_sc1_vfd);
 
 	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<0>))
@@ -1118,7 +1117,7 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_adder2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sc1_adder2)                // setup read and write memorymap
 
-	MCFG_DEFAULT_LAYOUT(layout_sc1_vid)
+	config.set_default_layout(layout_sc1_vid);
 
 	MCFG_BFM_ADDER2_ADD("adder2")
 MACHINE_CONFIG_END

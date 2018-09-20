@@ -164,12 +164,12 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) // CS (active low)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) // SK (active high)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) // EEPROM data (DIN)
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)); // CS (active low)
+	mainlatch.q_out_cb<5>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)); // SK (active high)
+	mainlatch.q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)); // EEPROM data (DIN)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

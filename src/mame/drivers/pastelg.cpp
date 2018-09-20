@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(pastelg_state::pastelg)
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PASTELG )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(pastelg_state::threeds)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

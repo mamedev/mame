@@ -32,10 +32,11 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void init_poolshrk();
 	void poolshrk(machine_config &config);
 
-protected:
+	void init_poolshrk();
+
+private:
 	DECLARE_WRITE8_MEMBER(da_latch_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
@@ -55,7 +56,6 @@ protected:
 	void poolshrk_cpu_map(address_map &map);
 	virtual void machine_start() override { m_leds.resolve(); }
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;

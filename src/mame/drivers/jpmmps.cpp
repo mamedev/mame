@@ -132,9 +132,8 @@
 #include "j2trail.lh"
 #include "j2tstplt.lh"
 
-
-
-
+#define UART_IC5 "tms9902_ic5"
+#define UART_IC10 "tms9902_ic10"
 
 
 class jpmmps_state : public driver_device
@@ -144,22 +143,28 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_psg(*this, "sn"),
-			m_meters(*this, "meters")
+			m_meters(*this, "meters"),
+			m_uart_ic5(*this, UART_IC5),
+			m_uart_ic10(*this, UART_IC10)
 	{ }
+
+	void jpmmps(machine_config &config);
+
+private:
 	uint8_t m_sound_buffer;
 	uint8_t m_psg_latch;
 	virtual void machine_reset() override;
 
-	void jpmmps(machine_config &config);
 	void jpmmps_io_map(address_map &map);
 	void jpmmps_map(address_map &map);
-protected:
 
 	// devices
 	required_device<tms9995_device> m_maincpu;
 	required_device<sn76489_device> m_psg;
 	required_device<meters_device> m_meters;
-public:
+	required_device<tms9902_device> m_uart_ic5;
+	required_device<tms9902_device> m_uart_ic10;
+
 	DECLARE_WRITE8_MEMBER(jpmmps_meters_w);
 	DECLARE_WRITE8_MEMBER(jpmmps_psg_buf_w);
 	DECLARE_WRITE8_MEMBER(jpmmps_ic22_portc_w);
@@ -180,7 +185,7 @@ void jpmmps_state::jpmmps_map(address_map &map)
 void jpmmps_state::jpmmps_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x001f).rw("tms9902_ic5", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
+	map(0x0000, 0x001f).rw(UART_IC5, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 
 //  AM_RANGE(0x0020, 0x0020) // power fail
 //  AM_RANGE(0x0021, 0x0021) // wd timeout
@@ -190,7 +195,7 @@ void jpmmps_state::jpmmps_io_map(address_map &map)
 //  AM_RANGE(0x0026, 0x0026) // uart4 int
 //  AM_RANGE(0x0027, 0x0027) // uart2 int
 
-	map(0x0040, 0x005f).rw("tms9902_ic10", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
+	map(0x0040, 0x005f).rw(UART_IC10, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 	map(0x0060, 0x0067).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
@@ -246,34 +251,36 @@ void jpmmps_state::machine_reset()
 MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
+	TMS9995(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmmps_state::jpmmps_map);
+	m_maincpu->set_addrmap(AS_IO, &jpmmps_state::jpmmps_io_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // watchdog
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // ram en
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // alarm
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // nmi en
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("reelmcu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // reel en
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // io en
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bb
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // diagnostic led
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC10
+	mainlatch.q_out_cb<0>().set_nop(); // watchdog
+	mainlatch.q_out_cb<1>().set_nop(); // ram en
+	mainlatch.q_out_cb<2>().set_nop(); // alarm
+	mainlatch.q_out_cb<3>().set_nop(); // nmi en
+	//mainlatch.q_out_cb<4>().set_inputline("reelmcu", INPUT_LINE_RESET).invert(); // reel en
+	mainlatch.q_out_cb<5>().set_nop(); // io en
+	mainlatch.q_out_cb<6>().set_nop(); // bb
+	mainlatch.q_out_cb<7>().set_nop(); // diagnostic led
 
 	//MCFG_DEVICE_ADD("reelmcu", TMS7041, XTAL(5'000'000))
 
-	MCFG_DEVICE_ADD("ppi8255_ic26", I8255, 0)
+	i8255_device &ic26(I8255(config, "ppi8255_ic26"));
 	// Port B 0 is coin lockout
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_meters_w))
+	ic26.out_pc_callback().set(FUNC(jpmmps_state::jpmmps_meters_w));
 
-	MCFG_DEVICE_ADD("ppi8255_ic21", I8255, 0)
+	I8255(config, "ppi8255_ic21");
 
-	MCFG_DEVICE_ADD("ppi8255_ic22", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jpmmps_state, jpmmps_psg_buf_w)) // SN chip data
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_ic22_portc_w))  // C3 is last meter, C2 latches in data
+	i8255_device &ic22(I8255(config, "ppi8255_ic22"));
+	ic22.out_pb_callback().set(FUNC(jpmmps_state::jpmmps_psg_buf_w)); // SN chip data
+	ic22.out_pc_callback().set(FUNC(jpmmps_state::jpmmps_ic22_portc_w));  // C3 is last meter, C2 latches in data
 
-	MCFG_DEVICE_ADD("ppi8255_ic25", I8255, 0)
+	I8255(config, "ppi8255_ic25");
 
-	MCFG_DEVICE_ADD("tms9902_ic10", TMS9902, DUART_CLOCK) // Communication with Reel MCU
-	MCFG_DEVICE_ADD("tms9902_ic5", TMS9902, DUART_CLOCK) // Communication with Security / Printer
+	TMS9902(config, m_uart_ic10, DUART_CLOCK); // Communication with Reel MCU
+	TMS9902(config, m_uart_ic5, DUART_CLOCK); // Communication with Security / Printer
 
 	SPEAKER(config, "mono").front_center();
 
@@ -283,7 +290,7 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(9) // TODO: meters.cpp sets a max of 8
 
-	MCFG_DEFAULT_LAYOUT(layout_jpmmps)
+	config.set_default_layout(layout_jpmmps);
 MACHINE_CONFIG_END
 
 

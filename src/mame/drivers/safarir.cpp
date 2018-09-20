@@ -68,6 +68,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void safarir(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_shared_ptr<uint8_t> m_ram;
@@ -92,7 +95,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(safarir);
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void safarir(machine_config &config);
 	void safarir_audio(machine_config &config);
 	void main_map(address_map &map);
 };

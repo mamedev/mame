@@ -255,6 +255,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
 		m_konppc(*this, "konppc"),
+		m_k056230(*this, "k056230"),
 		m_k001005(*this, "k001005"),
 		m_k001006_1(*this, "k001006_1"),
 		m_k001006_2(*this, "k001006_2"),
@@ -273,7 +274,17 @@ public:
 	{
 	}
 
+	void thunderh(machine_config &config);
+	void hangplt(machine_config &config);
+	void slrasslt(machine_config &config);
+	void gticlub(machine_config &config);
 
+	void init_hangplt_common();
+	void init_hangplt();
+	void init_hangpltu();
+	void init_gticlub();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -286,6 +297,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
 	required_device<konppc_device> m_konppc;
+	required_device<k056230_device> m_k056230;
 	optional_device<k001005_device> m_k001005;
 	optional_device<k001006_device> m_k001006_1;
 	optional_device<k001006_device> m_k001006_2;
@@ -320,10 +332,6 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 
-	void init_hangplt_common();
-	void init_hangplt();
-	void init_hangpltu();
-	void init_gticlub();
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
@@ -331,23 +339,19 @@ public:
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
-	ADC1038_INPUT_CB(adc1038_input_callback);
+	int adc1038_input_callback(int input);
 
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void thunderh(machine_config &config);
-	void hangplt(machine_config &config);
-	void slrasslt(machine_config &config);
-	void gticlub(machine_config &config);
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
-private:
+
 	void gticlub_led_setreg(int offset, uint8_t data);
 
 	uint8_t m_gticlub_led_reg[2];
@@ -531,8 +535,8 @@ void gticlub_state::gticlub_map(address_map &map)
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));
-	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
 	map(0x7f800000, 0x7f9fffff).rom().share("share2");
@@ -549,8 +553,8 @@ void gticlub_state::hangplt_map(address_map &map)
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));
-	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
 	map(0x7f800000, 0x7f9fffff).rom().share("share2");
@@ -823,22 +827,16 @@ INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
 }
 
 
-ADC1038_INPUT_CB(gticlub_state::adc1038_input_callback)
+int gticlub_state::adc1038_input_callback(int input)
 {
-	int value = 0;
 	switch (input)
 	{
-	case 0: value = m_analog0->read(); break;
-	case 1: value = m_analog1->read(); break;
-	case 2: value = m_analog2->read(); break;
-	case 3: value = m_analog3->read(); break;
-	case 4: value = 0x000; break;
-	case 5: value = 0x000; break;
-	case 6: value = 0x000; break;
-	case 7: value = 0x000; break;
+	case 0:  return m_analog0->read();
+	case 1:  return m_analog1->read();
+	case 2:  return m_analog2->read();
+	case 3:  return m_analog3->read();
+	default: return 0;
 	}
-
-	return value;
 }
 
 MACHINE_RESET_MEMBER(gticlub_state,gticlub)
@@ -972,17 +970,16 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
-	MCFG_ADC1038_GTIHACK(1)
+	ADC1038(config, m_adc1038, 0);
+	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
+	m_adc1038->set_gti_club_hack(true);
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, m_k056230, "maincpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1014,8 +1011,8 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(1)
 
-	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(33'868'800)/2);
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1032,22 +1029,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gticlub_state::thunderh)
 	gticlub(config);
 
-	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	m_adc1038->set_gti_club_hack(false);
 
-	MCFG_DEVICE_REMOVE("k056230")
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
-	MCFG_K056230_HACK(1)
+	m_k056230->set_thunderh_hack(true);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gticlub_state::slrasslt)
 	gticlub(config);
 
-	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	m_adc1038->set_gti_club_hack(false);
 
 	MCFG_DEVICE_REMOVE("k001604_1")
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
@@ -1084,16 +1074,15 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	ADC1038(config, m_adc1038, 0);
+	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, m_k056230, "maincpu");
 
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1109,11 +1098,8 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_VOODOO_CPU_TAG("dsp2")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, gticlub_state,voodoo_vblank_1))
 
-	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo0")
-
-	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo1")
+	K033906(config, "k033906_1", 0, "voodoo0");
+	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 65536)
@@ -1144,8 +1130,8 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(33'868'800)/2);
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

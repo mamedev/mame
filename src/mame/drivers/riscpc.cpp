@@ -34,6 +34,14 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void rpc700(machine_config &config);
+	void rpc600(machine_config &config);
+	void sarpc(machine_config &config);
+	void sarpc_j233(machine_config &config);
+	void a7000(machine_config &config);
+	void a7000p(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -70,12 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
-	void rpc700(machine_config &config);
-	void rpc600(machine_config &config);
-	void sarpc(machine_config &config);
-	void sarpc_j233(machine_config &config);
-	void a7000(machine_config &config);
-	void a7000p(machine_config &config);
+
 	void a7000_mem(address_map &map);
 };
 
@@ -193,10 +196,11 @@ void riscpc_state::vidc20_dynamic_screen_change()
 			hblank_period = (m_vidc20_horz_reg[HCR] & 0x3ffc);
 			vblank_period = (m_vidc20_vert_reg[VCR] & 0x3fff);
 			/* note that we use the border registers as the visible area */
-			visarea.min_x = (m_vidc20_horz_reg[HBSR] & 0x3ffe);
-			visarea.max_x = (m_vidc20_horz_reg[HBER] & 0x3ffe)-1;
-			visarea.min_y = (m_vidc20_vert_reg[VBSR] & 0x1fff);
-			visarea.max_y = (m_vidc20_vert_reg[VBER] & 0x1fff)-1;
+			visarea.set(
+					(m_vidc20_horz_reg[HBSR] & 0x3ffe),
+					(m_vidc20_horz_reg[HBER] & 0x3ffe) - 1,
+					(m_vidc20_vert_reg[VBSR] & 0x1fff),
+					(m_vidc20_vert_reg[VBER] & 0x1fff) - 1);
 
 			m_screen->configure(hblank_period, vblank_period, visarea, m_screen->frame_period().attoseconds() );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",

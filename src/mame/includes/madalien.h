@@ -41,6 +41,12 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2") { }
 
+	void madalien(machine_config &config);
+	void madalien_video(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_charram;
 	required_shared_ptr<uint8_t> m_video_control;
@@ -61,7 +67,6 @@ public:
 	DECLARE_WRITE8_MEMBER(madalien_output_w);
 	DECLARE_WRITE8_MEMBER(madalien_videoram_w);
 	DECLARE_WRITE8_MEMBER(madalien_charram_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_WRITE8_MEMBER(madalien_portA_w);
 	DECLARE_WRITE8_MEMBER(madalien_portB_w);
 	TILEMAP_MAPPER_MEMBER(scan_mode0);
@@ -86,8 +91,6 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	void madalien(machine_config &config);
-	void madalien_video(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };

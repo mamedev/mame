@@ -7,7 +7,7 @@
 
 
 #define MCFG_YMF271_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ymf271_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ymf271_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class ymf271_device : public device_t, public device_sound_interface, public device_rom_interface
 {

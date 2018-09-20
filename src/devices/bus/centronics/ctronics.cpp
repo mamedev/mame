@@ -82,6 +82,18 @@ void centronics_device::device_start()
 	m_select_in_handler(1);
 }
 
+void centronics_device::set_output_latch(output_latch_device &latch)
+{
+	latch.bit_handler<0>().set(*this, FUNC(centronics_device::write_data0));
+	latch.bit_handler<1>().set(*this, FUNC(centronics_device::write_data1));
+	latch.bit_handler<2>().set(*this, FUNC(centronics_device::write_data2));
+	latch.bit_handler<3>().set(*this, FUNC(centronics_device::write_data3));
+	latch.bit_handler<4>().set(*this, FUNC(centronics_device::write_data4));
+	latch.bit_handler<5>().set(*this, FUNC(centronics_device::write_data5));
+	latch.bit_handler<6>().set(*this, FUNC(centronics_device::write_data6));
+	latch.bit_handler<7>().set(*this, FUNC(centronics_device::write_data7));
+}
+
 WRITE_LINE_MEMBER( centronics_device::write_strobe ) { if (m_dev) m_dev->input_strobe(state); }
 WRITE_LINE_MEMBER( centronics_device::write_data0 ) { if (m_dev) m_dev->input_data0(state); }
 WRITE_LINE_MEMBER( centronics_device::write_data1 ) { if (m_dev) m_dev->input_data1(state); }

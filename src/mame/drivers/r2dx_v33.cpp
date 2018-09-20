@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, David Haywood, ???
+// copyright-holders:Olivier Galibert, David Haywood
 /*
 
 Raiden 2 / DX V33 Version
@@ -88,6 +88,16 @@ public:
 		m_math(*this, "math")
 	{ }
 
+	void nzerotea(machine_config &config);
+	void rdx_v33(machine_config &config);
+	void zerotm2k(machine_config &config);
+
+	void init_rdx_v33();
+	void init_nzerotea();
+	void init_zerotm2k();
+
+private:
+
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dy_w);
@@ -110,9 +120,6 @@ public:
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
 	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
 	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
-	void init_rdx_v33();
-	void init_nzerotea();
-	void init_zerotm2k();
 
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
@@ -123,18 +130,14 @@ public:
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
 
-	void nzerotea(machine_config &config);
-	void rdx_v33(machine_config &config);
-	void zerotm2k(machine_config &config);
 	void nzerotea_map(address_map &map);
 	void nzeroteam_base_map(address_map &map);
 	void r2dx_oki_map(address_map &map);
 	void rdx_v33_map(address_map &map);
 	void zerotm2k_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	void r2dx_setbanking(void);
 
 	int m_r2dxbank;
@@ -490,12 +493,8 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 //  map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 
 	map(0x00780, 0x0079f).lrw8("seibu_sound_rw",
-							   [this](address_space &space, offs_t offset, u8 mem_mask) {
-								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-							   },
-							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-							   }).umask16(0x00ff);
+							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
 
 	map(0x00800, 0x00fff).ram();
 	map(0x01000, 0x0bfff).ram();
@@ -793,7 +792,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -830,8 +829,9 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -854,11 +854,11 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'636'363)/8)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -873,7 +873,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zerotm2k_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 void r2dx_v33_state::init_rdx_v33()

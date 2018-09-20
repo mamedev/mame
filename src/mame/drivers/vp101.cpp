@@ -116,6 +116,10 @@ public:
 			m_in0(*this, "IN0")
 	{ }
 
+	void vp50(machine_config &config);
+	void vp101(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -140,11 +144,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t vp50_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void vp50(machine_config &config);
-	void vp101(machine_config &config);
 	void main_map(address_map &map);
 	void vp50_map(address_map &map);
-protected:
 
 	// devices
 	required_device<mips3_device> m_maincpu;
@@ -380,10 +381,10 @@ MACHINE_CONFIG_START(vp10x_state::vp101)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(*this, vp10x_state, dmarq_w))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	m_ata->dmarq_handler().set(FUNC(vp10x_state::dmarq_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vp10x_state::vp50)
@@ -399,9 +400,9 @@ MACHINE_CONFIG_START(vp10x_state::vp50)
 	MCFG_SCREEN_SIZE(400, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START(jnero)

@@ -646,33 +646,33 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 
 MACHINE_CONFIG_START(playch10_state::playch10)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000/2) // 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(bios_map)
-	MCFG_DEVICE_IO_MAP(bios_io_map)
+	Z80(config, m_maincpu, 8000000/2); // 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &playch10_state::bios_map);
+	m_maincpu->set_addrmap(AS_IO, &playch10_state::bios_io_map);
 
-	MCFG_DEVICE_ADD("cart", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cart_map)
+	N2A03(config, m_cartcpu, NTSC_APU_CLOCK);
+	m_cartcpu->set_addrmap(AS_PROGRAM, &playch10_state::cart_map);
 
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 7D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, sdcs_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, cntrl_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, disp_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, playch10_state, sound_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("cart", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // GAMERES
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("cart", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // GAMESTOP
+	ls259_device &outlatch1(LS259(config, "outlatch1")); // 7D
+	outlatch1.q_out_cb<0>().set(FUNC(playch10_state::sdcs_w));
+	outlatch1.q_out_cb<1>().set(FUNC(playch10_state::cntrl_mask_w));
+	outlatch1.q_out_cb<2>().set(FUNC(playch10_state::disp_mask_w));
+	outlatch1.q_out_cb<3>().set(FUNC(playch10_state::sound_mask_w));
+	outlatch1.q_out_cb<4>().set_inputline(m_cartcpu, INPUT_LINE_RESET).invert(); // GAMERES
+	outlatch1.q_out_cb<5>().set_inputline(m_cartcpu, INPUT_LINE_HALT).invert(); // GAMESTOP
 
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // 7E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, dog_di_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, ppu_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, playch10_state, up8w_w))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
+	ls259_device &outlatch2(LS259(config, "outlatch2")); // 7E
+	outlatch2.q_out_cb<0>().set(FUNC(playch10_state::nmi_enable_w));
+	outlatch2.q_out_cb<1>().set(FUNC(playch10_state::dog_di_w));
+	outlatch2.q_out_cb<2>().set(FUNC(playch10_state::ppu_reset_w));
+	outlatch2.q_out_cb<7>().set(FUNC(playch10_state::up8w_w));
+	outlatch2.parallel_out_cb().set(FUNC(playch10_state::cart_sel_w)).rshift(3).mask(0x0f);
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
-	MCFG_DEFAULT_LAYOUT(layout_playch10)
+	config.set_default_layout(layout_playch10);
 
 	MCFG_SCREEN_ADD("top", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -687,21 +687,22 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
 
-	MCFG_PPU2C03B_ADD("ppu")
-	MCFG_PPU2C0X_SET_SCREEN("bottom")
-	MCFG_PPU2C0X_CPU("cart")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("cart", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, playch10_state, int_detect_w))
+	PPU_2C03B(config, m_ppu, 0);
+	m_ppu->set_screen("bottom");
+	m_ppu->set_cpu_tag("cart");
+	m_ppu->int_callback().set_inputline(m_cartcpu, INPUT_LINE_NMI);
+	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
 	SPEAKER(config, "mono").front_center();
 
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(playch10_state::playchnv)
+void playch10_state::playchnv(machine_config &config)
+{
 	playch10(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(playch10_state::playch10_hboard)
 	playch10(config);
@@ -1748,7 +1749,6 @@ GAME( 1987, pc_miket, playch10, playchnv, playch10, playch10_state, init_pceboar
 
 /* F-Board Games */
 GAME( 1987, pc_rcpam, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Rare",                                     "R.C. Pro-Am (PlayChoice-10)", 0 )
-GAME( 1987, pc_rrngr, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
 GAME( 1988, pc_ddrgn, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Technos Japan",                            "Double Dragon (PlayChoice-10)", 0 )
 GAME( 1989, pc_ngaid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
 GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
@@ -1756,6 +1756,7 @@ GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, init_pcfboar
 GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, init_pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
 GAME( 1990, pc_virus, pc_drmro, playch10, playch10, playch10_state, init_virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_rrngr, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
 GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
 GAME( 1990, pc_bload, playch10, playch10, playch10, playch10_state, init_virus,    ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_ynoid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )

@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-
 #ifndef MAME_INCLUDES_PGM2_H
 #define MAME_INCLUDES_PGM2_H
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/ymz770.h"
@@ -30,8 +28,8 @@ struct kov3_module_key
 class pgm2_state : public driver_device
 {
 public:
-	pgm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pgm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_lineram(*this, "lineram"),

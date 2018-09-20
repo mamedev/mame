@@ -253,9 +253,9 @@ void scramble_state::hunchbks_map(address_map &map)
 void scramble_state::mimonscr_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address?, probably not */
-	map(0x4400, 0x47ff).ram();
+	map(0x4000, 0x47ff).ram();
 	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address */
 	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x5040, 0x505f).ram().share("spriteram");
 	map(0x5060, 0x507f).ram().share("bulletsram");
@@ -1313,29 +1313,29 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_DEVICE_IO_MAP(scramble_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,scramble)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi8255_0);
+	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
+	m_ppi8255_0->in_pb_callback().set_ioport("IN1");
+	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
+	I8255A(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1373,11 +1373,9 @@ MACHINE_CONFIG_START(scramble_state::mars)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
+	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1422,10 +1420,9 @@ MACHINE_CONFIG_START(scramble_state::mrkougb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mrkougar_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, mrkougar_sh_irqtrigger_w))
+	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::mrkougar_sh_irqtrigger_w));
+	m_ppi8255_1->in_pc_callback().set_constant(0);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1587,18 +1584,18 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ad2083_map)
 
-	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
@@ -1751,7 +1748,6 @@ ROM_START( knockoutc )
 	ROM_LOAD( "ta.6e", 0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
 ROM_END
 
-
 ROM_START( mariner )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tp1.2h",       0x0000, 0x1000, CRC(dac1dfd0) SHA1(57b9106bb7452640544ba0ab2d2ba290cccb45f0) )
@@ -1782,6 +1778,29 @@ ROM_START( 800fath )
 	ROM_LOAD( "tm3.2l",       0x2000, 0x1000, CRC(027881a6) SHA1(47953aa5140a157ade484341609d477510e8342b) )
 	ROM_LOAD( "tm4.2m",       0x3000, 0x1000, CRC(a0fde7dc) SHA1(ea6700520b1bd31e6c6bfac6f067bbf652676eef) )
 	ROM_LOAD( "tu5.2p",       0x6000, 0x0800, CRC(f864a8a6) SHA1(bd0c84284d13d099da4e139db7c9948a074d6774) )
+	ROM_CONTINUE(             0x5800, 0x0800             )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "tm8.5f",       0x0000, 0x1000, CRC(70ae611f) SHA1(2686dc6d3910bd58b290d6296f30c552686709f5) )
+	ROM_LOAD( "tm9.5h",       0x1000, 0x1000, CRC(8e4e999e) SHA1(195e6896ca2f3175137d8c92777ba32c41e835d3) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "t4.6e",        0x0000, 0x0020, CRC(ca42b6dd) SHA1(d1e224e788e3dcf57249e72f03f9fe3fd71e6c12) )
+
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "t6.6p",        0x0000, 0x0100, CRC(ad208ccc) SHA1(66a4122e46467344a7f3ddcc953a5f7f451411fa) )    /* background color prom */
+
+	ROM_REGION( 0x0020, "user2", 0 )
+	ROM_LOAD( "t5.7p",        0x0000, 0x0020, CRC(1bd88cff) SHA1(8d1620386ef654d99c51e489c822eeb2e8a4fe76) )    /* char banking and star placement */
+ROM_END
+
+ROM_START( 800fatha )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tq1.2h",       0x0000, 0x1000, CRC(d858c242) SHA1(3f236ae6ac60067eec4f5df0746435e6dfde0401) ) /* older based on letter revision, Q vs U */
+	ROM_LOAD( "tm2.2k",       0x1000, 0x1000, CRC(efe7ca28) SHA1(496f8eb2ebc9edeed5b19d87f437f23bbeb2a007) )
+	ROM_LOAD( "tm3.2l",       0x2000, 0x1000, CRC(027881a6) SHA1(47953aa5140a157ade484341609d477510e8342b) )
+	ROM_LOAD( "tm4.2m",       0x3000, 0x1000, CRC(a0fde7dc) SHA1(ea6700520b1bd31e6c6bfac6f067bbf652676eef) )
+	ROM_LOAD( "tm5.2p",       0x6000, 0x0800, CRC(d7ebcb8e) SHA1(bddefdc5f04c2f940e08a6968fbd6f930d16b8e4) )
 	ROM_CONTINUE(             0x5800, 0x0800             )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -2264,45 +2283,46 @@ ROM_START( harem ) /* Main PCB version similar to Scorpion (also developed by I.
 ROM_END
 
 
-GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",         MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate
+GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, init_scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutc,triplep,  triplep,  knockoutb,scramble_state, init_scramble_ppi, ROT90, "bootleg (ESG)",       "Knock Out!! (bootleg, set 3)",      MACHINE_SUPPORTS_SAVE ) // ESG = Elektronik Spiel Gerate
 
-GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, init_mariner,      ROT90, "Amenip",              "Mariner",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, init_mariner,      ROT90, "Amenip",              "Mariner",                            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 800fatha, mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, init_ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, init_ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                               MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish",                         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, init_mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, init_newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, init_mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7 (set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, init_newsin7a,     ROT90, "ATW USA, Inc",        "New Sinbad 7 (set 2)",               MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg",             "Mr. Kougar (bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
+GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg",             "Mr. Kougar (bootleg)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
 
-GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",  MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
+GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",      MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
 
-GAME( 198?, conquer,  0,        hotshock, hotshock, scramble_state, empty_init,        ROT90, "<unknown>",           "Conqueror",                      MACHINE_NOT_WORKING   )
+GAME( 198?, conquer,  0,        hotshock, hotshock, scramble_state, empty_init,        ROT90, "<unknown>",           "Conqueror",                          MACHINE_NOT_WORKING )
 
-GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, init_scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, init_scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, init_scramble_ppi, ROT90, "bootleg (Sig)",       "Hunchback (Scramble hardware, bootleg)",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, init_scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, init_cavelon,      ROT90, "Jetsoft",             "Cavelon",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, init_cavelon,      ROT90, "Jetsoft",             "Cavelon",                            MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, init_ad2083,       ROT90, "Midcoin",             "A. D. 2083",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, init_ad2083,       ROT90, "Midcoin",             "A. D. 2083",                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1983, harem,    0,        harem,    harem,    scramble_state, init_harem,        ROT90, "I.G.R.",              "Harem",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, harem,    0,        harem,    harem,    scramble_state, init_harem,        ROT90, "I.G.R.",              "Harem",                              MACHINE_SUPPORTS_SAVE )

@@ -599,6 +599,8 @@ if (CPUS["H8"]~=null) then
 		MAME_DIR .. "src/devices/cpu/h8/h83337.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83002.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83002.h",
+		MAME_DIR .. "src/devices/cpu/h8/h83003.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h83003.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83006.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83006.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83008.cpp",
@@ -744,6 +746,23 @@ end
 if (CPUS["SH"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh_dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh_dasm.h")
+end
+
+--------------------------------------------------
+-- STmicro ST62xx
+--@src/devices/cpu/st62xx/st62xx.h,CPUS["ST62XX"] = true
+--------------------------------------------------
+
+if (CPUS["ST62XX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/st62xx/st62xx.cpp",
+		MAME_DIR .. "src/devices/cpu/st62xx/st62xx.h",
+	}
+end
+
+if (CPUS["ST62XX"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st62xx/st62xx_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/st62xx/st62xx_dasm.h")
 end
 
 --------------------------------------------------
@@ -1263,12 +1282,18 @@ if (CPUS["MIPS"]~=null) then
 		MAME_DIR .. "src/devices/cpu/mips/mips3fe.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/mips3fe.h",
 		MAME_DIR .. "src/devices/cpu/mips/mips3drc.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vu.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vu.h",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.h",
 	}
 end
 
 if (CPUS["MIPS"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/mips3dsm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/mips3dsm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/vudasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/vudasm.h")
 end
 
 --------------------------------------------------
@@ -1354,6 +1379,7 @@ end
 --@src/devices/cpu/m6502/m65c02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/r65c02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m65sc02.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m6500_1.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6504.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6507.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6509.h,CPUS["M6502"] = true
@@ -1384,6 +1410,8 @@ if (CPUS["M6502"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6502/m65ce02.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m6500_1.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m6500_1.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6507.cpp",
@@ -2334,11 +2362,13 @@ if (CPUS["TMS57002"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57002.cpp",
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57002.h",
+		MAME_DIR .. "src/devices/cpu/tms57002/tmsops.cpp",
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57kdec.cpp",
 	}
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tms57kdec.cpp", GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tms57002.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsops.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" },
 	}
 	custombuildtask {
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx",   { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) $(<) $(@)" } }
@@ -2377,6 +2407,11 @@ end
 if (CPUS["TLCS870"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_reg.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_src.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_dst.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_helper.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.h",
 	}
 end

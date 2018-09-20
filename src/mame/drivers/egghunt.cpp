@@ -64,6 +64,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void egghunt(machine_config &config);
+
+private:
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
 	uint8_t     m_vidram_bank;
@@ -98,7 +101,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void egghunt(machine_config &config);
 	void egghunt_map(address_map &map);
 	void io_map(address_map &map);
 	void sound_map(address_map &map);

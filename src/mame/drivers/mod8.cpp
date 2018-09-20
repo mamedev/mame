@@ -67,15 +67,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void mod8(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(tty_w);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(tty_r);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
-	void mod8(machine_config &config);
 	void mod8_io(address_map &map);
 	void mod8_mem(address_map &map);
-private:
+
 	uint16_t m_tty_data;
 	uint8_t m_tty_key_data;
 	int m_tty_cnt;

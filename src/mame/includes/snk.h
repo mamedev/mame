@@ -35,6 +35,38 @@ public:
 		m_bonus_io(*this, "BONUS")
 	{ }
 
+	void gwar(machine_config &config);
+	void psychos(machine_config &config);
+	void fitegolf(machine_config &config);
+	void countryc(machine_config &config);
+	void tdfever2(machine_config &config);
+	void aso(machine_config &config);
+	void gwara(machine_config &config);
+	void tdfever(machine_config &config);
+	void fitegolf2(machine_config &config);
+	void jcross(machine_config &config);
+	void choppera(machine_config &config);
+	void tnk3(machine_config &config);
+	void victroad(machine_config &config);
+	void chopper1(machine_config &config);
+	void vangrd2(machine_config &config);
+	void bermudat(machine_config &config);
+	void hal21(machine_config &config);
+	void marvins(machine_config &config);
+	void athena(machine_config &config);
+	void ikari(machine_config &config);
+	void sgladiat(machine_config &config);
+	void madcrush(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(marvins_sound_busy);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk_sound_busy);
+	DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
+	DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
+	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
+	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
@@ -165,13 +197,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gwara_sp_scroll_msb_w);
 	DECLARE_WRITE8_MEMBER(tdfever_sp_scroll_msb_w);
 	DECLARE_WRITE8_MEMBER(tdfever_spriteram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(marvins_sound_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(snk_sound_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
-	DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
-	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
+
 	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
 	TILE_GET_INFO_MEMBER(marvins_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ikari_get_tx_tile_info);
@@ -213,28 +239,7 @@ public:
 	int turbofront_check(int small, int num);
 	int turbofront_check8(int small, int num);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_1);
-	void gwar(machine_config &config);
-	void psychos(machine_config &config);
-	void fitegolf(machine_config &config);
-	void countryc(machine_config &config);
-	void tdfever2(machine_config &config);
-	void aso(machine_config &config);
-	void gwara(machine_config &config);
-	void tdfever(machine_config &config);
-	void fitegolf2(machine_config &config);
-	void jcross(machine_config &config);
-	void choppera(machine_config &config);
-	void tnk3(machine_config &config);
-	void victroad(machine_config &config);
-	void chopper1(machine_config &config);
-	void vangrd2(machine_config &config);
-	void bermudat(machine_config &config);
-	void hal21(machine_config &config);
-	void marvins(machine_config &config);
-	void athena(machine_config &config);
-	void ikari(machine_config &config);
-	void sgladiat(machine_config &config);
-	void madcrush(machine_config &config);
+
 	void Y8950_sound_map(address_map &map);
 	void YM3526_Y8950_sound_map(address_map &map);
 	void YM3526_YM3526_sound_map(address_map &map);

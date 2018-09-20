@@ -10,6 +10,7 @@
 #define MAME_INCLUDES_NC_H
 
 #include "bus/centronics/ctronics.h"
+#include "machine/upd765.h"     // for NC200 disk drive interface
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
@@ -51,10 +52,16 @@ public:
 		m_uart(*this, "uart"),
 		m_uart_clock(*this, "uart_clock"),
 		m_nvram(*this, "nvram"),
+		m_fdc(*this, "upd765"),
 		m_nc_type(variant)
 	{
 	}
 
+	void nc_base(machine_config &config);
+
+	void init_nc();
+
+protected:
 	DECLARE_READ8_MEMBER(nc_memory_management_r);
 	DECLARE_WRITE8_MEMBER(nc_memory_management_w);
 	DECLARE_WRITE8_MEMBER(nc_irq_mask_w);
@@ -71,16 +78,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	void init_nc();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void nc_base(machine_config &config);
 	void nc_map(address_map &map);
 
 	uint32_t screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int height, int width, int const (&pens)[2]);
@@ -93,7 +97,7 @@ private:
 	void nc_refresh_memory_config();
 	void nc_sound_update(int channel);
 
-public: // HACK FOR MC6845
+protected: // HACK FOR MC6845
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beeper1;
@@ -103,6 +107,7 @@ public: // HACK FOR MC6845
 	required_device<i8251_device> m_uart;
 	required_device<clock_device> m_uart_clock;
 	required_device<nvram_device> m_nvram;
+	optional_device<upd765a_device> m_fdc;
 
 	char m_memory_config[4];
 	emu_timer *m_keyboard_timer;

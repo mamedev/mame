@@ -54,7 +54,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in5);
 	DECLARE_INPUT_CHANGED_MEMBER(in6);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(io_40_w);
 
 	DECLARE_READ8_MEMBER(io_60_r);
@@ -66,7 +66,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(io_d0_w);
 	DECLARE_WRITE8_MEMBER(io_e0_w);
 	DECLARE_WRITE8_MEMBER(io_f0_w);
-
 
 	DECLARE_READ_LINE_MEMBER(sid_read);
 
@@ -87,7 +86,6 @@ protected:
 	void fastinvaders_6845_io(address_map &map);
 	void fastinvaders_8275_io(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -657,11 +655,11 @@ MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("dma8257", I8257, 6144100)
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, fastinvaders_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fastinvaders_state, memory_write_byte))
-	MCFG_I8257_OUT_DACK_1_CB(WRITE8(*this, fastinvaders_state, dark_1_clr))
-	MCFG_I8257_OUT_DACK_2_CB(WRITE8(*this, fastinvaders_state, dark_2_clr))
+	I8257(config, m_dma8257, 6144100);
+	m_dma8257->in_memr_cb().set(FUNC(fastinvaders_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(fastinvaders_state::memory_write_byte));
+	m_dma8257->out_dack_cb<1>().set(FUNC(fastinvaders_state::dark_1_clr));
+	m_dma8257->out_dack_cb<2>().set(FUNC(fastinvaders_state::dark_2_clr));
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("count_ar", fastinvaders_state, count_ar,  attotime::from_hz(11500000/2))

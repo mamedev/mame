@@ -63,9 +63,11 @@ MACHINE_CONFIG_START(ms7004_device::device_add_mconfig)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ms7004_device, p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ms7004_device, p2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ms7004_device, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(*this, ms7004_device, i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->read_handler().set_constant(0);
+	m_i8243->write_handler().set(FUNC(ms7004_device::i8243_port_w));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MS7004_SPK_TAG, BEEP, 3250)

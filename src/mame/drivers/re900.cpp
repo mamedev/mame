@@ -98,6 +98,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void re900(machine_config &config);
+	void bs94(machine_config &config);
+
+	void init_re900();
+
+private:
 	// common
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
@@ -109,13 +115,9 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
-	void init_re900();
-	void re900(machine_config &config);
-	void bs94(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
@@ -395,13 +397,13 @@ MACHINE_CONFIG_START(re900_state::re900)
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, re900_state, cpu_port_0_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9128", tms9128_device, screen_update )
+	tms9128_device &vdp(TMS9128(config, "tms9128", VDP_CLOCK));   /* TMS9128NL on the board */
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	//vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware   */
 	SPEAKER(config, "mono").front_center();

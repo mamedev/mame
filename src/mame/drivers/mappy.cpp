@@ -609,16 +609,10 @@ WRITE_LINE_MEMBER(mappy_state::mappy_flip_w)
 }
 
 
-void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+template<uint8_t Chip>
+TIMER_CALLBACK_MEMBER(mappy_state::namcoio_run_timer)
 {
-	switch (id)
-	{
-		case TIMER_IO_RUN:
-			m_namcoio[param]->customio_run();
-			break;
-		default:
-			assert_always(false, "Unknown id in mappy_state::device_timer");
-	}
+	m_namcoio[Chip]->customio_run();
 }
 
 WRITE_LINE_MEMBER(mappy_state::vblank_irq)
@@ -630,10 +624,10 @@ WRITE_LINE_MEMBER(mappy_state::vblank_irq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!m_namcoio[0]->read_reset_line())        // give the cpu a tiny bit of time to write the command before processing it
-		timer_set(attotime::from_usec(50), TIMER_IO_RUN, 0);
+		m_namcoio_run_timer[0]->adjust(attotime::from_usec(50));
 
 	if (!m_namcoio[1]->read_reset_line())        // give the cpu a tiny bit of time to write the command before processing it
-		timer_set(attotime::from_usec(50), TIMER_IO_RUN, 1);
+		m_namcoio_run_timer[1]->adjust(attotime::from_usec(50));
 
 	if (m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
@@ -1312,6 +1306,9 @@ void mappy_state::machine_start()
 {
 	m_leds.resolve();
 
+	m_namcoio_run_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mappy_state::namcoio_run_timer<0>), this));
+	m_namcoio_run_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mappy_state::namcoio_run_timer<1>), this));
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));
@@ -1327,22 +1324,20 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(superpac_cpu2_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mappy_state, int_on_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mappy_state, int_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("namco", namco_15xx_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2M on CPU board
+	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::int_on_w));
+	mainlatch.q_out_cb<3>().set(m_namco_15xx, FUNC(namco_15xx_device::sound_enable_w));
+	mainlatch.q_out_cb<4>().set(m_namcoio[0], FUNC(namcoio_device::set_reset_line)).invert();
+	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
+	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-													/* synchronization of the CPUs */
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
+	ls157_device &dipmux(LS157(config, "dipmux"));
+	dipmux.a_in_callback().set_ioport("DSW2");
+	dipmux.b_in_callback().set_ioport("DSW2").rshift(4);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superpac)
@@ -1367,60 +1362,60 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(mappy_state::superpac)
-
+void mappy_state::superpac(machine_config &config)
+{
 	superpac_common(config);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
+	NAMCO_56XX(config, m_namcoio[0], 0);
+	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
+	m_namcoio[0]->in_callback<1>().set_ioport("P1");
+	m_namcoio[0]->in_callback<2>().set_ioport("P2");
+	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-MACHINE_CONFIG_END
+	NAMCO_56XX(config, m_namcoio[1], 0);
+	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
+	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
+	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
+	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
+	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
+}
 
-MACHINE_CONFIG_START(mappy_state::pacnpal)
-
+void mappy_state::pacnpal(machine_config &config)
+{
 	superpac_common(config);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, mappy_state, out_lamps))
+	NAMCO_56XX(config, m_namcoio[0], 0);
+	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
+	m_namcoio[0]->in_callback<1>().set_ioport("P1");
+	m_namcoio[0]->in_callback<2>().set_ioport("P2");
+	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
+	m_namcoio[0]->out_callback<0>().set(FUNC(mappy_state::out_lamps));
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_59XX, 0)
-	MCFG_NAMCO59XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
-	MCFG_NAMCO59XX_IN_1_CB(IOPORT("DSW1"))
-	MCFG_NAMCO59XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO59XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO59XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-MACHINE_CONFIG_END
+	NAMCO_59XX(config, m_namcoio[1], 0);
+	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
+	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
+	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
+	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
+	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
+}
 
 
 MACHINE_CONFIG_START(mappy_state::grobda)
 
 	superpac_common(config);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	NAMCO_58XX(config, m_namcoio[0], 0);
+	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
+	m_namcoio[0]->in_callback<1>().set_ioport("P1");
+	m_namcoio[0]->in_callback<2>().set_ioport("P2");
+	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	NAMCO_56XX(config, m_namcoio[1], 0);
+	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
+	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
+	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
+	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
+	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // alternate route to 15XX-related DAC?
@@ -1441,36 +1436,35 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_DEVICE_ADD("sub2", MC6809E, PIXEL_CLOCK/4)  /* SUB CPU */
 	MCFG_DEVICE_PROGRAM_MAP(phozon_cpu3_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mappy_state, int_on_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mappy_state, int_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mappy_state, int_on_3_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("namco", namco_15xx_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("namcoio_1", namco58xx_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namcoio_2", namco56xx_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5C
+	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::int_on_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mappy_state::int_on_3_w));
+	mainlatch.q_out_cb<3>().set(m_namco_15xx, FUNC(namco_15xx_device::sound_enable_w));
+	mainlatch.q_out_cb<4>().set(m_namcoio[0], FUNC(namcoio_device::set_reset_line)).invert();
+	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
+	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<6>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-													/* synchronization of the CPUs */
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
+	NAMCO_58XX(config, m_namcoio[0], 0);
+	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
+	m_namcoio[0]->in_callback<1>().set_ioport("P1");
+	m_namcoio[0]->in_callback<2>().set_ioport("P2");
+	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
+	NAMCO_56XX(config, m_namcoio[1], 0);
+	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
+	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
+	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
+	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
+	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
+
+	ls157_device &dipmux(LS157(config, "dipmux"));
+	dipmux.a_in_callback().set_ioport("DSW2");
+	dipmux.b_in_callback().set_ioport("DSW2").rshift(4);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phozon)
@@ -1504,23 +1498,21 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(mappy_cpu2_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mappy_state, int_on_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mappy_state, int_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mappy_state, mappy_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("namco", namco_15xx_device, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2M on CPU board
+	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::int_on_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mappy_state::mappy_flip_w));
+	mainlatch.q_out_cb<3>().set(m_namco_15xx, FUNC(namco_15xx_device::sound_enable_w));
+	mainlatch.q_out_cb<4>().set(m_namcoio[0], FUNC(namcoio_device::set_reset_line)).invert();
+	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
+	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-													/* synchronization of the CPUs */
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
-	MCFG_DEVICE_ADD("dipmux", LS157, 0)
-	MCFG_74157_A_IN_CB(IOPORT("DSW2"))
-	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
+	ls157_device &dipmux(LS157(config, "dipmux"));
+	dipmux.a_in_callback().set_ioport("DSW2");
+	dipmux.b_in_callback().set_ioport("DSW2").rshift(4);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mappy)
@@ -1544,44 +1536,43 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mappy_state::mappy)
-
+void mappy_state::mappy(machine_config &config)
+{
 	mappy_common(config);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	NAMCO_58XX(config, m_namcoio[0], 0);
+	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
+	m_namcoio[0]->in_callback<1>().set_ioport("P1");
+	m_namcoio[0]->in_callback<2>().set_ioport("P2");
+	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("DSW1"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO58XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-MACHINE_CONFIG_END
+	NAMCO_58XX(config, m_namcoio[1], 0);
+	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
+	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
+	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
+	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
+	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
+}
 
-MACHINE_CONFIG_START(mappy_state::digdug2)
-
+void mappy_state::digdug2(machine_config &config)
+{
 	mappy_common(config);
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
+	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 0);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	NAMCO_58XX(config, m_namcoio[0], 0);
+	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
+	m_namcoio[0]->in_callback<1>().set_ioport("P1");
+	m_namcoio[0]->in_callback<2>().set_ioport("P2");
+	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-MACHINE_CONFIG_END
+	NAMCO_56XX(config, m_namcoio[1], 0);
+	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
+	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
+	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
+	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
+	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
+}
 
 MACHINE_CONFIG_START(mappy_state::todruaga)
 	digdug2(config);
@@ -1592,24 +1583,24 @@ MACHINE_CONFIG_START(mappy_state::todruaga)
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mappy_state::motos)
-
+void mappy_state::motos(machine_config &config)
+{
 	mappy_common(config);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, mappy_state, out_lamps))
+	NAMCO_56XX(config, m_namcoio[0], 0);
+	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
+	m_namcoio[0]->in_callback<1>().set_ioport("P1");
+	m_namcoio[0]->in_callback<2>().set_ioport("P2");
+	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
+	m_namcoio[0]->out_callback<0>().set(FUNC(mappy_state::out_lamps));
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8("dipmux", ls157_device, output_r))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSW1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITELINE("dipmux", ls157_device, select_w)) MCFG_DEVCB_BIT(0)
-MACHINE_CONFIG_END
+	NAMCO_56XX(config, m_namcoio[1], 0);
+	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
+	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
+	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
+	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
+	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
+}
 
 
 

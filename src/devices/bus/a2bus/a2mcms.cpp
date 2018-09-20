@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 #define ENGINE_TAG  "engine"
 
 #define MCFG_MCMS_IRQ_CALLBACK(_cb) \
-	devcb = &downcast<mcms_device &>(*device).set_irq_cb(DEVCB_##_cb);
+	downcast<mcms_device &>(*device).set_irq_cb(DEVCB_##_cb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES

@@ -654,6 +654,12 @@ void cps_state::sf2m3_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();
 }
 
+void cps_state::sf2cems6_map(address_map &map)
+{
+	sf2m3_map(map);
+	map(0x8001ee, 0x8001ef).nopw(); // writes 0xFFFF
+}
+
 void cps_state::sf2m10_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
@@ -3434,12 +3440,13 @@ MACHINE_CONFIG_START(cps_state::cps1_12MHz)
 	MCFG_DEVICE_CLOCK( XTAL(12'000'000) )    /* verified on pcb */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cps_state::pang3)
+void cps_state::pang3(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(cps_state::ganbare)
 	cps1_10MHz(config);
@@ -3467,7 +3474,7 @@ MACHINE_CONFIG_START(cps_state::qsound)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
@@ -3484,17 +3491,24 @@ MACHINE_CONFIG_START(cps_state::qsound)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cps_state::wofhfh)
+void cps_state::wofhfh(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(cps_state::sf2m3)
 	cps1_12MHz(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sf2m3_map)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(cps_state::sf2cems6)
+	cps1_10MHz(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sf2cems6_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::sf2m10)
@@ -10377,6 +10391,167 @@ ROM_START( sf2level ) // program very similar to sf2dkot2
 	ROM_LOAD( "km418c256z-80.u210",  0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
 ROM_END
 
+/*
+    05/13/92 MSTREET-6
+
+    There are quite a few variations of this board. The main differences seem to be the amount and size of roms around the 68k.
+    Some variations have an additional "patch" rom and palce or gal that patches various chunks of code over the main program roms.
+    This adds the usual "rainbow edition" style gameplay hacks, such as air fireballs, change character mid-game, etc.
+    The boards can be run without the patch rom by removing it and the pal/gal and linking pins 1-19, 2-18, 11-16 of the empty gal socket.
+    (There is also a jumper that can be soldered instead for the third connection.)
+
+    Luckily one of my boards has an unprotected gal so I was able to decode the rom patching:
+
+    patch rom            program space
+    --------------------------------------
+    0x00000-0x07fff  ->  0x000000-0x007fff
+    0x08000-0x27fff  ->  0x030000-0x04ffff
+    0x28000-0x37fff  ->  0x170000-0x17ffff
+
+    Gfx:
+    There are six 8Mbit roms which match the official sf2ce set almost exactly (7 bytes diff in one rom).
+    There are also another two 2Mbit roms which contain very near identical data.
+    Not sure why the bootleg hardware needs this or how it should be represented in emulation.
+    There is also a 512Kbit rom that's purpose is unknown (possibly related to priority according to notes in other bootleg sets).
+
+    Sound:
+    YM2151 is clone marked "KA51".
+    YM3012 is clone marked "KA12".
+    MSM6295 is clone marked "TD735".
+
+    Other:
+    All roms have nonsense markings such as KM418C256, KM416C256 etc.
+    Obviously they are not Samsung soj/tsop FPM DRAMs ;)
+    Main clock is 10MHz, rather than usual 12MHZ for champion edition.
+    Sets b and c:
+      Turbo mode on SW(C):1.
+      Press start to change character mid-game. (bug: screen goes dark when changing character, happens in attract mode as well).
+*/
+
+ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
+	ROM_LOAD16_WORD_SWAP( "ms6.u196", 0x000000, 0x100000, CRC(596609d4) SHA1(4d876e6e44554eccbd0c5ea2d2d09e5024af0f9f) )  // == sf2m3: u196chp + u222chp (interleaved)
+	ROM_LOAD16_WORD_SWAP( "ms6.u10",  0x100000,  0x80000, CRC(ed4186bd) SHA1(f3dfe91d8f4384275190b0d86488843c1161d86f) )  // == sf2ce: s92_21a.6f 1st half doubled, also == sf2dkot2: turboii.21
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "ms6.u70", 0x000000, 0x80000, CRC(baa0f81f) SHA1(5e55a5c4ad64be17089670a3d73c1c0d9082351b), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2ce: s92-1m.3a + s92-2m.4a
+	ROM_CONTINUE(         0x000004, 0x80000 )
+	ROMX_LOAD( "ms6.u68", 0x000002, 0x80000, CRC(8edff95a) SHA1(8db35c5940dcc1f09f11be26051b2f98445d10e7), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2ce: s92-3m.5a + s92-4m.6a
+	ROM_CONTINUE(         0x000006, 0x80000 )
+	ROMX_LOAD( "ms6.u69", 0x200000, 0x80000, CRC(468962b1) SHA1(fdfd2a7cbbcafaa37e972da425446d471e1e1dae), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2ce: s92-5m.7a + s92-6m.8a
+	ROM_CONTINUE(         0x200004, 0x80000 )
+	ROMX_LOAD( "ms6.u64", 0x200002, 0x80000, CRC(8165f536) SHA1(8178fe2240c73c7283592aa31dd24aec5bf9429b), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2ce: s92-7m.9a + s92-8m.10a
+	ROM_CONTINUE(         0x200006, 0x80000 )
+	ROMX_LOAD( "ms6.u19", 0x400000, 0x80000, CRC(39d763d3) SHA1(a2a0bddecaca6046785ccddfd20b8356a6ec36f0), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2ce: s92-10m.3c + s92-11m.4c
+	ROM_CONTINUE(         0x400004, 0x80000 )
+	ROMX_LOAD( "ms6.u18", 0x400002, 0x80000, CRC(2ddfe46e) SHA1(517a76166d387375a75a36b2785de86898bdc777), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2ce: s92-12m.5c + s92-13m.6c (1st half differs from s92-12m.5c by 7 bytes, CRC: 19fd3c2d)
+	ROM_CONTINUE(         0x400006, 0x80000 )
+	/* extra gfx data, purpose unknown */
+	/* mapping over 0x400000, not sure if correct */
+	ROMX_LOAD( "ms6.u31", 0x400000, 0x20000, CRC(35486f2d) SHA1(abdcfc73d2d42a7f3523e1a383c1ce5563c4fbd7), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2m8: yyc-6.1 + yyc-7.10 (interleaved)
+	ROM_CONTINUE(         0x400004, 0x20000 )  // 1st half == ms6.u19 0x00000-0x20000, 2nd half == ms6.u19 0x80000-0xa0000
+	ROMX_LOAD( "ms6.u29", 0x400002, 0x20000, CRC(e4eca601) SHA1(acee4988f12a037a3b50f3923892fdac65f35805), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2m8: yyc-8.9 + yyc-9.8 (interleaved)
+	ROM_CONTINUE(         0x400006, 0x20000 )  // 1st half != ms6.u18 0x00000-0x20000 (4 bytes diff), 2nd half == ms6.u18 0x80000-0xa0000
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* z80 code */
+	ROM_LOAD( "ms6.u191", 0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )  // == sf2ce: s92_09.11a
+	ROM_CONTINUE(         0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
+	ROM_LOAD( "ms6.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )  // == sf2ce: s92_18.11c + s92_19.12c, also == sf2amf2: fun-u210.bin, sf2rules: voice.u210, sf2m8: b-16.6
+
+	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
+	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // == loads other bootleg sets
+ROM_END
+
+ROM_START( sf2cems6b )  /* 920322 USA */
+	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
+	ROM_LOAD16_WORD_SWAP( "ms6b.u0", 0x00000, 0x40000, CRC(b6f3724b) SHA1(aa8eea819fdaf205ca068067a4624715a8cf6c8c) )
+
+	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld gal16v8 */
+	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
+
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
+	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
+	ROM_LOAD16_WORD_SWAP( "ms6b.u10",  0x100000,  0x40000, CRC(c812b7b2) SHA1(23ed0e1bd8b2015b39ad5e452dff0e372df0d5c9) )
+
+	ROM_COPY( "patch", 0x00000, 0x000000,  0x8000 )
+	ROM_COPY( "patch", 0x08000, 0x030000, 0x20000 )
+	ROM_COPY( "patch", 0x28000, 0x170000, 0x10000 )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "ms6.u70", 0x000000, 0x80000, CRC(baa0f81f) SHA1(5e55a5c4ad64be17089670a3d73c1c0d9082351b), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x000004, 0x80000 )
+	ROMX_LOAD( "ms6.u68", 0x000002, 0x80000, CRC(8edff95a) SHA1(8db35c5940dcc1f09f11be26051b2f98445d10e7), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x000006, 0x80000 )
+	ROMX_LOAD( "ms6.u69", 0x200000, 0x80000, CRC(468962b1) SHA1(fdfd2a7cbbcafaa37e972da425446d471e1e1dae), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x200004, 0x80000 )
+	ROMX_LOAD( "ms6.u64", 0x200002, 0x80000, CRC(8165f536) SHA1(8178fe2240c73c7283592aa31dd24aec5bf9429b), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x200006, 0x80000 )
+	ROMX_LOAD( "ms6.u19", 0x400000, 0x80000, CRC(39d763d3) SHA1(a2a0bddecaca6046785ccddfd20b8356a6ec36f0), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400004, 0x80000 )
+	ROMX_LOAD( "ms6.u18", 0x400002, 0x80000, CRC(2ddfe46e) SHA1(517a76166d387375a75a36b2785de86898bdc777), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400006, 0x80000 )
+	ROMX_LOAD( "ms6.u31", 0x400000, 0x20000, CRC(35486f2d) SHA1(abdcfc73d2d42a7f3523e1a383c1ce5563c4fbd7), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400004, 0x20000 )
+	ROMX_LOAD( "ms6.u29", 0x400002, 0x20000, CRC(e4eca601) SHA1(acee4988f12a037a3b50f3923892fdac65f35805), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400006, 0x20000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* z80 code */
+	ROM_LOAD( "ms6.u191", 0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(         0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
+	ROM_LOAD( "ms6.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
+	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+ROM_END
+
+ROM_START( sf2cems6c )  /* 920322 USA */
+	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
+	ROM_LOAD16_WORD_SWAP( "ms6c.u0", 0x00000, 0x40000, CRC(04088b61) SHA1(03c361a0c9c70c21ef53351d5f975b06f51ce2e0) )
+
+	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld palce16v8, protected, using gal dump from sf2cems6b */
+	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
+
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
+	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
+	ROM_LOAD16_WORD_SWAP( "ms6b.u10",  0x100000,  0x40000, CRC(c812b7b2) SHA1(23ed0e1bd8b2015b39ad5e452dff0e372df0d5c9) )
+
+	ROM_COPY( "patch", 0x00000, 0x000000,  0x8000 )
+	ROM_COPY( "patch", 0x08000, 0x030000, 0x20000 )
+	ROM_COPY( "patch", 0x28000, 0x170000, 0x10000 )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "ms6.u70", 0x000000, 0x80000, CRC(baa0f81f) SHA1(5e55a5c4ad64be17089670a3d73c1c0d9082351b), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x000004, 0x80000 )
+	ROMX_LOAD( "ms6.u68", 0x000002, 0x80000, CRC(8edff95a) SHA1(8db35c5940dcc1f09f11be26051b2f98445d10e7), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x000006, 0x80000 )
+	ROMX_LOAD( "ms6.u69", 0x200000, 0x80000, CRC(468962b1) SHA1(fdfd2a7cbbcafaa37e972da425446d471e1e1dae), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x200004, 0x80000 )
+	ROMX_LOAD( "ms6.u64", 0x200002, 0x80000, CRC(8165f536) SHA1(8178fe2240c73c7283592aa31dd24aec5bf9429b), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x200006, 0x80000 )
+	ROMX_LOAD( "ms6.u19", 0x400000, 0x80000, CRC(39d763d3) SHA1(a2a0bddecaca6046785ccddfd20b8356a6ec36f0), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400004, 0x80000 )
+	ROMX_LOAD( "ms6.u18", 0x400002, 0x80000, CRC(2ddfe46e) SHA1(517a76166d387375a75a36b2785de86898bdc777), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400006, 0x80000 )
+	ROMX_LOAD( "ms6.u31", 0x400000, 0x20000, CRC(35486f2d) SHA1(abdcfc73d2d42a7f3523e1a383c1ce5563c4fbd7), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400004, 0x20000 )
+	ROMX_LOAD( "ms6.u29", 0x400002, 0x20000, CRC(e4eca601) SHA1(acee4988f12a037a3b50f3923892fdac65f35805), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(         0x400006, 0x20000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* z80 code */
+	ROM_LOAD( "ms6.u191", 0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(     0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
+	ROM_LOAD( "ms6.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
+	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+ROM_END
+
 /* B-Board 89625B-1 */
 ROM_START( cworld2j )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -13009,6 +13184,9 @@ GAME( 1992, sf2yyc,      sf2ce,    cps1_12MHz, sf2hack,  cps_state, init_sf2hack
 GAME( 1992, sf2koryu,    sf2ce,    cps1_12MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Xiang Long, Chinese bootleg)", MACHINE_SUPPORTS_SAVE )       // 811102 !!! - based on World version
 GAME( 1992, sf2dongb,    sf2ce,    cps1_12MHz, sf2,      cps_state, init_sf2dongb, ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dongfang Bubai protection, bootleg)", MACHINE_SUPPORTS_SAVE ) // 920313 - based on World version
 GAME( 1992, sf2ceupl,    sf2ce,    sf2m10,     sf2hack,  cps_state, init_cps1,     ROT0,   "bootleg (UPL)", "Street Fighter II': Champion Edition (UPL bootleg)", MACHINE_SUPPORTS_SAVE ) // 920322 - based on Japan version
+GAME( 1992, sf2cems6a,   sf2ce,    sf2cems6,   sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 1)", MACHINE_SUPPORTS_SAVE ) // 920313 USA
+GAME( 1992, sf2cems6b,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
+GAME( 1992, sf2cems6c,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 3)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
 GAME( 1992, cworld2j,    0,        cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2ja,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 90629B-3, no battery)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2jb,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 91634B-2)", MACHINE_SUPPORTS_SAVE )

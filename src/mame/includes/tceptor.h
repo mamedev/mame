@@ -8,8 +8,8 @@
 class tceptor_state : public driver_device
 {
 public:
-	tceptor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tceptor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
@@ -26,6 +26,9 @@ public:
 		m_shutter(*this, "shutter")
 	{ }
 
+	void tceptor(machine_config &config);
+
+private:
 	uint8_t m_m6809_irq_enable;
 	uint8_t m_m68k_irq_enable;
 	uint8_t m_mcu_irq_enable;
@@ -42,12 +45,9 @@ public:
 	int m_sprite32;
 	int m_bg;
 	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg1_tilemap;
-	tilemap_t *m_bg2_tilemap;
-	int32_t m_bg1_scroll_x;
-	int32_t m_bg1_scroll_y;
-	int32_t m_bg2_scroll_x;
-	int32_t m_bg2_scroll_y;
+	tilemap_t *m_bg_tilemap[2];
+	int32_t m_bg_scroll_x[2];
+	int32_t m_bg_scroll_y[2];
 	bitmap_ind16 m_temp_bitmap;
 	std::unique_ptr<uint16_t[]> m_sprite_ram_buffered;
 	std::unique_ptr<uint8_t[]> m_decoded_16;
@@ -98,7 +98,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	inline uint8_t fix_input0(uint8_t in1, uint8_t in2);
 	inline uint8_t fix_input1(uint8_t in1, uint8_t in2);
-	void tceptor(machine_config &config);
+
 	void m6502_a_map(address_map &map);
 	void m6502_b_map(address_map &map);
 	void m6809_map(address_map &map);

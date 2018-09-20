@@ -86,6 +86,11 @@ public:
 		m_textram(*this, "textram"),
 		m_spritebank(*this, "spritebank") { }
 
+	void panicr(machine_config &config);
+
+	void init_panicr();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -117,7 +122,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
-	void init_panicr();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(panicr);
 
@@ -125,7 +129,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void panicr(machine_config &config);
 	void panicr_map(address_map &map);
 };
 

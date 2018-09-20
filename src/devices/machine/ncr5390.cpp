@@ -340,7 +340,7 @@ void ncr5390_device::step(bool timeout)
 
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
-		if (!fifo_pos || (dma_command && !(status & S_TC0)))
+		if (!fifo_pos && dma_command && !(status & S_TC0))
 			break;
 
 		command_length = derive_msg_size(fifo[0]);
@@ -375,7 +375,7 @@ void ncr5390_device::step(bool timeout)
 	case DISC_SEL_ATN_SEND_BYTE:
 		if(c == CD_SELECT_ATN_STOP) {
 			seq = 1;
-			function_complete();
+			function_bus_complete();
 		} else {
 			command_length = derive_msg_size(fifo[0]);
 			state = DISC_SEL_WAIT_REQ;
@@ -510,16 +510,16 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case INIT_XFR_FUNCTION_COMPLETE:
-		// wait for dma transfer to complete
-		if (dma_command && !(status & S_TC0))
+		// wait for dma transfer to complete or fifo to drain
+		if (dma_command && !(status & S_TC0) && fifo_pos)
 			break;
 
 		function_complete();
 		break;
 
 	case INIT_XFR_BUS_COMPLETE:
-		// wait for dma transfer to complete
-		if (dma_command && !(status & S_TC0))
+		// wait for dma transfer to complete or fifo to drain
+		if (dma_command && !(status & S_TC0) && fifo_pos)
 			break;
 
 		bus_complete();
@@ -825,6 +825,7 @@ void ncr5390_device::start_command()
 	case CI_COMPLETE:
 		LOGMASKED(LOG_COMMAND, "Initiator command complete sequence\n");
 		state = INIT_CPT_RECV_BYTE_ACK;
+		dma_set(dma_command ? DMA_IN : DMA_NONE);
 		recv_byte();
 		break;
 
@@ -987,7 +988,7 @@ WRITE8_MEMBER(ncr5390_device::clock_w)
 void ncr5390_device::dma_set(int dir)
 {
 	dma_dir = dir;
-	if(dma_dir == DMA_OUT && fifo_pos != 16 && tcounter > fifo_pos)
+	if(dma_dir == DMA_OUT && fifo_pos != 16 && ((tcounter > fifo_pos) || !tcounter))
 		drq_set();
 }
 

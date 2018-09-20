@@ -26,7 +26,6 @@
 
 #include "emu.h"
 #include "video/gamate.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Video Hardware")
@@ -262,13 +261,13 @@ int gamate_video_device::get_pixel_from_vram(int x, int y)
 
 uint32_t gamate_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		//printf("updating scanline %d\n", y);
 		int real_x, real_y;
 		get_real_x_and_y(real_x, real_y, y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int pix = get_pixel_from_vram(x + real_x, real_y);
 
@@ -315,8 +314,6 @@ MACHINE_CONFIG_START(gamate_video_device::device_add_mconfig)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE) // close approximate until we use timers to emulate exact video update
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gamate_video_device,gamate)

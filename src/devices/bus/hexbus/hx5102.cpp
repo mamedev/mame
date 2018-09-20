@@ -151,7 +151,7 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 
 WRITE8_MEMBER( hx5102_device::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) LOGMASKED(LOG_WARN, "External operation %s not implemented on HX5102 board\n", extop[offset]);
 }
 
@@ -633,7 +633,6 @@ WRITE_LINE_MEMBER( hx5102_device::fdc_drq_w )
 
 /*
     Define the floppy formats.
-    TODO: Define another DSDD format with 16 sectors.
 */
 FLOPPY_FORMATS_MEMBER(hx5102_device::floppy_formats)
 	FLOPPY_TI99_SDF_FORMAT,
@@ -668,65 +667,62 @@ INPUT_PORTS_END
 /*
     HX5102 configuration
 */
-MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
+void hx5102_device::device_add_mconfig(machine_config& config)
+{
 	// Hexbus controller
-	MCFG_DEVICE_ADD(IBC_TAG, IBC, 0)
-	MCFG_IBC_HEXBUS_OUT_CALLBACK(WRITE8(*this, hx5102_device, hexbus_out))
-	MCFG_IBC_HSKLATCH_CALLBACK(WRITELINE(*this, hx5102_device, hsklatch_out))
+	IBC(config, m_hexbus_ctrl, 0);
+	m_hexbus_ctrl->hexbus_cb().set(FUNC(hx5102_device::hexbus_out));
+	m_hexbus_ctrl->hsklatch_cb().set(FUNC(hx5102_device::hsklatch_out));
 
 	// Outgoing socket for downstream devices
-	MCFG_HEXBUS_ADD("hexbus")
+	HEXBUS(config, "hexbus", 0, hexbus_options, nullptr);
 
 	// TMS9995 CPU @ 12.0 MHz
-	MCFG_TMS99xx_ADD(TMS9995_TAG, TMS9995, XTAL(12'000'000), memmap, crumap)
-	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, hx5102_device, external_operation) )
-	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, hx5102_device, clock_out) )
+	TMS9995(config, m_flopcpu, XTAL(12'000'000));
+	m_flopcpu->set_addrmap(AS_PROGRAM, &hx5102_device::memmap);
+	m_flopcpu->set_addrmap(AS_IO, &hx5102_device::crumap);
+	m_flopcpu->extop_cb().set(FUNC(hx5102_device::external_operation));
+	m_flopcpu->clkout_cb().set(FUNC(hx5102_device::clock_out));
 
 	// Disk controller i8272A
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
 	// Tied to 1: READY
 	// Tied to 0: TC
-	MCFG_I8272A_ADD(FDC_TAG, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hx5102_device, fdc_irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hx5102_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("d0", hx5102_drive, "525dd", hx5102_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("d1", hx5102_drive, nullptr, hx5102_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	I8272A(config, m_floppy_ctrl, 0);
+	m_floppy_ctrl->set_ready_line_connected(false);
+	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
+	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
+
+	FLOPPY_CONNECTOR(config, "d0", hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "d1", hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
 
 	// Monoflops
-	MCFG_DEVICE_ADD(MTRD_TAG, TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(200))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(47))
-	MCFG_TTL74123_A_PIN_VALUE(0)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hx5102_device, motor_w))
+	TTL74123(config, m_motormf, 0);
+	m_motormf->set_connection_type(TTL74123_GROUNDED);
+	m_motormf->set_resistor_value(RES_K(200));
+	m_motormf->set_capacitor_value(CAP_U(47));
+	m_motormf->set_a_pin_value(0);
+	m_motormf->set_b_pin_value(1);
+	m_motormf->set_clear_pin_value(1);
+	m_motormf->out_cb().set(FUNC(hx5102_device::motor_w));
 
-	MCFG_DEVICE_ADD(MTSPD_TAG, TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(200))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(10))
-	MCFG_TTL74123_A_PIN_VALUE(0)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hx5102_device, mspeed_w))
+	TTL74123(config, m_speedmf, 0);
+	m_speedmf->set_connection_type(TTL74123_GROUNDED);
+	m_speedmf->set_resistor_value(RES_K(200));
+	m_speedmf->set_capacitor_value(CAP_U(10));
+	m_speedmf->set_a_pin_value(0);
+	m_speedmf->set_b_pin_value(1);
+	m_speedmf->set_clear_pin_value(1);
+	m_speedmf->out_cb().set(FUNC(hx5102_device::mspeed_w));
 
 	// READY flipflop
-	MCFG_DEVICE_ADD(READYFF_TAG, TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, hx5102_device, board_ready))
+	TTL7474(config, m_readyff, 0);
+	m_readyff->comp_output_cb().set(FUNC(hx5102_device::board_ready));
 
 	// RAM
-	MCFG_RAM_ADD(RAM1_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2048")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-	MCFG_RAM_ADD(RAM2_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2048")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-MACHINE_CONFIG_END
+	RAM(config, RAM1_TAG).set_default_size("2048").set_default_value(0);
+	RAM(config, RAM2_TAG).set_default_size("2048").set_default_value(0);
+}
 
 ROM_START( hx5102 )
 	ROM_REGION( 0x4000, DSR_TAG, 0 )

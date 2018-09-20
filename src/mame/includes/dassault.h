@@ -33,6 +33,11 @@ public:
 		, m_pf4_rowscroll(*this, "pf4_rowscroll")
 	{ }
 
+	void dassault(machine_config &config);
+
+	void init_dassault();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
@@ -57,13 +62,11 @@ public:
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
 	DECLARE_READ16_MEMBER(dassault_sub_control_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	void init_dassault();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	void dassault(machine_config &config);
 	void dassault_map(address_map &map);
 	void dassault_sub_map(address_map &map);
 	void sound_map(address_map &map);

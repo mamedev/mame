@@ -513,12 +513,12 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, chinsan_state, input_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, chinsan_state, input_p2_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, chinsan_state, input_p1_r))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(chinsan_state::input_select_w));
+	ppi.in_pb_callback().set(FUNC(chinsan_state::input_p2_r));
+	ppi.in_pc_callback().set(FUNC(chinsan_state::input_p1_r));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

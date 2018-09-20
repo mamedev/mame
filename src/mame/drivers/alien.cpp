@@ -81,15 +81,16 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void alien(machine_config &config);
+
+	void init_dkbanans();
+
+private:
 	DECLARE_READ64_MEMBER(test_r);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alien(machine_config &config);
 	void alien_map(address_map &map);
-
-	void init_dkbanans();
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

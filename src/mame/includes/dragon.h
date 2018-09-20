@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_INCLUDES_DRAGON_H
 #define MAME_INCLUDES_DRAGON_H
+
+#pragma once
 
 
 #include "includes/coco12.h"

@@ -43,6 +43,46 @@ public:
 		m_io_dsw2(*this, "DSW2")
 		{ }
 
+	void system_A_soldam(machine_config &config);
+	void system_B_monkelf(machine_config &config);
+	void system_A_iganinju(machine_config &config);
+	void system_A_hachoo(machine_config &config);
+	void kickoffb(machine_config &config);
+	void system_D(machine_config &config);
+	void system_C(machine_config &config);
+	void system_Bbl(machine_config &config);
+	void system_A(machine_config &config);
+	void system_B(machine_config &config);
+	void system_B_hayaosi1(machine_config &config);
+	void system_Z(machine_config &config);
+
+	void init_64street();
+	void init_chimerab();
+	void init_peekaboo();
+	void init_soldam();
+	void init_astyanax();
+	void init_stdragon();
+	void init_hayaosi1();
+	void init_soldamj();
+	void init_phantasm();
+	void init_jitsupro();
+	void init_iganinju();
+	void init_cybattlr();
+	void init_rodlandj();
+	void init_rittam();
+	void init_rodlandjb();
+	void init_avspirit();
+	void init_monkelf();
+	void init_edf();
+	void init_edfp();
+	void init_bigstrik();
+	void init_rodland();
+	void init_edfbl();
+	void init_stdragona();
+	void init_stdragonb();
+	void init_systemz();
+
+private:
 	required_shared_ptr<uint16_t> m_objectram;
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	required_shared_ptr<uint16_t> m_ram;
@@ -128,31 +168,7 @@ public:
 	DECLARE_WRITE16_MEMBER(okim6295_both_2_w);
 	DECLARE_WRITE16_MEMBER(ram_w);
 
-	void init_64street();
-	void init_chimerab();
-	void init_peekaboo();
-	void init_soldam();
-	void init_astyanax();
-	void init_stdragon();
-	void init_hayaosi1();
-	void init_soldamj();
-	void init_phantasm();
-	void init_jitsupro();
-	void init_iganinju();
-	void init_cybattlr();
-	void init_rodlandj();
-	void init_rittam();
-	void init_rodlandjb();
-	void init_avspirit();
-	void init_monkelf();
-	void init_edf();
-	void init_edfp();
-	void init_bigstrik();
-	void init_rodland();
-	void init_edfbl();
-	void init_stdragona();
-	void init_stdragonb();
-	void init_systemz();
+
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
 	DECLARE_PALETTE_INIT(megasys1);
@@ -173,18 +189,6 @@ public:
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
-	void system_A_soldam(machine_config &config);
-	void system_B_monkelf(machine_config &config);
-	void system_A_iganinju(machine_config &config);
-	void system_A_hachoo(machine_config &config);
-	void kickoffb(machine_config &config);
-	void system_D(machine_config &config);
-	void system_C(machine_config &config);
-	void system_Bbl(machine_config &config);
-	void system_A(machine_config &config);
-	void system_B(machine_config &config);
-	void system_B_hayaosi1(machine_config &config);
-	void system_Z(machine_config &config);
 	void kickoffb_sound_map(address_map &map);
 	void megasys1A_map(address_map &map);
 	void megasys1A_sound_map(address_map &map);

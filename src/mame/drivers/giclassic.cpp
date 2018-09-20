@@ -64,6 +64,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void giclassic(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
@@ -81,9 +84,8 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
 
-	void giclassic(machine_config &config);
 	void satellite_main(address_map &map);
-private:
+
 	uint8_t m_control;
 };
 
@@ -351,11 +353,8 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252a", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
-
-	MCFG_DEVICE_ADD("k053252b", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
+	K053252(config, "k053252a", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
+	K053252(config, "k053252b", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
 MACHINE_CONFIG_END
 
 ROM_START( giclasex )

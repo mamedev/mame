@@ -23,6 +23,9 @@ public:
 	{
 	}
 
+	void mpu4plasma(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_plasmaram;
 
 	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
@@ -34,7 +37,6 @@ public:
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mpu4plasma(machine_config &config);
 	void mpu4plasma_map(address_map &map);
 };
 

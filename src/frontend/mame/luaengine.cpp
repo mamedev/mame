@@ -202,6 +202,11 @@ namespace sol
 						typestr = "unmap";
 						break;
 					case AMH_DEVICE_DELEGATE:
+					case AMH_DEVICE_DELEGATE_M:
+					case AMH_DEVICE_DELEGATE_S:
+					case AMH_DEVICE_DELEGATE_SM:
+					case AMH_DEVICE_DELEGATE_MO:
+					case AMH_DEVICE_DELEGATE_SMO:
 						typestr = "delegate";
 						break;
 					case AMH_PORT:
@@ -1287,42 +1292,40 @@ void lua_engine::initialize()
 					return table;
 				},
 			"wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
-					int wptype = WATCHPOINT_READ;
+					read_or_write wptype = read_or_write::READ;
 					if(type == "w")
-						wptype = WATCHPOINT_WRITE;
+						wptype = read_or_write::WRITE;
 					else if((type == "rw") || (type == "wr"))
-						wptype = WATCHPOINT_READ | WATCHPOINT_WRITE;
+						wptype = read_or_write::READWRITE;
 					return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
 				},
 			"wpclr", &device_debug::watchpoint_clear,
 			"wplist", [this](device_debug &dev, addr_space &sp) {
 					sol::table table = sol().create_table();
-					device_debug::watchpoint *list = dev.watchpoint_first(sp.space.spacenum());
-					while(list)
+					for(auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
 					{
 						sol::table wp = sol().create_table();
-						wp["enabled"] = list->enabled();
-						wp["address"] = list->address();
-						wp["length"] = list->length();
-						switch(list->type())
+						wp["enabled"] = wpp->enabled();
+						wp["address"] = wpp->address();
+						wp["length"] = wpp->length();
+						switch(wpp->type())
 						{
-							case WATCHPOINT_READ:
+							case read_or_write::READ:
 								wp["type"] = "r";
 								break;
-							case WATCHPOINT_WRITE:
+							case read_or_write::WRITE:
 								wp["type"] = "w";
 								break;
-							case WATCHPOINT_READ | WATCHPOINT_WRITE:
+							case read_or_write::READWRITE:
 								wp["type"] = "rw";
 								break;
 							default: // huh?
 								wp["type"] = "";
 								break;
 						}
-						wp["condition"] = list->condition();
-						wp["action"] = list->action();
-						table[list->index()] = wp;
-						list = list->next();
+						wp["condition"] = wpp->condition();
+						wp["action"] = wpp->action();
+						table[wpp->index()] = wp;
 					}
 					return table;
 				});
@@ -1784,7 +1787,7 @@ void lua_engine::initialize()
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
 			"orientation", [](screen_device &sdev) {
-					uint32_t flags = sdev.machine().system().flags & machine_flags::MASK_ORIENTATION;
+					uint32_t flags = sdev.orientation();
 					int rotation_angle = 0;
 					switch (flags)
 					{

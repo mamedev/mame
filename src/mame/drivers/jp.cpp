@@ -47,7 +47,7 @@ public:
 	void jp(machine_config &config);
 	void jps(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(out1_w);
@@ -67,7 +67,6 @@ protected:
 	void jp_map(address_map &map);
 	void jp_sound_map(address_map &map);
 
-private:
 	void update_display();
 
 	uint32_t m_disp_data;
@@ -339,38 +338,38 @@ MACHINE_CONFIG_START(jp_state::jp)
 	MCFG_DEVICE_PROGRAM_MAP(jp_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("latch0", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_data_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_latch[0]);
+	m_latch[0]->q_out_cb<1>().set(FUNC(jp_state::disp_data_w)).invert();
 
-	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_clock_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_latch[1]);
+	m_latch[1]->q_out_cb<1>().set(FUNC(jp_state::disp_clock_w)).invert();
 
-	MCFG_DEVICE_ADD("latch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_strobe_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_latch[2]);
+	m_latch[2]->q_out_cb<1>().set(FUNC(jp_state::disp_strobe_w)).invert();
 
-	MCFG_DEVICE_ADD("latch3", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[3]);
+	m_latch[3]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch4", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[4]);
+	m_latch[4]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch5", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[5]);
+	m_latch[5]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch6", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[6]);
+	m_latch[6]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch7", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[7]);
+	m_latch[7]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch8", LS259, 0)
+	LS259(config, m_latch[8]);
 
-	MCFG_DEVICE_ADD("latch9", LS259, 0)
+	LS259(config, m_latch[9]);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_jp)
+	config.set_default_layout(layout_jp);
 
 	/* Sound */
 	genpin_audio(config);
@@ -414,8 +413,8 @@ MACHINE_CONFIG_START(jp_state::jps)
 	MCFG_DEVICE_PROGRAM_MAP(jp_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // not labeled in manual; might even be a CD4019
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0); // not labeled in manual; might even be a CD4019
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	SPEAKER(config, "msmvol").front_center();
 	MCFG_DEVICE_ADD("msm", MSM5205, 384'000) // not labeled in manual; clock unknown
@@ -423,8 +422,7 @@ MACHINE_CONFIG_START(jp_state::jps)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
-	MCFG_DEVICE_MODIFY("latch9")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI)) // only external input for sound board
+	m_latch[9]->q_out_cb<5>().set_inputline("soundcpu", INPUT_LINE_NMI); // only external input for sound board
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

@@ -39,7 +39,7 @@ void epson_tf20_device::cpu_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf0, 0xf3).rw("3a", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
+	map(0xf0, 0xf3).rw(m_mpsc, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
 	map(0xf6, 0xf6).r(FUNC(epson_tf20_device::rom_disable_r));
 	map(0xf7, 0xf7).portr("tf20_dip");
 	map(0xf8, 0xf8).rw(FUNC(epson_tf20_device::upd765_tc_r), FUNC(epson_tf20_device::fdc_control_w));
@@ -93,13 +93,12 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device, irq_callback)
 
 	// 64k internal ram
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_SIZE("64k")
+	RAM(config, "ram").set_default_size("64K");
 
 	// upd7201 serial interface
-	MCFG_DEVICE_ADD("3a", UPD7201, XTAL_CR1 / 2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, epson_tf20_device, txda_w))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(*this, epson_tf20_device, dtra_w))
+	UPD7201(config, m_mpsc, XTAL_CR1 / 2);
+	m_mpsc->out_txda_callback().set(FUNC(epson_tf20_device::txda_w));
+	m_mpsc->out_dtra_callback().set(FUNC(epson_tf20_device::dtra_w));
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("5a", true, true)

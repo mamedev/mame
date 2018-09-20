@@ -43,6 +43,11 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void pzletime(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_video_regs;
 	required_shared_ptr<uint16_t> m_tilemap_regs;
@@ -61,7 +66,6 @@ public:
 	DECLARE_WRITE16_MEMBER(txt_videoram_w);
 	DECLARE_WRITE16_MEMBER(ticket_w);
 	DECLARE_WRITE16_MEMBER(video_regs_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
@@ -77,7 +81,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void pzletime(machine_config &config);
 	void pzletime_map(address_map &map);
 };
 
@@ -354,7 +357,7 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 
 	/* sound hardware */

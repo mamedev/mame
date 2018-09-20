@@ -26,6 +26,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
+	void mz6500(machine_config &config);
+
+private:
 	required_device<upd7220_device> m_hgdc;
 	required_device<upd765a_device> m_fdc;
 	DECLARE_READ8_MEMBER(mz6500_vram_r);
@@ -38,7 +41,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void mz6500(machine_config &config);
 	void mz6500_io(address_map &map);
 	void mz6500_map(address_map &map);
 	void upd7220_map(address_map &map);

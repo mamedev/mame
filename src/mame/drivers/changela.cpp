@@ -428,14 +428,14 @@ MACHINE_CONFIG_START(changela_state::changela)
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, changela_state, changela_68705_port_c_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U44 on Sound I/O Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, changela_state, collision_reset_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, changela_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, changela_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, changela_state, mcu_pc_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, changela_state, collision_reset_1_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // U44 on Sound I/O Board
+	outlatch.q_out_cb<0>().set(FUNC(changela_state::collision_reset_0_w));
+	outlatch.q_out_cb<1>().set(FUNC(changela_state::coin_counter_1_w));
+	outlatch.q_out_cb<2>().set(FUNC(changela_state::coin_counter_2_w));
+	outlatch.q_out_cb<4>().set(FUNC(changela_state::mcu_pc_0_w));
+	outlatch.q_out_cb<5>().set(FUNC(changela_state::collision_reset_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

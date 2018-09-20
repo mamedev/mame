@@ -81,6 +81,9 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void meyc8080(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
@@ -89,10 +92,8 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void meyc8080(machine_config &config);
 	void meyc8080_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_shared_ptr<uint8_t> m_videoram_0;
@@ -590,10 +591,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(meyc8080_state::meyc8080)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_DEVICE_PROGRAM_MAP(meyc8080_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

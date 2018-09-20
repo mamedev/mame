@@ -25,7 +25,7 @@ DECLARE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device)
 //**************************************************************************
 
 #define MCFG_ZACCARIA_1B11142_SET_ACS_CALLBACK(_devcb) \
-	devcb = &downcast<zac1b11142_audio_device &>(device).set_acs_cb(DEVCB_##_devcb);
+	downcast<zac1b11142_audio_device &>(device).set_acs_cb(DEVCB_##_devcb);
 
 
 

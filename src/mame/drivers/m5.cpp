@@ -277,7 +277,6 @@ Few other notes:
 #include "emu.h"
 #include "includes/m5.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
@@ -1407,10 +1406,10 @@ void brno_state::machine_reset()
 
 MACHINE_CONFIG_START(m5_state::m5)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 14.318181_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(m5_mem)
-	MCFG_DEVICE_IO_MAP(m5_io)
-	MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m5_state::m5_mem);
+	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
+	m_maincpu->set_daisy_config(m5_daisy_chain);
 
 	MCFG_DEVICE_ADD(Z80_FD5_TAG, Z80, 14.318181_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
@@ -1422,8 +1421,8 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 14.318181_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 14.318181_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
 	// ZC2 = EXCLK
 
@@ -1437,12 +1436,12 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("m5_cass")
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, m5_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, m5_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, m5_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, m5_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, m5_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(m5_state::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(m5_state::ppi_pa_w));
+	m_ppi->out_pb_callback().set(FUNC(m5_state::ppi_pb_w));
+	m_ppi->in_pc_callback().set(FUNC(m5_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(m5_state::ppi_pc_w));
 
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
@@ -1458,9 +1457,8 @@ MACHINE_CONFIG_START(m5_state::m5)
 	//MCFG_SOFTWARE_LIST_ADD("flop_list", "m5_flop")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("36K,64K") //68K is not possible, 'cos internal ram always overlays any expansion memory in that area
+	//68K is not possible, 'cos internal ram always overlays any expansion memory in that area
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("36K,64K");
 MACHINE_CONFIG_END
 
 
@@ -1468,30 +1466,32 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG_START( ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m5_state::ntsc)
+void m5_state::ntsc(machine_config &config)
+{
 	m5(config);
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, 10.738635_MHz_XTAL / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-MACHINE_CONFIG_END
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(m5_state::sordm5_video_interrupt_callback));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_START( pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m5_state::pal)
+void m5_state::pal(machine_config &config)
+{
 	m5(config);
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-MACHINE_CONFIG_END
+	tms9929a_device &vdp(TMS9929A(config, "tms9928a", 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(m5_state::sordm5_video_interrupt_callback));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( m5p_brno )
@@ -1502,10 +1502,8 @@ MACHINE_CONFIG_START(brno_state::brno)
 	m5(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(m5_mem_brno)
-	MCFG_DEVICE_IO_MAP(brno_io)
-//  MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
+	m_maincpu->set_addrmap(AS_PROGRAM, &brno_state::m5_mem_brno);
+	m_maincpu->set_addrmap(AS_IO, &brno_state::brno_io);
 
 
 	//remove devices used for fd5 floppy
@@ -1514,15 +1512,14 @@ MACHINE_CONFIG_START(brno_state::brno)
 	MCFG_DEVICE_REMOVE(UPD765_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD("tms9928a", TMS9929A, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-
+	tms9929a_device &vdp(TMS9929A(config, "tms9928a", 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(m5_state::sordm5_video_interrupt_callback));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// floppy
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
+	WD2797(config, m_fdc, 1_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats)
@@ -1576,7 +1573,7 @@ ROM_START( m5p_brno )
 	ROM_LOAD( "sordint.ic21", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2)) // monitor rom
 	ROM_LOAD( "brno_win.rom", 0x2000, 0x2000, CRC(f4cfb2ee) SHA1(23f41d2d9ac915545409dd0163f3dc298f04eea2)) //windows
 	//ROM_LOAD( "brno_rom12.rom", 0x2000, 0x4000, CRC(cac52406) SHA1(91f6ba97e85a2b3a317689635d425ee97413bbe3)) //windows+BI
-	//ROM_LOAD( "brno_boot.rom", 0x2000, 0xd80, CRC(60008729) SHA1(FB26E2AE9F74B0AE0D723B417A038A8EF3D72782))
+	//ROM_LOAD( "brno_boot.rom", 0x2000, 0xd80, CRC(60008729) SHA1(fb26e2ae9f74b0ae0d723b417a038a8ef3d72782))
 
 	//Ramdisc area (maximum is 1024kB 256x 4kB banks)
 	ROM_REGION(1024*1024,RAMDISK,0)

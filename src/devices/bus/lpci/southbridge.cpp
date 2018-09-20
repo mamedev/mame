@@ -26,80 +26,79 @@
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(southbridge_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
-	MCFG_PIT8253_CLK0(4772720/4) // heartbeat IRQ
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, southbridge_device, at_pit8254_out0_changed))
-	MCFG_PIT8253_CLK1(4772720/4) // dram refresh
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, southbridge_device, at_pit8254_out1_changed))
-	MCFG_PIT8253_CLK2(4772720/4) // pio port c pin 4, and speaker polling enough
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, southbridge_device, at_pit8254_out2_changed))
+	PIT8254(config, m_pit8254, 0);
+	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
+	m_pit8254->out_handler<0>().set(FUNC(southbridge_device::at_pit8254_out0_changed));
+	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
+	m_pit8254->out_handler<1>().set(FUNC(southbridge_device::at_pit8254_out1_changed));
+	m_pit8254->set_clk<2>(4772720/4); // PIO port C pin 4, and speaker polling enough
+	m_pit8254->out_handler<2>().set(FUNC(southbridge_device::at_pit8254_out2_changed));
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_2", am9517a_device, dreq0_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, southbridge_device, at_dma8237_out_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, southbridge_device, pc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, southbridge_device, pc_dma_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(READ8(*this, southbridge_device, pc_dma8237_0_dack_r))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, southbridge_device, pc_dma8237_1_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, southbridge_device, pc_dma8237_2_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(*this, southbridge_device, pc_dma8237_3_dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, southbridge_device, pc_dma8237_0_dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, southbridge_device, pc_dma8237_1_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, southbridge_device, pc_dma8237_2_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, southbridge_device, pc_dma8237_3_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, southbridge_device, pc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, southbridge_device, pc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, southbridge_device, pc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, southbridge_device, pc_dack3_w))
+	AM9517A(config, m_dma8237_1, XTAL(14'318'181)/3);
+	m_dma8237_1->out_hreq_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq0_w));
+	m_dma8237_1->out_eop_callback().set(FUNC(southbridge_device::at_dma8237_out_eop));
+	m_dma8237_1->in_memr_callback().set(FUNC(southbridge_device::pc_dma_read_byte));
+	m_dma8237_1->out_memw_callback().set(FUNC(southbridge_device::pc_dma_write_byte));
+	m_dma8237_1->in_ior_callback<0>().set(FUNC(southbridge_device::pc_dma8237_0_dack_r));
+	m_dma8237_1->in_ior_callback<1>().set(FUNC(southbridge_device::pc_dma8237_1_dack_r));
+	m_dma8237_1->in_ior_callback<2>().set(FUNC(southbridge_device::pc_dma8237_2_dack_r));
+	m_dma8237_1->in_ior_callback<3>().set(FUNC(southbridge_device::pc_dma8237_3_dack_r));
+	m_dma8237_1->out_iow_callback<0>().set(FUNC(southbridge_device::pc_dma8237_0_dack_w));
+	m_dma8237_1->out_iow_callback<1>().set(FUNC(southbridge_device::pc_dma8237_1_dack_w));
+	m_dma8237_1->out_iow_callback<2>().set(FUNC(southbridge_device::pc_dma8237_2_dack_w));
+	m_dma8237_1->out_iow_callback<3>().set(FUNC(southbridge_device::pc_dma8237_3_dack_w));
+	m_dma8237_1->out_dack_callback<0>().set(FUNC(southbridge_device::pc_dack0_w));
+	m_dma8237_1->out_dack_callback<1>().set(FUNC(southbridge_device::pc_dack1_w));
+	m_dma8237_1->out_dack_callback<2>().set(FUNC(southbridge_device::pc_dack2_w));
+	m_dma8237_1->out_dack_callback<3>().set(FUNC(southbridge_device::pc_dack3_w));
 
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, southbridge_device, pc_dma_hrq_changed))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, southbridge_device, pc_dma_read_word))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, southbridge_device, pc_dma_write_word))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, southbridge_device, pc_dma8237_5_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(*this, southbridge_device, pc_dma8237_6_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(*this, southbridge_device, pc_dma8237_7_dack_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, southbridge_device, pc_dma8237_5_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, southbridge_device, pc_dma8237_6_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, southbridge_device, pc_dma8237_7_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, southbridge_device, pc_dack4_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, southbridge_device, pc_dack5_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, southbridge_device, pc_dack6_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, southbridge_device, pc_dack7_w))
+	AM9517A(config, m_dma8237_2, XTAL(14'318'181)/3);
+	m_dma8237_2->out_hreq_callback().set(FUNC(southbridge_device::pc_dma_hrq_changed));
+	m_dma8237_2->in_memr_callback().set(FUNC(southbridge_device::pc_dma_read_word));
+	m_dma8237_2->out_memw_callback().set(FUNC(southbridge_device::pc_dma_write_word));
+	m_dma8237_2->in_ior_callback<1>().set(FUNC(southbridge_device::pc_dma8237_5_dack_r));
+	m_dma8237_2->in_ior_callback<2>().set(FUNC(southbridge_device::pc_dma8237_6_dack_r));
+	m_dma8237_2->in_ior_callback<3>().set(FUNC(southbridge_device::pc_dma8237_7_dack_r));
+	m_dma8237_2->out_iow_callback<1>().set(FUNC(southbridge_device::pc_dma8237_5_dack_w));
+	m_dma8237_2->out_iow_callback<2>().set(FUNC(southbridge_device::pc_dma8237_6_dack_w));
+	m_dma8237_2->out_iow_callback<3>().set(FUNC(southbridge_device::pc_dma8237_7_dack_w));
+	m_dma8237_2->out_dack_callback<0>().set(FUNC(southbridge_device::pc_dack4_w));
+	m_dma8237_2->out_dack_callback<1>().set(FUNC(southbridge_device::pc_dack5_w));
+	m_dma8237_2->out_dack_callback<2>().set(FUNC(southbridge_device::pc_dack6_w));
+	m_dma8237_2->out_dack_callback<3>().set(FUNC(southbridge_device::pc_dack7_w));
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, southbridge_device, get_slave_ack))
+	PIC8259(config, m_pic8259_master, 0);
+	m_pic8259_master->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic8259_master->in_sp_callback().set_constant(1);
+	m_pic8259_master->read_slave_ack_callback().set(FUNC(southbridge_device::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir2_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pic8259_slave, 0);
+	m_pic8259_slave->out_int_callback().set(m_pic8259_master, FUNC(pic8259_device::ir2_w));
+	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir6_w))
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(ata_devices, "hdd", nullptr, false);
+	m_ide->irq_handler().set("pic8259_slave", FUNC(pic8259_device::ir6_w));
+	m_ide->set_bus_master_space(":maincpu", AS_PROGRAM);
 
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "cdrom", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir7_w))
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+	BUS_MASTER_IDE_CONTROLLER(config, m_ide2).options(ata_devices, "cdrom", nullptr, false);
+	m_ide2->irq_handler().set("pic8259_slave", FUNC(pic8259_device::ir7_w));
+	m_ide2->set_bus_master_space(":maincpu", AS_PROGRAM);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
 	MCFG_ISA16_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_slave",  pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
 	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_master", pic8259_device, ir4_w))
 	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_master", pic8259_device, ir5_w))
 	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_master", pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("pic8259_slave", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_slave", pic8259_device, ir1_w)) // in place of irq 2 on at irq 9 is used
+	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("pic8259_slave", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
 	MCFG_ISA_OUT_IRQ14_CB(WRITELINE("pic8259_slave", pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ15_CB(WRITELINE("pic8259_slave", pic8259_device, ir7_w))
 	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
@@ -111,8 +110,8 @@ MACHINE_CONFIG_START(southbridge_device::device_add_mconfig)
 	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("dma8237_2", am9517a_device, dreq3_w))
 MACHINE_CONFIG_END
 
-southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
+southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_pic8259_master(*this, "pic8259_master"),
 	m_pic8259_slave(*this, "pic8259_slave"),
@@ -510,20 +509,21 @@ static void pc_isa_onboard(device_slot_interface &device)
 MACHINE_CONFIG_START(southbridge_extended_device::device_add_mconfig)
 	southbridge_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("pic8259_master", pic8259_device, ir1_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	keybc.system_reset_cb().set_inputline(":maincpu", INPUT_LINE_RESET);
+	keybc.gate_a20_cb().set_inputline(":maincpu", INPUT_LINE_A20);
+	keybc.input_buffer_full_cb().set("pic8259_master", FUNC(pic8259_device::ir1_w));
+	keybc.keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config, "rtc"));
+	rtc.irq().set("pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 
 	// on board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "isabus", pc_isa_onboard, "fdcsmc", true) // FIXME: determine ISA bus clock

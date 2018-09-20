@@ -133,7 +133,7 @@ READ8_MEMBER(segas1x_bootleg_state::sound_command_irq_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::soundbank_msm_w)
 {
-	m_soundbank->set_entry(data & 7);
+	m_soundbank->set_entry((data & 7) ^ 6); // probably wrong
 	m_msm->reset_w(BIT(data, 3));
 }
 
@@ -487,7 +487,8 @@ WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
 	int offs, size = m_soundcpu_region->bytes() - 0x10000;
 
-	m_upd7759->reset_w(data & 0x40);
+	m_upd7759->start_w(BIT(data, 7));
+	m_upd7759->reset_w(BIT(data, 6));
 	offs = 0x10000 + (data * 0x4000) % size;
 	membank("bank1")->set_base(m_soundcpu_region->base() + offs);
 }
@@ -2076,8 +2077,8 @@ MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 {
-	/* upd7759 callback */
-	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (state)
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
@@ -2095,6 +2096,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 
 	MCFG_DEVICE_ADD("7759", UPD7759)
+	MCFG_UPD7759_MD(0)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas1x_bootleg_state,sound_cause_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
@@ -2144,8 +2146,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_2x_ym2203_msm5205)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("5205", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("5205", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("5205", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, datsu_msm5205_callback))
@@ -2288,6 +2290,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
 	goldnaxeb_base(config);
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+
 	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
@@ -2299,16 +2304,20 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb2)
 	MCFG_DEVICE_PROGRAM_MAP(goldnaxeb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+
 	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb1)
-	goldnaxeb1(config);
+	goldnaxeb_base(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bayrouteb1_map)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb2)
@@ -3123,6 +3132,16 @@ ROM_START( dduxbl )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "dduxb01.bin", 0x0000, 0x8000, CRC(0dbef0d7) SHA1(8b9afb2fcb946cec467b1e691c267194b503f841) )
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "dduxb_5_82s129.b1",  0x0000, 0x0100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) )
+	ROM_LOAD( "dduxb_4_18s030.a17", 0x0100, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "dduxb_pal16l8.1",     0x0000, 0x0104, CRC(3b406587) SHA1(76f875879fb041c39fb5e6527c0d3ab98b66e36e) )
+	ROM_LOAD( "dduxb_p_gal16v8.a18", 0x0200, 0x0117, CRC(ce1ab1e1) SHA1(dcfc0015d8595ee6cb6bb02c95655161a7f3b017) )
+	ROM_LOAD( "dduxb_pal20l8.2",     0x0400, 0x0144, CRC(09098fbe) SHA1(ea251bbcc140b2c69a155bf2fc046c57b206335b) )
 ROM_END
 
 

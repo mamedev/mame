@@ -1,15 +1,35 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/***************************************************************************
+/******************************************************************************************
 
-2013-09-09 Skeleton of LFT computer system. A search on the net produces
-           no finds.
+2013-09-09 Skeleton of LFT computer system.
 
-****************************************************************************/
+These are the monitor programs for 80186-based "S100+" systems by L/F Technologies. Many
+of these boards were distributed under the IMS International name. Documentation available
+online is woefully inadequate.
+
+LFT1230 does extensive testing of devices at boot time. As they are mostly missing,
+it gets caught in a loop. There's unknown devices in the i/o 008x, 00Ax, 00Cx range.
+The devices at 008x and 00Cx would appear to be the same type.
+BUG:If the rtc fails to clear the interrupt pin (first test), it cannot print the error
+as the SCC hasn't yet been set up.
+***Status: hangs at start
+
+
+LFT1510 doesn't bother with the tests. The i/o ports seem to be the same.
+***Status: mostly working
+
+
+Note: Backspace/delete performs oddly.
+
+******************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "machine/terminal.h"
+#include "machine/mm58167.h"
+#include "machine/z80scc.h"
+#include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 
 
 class lft_state : public driver_device
@@ -18,42 +38,40 @@ public:
 	lft_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
-	{
-	}
-
-	void kbd_put(u8 data);
-	DECLARE_WRITE16_MEMBER(term_w);
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
+		, m_rtc(*this, "rtc")
+		, m_scc(*this, "scc")
+	{ }
 
 	void lft(machine_config &config);
-	void lft_io(address_map &map);
-	void lft_mem(address_map &map);
+
 private:
-	uint8_t m_term_data;
+
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<mm58167_device> m_rtc;
+	required_device<scc8530_device> m_scc;
 };
 
-void lft_state::lft_mem(address_map &map)
+void lft_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x5ffff).ram();
 	map(0xfc000, 0xfffff).rom().region("roms", 0);
 }
 
-void lft_state::lft_io(address_map &map)
+void lft_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xff);
-	// screen 1
-	map(0x00, 0x01).nopr();
-	map(0x04, 0x05).rw(FUNC(lft_state::keyin_r), FUNC(lft_state::term_w));
-	// screen 2
-	map(0x02, 0x03).nopr();
-	map(0x06, 0x07).nopw();
+	//map.global_mask(0x3ff);
+	//map(0x0080, 0x0087) // unknown device
+	//map(0x00a0, 0x00a?) // unknown device
+	//map(0x00c0, 0x00c7) // unknown device
+	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x0180, 0x01bf).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
+	//map(0x0200, 0x0207) // unknown device
 }
 
 
@@ -61,42 +79,37 @@ void lft_state::lft_io(address_map &map)
 static INPUT_PORTS_START( lft )
 INPUT_PORTS_END
 
-READ16_MEMBER( lft_state::keyin_r )
-{
-	uint16_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ16_MEMBER( lft_state::status_r )
-{
-	return (m_term_data) ? 5 : 4;
-}
-
-void lft_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
-
-WRITE16_MEMBER( lft_state::term_w )
-{
-	m_terminal->write(space, 0, data & 0x7f); // fix backspace
-}
-
 void lft_state::machine_reset()
 {
-	m_term_data = 0;
 }
 
 MACHINE_CONFIG_START(lft_state::lft)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80186, 4000000) // no idea
-	MCFG_DEVICE_PROGRAM_MAP(lft_mem)
-	MCFG_DEVICE_IO_MAP(lft_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(lft_state, kbd_put))
+	// Devices
+	MM58167(config, m_rtc, 32.768_kHz_XTAL);
+
+	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
+	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc8530_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc8530_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc8530_device, ctsa_w))
+
+	m_scc->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc8530_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc8530_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc8530_device, ctsb_w))
 MACHINE_CONFIG_END
 
 
@@ -118,6 +131,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME    FLAGS
-COMP( ????, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
-COMP( ????, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "LFT",   "LFT 1230", MACHINE_IS_SKELETON)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME                      FLAGS
+COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_IS_SKELETON)
+COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_IS_SKELETON)

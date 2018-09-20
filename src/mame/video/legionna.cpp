@@ -492,7 +492,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		y = spriteram16[offs+3];
 		x = spriteram16[offs+2];
 
-		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
+		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite wrap,
 		   this doesn't work on denjin makai as the visible area is larger */
 		if (cliprect.max_x<(320-1))
 		{

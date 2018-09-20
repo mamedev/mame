@@ -62,6 +62,9 @@ public:
 		, m_midi_timer(*this, "midi_timer")
 		, m_maincpu(*this, "maincpu") { }
 
+	void d110(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(so_w);
 	DECLARE_WRITE16_MEMBER(midi_w);
@@ -74,10 +77,8 @@ public:
 	DECLARE_PALETTE_INIT(d110);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void d110(machine_config &config);
 	void d110_io(address_map &map);
 	void d110_map(address_map &map);
-private:
 
 	uint8_t  m_lcd_data_buffer[256];
 	int      m_lcd_data_buffer_pos;
@@ -237,20 +238,17 @@ void d110_state::d110_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(d110_state::d110)
-	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
+	MCFG_DEVICE_ADD( m_maincpu, P8098, XTAL(12'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP( d110_map )
 	MCFG_DEVICE_IO_MAP( d110_io )
 
 // Battery-backed main ram
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
-	MCFG_NVRAM_ADD_0FILL( "rams" )
-
+	RAM( config, "ram" ).set_default_size( "32K" );
+	NVRAM(config, m_rams, nvram_device::DEFAULT_ALL_0);
 
 // Shall become a proper memcard device someday
-	MCFG_RAM_ADD( "memc" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
-	MCFG_NVRAM_ADD_0FILL( "memcs" )
+	RAM( config, m_memc ).set_default_size( "32K" );
+	NVRAM( config, m_memcs, nvram_device::DEFAULT_ALL_0 );
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -263,9 +261,9 @@ MACHINE_CONFIG_START(d110_state::d110)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(d110_state, d110)
 
-	MCFG_MSM6222B_01_ADD( "lcd" )
+	MCFG_MSM6222B_01_ADD( m_lcd )
 
-	MCFG_TIMER_DRIVER_ADD( "midi_timer", d110_state, midi_timer_cb )
+	MCFG_TIMER_DRIVER_ADD( m_midi_timer, d110_state, midi_timer_cb )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC( "samples_timer", d110_state, samples_timer_cb, attotime::from_hz(32000*2) )
 MACHINE_CONFIG_END

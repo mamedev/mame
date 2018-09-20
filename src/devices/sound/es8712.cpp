@@ -57,10 +57,11 @@ es8712_device::es8712_device(const machine_config &mconfig, const char *tag, dev
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(es8712_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0) // TODO : gcpinbal case, differs per games?
-	MCFG_74157_OUT_CB(WRITE8(*this, es8712_device, msm_w))
-MACHINE_CONFIG_END
+void es8712_device::device_add_mconfig(machine_config &config)
+{
+	HCT157(config, m_adpcm_select, 0); // TODO : gcpinbal case, differs per games?
+	m_adpcm_select->out_callback().set(FUNC(es8712_device::msm_w));
+}
 
 
 //-------------------------------------------------

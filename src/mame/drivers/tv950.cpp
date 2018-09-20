@@ -65,6 +65,9 @@ public:
 		, m_gfx(*this, "graphics")
 	{ }
 
+	void tv950(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(via_b_r);
@@ -75,9 +78,8 @@ public:
 	DECLARE_WRITE8_MEMBER(row_addr_w);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
-	void tv950(machine_config &config);
 	void tv950_mem(address_map &map);
-private:
+
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
 	uint8_t m_attr_screen;
@@ -270,44 +272,41 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	m_row = (m_row + 1) % 250;
 }
 
-MACHINE_CONFIG_START(tv950_state::tv950)
+void tv950_state::tv950(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/14)
-	MCFG_DEVICE_PROGRAM_MAP(tv950_mem)
+	M6502(config, m_maincpu, MASTER_CLOCK/14);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tv950_state::tv950_mem);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )   // not real values
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250);   // not real values
+	screen.set_screen_update(CRTC_TAG, FUNC(r6545_1_device::screen_update));
 
 	// there are many 6845 CRTC submodels, the Theory of Operation manual references the Rockwell R6545-1 specificially.
-	MCFG_MC6845_ADD(CRTC_TAG, R6545_1, "screen", MASTER_CLOCK/14)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(14)
-	MCFG_MC6845_UPDATE_ROW_CB(tv950_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(tv950_state, crtc_update_addr)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(VIA_TAG, via6522_device, write_pb6))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tv950_state, crtc_vs_w))
-	MCFG_VIDEO_SET_SCREEN(nullptr)
+	R6545_1(config, m_crtc, MASTER_CLOCK/14);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(14);
+	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr), this);
+	m_crtc->out_hsync_callback().set(VIA_TAG, FUNC(via6522_device::write_pb6));
+	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
+	m_crtc->set_screen(nullptr);
 
-	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, MASTER_CLOCK/14)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, tv950_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, tv950_state, via_b_w))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, tv950_state, via_b_r))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, tv950_state, via_crtc_reset_w))
-	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, tv950_state, via_blink_rate_w))
+	VIA6522(config, m_via, MASTER_CLOCK/14);
+	m_via->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
+	m_via->writepa_handler().set(FUNC(tv950_state::via_a_w));
+	m_via->writepb_handler().set(FUNC(tv950_state::via_b_w));
+	m_via->readpb_handler().set(FUNC(tv950_state::via_b_r));
+	m_via->ca2_handler().set(FUNC(tv950_state::via_crtc_reset_w));
+	//m_via->cb2_handler().set(FUNC(tv950_state::via_blink_rate_w));
 
-	MCFG_DEVICE_ADD(ACIA1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
+	MOS6551(config, ACIA1_TAG, 0).set_xtal(MASTER_CLOCK/13);
+	MOS6551(config, ACIA2_TAG, 0).set_xtal(MASTER_CLOCK/13);
+	MOS6551(config, ACIA3_TAG, 0).set_xtal(MASTER_CLOCK/13);
 
-	MCFG_DEVICE_ADD(ACIA2_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
-
-	MCFG_DEVICE_ADD(ACIA3_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
-
-	MCFG_DEVICE_ADD("kbd", I8748, XTAL(5'714'300))
-MACHINE_CONFIG_END
+	I8748(config, "kbd", XTAL(5'714'300));
+}
 
 /* ROM definition */
 ROM_START( tv950 )

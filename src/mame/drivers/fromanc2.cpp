@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -634,12 +634,12 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_INS8250_OUT_TX_CB(WRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_INS8250_OUT_RTS_CB(WRITELINE("link", rs232_port_device, write_rts))
+	NS16550(config, m_uart, 2000000); // actual type is TL16C550CFN; clock unknown
+	m_uart->out_int_callback().set_inputline("maincpu", M68K_IRQ_2);
+	//m_uart->out_tx_callback().set("link", FUNC(rs232_port_device::write_txd));
+	//m_uart->out_rts_callback().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
@@ -649,7 +649,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

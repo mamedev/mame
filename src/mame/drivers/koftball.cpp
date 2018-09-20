@@ -53,6 +53,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void koftball(machine_config &config);
+
+	void init_koftball();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_main_ram;
 	required_shared_ptr<uint16_t> m_bmc_1_videoram;
@@ -68,13 +73,11 @@ public:
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
 	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
-	void init_koftball();
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
-	void koftball(machine_config &config);
 	void koftball_mem(address_map &map);
 	void ramdac_map(address_map &map);
 };

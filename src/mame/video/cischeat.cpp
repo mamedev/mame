@@ -582,8 +582,15 @@ void cischeat_state::cischeat_draw_sprites(bitmap_ind16 &bitmap , const rectangl
 
 		sx      =   source[ 3 ];
 		sy      =   source[ 4 ];
-		sx      =   (sx & 0x1ff) - (sx & 0x200);
-		sy      =   (sy & 0x1ff) - (sy & 0x200);
+		// TODO: was & 0x1ff with 0x200 as sprite wrap sign, looks incorrect with Grand Prix Star
+		//       during big car on side view in attract mode (a tyre gets stuck on the right of the screen)
+		//       this arrangement works with both games (otherwise Part 2 gets misaligned bleachers sprites)
+		sx      =   (sx & 0x7ff);
+		sy      =   (sy & 0x7ff);
+		if(sx & 0x400)
+			sx -= 0x800;
+		if(sy & 0x400)
+			sy -= 0x800;
 
 		/* use fixed point values (16.16), for accuracy */
 		sx <<= 16;

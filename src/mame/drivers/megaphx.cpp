@@ -93,12 +93,22 @@ public:
 		m_mainram(*this, "mainram"),
 		m_indersb(*this, "inder_sb"),
 		m_ppi(*this, "ppi8255_0"),
-		m_dsw_shifter{ {*this, "ttl166_1"}, {*this, "ttl166_2"} },
+		m_dsw_shifter(*this, "ttl166_%u", 1U),
 		m_dsw_data(0),
 		m_ppi_to_pic_command(0), m_ppi_to_pic_clock(0), m_ppi_to_pic_data(0),
 		m_pic_to_ppi_clock(0), m_pic_to_ppi_data(0)
 	{ }
 
+	void megaphx(machine_config &config);
+
+	void init_megaphx();
+
+protected:
+	virtual void machine_reset() override;
+
+	required_device<inder_vid_device> m_indervid;
+
+private:
 	DECLARE_READ8_MEMBER(pic_porta_r);
 	DECLARE_WRITE8_MEMBER(pic_porta_w);
 	DECLARE_READ8_MEMBER(pic_portb_r);
@@ -107,20 +117,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
 
-	void init_megaphx();
-
-	void megaphx(machine_config &config);
 	void megaphx_68k_map(address_map &map);
 
-protected:
-	virtual void machine_reset() override;
-	required_device<inder_vid_device> m_indervid;
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<inder_sb_device> m_indersb;
 	required_device<i8255_device> m_ppi;
-	required_device<ttl166_device> m_dsw_shifter[2];
+	required_device_array<ttl166_device, 2> m_dsw_shifter;
 
 	int m_dsw_data;
 	int m_ppi_to_pic_command;
@@ -385,19 +388,19 @@ MACHINE_CONFIG_START(megaphx_state::megaphx)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("ttl166_1", TTL166)
-	MCFG_TTL166_DATA_CB(IOPORT("DSW1"))
-	MCFG_TTL166_QH_CB(WRITELINE("ttl166_2", ttl166_device, serial_w))
+	TTL166(config, m_dsw_shifter[0]);
+	m_dsw_shifter[0]->data_callback().set_ioport("DSW1");
+	m_dsw_shifter[0]->qh_callback().set(m_dsw_shifter[1], FUNC(ttl166_device::serial_w));
 
-	MCFG_DEVICE_ADD("ttl166_2", TTL166)
-	MCFG_TTL166_DATA_CB(IOPORT("DSW2"))
-	MCFG_TTL166_QH_CB(WRITELINE(*this, megaphx_state, dsw_w))
+	TTL166(config, m_dsw_shifter[1]);
+	m_dsw_shifter[1]->data_callback().set_ioport("DSW2");
+	m_dsw_shifter[1]->qh_callback().set(FUNC(megaphx_state::dsw_w));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, megaphx_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, megaphx_state, ppi_portc_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("P1");
+	m_ppi->in_pb_callback().set_ioport("P2");
+	m_ppi->in_pc_callback().set(FUNC(megaphx_state::ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
 
 	MCFG_INDER_VIDEO_ADD("inder_vid")
 
@@ -436,9 +439,9 @@ ROM_START( megaphx )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
 	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
 
-	ROM_REGION( 0x100000, "pals", 0 ) // jedutil won't convert these? are they bad?
-	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
-	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
+	ROM_REGION( 0x1000, "pals", 0 ) // protected
+	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
+	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
 ROM_END
 
 ROM_START( hamboy )

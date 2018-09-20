@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
+#include "emu.h"
 #include "hlekbd.h"
 
 #include "machine/keyboard.ipp"

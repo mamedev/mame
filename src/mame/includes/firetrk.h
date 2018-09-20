@@ -64,6 +64,20 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void firetrk(machine_config &config);
+	void montecar(machine_config &config);
+	void superbug(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(steer_dir_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(steer_flag_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
+
+private:
 	DECLARE_WRITE8_MEMBER(firetrk_output_w);
 	DECLARE_WRITE8_MEMBER(superbug_output_w);
 	DECLARE_WRITE8_MEMBER(montecar_output_1_w);
@@ -77,14 +91,6 @@ public:
 	DECLARE_WRITE8_MEMBER(montecar_drone_reset_w);
 	DECLARE_WRITE8_MEMBER(steer_reset_w);
 	DECLARE_WRITE8_MEMBER(crash_reset_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_dir_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_flag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
-	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info1);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info1);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info1);
@@ -113,14 +119,10 @@ public:
 	void check_collision(int which);
 	void set_service_mode(int enable);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *alpha_ram, int x, int count, int height);
-	void firetrk(machine_config &config);
-	void montecar(machine_config &config);
-	void superbug(machine_config &config);
 	void firetrk_map(address_map &map);
 	void montecar_map(address_map &map);
 	void superbug_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;

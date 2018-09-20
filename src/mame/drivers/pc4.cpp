@@ -30,7 +30,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
 
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -232,7 +231,6 @@ MACHINE_CONFIG_START(pc4_state::pc4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc4_state, pc4)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc4)

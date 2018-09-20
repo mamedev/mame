@@ -20,6 +20,21 @@ public:
 			m_ports(*this, { { "IN0", "IN1", "DSW", "IN2" } })
 			{ }
 
+	void wunit(machine_config &config);
+	void wunit_picemu(machine_config &config);
+	void wunit_picsim(machine_config &config);
+
+	void init_mk3r10();
+	void init_nbahangt();
+	void init_wwfmania();
+	void init_umk3();
+	void init_mk3();
+	void init_openice();
+	void init_rmpgwt();
+	void init_umk3r11();
+	void init_mk3r20();
+
+private:
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic_emu_device> m_midway_serial_pic_emu;
 	required_shared_ptr<uint16_t> m_nvram;
@@ -46,24 +61,11 @@ public:
 	DECLARE_WRITE16_MEMBER(umk3_palette_hack_w);
 	DECLARE_WRITE16_MEMBER(wwfmania_io_0_w);
 
-	void init_mk3r10();
-	void init_nbahangt();
-	void init_wwfmania();
-	void init_umk3();
-	void init_mk3();
-	void init_openice();
-	void init_rmpgwt();
-	void init_umk3r11();
-	void init_mk3r20();
-
 	DECLARE_MACHINE_RESET(midwunit);
 	DECLARE_VIDEO_START(midwunit);
 
 	void register_state_saving();
 	void init_wunit_generic();
 	void init_mk3_common();
-	void wunit(machine_config &config);
-	void wunit_picemu(machine_config &config);
-	void wunit_picsim(machine_config &config);
 	void main_map(address_map &map);
 };

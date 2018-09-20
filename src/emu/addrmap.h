@@ -33,6 +33,11 @@ enum map_handler_type
 	AMH_NOP,
 	AMH_UNMAP,
 	AMH_DEVICE_DELEGATE,
+	AMH_DEVICE_DELEGATE_M,
+	AMH_DEVICE_DELEGATE_S,
+	AMH_DEVICE_DELEGATE_SM,
+	AMH_DEVICE_DELEGATE_MO,
+	AMH_DEVICE_DELEGATE_SMO,
 	AMH_PORT,
 	AMH_BANK,
 	AMH_DEVICE_SUBMAP
@@ -69,15 +74,8 @@ class address_map_entry
 	struct is_addrmap_method { static constexpr bool value = std::is_constructible<address_map_constructor, Ret (T::*)(Params...), const char *, T*>::value; };
 
 	template <typename T, typename Ret, typename... Params>
-	struct is_setoffset_method { static constexpr bool value = std::is_constructible<setoffset_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-
-	template <typename T, typename Ret, typename... Params>
 	static std::enable_if_t<is_addrmap_method<T, Ret, Params...>::value, address_map_constructor> make_delegate(Ret (T::*func)(Params...), const char *name, T *obj)
 	{ return address_map_constructor(func, name, obj); }
-
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_setoffset_method<T, Ret, Params...>::value, setoffset_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return setoffset_delegate(func, name, tag, obj); }
 
 	template <typename T, typename U>
 	static std::enable_if_t<std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T *> make_pointer(U &obj)
@@ -167,9 +165,6 @@ public:
 		return bankrw(target.second);
 	}
 
-	// set offset handler (only one version, since there is no data width to consider)
-	address_map_entry &setoffset(setoffset_delegate func);
-
 	// type setters
 	address_map_entry &set_read_type(map_handler_type _type) { m_read.m_type = _type; return *this; }
 	address_map_entry &set_write_type(map_handler_type _type) { m_write.m_type = _type; return *this; }
@@ -190,15 +185,11 @@ public:
 
 	template <typename T, typename RetR, typename... ParamsR, typename U, typename RetW, typename... ParamsW>
 	address_map_entry &rw(RetR (T::*read)(ParamsR...), const char *read_name, RetW (U::*write)(ParamsW...), const char *write_name)
-	{ return rw(emu::detail::make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase)), emu::detail::make_delegate(write, write_name, m_devbase.tag(), make_pointer<U>(m_devbase))); }
+	{ return r(emu::detail::make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase))).w(emu::detail::make_delegate(write, write_name, m_devbase.tag(), make_pointer<U>(m_devbase))); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &m(Ret (T::*map)(Params...), const char *map_name)
 	{ return m(&m_devbase, make_delegate(map, map_name, make_pointer<T>(m_devbase))); }
-
-	template <typename T, typename Ret, typename... Params>
-	address_map_entry &setoffset(Ret (T::*so)(Params...), const char *so_name)
-	{ return setoffset(make_delegate(so, so_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
 
 
 	// device tag -> delegate converter
@@ -212,15 +203,11 @@ public:
 
 	template <typename T, typename RetR, typename... ParamsR, typename U, typename RetW, typename... ParamsW>
 	address_map_entry &rw(const char *tag, RetR (T::*read)(ParamsR...), const char *read_name, RetW (U::*write)(ParamsW...), const char *write_name)
-	{ return rw(emu::detail::make_delegate(read, read_name, tag, nullptr), emu::detail::make_delegate(write, write_name, tag, nullptr)); }
+	{ return r(emu::detail::make_delegate(read, read_name, tag, nullptr)).w(emu::detail::make_delegate(write, write_name, tag, nullptr)); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &m(const char *tag, Ret (T::*map)(Params...), const char *map_name)
 	{ return m(tag, make_delegate(map, map_name, static_cast<T *>(nullptr))); }
-
-	template <typename T, typename Ret, typename... Params>
-	address_map_entry &setoffset(const char *tag, Ret (T::*so)(Params...), const char *so_name)
-	{ return setoffset(make_delegate(so, so_name, tag, static_cast<T *>(nullptr))); }
 
 
 	// device reference -> delegate converter
@@ -234,15 +221,11 @@ public:
 
 	template <typename T, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
 	address_map_entry &rw(T &obj, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ return rw(emu::detail::make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj)), emu::detail::make_delegate(write, write_name, get_tag(obj), make_pointer<V>(obj))); }
+	{ return r(emu::detail::make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj))).w(emu::detail::make_delegate(write, write_name, get_tag(obj), make_pointer<V>(obj))); }
 
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &m(T &obj, Ret (U::*map)(Params...), const char *map_name)
 	{ return m(make_pointer<device_t>(obj), make_delegate(map, map_name, make_pointer<U>(obj))); }
-
-	template <typename T, typename U, typename Ret, typename... Params>
-	address_map_entry &setoffset(T &obj, Ret (U::*so)(Params...), const char *so_name)
-	{ return w(make_delegate(so, so_name, get_tag(obj), make_pointer<U>(obj))); }
 
 
 	// device finder -> delegate converter
@@ -264,11 +247,11 @@ public:
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
 	address_map_entry &rw(device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return rw(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)), emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))).w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
 	address_map_entry &rw(const device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return rw(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)), emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
+	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))).w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
 	address_map_entry &m(device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)
@@ -278,62 +261,54 @@ public:
 	address_map_entry &m(const device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)
 	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return m(make_delegate(map, map_name, make_pointer<U>(device))); }
 
-	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &setoffset(device_finder<T, Reqd> &finder, Ret (U::*so)(Params...), const char *so_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return setoffset(make_delegate(so, so_name, device.tag(), make_pointer<U>(device))); }
-
-	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &setoffset(const device_finder<T, Reqd> &finder, Ret (U::*so)(Params...), const char *so_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return setoffset(make_delegate(so, so_name, device.tag(), make_pointer<U>(device))); }
-
 
 	// lambda -> delegate converter
 	template<typename _lr> address_map_entry &lr8(const char *name, _lr &&read) {
-		return r(read8_delegate(read, name));
+		return r(emu::detail::make_lr8_delegate(read, name));
 	}
 
 	template<typename _lr> address_map_entry &lr16(const char *name, _lr &&read) {
-		return r(read16_delegate(read, name));
+		return r(emu::detail::make_lr16_delegate(read, name));
 	}
 
 	template<typename _lr> address_map_entry &lr32(const char *name, _lr &&read) {
-		return r(read32_delegate(read, name));
+		return r(emu::detail::make_lr32_delegate(read, name));
 	}
 
 	template<typename _lr> address_map_entry &lr64(const char *name, _lr &&read) {
-		return r(read64_delegate(read, name));
+		return r(emu::detail::make_lr64_delegate(read, name));
 	}
 
 	template<typename _lw> address_map_entry &lw8(const char *name, _lw &&write) {
-		return w(write8_delegate(write, name));
+		return w(emu::detail::make_lw8_delegate(write, name));
 	}
 
 	template<typename _lw> address_map_entry &lw16(const char *name, _lw &&write) {
-		return w(write16_delegate(write, name));
+		return w(emu::detail::make_lw16_delegate(write, name));
 	}
 
 	template<typename _lw> address_map_entry &lw32(const char *name, _lw &&write) {
-		return w(write32_delegate(write, name));
+		return w(emu::detail::make_lw32_delegate(write, name));
 	}
 
 	template<typename _lw> address_map_entry &lw64(const char *name, _lw &&write) {
-		return w(write64_delegate(write, name));
+		return w(emu::detail::make_lw64_delegate(write, name));
 	}
 
 	template<typename _lr, typename _lw> address_map_entry &lrw8(const char *name, _lr &&read, _lw &&write) {
-		return rw(read8_delegate(read, name), write8_delegate(write, name));
+		return r(emu::detail::make_lr8_delegate(read, name)).w(emu::detail::make_lw8_delegate(write, name));
 	}
 
 	template<typename _lr, typename _lw> address_map_entry &lrw16(const char *name, _lr &&read, _lw &&write) {
-		return rw(read16_delegate(read, name), write16_delegate(write, name));
+		return r(emu::detail::make_lr16_delegate(read, name)).w(emu::detail::make_lw16_delegate(write, name));
 	}
 
 	template<typename _lr, typename _lw> address_map_entry &lrw32(const char *name, _lr &&read, _lw &&write) {
-		return rw(read32_delegate(read, name), write32_delegate(write, name));
+		return r(emu::detail::make_lr32_delegate(read, name)).w(emu::detail::make_lw32_delegate(write, name));
 	}
 
 	template<typename _lr, typename _lw> address_map_entry &lrw64(const char *name, _lr &&read, _lw &&write) {
-		return rw(read64_delegate(read, name), write64_delegate(write, name));
+		return r(emu::detail::make_lr64_delegate(read, name)).w(emu::detail::make_lw64_delegate(write, name));
 	}
 
 	// public state
@@ -351,7 +326,6 @@ public:
 	int                     m_cswidth;              // chip select width override
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
-	map_handler_data        m_setoffsethd;          // data for setoffset handler
 	const char *            m_share;                // tag of a shared memory block
 	const char *            m_region;               // tag of region containing the memory backing this entry
 	offs_t                  m_rgnoffs;              // offset within the region
@@ -366,7 +340,51 @@ public:
 	write32_delegate        m_wproto32;             // 32-bit write proto-delegate
 	write64_delegate        m_wproto64;             // 64-bit write proto-delegate
 
-	setoffset_delegate      m_soproto;              // set offset proto-delegate
+	read8m_delegate         m_rproto8m;             // 8-bit read proto-delegate
+	read16m_delegate        m_rproto16m;            // 16-bit read proto-delegate
+	read32m_delegate        m_rproto32m;            // 32-bit read proto-delegate
+	read64m_delegate        m_rproto64m;            // 64-bit read proto-delegate
+	write8m_delegate        m_wproto8m;             // 8-bit write proto-delegate
+	write16m_delegate       m_wproto16m;            // 16-bit write proto-delegate
+	write32m_delegate       m_wproto32m;            // 32-bit write proto-delegate
+	write64m_delegate       m_wproto64m;            // 64-bit write proto-delegate
+
+	read8s_delegate         m_rproto8s;             // 8-bit read proto-delegate
+	read16s_delegate        m_rproto16s;            // 16-bit read proto-delegate
+	read32s_delegate        m_rproto32s;            // 32-bit read proto-delegate
+	read64s_delegate        m_rproto64s;            // 64-bit read proto-delegate
+	write8s_delegate        m_wproto8s;             // 8-bit write proto-delegate
+	write16s_delegate       m_wproto16s;            // 16-bit write proto-delegate
+	write32s_delegate       m_wproto32s;            // 32-bit write proto-delegate
+	write64s_delegate       m_wproto64s;            // 64-bit write proto-delegate
+
+	read8sm_delegate        m_rproto8sm;            // 8-bit read proto-delegate
+	read16sm_delegate       m_rproto16sm;           // 16-bit read proto-delegate
+	read32sm_delegate       m_rproto32sm;           // 32-bit read proto-delegate
+	read64sm_delegate       m_rproto64sm;           // 64-bit read proto-delegate
+	write8sm_delegate       m_wproto8sm;            // 8-bit write proto-delegate
+	write16sm_delegate      m_wproto16sm;           // 16-bit write proto-delegate
+	write32sm_delegate      m_wproto32sm;           // 32-bit write proto-delegate
+	write64sm_delegate      m_wproto64sm;           // 64-bit write proto-delegate
+
+	read8mo_delegate        m_rproto8mo;            // 8-bit read proto-delegate
+	read16mo_delegate       m_rproto16mo;           // 16-bit read proto-delegate
+	read32mo_delegate       m_rproto32mo;           // 32-bit read proto-delegate
+	read64mo_delegate       m_rproto64mo;           // 64-bit read proto-delegate
+	write8mo_delegate       m_wproto8mo;            // 8-bit write proto-delegate
+	write16mo_delegate      m_wproto16mo;           // 16-bit write proto-delegate
+	write32mo_delegate      m_wproto32mo;           // 32-bit write proto-delegate
+	write64mo_delegate      m_wproto64mo;           // 64-bit write proto-delegate
+
+	read8smo_delegate       m_rproto8smo;           // 8-bit read proto-delegate
+	read16smo_delegate      m_rproto16smo;          // 16-bit read proto-delegate
+	read32smo_delegate      m_rproto32smo;          // 32-bit read proto-delegate
+	read64smo_delegate      m_rproto64smo;          // 64-bit read proto-delegate
+	write8smo_delegate      m_wproto8smo;           // 8-bit write proto-delegate
+	write16smo_delegate     m_wproto16smo;          // 16-bit write proto-delegate
+	write32smo_delegate     m_wproto32smo;          // 32-bit write proto-delegate
+	write64smo_delegate     m_wproto64smo;          // 64-bit write proto-delegate
+
 	device_t               *m_submap_device;
 	address_map_constructor m_submap_delegate;
 
@@ -376,22 +394,58 @@ public:
 	// handler setters for 8-bit delegates
 	address_map_entry &r(read8_delegate func);
 	address_map_entry &w(write8_delegate func);
-	address_map_entry &rw(read8_delegate rfunc, write8_delegate wfunc);
+	address_map_entry &r(read8m_delegate func);
+	address_map_entry &w(write8m_delegate func);
+	address_map_entry &r(read8s_delegate func);
+	address_map_entry &w(write8s_delegate func);
+	address_map_entry &r(read8sm_delegate func);
+	address_map_entry &w(write8sm_delegate func);
+	address_map_entry &r(read8mo_delegate func);
+	address_map_entry &w(write8mo_delegate func);
+	address_map_entry &r(read8smo_delegate func);
+	address_map_entry &w(write8smo_delegate func);
 
 	// handler setters for 16-bit delegates
 	address_map_entry &r(read16_delegate func);
 	address_map_entry &w(write16_delegate func);
-	address_map_entry &rw(read16_delegate rfunc, write16_delegate wfunc);
+	address_map_entry &r(read16m_delegate func);
+	address_map_entry &w(write16m_delegate func);
+	address_map_entry &r(read16s_delegate func);
+	address_map_entry &w(write16s_delegate func);
+	address_map_entry &r(read16sm_delegate func);
+	address_map_entry &w(write16sm_delegate func);
+	address_map_entry &r(read16mo_delegate func);
+	address_map_entry &w(write16mo_delegate func);
+	address_map_entry &r(read16smo_delegate func);
+	address_map_entry &w(write16smo_delegate func);
 
 	// handler setters for 32-bit delegates
 	address_map_entry &r(read32_delegate func);
 	address_map_entry &w(write32_delegate func);
-	address_map_entry &rw(read32_delegate rfunc, write32_delegate wfunc);
+	address_map_entry &r(read32m_delegate func);
+	address_map_entry &w(write32m_delegate func);
+	address_map_entry &r(read32s_delegate func);
+	address_map_entry &w(write32s_delegate func);
+	address_map_entry &r(read32sm_delegate func);
+	address_map_entry &w(write32sm_delegate func);
+	address_map_entry &r(read32mo_delegate func);
+	address_map_entry &w(write32mo_delegate func);
+	address_map_entry &r(read32smo_delegate func);
+	address_map_entry &w(write32smo_delegate func);
 
 	// handler setters for 64-bit delegates
 	address_map_entry &r(read64_delegate func);
 	address_map_entry &w(write64_delegate func);
-	address_map_entry &rw(read64_delegate rfunc, write64_delegate wfunc);
+	address_map_entry &r(read64m_delegate func);
+	address_map_entry &w(write64m_delegate func);
+	address_map_entry &r(read64s_delegate func);
+	address_map_entry &w(write64s_delegate func);
+	address_map_entry &r(read64sm_delegate func);
+	address_map_entry &w(write64sm_delegate func);
+	address_map_entry &r(read64mo_delegate func);
+	address_map_entry &w(write64mo_delegate func);
+	address_map_entry &r(read64smo_delegate func);
+	address_map_entry &w(write64smo_delegate func);
 
 private:
 	// helper functions

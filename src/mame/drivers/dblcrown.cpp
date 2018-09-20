@@ -73,14 +73,13 @@ public:
 
 	void dblcrown(machine_config &config);
 
-protected:
+private:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -608,8 +607,7 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_DEVICE_IO_MAP(dblcrown_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dblcrown_state, dblcrown_irq_scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1000))   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -625,12 +623,12 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dblcrown_state, lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dblcrown_state, bank_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dblcrown_state, mux_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(dblcrown_state::lamps_w));
+	ppi.out_pb_callback().set(FUNC(dblcrown_state::bank_w));
+	ppi.out_pc_callback().set(FUNC(dblcrown_state::mux_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

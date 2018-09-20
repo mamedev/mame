@@ -155,6 +155,17 @@ public:
 		m_toggle = 0;
 	}
 
+	void x2222(machine_config &config);
+	void gstream(machine_config &config);
+
+	void init_gstream();
+	void init_x2222();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
+
+private:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	optional_device_array<okim6295_device, 2> m_oki;
@@ -182,11 +193,6 @@ public:
 	DECLARE_READ32_MEMBER(gstream_speedup_r);
 	DECLARE_READ32_MEMBER(x2222_speedup_r);
 	DECLARE_READ32_MEMBER(x2222_speedup2_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
-	void init_gstream();
-	void init_x2222();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -200,8 +206,6 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void x2222(machine_config &config);
-	void gstream(machine_config &config);
 	void gstream_32bit_map(address_map &map);
 	void gstream_io(address_map &map);
 	void x2222_32bit_map(address_map &map);
@@ -833,7 +837,7 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -865,7 +869,7 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 	MCFG_DEVICE_IO_MAP(x2222_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
-//  MCFG_NVRAM_ADD_1FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

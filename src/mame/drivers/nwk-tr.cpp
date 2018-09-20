@@ -291,6 +291,12 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram") { }
 
+	void thrilld(machine_config &config);
+	void nwktr(machine_config &config);
+
+	void init_nwktr();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -332,18 +338,16 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
-	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
+	double adc12138_input_callback(uint8_t input);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void lanc2_init();
-	void thrilld(machine_config &config);
-	void nwktr(machine_config &config);
+
 	void nwktr_map(address_map &map);
 	void sharc0_map(address_map &map);
 	void sharc1_map(address_map &map);
@@ -805,7 +809,7 @@ static INPUT_PORTS_START( nwktr )
 INPUT_PORTS_END
 
 
-ADC12138_IPT_CONVERT_CB(nwktr_state::adc12138_input_callback)
+double nwktr_state::adc12138_input_callback(uint8_t input)
 {
 	int value = 0;
 	switch (input)
@@ -847,14 +851,11 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
-	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
-	MCFG_ADC1213X_IPT_CONVERT_CB(nwktr_state, adc12138_input_callback)
+	ADC12138(config, m_adc12138, 0);
+	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo0")
-
-	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo1")
+	K033906(config, "k033906_1", 0, "voodoo0");
+	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
@@ -895,8 +896,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(16'934'400));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

@@ -40,7 +40,7 @@ public:
 	void gaunt2p(machine_config &config);
 	void gauntlet2(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -64,7 +64,6 @@ protected:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<atari_sound_comm_device> m_soundcomm;
 	required_device<ym2151_device> m_ym2151;

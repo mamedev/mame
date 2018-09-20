@@ -18,7 +18,6 @@
 #define M6801_TAG       "m6801"
 #define MC2661_TAG      "mc2661"
 #define RS232_TAG       "rs232"
-#define CENTRONICS_TAG  "centronics"
 
 
 
@@ -85,10 +84,10 @@ MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.set_data_input_buffer("cent_data_in");
+	INPUT_BUFFER(config, "cent_data_in");
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 
@@ -102,9 +101,9 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 adam_spi_device::adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_SPI, tag, owner, clock),
-		device_adamnet_card_interface(mconfig, *this),
-		m_maincpu(*this, M6801_TAG)
+	: device_t(mconfig, ADAM_SPI, tag, owner, clock)
+	, device_adamnet_card_interface(mconfig, *this)
+	, m_maincpu(*this, M6801_TAG)
 {
 }
 

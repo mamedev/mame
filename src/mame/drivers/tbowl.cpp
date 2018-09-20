@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 

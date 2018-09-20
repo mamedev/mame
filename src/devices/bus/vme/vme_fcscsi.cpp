@@ -228,36 +228,37 @@ ROM_START (fcscsi1)
 ROM_END
 
 
-MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
+void vme_fcscsi1_card_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_DEVICE_PROGRAM_MAP(fcscsi1_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vme_fcscsi1_card_device, maincpu_irq_acknowledge_callback)
+	M68010(config, m_maincpu, CPU_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_fcscsi1_card_device::fcscsi1_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(vme_fcscsi1_card_device::maincpu_irq_acknowledge_callback));
 
 	/* FDC  */
-	MCFG_DEVICE_ADD("fdc", WD1772, PIT_CRYSTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(*this, vme_fcscsi1_card_device, fdc_irq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("mc68450", hd63450_device, drq1_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
+	WD1772(config, m_fdc, PIT_CRYSTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(vme_fcscsi1_card_device::fdc_irq));
+	m_fdc->drq_wr_callback().set("mc68450", FUNC(hd63450_device::drq1_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
 
 	/* PIT Parallel Interface and Timer device */
-	MCFG_DEVICE_ADD("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, vme_fcscsi1_card_device, led_w))
+	PIT68230(config, m_pit, PIT_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
+	m_pit->pb_out_callback().set(FUNC(vme_fcscsi1_card_device::led_w));
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
-	MCFG_DEVICE_ADD("mc68450", HD63450, "maincpu")   // MC68450 compatible
-	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
-	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
-	MCFG_HD63450_DMA_END_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_end))
-	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_error))
-	//MCFG_HD63450_DMA_READ_0_CB(READ8(*this, vme_fcscsi1_card_device, scsi_read_byte))  // ch 0 = SCSI
-	//MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(*this, vme_fcscsi1_card_device, scsi_write_byte))
-	MCFG_HD63450_DMA_READ_1_CB(READ8(*this, vme_fcscsi1_card_device, fdc_read_byte))  // ch 1 = fdc
-	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(*this, vme_fcscsi1_card_device, fdc_write_byte))
-MACHINE_CONFIG_END
+	HD63450(config, m_dmac, CPU_CRYSTAL / 2, "maincpu");   // MC68450 compatible
+	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
+	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_dmac->dma_end().set(FUNC(vme_fcscsi1_card_device::dma_end));
+	m_dmac->dma_error().set(FUNC(vme_fcscsi1_card_device::dma_error));
+	//m_dmac->dma_read<0>().set(FUNC(vme_fcscsi1_card_device::scsi_read_byte));  // ch 0 = SCSI
+	//m_dmac->dma_write<0>().set(FUNC(vme_fcscsi1_card_device::scsi_write_byte));
+	m_dmac->dma_read<1>().set(FUNC(vme_fcscsi1_card_device::fdc_read_byte));  // ch 1 = fdc
+	m_dmac->dma_write<1>().set(FUNC(vme_fcscsi1_card_device::fdc_write_byte));
+}
 
 const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const
 {
@@ -416,12 +417,12 @@ WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 
 READ8_MEMBER(vme_fcscsi1_card_device::fdc_read_byte)
 {
-	return m_fdc->read_data();
+	return m_fdc->data_r();
 }
 
 WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_write_byte)
 {
-	m_fdc->write_data(data & 0xff);
+	m_fdc->data_w(data & 0xff);
 }
 
 READ8_MEMBER(vme_fcscsi1_card_device::scsi_r)

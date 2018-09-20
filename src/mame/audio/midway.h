@@ -67,7 +67,7 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 
 	void ssio_map(address_map &map);
-	void ssio_input_ports(address_map &map, const char *ssio) const;
+	static void ssio_input_ports(address_map &map, const char *ssio);
 
 protected:
 	// device-level overrides

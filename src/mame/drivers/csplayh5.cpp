@@ -50,7 +50,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
-		m_v9958(*this, "v9958"),
 		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
@@ -58,7 +57,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
-	required_device<v9958_device> m_v9958;
 	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
@@ -139,7 +137,7 @@ void csplayh5_state::csplayh5_map(address_map &map)
 	map(0x200200, 0x200201).rw(FUNC(csplayh5_state::csplayh5_mux_r), FUNC(csplayh5_state::csplayh5_mux_w));
 	map(0x200400, 0x200401).portr("SYSTEM");
 
-	map(0x200600, 0x200607).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write)).umask16(0x00ff);
+	map(0x200600, 0x200607).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write)).umask16(0x00ff);
 
 	map(0x800000, 0xbfffff).rom().region("blit_gfx", 0); // GFX ROM routes here
 
@@ -378,16 +376,18 @@ MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 	MCFG_DEVICE_PROGRAM_MAP(csplayh5_sub_map)
 	MCFG_DEVICE_IO_MAP(csplayh5_sub_io_map)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, csplayh5_state, ide_irq))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true)); // dvd
+	ide.irq_handler().set(FUNC(csplayh5_state::ide_irq));
 #endif
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, csplayh5_state, csplayh5_vdp0_interrupt))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set(FUNC(csplayh5_state::csplayh5_vdp0_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	MCFG_NICHISND_ADD("nichisnd")

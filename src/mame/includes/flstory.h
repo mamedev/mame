@@ -30,6 +30,15 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundnmi(*this, "soundnmi") { }
 
+	void flstory(machine_config &config);
+	void rumba(machine_config &config);
+	void onna34ro(machine_config &config);
+	void victnine(machine_config &config);
+	void onna34ro_mcu(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -80,7 +89,6 @@ public:
 	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
 	DECLARE_WRITE8_MEMBER(sound_control_0_w);
 	DECLARE_WRITE8_MEMBER(sound_control_1_w);
 	DECLARE_WRITE8_MEMBER(sound_control_2_w);
@@ -100,11 +108,6 @@ public:
 	uint32_t screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void flstory(machine_config &config);
-	void rumba(machine_config &config);
-	void onna34ro(machine_config &config);
-	void victnine(machine_config &config);
-	void onna34ro_mcu(machine_config &config);
 	void base_map(address_map &map);
 	void flstory_map(address_map &map);
 	void onna34ro_map(address_map &map);

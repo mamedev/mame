@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "machine/eepromser.h"
+#include "machine/er2055.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
@@ -27,6 +29,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"),
 		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
+		m_earom(*this, "earom"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -57,6 +61,8 @@ private:
 	optional_shared_ptr<uint8_t> m_bullsdrt_tiles_bankram;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_outlatch;
+	optional_device<er2055_device> m_earom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -89,6 +95,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
 	DECLARE_READ8_MEMBER(caterplr_unknown_r);
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);

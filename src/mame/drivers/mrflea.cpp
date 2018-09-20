@@ -270,16 +270,16 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainppi", I8255, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8("subppi", i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE("subppi", i8255_device, pc4_w)) MCFG_DEVCB_BIT(7) // OBFA -> STBA
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("subppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // IBFB -> ACKB
+	i8255_device &mainppi(I8255(config, "mainppi", 0));
+	mainppi.in_pb_callback().set("subppi", FUNC(i8255_device::pb_r));
+	mainppi.out_pc_callback().set("subppi", FUNC(i8255_device::pc4_w)).bit(7); // OBFA -> STBA
+	mainppi.out_pc_callback().append("subppi", FUNC(i8255_device::pc2_w)).bit(1); // IBFB -> ACKB
 
-	MCFG_DEVICE_ADD("subppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("mainppi", i8255_device, pa_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE("mainppi", i8255_device, pc6_w)) MCFG_DEVCB_BIT(5) // IBFA -> ACKA
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("pic", pic8259_device, ir0_w)) MCFG_DEVCB_BIT(3) // INTRA
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mainppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // OBFB -> STBB
+	i8255_device &subppi(I8255(config, "subppi", 0));
+	subppi.in_pa_callback().set("mainppi", FUNC(i8255_device::pa_r));
+	subppi.out_pc_callback().set("mainppi", FUNC(i8255_device::pc6_w)).bit(5); // IBFA -> ACKA
+	subppi.out_pc_callback().append("pic", FUNC(pic8259_device::ir0_w)).bit(3); // INTRA
+	subppi.out_pc_callback().append("mainppi", FUNC(i8255_device::pc2_w)).bit(1); // OBFB -> STBB
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("subcpu", 0))

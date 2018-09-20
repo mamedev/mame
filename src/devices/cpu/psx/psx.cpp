@@ -137,6 +137,10 @@
 
 #define CAUSE_EXC ( 31L << 2 )
 #define CAUSE_IP ( 255L << 8 )
+// software interrupts
+#define CAUSE_IP0 ( 1L << 8 )
+#define CAUSE_IP1 ( 1L << 9 )
+// hardware interrupts
 #define CAUSE_IP2 ( 1L << 10 )
 #define CAUSE_IP3 ( 1L << 11 )
 #define CAUSE_IP4 ( 1L << 12 )
@@ -1436,21 +1440,32 @@ void psxcpu_device::update_rom_config()
 	}
 }
 
-void psxcpu_device::update_cop0( int reg )
+void psxcpu_device::update_cop0(int reg)
 {
-	if( reg == CP0_SR )
+	if (reg == CP0_SR)
 	{
 		update_memory_handlers();
 		update_address_masks();
 	}
 
-	if( ( reg == CP0_SR || reg == CP0_CAUSE ) &&
-		( m_cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
-		( m_cp0r[ CP0_SR ] & m_cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
+	if ((reg == CP0_SR || reg == CP0_CAUSE) &&
+		(m_cp0r[CP0_SR] & SR_IEC) != 0)
 	{
-		m_op = m_cache->read_dword( m_pc );
-		execute_unstoppable_instructions( 1 );
-		exception( EXC_INT );
+		uint32_t ip = m_cp0r[CP0_SR] & m_cp0r[CP0_CAUSE] & CAUSE_IP;
+		if (ip != 0)
+		{
+			if (ip & CAUSE_IP0) debugger_exception_hook(EXC_INT);
+			if (ip & CAUSE_IP1) debugger_exception_hook(EXC_INT);
+			//if (ip & CAUSE_IP2) debugger_interrupt_hook(PSXCPU_IRQ0);
+			//if (ip & CAUSE_IP3) debugger_interrupt_hook(PSXCPU_IRQ1);
+			//if (ip & CAUSE_IP4) debugger_interrupt_hook(PSXCPU_IRQ2);
+			//if (ip & CAUSE_IP5) debugger_interrupt_hook(PSXCPU_IRQ3);
+			//if (ip & CAUSE_IP6) debugger_interrupt_hook(PSXCPU_IRQ4);
+			//if (ip & CAUSE_IP7) debugger_interrupt_hook(PSXCPU_IRQ5);
+			m_op = m_cache->read_dword(m_pc);
+			execute_unstoppable_instructions(1);
+			exception(EXC_INT);
+		}
 	}
 }
 
@@ -1588,9 +1603,12 @@ void psxcpu_device::common_exception( int exception, uint32_t romOffset, uint32_
 		m_cp0r[ CP0_EPC ] = m_pc;
 	}
 
-	if( LOG_BIOSCALL && exception != EXC_INT )
+	if (exception != EXC_INT)
 	{
-		logerror( "%08x: Exception %d\n", m_pc, exception );
+		if (LOG_BIOSCALL)
+			logerror("%08x: Exception %d\n", m_pc, exception);
+
+		debugger_exception_hook(exception);
 	}
 
 	m_delayr = 0;
@@ -3444,12 +3462,11 @@ MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	MCFG_PSX_RCNT_IRQ1_HANDLER( WRITELINE( "irq", psxirq_device, intin5 ) )
 	MCFG_PSX_RCNT_IRQ2_HANDLER( WRITELINE( "irq", psxirq_device, intin6 ) )
 
-	MCFG_DEVICE_ADD( "sio0", PSX_SIO0, 0 )
-	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin7 ) )
+	auto &sio0(PSX_SIO0(config, "sio0", DERIVED_CLOCK(1, 2)));
+	sio0.irq_handler().set("irq", FUNC(psxirq_device::intin7));
 
-	MCFG_DEVICE_ADD( "sio1", PSX_SIO1, 0 )
-	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin8 ) )
+	auto &sio1(PSX_SIO1(config, "sio1", DERIVED_CLOCK(1, 2)));
+	sio1.irq_handler().set("irq", FUNC(psxirq_device::intin8));
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_VALUE( 0x00 )
+	RAM( config, "ram" ).set_default_value( 0x00 );
 MACHINE_CONFIG_END

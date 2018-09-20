@@ -78,17 +78,17 @@ ROM_START( abc_cadmouse )
 	ROM_LOAD( "eprom1.bin", 0x0000, 0x2000, CRC(e71c9141) SHA1(07a6fae4e3fff3d7a4f67ad0791e4e297c1763aa) )
 
 	ROM_REGION( 0x20, "cadmouse_prom2", 0 )
-	ROM_LOAD( "prom2.bin", 0x0000, 0x0020, CRC(C6C3BC9B) SHA1(5944cce355657b7bdc693f47a72f6b01decdc02a) ) // 32x8
+	ROM_LOAD( "prom2.bin", 0x0000, 0x0020, CRC(c6c3bc9b) SHA1(5944cce355657b7bdc693f47a72f6b01decdc02a) ) // 32x8
 	ROM_REGION( 0x20, "cadmouse_prom3", 0 )
-	ROM_LOAD( "prom3.bin", 0x0000, 0x0020, CRC(862FC73A) SHA1(8a5391cd2ab61e5c3e22bb8805ace48566f5f57d) ) // 32x8
+	ROM_LOAD( "prom3.bin", 0x0000, 0x0020, CRC(862fc73a) SHA1(8a5391cd2ab61e5c3e22bb8805ace48566f5f57d) ) // 32x8
 	ROM_REGION( 0x100, "cadmouse_prom4", 0 )
-	ROM_LOAD( "prom4.bin", 0x0000, 0x0100, CRC(DF58AAA9) SHA1(a2ab3b19a85ba3da6d78d1b0d44e2c33b44de5bc) ) // 256x4
+	ROM_LOAD( "prom4.bin", 0x0000, 0x0100, CRC(df58aaa9) SHA1(a2ab3b19a85ba3da6d78d1b0d44e2c33b44de5bc) ) // 256x4
 	ROM_REGION( 0x20, "cadmouse_prom5", 0 )
-	ROM_LOAD( "prom5.bin", 0x0000, 0x0020, CRC(5EFD8B94) SHA1(cbfd6ebee815b02667ae886bb0820efa29311d37) ) // 32x8
+	ROM_LOAD( "prom5.bin", 0x0000, 0x0020, CRC(5efd8b94) SHA1(cbfd6ebee815b02667ae886bb0820efa29311d37) ) // 32x8
 	ROM_REGION( 0x100, "cadmouse_prom6", 0 )
-	ROM_LOAD( "prom6.bin", 0x0000, 0x0100, CRC(EE3D8B75) SHA1(1afb22e3cff6e36f49228f63d0c7830bc48cf3cf) ) // 256x4
+	ROM_LOAD( "prom6.bin", 0x0000, 0x0100, CRC(ee3d8b75) SHA1(1afb22e3cff6e36f49228f63d0c7830bc48cf3cf) ) // 256x4
 	ROM_REGION( 0x100, "cadmouse_prom7", 0 )
-	ROM_LOAD( "prom7.bin", 0x0000, 0x0100, CRC(395110BD) SHA1(54720d155b4990d9879b95c0d13592bb7534da09) ) // 256x4
+	ROM_LOAD( "prom7.bin", 0x0000, 0x0100, CRC(395110bd) SHA1(54720d155b4990d9879b95c0d13592bb7534da09) ) // 256x4
 ROM_END
 
 

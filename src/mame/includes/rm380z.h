@@ -48,8 +48,27 @@ Research Machines RM 380Z
 
 class rm380z_state : public driver_device
 {
-private:
+public:
+	rm380z_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, RM380Z_MAINCPU_TAG),
+		m_cassette(*this, "cassette"),
+		m_messram(*this, RAM_TAG),
+		m_fdc(*this, "wd1771"),
+		m_floppy0(*this, "wd1771:0"),
+		m_floppy1(*this, "wd1771:1")
+	{
+	}
 
+	void rm480z(machine_config &config);
+	void rm380z(machine_config &config);
+
+	void init_rm380z();
+	void init_rm380z34d();
+	void init_rm380z34e();
+	void init_rm480z();
+
+private:
 	void put_point(int charnum,int x,int y,int col);
 	void init_graphic_chars();
 
@@ -96,18 +115,6 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
-public:
-	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, RM380Z_MAINCPU_TAG),
-		m_cassette(*this, "cassette"),
-		m_messram(*this, RAM_TAG),
-		m_fdc(*this, "wd1771"),
-		m_floppy0(*this, "wd1771:0"),
-		m_floppy1(*this, "wd1771:1")
-	{
-	}
-
 	DECLARE_WRITE8_MEMBER( port_write );
 	DECLARE_READ8_MEMBER( port_read );
 	DECLARE_WRITE8_MEMBER( port_write_1b00 );
@@ -129,10 +136,6 @@ public:
 
 	void keyboard_put(u8 data);
 
-	void init_rm380z();
-	void init_rm380z34d();
-	void init_rm380z34e();
-	void init_rm480z();
 	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();
@@ -140,8 +143,7 @@ public:
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
-	void rm480z(machine_config &config);
-	void rm380z(machine_config &config);
+
 	void rm380z_io(address_map &map);
 	void rm380z_mem(address_map &map);
 	void rm480z_io(address_map &map);

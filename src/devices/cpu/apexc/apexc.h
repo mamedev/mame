@@ -7,10 +7,10 @@
 #pragma once
 
 #define MCFG_APEXC_TAPE_READ_CB(_devcb) \
-	devcb = &downcast<apexc_cpu_device &>(*device).set_tape_read_cb(DEVCB_##_devcb);
+	downcast<apexc_cpu_device &>(*device).set_tape_read_cb(DEVCB_##_devcb);
 
 #define MCFG_APEXC_TAPE_PUNCH_CB(_devcb) \
-	devcb = &downcast<apexc_cpu_device &>(*device).set_tape_punch_cb(DEVCB_##_devcb);
+	downcast<apexc_cpu_device &>(*device).set_tape_punch_cb(DEVCB_##_devcb);
 
 enum
 {

@@ -34,6 +34,9 @@ public:
 		: pk8000_base_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
+	void photon(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(_80_porta_w);
 	DECLARE_READ8_MEMBER(_80_portb_r);
 	DECLARE_WRITE8_MEMBER(_80_portc_w);
@@ -48,7 +51,6 @@ public:
 	void set_bank(uint8_t data);
 
 	required_device<speaker_sound_device> m_speaker;
-	void photon(machine_config &config);
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
 };
@@ -221,15 +223,15 @@ MACHINE_CONFIG_START(photon_state::photon)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, photon_state, _80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, photon_state, _80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, photon_state, _80_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(photon_state::_80_porta_w));
+	ppi1.in_pb_callback().set(FUNC(photon_state::_80_portb_r));
+	ppi1.out_pc_callback().set(FUNC(photon_state::_80_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8000_base_state, _84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_base_state, _84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_base_state, _84_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

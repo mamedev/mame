@@ -614,25 +614,20 @@ MACHINE_CONFIG_START(z88_state::z88)
 	device = &PALETTE(config, m_palette, Z88_NUM_COLOURS);
 	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	device = &UPD65031(config, m_blink, XTAL(9'830'400));
-	MCFG_UPD65031_KB_CALLBACK(READ8(*this, z88_state, kb_r))
-	MCFG_UPD65031_INT_CALLBACK(INPUTLINE(m_maincpu, INPUT_LINE_IRQ0))
-	MCFG_UPD65031_NMI_CALLBACK(INPUTLINE(m_maincpu, INPUT_LINE_NMI))
-	MCFG_UPD65031_SPKR_CALLBACK(WRITELINE(m_speaker, speaker_sound_device, level_w))
+	m_blink->kb_rd_callback().set(FUNC(z88_state::kb_r));
+	m_blink->int_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_blink->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_blink->spkr_wr_callback().set("speaker", FUNC(speaker_sound_device::level_w));
 	MCFG_UPD65031_SCR_UPDATE_CB(z88_state, lcd_update)
 	MCFG_UPD65031_MEM_UPDATE_CB(z88_state, bankswitch_update)
 
 	/* sound hardware */
-	SPEAKER(config, m_mono).front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("32K,64K,256K,512K");
 
 	/* cartridges */
 	device = &Z88CART_SLOT(config, m_carts[1]);

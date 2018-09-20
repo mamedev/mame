@@ -24,6 +24,14 @@ public:
 		m_spriteram(*this, "spriteram", 0),
 		m_spriteram2(*this, "spriteram2", 0)  { }
 
+	void fantland(machine_config &config);
+	void wheelrun(machine_config &config);
+	void borntofi(machine_config &config);
+	void galaxygn(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
+
+private:
 	/* memory pointers */
 //  uint8_t *    m_spriteram;   // currently directly used in a 16bit map...
 //  uint8_t *    m_spriteram_2; // currently directly used in a 16bit map...
@@ -64,7 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER(borntofi_nmi_enable_w);
 	DECLARE_READ8_MEMBER(borntofi_inputs_r);
 	DECLARE_WRITE8_MEMBER(borntofi_msm5205_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
 	DECLARE_MACHINE_START(fantland);
 	DECLARE_MACHINE_RESET(fantland);
 	DECLARE_MACHINE_START(borntofi);
@@ -80,10 +87,6 @@ public:
 	void borntofi_adpcm_start( msm5205_device *device, int voice );
 	void borntofi_adpcm_stop( msm5205_device *device, int voice );
 	void borntofi_adpcm_int( msm5205_device *device, int voice );
-	void fantland(machine_config &config);
-	void wheelrun(machine_config &config);
-	void borntofi(machine_config &config);
-	void galaxygn(machine_config &config);
 	void borntofi_map(address_map &map);
 	void borntofi_sound_map(address_map &map);
 	void fantland_map(address_map &map);

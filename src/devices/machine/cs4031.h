@@ -31,56 +31,19 @@
 #include "machine/ds128x.h"
 #include "machine/at_keybc.h"
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CS4031_ADD(_tag, _clock, _cputag, _isatag, _biostag, _keybctag) \
-	MCFG_DEVICE_ADD(_tag, CS4031, _clock) \
-	downcast<cs4031_device &>(*device).set_cputag(_cputag); \
-	downcast<cs4031_device &>(*device).set_isatag(_isatag); \
-	downcast<cs4031_device &>(*device).set_biostag(_biostag); \
-	downcast<cs4031_device &>(*device).set_keybctag(_keybctag);
-
-#define MCFG_CS4031_IOR(_ior) \
-	devcb = &downcast<cs4031_device *>(device)->set_ior_callback(DEVCB_##_ior);
-
-#define MCFG_CS4031_IOW(_iow) \
-	devcb = &downcast<cs4031_device *>(device)->set_iow_callback(DEVCB_##_iow);
-
-#define MCFG_CS4031_TC(_tc) \
-	devcb = &downcast<cs4031_device *>(device)->set_tc_callback(DEVCB_##_tc);
-
-#define MCFG_CS4031_HOLD(_hold) \
-	devcb = &downcast<cs4031_device *>(device)->set_hold_callback(DEVCB_##_hold);
-
-#define MCFG_CS4031_NMI(_nmi) \
-	devcb = &downcast<cs4031_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
-
-#define MCFG_CS4031_INTR(_intr) \
-	devcb = &downcast<cs4031_device *>(device)->set_intr_callback(DEVCB_##_intr);
-
-#define MCFG_CS4031_CPURESET(_cpureset) \
-	devcb = &downcast<cs4031_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
-
-#define MCFG_CS4031_A20M(_a20m) \
-	devcb = &downcast<cs4031_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
-
-#define MCFG_CS4031_SPKR(_spkr) \
-	devcb = &downcast<cs4031_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> cs4031_device
-
 class cs4031_device : public device_t
 {
 public:
 	// construction/destruction
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *cputag, const char *isatag, const char *biostag, const char *keybctag)
+		: cs4031_device(mconfig, tag, owner, clock)
+	{
+		set_cputag(cputag);
+		set_isatag(isatag);
+		set_biostag(biostag);
+		set_keybctag(keybctag);
+	}
+
 	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
@@ -93,6 +56,15 @@ public:
 	template <class Obj> devcb_base &set_intr_callback(Obj &&intr) { return m_write_intr.set_callback(std::forward<Obj>(intr)); }
 	template <class Obj> devcb_base &set_a20m_callback(Obj &&a20m) { return m_write_a20m.set_callback(std::forward<Obj>(a20m)); }
 	template <class Obj> devcb_base &set_spkr_callback(Obj &&spkr) { return m_write_spkr.set_callback(std::forward<Obj>(spkr)); }
+	auto ior() { return m_read_ior.bind(); }
+	auto iow() { return m_write_iow.bind(); }
+	auto tc() { return m_write_tc.bind(); }
+	auto hold() { return m_write_hold.bind(); }
+	auto cpureset() { return m_write_cpureset.bind(); }
+	auto nmi() { return m_write_nmi.bind(); }
+	auto intr() { return m_write_intr.bind(); }
+	auto a20m() { return m_write_a20m.bind(); }
+	auto spkr() { return m_write_spkr.bind(); }
 
 	// internal io
 	DECLARE_WRITE8_MEMBER( config_address_w );
@@ -170,8 +142,8 @@ private:
 	void set_dma_channel(int channel, bool state);
 	void update_dma_clock();
 
-	void nmi();
-	void a20m();
+	void trigger_nmi();
+	void update_a20m();
 
 	void emulated_kbreset(int state);
 	void emulated_gatea20(int state);
@@ -278,8 +250,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( ctc_out2_w );
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(CS4031, cs4031_device)
 
 #endif // MAME_MACHINE_CS4031_H

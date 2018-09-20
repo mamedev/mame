@@ -46,17 +46,20 @@ public:
 	{
 	}
 
+	void voyager(machine_config &config);
+
+	void init_voyager();
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	uint32_t m_idle_skip_ram;
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	void init_voyager();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void voyager(machine_config &config);
 	void voyager_io(address_map &map);
 	void voyager_map(address_map &map);
 
@@ -507,8 +510,8 @@ MACHINE_CONFIG_START(voyager_state::voyager)
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, voyager_state, intel82439tx_pci_r, intel82439tx_pci_w)

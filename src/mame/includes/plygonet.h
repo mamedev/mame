@@ -36,6 +36,11 @@ public:
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000")
 	{ }
 
+	void plygonet(machine_config &config);
+
+	void init_polygonet();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dsp56k_device> m_dsp;
@@ -97,7 +102,7 @@ public:
 	DECLARE_WRITE32_MEMBER(polygonet_ttl_ram_w);
 	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
 	DECLARE_WRITE32_MEMBER(polygonet_roz_ram_w);
-	void init_polygonet();
+
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(plygonet_scan);
@@ -108,7 +113,7 @@ public:
 	uint32_t screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
-	void plygonet(machine_config &config);
+
 	void dsp_data_map(address_map &map);
 	void dsp_program_map(address_map &map);
 	void main_map(address_map &map);

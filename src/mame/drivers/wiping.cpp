@@ -296,13 +296,13 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wiping_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wiping_state, main_irq_mask_w)) // INT1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wiping_state, sound_irq_mask_w)) // INT2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wiping_state, flipscreen_w)) // INV
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // CP2RE
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5A
+	mainlatch.q_out_cb<0>().set(FUNC(wiping_state::main_irq_mask_w)); // INT1
+	mainlatch.q_out_cb<1>().set(FUNC(wiping_state::sound_irq_mask_w)); // INT2
+	mainlatch.q_out_cb<2>().set(FUNC(wiping_state::flipscreen_w)); // INV
+	mainlatch.q_out_cb<3>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert(); // CP2RE
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -321,8 +321,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("wiping", WIPING_CUSTOM, 96000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	WIPING_CUSTOM(config, "wiping", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

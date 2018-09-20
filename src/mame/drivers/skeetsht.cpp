@@ -40,6 +40,9 @@ public:
 	{
 	}
 
+	void skeetsht(machine_config &config);
+
+private:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_tms_vram;
 	uint8_t m_porta_latch;
@@ -60,7 +63,6 @@ public:
 	required_device<cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
-	void skeetsht(machine_config &config);
 	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);
 	void tms_program_map(address_map &map);

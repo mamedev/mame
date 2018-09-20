@@ -158,9 +158,9 @@ public:
 	void set_shuffle(uint8_t shuffle) { m_shuffle_type = shuffle; }
 	void set_shuffle_default(uint8_t shuffle) { m_shuffle_default = shuffle; }
 	void set_auto_ack(uint8_t auto_ack) { m_auto_ack = auto_ack; }
-	template <class Object> devcb_base &set_irqhandler_callback(Object &&cb) { return m_irq_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_serial_tx_callback(Object &&cb) { return m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_aux_output_callback(Object &&cb) { return m_aux_output_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_callback.bind(); }
+	auto serial_tx_handler() { return m_serial_tx_cb.bind(); }
+	auto aux_output_handler() { return m_aux_output_cb.bind(); }
 
 	void set_shuffle_state(int state);
 	void fifo_w(uint16_t data);
@@ -191,6 +191,11 @@ protected:
 private:
 	void ioasic_register_state();
 	void update_ioasic_irq();
+
+	required_ioport m_io_dips;
+	required_ioport m_io_system;
+	required_ioport m_io_in1;
+	required_ioport m_io_in2;
 
 	devcb_write8    m_serial_tx_cb;
 	devcb_write32   m_aux_output_cb;
@@ -234,16 +239,16 @@ DECLARE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device)
 	downcast<midway_ioasic_device &>(*device).set_shuffle_default(_shuffle);
 
 #define MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(_write) \
-	devcb = &downcast<midway_ioasic_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
+	downcast<midway_ioasic_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
 
 #define MCFG_MIDWAY_IOASIC_AUTO_ACK(_ack) \
 	downcast<midway_ioasic_device &>(*device).set_auto_ack(_ack);
 
 #define MCFG_MIDWAY_IOASIC_OUT_TX_CB(_devcb) \
-	devcb = &downcast<midway_ioasic_device &>(*device).set_serial_tx_callback(DEVCB_##_devcb);
+	downcast<midway_ioasic_device &>(*device).set_serial_tx_callback(DEVCB_##_devcb);
 
 #define MCFG_MIDWAY_IOASIC_AUX_OUT_CB(_devcb) \
-	devcb = &downcast<midway_ioasic_device &>(*device).set_aux_output_callback(DEVCB_##_devcb);
+	downcast<midway_ioasic_device &>(*device).set_aux_output_callback(DEVCB_##_devcb);
 
 
 enum

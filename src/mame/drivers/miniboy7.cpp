@@ -168,6 +168,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void miniboy7(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 	DECLARE_WRITE8_MEMBER(ay_pb_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -177,14 +180,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(miniboy7);
 
-	void miniboy7(machine_config &config);
 	void miniboy7_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 
-private:
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;
 	required_shared_ptr<uint8_t> m_videoram_b;
@@ -517,14 +517,14 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(miniboy7_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("INPUT1"))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, miniboy7_state, pia_pb_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, miniboy7_state, pia_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", 0))
+	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia.readpa_handler().set_ioport("INPUT1");
+	pia.readpb_handler().set(FUNC(miniboy7_state::pia_pb_r));
+	pia.ca2_handler().set(FUNC(miniboy7_state::pia_ca2_w));
+	pia.irqa_handler().set_inputline("maincpu", 0);
+	pia.irqb_handler().set_inputline("maincpu", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

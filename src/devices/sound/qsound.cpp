@@ -120,7 +120,7 @@ DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "QSound")
 
 // DSP internal ROM region
 ROM_START( qsound )
-	ROM_REGION( 0x2000, "dsp", 0 )
+	ROM_REGION16_BE( 0x2000, "dsp", 0 )
 	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
 	ROM_IGNORE( 0x4000 )
 ROM_END
@@ -227,6 +227,14 @@ void qsound_device::device_start()
 	save_item(NAME(m_channel));
 }
 
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void qsound_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 2 / 1248);
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -272,11 +280,11 @@ void qsound_device::dsp_io_map(address_map &map)
 
 READ16_MEMBER(qsound_device::dsp_sample_r)
 {
-	// FIXME: DSP16 doesn't like bytes, only signed words - should this zero-pad or byte-smear?
+	// on CPS2, bit 0-7 of external ROM data is tied to ground
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));
 	if (!machine().side_effects_disabled())
-		m_rom_bank = offset;
-	return (u16(byte) << 8) | u16(byte);
+		m_rom_bank = (m_rom_bank & 0x8000U) | offset;
+	return u16(byte) << 8;
 }
 
 WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
@@ -323,25 +331,11 @@ WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
 
 WRITE16_MEMBER(qsound_device::dsp_pio_w)
 {
-	/*
-	 *  FIXME: what does this do when PDX is high?
-	 *  There are seemingly two significant points where the program writes PDX1 every sample interval.
-	 *
-	 *  Before writing the right-channel sample to SDX - this causes the PSEL 0->1 transition:
-	 *  0:5d4: 996e       if true a0 = rnd(a0)
-	 *  0:5d5: 51e0 0000  pdx1 = 0x0000
-	 *  0:5d7: 49a0       move sdx = a0
-	 *
-	 * This curious code where it writes out the a word from RAM@0x00f1 - this value seems significant:
-	 * 0:335: 18f1       set r0 = 0x00f1
-	 * 0:336: 3cd0       nop, a0 = *r0
-	 * 0:337: d850       p = x*y, y = a1, x = *pt++i
-	 * 0:338: 49e0       move pdx1 = a0
-	 */
-	if (offset)
-		LOG("QSound: DSP PDX1 = %04X\n", data);
-	else
-		m_rom_offset = data;
+	// PDX0 is used for QSound ROM offset, and PDX1 is used for ADPCM ROM offset
+	// this prevents spurious PSEL transitions between sending samples to the DAC
+	// it could still be used to have separate QSound/ADPCM ROM banks
+	m_rom_bank = (m_rom_bank & 0x7fffU) | u16(offset << 15);
+	m_rom_offset = data;
 }
 
 

@@ -268,7 +268,6 @@ ROMs:
 #include "includes/segaxbd.h"
 #include "includes/segaipt.h"
 
-#include "machine/cxd1095.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
@@ -290,6 +289,7 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 	, m_soundcpu2(*this, "soundcpu2")
 	, m_mcu(*this, "mcu")
 	, m_watchdog(*this, "watchdog")
+	, m_iochip(*this, "iochip_%u", 0U)
 	, m_cmptimer_1(*this, "cmptimer_main")
 	, m_sprites(*this, "sprites")
 	, m_segaic16vid(*this, "segaic16vid")
@@ -360,7 +360,14 @@ public:
 	{
 	}
 
-	required_device<segaxbd_state> m_mainpcb;
+	void sega_smgp_fd1094(machine_config &config);
+	void sega_lastsurv_fd1094(machine_config &config);
+	void sega_lastsurv(machine_config &config);
+	void sega_xboard(machine_config &config);
+	void sega_aburner2(machine_config &config);
+	void sega_xboard_fd1094(machine_config &config);
+	void sega_rascot(machine_config &config);
+	void sega_smgp(machine_config &config);
 
 	// game-specific driver init
 	void init_generic();
@@ -371,14 +378,8 @@ public:
 	void init_rascot();
 	void init_gprider();
 
-	void sega_smgp_fd1094(machine_config &config);
-	void sega_lastsurv_fd1094(machine_config &config);
-	void sega_lastsurv(machine_config &config);
-	void sega_xboard(machine_config &config);
-	void sega_aburner2(machine_config &config);
-	void sega_xboard_fd1094(machine_config &config);
-	void sega_rascot(machine_config &config);
-	void sega_smgp(machine_config &config);
+protected:
+	required_device<segaxbd_state> m_mainpcb;
 };
 
 class segaxbd_new_state_double : public segaxbd_new_state
@@ -396,6 +397,11 @@ public:
 		rampage2 = 0x0000;
 	}
 
+	void sega_xboard_fd1094_double(machine_config &config);
+
+	void init_gprider_double();
+
+private:
 	required_device<segaxbd_state> m_subpcb;
 
 	DECLARE_READ16_MEMBER(shareram1_r) {
@@ -429,12 +435,9 @@ public:
 		}
 	}
 
-	void init_gprider_double();
-
 	uint16_t shareram[0x800];
 	uint16_t rampage1;
 	uint16_t rampage2;
-	void sega_xboard_fd1094_double(machine_config &config);
 };
 
 //**************************************************************************
@@ -926,13 +929,13 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x0d0000, 0x0d0fff).mirror(0x00f000).rw("segaic16vid", FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x0e0000, 0x0e0007).mirror(0x003ff8).rw("multiplier_main", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
 	map(0x0e4000, 0x0e401f).mirror(0x003fe0).rw("divider_main", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
-	map(0x0e8000, 0x0e801f).mirror(0x003fe0).rw("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
+	map(0x0e8000, 0x0e801f).mirror(0x003fe0).rw(m_cmptimer_1, FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
 	map(0x100000, 0x100fff).mirror(0x00f000).ram().share("sprites");
 	map(0x110000, 0x11ffff).w("sprites", FUNC(sega_xboard_sprite_device::draw_write));
 	map(0x120000, 0x123fff).mirror(0x00c000).ram().w(FUNC(segaxbd_state::paletteram_w)).share("paletteram");
 	map(0x130000, 0x13ffff).rw(FUNC(segaxbd_state::adc_r), FUNC(segaxbd_state::adc_w));
-	map(0x140000, 0x14000f).mirror(0x00fff0).rw("iochip_0", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
-	map(0x150000, 0x15000f).mirror(0x00fff0).rw("iochip_1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
+	map(0x140000, 0x14000f).mirror(0x00fff0).rw(m_iochip[0], FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
+	map(0x150000, 0x15000f).mirror(0x00fff0).rw(m_iochip[1], FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).w(FUNC(segaxbd_state::iocontrol_w));
 	map(0x200000, 0x27ffff).rom().region("subcpu", 0x00000);
 	map(0x280000, 0x283fff).mirror(0x01c000).ram().share("subram0");
@@ -990,7 +993,7 @@ void segaxbd_state::sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).mirror(0x3f).r("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::zread));
+	map(0x40, 0x40).mirror(0x3f).r(m_cmptimer_1, FUNC(sega_315_5250_compare_timer_device::zread));
 }
 
 
@@ -1014,7 +1017,7 @@ void segaxbd_state::smgp_sound2_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).r("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::zread));
+	map(0x40, 0x40).mirror(0x3f).r(m_cmptimer_1, FUNC(sega_315_5250_compare_timer_device::zread));
 }
 
 
@@ -1671,34 +1674,34 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("backup1")
-	MCFG_NVRAM_ADD_0FILL("backup2")
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "backup2", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MB3773_ADD("watchdog")
+	MB3773(config, "watchdog");
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
 	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
 	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
 
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
-	MCFG_SEGA_315_5250_68KINT_CALLBACK(WRITELINE(*this, segaxbd_state, timer_irq_w))
-	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
+	m_cmptimer_1->m68kint_callback().set(FUNC(segaxbd_state::timer_irq_w));
+	m_cmptimer_1->zint_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
+	SEGA_315_5250_COMPARE_TIMER(config, "cmptimer_subx", 0);
 
-	MCFG_DEVICE_ADD("iochip_0", CXD1095, 0) // IC160
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO0PORTA"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("IO0PORTB"))
-	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(*this, segaxbd_state, pc_0_w))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, segaxbd_state, pd_0_w))
+	CXD1095(config, m_iochip[0], 0); // IC160
+	m_iochip[0]->in_porta_cb().set_ioport("IO0PORTA");
+	m_iochip[0]->in_portb_cb().set_ioport("IO0PORTB");
+	m_iochip[0]->out_portc_cb().set(FUNC(segaxbd_state::pc_0_w));
+	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::pd_0_w));
 
-	MCFG_DEVICE_ADD("iochip_1", CXD1095, 0) // IC159
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO1PORTA"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("IO1PORTB"))
-	MCFG_CXD1095_IN_PORTC_CB(IOPORT("IO1PORTC"))
-	MCFG_CXD1095_IN_PORTD_CB(IOPORT("IO1PORTD"))
+	CXD1095(config, m_iochip[1], 0); // IC159
+	m_iochip[1]->in_porta_cb().set_ioport("IO1PORTA");
+	m_iochip[1]->in_portb_cb().set_ioport("IO1PORTB");
+	m_iochip[1]->in_portc_cb().set_ioport("IO1PORTC");
+	m_iochip[1]->in_portd_cb().set_ioport("IO1PORTD");
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segaxbd)
@@ -1788,14 +1791,13 @@ segaxbd_aburner2_state::segaxbd_aburner2_state(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_aburner2_state::device_add_mconfig)
+void segaxbd_aburner2_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
 
-	// basic machine hardware
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, aburner2_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, aburner2_motor_w))
-MACHINE_CONFIG_END
+	m_iochip[0]->in_porta_cb().set(FUNC(segaxbd_state::aburner2_motor_r));
+	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::aburner2_motor_w));
+}
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_aburner2)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_ABURNER2_DEVICE, 0)
@@ -1820,11 +1822,8 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_fd1094_state::device_add_mconfig)
 	// basic machine hardware
 	// TODO: network board
 
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, segaxbd_state, lastsurv_muxer_w))
-
-	MCFG_DEVICE_MODIFY("iochip_1")
-	MCFG_CXD1095_IN_PORTB_CB(READ8(*this, segaxbd_state, lastsurv_port_r))
+	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::lastsurv_muxer_w));
+	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
 
 	// sound hardware - ym2151 stereo is reversed
 	MCFG_DEVICE_MODIFY("ymsnd")
@@ -1852,11 +1851,8 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_state::device_add_mconfig)
 	// basic machine hardware
 	// TODO: network board
 
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, segaxbd_state, lastsurv_muxer_w))
-
-	MCFG_DEVICE_MODIFY("iochip_1")
-	MCFG_CXD1095_IN_PORTB_CB(READ8(*this, segaxbd_state, lastsurv_port_r))
+	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::lastsurv_muxer_w));
+	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
 
 	// sound hardware - ym2151 stereo is reversed
 	MCFG_DEVICE_MODIFY("ymsnd")
@@ -1897,13 +1893,10 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
-	MCFG_DEVICE_MODIFY("cmptimer_main")
-	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("soundcpu2", INPUT_LINE_NMI))
+	m_cmptimer_1->zint_callback().append_inputline(m_soundcpu2, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
+	m_iochip[0]->in_porta_cb().set(FUNC(segaxbd_state::smgp_motor_r));
+	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
 	SPEAKER(config, "rearleft").front_left();
@@ -1943,13 +1936,10 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
-	MCFG_DEVICE_MODIFY("cmptimer_main")
-	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("soundcpu2", INPUT_LINE_NMI))
+	m_cmptimer_1->zint_callback().append_inputline(m_soundcpu2, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
+	m_iochip[0]->in_porta_cb().set(FUNC(segaxbd_state::smgp_motor_r));
+	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
 	SPEAKER(config, "rearleft").front_left();

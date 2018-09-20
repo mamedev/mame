@@ -259,17 +259,15 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 //  MCFG_SCREEN_SIZE(650, 260)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K,576K,640K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("128K,192K,256K,320K,384K,448K,512K,576K,640K");
 
 	/* sound hardware */
 	SPEAKER(config, MONO_TAG).front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	/* Devices */
-	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir3_w))
+	I8251(config, m_kb_uart, 0);
+	m_kb_uart->rxrdy_handler().set(PIC8259_TAG, FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIT_C0_CLOCK)
@@ -282,13 +280,13 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_DEVICE_ADD(PIC8259_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD(PPI8255_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mbc55x_state, mbc55x_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(mbc55x_state::mbc55x_ppi_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(mbc55x_state::mbc55x_ppi_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portc_w));
 
 	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -298,7 +296,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	MCFG_DEVICE_ADD(FDC_TAG, FD1793, 1_MHz_XTAL)
+	FD1793(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)

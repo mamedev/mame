@@ -21,7 +21,7 @@
 #define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
-	devcb = &downcast<atari_vad_device &>(*device).set_scanline_int_cb(DEVCB_##_intcb);
+	downcast<atari_vad_device &>(*device).set_scanline_int_cb(DEVCB_##_intcb);
 
 #define MCFG_ATARI_VAD_PLAYFIELD(_class, _gfxtag, _getinfo) \
 	{ std::string fulltag(device->tag()); fulltag.append(":playfield"); device_t *device; \

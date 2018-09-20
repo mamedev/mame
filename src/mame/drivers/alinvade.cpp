@@ -38,6 +38,9 @@ public:
 		, m_discrete(*this, "discrete")
 	{ }
 
+	void alinvade(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(irqmask_r);
 	DECLARE_WRITE8_MEMBER(irqmask_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -45,9 +48,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alinvade(machine_config &config);
 	void alinvade_map(address_map &map);
-private:
+
 	uint8_t m_irqmask;
 	uint8_t m_irqff;
 	virtual void machine_start() override;

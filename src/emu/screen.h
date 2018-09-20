@@ -173,7 +173,7 @@ public:
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type)
-		: screen_device(mconfig, tag, owner, (u32)0)
+		: screen_device(mconfig, tag, owner, u32(0))
 	{
 		set_type(type);
 	}
@@ -181,6 +181,8 @@ public:
 
 	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
+	int orientation() const { assert(configured()); return m_orientation; }
+	std::pair<unsigned, unsigned> physical_aspect() const;
 	int width() const { return m_width; }
 	int height() const { return m_height; }
 	const rectangle &visible_area() const { return m_visarea; }
@@ -193,10 +195,13 @@ public:
 	float yoffset() const { return m_yoffset; }
 	float xscale() const { return m_xscale; }
 	float yscale() const { return m_yscale; }
-	bool have_screen_update() const { return !m_screen_update_ind16.isnull() && !m_screen_update_rgb32.isnull(); }
+	bool has_screen_update() const { return !m_screen_update_ind16.isnull() || !m_screen_update_rgb32.isnull(); }
 
 	// inline configuration helpers
-	void set_type(screen_type_enum type) { m_type = type; }
+	void set_type(screen_type_enum type) { assert(!configured()); m_type = type; }
+	void set_orientation(int orientation) { assert(!configured()); m_orientation = orientation; }
+	void set_physical_aspect(unsigned x, unsigned y) { assert(!configured()); m_phys_aspect = std::make_pair(x, y); }
+	void set_native_aspect() { assert(!configured()); m_phys_aspect = std::make_pair(~0U, ~0U); }
 	void set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		m_clock = pixclock;
@@ -208,7 +213,7 @@ public:
 	}
 	void set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
-	void set_refresh_hz(attoseconds_t hz) { set_refresh(HZ_TO_ATTOSECONDS(hz)); }
+	template <typename T> void set_refresh_hz(T &&hz) { set_refresh(HZ_TO_ATTOSECONDS(std::forward<T>(hz))); }
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }
@@ -252,6 +257,7 @@ public:
 	}
 
 	template<class Object> devcb_base &set_screen_vblank(Object &&object) { return m_screen_vblank.set_callback(std::forward<Object>(object)); }
+	auto screen_vblank() { return m_screen_vblank.bind(); }
 	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_video_attributes(u32 flags) { m_video_attributes = flags; }
 	void set_color(rgb_t color) { m_color = color; }
@@ -272,13 +278,12 @@ public:
 	// beam positioning and state
 	int vpos() const;
 	int hpos() const;
-	bool vblank() const { return (machine().time() < m_vblank_end_time); }
-	DECLARE_READ_LINE_MEMBER(vblank) { return (machine().time() < m_vblank_end_time) ? ASSERT_LINE : CLEAR_LINE; }
-	DECLARE_READ_LINE_MEMBER(hblank) { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x) ? ASSERT_LINE : CLEAR_LINE; }
+	DECLARE_READ_LINE_MEMBER(vblank) const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
+	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;
-	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.max_y + 1); }
+	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.bottom() + 1); }
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
@@ -317,6 +322,7 @@ private:
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -334,6 +340,8 @@ private:
 
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen
+	int                 m_orientation;              // orientation flags combined with system flags
+	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
 	bool                m_oldstyle_vblank_supplied; // MCFG_SCREEN_VBLANK_TIME macro used
 	attoseconds_t       m_refresh;                  // default refresh period
 	attoseconds_t       m_vblank;                   // duration of a VBLANK
@@ -542,7 +550,7 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
 	downcast<screen_device &>(*device).set_screen_update(_device, &_class::_method, #_class "::" #_method);
 #define MCFG_SCREEN_VBLANK_CALLBACK(_devcb) \
-	devcb = &downcast<screen_device &>(*device).set_screen_vblank(DEVCB_##_devcb);
+	downcast<screen_device &>(*device).set_screen_vblank(DEVCB_##_devcb);
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
 	downcast<screen_device &>(*device).set_palette(_palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \

@@ -18,6 +18,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fgram(*this, "fgram") { }
 
+	void mainsnk(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -47,7 +50,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly );
-	void mainsnk(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);

@@ -33,6 +33,9 @@ public:
 		, m_soundbank(*this, "soundbank")
 	{ }
 
+	void mephisto(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(shift_load_w);
 	DECLARE_READ8_MEMBER(ay8910_read);
 	DECLARE_WRITE8_MEMBER(ay8910_write);
@@ -41,12 +44,11 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
-	void mephisto(machine_config &config);
 	void mephisto_8051_io(address_map &map);
 	void mephisto_8051_map(address_map &map);
 	void mephisto_map(address_map &map);
 	void sport2k_8051_io(address_map &map);
-private:
+
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
 	bool m_ay8910_bc1;
@@ -164,17 +166,19 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_DEVICE_PROGRAM_MAP(mephisto_map)
 	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	//MCFG_DEVICE_ADD("muart", I8256, XTAL(18'000'000)/3)
 	//MCFG_I8256_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_I8256_TXD_HANDLER(INPUTLINE("audiocpu", MCS51_RX_LINE))
 
-	MCFG_DEVICE_ADD("ic20", I8155, XTAL(18'000'000)/6)
-	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("muart", i8256_device, write_txc))
+	I8155(config, "ic20", XTAL(18'000'000)/6);
+	//i8155_device &i8155_1(I8155(config, "ic20", XTAL(18'000'000)/6));
+	//i8155_1.out_to_callback().set("muart", FUNC(i8256_device::write_txc));
 
-	MCFG_DEVICE_ADD("ic9", I8155, XTAL(18'000'000)/6)
-	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, mephisto_pinball_state, clk_shift_w))
+	I8155(config, "ic9", XTAL(18'000'000)/6);
+	//i8155_device &i8155_2(I8155(config, "ic9", XTAL(18'000'000)/6));
+	//i8155_2.out_to_callback().set(FUNC(mephisto_pinball_state::clk_shift_w));
 
 	MCFG_DEVICE_ADD("soundcpu", I8051, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
@@ -182,7 +186,7 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, mephisto_pinball_state, ay8910_read))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, mephisto_pinball_state, ay8910_write))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, mephisto_pinball_state, t0_t1_w))
-	MCFG_MCS51_SERIAL_RX_CB(NOOP) // from MUART
+	MCFG_MCS51_SERIAL_RX_CB(CONSTANT(0)) // from MUART
 
 	SPEAKER(config, "mono").front_center();
 

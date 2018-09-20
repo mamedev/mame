@@ -61,8 +61,8 @@ MACHINE_CONFIG_START(compis_keyboard_device::device_add_mconfig)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, compis_keyboard_device, bus_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, compis_keyboard_device, p1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, compis_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(NOOP) // ???
-	MCFG_MCS48_PORT_T1_IN_CB(NOOP) // ???
+	MCFG_MCS48_PORT_T0_IN_CB(CONSTANT(0)) // ???
+	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // ???
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

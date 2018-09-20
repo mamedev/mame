@@ -262,6 +262,10 @@ public:
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
 	{}
+
+	void spc1500(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -292,10 +296,10 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
-	void spc1500(machine_config &config);
+
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
-private:
+
 	uint8_t *m_p_ram;
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
@@ -898,11 +902,11 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, spc1500_state, portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spc1500_state, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spc1500_state, portc_w))
+	I8255(config, m_pio);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pb_callback().set(FUNC(spc1500_state::portb_r));
+	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
+	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
 
@@ -927,8 +931,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

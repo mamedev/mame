@@ -319,8 +319,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_DEVICE_SLOT_INTERFACE(spec128_expansion_devices, nullptr, false)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 MACHINE_CONFIG_END
 
 

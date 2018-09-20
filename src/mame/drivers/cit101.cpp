@@ -72,6 +72,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_nvr(*this, "nvr")
+		, m_comuart(*this, "comuart")
+		, m_kbduart(*this, "kbduart")
 		, m_chargen(*this, "chargen")
 		, m_mainram(*this, "mainram")
 		, m_extraram(*this, "extraram")
@@ -109,6 +111,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<er2055_device> m_nvr;
+	required_device<i8251_device> m_comuart;
+	required_device<i8251_device> m_kbduart;
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr<u8> m_mainram;
 	required_shared_ptr<u8> m_extraram;
@@ -117,8 +121,8 @@ private:
 
 void cit101_state::machine_start()
 {
-	subdevice<i8251_device>("comuart")->write_cts(0);
-	subdevice<i8251_device>("kbduart")->write_cts(0);
+	m_comuart->write_cts(0);
+	m_kbduart->write_cts(0);
 
 	m_brightness = 0xff;
 
@@ -302,12 +306,9 @@ void cit101_state::mem_map(address_map &map)
 	map(0x8000, 0xbfff).ram().share("extraram"); // only 4 bits wide?
 	map(0x8000, 0x8000).w(FUNC(cit101_state::screen_control_w));
 	map(0xc000, 0xdfff).rw(FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
-	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc21, 0xfc21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc40, 0xfc40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc41, 0xfc41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc00, 0xfc01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc20, 0xfc21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc40, 0xfc41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xfc60, 0xfc63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc80, 0xfc83).w("pit0", FUNC(pit8253_device::write));
 	map(0xfcc0, 0xfcc3).w("pit1", FUNC(pit8253_device::write));
@@ -315,12 +316,9 @@ void cit101_state::mem_map(address_map &map)
 
 void cit101_state::io_map(address_map &map)
 {
-	map(0x00, 0x00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x20, 0x20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x40, 0x40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x20, 0x21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x40, 0x41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa0).w(FUNC(cit101_state::brightness_w));
 	map(0xe0, 0xe0).rw(FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
@@ -335,7 +333,7 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_I8085A_SID(GND) // used to time NVR reads
+	MCFG_I8085A_SID(CONSTANT(0)) // used to time NVR reads
 	MCFG_I8085A_SOD(WRITELINE(*this, cit101_state, blink_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -344,12 +342,12 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_SCREEN_UPDATE_DRIVER(cit101_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 
-	MCFG_DEVICE_ADD("comuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("comm", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("comm", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<2>))
+	I8251(config, m_comuart, 6.144_MHz_XTAL / 2);
+	m_comuart->txd_handler().set("comm", FUNC(rs232_port_device::write_txd));
+	m_comuart->dtr_handler().set("comm", FUNC(rs232_port_device::write_dtr));
+	m_comuart->rts_handler().set("comm", FUNC(rs232_port_device::write_rts));
+	m_comuart->rxrdy_handler().set("uartint", FUNC(input_merger_device::in_w<0>));
+	m_comuart->txrdy_handler().set("uartint", FUNC(input_merger_device::in_w<2>));
 
 	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", i8251_device, write_rxd))
@@ -357,10 +355,10 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	// CTS can be disabled in SET-UP Mode C
 	// DSR, CD, SI, RI are examined only during the modem test, not "always ignored" as the User's Manual claims
 
-	MCFG_DEVICE_ADD("auxuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<1>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<3>))
+	i8251_device &auxuart(I8251(config, "auxuart", 6.144_MHz_XTAL / 2));
+	auxuart.txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
+	auxuart.rxrdy_handler().set("uartint", FUNC(input_merger_device::in_w<1>));
+	auxuart.txrdy_handler().set("uartint", FUNC(input_merger_device::in_w<3>));
 
 	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("auxuart", i8251_device, write_rxd))
@@ -369,9 +367,9 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_INPUT_MERGER_ANY_HIGH("uartint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE))
 
-	MCFG_DEVICE_ADD("kbduart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("keyboard", cit101_hle_keyboard_device, write_rxd))
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
+	I8251(config, m_kbduart, 6.144_MHz_XTAL / 2);
+	m_kbduart->txd_handler().set("keyboard", FUNC(cit101_hle_keyboard_device::write_rxd));
+	m_kbduart->rxrdy_handler().set_inputline("maincpu", I8085_RST65_LINE);
 
 	MCFG_DEVICE_ADD("keyboard", CIT101_HLE_KEYBOARD, 0)
 	MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(WRITELINE("kbduart", i8251_device, write_rxd))
@@ -385,24 +383,24 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	// OUT2 might be used for an internal expansion similar to the VT100 STP.
 	// The output appears to be fixed to a 307.2 kHz rate; turning this off boosts driver performance.
 
-	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("comuart", i8251_device, write_txc))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("comuart", i8251_device, write_rxc))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("kbduart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("kbduart", i8251_device, write_rxc))
+	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit1.set_clk<0>(6.144_MHz_XTAL / 4);
+	pit1.set_clk<1>(6.144_MHz_XTAL / 4);
+	pit1.set_clk<2>(6.144_MHz_XTAL / 4);
+	pit1.out_handler<0>().set("comuart", FUNC(i8251_device::write_txc));
+	pit1.out_handler<1>().set("comuart", FUNC(i8251_device::write_rxc));
+	pit1.out_handler<2>().set("kbduart", FUNC(i8251_device::write_txc));
+	pit1.out_handler<2>().append("kbduart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cit101_state, nvr_address_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, cit101_state, nvr_data_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cit101_state, nvr_data_w))
-	MCFG_I8255_IN_PORTC_CB(READLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cit101_state, nvr_control_w))
+	i8255_device &ppi(I8255A(config, "ppi", 0));
+	ppi.out_pa_callback().set(FUNC(cit101_state::nvr_address_w));
+	ppi.in_pb_callback().set(FUNC(cit101_state::nvr_data_r));
+	ppi.out_pb_callback().set(FUNC(cit101_state::nvr_data_w));
+	ppi.in_pc_callback().set("comm", FUNC(rs232_port_device::cts_r)).lshift(0);
+	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::dcd_r)).lshift(1); // tied to DSR for loopback test
+	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::ri_r)).lshift(2); // tied to CTS for loopback test
+	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::si_r)).lshift(3); // tied to CTS for loopback test
+	ppi.out_pc_callback().set(FUNC(cit101_state::nvr_control_w));
 
 	MCFG_DEVICE_ADD("nvr", ER2055, 0)
 MACHINE_CONFIG_END

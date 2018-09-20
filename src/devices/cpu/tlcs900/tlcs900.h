@@ -613,37 +613,37 @@ protected:
 };
 
 #define MCFG_TMP95C061_PORT1_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port1_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_port1_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT1_WRITE( _port_write ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port1_write(DEVCB_##_port_write);
+	downcast<tmp95c061_device &>(*device).set_port1_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT2_WRITE( _port_write ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port2_write(DEVCB_##_port_write);
+	downcast<tmp95c061_device &>(*device).set_port2_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT5_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port5_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_port5_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT5_WRITE( _port_write ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port5_write(DEVCB_##_port_write);
+	downcast<tmp95c061_device &>(*device).set_port5_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT6_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port6_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_port6_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT6_WRITE( _port_write ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port6_write(DEVCB_##_port_write);
+	downcast<tmp95c061_device &>(*device).set_port6_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT7_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port7_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_port7_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT7_WRITE( _port_write ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port7_write(DEVCB_##_port_write);
+	downcast<tmp95c061_device &>(*device).set_port7_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT8_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port8_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_port8_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORT8_WRITE( _port_write ) \
-	devcb = &downcast<mp95c061_device &>(*device).set_port8_write(DEVCB_##_port_write);
+	downcast<mp95c061_device &>(*device).set_port8_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORT9_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_port9_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_port9_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORTA_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_porta_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_porta_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORTA_WRITE( _port_write ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_porta_write(DEVCB_##_port_write);
+	downcast<tmp95c061_device &>(*device).set_porta_write(DEVCB_##_port_write);
 #define MCFG_TMP95C061_PORTB_READ( _port_read ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_portb_read(DEVCB_##_port_read);
+	downcast<tmp95c061_device &>(*device).set_portb_read(DEVCB_##_port_read);
 #define MCFG_TMP95C061_PORTB_WRITE( _port_write ) \
-	devcb = &downcast<tmp95c061_device &>(*device).set_portb_write(DEVCB_##_port_write);
+	downcast<tmp95c061_device &>(*device).set_portb_write(DEVCB_##_port_write);
 
 class tmp95c061_device : public tlcs900h_device
 {
@@ -728,44 +728,44 @@ private:
 };
 
 
-#define MCFG_TMP95C063_PORT0_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port0_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT0_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port0_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT1_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port1_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT1_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port1_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT2_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port2_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT2_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port2_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT3_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port3_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT3_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port3_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT4_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port4_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT4_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port4_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT5_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port5_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT5_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port5_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT6_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port6_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT6_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port6_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT7_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port7_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT7_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port7_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT8_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port8_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT8_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port8_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORT9_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port9_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORT9_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port9_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORTA_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_porta_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORTA_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_porta_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORTB_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portb_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORTB_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portb_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORTC_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portc_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORTC_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portc_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORTD_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portd_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORTD_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portd_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_PORTE_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_porte_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_PORTE_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_porte_write(DEVCB_##_port_write);
-#define MCFG_TMP95C063_AN0_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an0_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_AN1_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an1_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_AN2_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an2_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_AN3_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an3_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_AN4_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an4_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_AN5_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an5_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_AN6_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an6_read(DEVCB_##_port_read);
-#define MCFG_TMP95C063_AN7_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an7_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT0_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port0_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT0_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port0_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT1_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port1_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT1_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port1_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT2_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port2_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT2_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port2_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT3_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port3_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT3_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port3_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT4_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port4_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT4_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port4_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT5_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port5_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT5_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port5_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT6_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port6_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT6_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port6_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT7_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port7_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT7_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port7_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT8_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port8_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT8_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port8_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT9_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_port9_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT9_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_port9_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTA_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_porta_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTA_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_porta_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTB_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_portb_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTB_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_portb_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTC_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_portc_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTC_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_portc_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTD_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_portd_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTD_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_portd_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTE_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_porte_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTE_WRITE( _port_write ) downcast<tmp95c063_device &>(*device).set_porte_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_AN0_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an0_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN1_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an1_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN2_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an2_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN3_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an3_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN4_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an4_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN5_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an5_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN6_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an6_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN7_READ( _port_read ) downcast<tmp95c063_device &>(*device).set_an7_read(DEVCB_##_port_read);
 
 class tmp95c063_device : public tlcs900h_device
 {

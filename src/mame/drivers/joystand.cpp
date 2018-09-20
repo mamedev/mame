@@ -133,6 +133,9 @@ public:
 		m_outputs(*this, "outputs")
 	{ }
 
+	void joystand(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
@@ -204,7 +207,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
-	void joystand(machine_config &config);
 	void joystand_map(address_map &map);
 };
 
@@ -619,21 +621,21 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// cart
-	MCFG_TMS_29F040_ADD("cart.u1")
-	MCFG_TMS_29F040_ADD("cart.u2")
-	MCFG_TMS_29F040_ADD("cart.u3")
-	MCFG_TMS_29F040_ADD("cart.u4")
-	MCFG_TMS_29F040_ADD("cart.u5")
-	MCFG_TMS_29F040_ADD("cart.u6")
-	MCFG_TMS_29F040_ADD("cart.u7")
-	MCFG_TMS_29F040_ADD("cart.u8")
-	MCFG_TMS_29F040_ADD("cart.u9")
-	MCFG_TMS_29F040_ADD("cart.u10")
-	MCFG_TMS_29F040_ADD("cart.u11")
-	MCFG_TMS_29F040_ADD("cart.u12")
+	TMS_29F040(config, "cart.u1");
+	TMS_29F040(config, "cart.u2");
+	TMS_29F040(config, "cart.u3");
+	TMS_29F040(config, "cart.u4");
+	TMS_29F040(config, "cart.u5");
+	TMS_29F040(config, "cart.u6");
+	TMS_29F040(config, "cart.u7");
+	TMS_29F040(config, "cart.u8");
+	TMS_29F040(config, "cart.u9");
+	TMS_29F040(config, "cart.u10");
+	TMS_29F040(config, "cart.u11");
+	TMS_29F040(config, "cart.u12");
 
 	// devices
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 

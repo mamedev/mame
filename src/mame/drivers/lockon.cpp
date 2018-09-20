@@ -485,15 +485,14 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
 	MCFG_DEVICE_IO_MAP(sound_io)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096);
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("adc", M58990, 16_MHz_XTAL / 16)
-	MCFG_ADC0808_IN0_CB(IOPORT("ADC_BANK"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ADC_PITCH"))
-	MCFG_ADC0808_IN2_CB(IOPORT("ADC_MISSILE"))
-	MCFG_ADC0808_IN3_CB(IOPORT("ADC_HOVER"))
+	m58990_device &adc(M58990(config, "adc", 16_MHz_XTAL / 16));
+	adc.in_callback<0>().set_ioport("ADC_BANK");
+	adc.in_callback<1>().set_ioport("ADC_PITCH");
+	adc.in_callback<2>().set_ioport("ADC_MISSILE");
+	adc.in_callback<3>().set_ioport("ADC_HOVER");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

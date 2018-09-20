@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1009,7 +1009,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1047,21 +1047,21 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm1", msm5205_device, data_w))
+	LS157(config, m_adpcm_select[0], 0);
+	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm2", msm5205_device, data_w))
+	LS157(config, m_adpcm_select[1], 0);
+	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("msm2", msm5205_device, vclk_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaiden_state, vck_flipflop_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MSM5205(config, m_msm[0], 384000);
+	m_msm[0]->vck_callback().set(m_msm[1], FUNC(msm5205_device::vclk_w));
+	m_msm[0]->vck_callback().append(FUNC(gaiden_state::vck_flipflop_w));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MSM5205(config, m_msm[1], 384000);
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
 MACHINE_CONFIG_END
 
 /***************************************************************************

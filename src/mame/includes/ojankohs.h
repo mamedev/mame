@@ -31,6 +31,12 @@ public:
 		m_dsw3(*this, "dsw3"), m_dsw4(*this, "dsw4")
 	{ }
 
+	void ojankohs(machine_config &config);
+	void ccasino(machine_config &config);
+	void ojankoc(machine_config &config);
+	void ojankoy(machine_config &config);
+
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_colorram;
@@ -108,10 +114,7 @@ public:
 	uint32_t screen_update_ojankoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ojankoc_flipscreen( address_space &space, int data );
 	DECLARE_WRITE_LINE_MEMBER(ojankohs_adpcm_int);
-	void ojankohs(machine_config &config);
-	void ccasino(machine_config &config);
-	void ojankoc(machine_config &config);
-	void ojankoy(machine_config &config);
+
 	void ccasino_io_map(address_map &map);
 	void ojankoc_io_map(address_map &map);
 	void ojankoc_map(address_map &map);

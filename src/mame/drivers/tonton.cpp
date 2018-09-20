@@ -41,6 +41,9 @@ public:
 		m_hopper(*this, "hopper")
 	{ }
 
+	void tonton(machine_config &config);
+
+private:
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
@@ -50,7 +53,6 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
-	void tonton(machine_config &config);
 	void tonton_io(address_map &map);
 	void tonton_map(address_map &map);
 };
@@ -227,13 +229,15 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	MCFG_DEVICE_PROGRAM_MAP(tonton_map)
 	MCFG_DEVICE_IO_MAP(tonton_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MAIN_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(0x20000);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 

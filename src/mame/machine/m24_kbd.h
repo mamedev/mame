@@ -8,7 +8,7 @@
 #include "cpu/mcs48/mcs48.h"
 
 #define MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(_devcb) \
-	devcb = &downcast<m24_keyboard_device &>(*device).set_out_data_handler(DEVCB_##_devcb);
+	downcast<m24_keyboard_device &>(*device).set_out_data_handler(DEVCB_##_devcb);
 
 class m24_keyboard_device :  public device_t
 {

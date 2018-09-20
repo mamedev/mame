@@ -28,10 +28,11 @@ public:
 		m_playfield_latch(-1)
 	{ }
 
-	void init_skullxbo();
 	void skullxbo(machine_config &config);
 
-protected:
+	void init_skullxbo();
+
+private:
 	virtual void machine_reset() override;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -50,7 +51,6 @@ protected:
 
 	void main_map(address_map &map);
 
-private:
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<timer_device> m_scanline_timer;
 	required_device<tilemap_device> m_playfield_tilemap;

@@ -417,10 +417,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(brkthru_state::darwin)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MCFG_DEVICE_PROGRAM_MAP(darwin_map)
 
-	MCFG_DEVICE_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
+	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
