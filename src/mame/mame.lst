@@ -15922,6 +15922,10 @@ jankenmn                        // (c) 1985 Sunwise
 @source:jantotsu.cpp
 jantotsu                        // (c) 1983 Sanritsu
 
+@source:jazz.cpp
+mmr4000be                       // MIPS Magnum R4000 (big)
+mmr4000le                       // MIPS Magnum R4000 (little)
+
 @source:jchan.cpp
 jchan                           // (c) 1995 Kaneko
 jchan2                          // (c) 1995 Kaneko

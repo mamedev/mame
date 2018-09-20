@@ -324,6 +324,7 @@ VIDEOS["HUC6272"] = true
 VIDEOS["I8244"] = true
 VIDEOS["I82730"] = true
 VIDEOS["I8275"] = true
+VIDEOS["IMS_CVC"] = true
 --VIDEOS["M50458"] = true
 --VIDEOS["MB90082"] = true
 --VIDEOS["MB_VCU"] = true
@@ -420,6 +421,7 @@ MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
 MACHINES["CXD1095"] = true
 MACHINES["DP8390"] = true
+MACHINES["DP83932C"] = true
 --MACHINES["DS1204"] = true
 MACHINES["DS1302"] = true
 MACHINES["DS1315"] = true
@@ -1064,6 +1066,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"interton",
 		"intv",
 		"isc",
+		"jazz",
 		"kaypro",
 		"koei",
 		"kontron",
@@ -2338,6 +2341,14 @@ files {
 createMESSProjects(_target, _subtarget, "isc")
 files {
 	MAME_DIR .. "src/mame/drivers/compucolor.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "jazz")
+files {
+	MAME_DIR .. "src/mame/drivers/jazz.cpp",
+	MAME_DIR .. "src/mame/includes/jazz.h",
+	MAME_DIR .. "src/mame/machine/jazz_mct_adr.cpp",
+	MAME_DIR .. "src/mame/machine/jazz_mct_adr.h",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")
