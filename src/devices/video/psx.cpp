@@ -566,10 +566,8 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 		}
 	}
 
-	// icky!!!
-	machine().save().save_memory( this, "globals", nullptr, 0, "m_packet", (uint8_t *)&m_packet, 1, sizeof( m_packet ) );
-
 	save_pointer(NAME(p_vram), width * height );
+	save_item(NAME(m_packet.n_entry));
 	save_item(NAME(n_gpu_buffer_offset));
 	save_item(NAME(n_vramx));
 	save_item(NAME(n_vramy));
@@ -600,6 +598,8 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	save_item(NAME(n_ix));
 	save_item(NAME(n_iy));
 	save_item(NAME(n_ti));
+	save_item(NAME(m_draw_stp));
+	save_item(NAME(m_check_stp));
 }
 
 void psxgpu_device::device_post_load()
@@ -763,7 +763,16 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-#define WRITE_PIXEL( p ) *( p_vram ) = p;
+#define WRITE_PIXEL( p ) \
+	{ \
+		if( !m_check_stp || ( *( p_vram ) & 0x8000 ) == 0 ) \
+		{ \
+			if( m_draw_stp ) \
+				*( p_vram ) = ( p ) | 0x8000; \
+			else \
+				*( p_vram ) = p; \
+		} \
+	}
 
 /*
 type 1
@@ -781,7 +790,7 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 {
 	if( m_n_gputype == 2 )
 	{
-		n_gpustatus = ( n_gpustatus & 0xfffff800 ) | ( tpage & 0x7ff );
+		n_gpustatus = ( n_gpustatus & 0xffff7800 ) | ( tpage & 0x7ff ) | ( ( tpage & 0x800 ) << 4 );
 
 		m_n_tx = ( tpage & 0x0f ) << 6;
 		m_n_ty = ( ( tpage & 0x10 ) << 4 ) | ( ( tpage & 0x800 ) >> 2 );
@@ -801,6 +810,7 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 	}
 	else
 	{
+		// TODO: confirm status bits on real type 1 gpu
 		n_gpustatus = ( n_gpustatus & 0xffffe000 ) | ( tpage & 0x1fff );
 
 		m_n_tx = ( tpage & 0x0f ) << 6;
@@ -3185,16 +3195,12 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 				n_drawoffset_x, n_drawoffset_y );
 			break;
 		case 0xe6:
+			m_draw_stp = BIT( data, 0 );
+			m_check_stp = BIT( data, 1 );
+			// TODO: confirm status bits on real type 1 gpu
 			n_gpustatus &= ~( 3L << 0xb );
 			n_gpustatus |= ( data & 0x03 ) << 0xb;
-			if( ( m_packet.n_entry[ 0 ] & 3 ) != 0 )
-			{
-				verboselog( *this, 1, "not handled: mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
-			}
-			else
-			{
-				verboselog( *this, 1, "mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
-			}
+			verboselog( *this, 1, "mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
 			break;
 		default:
 #if defined( MAME_DEBUG )
