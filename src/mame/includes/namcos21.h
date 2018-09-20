@@ -64,7 +64,8 @@ public:
 
 	namcos21_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_master_dsp_code(*this,"master_dsp_code"),
+		m_master_dsp_ram(*this,"master_dsp_ram"),
+		namcos2_kickstart(false),
 		m_gametype(0),
 		m_c67master(*this, "dspmaster"),
 		m_c67slave(*this, "dspslave%u", 0U),
@@ -102,8 +103,9 @@ public:
 	void init_cybsled();
 	void init_aircomb();
 
-	optional_shared_ptr<uint16_t> m_master_dsp_code;
+	optional_shared_ptr<uint16_t> m_master_dsp_ram;
 	int m_mbNeedsKickstart;
+	bool namcos2_kickstart;
 	std::unique_ptr<dsp_state> m_mpDspState;
 
 	int m_gametype;
@@ -220,6 +222,8 @@ private:
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
 
+	void namcos21_kickstart_hacks(int internal);
+
 	DECLARE_MACHINE_START(namcos21);
 	DECLARE_MACHINE_RESET(namcos21);
 	DECLARE_VIDEO_START(namcos21);
@@ -234,7 +238,6 @@ private:
 	void transfer_dsp_data();
 	uint16_t read_word_from_slave_input();
 	uint16_t get_input_bytes_advertised_for_slave();
-	int init_dsp();
 	void render_slave_output(uint16_t data);
 	void init(int game_type);
 	void configure_c65_namcos21(machine_config &config);

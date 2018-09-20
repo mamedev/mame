@@ -32,11 +32,11 @@ void namcos21_3d_device::allocate_poly_framebuffer()
 	m_mpPolyFrameBufferZ2 = std::make_unique<uint16_t[]>(FRAMEBUFFER_SIZE_IN_BYTES / 2);
 	m_mpPolyFrameBufferPens2 = std::make_unique<uint16_t[]>(FRAMEBUFFER_SIZE_IN_BYTES / 2);
 
-	clear_poly_framebuffer();
-	clear_poly_framebuffer();
+	swap_and_clear_poly_framebuffer();
+	swap_and_clear_poly_framebuffer();
 }
 
-void namcos21_3d_device::clear_poly_framebuffer()
+void namcos21_3d_device::swap_and_clear_poly_framebuffer()
 {
 	/* swap work and visible framebuffers */
 	m_mpPolyFrameBufferZ.swap(m_mpPolyFrameBufferZ2);

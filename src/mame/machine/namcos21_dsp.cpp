@@ -165,7 +165,7 @@ WRITE16_MEMBER(namcos21_dsp_device::winrun_dsp_complete_w)
 	{
 		winrun_flush_poly();
 		m_dsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_renderer->clear_poly_framebuffer();
+		m_renderer->swap_and_clear_poly_framebuffer();
 	}
 }
 

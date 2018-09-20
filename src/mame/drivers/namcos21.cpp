@@ -717,36 +717,34 @@ void namcos21_state::transfer_dsp_data()
 
 
 
-void namcos21_kickstart(running_machine &machine, int internal)
+void namcos21_state::namcos21_kickstart_hacks(int internal)
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-
 	/* patch dsp watchdog */
-	switch (state->m_gametype)
+	switch (m_gametype)
 	{
 	case namcos21_state::NAMCOS21_AIRCOMBAT:
-		state->m_master_dsp_code[0x008e] = 0x808f;
+		m_master_dsp_ram[0x008e] = 0x808f;
 		break;
 	case namcos21_state::NAMCOS21_SOLVALOU:
-		state->m_master_dsp_code[0x008b] = 0x808c;
+		m_master_dsp_ram[0x008b] = 0x808c;
 		break;
 	default:
 		break;
 	}
 	if (internal)
 	{
-		if (state->m_mbNeedsKickstart == 0) return;
-		state->m_mbNeedsKickstart--;
-		if (state->m_mbNeedsKickstart) return;
+		if (m_mbNeedsKickstart == 0) return;
+		m_mbNeedsKickstart--;
+		if (m_mbNeedsKickstart) return;
 	}
 
-	state->m_namcos21_3d->clear_poly_framebuffer();
-	state->m_mpDspState->masterSourceAddr = 0;
-	state->m_mpDspState->slaveOutputSize = 0;
-	state->m_mpDspState->masterFinished = 0;
-	state->m_mpDspState->slaveActive = 0;
-	state->m_c67master->set_input_line(0, HOLD_LINE);
-	state->m_c67slave[0]->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_namcos21_3d->swap_and_clear_poly_framebuffer();
+	m_mpDspState->masterSourceAddr = 0;
+	m_mpDspState->slaveOutputSize = 0;
+	m_mpDspState->masterFinished = 0;
+	m_mpDspState->slaveActive = 0;
+	m_c67master->set_input_line(0, HOLD_LINE);
+	m_c67slave[0]->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 uint16_t namcos21_state::read_word_from_slave_input()
@@ -774,7 +772,7 @@ uint16_t namcos21_state::get_input_bytes_advertised_for_slave()
 	}
 	else if( m_mpDspState->slaveActive && m_mpDspState->masterFinished && m_mpDspState->masterSourceAddr )
 	{
-		namcos21_kickstart(machine(), 0);
+		namcos21_kickstart_hacks(0);
 	}
 	return m_mpDspState->slaveBytesAdvertised;
 }
@@ -803,11 +801,6 @@ template<bool maincpu> WRITE16_MEMBER(namcos21_state::dspram16_w)
 
 /************************************************************************************/
 
-int namcos21_state::init_dsp()
-{
-	m_mpDspState = make_unique_clear<dsp_state>();
-	return 0;
-}
 
 /***********************************************************/
 
@@ -966,7 +959,7 @@ WRITE16_MEMBER(namcos21_state::dsp_xf_w)
 
 void namcos21_state::master_dsp_program(address_map &map)
 {
-	map(0x8000, 0xbfff).ram().share("master_dsp_code");
+	map(0x8000, 0xbfff).ram().share("master_dsp_ram");
 }
 
 void namcos21_state::master_dsp_data(address_map &map)
@@ -1702,7 +1695,6 @@ WRITE8_MEMBER( namcos21_state::namcos2_sound_bankselect_w )
 	m_audiobank->set_entry(data>>4);
 }
 
-void (*namcos2_kickstart)(running_machine &machine, int internal);
 
 WRITE8_MEMBER(namcos21_state::sound_reset_w)
 {
@@ -1718,12 +1710,12 @@ WRITE8_MEMBER(namcos21_state::sound_reset_w)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	if (namcos2_kickstart != nullptr)
+	if (namcos2_kickstart)
 	{
 		//printf( "dspkick=0x%x\n", data );
 		if (data & 0x04)
 		{
-			(*namcos2_kickstart)(machine(), 1);
+			namcos21_kickstart_hacks(1);
 		}
 	}
 }
@@ -1774,7 +1766,6 @@ READ8_MEMBER(namcos21_state::namcos2_68k_eeprom_r)
 
 MACHINE_RESET_MEMBER(namcos21_state, namcos21)
 {
-//  address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
 
 	/* Initialise the bank select in the sound CPU */
@@ -1784,13 +1775,23 @@ MACHINE_RESET_MEMBER(namcos21_state, namcos21)
 
 	/* Place CPU2 & CPU3 into the reset condition */
 	reset_all_subcpus(ASSERT_LINE);
+
+	/* DSP startup hacks */
+	m_mbNeedsKickstart = 20;
+	if( m_gametype==NAMCOS21_CYBERSLED )
+	{
+		m_mbNeedsKickstart = 200;
+	}
+
+	/* Wipe the framebuffers */
+	m_namcos21_3d->swap_and_clear_poly_framebuffer();
+	m_namcos21_3d->swap_and_clear_poly_framebuffer();
 }
 
 
 
 MACHINE_START_MEMBER(namcos21_state,namcos21)
 {
-	namcos2_kickstart = nullptr;
 	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
 
@@ -1803,7 +1804,7 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 		m_audiobank->set_entry(0);
 	}
 
-	namcos2_kickstart = namcos21_kickstart;
+	namcos2_kickstart = true;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
@@ -2634,12 +2635,8 @@ void namcos21_state::init(int game_type)
 {
 	m_gametype = game_type;
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
-	init_dsp();
-	m_mbNeedsKickstart = 20;
-	if( game_type==NAMCOS21_CYBERSLED )
-	{
-		m_mbNeedsKickstart = 200;
-	}
+	m_mpDspState = make_unique_clear<dsp_state>();
+
 }
 
 void namcos21_state::init_aircomb()

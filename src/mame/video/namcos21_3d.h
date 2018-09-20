@@ -25,7 +25,7 @@ public:
 
 
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
-	void clear_poly_framebuffer();
+	void swap_and_clear_poly_framebuffer();
 
 	void draw_quad(int sx[4], int sy[4], int zcode[4], int color);
 
