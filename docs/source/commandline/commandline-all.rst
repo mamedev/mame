@@ -747,7 +747,7 @@ Core Video Options
 
 **-[no]window** / **-[no]w**
 
-	Run MAME in either a window or full screen. The default is OFF (*-nowindow*).
+	Makes MAME display the screen in either a window or in a full screen mode. The default is OFF (*-nowindow*).
 
 .. _mame-commandline-maximize:
 
