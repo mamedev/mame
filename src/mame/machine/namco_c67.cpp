@@ -18,6 +18,7 @@ DEFINE_DEVICE_TYPE(NAMCO_C67, namco_c67_device, "namcoc67", "Namco C67 (TMS320C2
 namco_c67_device::namco_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	tms32025_device(mconfig, NAMCO_C67, tag, owner, clock)
 {
+	set_mp_mc(false);
 }
 
 ROM_START( c67 )
@@ -28,10 +29,4 @@ ROM_END
 const tiny_rom_entry *namco_c67_device::device_rom_region() const
 {
 	return ROM_NAME(c67);
-}
-
-void namco_c67_device::device_start()
-{
-	tms32025_device::device_start();
-	m_program->install_rom(0x0000, 0x0fff, memregion("internal")->base());
 }

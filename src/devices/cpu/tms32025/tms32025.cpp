@@ -190,7 +190,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
    MP/MC = 0 (Microcomputer Mode)
    in 'Microcomputer' mode the 4K Word internal ROM is used (TMS320C25)
 
-   currently for internal ROM cases the ROM is dynamically installed in the  driver
+   use set_mp_mc in the device configuration to set the pin for internal ROM mode
 */
 DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "Texas Instruments TMS32025")
 DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "Texas Instruments TMS32026")
@@ -223,11 +223,23 @@ void tms32025_device::tms32026_data(address_map &map)
 }
 
 #if 0
+// Instead of using the map here we install the ROM depending on the MP/MC pin set in the config
 void tms32025_device::tms32025_program(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("internal", 0); // 4K Words Internal ROM / EPROM
 }
 #endif
+
+ROM_START( tms32025 )
+	ROM_REGION16_BE( 0x2000, "internal", ROMREGION_ERASE00 )
+	// use blank data if internal ROM is not programmed
+ROM_END
+
+const tiny_rom_entry *tms32025_device::device_rom_region() const
+{
+	return ROM_NAME(tms32025);
+}
+
 
 tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -244,6 +256,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_xf_out(*this)
 	, m_dr_in(*this)
 	, m_dx_out(*this)
+	, m_mp_mc(true)
 {
 }
 
@@ -1642,6 +1655,11 @@ void tms32025_device::device_start()
 	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
+
+	if (!m_mp_mc) // if pin 1 is 0 then we're using internal ROM
+	{
+		m_program->install_rom(0x0000, 0x0fff, memregion("internal")->base());
+	}
 
 	m_bio_in.resolve_safe(0xffff);
 	m_hold_in.resolve_safe(0xffff);

@@ -73,6 +73,8 @@ public:
 	auto dr_in_cb() { return m_dr_in.bind(); }
 	auto dx_out_cb() { return m_dx_out.bind(); }
 
+	void set_mp_mc(bool state) { m_mp_mc = state; }
+
 	DECLARE_READ16_MEMBER( drr_r);
 	DECLARE_WRITE16_MEMBER(drr_w);
 	DECLARE_READ16_MEMBER( dxr_r);
@@ -111,6 +113,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void common_reset();
 
@@ -356,6 +360,8 @@ protected:
 	void zals();
 	inline int process_IRQs();
 	inline void process_timer(int clocks);
+
+	bool m_mp_mc;
 };
 
 
