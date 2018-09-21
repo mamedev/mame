@@ -150,10 +150,10 @@
 #define UPDATE_PC   true
 #define PC_UPDATED  false
 
-#define OP_TYPE0    0
-#define OP_CALL     1
-#define OP_ALU      2
-#define OP_LDST     3
+#define OP_TYPE0    u32(0)
+#define OP_CALL     u32(1)
+#define OP_ALU      u32(2)
+#define OP_LDST     u32(3)
 
 #define OP_TYPE0_NS	(OP_TYPE0 << 30)
 #define OP_CALL_NS	(OP_CALL << 30)
