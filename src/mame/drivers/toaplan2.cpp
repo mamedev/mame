@@ -936,7 +936,7 @@ void toaplan2_state::truxton2_68k_mem(address_map &map)
 	map(0x402000, 0x402fff).ram().share("tx_lineselect");
 	map(0x403000, 0x4031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x403200, 0x403fff).ram();
-	map(0x500000, 0x50ffff).ram().w(FUNC(toaplan2_state::tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x500000, 0x50ffff).ram().w(FUNC(toaplan2_state::tx_gfxram_w)).share("tx_gfxram");
 	map(0x600000, 0x600001).r(FUNC(toaplan2_state::video_count_r));
 	map(0x700000, 0x700001).portr("DSWA");
 	map(0x700002, 0x700003).portr("DSWB");
@@ -1005,7 +1005,7 @@ void toaplan2_state::fixeight_68k_mem(address_map &map)
 	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x5021ff).ram().share("tx_lineselect");
 	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
-	map(0x600000, 0x60ffff).ram().w(FUNC(toaplan2_state::tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x600000, 0x60ffff).ram().w(FUNC(toaplan2_state::tx_gfxram_w)).share("tx_gfxram");
 	map(0x700000, 0x700001).w(FUNC(toaplan2_state::fixeight_subcpu_ctrl_w));
 	map(0x800000, 0x800001).r(FUNC(toaplan2_state::video_count_r));
 }
@@ -1246,7 +1246,7 @@ void toaplan2_state::batrider_dma_mem(address_map &map)
 	map(0x3000, 0x31ff).ram().share("tx_lineselect");
 	map(0x3200, 0x33ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x3400, 0x7fff).ram();
-	map(0x8000, 0xffff).ram().w(FUNC(toaplan2_state::batrider_tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x8000, 0xffff).ram().w(FUNC(toaplan2_state::batrider_tx_gfxram_w)).share("tx_gfxram");
 }
 
 
@@ -1254,7 +1254,7 @@ void toaplan2_state::batrider_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	map(0x200000, 0x207fff).ram().share("mainram16");
+	map(0x200000, 0x207fff).ram().share("mainram");
 	map(0x208000, 0x20ffff).ram();
 	map(0x300000, 0x37ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).lrw16("gp9001_invert_rw",
@@ -1283,7 +1283,7 @@ void toaplan2_state::bbakraid_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	map(0x200000, 0x207fff).ram().share("mainram16");
+	map(0x200000, 0x207fff).ram().share("mainram");
 	map(0x208000, 0x20ffff).ram();
 	map(0x300000, 0x33ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).lrw16("gp9001_invert_rw",
