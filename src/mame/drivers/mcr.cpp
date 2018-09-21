@@ -707,7 +707,7 @@ void mcr_state::cpu_90009_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -736,7 +736,7 @@ void mcr_state::cpu_90010_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -766,7 +766,7 @@ void mcr_state::cpu_91490_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -1752,18 +1752,18 @@ static const char *const twotiger_sample_names[] =
 MACHINE_CONFIG_START(mcr_state::mcr_90009)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
-	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_90009_map)
-	MCFG_DEVICE_IO_MAP(cpu_90009_portmap)
+	Z80(config, m_maincpu, MAIN_OSC_MCR_I/8);
+	m_maincpu->set_daisy_config(mcr_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90009_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90009_portmap);
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_OSC_MCR_I/8 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	Z80CTC(config, m_ctc, MAIN_OSC_MCR_I/8 /* same as "maincpu" */);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1805,9 +1805,8 @@ MACHINE_CONFIG_START(mcr_state::mcr_90010)
 	mcr_90009(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cpu_90010_map)
-	MCFG_DEVICE_IO_MAP(cpu_90010_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90010_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90010_portmap);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1848,18 +1847,17 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490)
+void mcr_state::mcr_91490(machine_config & config)
+{
 	mcr_90010(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(5000000)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_91490_map)
-	MCFG_DEVICE_IO_MAP(cpu_91490_portmap)
+	m_maincpu->set_clock(5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_91490_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_91490_portmap);
 
-	MCFG_DEVICE_MODIFY("ctc")
-	MCFG_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
-MACHINE_CONFIG_END
+	m_ctc->set_clock(5000000 /* same as "maincpu" */);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
@@ -1878,15 +1876,16 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 	mcr_91490_snt(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_ipu, Z80, 7372800/2)
-	MCFG_Z80_DAISY_CHAIN(mcr_ipu_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(ipu_91695_map)
-	MCFG_DEVICE_IO_MAP(ipu_91695_portmap)
+	Z80(config, m_ipu, 7372800/2);
+	m_ipu->set_daisy_config(mcr_ipu_daisy_chain);
+	m_ipu->set_addrmap(AS_PROGRAM, &mcr_nflfoot_state::ipu_91695_map);
+	m_ipu->set_addrmap(AS_IO, &mcr_nflfoot_state::ipu_91695_portmap);
+
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mcr_nflfoot_state, ipu_interrupt)
 
-	MCFG_DEVICE_ADD("ipu_ctc", Z80CTC, 7372800/2 /* same as "ipu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ipu_ctc, 7372800/2 /* same as "ipu" */);
+	m_ipu_ctc->intr_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
 	Z80PIO(config, m_ipu_pio0, 7372800/2);
 	m_ipu_pio0->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);

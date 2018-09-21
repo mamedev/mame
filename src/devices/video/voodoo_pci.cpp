@@ -203,9 +203,13 @@ READ32_MEMBER (voodoo_pci_device::pcictrl_r)
 	// The address map starts at 0x40
 	switch (offset + 0x40 / 4) {
 	case 0x40/4:
-		// V2: Init Enable: 19:16=Fab ID, 15:12=Graphics Rev
-		// Vegas driver needs this value at PCI 0x40
-		result = 0x00044000;
+		// V1: initEnable: 11:0
+		// V2: initEnable: Fab ID=19:16, Graphics Rev=15:12
+		// Banshee/V3: fabID: ScratchPad=31:4 fabID=3:0
+		if (m_voodoo->vd_type== TYPE_VOODOO_2)
+			result = (result & ~0xff000) | 0x00044000; // Vegas driver needs this value
+		else if (m_voodoo->vd_type >= TYPE_VOODOO_BANSHEE)
+			result = (result & ~0xf) | 0x1;
 		break;
 	case 0x54/4:
 		// V2: SiProcess Register: Osc Force On, Osc Ring Sel, Osc Count Reset, 12 bit PCI Counter, 16 bit Oscillator Counter

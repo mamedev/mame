@@ -56,7 +56,7 @@ private:
 	uint8_t m_input_select;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_ioport_array<3> m_buttons;
 };
@@ -119,10 +119,10 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 
 
 MACHINE_CONFIG_START(bbcbc_state::bbcbc)
-	MCFG_DEVICE_ADD("maincpu", Z80, 10.6875_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(bbcbc_daisy_chain)
+	Z80(config, m_maincpu, 10.6875_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbcbc_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &bbcbc_state::io_map);
+	m_maincpu->set_daisy_config(bbcbc_daisy_chain);
 
 	Z80PIO(config, m_z80pio, 10.6875_MHz_XTAL / 3);
 	//m_z80pio->out_pa_callback().set(???);

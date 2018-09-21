@@ -327,8 +327,7 @@ void a7150_state::a7150_io(address_map &map)
 	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x0200, 0x0203).rw(FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
 	map(0x0300, 0x031f).unmaprw(); // ASP board #1
 	map(0x0320, 0x033f).unmaprw(); // ASP board #2
@@ -485,10 +484,10 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	// IFSP port on processor card
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-//  MCFG_I8255_IN_PORTA_CB(READ8("cent_status_in", input_buffer_device, bus_r))
-//  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a7150_state, ppi_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::bus_w));
+	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(14.7456_MHz_XTAL/4);
@@ -516,10 +515,10 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
-	MCFG_DEVICE_ADD("gfxcpu", Z80, XTAL(16'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(k7070_cpu_mem)
-	MCFG_DEVICE_IO_MAP(k7070_cpu_io)
-	MCFG_Z80_DAISY_CHAIN(k7070_daisy_chain)
+	Z80(config, m_gfxcpu, XTAL(16'000'000)/4);
+	m_gfxcpu->set_addrmap(AS_PROGRAM, &a7150_state::k7070_cpu_mem);
+	m_gfxcpu->set_addrmap(AS_IO, &a7150_state::k7070_cpu_io);
+	m_gfxcpu->set_daisy_config(k7070_daisy_chain);
 
 	ADDRESS_MAP_BANK(config, m_video_bankdev, 0);
 	m_video_bankdev->set_map(&a7150_state::k7070_cpu_banked);

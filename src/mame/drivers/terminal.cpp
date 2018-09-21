@@ -74,20 +74,6 @@ ROM_START( alcat7100 ) // Z80  // 256k ram // b&w  // looks like it needs a boot
 ROM_END
 
 
-ROM_START( facit4440 ) // Z80 (+HD46505SP, 2x Z80ADART // 16k ram // b&w
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom7.bin",     0x0000, 0x4000, CRC(a8da2b11) SHA1(4436ef14c29ae299f7bc338748158771c02d02a9) )
-	ROM_LOAD( "rom5.bin",     0xa000, 0x2000, CRC(715d02b6) SHA1(e304718dbdc8867ac01909fd2d027e5014a8c4f9) )
-
-	ROM_REGION( 0x8000, "chargen", 0 ) // order unknown
-	ROM_LOAD( "rom2.bin",     0x0000, 0x0800, CRC(9e1a190c) SHA1(fb08ee806f1056bcdfb5b08ea85995e1d3d01298) )
-	ROM_LOAD( "rom1.bin",     0x0800, 0x1000, CRC(b503c173) SHA1(209bf59e2e9953179d04c4e768fc41574e039d36) )
-	ROM_LOAD( "rom3.bin",     0x1800, 0x1000, CRC(a55a25d9) SHA1(c0d321e65f214adee01bf5f8c495b2518fa31b7b) )
-	ROM_LOAD( "rom4.bin",     0x2800, 0x1000, CRC(52004ef8) SHA1(50d6e2eb48f60db3a3c9d206fc40d3294b6adc0e) )
-	ROM_LOAD( "rom6.bin",     0x3800, 0x4000, CRC(790b7642) SHA1(688a80cbf011e5c14f501e11fe0e3bf64a85bbd7) )
-ROM_END
-
-
 ROM_START( itt9216 ) // MC68008P8, (+beeper, 701188-001, xtal 38.080)// 64k ram // colour
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "174054-007.u52", 0x0000, 0x2000, CRC(be1f85c8) SHA1(8c44ff6166c43b524f41133053fa82f5c48047d8) )
@@ -158,7 +144,6 @@ ROM_END
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY             FULLNAME                     FLAGS */
 COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_IS_SKELETON )
 COMP( 1984, alcat7100, 0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminal 7100",          MACHINE_IS_SKELETON )
-COMP( 1986, facit4440, 0,      0,      terminal, terminal, terminal_state, empty_init, "Facit",              "Terminal 4440 (30M-F1)", MACHINE_IS_SKELETON )
 COMP( 1986, itt9216,   0,      0,      terminal, terminal, terminal_state, empty_init, "ITT",                "Courier 9216-X",         MACHINE_IS_SKELETON )
 COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multitel D",             MACHINE_IS_SKELETON )
 COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multicom 715L",          MACHINE_IS_SKELETON )

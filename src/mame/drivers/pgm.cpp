@@ -523,7 +523,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_V3021_ADD("rtc")
+	V3021(config, "rtc");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

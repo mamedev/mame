@@ -489,10 +489,10 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 
-	MCFG_DEVICE_ADD("fdc2", FD1793, 8_MHz_XTAL / 8)  // confirmed clock
-	MCFG_WD_FDC_FORCE_READY // should be able to get rid of this when fdc issue is fixed
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, sorcerer_state, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, sorcerer_state, drq_w))
+	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
+	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
+	m_fdc2->intrq_wr_callback().set(FUNC(sorcerer_state::intrq_w));
+	m_fdc2->drq_wr_callback().set(FUNC(sorcerer_state::drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats)

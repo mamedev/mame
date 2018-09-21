@@ -130,6 +130,11 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	}
 }
 
+void nesapu_device::device_reset()
+{
+	write(0x15, 0x00);
+}
+
 void nesapu_device::device_clock_changed()
 {
 	calculate_rates();
@@ -710,7 +715,7 @@ logerror("invalid apu write: $%02X at $%04X\n", value, address);
 
 
 /* READ VALUES FROM REGISTERS */
-inline u8 nesapu_device::apu_read(int address)
+u8 nesapu_device::read(offs_t address)
 {
 	if (address == 0x15) /*FIXED* Address $4015 has different behaviour*/
 	{
@@ -740,18 +745,12 @@ inline u8 nesapu_device::apu_read(int address)
 }
 
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
-inline void nesapu_device::apu_write(int address, u8 value)
+void nesapu_device::write(offs_t address, u8 value)
 {
 	m_APU.regs[address]=value;
 	m_stream->update();
 	apu_regwrite(address,value);
 }
-
-/* EXTERNAL INTERFACE FUNCTIONS */
-
-/* REGISTER READ/WRITE FUNCTIONS */
-READ8_MEMBER( nesapu_device::read ) {return apu_read(offset);}
-WRITE8_MEMBER( nesapu_device::write ) {apu_write(offset,data);}
 
 
 //-------------------------------------------------

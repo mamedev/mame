@@ -487,10 +487,10 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 
 MACHINE_CONFIG_START(abc80_state::abc80)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(11'980'800)/2/2) // 2.9952 MHz
-	MCFG_DEVICE_PROGRAM_MAP(abc80_mem)
-	MCFG_DEVICE_IO_MAP(abc80_io)
-	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
+	Z80(config, m_maincpu, XTAL(11'980'800)/2/2); // 2.9952 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc80_state::abc80_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc80_state::abc80_io);
+	m_maincpu->set_daisy_config(abc80_daisy_chain);
 
 	// video hardware
 	abc80_video(config);

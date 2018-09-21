@@ -651,6 +651,24 @@ void tumbleb_state::tumblepopb_main_map(address_map &map)
 	map(0x342400, 0x34247f).nopw();
 }
 
+void tumbleb_state::tumblepopba_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+#if TUMBLEP_HACK
+	map(0x000000, 0x07ffff).writeonly();   /* To write levels modifications */
+#endif
+	//map(0x100000, 0x100001).rw(FUNC(tumbleb_state::tumblepb_prot_r), FUNC(tumbleb_state::tumblepb_oki_w)); // where's the oki mapped?
+	map(0x120000, 0x123fff).ram().share("mainram");
+	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x1a0000, 0x1a07ff).ram().share("spriteram"); /* Bootleg sprite buffer */
+	map(0x1a1000, 0x1a1fff).ram(); // ?
+	map(0x200000, 0x200fff).ram(); // ?
+	//map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w)); // 0x180000?
+	map(0x320000, 0x320fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+}
+
 void tumbleb_state::fncywld_main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
@@ -2056,6 +2074,11 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(tumbleb_state::tumblepba)
+	tumblepb(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tumblepopba_main_map)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 
@@ -2431,7 +2454,7 @@ ROM_START( tumbleb2 )
 	ROM_LOAD( "wj-1", 0x00000, 0x80000, CRC(fabbf15d) SHA1(de60be43a5cd1d4b93c142bde6cbfc48a25545a3) )
 	ROM_RELOAD(0x80000,0x80000)
 
-	ROM_REGION(0x1500, "plds", 0 ) // not dumped one are soldered
+	ROM_REGION(0x1500, "plds", 0 ) // not dumped ones are soldered
 	ROM_LOAD( "palce16v8.1",   0x0000, 0x104, NO_DUMP )
 	ROM_LOAD( "palce20v8.2",   0x0000, 0x157, NO_DUMP )
 	ROM_LOAD( "palce16v8.3",   0x0200, 0x104, NO_DUMP )
@@ -3616,7 +3639,7 @@ void tumbleb_state::init_dquizgo()
 /* Misc 'bootleg' hardware - close to base Tumble Pop */
 GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
 GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
-GAME( 1991, tumblepba,tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs
+GAME( 1991, tumblepba,tumblep, tumblepba,   tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
 
 GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, tumbleb_state, init_jumpkids, ROT0, "Comad",    "Jump Kids", MACHINE_SUPPORTS_SAVE )
 

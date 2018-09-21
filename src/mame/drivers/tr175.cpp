@@ -86,27 +86,30 @@ void tr175_state::ramdac_map(address_map &map)
 static INPUT_PORTS_START( tr175 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tr175_state::tr175)
-	MCFG_DEVICE_ADD("maincpu", M68000, 12'000'000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void tr175_state::tr175(machine_config &config)
+{
+	M68000(config, m_maincpu, 12'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tr175_state::mem_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000), 900, 0, 720, 449, 0, 416) // guess
-	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(28.322_MHz_XTAL, 900, 0, 720, 449, 0, 416); // guess
+	screen.set_screen_update("avdc", FUNC(scn2674_device::screen_update));
 
-	MCFG_DEVICE_ADD("avdc", SCN2674, XTAL(28'322'000) / 18) // guess
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_SCN2674_CHARACTER_WIDTH(18) // guess
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(tr175_state, draw_character)
-	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	scn2674_device &avdc(SCN2674(config, "avdc", 28.322_MHz_XTAL / 18)); // guess
+	avdc.intr_callback().set_inputline("maincpu", M68K_IRQ_2);
+	avdc.set_character_width(18); // guess
+	avdc.set_display_callback(FUNC(tr175_state::draw_character));
+	avdc.set_addrmap(0, &tr175_state::vram_map);
+	avdc.set_screen("screen");
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(11'059'200) / 3) // is this the right clock?
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_1))
+	scn2681_device &duart(SCN2681(config, "duart", 11.0592_MHz_XTAL / 3)); // is this the right clock?
+	duart.irq_cb().set_inputline("maincpu", M68K_IRQ_1);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", 0x100);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0));
+	ramdac.set_addrmap(0, &tr175_state::ramdac_map);
+	ramdac.set_palette("palette");
+}
 
 
 

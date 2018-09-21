@@ -123,12 +123,13 @@ WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { m_channel[3]->trigger(state != 0); }
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(z80ctc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ch0", Z80CTC_CHANNEL, 0)
-	MCFG_DEVICE_ADD("ch1", Z80CTC_CHANNEL, 0)
-	MCFG_DEVICE_ADD("ch2", Z80CTC_CHANNEL, 0)
-	MCFG_DEVICE_ADD("ch3", Z80CTC_CHANNEL, 0)
-MACHINE_CONFIG_END
+void z80ctc_device::device_add_mconfig(machine_config & config)
+{
+	Z80CTC_CHANNEL(config, m_channel[0], 0);
+	Z80CTC_CHANNEL(config, m_channel[1], 0);
+	Z80CTC_CHANNEL(config, m_channel[2], 0);
+	Z80CTC_CHANNEL(config, m_channel[3], 0);
+}
 
 
 //-------------------------------------------------

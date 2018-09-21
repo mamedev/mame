@@ -597,10 +597,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(xerox820_state::xerox820)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 20_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(xerox820_mem)
-	MCFG_DEVICE_IO_MAP(xerox820_io)
-	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
+	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820_state::xerox820_mem);
+	m_maincpu->set_addrmap(AS_IO, &xerox820_state::xerox820_io);
+	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -620,32 +620,32 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 20_MHz_XTAL / 8));
 	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 20_MHz_XTAL / 8)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	Z80CTC(config, m_ctc, 20_MHz_XTAL / 8);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(20_MHz_XTAL / 8))
 
-	MCFG_DEVICE_ADD(FD1771_TAG, FD1771, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
+	FD1771(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 20_MHz_XTAL / 8)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80SIO0(config, m_sio, 20_MHz_XTAL / 8);
+	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio0_device, rxa_w))
 
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio0_device, rxb_w))
 
 	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
 	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
@@ -673,10 +673,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(xerox820ii_mem)
-	MCFG_DEVICE_IO_MAP(xerox820ii_io)
-	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820ii_state::xerox820ii_mem);
+	m_maincpu->set_addrmap(AS_IO, &xerox820ii_state::xerox820ii_io);
+	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -709,32 +709,32 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	pio_rd.in_pb_callback().set("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
 	pio_rd.out_pb_callback().set(FUNC(xerox820ii_state::rdpio_pb_w));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(16_MHz_XTAL / 4))
 
-	MCFG_DEVICE_ADD(FD1797_TAG, FD1797, 16_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, xerox820_state, fdc_drq_w))
+	FD1797(config, m_fdc, 16_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 16_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80SIO0(config, m_sio, 16_MHz_XTAL / 4);
+	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio0_device, rxa_w))
 
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio0_device, rxb_w))
 
 	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
 	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
@@ -776,11 +776,12 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox168)
 	m_ram->set_default_size("192K").set_extra_options("320K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xerox820_state::mk83)
+void xerox820_state::mk83(machine_config & config)
+{
 	xerox820(config);
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(mk83_mem)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820_state::mk83_mem);
+}
 
 /* ROMs */
 

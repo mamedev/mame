@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 	MCFG_DEVICE_IO_MAP(pitnrun_sound_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

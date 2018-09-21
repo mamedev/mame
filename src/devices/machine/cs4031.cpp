@@ -149,7 +149,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_ctc->out_handler<2>().set(FUNC(cs4031_device::ctc_out2_w));
 
 	DS12885(config, m_rtc);
-	m_rtc->irq_callback().set(m_intc2, FUNC(pic8259_device::ir0_w));
+	m_rtc->irq().set(m_intc2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 }
 

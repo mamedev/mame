@@ -256,10 +256,10 @@ void c80_state::machine_start()
 
 MACHINE_CONFIG_START(c80_state::c80)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2500000) /* U880D */
-	MCFG_DEVICE_PROGRAM_MAP(c80_mem)
-	MCFG_DEVICE_IO_MAP(c80_io)
-	MCFG_Z80_DAISY_CHAIN(c80_daisy_chain)
+	Z80(config, m_maincpu, 2500000); /* U880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &c80_state::c80_mem);
+	m_maincpu->set_addrmap(AS_IO, &c80_state::c80_io);
+	m_maincpu->set_daisy_config(c80_daisy_chain);
 
 	/* video hardware */
 	config.set_default_layout(layout_c80);

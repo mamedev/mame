@@ -574,7 +574,7 @@ MACHINE_CONFIG_START( efdt_state::efdt )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, efdt_state, vblank_nmi_w))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_efdt)
-	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(efdt_state, efdt)
 
 	MCFG_VIDEO_START_OVERRIDE(efdt_state, efdt)

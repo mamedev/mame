@@ -417,9 +417,9 @@ static const char *const sega005_sample_names[] =
 
 MACHINE_CONFIG_START(segag80r_state::sega005_sound_board)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segag80r_state, sega005_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segag80r_state, sega005_sound_b_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(segag80r_state::sega005_sound_a_w));
+	ppi.out_pb_callback().set(FUNC(segag80r_state::sega005_sound_b_w));
 
 	/* sound hardware */
 

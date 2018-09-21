@@ -127,7 +127,7 @@ private:
 	uint16_t m_graph_address;
 	int m_centronics_busy;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_attribram;

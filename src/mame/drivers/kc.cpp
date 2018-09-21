@@ -98,10 +98,11 @@ void kc85_exp(device_slot_interface &device)
 
 MACHINE_CONFIG_START(kc_state::kc85_3)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, KC85_3_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kc85_3_mem)
-	MCFG_DEVICE_IO_MAP(kc85_3_io)
-	MCFG_Z80_DAISY_CHAIN(kc85_daisy_chain)
+	Z80(config, m_maincpu, KC85_3_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_3_mem);
+	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_3_io);
+	m_maincpu->set_daisy_config(kc85_daisy_chain);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	Z80PIO(config, m_z80pio, KC85_3_CLOCK);
@@ -113,11 +114,11 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
 	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_3_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, kc_state, ctc_zc0_callback))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, kc_state, ctc_zc1_callback))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, kc_state, video_toggle_blink_state))
+	Z80CTC(config, m_z80ctc, KC85_3_CLOCK);
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, 0);
+	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
+	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));
+	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -179,10 +180,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, KC85_4_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kc85_4_mem)
-	MCFG_DEVICE_IO_MAP(kc85_4_io)
-	MCFG_Z80_DAISY_CHAIN(kc85_daisy_chain)
+	Z80(config, m_maincpu, KC85_4_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_4_state::kc85_4_mem);
+	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
+	m_maincpu->set_daisy_config(kc85_daisy_chain);
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	Z80PIO(config, m_z80pio, KC85_4_CLOCK);
@@ -194,11 +195,11 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
 	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, KC85_4_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, kc_state, ctc_zc0_callback))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, kc_state, ctc_zc1_callback))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, kc_state, video_toggle_blink_state))
+	Z80CTC(config, m_z80ctc, 0);
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
+	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));
+	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

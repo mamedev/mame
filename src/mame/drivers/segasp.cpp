@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(segasp_state::segasp)
 	EEPROM_93C46_16BIT(config, "sp_eeprom");
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
-	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present
+	X76F100(config, "naomibd_eeprom");  // actually not present
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 

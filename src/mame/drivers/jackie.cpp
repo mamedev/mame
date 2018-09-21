@@ -622,14 +622,14 @@ MACHINE_CONFIG_START(jackie_state::jackie)
 	MCFG_DEVICE_IO_MAP(jackie_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0) // D8255AC
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jackie_state, nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi1(I8255A(config, "ppi1")); // D8255AC
+	ppi1.out_pa_callback().set(FUNC(jackie_state::nmi_and_coins_w));
+	ppi1.in_pb_callback().set_ioport("SERVICE");
+	ppi1.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0) // D8255AC
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jackie_state, lamps_w))
+	i8255_device &ppi2(I8255A(config, "ppi2")); // D8255AC
+	ppi2.in_pa_callback().set_ioport("BUTTONS1");
+	ppi2.out_pb_callback().set(FUNC(jackie_state::lamps_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -223,6 +223,7 @@ const double XTAL::known_xtals[] = {
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
 	 17'550'000, /* 17.55_MHz_XTAL         HP 264x display clock (50 Hz configuration) */
+	 17'600'000, /* 17.6_MHz_XTAL          LSI Octopus */
 	 17'734'470, /* 17.73447_MHz_XTAL      (~4x PAL subcarrier) */
 	 17'734'472, /* 17.734472_MHz_XTAL     actually ~4x PAL subcarrier */
 	 17'971'200, /* 17.9712_MHz_XTAL       - */
@@ -234,6 +235,7 @@ const double XTAL::known_xtals[] = {
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */
 	 19'339'600, /* 19.3396_MHz_XTAL       TeleVideo TVI-955 80-column display clock */
 	 19'600'000, /* 19.6_MHz_XTAL          Universal Mr. Do - Model 8021 PCB */
+	 19'602'000, /* 19.602_MHz_XTAL        Ampex 210+ 80-column display clock */
 	 19'660'800, /* 19.6608_MHz_XTAL       Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	 19'661'400, /* 19.6614_MHz_XTAL       Wyse WY-30 */
 	 19'923'000, /* 19.923_MHz_XTAL        Cinematronics vectors */
@@ -251,6 +253,7 @@ const double XTAL::known_xtals[] = {
 	 21'300'000, /* 21.3_MHz_XTAL          - */
 	 21'477'272, /* 21.477272_MHz_XTAL     BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	 22'000'000, /* 22_MHz_XTAL            - */
+	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
 	 22'118'400, /* 22.1184_MHz_XTAL       Amusco Poker */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
@@ -302,6 +305,7 @@ const double XTAL::known_xtals[] = {
 	 31'684'000, /* 31.684_MHz_XTAL        TeleVideo TVI-955 132-column display clock */
 	 31'948'800, /* 31.9488_MHz_XTAL       NEC PC-88xx, PC-98xx */
 	 32'000'000, /* 32_MHz_XTAL            - */
+	 32'147'000, /* 32.147_MHz_XTAL        Ampex 210+ 132-column display clock */
 	 32'220'000, /* 32.22_MHz_XTAL         Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz */
 	 32'317'400, /* 32.3174_MHz_XTAL       DEC VT330, VT340 */
 	 32'530'400, /* 32.5304_MHz_XTAL       Seta 2 */

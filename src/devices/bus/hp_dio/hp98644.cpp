@@ -26,18 +26,17 @@ DEFINE_DEVICE_TYPE(HPDIO_98644, dio16_98644_device, "dio98644", "HP98644A Asynch
 #define INS8250_TAG     "ins8250"
 
 MACHINE_CONFIG_START( dio16_98644_device::device_add_mconfig )
-	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL(2'457'600))
-
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	INS8250(config, m_uart, XTAL(2'457'600));
+	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
 
 //**************************************************************************

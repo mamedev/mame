@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 	m_outlatch->q_out_cb<6>().set(FUNC(liberatr_state::coin_counter_left_w));
 	m_outlatch->q_out_cb<7>().set([this] (int state) { m_planet_select = state; });
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

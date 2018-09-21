@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	m_inp[1]->read_port5_callback().set_ioport("BUTTONS").rshift(4);
 	m_inp[1]->read_port7_callback().set_ioport("SYSTEM").rshift(4);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(9'828'000) / 16)

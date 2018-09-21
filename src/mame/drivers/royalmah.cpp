@@ -3484,7 +3484,7 @@ MACHINE_CONFIG_START(royalmah_state::royalmah)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 16*2)
+	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INIT_OWNER(royalmah_state,royalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4885,7 +4885,7 @@ ROM_START( mjsiyoub )
 	ROM_LOAD( "1.1k", 0x00000, 0x8000, CRC(a1083321) SHA1(b36772e90be60270234df16cf92d87f8d950190d) )
 	ROM_LOAD( "2.1g", 0x08000, 0x4000, CRC(cfe5de1d) SHA1(4acf9a752aa3c02b0889b0b49d3744359fa24460) )
 
-	ROM_REGION( 0x40000, "proms", 0 )
+	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "color.bpr", 0x00, 0x20,  CRC(d21367e5) SHA1(b28321ac8f99abfebe2ef4da0c751cefe9f3f3b6) )
 ROM_END
 

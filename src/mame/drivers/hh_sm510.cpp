@@ -1205,6 +1205,7 @@ MACHINE_CONFIG_START(gnw_mickdon_state::gnw_mickdon)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1236/2-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1288,6 +1289,7 @@ MACHINE_CONFIG_START(gnw_dkong2_state::gnw_dkong2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1237/2-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1373,6 +1375,7 @@ MACHINE_CONFIG_START(gnw_mario_state::gnw_mario)
 	MCFG_SCREEN_VISIBLE_AREA(0, 2261/2-1, 0, 1440/2-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_gnw_dualh);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

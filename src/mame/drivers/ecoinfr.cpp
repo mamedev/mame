@@ -488,8 +488,7 @@ void ecoinfr_state::memmap(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 
-	map(0xa000, 0xa000).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xa001, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa000, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 }
 

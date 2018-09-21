@@ -86,7 +86,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// needed by dg680 class
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu; // S2650 or Z80
 	required_device<cassette_image_device> m_cass;
 
 	void binbug(machine_config &config);
@@ -537,10 +537,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 
 MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(dg680_mem)
-	MCFG_DEVICE_IO_MAP(dg680_io)
-	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
+	z80_device& maincpu(Z80(config, m_maincpu, XTAL(8'000'000) / 4));
+	maincpu.set_addrmap(AS_PROGRAM, &dg680_state::dg680_mem);
+	maincpu.set_addrmap(AS_IO, &dg680_state::dg680_io);
+	maincpu.set_daisy_config(dg680_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
@@ -564,9 +564,9 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(8'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000) / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

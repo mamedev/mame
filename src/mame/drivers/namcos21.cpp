@@ -36,7 +36,7 @@ Driver's Eyes
 --------------------------+-------------+---------------+-----------+------------
 GPU+bitmap layer          | yes         | no            | no        | no
 Namco System NB1 Sprites  | no          | yes           | yes       | yes
-Number of DSPs            | 1           | 1             | 5         | 4
+Number of DSPs            | 1           | 1             | 5         | 1x Ma, 4x Sl
 
 The main 68k CPUs populate a chunk of shared RAM with an display list describing a scene to be rendered.
 The main CPUs also specify attributes for a master camera which provides additional global transformations.
@@ -170,8 +170,8 @@ quad primitives (n x 5 words) - color code and four vertex indices
 
 -----------------------------------------------------------------------
 Board 1 : DSP Board - 1st PCB. (Uppermost)
-DSP Type 1 : 4 x TMS320C25 connected x 4 x Namco Custom chip 67 (68 pin PLCC) (Cybersled)
-DSP Type 2 : 5 x TMS320C20 (Starblade)
+DSP Type 1 : 1 x Master TMS320C25 (C67) 4 x Slave TMS320C25 (C67) each connected to a Namco Custom chip 342 
+DSP Type 2 : 5 x TMS320C20 (Starblade) (verify this information)
 OSC: 40.000MHz
 RAM: HM62832 x 2, M5M5189 x 4, ISSI IS61C68 x 16
 ROMS: TMS27C040
@@ -520,7 +520,6 @@ Filter Board
 */
 #include "emu.h"
 #include "includes/namcos21.h"
-#include "machine/namcoic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
@@ -723,22 +722,22 @@ void namcos21_kickstart(running_machine &machine, int internal)
 	namcos21_state *state = machine.driver_data<namcos21_state>();
 
 	/* patch dsp watchdog */
-	switch( state->m_gametype )
+	switch (state->m_gametype)
 	{
-		case NAMCOS21_AIRCOMBAT:
-			state->m_master_dsp_code[0x008e] = 0x808f;
-			break;
-		case NAMCOS21_SOLVALOU:
-			state->m_master_dsp_code[0x008b] = 0x808c;
-			break;
-		default:
-			break;
+	case namcos21_state::NAMCOS21_AIRCOMBAT:
+		state->m_master_dsp_code[0x008e] = 0x808f;
+		break;
+	case namcos21_state::NAMCOS21_SOLVALOU:
+		state->m_master_dsp_code[0x008b] = 0x808c;
+		break;
+	default:
+		break;
 	}
-	if( internal )
+	if (internal)
 	{
-		if( state->m_mbNeedsKickstart==0 ) return;
-			state->m_mbNeedsKickstart--;
-		if( state->m_mbNeedsKickstart ) return;
+		if (state->m_mbNeedsKickstart == 0) return;
+		state->m_mbNeedsKickstart--;
+		if (state->m_mbNeedsKickstart) return;
 	}
 
 	state->clear_poly_framebuffer();
@@ -1248,8 +1247,8 @@ void namcos21_state::common_map(address_map &map)
 	map(0x440000, 0x440001).rw(FUNC(namcos21_state::pointram_data_r), FUNC(namcos21_state::pointram_data_w));
 	map(0x440002, 0x47ffff).nopw(); /* (?) Air Combat */
 	map(0x480000, 0x4807ff).rw(FUNC(namcos21_state::namcos21_depthcue_r), FUNC(namcos21_state::namcos21_depthcue_w)); /* Air Combat */
-	map(0x700000, 0x71ffff).rw(FUNC(namcos21_state::c355_obj_ram_r), FUNC(namcos21_state::c355_obj_ram_w));
-	map(0x720000, 0x720007).rw(FUNC(namcos21_state::c355_obj_position_r), FUNC(namcos21_state::c355_obj_position_w));
+	map(0x700000, 0x71ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w));
+	map(0x720000, 0x720007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x740000, 0x74ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x750000, 0x75ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x760000, 0x760001).rw(FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));
@@ -1533,7 +1532,7 @@ void namcos21_state::winrun_gpu_map(address_map &map)
 
 void namcos21_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank6"); /* banked */
+	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
@@ -1544,7 +1543,7 @@ void namcos21_state::sound_map(address_map &map)
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
 	map(0xc000, 0xc001).w(FUNC(namcos21_state::namcos2_sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
-	map(0xd000, 0xffff).rom();
+	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
 }
 
 
@@ -1552,28 +1551,51 @@ void namcos21_state::sound_map(address_map &map)
 /* I/O HD63705 MCU Memory declarations                       */
 /*************************************************************/
 
-void namcos21_state::mcu_map(address_map &map)
+void namcos21_state::configure_c65_namcos21(machine_config &config)
 {
-	map(0x0000, 0x003f).ram();
-	map(0x0000, 0x0000).nopr();
-	map(0x0001, 0x0001).portr("PORTB");          /* p1,p2 start */
-	map(0x0002, 0x0002).portr("PORTC");          /* coins */
-	map(0x0003, 0x0003).rw(FUNC(namcos21_state::namcos2_mcu_port_d_r), FUNC(namcos21_state::namcos2_mcu_port_d_w));
-	map(0x0007, 0x0007).portr("PORTH");          /* fire buttons */
-	map(0x0010, 0x0010).rw(FUNC(namcos21_state::namcos2_mcu_analog_ctrl_r), FUNC(namcos21_state::namcos2_mcu_analog_ctrl_w));
-	map(0x0011, 0x0011).rw(FUNC(namcos21_state::namcos2_mcu_analog_port_r), FUNC(namcos21_state::namcos2_mcu_analog_port_w));
-	map(0x0040, 0x01bf).ram();
-	map(0x01c0, 0x1fff).rom();
-	map(0x2000, 0x2000).portr("DSW");
-	map(0x3000, 0x3000).portr("DIAL0");
-	map(0x3001, 0x3001).portr("DIAL1");
-	map(0x3002, 0x3002).portr("DIAL2");
-	map(0x3003, 0x3003).portr("DIAL3");
-	map(0x5000, 0x57ff).rw(FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)).share("mpdualportram");
-	map(0x6000, 0x6fff).nopr();             /* watchdog */
-	map(0x8000, 0xffff).rom();
+	NAMCOC65(config, m_c65, 2048000);
+	m_c65->in_pb_callback().set_ioport("MCUB");
+	m_c65->in_pc_callback().set_ioport("MCUC");
+	m_c65->in_ph_callback().set_ioport("MCUH");
+	m_c65->in_pdsw_callback().set_ioport("DSW");
+	m_c65->di0_in_cb().set_ioport("MCUDI0");
+	m_c65->di1_in_cb().set_ioport("MCUDI1");
+	m_c65->di2_in_cb().set_ioport("MCUDI2");
+	m_c65->di3_in_cb().set_ioport("MCUDI3");
+	m_c65->an0_in_cb().set_ioport("AN0");
+	m_c65->an1_in_cb().set_ioport("AN1");
+	m_c65->an2_in_cb().set_ioport("AN2");
+	m_c65->an3_in_cb().set_ioport("AN3");
+	m_c65->an4_in_cb().set_ioport("AN4");
+	m_c65->an5_in_cb().set_ioport("AN5");
+	m_c65->an6_in_cb().set_ioport("AN6");
+	m_c65->an7_in_cb().set_ioport("AN7");
+	m_c65->dp_in_callback().set(FUNC(namcos21_state::namcos2_dualportram_byte_r));
+	m_c65->dp_out_callback().set(FUNC(namcos21_state::namcos2_dualportram_byte_w));
 }
 
+void namcos21_state::configure_c68_namcos21(machine_config &config)
+{
+	NAMCOC68(config, m_c68, 8000000);
+	m_c68->in_pb_callback().set_ioport("MCUB");
+	m_c68->in_pc_callback().set_ioport("MCUC");
+	m_c68->in_ph_callback().set_ioport("MCUH");
+	m_c68->in_pdsw_callback().set_ioport("DSW");
+	m_c68->di0_in_cb().set_ioport("MCUDI0");
+	m_c68->di1_in_cb().set_ioport("MCUDI1");
+	m_c68->di2_in_cb().set_ioport("MCUDI2");
+	m_c68->di3_in_cb().set_ioport("MCUDI3");
+	m_c68->an0_in_cb().set_ioport("AN0");
+	m_c68->an1_in_cb().set_ioport("AN1");
+	m_c68->an2_in_cb().set_ioport("AN2");
+	m_c68->an3_in_cb().set_ioport("AN3");
+	m_c68->an4_in_cb().set_ioport("AN4");
+	m_c68->an5_in_cb().set_ioport("AN5");
+	m_c68->an6_in_cb().set_ioport("AN6");
+	m_c68->an7_in_cb().set_ioport("AN7");
+	m_c68->dp_in_callback().set(FUNC(namcos21_state::namcos2_dualportram_byte_r));
+	m_c68->dp_out_callback().set(FUNC(namcos21_state::namcos2_dualportram_byte_w));
+}
 
 /*************************************************************/
 /* Driver's Eyes Memory declarations overrides               */
@@ -1582,8 +1604,8 @@ void namcos21_state::mcu_map(address_map &map)
 
 void namcos21_state::driveyes_common_map(address_map &map)
 {
-	map(0x700000, 0x71ffff).rw(FUNC(namcos21_state::c355_obj_ram_r), FUNC(namcos21_state::c355_obj_ram_w));
-	map(0x720000, 0x720007).rw(FUNC(namcos21_state::c355_obj_position_r), FUNC(namcos21_state::c355_obj_position_w));
+	map(0x700000, 0x71ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w));
+	map(0x720000, 0x720007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x740000, 0x74ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x750000, 0x75ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x760000, 0x760001).rw(FUNC(namcos21_state::namcos21_video_enable_r), FUNC(namcos21_state::namcos21_video_enable_w));
@@ -1624,12 +1646,12 @@ void namcos21_state::driveyes_slave_map(address_map &map)
 /*************************************************************/
 
 static INPUT_PORTS_START( s21default )
-	PORT_START("PORTB")     /* 63B05Z0 - PORT B */
+	PORT_START("MCUB")     /* 63B05Z0 - PORT B */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("PORTC")     /* 63B05Z0 - PORT C & SCI */
+	PORT_START("MCUC")     /* 63B05Z0 - PORT C & SCI */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1653,7 +1675,7 @@ static INPUT_PORTS_START( s21default )
 	PORT_START("AN7")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PORTH")     /* 63B05Z0 - PORT H */
+	PORT_START("MCUH")     /* 63B05Z0 - PORT H */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1686,13 +1708,13 @@ static INPUT_PORTS_START( s21default )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DIAL0")     /* 63B05Z0 - $3000 */
+	PORT_START("MCUDI0")     /* 63B05Z0 - $3000 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("DIAL1")     /* 63B05Z0 - $3001 */
+	PORT_START("MCUDI1")     /* 63B05Z0 - $3001 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("DIAL2")     /* 63B05Z0 - $3002 */
+	PORT_START("MCUDI2")     /* 63B05Z0 - $3002 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("DIAL3")     /* 63B05Z0 - $3003 */
+	PORT_START("MCUDI3")     /* 63B05Z0 - $3003 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1705,7 +1727,7 @@ static INPUT_PORTS_START( winrun )
 	PORT_DIPSETTING(    0x20, "2M" )
 	PORT_DIPSETTING(    0x00, "4M" )
 
-	PORT_MODIFY("PORTB")        /* 63B05Z0 - PORT B */
+	PORT_MODIFY("MCUB")        /* 63B05Z0 - PORT B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) /* ? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) /* ? */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
@@ -1728,7 +1750,7 @@ static INPUT_PORTS_START( winrun )
 	PORT_MODIFY("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
+	PORT_MODIFY("MCUH")        /* 63B05Z0 - PORT H */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1750,15 +1772,15 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( driveyes )
 	PORT_INCLUDE(winrungp)
 
-	PORT_MODIFY("PORTB")
+	PORT_MODIFY("MCUB")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("gearbox", namcoio_gearbox_device, clutch_r )
 	PORT_BIT( 0x37, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("DIAL0")
+	PORT_MODIFY("MCUDI0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
+	PORT_MODIFY("MCUH") 
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1766,6 +1788,14 @@ static INPUT_PORTS_START( driveyes )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Green Button")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0c, 0x0c, "Screen")
+	PORT_DIPSETTING(    0x0c, "Center" )
+	// these will show 'receive error' because they want comms from the main screen
+	PORT_DIPSETTING(    0x08, "Left" )
+	PORT_DIPSETTING(    0x04, "Right" )
+	PORT_DIPSETTING(    0x00, "Right (duplicate)" )
 INPUT_PORTS_END
 
 // the default inc/dec analog keys have been chosen to map 'tank' style inputs found on Assault.
@@ -1792,7 +1822,7 @@ static INPUT_PORTS_START( cybsled )
 	PORT_MODIFY("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
+	PORT_MODIFY("MCUH")        /* 63B05Z0 - PORT H */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Viewport Change Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1836,7 +1866,7 @@ static INPUT_PORTS_START( aircomb )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_MODIFY("PORTH")        /* IN#10: 63B05Z0 - PORT H */
+	PORT_MODIFY("MCUH")        /* IN#10: 63B05Z0 - PORT H */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) ///???
@@ -1874,9 +1904,138 @@ static GFXDECODE_START( gfx_namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
+
+WRITE8_MEMBER( namcos21_state::namcos2_sound_bankselect_w )
+{
+	m_audiobank->set_entry(data>>4);
+}
+
+void (*namcos2_kickstart)(running_machine &machine, int internal);
+
+WRITE8_MEMBER(namcos21_state::sound_reset_w)
+{
+	if (data & 0x01)
+	{
+		/* Resume execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->yield();
+	}
+	else
+	{
+		/* Suspend execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+
+	if (namcos2_kickstart != nullptr)
+	{
+		//printf( "dspkick=0x%x\n", data );
+		if (data & 0x04)
+		{
+			(*namcos2_kickstart)(machine(), 1);
+		}
+	}
+}
+
+WRITE8_MEMBER(namcos21_state::system_reset_w)
+{
+	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+
+	if (data & 0x01)
+		m_maincpu->yield();
+}
+
+void namcos21_state::reset_all_subcpus(int state)
+{
+	m_slave->set_input_line(INPUT_LINE_RESET, state);
+	if (m_c68)
+	{
+		m_c68->ext_reset(state);
+	}
+	else if (m_c65)
+	{
+		m_c65->ext_reset(state);
+	}
+	else
+	{
+		logerror("no MCU to reset?\n");
+	}
+
+	switch (m_gametype)
+	{
+	case namcos21_state::NAMCOS21_SOLVALOU:
+	case namcos21_state::NAMCOS21_STARBLADE:
+	case namcos21_state::NAMCOS21_AIRCOMBAT:
+	case namcos21_state::NAMCOS21_CYBERSLED:
+		m_dspmaster->set_input_line(INPUT_LINE_RESET, state);
+		m_dspslave->set_input_line(INPUT_LINE_RESET, state);
+		break;
+
+	//case namcos21_state::NAMCOS21_WINRUN91:
+	//case namcos21_state::NAMCOS21_DRIVERS_EYES:
+	default:
+		break;
+	}
+}
+
+
+bool namcos21_state::is_system21()
+{
+	switch (m_gametype)
+	{
+	case namcos21_state::NAMCOS21_AIRCOMBAT:
+	case namcos21_state::NAMCOS21_STARBLADE:
+	case namcos21_state::NAMCOS21_CYBERSLED:
+	case namcos21_state::NAMCOS21_SOLVALOU:
+	case namcos21_state::NAMCOS21_WINRUN91:
+	case namcos21_state::NAMCOS21_DRIVERS_EYES:
+		return 1;
+	default:
+		return 0;
+	}
+}
+
+
+WRITE8_MEMBER(namcos21_state::namcos2_68k_eeprom_w)
+{
+	m_eeprom[offset] = data;
+}
+
+READ8_MEMBER(namcos21_state::namcos2_68k_eeprom_r)
+{
+	return m_eeprom[offset];
+}
+
+MACHINE_RESET_MEMBER(namcos21_state, namcos21)
+{
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
+	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
+
+	/* Initialise the bank select in the sound CPU */
+	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
+
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+
+	/* Place CPU2 & CPU3 into the reset condition */
+	reset_all_subcpus(ASSERT_LINE);
+}
+
+
+
 MACHINE_START_MEMBER(namcos21_state,namcos21)
 {
-	MACHINE_START_CALL_MEMBER( namcos2 );
+	namcos2_kickstart = nullptr;
+	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
+	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
+
+	if (m_audiobank)
+	{
+		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+		for (int i = 0; i < 0x10; i++)
+			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
+
+		m_audiobank->set_entry(0);
+	}
+
 	namcos2_kickstart = namcos21_kickstart;
 }
 
@@ -1891,6 +2050,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 		m_slave_intc->vblank_irq_trigger();
 		if(m_gpu_intc)
 			m_gpu_intc->vblank_irq_trigger();
+
+		if (m_c65)
+			m_c65->ext_interrupt(HOLD_LINE);
+
+		if (m_c68)
+			m_c68->ext_interrupt(ASSERT_LINE);
+
 	}
 
 	if(m_gpu_intc != nullptr)
@@ -1911,134 +2077,7 @@ void namcos21_state::configure_c148_standard(machine_config &config)
 	m_slave_intc->link_c148_device(m_master_intc);
 }
 
-MACHINE_CONFIG_START(namcos21_state::namcos21)
-	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
-
-	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
-
-	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
-	MCFG_DEVICE_DATA_MAP(master_dsp_data)
-	MCFG_DEVICE_IO_MAP(master_dsp_io)
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, dsp_xf_w))
-
-	MCFG_DEVICE_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
-	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
-	MCFG_DEVICE_IO_MAP(slave_dsp_io)
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, slave_XF_output_w))
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
-
-	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
-	MCFG_SCREEN_PALETTE("palette")
-
-	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
-	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_FORMAT(XBRG)
-
-	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, 8000000/374);
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
-	m_c140->add_route(0, "lspeaker", 0.50);
-	m_c140->add_route(1, "rspeaker", 0.50);
-
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(namcos21_state::driveyes)
-	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_DEVICE_PROGRAM_MAP(driveyes_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
-
-	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_DEVICE_PROGRAM_MAP(driveyes_slave_map)
-
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
-
-	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
-	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(NOOP)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
-
-	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
-
-	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_driveyes)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
-	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_FORMAT(XBRG)
-
-	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, 8000000/374);
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
-	m_c140->add_route(0, "lspeaker", 0.50);
-	m_c140->add_route(1, "rspeaker", 0.50);
-
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_CONFIG_END
-
+// winrun, winrungp, winrun91
 MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_master_map)
@@ -2052,18 +2091,16 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	configure_c65_namcos21(config);
 
-	MCFG_DEVICE_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
-	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
-	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(NOOP)
+	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000)); /* 24 MHz? overclocked */
+	dsp.set_addrmap(AS_PROGRAM, &namcos21_state::winrun_dsp_program);
+	dsp.set_addrmap(AS_DATA, &namcos21_state::winrun_dsp_data);
+	dsp.set_addrmap(AS_IO, &namcos21_state::winrun_dsp_io);
+	dsp.bio_in_cb().set(FUNC(namcos21_state::winrun_poly_reset_r));
+	dsp.hold_in_cb().set_constant(0);
+	dsp.hold_ack_out_cb().set_nop();
+	dsp.xf_out_cb().set_nop();
 
 	MCFG_DEVICE_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
@@ -2075,7 +2112,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos21)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2102,6 +2139,525 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 MACHINE_CONFIG_END
 
 
+// driveyes only
+MACHINE_CONFIG_START(namcos21_state::driveyes)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(driveyes_master_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(driveyes_slave_map)
+
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+
+	configure_c68_namcos21(config);
+
+	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000*2)); /* 24 MHz? overclocked */
+	dsp.set_addrmap(AS_PROGRAM, &namcos21_state::winrun_dsp_program);
+	dsp.set_addrmap(AS_DATA, &namcos21_state::winrun_dsp_data);
+	dsp.set_addrmap(AS_IO, &namcos21_state::winrun_dsp_io);
+	dsp.bio_in_cb().set(FUNC(namcos21_state::winrun_poly_reset_r));
+	dsp.hold_in_cb().set_constant(0);
+	dsp.hold_ack_out_cb().set_nop();
+	dsp.xf_out_cb().set_nop();
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
+
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos21)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
+
+	configure_c148_standard(config);
+	NAMCO_C139(config, m_sci, 0);
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
+	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_driveyes)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
+	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
+	MCFG_PALETTE_FORMAT(XBRG)
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0xf); // reverse mapping
+	m_c355spr->set_gfxregion(0);
+
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	C140(config, m_c140, 8000000/374);
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->add_route(0, "lspeaker", 0.50);
+	m_c140->add_route(1, "rspeaker", 0.50);
+
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+MACHINE_CONFIG_END
+
+// starblad, solvalou, aircomb, cybsled
+MACHINE_CONFIG_START(namcos21_state::namcos21)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+
+	configure_c68_namcos21(config);
+
+	tms32025_device& dspmaster(TMS32025(config, m_dspmaster, 24000000)); /* 24 MHz? overclocked */
+	dspmaster.set_addrmap(AS_PROGRAM, &namcos21_state::master_dsp_program);
+	dspmaster.set_addrmap(AS_DATA, &namcos21_state::master_dsp_data);
+	dspmaster.set_addrmap(AS_IO, &namcos21_state::master_dsp_io);
+	dspmaster.hold_in_cb().set_constant(0);
+	dspmaster.hold_ack_out_cb().set_nop();
+	dspmaster.xf_out_cb().set(FUNC(namcos21_state::dsp_xf_w));
+
+	tms32025_device& dspslave(TMS32025(config, m_dspslave, 24000000*4)); /* 24 MHz? overclocked */
+	dspslave.set_addrmap(AS_PROGRAM, &namcos21_state::slave_dsp_program);
+	dspslave.set_addrmap(AS_DATA, &namcos21_state::slave_dsp_data);
+	dspslave.set_addrmap(AS_IO, &namcos21_state::slave_dsp_io);
+	dspslave.hold_in_cb().set_constant(0);
+	dspslave.hold_ack_out_cb().set_nop();
+	dspslave.xf_out_cb().set(FUNC(namcos21_state::slave_XF_output_w));
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+
+	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos21)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
+	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
+	MCFG_SCREEN_PALETTE("palette")
+
+	configure_c148_standard(config);
+	NAMCO_C139(config, m_sci, 0);
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
+	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
+	MCFG_PALETTE_FORMAT(XBRG)
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0xf); // reverse mapping
+	m_c355spr->set_gfxregion(0);
+
+	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	C140(config, m_c140, 8000000/374);
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->add_route(0, "lspeaker", 0.50);
+	m_c140->add_route(1, "rspeaker", 0.50);
+
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+MACHINE_CONFIG_END
+
+
+
+
+
+
+ROM_START( winrun )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "wr2-mpub.3k",  0x000000, 0x20000, CRC(3bb0ea17) SHA1(201cedf5865224c1c4a0c9b017982e36ec9b8243) )
+	ROM_LOAD16_BYTE( "wr2-mplb.1k",  0x000001, 0x20000, CRC(95465062) SHA1(7d010ff92e87949b7b9109f8320ab61de7d0400a) )
+
+	ROM_REGION( 0x40000, "slave", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "wr1-spu.6b",  0x000000, 0x20000, CRC(d4915d44) SHA1(57056051138b259d021b3e7cc1c43a9f951b5cc1) )
+	ROM_LOAD16_BYTE( "wr1-spl.4b",  0x000001, 0x20000, CRC(0c336505) SHA1(edee073bf6fabe45c577b0b9375295183eb30c62) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "wr1-snd0.7c",  0x000000, 0x020000, CRC(698bae12) SHA1(86d22c1c639a9489e3c95820e4e3f04c30407e41) )
+
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+
+	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
+
+	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "wr1-gp0u.1k",  0x00000, 0x20000, CRC(c66a43be) SHA1(88ec02c5c18c8bb91a95934c14e9ae530ae09880) )
+	ROM_LOAD16_BYTE( "wr1-gp0l.3k",  0x00001, 0x20000, CRC(91a70e6f) SHA1(e613e2544f63cd386588445a2a199ae6b84d741e) )
+	ROM_LOAD16_BYTE( "wr1-gp1u.1l",  0x40000, 0x20000, CRC(8ff51a3d) SHA1(81fbcd4e8c51742f35607537e1b1a86fd7782827) )
+	ROM_LOAD16_BYTE( "wr1-gp1l.3l",  0x40001, 0x20000, CRC(9360d34e) SHA1(e558eb540c02acfe84f2dfe2d65afd609b7f3207) )
+
+	ROM_REGION16_BE( 0x80000, "data", 0 )
+	ROM_LOAD16_BYTE( "wr1-d0u.3a", 0x00000, 0x20000, CRC(84ea1492) SHA1(56274b39bd5be076c9904d9ed9ce3f6e29d9f038) )
+	ROM_LOAD16_BYTE( "wr1-d0l.1a", 0x00001, 0x20000, CRC(b81508f9) SHA1(51c03c3dff86cece9790667b1557de940ebccbe9) )
+	ROM_LOAD16_BYTE( "wr1-d1u.3b", 0x40000, 0x20000, CRC(bbd1fdd7) SHA1(026e9410525fa0e93f155949bbc1d3b8a2785bd1) )
+	ROM_LOAD16_BYTE( "wr1-d1l.1b", 0x40001, 0x20000, CRC(8ddd7eac) SHA1(b873b253b0a095e66a9f68d45a2cb41fa025ba16) )
+
+	ROM_REGION16_BE( 0x100000, "gdata", 0 ) /* bitmapped graphics */
+	ROM_LOAD16_BYTE( "wr1-gd0u-2.1p",  0x00000, 0x40000, CRC(9752eef5) SHA1(d6df0faf9c2696247bdf463f53c1e474ec595dd0) )
+	ROM_LOAD16_BYTE( "wr1-gd0l-2.3p",  0x00001, 0x40000, CRC(349c95cc) SHA1(8898eecf5918485ec683900520f123483077df28) )
+
+	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
+	ROM_LOAD16_BYTE( "wr1-pt0u.8j", 0x00000, 0x20000, CRC(7ec4cf6b) SHA1(92ec92567b9f7321efb4a3724cbcdba216eb22f9) )
+	ROM_LOAD16_BYTE( "wr1-pt0l.8d", 0x00001, 0x20000, CRC(58c14b73) SHA1(e34a26866cd870743e166669f7fa5915a82104e9) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("wr-voi-0.11b", 0x040000, 0x40000, CRC(8040b645) SHA1(7ccafb3073fa79910e26cf9b8b6e8e9ae22e55fc) )
+	ROM_LOAD("wr-voi-1.11c", 0x0c0000, 0x40000, CRC(d347e904) SHA1(620cd07e6230322c306283e45a43fa1e217028d4) )
+	ROM_LOAD("wr-voi-2.11d", 0x140000, 0x40000, CRC(b34747af) SHA1(7e0b55631bffa0583bf4f7f5368db9f09e411ba1) )
+	ROM_LOAD("wr-voi-3.11e", 0x1c0000, 0x40000, CRC(43085303) SHA1(9f743055c20df3548879118194244e37a0b91f7e) )
+
+	ROM_REGION( 0x1000, "pals", 0 )
+	/* Main PCB (2252960101) */
+	ROM_LOAD("sys87b-2.3w", 0x000, 0x104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) ) /* PAL16L8ACN */
+	ROM_LOAD("wr-c1.6p",    0x000, 0x040, CRC(d6c33258) SHA1(5baf71fae1ad73a75d91ee2dededca2254b4f414) ) /* PAL12L10CNS */
+	ROM_LOAD("wr-c2.8k",    0x000, 0x040, CRC(a3e77ade) SHA1(b4282fc4d21ce7813aba7772a85d721fb25144b6) ) /* PAL12L10CNS */
+
+	/* Framebuffer PCB (2252960900) */
+	ROM_LOAD("wr-g1.3a",    0x000, 0x104, CRC(d6b4373d) SHA1(b4db4526a37b7d6862cec1d223f2281e5120f225) ) /* PAL16L8ACN */
+	ROM_LOAD("wr-g2b.4p",   0x000, 0x104, NO_DUMP ) /* PAL16L8ACN */
+	ROM_LOAD("wr-g3.4s",    0x000, 0x104, NO_DUMP ) /* GAL20V8 */
+	ROM_LOAD("wr-g4.7f",    0x000, 0x104, CRC(f858b32b) SHA1(59af496e4416c9becb116315542858ac917cbe46) ) /* PAL16L8ACN */
+
+	/* 3D PCB (2252960701) */
+	ROM_LOAD("wr-p1.1b",    0x000, 0x104, CRC(5856cc43) SHA1(4578c7a7d731c61d678d594dd071370db46cc3f7) ) /* PAL16L8ACN */
+
+	/* DSP PCB (2252960601) */
+	ROM_LOAD("wr-d1.3b",    0x000, 0x104, CRC(7a072b71) SHA1(45b8d9405a2c1a40f2cd9c6a33d105565136c538) ) /* PAL16L8ACN */
+	ROM_LOAD("wr-d2.4j",    0x000, 0x104, CRC(614de474) SHA1(80c3ab287896e07073a70dd42e7b47f515dd3931) ) /* PAL16L8ACN */
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(93b4c4b5) SHA1(2fb5b9437304c97a2436b446671284aae69d545d) )
+ROM_END
+
+ROM_START( winrungp )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "sg1-mp-ub.3k", 0x000000, 0x20000, CRC(7f9b855a) SHA1(6d39a3a9959dbcd0047dbaab0fcd68adc81f5508) )
+	ROM_LOAD16_BYTE( "sg1-mp-lb.1k", 0x000001, 0x20000, CRC(a45e8543) SHA1(f9e583a988e4661026ee7873a48d078225778df3) )
+
+	ROM_REGION( 0x40000, "slave", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "sg1-sp-u.6b", 0x000000, 0x20000, CRC(7c9c3a3f) SHA1(cacb45c9111ac66c6e60b7a0cacd8bf47fd00752) )
+	ROM_LOAD16_BYTE( "sg1-sp-l.4b", 0x000001, 0x20000, CRC(5068fc5d) SHA1(7f6e80f74985959509d824318a4a7ff2b11953da) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "sg1-snd0.7c", 0x000000, 0x020000, CRC(de04b794) SHA1(191f4d79ac2375d7060f3d83ec753185e92f28ea) )
+
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+
+	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
+
+	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "sg1-gp0-u.1j", 0x00000, 0x20000, CRC(475da78a) SHA1(6e69bcc6caf2e3cd28fed75796c8992e754f9323) )
+	ROM_LOAD16_BYTE( "sg1-gp0-l.3j", 0x00001, 0x20000, CRC(580479bf) SHA1(ba682190cba0d3cdc49aa4937c898ba7ed2a25f5) )
+	ROM_LOAD16_BYTE( "sg1-gp1-u.1l", 0x40000, 0x20000, CRC(f5f2e927) SHA1(ebf709f16f01f1a634de9121454537cda74e891b) )
+	ROM_LOAD16_BYTE( "sg1-gp1-l.3l", 0x40001, 0x20000, CRC(17ed90a5) SHA1(386bdcb11dcbe400f5be1fe4a7418158b46e50ef) )
+
+	ROM_REGION16_BE( 0x80000, "data", 0 )
+	ROM_LOAD16_BYTE( "sg1-data0-u.3a", 0x00000, 0x20000, CRC(1dde2ac2) SHA1(2d20a434561c04e48b52a2137a8c9047e17c1013) )
+	ROM_LOAD16_BYTE( "sg1-data0-l.1a", 0x00001, 0x20000, CRC(2afeb77e) SHA1(ac1552f6e2788158d3477b6a0981d001d6cbdf13) )
+	ROM_LOAD16_BYTE( "sg1-data1-u.3b", 0x40000, 0x20000, CRC(5664b09e) SHA1(10c1c29614eee2cffcfd69085f0450d81ba2e25f) )
+	ROM_LOAD16_BYTE( "sg1-data1-l.1b", 0x40001, 0x20000, CRC(2dbc7de4) SHA1(824304c95942c7296f8e8dcf8ee7e22bf56154b1) )
+
+	ROM_REGION16_BE( 0x100000, "gdata", 0 ) /* bitmapped graphics */
+	ROM_LOAD16_BYTE( "sg1-gd0-u.1p", 0x00000, 0x40000, CRC(7838fcde) SHA1(45e31269eed1999b73c41c2f5d2c5bfbbdaf23df) )
+	ROM_LOAD16_BYTE( "sg1-gd0-l.3p", 0x00001, 0x40000, CRC(4bd02b9a) SHA1(b2fdfd1c1325864aaad87f5358ab9bbdd79ff6ae) )
+	ROM_LOAD16_BYTE( "sg1-gd1-u.1s", 0x80000, 0x40000, CRC(271db29b) SHA1(8b35fcf273b9aec28d4c606c41c0626dded697e1) )
+	ROM_LOAD16_BYTE( "sg1-gd1-l.3s", 0x80001, 0x40000, CRC(a6c4da96) SHA1(377dbf21a1bede01de16708c96c112abab4417ce) )
+
+	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
+	ROM_LOAD16_BYTE( "sg1-pt0-u.8j", 0x00000, 0x20000, CRC(160c3634) SHA1(485d20d6cc459f17d77682201dee07bdf76bf343) )
+	ROM_LOAD16_BYTE( "sg1-pt0-l.8d", 0x00001, 0x20000, CRC(b5a665bf) SHA1(5af6ec492f31395c0492e14590b025b120067b8d) )
+	ROM_LOAD16_BYTE( "sg1-pt1-u.8l", 0x40000, 0x20000, CRC(b63d3006) SHA1(78e78619766b0fd91b1e830cfb066495d6773981) )
+	ROM_LOAD16_BYTE( "sg1-pt1-l.8e", 0x40001, 0x20000, CRC(6385e325) SHA1(d50bceb2e9c0d0a38d7b0f918f99c482649e260d) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("sg-voi-1.11c", 0x080000, 0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
+	ROM_LOAD("sg-voi-3.11e", 0x180000, 0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(93cca84c) SHA1(e39510d9f066266a77780662a6d991c3dd0348d1) )
+ROM_END
+
+ROM_START( winrun91 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "r911-mpu.3k", 0x000000, 0x20000, CRC(80a0e5be) SHA1(6613b95e164c2032ea9043e4161130c6b3262492) )
+	ROM_LOAD16_BYTE( "r911-mpl.1k", 0x000001, 0x20000, CRC(942172d8) SHA1(21d8dfd2165b5ceb0399fdb53d9d0f51f1255803) )
+
+	ROM_REGION( 0x40000, "slave", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "r911-spu.6b", 0x000000, 0x20000, CRC(0221d4b2) SHA1(65fd38b1cfaa6693d71248561d764a9ea1098c56) )
+	ROM_LOAD16_BYTE( "r911-spl.4b", 0x000001, 0x20000, CRC(288799e2) SHA1(2c4bf0cf9c71458fff4dd77e426a76685d9e1bab) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "r911-snd0.7c", 0x000000, 0x020000, CRC(6a321e1e) SHA1(b2e77cac4ed7609593fa5a462c9d78526451e477) )
+
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+
+	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
+
+	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "r911-gp0u.1j", 0x00000, 0x20000, CRC(f5469a29) SHA1(38b6ea1fbe482b69fbb0e2f44f44a0ca2a49f6bc) )
+	ROM_LOAD16_BYTE( "r911-gp0l.3j", 0x00001, 0x20000, CRC(5c18f596) SHA1(215cbda62254e31b4ff6431623384df1639bfdb7) )
+	ROM_LOAD16_BYTE( "r911-gp1u.1l", 0x40000, 0x20000, CRC(146ab6b8) SHA1(aefb89585bf311f8d33f18298fea326ef1f19f1e) )
+	ROM_LOAD16_BYTE( "r911-gp1l.3l", 0x40001, 0x20000, CRC(96c2463c) SHA1(e43db580e7b454af04c22e894108fbb56da0eeb5) )
+
+	ROM_REGION16_BE( 0x80000, "data", 0 )
+	ROM_LOAD16_BYTE( "r911-d0u.3a", 0x00000, 0x20000, CRC(dcb27da5) SHA1(ecd72397d10313fe8dcb8589bdc5d88d4298b26c) )
+	ROM_LOAD16_BYTE( "r911-d0l.1a", 0x00001, 0x20000, CRC(f692a8f3) SHA1(4c29f60400b18d9ef0425de149618da6cf762ca4) )
+	ROM_LOAD16_BYTE( "r911-d1u.3b", 0x40000, 0x20000, CRC(ac2afd1b) SHA1(510eb41931164b086c85ba0a86d6f10b88f5e534) )
+	ROM_LOAD16_BYTE( "r911-d1l.1b", 0x40001, 0x20000, CRC(ebb51af1) SHA1(87b7b64ee662bf652add1e1199e42391d0e2f7e8) )
+
+	ROM_REGION16_BE( 0x100000, "gdata", 0 ) /* bitmapped graphics */
+	ROM_LOAD16_BYTE( "r911-gd0u.1p", 0x00000, 0x40000, CRC(33f5a19b) SHA1(b1dbd242168007f80e13e11c78b34abc1668883e) )
+	ROM_LOAD16_BYTE( "r911-gd0l.3p", 0x00001, 0x40000, CRC(9a29500e) SHA1(c605f86b138e0a4c3163ffd967482e298a15fbe7) )
+	ROM_LOAD16_BYTE( "r911-gd1u.1s", 0x80000, 0x40000, CRC(17e5a61c) SHA1(272ebd7daa56847f1887809535362331b5465dec) )
+	ROM_LOAD16_BYTE( "r911-gd1l.3s", 0x80001, 0x40000, CRC(64df59a2) SHA1(1e9d0945b94780bb0be16803e767466d2cda07e8) )
+
+	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* winrun91 - 3d objects */
+	ROM_LOAD16_BYTE( "r911-pt0u.8j", 0x00000, 0x20000, CRC(abf512a6) SHA1(e86288039d6c4dedfa95b11cb7e4b87637f90c09) ) /* Version on SYSTEM21B CPU only has R911 PTU @ 8W */
+	ROM_LOAD16_BYTE( "r911-pt0l.8d", 0x00001, 0x20000, CRC(ac8d468c) SHA1(d1b457a19a5d3259d0caf933f42b3a02b485867b) ) /* and R911 PTL @ 12W with rom type 27C020 */
+	ROM_LOAD16_BYTE( "r911-pt1u.8l", 0x40000, 0x20000, CRC(7e5dab74) SHA1(5bde219d5b4305d38d17b494b2e759f05d05329f) )
+	ROM_LOAD16_BYTE( "r911-pt1l.8e", 0x40001, 0x20000, CRC(38a54ec5) SHA1(5c6017c98cae674868153ff2d64532027cf0ab83) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("r911-avo1.11c", 0x080000, 0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
+	ROM_LOAD("r911-avo3.11e", 0x180000, 0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(75bcbc22) SHA1(1e7e785735d27aa8cd8393b16b589a46ecd7956a) )
+ROM_END
+
+
+
+ROM_START( driveyes )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* C68C - 68k code */
+	ROM_LOAD16_BYTE( "de2-mp-ub.3j", 0x000000, 0x20000, CRC(f9c86fb5) SHA1(b48d16e8f26e7a2cfecb30285b517c42e5585ac7) )
+	ROM_LOAD16_BYTE( "de2-mp-lb.1j", 0x000001, 0x20000, CRC(11d8587a) SHA1(ecb1e8fe2ba56b6f6a71a5552d5663b597165786) )
+
+	ROM_REGION( 0x40000, "slave", 0 ) /* C68 - 68k code */
+	ROM_LOAD16_BYTE( "de1-sp-ub.6c", 0x000000, 0x20000, CRC(231b144f) SHA1(42518614cb083455dc5fec71e699403907ca784b) )
+	ROM_LOAD16_BYTE( "de1-sp-lb.4c", 0x000001, 0x20000, CRC(50cb9f59) SHA1(aec7fa080854f0297d9e90e3aaeb0f332fd579bd) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
+/*
+There are 3 separate complete boards used for this 3 screen version....
+"Set2" (center screen board?) has de1_snd0 while the other 2 sets have de1_snd0r (rear speakers??)
+Only "Set2" has voice roms present/dumped?
+We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom in the set
+*/
+	ROM_LOAD( "de1-snd0r.8j", 0x000000, 0x020000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) /* Sets 1 & 3 */
+	ROM_LOAD( "de1-snd0.8j",  0x000000, 0x020000, CRC(5474f203) SHA1(e0ae2f6978deb0c934d9311a334a6e36bb402aee) ) /* Set 2 */
+
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
+
+	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP (no internal ROM?) */
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
+	ROM_LOAD( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
+	ROM_LOAD( "de1-obj4.4s", 0x040000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
+	ROM_LOAD( "de1-obj1.5x", 0x080000, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
+	ROM_LOAD( "de1-obj5.4x", 0x0c0000, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
+	ROM_LOAD( "de1-obj2.3s", 0x100000, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
+	ROM_LOAD( "de1-obj6.2s", 0x140000, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
+	ROM_LOAD( "de1-obj3.3x", 0x180000, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
+	ROM_LOAD( "de1-obj7.2x", 0x1c0000, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
+	ROM_LOAD16_BYTE( "de1-data-l.1a",  0x00001, 0x80000, CRC(9bb37aca) SHA1(7f5dffc95cadcf12f53ff7944920afc25ed3cf68) )
+
+	ROM_REGION16_BE( 0xc0000, "point16", 0 ) /* 3d objects */
+	ROM_LOAD16_BYTE( "de1-pt0-ub.8j", 0x00000, 0x20000, CRC(3b6b746d) SHA1(40c992ef4cf5187b30aba42c5fe7ce0f8f02bee0) )
+	ROM_LOAD16_BYTE( "de1-pt0-lb.8d", 0x00001, 0x20000, CRC(9c5c477e) SHA1(c8ae8a663227d636d35bd5f432d23f05d6695942) )
+	ROM_LOAD16_BYTE( "de1-pt1-u.8l",  0x40000, 0x20000, CRC(23bc72a1) SHA1(083e2955ae2f88d1ad461517b47054d64375b46e) )
+	ROM_LOAD16_BYTE( "de1-pt1-l.8e",  0x40001, 0x20000, CRC(a05ee081) SHA1(1be4c61ad716abb809856e04d4bb450943706a55) )
+	ROM_LOAD16_BYTE( "de1-pt2-u.5n",  0x80000, 0x20000, CRC(10e83d81) SHA1(446fedc3b1e258a39fb9467e5327c9f9a9f1ac3f) )
+	ROM_LOAD16_BYTE( "de1-pt2-l.7n",  0x80001, 0x20000, CRC(3339a976) SHA1(c9eb9c04f7b3f2a85e5ab64ffb2fe4fcfb6c494b) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("de1-voi0.12b", 0x040000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
+	ROM_LOAD("de1-voi1.12c", 0x0c0000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
+	ROM_LOAD("de1-voi2.12d", 0x140000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
+	ROM_LOAD("de1-voi3.12e", 0x1c0000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(fa6623e9) SHA1(8c313f136724eb6c829261b223a2ac1fc08d00c2) )
+ROM_END
+
+
+
+ROM_START( starblad )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
+	ROM_LOAD16_BYTE( "st2_mpu.mpru", 0x000000, 0x80000, CRC(35bc9e4a) SHA1(03401fb846c1b2aee775071a554654e49fe5c47c) )
+	ROM_LOAD16_BYTE( "st2_mpl.mprl", 0x000001, 0x80000, CRC(193e641b) SHA1(fed803167c5b0bba5b8381c26c909b7380d57efd) )
+
+	ROM_REGION( 0x080000, "slave", 0 ) /* Slave */
+	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
+	ROM_LOAD16_BYTE( "st1-sp-l.bin", 0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "st1-snd0.bin", 0x000000, 0x020000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
+
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
+
+	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
+	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
+	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
+	ROM_LOAD( "st1-obj2.bin", 0x100000, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
+	ROM_LOAD( "st1-obj3.bin", 0x180000, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "st1-data-u.bin", 0x000000, 0x20000, CRC(2433e911) SHA1(95f5f00d3bacda4996e055a443311fb9f9a5fe2f) )
+	ROM_LOAD16_BYTE( "st1-data-l.bin", 0x000001, 0x20000, CRC(4a2cc252) SHA1(d9da9992bac878f8a1f5e84cc3c6d457b4705e8f) )
+
+	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
+
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00) /* 24bit signed point data */
+	ROM_LOAD32_BYTE( "st1-pt0-h.bin", 0x000001, 0x80000, CRC(84eb355f) SHA1(89a248b8be2e0afcee29ba4c4c9cca65d5fb246a) )
+	ROM_LOAD32_BYTE( "st1-pt0-u.bin", 0x000002, 0x80000, CRC(1956cd0a) SHA1(7d21b3a59f742694de472c545a1f30c3d92e3390) )
+	ROM_LOAD32_BYTE( "st1-pt0-l.bin", 0x000003, 0x80000, CRC(ff577049) SHA1(1e1595174094e88d5788753d05ce296c1f7eca75) )
+	ROM_LOAD32_BYTE( "st1-pt1-h.bin", 0x200001, 0x80000, CRC(96b1bd7d) SHA1(55da7896dda2aa4c35501a55c8605a065b02aa17) )
+	ROM_LOAD32_BYTE( "st1-pt1-u.bin", 0x200002, 0x80000, CRC(ecf21047) SHA1(ddb13f5a2e7d192f0662fa420b49f89e1e991e66) )
+	ROM_LOAD32_BYTE( "st1-pt1-l.bin", 0x200003, 0x80000, CRC(01cb0407) SHA1(4b58860bbc353de8b4b8e83d12b919d9386846e8) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("st1-voi0.bin", 0x000000, 0x80000,CRC(5b3d43a9) SHA1(cdc04f19dc91dca9fa88ba0c2fca72aa195a3694) )
+	ROM_LOAD("st1-voi1.bin", 0x080000, 0x80000,CRC(413e6181) SHA1(e827ec11f5755606affd2635718512aeac9354da) )
+	ROM_LOAD("st1-voi2.bin", 0x100000, 0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
+	ROM_LOAD("st1-voi3.bin", 0x180000, 0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
+
+	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
+	// starblad needs default NVRAM to be all 0
+ROM_END
+
+ROM_START( starbladj )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
+	ROM_LOAD16_BYTE( "st1_mpu.mpru", 0x000000, 0x80000, CRC(483a311c) SHA1(dd9416b8d4b0f8b361630e312eac71c113064eae) )
+	ROM_LOAD16_BYTE( "st1_mpl.mprl", 0x000001, 0x80000, CRC(0a4dd661) SHA1(fc2b71a255a8613693c4d1c79ddd57a6d396165a) )
+
+	ROM_REGION( 0x080000, "slave", 0 ) /* Slave */
+	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
+	ROM_LOAD16_BYTE( "st1-sp-l.bin", 0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "st1-snd0.bin", 0x000000, 0x020000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
+
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
+
+	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
+	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
+	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
+	ROM_LOAD( "st1-obj2.bin", 0x100000, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
+	ROM_LOAD( "st1-obj3.bin", 0x180000, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "st1-data-u.bin", 0x000000, 0x20000, CRC(2433e911) SHA1(95f5f00d3bacda4996e055a443311fb9f9a5fe2f) )
+	ROM_LOAD16_BYTE( "st1-data-l.bin", 0x000001, 0x20000, CRC(4a2cc252) SHA1(d9da9992bac878f8a1f5e84cc3c6d457b4705e8f) )
+
+	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
+
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00) /* 24bit signed point data */
+	ROM_LOAD32_BYTE( "st1-pt0-h.bin", 0x000001, 0x80000, CRC(84eb355f) SHA1(89a248b8be2e0afcee29ba4c4c9cca65d5fb246a) )
+	ROM_LOAD32_BYTE( "st1-pt0-u.bin", 0x000002, 0x80000, CRC(1956cd0a) SHA1(7d21b3a59f742694de472c545a1f30c3d92e3390) )
+	ROM_LOAD32_BYTE( "st1-pt0-l.bin", 0x000003, 0x80000, CRC(ff577049) SHA1(1e1595174094e88d5788753d05ce296c1f7eca75) )
+	ROM_LOAD32_BYTE( "st1-pt1-h.bin", 0x200001, 0x80000, CRC(96b1bd7d) SHA1(55da7896dda2aa4c35501a55c8605a065b02aa17) )
+	ROM_LOAD32_BYTE( "st1-pt1-u.bin", 0x200002, 0x80000, CRC(ecf21047) SHA1(ddb13f5a2e7d192f0662fa420b49f89e1e991e66) )
+	ROM_LOAD32_BYTE( "st1-pt1-l.bin", 0x200003, 0x80000, CRC(01cb0407) SHA1(4b58860bbc353de8b4b8e83d12b919d9386846e8) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("st1-voi0.bin", 0x000000, 0x80000,CRC(5b3d43a9) SHA1(cdc04f19dc91dca9fa88ba0c2fca72aa195a3694) )
+	ROM_LOAD("st1-voi1.bin", 0x080000, 0x80000,CRC(413e6181) SHA1(e827ec11f5755606affd2635718512aeac9354da) )
+	ROM_LOAD("st1-voi2.bin", 0x100000, 0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
+	ROM_LOAD("st1-voi3.bin", 0x180000, 0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
+
+	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
+	// starblad needs default NVRAM to be all 0
+ROM_END
+
+ROM_START( solvalou )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
+	ROM_LOAD16_BYTE( "sv1-mp-u.bin", 0x000000, 0x20000, CRC(b6f92762) SHA1(d177328b3da2ab0580e101478142bc8c373d6140) )
+	ROM_LOAD16_BYTE( "sv1-mp-l.bin", 0x000001, 0x20000, CRC(28c54c42) SHA1(32fcca2eb4bb8ba8c2587b03d3cf59f072f7fac5) )
+
+	ROM_REGION( 0x80000, "slave", 0 ) /* Slave */
+	ROM_LOAD16_BYTE( "sv1-sp-u.bin", 0x000000, 0x20000, CRC(ebd4bf82) SHA1(67946360d680a675abcb3c131bac0502b2455573) )
+	ROM_LOAD16_BYTE( "sv1-sp-l.bin", 0x000001, 0x20000, CRC(7acab679) SHA1(764297c9601be99dbbffb75bbc6fe4a40ea38529) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "sv1-snd0.bin", 0x000000, 0x020000, CRC(5e007864) SHA1(94da2d51544c6127056beaa251353038646da15f) )
+
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
+
+	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "sv1-obj0.bin", 0x000000, 0x80000, CRC(773798bb) SHA1(51ab76c95030bab834f1a74ae677b2f0afc18c52) )
+	ROM_LOAD( "sv1-obj4.bin", 0x080000, 0x80000, CRC(33a008a7) SHA1(4959a0ac24ad64f1367e2d8d63d39a0273c60f3e) )
+	ROM_LOAD( "sv1-obj1.bin", 0x100000, 0x80000, CRC(a36d9e79) SHA1(928d9995e97ee7509e23e6cc64f5e7bfb5c02d42) )
+	ROM_LOAD( "sv1-obj5.bin", 0x180000, 0x80000, CRC(31551245) SHA1(385452ea4830c466263ad5241313ac850dfef756) )
+	ROM_LOAD( "sv1-obj2.bin", 0x200000, 0x80000, CRC(c8672b8a) SHA1(8da037b27d2c2b178aab202781f162371458f788) )
+	ROM_LOAD( "sv1-obj6.bin", 0x280000, 0x80000, CRC(fe319530) SHA1(8f7e46c8f0b86c7515f6d763b795ce07d11c77bc) )
+	ROM_LOAD( "sv1-obj3.bin", 0x300000, 0x80000, CRC(293ef1c5) SHA1(f677883bfec16bbaeb0a01ac565d0e6cac679174) )
+	ROM_LOAD( "sv1-obj7.bin", 0x380000, 0x80000, CRC(95ed6dcb) SHA1(931706ce3fea630823ce0c79febec5eec0cc623d) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "sv1-data-u.bin", 0x000000, 0x80000, CRC(2e561996) SHA1(982158481e5649f21d5c2816fdc80cb725ed1419) )
+	ROM_LOAD16_BYTE( "sv1-data-l.bin", 0x000001, 0x80000, CRC(495fb8dd) SHA1(813d1da4109652008d72b3bdb03032efc5c0c2d5) )
+
+	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
+
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00)       /* 24bit signed point data */
+	ROM_LOAD32_BYTE( "sv1-pt0-h.bin", 0x000001, 0x80000, CRC(3be21115) SHA1(c9f30353c1216f64199f87cd34e787efd728e739) ) /* most significant */
+	ROM_LOAD32_BYTE( "sv1-pt0-u.bin", 0x000002, 0x80000, CRC(4aacfc42) SHA1(f0e179e057183b41744ca429764f44306f0ce9bf) )
+	ROM_LOAD32_BYTE( "sv1-pt0-l.bin", 0x000003, 0x80000, CRC(6a4dddff) SHA1(9ed182d21d328c6a684ee6658a9dfcf3f3dd8646) ) /* least significant */
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("sv1-voi0.bin", 0x000000, 0x80000,CRC(7f61bbcf) SHA1(b3b7e66e24d9cb16ebd139237c1e51f5d60c1585) )
+	ROM_LOAD("sv1-voi1.bin", 0x080000, 0x80000,CRC(c732e66c) SHA1(14e75dd9bea4055f85eb2bcbf69cf6695a3f7ec4) )
+	ROM_LOAD("sv1-voi2.bin", 0x100000, 0x80000,CRC(51076298) SHA1(ec52c9ae3029118f3ea3732948d6de28f5fba561) )
+	ROM_LOAD("sv1-voi3.bin", 0x180000, 0x80000,CRC(33085ff3) SHA1(0a30b91618c250a5e7bd896a8ceeb3d16da178a9) )
+ROM_END
+
+
 ROM_START( aircomb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
 	ROM_LOAD16_BYTE( "ac2-mpr-u.3j", 0x000000, 0x80000, CRC(a7133f85) SHA1(9f1c99dd503f1fc81096170fd272e33ae8a7de2f) )
@@ -2111,14 +2667,11 @@ ROM_START( aircomb )
 	ROM_LOAD16_BYTE( "ac2-spr-u.6c", 0x000000, 0x20000, CRC(42aca956) SHA1(10ea2400bb4d5b2d805e2de43ca0e0f54597f660) )
 	ROM_LOAD16_BYTE( "ac2-spr-l.4c", 0x000001, 0x20000, CRC(3e15fa19) SHA1(65dbb33ab6b3c06c793613348ebb7b110b8bba0d) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "ac1-snd0.8j", 0x00c000, 0x004000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "ac1-snd0.8j", 0x000000, 0x020000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2172,14 +2725,11 @@ ROM_START( aircombj )
 	ROM_LOAD16_BYTE( "ac1-spr-u.6c", 0x000000, 0x20000, CRC(5810e219) SHA1(c312ffd8324670897871b12d521779570dc0f580) )
 	ROM_LOAD16_BYTE( "ac1-spr-l.4c", 0x000001, 0x20000, CRC(175a7d6c) SHA1(9e31dde6646cd9b6dcdbdb3f2326177508559e56) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "ac1-snd0.8j", 0x00c000, 0x004000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "ac1-snd0.8j", 0x000000, 0x020000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2233,14 +2783,11 @@ ROM_START( cybsled )
 	ROM_LOAD16_BYTE( "cy2-spr-u.6c", 0x000000, 0x80000, CRC(575a422d) SHA1(cad97742da1e2baf47ac110fadef5544b3a30cc7) )
 	ROM_LOAD16_BYTE( "cy2-spr-l.4c", 0x000001, 0x80000, CRC(4066291a) SHA1(6ebbc11a68f66ec1e6d2e6ee857e8c599691e289) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "cy1-snd0.8j", 0x00c000, 0x004000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "cy1-snd0.8j", 0x000000, 0x020000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2292,14 +2839,11 @@ ROM_START( cybsledj )
 	ROM_LOAD16_BYTE( "cy1-spr-u.6c", 0x000000, 0x80000, CRC(28dd707b) SHA1(11297ceae4fe78d170785a5cf9ad77833bbe7fff) )
 	ROM_LOAD16_BYTE( "cy1-spr-l.4c", 0x000001, 0x80000, CRC(437029de) SHA1(3d275a2b0ce6909e77e657c371bd22597ea9d398) )
 
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "cy1-snd0.8j", 0x00c000, 0x004000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "cy1-snd0.8j", 0x000000, 0x020000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
+	/* external ROM not populated, unclear how it would map */
 
 	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
 	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
@@ -2342,384 +2886,6 @@ ROM_START( cybsledj )
 	ROM_LOAD( "cybsledj.nv", 0x0000, 0x2000, CRC(a73bb03e) SHA1(e074bfeae14178c867070e06f6690ed13115f5fa) )
 ROM_END
 
-ROM_START( driveyes )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* C68C - 68k code */
-	ROM_LOAD16_BYTE( "de2-mp-ub.3j", 0x000000, 0x20000, CRC(f9c86fb5) SHA1(b48d16e8f26e7a2cfecb30285b517c42e5585ac7) )
-	ROM_LOAD16_BYTE( "de2-mp-lb.1j", 0x000001, 0x20000, CRC(11d8587a) SHA1(ecb1e8fe2ba56b6f6a71a5552d5663b597165786) )
-
-	ROM_REGION( 0x40000, "slave", 0 ) /* C68 - 68k code */
-	ROM_LOAD16_BYTE( "de1-sp-ub.6c", 0x000000, 0x20000, CRC(231b144f) SHA1(42518614cb083455dc5fec71e699403907ca784b) )
-	ROM_LOAD16_BYTE( "de1-sp-lb.4c", 0x000001, 0x20000, CRC(50cb9f59) SHA1(aec7fa080854f0297d9e90e3aaeb0f332fd579bd) )
-
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
-/*
-There are 3 separate complete boards used for this 3 screen version....
-"Set2" (center screen board?) has de1_snd0 while the other 2 sets have de1_snd0r (rear speakers??)
-Only "Set2" has voice roms present/dumped?
-We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom in the set
-*/
-	ROM_LOAD( "de1-snd0r.8j", 0x00c000, 0x004000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) /* Sets 1 & 3 */
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-	ROM_LOAD( "de1-snd0.8j",  0x00c000, 0x004000, CRC(5474f203) SHA1(e0ae2f6978deb0c934d9311a334a6e36bb402aee) ) /* Set 2 */
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* C67 - DSP */
-
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
-	ROM_LOAD( "de1-obj0.5s", 0x000000, 0x40000, CRC(7438bd53) SHA1(7619c4b56d5c466e845eb45e6157dcaf2a03ad94) )
-	ROM_LOAD( "de1-obj4.4s", 0x040000, 0x40000, CRC(335f0ea4) SHA1(9ec065d99ad0874b262b372334179a7e7612558e) )
-	ROM_LOAD( "de1-obj1.5x", 0x080000, 0x40000, CRC(45f2334e) SHA1(95f277a4e43d6662ae44d6b69a57f65c72978319) )
-	ROM_LOAD( "de1-obj5.4x", 0x0c0000, 0x40000, CRC(9e22999c) SHA1(02624186c359b5e2c96cd3f0e2cb1598ea36dff7) )
-	ROM_LOAD( "de1-obj2.3s", 0x100000, 0x40000, CRC(8f1a542c) SHA1(2cb59713607d8929815a9b28bf2a384b6a6c9db8) )
-	ROM_LOAD( "de1-obj6.2s", 0x140000, 0x40000, CRC(346df4d5) SHA1(edbadb9db93b7f5a3b064c7f6acb77001cdacce2) )
-	ROM_LOAD( "de1-obj3.3x", 0x180000, 0x40000, CRC(fc94544c) SHA1(6297445c64784ee253716f6438d98e5fcd4e7520) )
-	ROM_LOAD( "de1-obj7.2x", 0x1c0000, 0x40000, CRC(9ce325d7) SHA1(de4d788bec14842507ed405244974b4fd4f07515) )
-
-	ROM_REGION16_BE( 0x100000, "data", 0 ) /* 68k */
-	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
-	ROM_LOAD16_BYTE( "de1-data-l.1a",  0x00001, 0x80000, CRC(9bb37aca) SHA1(7f5dffc95cadcf12f53ff7944920afc25ed3cf68) )
-
-	ROM_REGION16_BE( 0xc0000, "point16", 0 ) /* 3d objects */
-	ROM_LOAD16_BYTE( "de1-pt0-ub.8j", 0x00000, 0x20000, CRC(3b6b746d) SHA1(40c992ef4cf5187b30aba42c5fe7ce0f8f02bee0) )
-	ROM_LOAD16_BYTE( "de1-pt0-lb.8d", 0x00001, 0x20000, CRC(9c5c477e) SHA1(c8ae8a663227d636d35bd5f432d23f05d6695942) )
-	ROM_LOAD16_BYTE( "de1-pt1-u.8l",  0x40000, 0x20000, CRC(23bc72a1) SHA1(083e2955ae2f88d1ad461517b47054d64375b46e) )
-	ROM_LOAD16_BYTE( "de1-pt1-l.8e",  0x40001, 0x20000, CRC(a05ee081) SHA1(1be4c61ad716abb809856e04d4bb450943706a55) )
-	ROM_LOAD16_BYTE( "de1-pt2-u.5n",  0x80000, 0x20000, CRC(10e83d81) SHA1(446fedc3b1e258a39fb9467e5327c9f9a9f1ac3f) )
-	ROM_LOAD16_BYTE( "de1-pt2-l.7n",  0x80001, 0x20000, CRC(3339a976) SHA1(c9eb9c04f7b3f2a85e5ab64ffb2fe4fcfb6c494b) )
-
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("de1-voi0.12b", 0x040000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
-	ROM_LOAD("de1-voi1.12c", 0x0c0000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
-	ROM_LOAD("de1-voi2.12d", 0x140000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
-	ROM_LOAD("de1-voi3.12e", 0x1c0000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
-ROM_END
-
-ROM_START( starblad )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
-	ROM_LOAD16_BYTE( "st2_mpu.mpru", 0x000000, 0x80000, CRC(35bc9e4a) SHA1(03401fb846c1b2aee775071a554654e49fe5c47c) )
-	ROM_LOAD16_BYTE( "st2_mpl.mprl", 0x000001, 0x80000, CRC(193e641b) SHA1(fed803167c5b0bba5b8381c26c909b7380d57efd) )
-
-	ROM_REGION( 0x080000, "slave", 0 ) /* Slave */
-	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
-	ROM_LOAD16_BYTE( "st1-sp-l.bin", 0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
-
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "st1-snd0.bin", 0x00c000, 0x004000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
-	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
-	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
-	ROM_LOAD( "st1-obj2.bin", 0x100000, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
-	ROM_LOAD( "st1-obj3.bin", 0x180000, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
-
-	ROM_REGION16_BE( 0x100000, "data", 0 )
-	ROM_LOAD16_BYTE( "st1-data-u.bin", 0x000000, 0x20000, CRC(2433e911) SHA1(95f5f00d3bacda4996e055a443311fb9f9a5fe2f) )
-	ROM_LOAD16_BYTE( "st1-data-l.bin", 0x000001, 0x20000, CRC(4a2cc252) SHA1(d9da9992bac878f8a1f5e84cc3c6d457b4705e8f) )
-
-	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
-
-	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00) /* 24bit signed point data */
-	ROM_LOAD32_BYTE( "st1-pt0-h.bin", 0x000001, 0x80000, CRC(84eb355f) SHA1(89a248b8be2e0afcee29ba4c4c9cca65d5fb246a) )
-	ROM_LOAD32_BYTE( "st1-pt0-u.bin", 0x000002, 0x80000, CRC(1956cd0a) SHA1(7d21b3a59f742694de472c545a1f30c3d92e3390) )
-	ROM_LOAD32_BYTE( "st1-pt0-l.bin", 0x000003, 0x80000, CRC(ff577049) SHA1(1e1595174094e88d5788753d05ce296c1f7eca75) )
-	ROM_LOAD32_BYTE( "st1-pt1-h.bin", 0x200001, 0x80000, CRC(96b1bd7d) SHA1(55da7896dda2aa4c35501a55c8605a065b02aa17) )
-	ROM_LOAD32_BYTE( "st1-pt1-u.bin", 0x200002, 0x80000, CRC(ecf21047) SHA1(ddb13f5a2e7d192f0662fa420b49f89e1e991e66) )
-	ROM_LOAD32_BYTE( "st1-pt1-l.bin", 0x200003, 0x80000, CRC(01cb0407) SHA1(4b58860bbc353de8b4b8e83d12b919d9386846e8) )
-
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("st1-voi0.bin", 0x000000, 0x80000,CRC(5b3d43a9) SHA1(cdc04f19dc91dca9fa88ba0c2fca72aa195a3694) )
-	ROM_LOAD("st1-voi1.bin", 0x080000, 0x80000,CRC(413e6181) SHA1(e827ec11f5755606affd2635718512aeac9354da) )
-	ROM_LOAD("st1-voi2.bin", 0x100000, 0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
-	ROM_LOAD("st1-voi3.bin", 0x180000, 0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
-
-	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
-	// starblad needs default NVRAM to be all 0
-ROM_END
-
-ROM_START( starbladj )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
-	ROM_LOAD16_BYTE( "st1_mpu.mpru", 0x000000, 0x80000, CRC(483a311c) SHA1(dd9416b8d4b0f8b361630e312eac71c113064eae) )
-	ROM_LOAD16_BYTE( "st1_mpl.mprl", 0x000001, 0x80000, CRC(0a4dd661) SHA1(fc2b71a255a8613693c4d1c79ddd57a6d396165a) )
-
-	ROM_REGION( 0x080000, "slave", 0 ) /* Slave */
-	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
-	ROM_LOAD16_BYTE( "st1-sp-l.bin", 0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
-
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "st1-snd0.bin", 0x00c000, 0x004000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
-	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
-	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
-	ROM_LOAD( "st1-obj2.bin", 0x100000, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
-	ROM_LOAD( "st1-obj3.bin", 0x180000, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
-
-	ROM_REGION16_BE( 0x100000, "data", 0 )
-	ROM_LOAD16_BYTE( "st1-data-u.bin", 0x000000, 0x20000, CRC(2433e911) SHA1(95f5f00d3bacda4996e055a443311fb9f9a5fe2f) )
-	ROM_LOAD16_BYTE( "st1-data-l.bin", 0x000001, 0x20000, CRC(4a2cc252) SHA1(d9da9992bac878f8a1f5e84cc3c6d457b4705e8f) )
-
-	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
-
-	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00) /* 24bit signed point data */
-	ROM_LOAD32_BYTE( "st1-pt0-h.bin", 0x000001, 0x80000, CRC(84eb355f) SHA1(89a248b8be2e0afcee29ba4c4c9cca65d5fb246a) )
-	ROM_LOAD32_BYTE( "st1-pt0-u.bin", 0x000002, 0x80000, CRC(1956cd0a) SHA1(7d21b3a59f742694de472c545a1f30c3d92e3390) )
-	ROM_LOAD32_BYTE( "st1-pt0-l.bin", 0x000003, 0x80000, CRC(ff577049) SHA1(1e1595174094e88d5788753d05ce296c1f7eca75) )
-	ROM_LOAD32_BYTE( "st1-pt1-h.bin", 0x200001, 0x80000, CRC(96b1bd7d) SHA1(55da7896dda2aa4c35501a55c8605a065b02aa17) )
-	ROM_LOAD32_BYTE( "st1-pt1-u.bin", 0x200002, 0x80000, CRC(ecf21047) SHA1(ddb13f5a2e7d192f0662fa420b49f89e1e991e66) )
-	ROM_LOAD32_BYTE( "st1-pt1-l.bin", 0x200003, 0x80000, CRC(01cb0407) SHA1(4b58860bbc353de8b4b8e83d12b919d9386846e8) )
-
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("st1-voi0.bin", 0x000000, 0x80000,CRC(5b3d43a9) SHA1(cdc04f19dc91dca9fa88ba0c2fca72aa195a3694) )
-	ROM_LOAD("st1-voi1.bin", 0x080000, 0x80000,CRC(413e6181) SHA1(e827ec11f5755606affd2635718512aeac9354da) )
-	ROM_LOAD("st1-voi2.bin", 0x100000, 0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
-	ROM_LOAD("st1-voi3.bin", 0x180000, 0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
-
-	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
-	// starblad needs default NVRAM to be all 0
-ROM_END
-
-ROM_START( solvalou )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
-	ROM_LOAD16_BYTE( "sv1-mp-u.bin", 0x000000, 0x20000, CRC(b6f92762) SHA1(d177328b3da2ab0580e101478142bc8c373d6140) )
-	ROM_LOAD16_BYTE( "sv1-mp-l.bin", 0x000001, 0x20000, CRC(28c54c42) SHA1(32fcca2eb4bb8ba8c2587b03d3cf59f072f7fac5) )
-
-	ROM_REGION( 0x80000, "slave", 0 ) /* Slave */
-	ROM_LOAD16_BYTE( "sv1-sp-u.bin", 0x000000, 0x20000, CRC(ebd4bf82) SHA1(67946360d680a675abcb3c131bac0502b2455573) )
-	ROM_LOAD16_BYTE( "sv1-sp-l.bin", 0x000001, 0x20000, CRC(7acab679) SHA1(764297c9601be99dbbffb75bbc6fe4a40ea38529) )
-
-	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "sv1-snd0.bin", 0x00c000, 0x004000, CRC(5e007864) SHA1(94da2d51544c6127056beaa251353038646da15f) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
-	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
-
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "sv1-obj0.bin", 0x000000, 0x80000, CRC(773798bb) SHA1(51ab76c95030bab834f1a74ae677b2f0afc18c52) )
-	ROM_LOAD( "sv1-obj4.bin", 0x080000, 0x80000, CRC(33a008a7) SHA1(4959a0ac24ad64f1367e2d8d63d39a0273c60f3e) )
-	ROM_LOAD( "sv1-obj1.bin", 0x100000, 0x80000, CRC(a36d9e79) SHA1(928d9995e97ee7509e23e6cc64f5e7bfb5c02d42) )
-	ROM_LOAD( "sv1-obj5.bin", 0x180000, 0x80000, CRC(31551245) SHA1(385452ea4830c466263ad5241313ac850dfef756) )
-	ROM_LOAD( "sv1-obj2.bin", 0x200000, 0x80000, CRC(c8672b8a) SHA1(8da037b27d2c2b178aab202781f162371458f788) )
-	ROM_LOAD( "sv1-obj6.bin", 0x280000, 0x80000, CRC(fe319530) SHA1(8f7e46c8f0b86c7515f6d763b795ce07d11c77bc) )
-	ROM_LOAD( "sv1-obj3.bin", 0x300000, 0x80000, CRC(293ef1c5) SHA1(f677883bfec16bbaeb0a01ac565d0e6cac679174) )
-	ROM_LOAD( "sv1-obj7.bin", 0x380000, 0x80000, CRC(95ed6dcb) SHA1(931706ce3fea630823ce0c79febec5eec0cc623d) )
-
-	ROM_REGION16_BE( 0x100000, "data", 0 )
-	ROM_LOAD16_BYTE( "sv1-data-u.bin", 0x000000, 0x80000, CRC(2e561996) SHA1(982158481e5649f21d5c2816fdc80cb725ed1419) )
-	ROM_LOAD16_BYTE( "sv1-data-l.bin", 0x000001, 0x80000, CRC(495fb8dd) SHA1(813d1da4109652008d72b3bdb03032efc5c0c2d5) )
-
-	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
-
-	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00)       /* 24bit signed point data */
-	ROM_LOAD32_BYTE( "sv1-pt0-h.bin", 0x000001, 0x80000, CRC(3be21115) SHA1(c9f30353c1216f64199f87cd34e787efd728e739) ) /* most significant */
-	ROM_LOAD32_BYTE( "sv1-pt0-u.bin", 0x000002, 0x80000, CRC(4aacfc42) SHA1(f0e179e057183b41744ca429764f44306f0ce9bf) )
-	ROM_LOAD32_BYTE( "sv1-pt0-l.bin", 0x000003, 0x80000, CRC(6a4dddff) SHA1(9ed182d21d328c6a684ee6658a9dfcf3f3dd8646) ) /* least significant */
-
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("sv1-voi0.bin", 0x000000, 0x80000,CRC(7f61bbcf) SHA1(b3b7e66e24d9cb16ebd139237c1e51f5d60c1585) )
-	ROM_LOAD("sv1-voi1.bin", 0x080000, 0x80000,CRC(c732e66c) SHA1(14e75dd9bea4055f85eb2bcbf69cf6695a3f7ec4) )
-	ROM_LOAD("sv1-voi2.bin", 0x100000, 0x80000,CRC(51076298) SHA1(ec52c9ae3029118f3ea3732948d6de28f5fba561) )
-	ROM_LOAD("sv1-voi3.bin", 0x180000, 0x80000,CRC(33085ff3) SHA1(0a30b91618c250a5e7bd896a8ceeb3d16da178a9) )
-ROM_END
-
-ROM_START( winrun )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "wr2-mpub.3k",  0x000000, 0x20000, CRC(3bb0ea17) SHA1(201cedf5865224c1c4a0c9b017982e36ec9b8243) )
-	ROM_LOAD16_BYTE( "wr2-mplb.1k",  0x000001, 0x20000, CRC(95465062) SHA1(7d010ff92e87949b7b9109f8320ab61de7d0400a) )
-
-	ROM_REGION( 0x40000, "slave", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "wr1-spu.6b",  0x000000, 0x20000, CRC(d4915d44) SHA1(57056051138b259d021b3e7cc1c43a9f951b5cc1) )
-	ROM_LOAD16_BYTE( "wr1-spl.4b",  0x000001, 0x20000, CRC(0c336505) SHA1(edee073bf6fabe45c577b0b9375295183eb30c62) )
-
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "wr1-snd0.7c",  0x00c000, 0x004000, CRC(698bae12) SHA1(86d22c1c639a9489e3c95820e4e3f04c30407e41) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
-
-	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "wr1-gp0u.1k",  0x00000, 0x20000, CRC(c66a43be) SHA1(88ec02c5c18c8bb91a95934c14e9ae530ae09880) )
-	ROM_LOAD16_BYTE( "wr1-gp0l.3k",  0x00001, 0x20000, CRC(91a70e6f) SHA1(e613e2544f63cd386588445a2a199ae6b84d741e) )
-	ROM_LOAD16_BYTE( "wr1-gp1u.1l",  0x40000, 0x20000, CRC(8ff51a3d) SHA1(81fbcd4e8c51742f35607537e1b1a86fd7782827) )
-	ROM_LOAD16_BYTE( "wr1-gp1l.3l",  0x40001, 0x20000, CRC(9360d34e) SHA1(e558eb540c02acfe84f2dfe2d65afd609b7f3207) )
-
-	ROM_REGION16_BE( 0x80000, "data", 0 )
-	ROM_LOAD16_BYTE( "wr1-d0u.3a", 0x00000, 0x20000, CRC(84ea1492) SHA1(56274b39bd5be076c9904d9ed9ce3f6e29d9f038) )
-	ROM_LOAD16_BYTE( "wr1-d0l.1a", 0x00001, 0x20000, CRC(b81508f9) SHA1(51c03c3dff86cece9790667b1557de940ebccbe9) )
-	ROM_LOAD16_BYTE( "wr1-d1u.3b", 0x40000, 0x20000, CRC(bbd1fdd7) SHA1(026e9410525fa0e93f155949bbc1d3b8a2785bd1) )
-	ROM_LOAD16_BYTE( "wr1-d1l.1b", 0x40001, 0x20000, CRC(8ddd7eac) SHA1(b873b253b0a095e66a9f68d45a2cb41fa025ba16) )
-
-	ROM_REGION16_BE( 0x100000, "gdata", 0 ) /* bitmapped graphics */
-	ROM_LOAD16_BYTE( "wr1-gd0u-2.1p",  0x00000, 0x40000, CRC(9752eef5) SHA1(d6df0faf9c2696247bdf463f53c1e474ec595dd0) )
-	ROM_LOAD16_BYTE( "wr1-gd0l-2.3p",  0x00001, 0x40000, CRC(349c95cc) SHA1(8898eecf5918485ec683900520f123483077df28) )
-
-	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
-	ROM_LOAD16_BYTE( "wr1-pt0u.8j", 0x00000, 0x20000, CRC(7ec4cf6b) SHA1(92ec92567b9f7321efb4a3724cbcdba216eb22f9) )
-	ROM_LOAD16_BYTE( "wr1-pt0l.8d", 0x00001, 0x20000, CRC(58c14b73) SHA1(e34a26866cd870743e166669f7fa5915a82104e9) )
-
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("wr-voi-0.11b", 0x040000, 0x40000, CRC(8040b645) SHA1(7ccafb3073fa79910e26cf9b8b6e8e9ae22e55fc) )
-	ROM_LOAD("wr-voi-1.11c", 0x0c0000, 0x40000, CRC(d347e904) SHA1(620cd07e6230322c306283e45a43fa1e217028d4) )
-	ROM_LOAD("wr-voi-2.11d", 0x140000, 0x40000, CRC(b34747af) SHA1(7e0b55631bffa0583bf4f7f5368db9f09e411ba1) )
-	ROM_LOAD("wr-voi-3.11e", 0x1c0000, 0x40000, CRC(43085303) SHA1(9f743055c20df3548879118194244e37a0b91f7e) )
-
-	ROM_REGION( 0x1000, "pals", 0 )
-	/* Main PCB (2252960101) */
-	ROM_LOAD("sys87b-2.3w", 0x000, 0x104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) ) /* PAL16L8ACN */
-	ROM_LOAD("wr-c1.6p",    0x000, 0x040, CRC(d6c33258) SHA1(5baf71fae1ad73a75d91ee2dededca2254b4f414) ) /* PAL12L10CNS */
-	ROM_LOAD("wr-c2.8k",    0x000, 0x040, CRC(a3e77ade) SHA1(b4282fc4d21ce7813aba7772a85d721fb25144b6) ) /* PAL12L10CNS */
-
-	/* Framebuffer PCB (2252960900) */
-	ROM_LOAD("wr-g1.3a",    0x000, 0x104, CRC(d6b4373d) SHA1(b4db4526a37b7d6862cec1d223f2281e5120f225) ) /* PAL16L8ACN */
-	ROM_LOAD("wr-g2b.4p",   0x000, 0x104, NO_DUMP ) /* PAL16L8ACN */
-	ROM_LOAD("wr-g3.4s",    0x000, 0x104, NO_DUMP ) /* GAL20V8 */
-	ROM_LOAD("wr-g4.7f",    0x000, 0x104, CRC(f858b32b) SHA1(59af496e4416c9becb116315542858ac917cbe46) ) /* PAL16L8ACN */
-
-	/* 3D PCB (2252960701) */
-	ROM_LOAD("wr-p1.1b",    0x000, 0x104, CRC(5856cc43) SHA1(4578c7a7d731c61d678d594dd071370db46cc3f7) ) /* PAL16L8ACN */
-
-	/* DSP PCB (2252960601) */
-	ROM_LOAD("wr-d1.3b",    0x000, 0x104, CRC(7a072b71) SHA1(45b8d9405a2c1a40f2cd9c6a33d105565136c538) ) /* PAL16L8ACN */
-	ROM_LOAD("wr-d2.4j",    0x000, 0x104, CRC(614de474) SHA1(80c3ab287896e07073a70dd42e7b47f515dd3931) ) /* PAL16L8ACN */
-ROM_END
-
-ROM_START( winrungp )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "sg1-mp-ub.3k", 0x000000, 0x20000, CRC(7f9b855a) SHA1(6d39a3a9959dbcd0047dbaab0fcd68adc81f5508) )
-	ROM_LOAD16_BYTE( "sg1-mp-lb.1k", 0x000001, 0x20000, CRC(a45e8543) SHA1(f9e583a988e4661026ee7873a48d078225778df3) )
-
-	ROM_REGION( 0x40000, "slave", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "sg1-sp-u.6b", 0x000000, 0x20000, CRC(7c9c3a3f) SHA1(cacb45c9111ac66c6e60b7a0cacd8bf47fd00752) )
-	ROM_LOAD16_BYTE( "sg1-sp-l.4b", 0x000001, 0x20000, CRC(5068fc5d) SHA1(7f6e80f74985959509d824318a4a7ff2b11953da) )
-
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "sg1-snd0.7c", 0x00c000, 0x004000, CRC(de04b794) SHA1(191f4d79ac2375d7060f3d83ec753185e92f28ea) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
-	ROM_RELOAD(              0x010000, 0x020000 )
-
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
-
-	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "sg1-gp0-u.1j", 0x00000, 0x20000, CRC(475da78a) SHA1(6e69bcc6caf2e3cd28fed75796c8992e754f9323) )
-	ROM_LOAD16_BYTE( "sg1-gp0-l.3j", 0x00001, 0x20000, CRC(580479bf) SHA1(ba682190cba0d3cdc49aa4937c898ba7ed2a25f5) )
-	ROM_LOAD16_BYTE( "sg1-gp1-u.1l", 0x40000, 0x20000, CRC(f5f2e927) SHA1(ebf709f16f01f1a634de9121454537cda74e891b) )
-	ROM_LOAD16_BYTE( "sg1-gp1-l.3l", 0x40001, 0x20000, CRC(17ed90a5) SHA1(386bdcb11dcbe400f5be1fe4a7418158b46e50ef) )
-
-	ROM_REGION16_BE( 0x80000, "data", 0 )
-	ROM_LOAD16_BYTE( "sg1-data0-u.3a", 0x00000, 0x20000, CRC(1dde2ac2) SHA1(2d20a434561c04e48b52a2137a8c9047e17c1013) )
-	ROM_LOAD16_BYTE( "sg1-data0-l.1a", 0x00001, 0x20000, CRC(2afeb77e) SHA1(ac1552f6e2788158d3477b6a0981d001d6cbdf13) )
-	ROM_LOAD16_BYTE( "sg1-data1-u.3b", 0x40000, 0x20000, CRC(5664b09e) SHA1(10c1c29614eee2cffcfd69085f0450d81ba2e25f) )
-	ROM_LOAD16_BYTE( "sg1-data1-l.1b", 0x40001, 0x20000, CRC(2dbc7de4) SHA1(824304c95942c7296f8e8dcf8ee7e22bf56154b1) )
-
-	ROM_REGION16_BE( 0x100000, "gdata", 0 ) /* bitmapped graphics */
-	ROM_LOAD16_BYTE( "sg1-gd0-u.1p", 0x00000, 0x40000, CRC(7838fcde) SHA1(45e31269eed1999b73c41c2f5d2c5bfbbdaf23df) )
-	ROM_LOAD16_BYTE( "sg1-gd0-l.3p", 0x00001, 0x40000, CRC(4bd02b9a) SHA1(b2fdfd1c1325864aaad87f5358ab9bbdd79ff6ae) )
-	ROM_LOAD16_BYTE( "sg1-gd1-u.1s", 0x80000, 0x40000, CRC(271db29b) SHA1(8b35fcf273b9aec28d4c606c41c0626dded697e1) )
-	ROM_LOAD16_BYTE( "sg1-gd1-l.3s", 0x80001, 0x40000, CRC(a6c4da96) SHA1(377dbf21a1bede01de16708c96c112abab4417ce) )
-
-	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
-	ROM_LOAD16_BYTE( "sg1-pt0-u.8j", 0x00000, 0x20000, CRC(160c3634) SHA1(485d20d6cc459f17d77682201dee07bdf76bf343) )
-	ROM_LOAD16_BYTE( "sg1-pt0-l.8d", 0x00001, 0x20000, CRC(b5a665bf) SHA1(5af6ec492f31395c0492e14590b025b120067b8d) )
-	ROM_LOAD16_BYTE( "sg1-pt1-u.8l", 0x40000, 0x20000, CRC(b63d3006) SHA1(78e78619766b0fd91b1e830cfb066495d6773981) )
-	ROM_LOAD16_BYTE( "sg1-pt1-l.8e", 0x40001, 0x20000, CRC(6385e325) SHA1(d50bceb2e9c0d0a38d7b0f918f99c482649e260d) )
-
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("sg-voi-1.11c", 0x080000, 0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
-	ROM_LOAD("sg-voi-3.11e", 0x180000, 0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
-ROM_END
-
-ROM_START( winrun91 )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "r911-mpu.3k", 0x000000, 0x20000, CRC(80a0e5be) SHA1(6613b95e164c2032ea9043e4161130c6b3262492) )
-	ROM_LOAD16_BYTE( "r911-mpl.1k", 0x000001, 0x20000, CRC(942172d8) SHA1(21d8dfd2165b5ceb0399fdb53d9d0f51f1255803) )
-
-	ROM_REGION( 0x40000, "slave", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "r911-spu.6b", 0x000000, 0x20000, CRC(0221d4b2) SHA1(65fd38b1cfaa6693d71248561d764a9ea1098c56) )
-	ROM_LOAD16_BYTE( "r911-spl.4b", 0x000001, 0x20000, CRC(288799e2) SHA1(2c4bf0cf9c71458fff4dd77e426a76685d9e1bab) )
-
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
-	ROM_LOAD( "r911-snd0.7c", 0x00c000, 0x004000, CRC(6a321e1e) SHA1(b2e77cac4ed7609593fa5a462c9d78526451e477) )
-	ROM_CONTINUE(             0x010000, 0x01c000 )
-	ROM_RELOAD(               0x010000, 0x020000 )
-
-	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
-
-	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "r911-gp0u.1j", 0x00000, 0x20000, CRC(f5469a29) SHA1(38b6ea1fbe482b69fbb0e2f44f44a0ca2a49f6bc) )
-	ROM_LOAD16_BYTE( "r911-gp0l.3j", 0x00001, 0x20000, CRC(5c18f596) SHA1(215cbda62254e31b4ff6431623384df1639bfdb7) )
-	ROM_LOAD16_BYTE( "r911-gp1u.1l", 0x40000, 0x20000, CRC(146ab6b8) SHA1(aefb89585bf311f8d33f18298fea326ef1f19f1e) )
-	ROM_LOAD16_BYTE( "r911-gp1l.3l", 0x40001, 0x20000, CRC(96c2463c) SHA1(e43db580e7b454af04c22e894108fbb56da0eeb5) )
-
-	ROM_REGION16_BE( 0x80000, "data", 0 )
-	ROM_LOAD16_BYTE( "r911-d0u.3a", 0x00000, 0x20000, CRC(dcb27da5) SHA1(ecd72397d10313fe8dcb8589bdc5d88d4298b26c) )
-	ROM_LOAD16_BYTE( "r911-d0l.1a", 0x00001, 0x20000, CRC(f692a8f3) SHA1(4c29f60400b18d9ef0425de149618da6cf762ca4) )
-	ROM_LOAD16_BYTE( "r911-d1u.3b", 0x40000, 0x20000, CRC(ac2afd1b) SHA1(510eb41931164b086c85ba0a86d6f10b88f5e534) )
-	ROM_LOAD16_BYTE( "r911-d1l.1b", 0x40001, 0x20000, CRC(ebb51af1) SHA1(87b7b64ee662bf652add1e1199e42391d0e2f7e8) )
-
-	ROM_REGION16_BE( 0x100000, "gdata", 0 ) /* bitmapped graphics */
-	ROM_LOAD16_BYTE( "r911-gd0u.1p", 0x00000, 0x40000, CRC(33f5a19b) SHA1(b1dbd242168007f80e13e11c78b34abc1668883e) )
-	ROM_LOAD16_BYTE( "r911-gd0l.3p", 0x00001, 0x40000, CRC(9a29500e) SHA1(c605f86b138e0a4c3163ffd967482e298a15fbe7) )
-	ROM_LOAD16_BYTE( "r911-gd1u.1s", 0x80000, 0x40000, CRC(17e5a61c) SHA1(272ebd7daa56847f1887809535362331b5465dec) )
-	ROM_LOAD16_BYTE( "r911-gd1l.3s", 0x80001, 0x40000, CRC(64df59a2) SHA1(1e9d0945b94780bb0be16803e767466d2cda07e8) )
-
-	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* winrun91 - 3d objects */
-	ROM_LOAD16_BYTE( "r911-pt0u.8j", 0x00000, 0x20000, CRC(abf512a6) SHA1(e86288039d6c4dedfa95b11cb7e4b87637f90c09) ) /* Version on SYSTEM21B CPU only has R911 PTU @ 8W */
-	ROM_LOAD16_BYTE( "r911-pt0l.8d", 0x00001, 0x20000, CRC(ac8d468c) SHA1(d1b457a19a5d3259d0caf933f42b3a02b485867b) ) /* and R911 PTL @ 12W with rom type 27C020 */
-	ROM_LOAD16_BYTE( "r911-pt1u.8l", 0x40000, 0x20000, CRC(7e5dab74) SHA1(5bde219d5b4305d38d17b494b2e759f05d05329f) )
-	ROM_LOAD16_BYTE( "r911-pt1l.8e", 0x40001, 0x20000, CRC(38a54ec5) SHA1(5c6017c98cae674868153ff2d64532027cf0ab83) )
-
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("r911-avo1.11c", 0x080000, 0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
-	ROM_LOAD("r911-avo3.11e", 0x180000, 0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
-ROM_END
 
 void namcos21_state::init(int game_type)
 {
@@ -2789,13 +2955,22 @@ void namcos21_state::init_driveyes()
 }
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
-GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, init_driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
-GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, init_solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+// Original 'Namco System 21' with C65 I/O MCU, uses TMS320C25 DSP with no custom part number (no internal ROM?)
+GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run (World) (89/06/06, Ver.09)",                   MACHINE_IMPERFECT_GRAPHICS ) // Sub Ver.09, 1989, Graphic Ver .06, 89/01/14, Sound Ver.2.00
+GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan) (89/12/03, Ver.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // Sub Ver.02, 1989, Graphic Ver.02 89/12/03, Sound Ver.0000
+// Available on a size/cost reduced 2 PCB set with 'Namco System 21B' printed on each board, still C65 I/O MCU, appears to be functionally identical to original NS21
+GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run '91 (Japan) (1991/03/05, Main Ver 1.0, Sub Ver 1.0)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+
+// 3 PCB stacks in a single cage (3x 4 PCBs) linked for 3 screen panorama, boards look similar to original Namco System 21 (not 21B) including TMS320C25 DSP, but use C68 I/O MCU and sprite chip instead of "68000 'GPU'" ?
+GAME( 1992, driveyes,  0,        driveyes, driveyes,   namcos21_state, init_driveyes, ROT0,    "Namco", "Driver's Eyes (Japan) (1992/01/10, Main Ver 2.1, Sub Ver 1.1)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
+
+// revised hardware, much more DSP power, similar to below but apparently uses TMS320C20 (no Namco part #?) instead of TMS320C25 (C67)? (verify this isn't just a miscommunication, it seems out of place)
 GAME( 1991, starblad,  0,        namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starbladj, starblad, namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
+
+// uses 5x TMS320C25 (C67, has internal ROM - dumped) but otherwise same as above?
+GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, init_solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
 GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, init_cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING )

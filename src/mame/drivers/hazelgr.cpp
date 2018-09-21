@@ -28,7 +28,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 };
 
 
@@ -72,12 +72,13 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 // All frequencies are guesswork, in an effort to get something to happen
-MACHINE_CONFIG_START(haze_state::haze)
+void haze_state::haze(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,2000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 2000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &haze_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &haze_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1'000'000));
 	ctc_clock.signal_handler().set("ctc1", FUNC(z80ctc_device::trg3));
@@ -88,14 +89,14 @@ MACHINE_CONFIG_START(haze_state::haze)
 	ctc_clock.signal_handler().append("ctc3", FUNC(z80ctc_device::trg0));
 	ctc_clock.signal_handler().append("ctc3", FUNC(z80ctc_device::trg1));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, 1'000'000 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc1(Z80CTC(config, "ctc1", 1'000'000));
+	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, 1'000'000 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc2(Z80CTC(config, "ctc2", 1'000'000));
+	ctc2.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc3", Z80CTC, 1'000'000 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc3(Z80CTC(config, "ctc3", 1'000'000));
+	ctc3.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80pio_device& pio1(Z80PIO(config, "pio1", 1'000'000));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -106,7 +107,7 @@ MACHINE_CONFIG_START(haze_state::haze)
 	Z80PIO(config, "pio3", 1'000'000);
 
 	Z80PIO(config, "pio4", 1'000'000);
-MACHINE_CONFIG_END
+}
 
 ROM_START( hg_frd )
 	ROM_REGION( 0x10000, "maincpu", 0 )

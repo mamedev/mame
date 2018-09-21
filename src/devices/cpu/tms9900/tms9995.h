@@ -88,7 +88,7 @@ protected:
 private:
 	// State / debug management
 	uint16_t  m_state_any;
-	static const char* s_statename[];
+	static char const *const s_statename[];
 	void    state_import(const device_state_entry &entry) override;
 	void    state_export(const device_state_entry &entry) override;
 	void    state_string_export(const device_state_entry &entry, std::string &str) const override;

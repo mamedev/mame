@@ -158,27 +158,4 @@ DECLARE_DEVICE_TYPE(INS8250,  ins8250_device)
 DECLARE_DEVICE_TYPE(NS16450,  ns16450_device)
 DECLARE_DEVICE_TYPE(NS16550,  ns16550_device)
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_INS8250_OUT_TX_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_tx_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_DTR_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_RTS_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_INT_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_OUT1_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_out1_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_OUT2_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_out2_callback(DEVCB_##_devcb);
-
 #endif // MAME_MACHINE_INS8250_H

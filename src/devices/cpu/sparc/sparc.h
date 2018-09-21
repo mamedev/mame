@@ -11,7 +11,7 @@
 
 #include "sparcdasm.h"
 
-#define SPARCV8         (0)
+#define SPARCV8         (1)
 #define LOG_FCODES      (0)
 
 #if LOG_FCODES
@@ -50,6 +50,7 @@ public:
 
 	uint8_t get_asi() { return m_asi; }
 	uint32_t pc() { return m_pc; }
+	void set_mae() { m_mae = 1; }
 
 	void add_asi_desc(std::function<void (sparc_disassembler *)> f) { m_asi_desc_adder = f; }
 

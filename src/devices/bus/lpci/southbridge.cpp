@@ -521,9 +521,9 @@ MACHINE_CONFIG_START(southbridge_extended_device::device_add_mconfig)
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config, "rtc"));
+	rtc.irq().set("pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 
 	// on board devices
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "isabus", pc_isa_onboard, "fdcsmc", true) // FIXME: determine ISA bus clock

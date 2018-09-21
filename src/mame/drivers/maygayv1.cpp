@@ -914,10 +914,10 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygayv1_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, maygayv1_state, duart_txa))
 
-	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, maygayv1_state, strobe_w))      // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygayv1_state, lamp_data_w)) // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, maygayv1_state, kbd_r))                   // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));			// unknown clock
+	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));			// scan SL lines
+	kbdc.out_disp_callback().set(FUNC(maygayv1_state::lamp_data_w));	// display A&B
+	kbdc.in_rl_callback().set(FUNC(maygayv1_state::kbd_r));				// kbd RL lines
 
 	SPEAKER(config, "mono").front_center();
 

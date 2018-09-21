@@ -10,7 +10,7 @@
     ---------------------------------------------------------
 
     Register map:
-    000-5fe : Channel specific registers
+    000-5fe : Channel specific registers (48 channels)
               (high)   (low)
        +000 : xxxxxxxx -------- : Start address (low)
        +000 : -------- xxxxxxxx :   Unknown register (usually cleared)
@@ -27,7 +27,7 @@
        +010 : xxxxxxxx xxxxxxxx : Initial filter time constant
        +012 : xxxxxxxx xxxxxxxx : Current filter time constant
        +014 : xxxxxxxx xxxxxxxx : Initial volume
-       +016 : xxxxxxxx xxxxxxxx : Current volume
+       +016 : xxxxxxxx xxxxxxxx : Current volume?
        +018 : xxxxxxxx xxxxxxxx : Target filter time constant
        +01a : xxxxxxxx -------- : DSP ch 1 (chorus) output gain
             : -------- xxxxxxxx : Filter ramping speed
@@ -85,7 +85,7 @@
 
 TODO:
 - Filter and ramping behavior might not be perfect.
-- sometimes clicking / popping noises
+- clicking / popping noises in gdarius, raystorm: maybe the sample ROMs are bad dumps?
 - memory reads out of range sometimes
 
 */
@@ -309,10 +309,11 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						elem.status &= ~STATUS_ACTIVE;
 						continue;
 					}
-
-					if(elem.cur_pos == elem.start_pos)
-						elem.emphasis_filter_state = EMPHASIS_INITIAL_BIAS;
 				}
+
+				if(elem.cur_pos == elem.start_pos)
+					elem.emphasis_filter_state = EMPHASIS_INITIAL_BIAS;
+
 				elem.step_ptr &= 0xffff;
 				filter_samples(&elem);
 			}

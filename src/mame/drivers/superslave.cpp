@@ -73,7 +73,7 @@ private:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232a;
@@ -363,10 +363,10 @@ void superslave_state::machine_reset()
 
 MACHINE_CONFIG_START(superslave_state::superslave)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(superslave_mem)
-	MCFG_DEVICE_IO_MAP(superslave_io)
-	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superslave_state::superslave_mem);
+	m_maincpu->set_addrmap(AS_IO, &superslave_state::superslave_io);
+	m_maincpu->set_daisy_config(superslave_daisy_chain);
 
 	// devices
 	am9519_device &am9519(AM9519(config, AM9519_TAG, 0));

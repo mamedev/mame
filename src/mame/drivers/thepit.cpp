@@ -734,7 +734,7 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	m_mainlatch->q_out_cb<6>().set(FUNC(thepit_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(thepit_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)

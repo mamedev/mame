@@ -203,6 +203,7 @@ elektronmono.cpp
 elf.cpp
 elwro800.cpp
 emate.cpp
+emma2.cpp
 enmirage.cpp
 ep64.cpp
 esprit.cpp
@@ -220,6 +221,7 @@ evmbug.cpp
 excali64.cpp
 exelv.cpp
 exp85.cpp
+facit4440.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -308,7 +310,6 @@ icatel.cpp
 icebox.cpp
 ie15.cpp
 if800.cpp
-imds.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -333,6 +334,7 @@ isbc8030.cpp
 iskr103x.cpp
 itt3030.cpp
 jade.cpp
+jazz.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
@@ -469,6 +471,7 @@ nes.cpp
 nes_vt.cpp
 newbrain.cpp
 next.cpp
+nforcepc.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp

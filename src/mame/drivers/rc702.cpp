@@ -15,7 +15,7 @@ ToDo:
 - Other things
 
 Issues:
-- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 1)
+- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 0)
 
 
 ****************************************************************************************************************/
@@ -89,7 +89,7 @@ private:
 	bool m_eop;
 	bool m_dack1;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
@@ -241,7 +241,7 @@ WRITE8_MEMBER( rc702_state::port1c_w )
 }
 
 // monitor is orange even when powered off
-static const rgb_t our_palette[3] = {
+static const rgb_t our_palette[2] = {
 	rgb_t(0xc0, 0x60, 0x00), // off
 	rgb_t(0xff, 0xb4, 0x00), // on
 };
@@ -329,10 +329,10 @@ static void floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(rc702_state::rc702)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(rc702_mem)
-	MCFG_DEVICE_IO_MAP(rc702_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::rc702_mem);
+	m_maincpu->set_addrmap(AS_IO, &rc702_state::rc702_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	CLOCK(config, "ctc_clock", 614000).signal_handler().set(FUNC(rc702_state::clock_w));
 

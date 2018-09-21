@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -507,8 +507,7 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	MCFG_DEVICE_MODIFY("k053246")
 	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
-	MCFG_K053252_OFFSETS(12*8, 1*8)
+	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
 MACHINE_CONFIG_END
 
 

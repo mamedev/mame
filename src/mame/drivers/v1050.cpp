@@ -336,7 +336,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 
 READ8_MEMBER( v1050_state::kb_status_r )
 {
-	uint8_t val = m_uart_kb->status_r(space, 0);
+	uint8_t val = m_uart_kb->status_r();
 
 	return val | (m_keyavail ? 0x02 : 0x00);
 }
@@ -481,12 +481,10 @@ void v1050_state::v1050_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x84, 0x87).rw(m_ppi_disp, FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, data_r, data_w)
-//  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, status_r, control_w)
+//  map(0x88, 0x89).rw(m_uart_kb, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x88, 0x88).r(FUNC(v1050_state::kb_data_r)).w(m_uart_kb, FUNC(i8251_device::data_w));
 	map(0x89, 0x89).r(FUNC(v1050_state::kb_status_r)).w(m_uart_kb, FUNC(i8251_device::control_w));
-	map(0x8c, 0x8c).rw(m_uart_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x8d, 0x8d).rw(m_uart_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x8c, 0x8d).rw(m_uart_sio, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x90, 0x93).rw(I8255A_MISC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x94, 0x97).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
 	map(0x9c, 0x9f).rw(I8255A_RTC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -1054,26 +1052,26 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_3_w))
 	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pc_3_w))
 
-	MCFG_DEVICE_ADD(I8255A_DISP_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_M6502_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, disp_ppi_pc_w))
+	I8255A(config, m_ppi_disp);
+	m_ppi_disp->in_pa_callback().set(I8255A_M6502_TAG, FUNC(i8255_device::pb_r));
+	m_ppi_disp->out_pc_callback().set(FUNC(v1050_state::disp_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_MISC_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, misc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state,misc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state,misc_ppi_pc_w))
+	i8255_device &ppi_misc(I8255A(config, I8255A_MISC_TAG));
+	ppi_misc.in_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_r));
+	ppi_misc.out_pa_callback().set(FUNC(v1050_state::misc_ppi_pa_w));
+	ppi_misc.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi_misc.out_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_RTC_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, v1050_state, rtc_ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, rtc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, v1050_state, rtc_ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state, rtc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, rtc_ppi_pc_w))
+	i8255_device &ppi_rtc(I8255A(config, I8255A_RTC_TAG));
+	ppi_rtc.in_pa_callback().set(FUNC(v1050_state::rtc_ppi_pa_r));
+	ppi_rtc.in_pc_callback().set(FUNC(v1050_state::rtc_ppi_pc_r));
+	ppi_rtc.out_pa_callback().set(FUNC(v1050_state::rtc_ppi_pa_w));
+	ppi_rtc.out_pb_callback().set(FUNC(v1050_state::rtc_ppi_pb_w));
+	ppi_rtc.out_pc_callback().set(FUNC(v1050_state::rtc_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_M6502_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_DISP_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, m6502_ppi_pc_w))
+	I8255A(config, m_ppi_6502);
+	m_ppi_6502->in_pa_callback().set(m_ppi_disp, FUNC(i8255_device::pb_r));
+	m_ppi_6502->out_pc_callback().set(FUNC(v1050_state::m6502_ppi_pc_w));
 
 	I8251(config, m_uart_kb, 0/*16_MHz_XTAL/8,*/);
 	m_uart_kb->txd_handler().set(V1050_KEYBOARD_TAG, FUNC(v1050_keyboard_device::si_w));
@@ -1100,9 +1098,9 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))
 
-	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL/16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_drq_w))
+	MB8877(config, m_fdc, 16_MHz_XTAL/16);
+	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(v1050_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)

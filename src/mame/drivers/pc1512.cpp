@@ -1207,8 +1207,8 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_state, pit2_w))
 
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(I8259A2_TAG, FUNC(pic8259_device::ir2_w));
 
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_state, fdc_int_w))
@@ -1216,11 +1216,11 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
-	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
+	INS8250(config, m_uart, 1.8432_MHz_XTAL);
+	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(I8259A2_TAG, FUNC(pic8259_device::ir4_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_ack))
@@ -1231,11 +1231,11 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
 
 	// ISA8 bus
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
@@ -1338,8 +1338,8 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_base_state, pit2_w))
 
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(I8259A2_TAG, FUNC(pic8259_device::ir2_w));
 
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_base_state, fdc_int_w))
@@ -1347,11 +1347,11 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
-	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
+	INS8250(config, m_uart, 1.8432_MHz_XTAL);
+	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(I8259A2_TAG, FUNC(pic8259_device::ir4_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_ack))

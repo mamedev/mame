@@ -237,11 +237,12 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc_fd2_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(abc_fd2_mem)
-	MCFG_DEVICE_IO_MAP(abc_fd2_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void abc_fd2_device::device_add_mconfig(machine_config &config)
+{
+ 	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc_fd2_device::abc_fd2_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc_fd2_device::abc_fd2_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -250,14 +251,14 @@ MACHINE_CONFIG_START(abc_fd2_device::device_add_mconfig)
 	m_pio->in_pb_callback().set(FUNC(abc_fd2_device::pio_pb_r));
 	m_pio->out_pb_callback().set(FUNC(abc_fd2_device::pio_pb_w));
 
-	MCFG_DEVICE_ADD(FD1771_TAG, FD1771, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_pio, z80pio_device, pb7_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_pio, z80pio_device, pb5_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(m_pio, z80pio_device, pb6_w))
+	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pb7_w));
+	m_fdc->drq_wr_callback().set(m_pio, FUNC(z80pio_device::pb5_w));
+	m_fdc->hld_wr_callback().set(m_pio, FUNC(z80pio_device::pb6_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats);
+}
 
 
 //**************************************************************************

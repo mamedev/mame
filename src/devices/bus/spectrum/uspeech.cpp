@@ -128,7 +128,7 @@ WRITE8_MEMBER(spectrum_uspeech_device::mreq_w)
 	{
 	case 0x1000:
 		// allophone
-		m_nsp->ald_w(space, 0, data & 0x3f);
+		m_nsp->ald_w(data & 0x3f);
 		break;
 
 	case 0x3000:

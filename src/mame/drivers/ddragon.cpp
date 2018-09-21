@@ -966,7 +966,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1038,7 +1038,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1091,7 +1091,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

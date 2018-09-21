@@ -78,7 +78,7 @@ private:
 	uint8_t m_key_pressed;
 	uint8_t row_number(uint8_t code);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<z80pio_device> m_pio_0;
 	required_device<z80pio_device> m_pio_1;
@@ -467,10 +467,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nanos_state::nanos)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(nanos_daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &nanos_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &nanos_state::io_map);
+	m_maincpu->set_daisy_config(nanos_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -485,17 +485,17 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD(m_ctc_0, Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
+	Z80CTC(config, m_ctc_0, XTAL(4'000'000));
+	m_ctc_0->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_0->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc_0->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc_0->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(m_ctc_1, Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
+	Z80CTC(config, m_ctc_1, XTAL(4'000'000));
+	m_ctc_1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_1->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc_1->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc_1->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
 	Z80PIO(config, m_pio_0, XTAL(4'000'000));
 	m_pio_0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

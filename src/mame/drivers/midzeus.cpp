@@ -31,7 +31,7 @@ The Grid         v1.2   10/18/2000
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/midzeus.h"
-#include "machine/midwayic.h"
+
 #include "audio/dcs.h"
 #include "machine/nvram.h"
 
@@ -40,26 +40,6 @@ The Grid         v1.2   10/18/2000
 #define LOG_FW        (0)
 
 #define CPU_CLOCK       XTAL(60'000'000)
-
-#define BEAM_DY         3
-#define BEAM_DX         3
-#define BEAM_XOFFS      40      /* table in the code indicates an offset of 20 with a beam height of 7 */
-
-static uint32_t           gun_control;
-static uint8_t            gun_irq_state;
-static emu_timer *      gun_timer[2];
-static int32_t            gun_x[2], gun_y[2];
-
-static uint8_t            crusnexo_leds_select;
-static uint8_t            keypad_select;
-static uint32_t           disk_asic[0x10];
-static uint32_t           disk_asic_jr[0x10];
-
-static uint8_t cmos_protected;
-
-
-static emu_timer *timer[2];
-
 
 /*************************************************************************
 Driver for Midway Zeus2 games
@@ -603,9 +583,7 @@ WRITE32_MEMBER(midzeus_state::tms32031_control_w)
 CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 {
 	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
-	const char *namex = (const char *)param;
-	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[ioport(namey)->read() >> 4] << 4) | translate49[ioport(namex)->read() >> 4];
+	return (translate49[m_io_49way_y->read() >> 4] << 4) | translate49[m_io_49way_x->read() >> 4];
 }
 
 
@@ -618,7 +596,7 @@ WRITE32_MEMBER(midzeus_state::keypad_select_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
-	uint32_t bits = ioport((const char *)param)->read();
+	uint32_t bits = m_io_keypad->read();
 	uint8_t select = keypad_select;
 	while ((select & 1) != 0)
 	{
@@ -630,16 +608,16 @@ CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 
 READ32_MEMBER(midzeus_state::grid_keypad_r)
 {
-	uint32_t bits = (ioport("KEYPAD")->read() >> ((offset >> 1) << 2)) & 0xf;
+	uint32_t bits = (m_io_keypad->read() >> ((offset >> 1) << 2)) & 0xf;
 	return bits;
 }
 
 READ32_MEMBER(midzeus_state::trackball_r)
 {
 	if (offset==0)
-		return ioport("TRACKY1")->read();
+		return m_io_tracky->read();
 	else
-		return ioport("TRACKX1")->read();
+		return m_io_trackx->read();
 }
 
 
@@ -652,10 +630,9 @@ READ32_MEMBER(midzeus_state::trackball_r)
 
 READ32_MEMBER(midzeus_state::analog_r)
 {
-	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
 		logerror("%06X:analog_r(%X)\n", m_maincpu->pc(), offset);
-	return ioport(tags[offset & 3])->read();
+	return m_io_analog[offset & 3]->read();
 }
 
 
@@ -716,13 +693,8 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
 			const rectangle &visarea = m_screen->visible_area();
-			static const char *const names[2][2] =
-			{
-				{ "GUNX1", "GUNY1" },
-				{ "GUNX2", "GUNY2" }
-			};
-			gun_x[player] = ioport(names[player][0])->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
-			gun_y[player] = ioport(names[player][1])->read() * visarea.height() / 255 + visarea.min_y;
+			gun_x[player] = m_io_gun_x[player]->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
+			gun_y[player] = m_io_gun_y[player]->read() * visarea.height() / 255 + visarea.min_y;
 			gun_timer[player]->adjust(m_screen->time_until_pos(std::max(0, gun_y[player] - BEAM_DY), std::max(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
@@ -1128,7 +1100,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state, keypad_r, "KEYPAD" )
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state, keypad_r, nullptr )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYPAD")
@@ -1244,7 +1216,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state,custom_49way_r, "49WAYX\0" "49WAYY")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state, custom_49way_r, nullptr)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("49WAYX")
@@ -1286,86 +1258,81 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midzeus_state::midzeus)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(zeus_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
+	TMS32032(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
+	m_maincpu->set_vblank_int("screen", FUNC(midzeus_state::display_irq));
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette", 32768);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(midzeus_state, screen_update_midzeus)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
+	m_screen->set_screen_update(FUNC(midzeus_state::screen_update_midzeus));
+	m_screen->set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
+	DCS2_AUDIO_2104(config, "dcs", 0);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_yearoffs(94);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midzeus_state::mk4)
 	midzeus(config);
-	MCFG_DEVICE_MODIFY("ioasic")
-	MCFG_MIDWAY_IOASIC_UPPER(461/* or 474 */)
-	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
+	m_ioasic->set_upper(461/* or 474 */);
+	m_ioasic->set_shuffle_default(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midzeus_state::invasn)
 	midzeus(config);
-	MCFG_DEVICE_ADD("pic", PIC16C57, 8000000)  /* ? */
-
-	MCFG_DEVICE_MODIFY("ioasic")
-	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
+	PIC16C57(config, "pic", 8000000);  /* ? */
+	m_ioasic->set_upper(468/* or 488 */);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(zeus2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
+	TMS32032(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(midzeus2_state::display_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 4, 666, 0, 512, 438, 0, 400);
+	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
-	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
-	MCFG_ZEUS2_IRQ_CB(WRITELINE(*this, midzeus2_state, zeus_irq))
+	ZEUS2(config, m_zeus, ZEUS2_VIDEO_CLOCK);
+	m_zeus->vblank_callback().set(FUNC(midzeus2_state::zeus_irq));
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
+	DCS2_AUDIO_2104(config, "dcs", 0);
 
-	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
+	M48T35(config, m_m48t35, 0);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(99)
-	MCFG_MIDWAY_IOASIC_UPPER(474)
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_yearoffs(99);
+	m_ioasic->set_upper(474);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midzeus2_state::crusnexo)
 	midzeus2(config);
-	MCFG_DEVICE_MODIFY("ioasic")
-	MCFG_MIDWAY_IOASIC_UPPER(472/* or 476,477,478,110 */)
+	m_ioasic->set_upper(472/* or 476,477,478,110 */);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midzeus2_state::thegrid)
 	midzeus2(config);
-	MCFG_DEVICE_MODIFY("ioasic")
-	MCFG_MIDWAY_IOASIC_UPPER(474/* or 491 */)
+	m_ioasic->set_upper(474/* or 491 */);
 MACHINE_CONFIG_END
 
 

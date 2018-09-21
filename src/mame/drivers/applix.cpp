@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2) //connected to Z80H clock pin
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", applix_floppies, "35dd", applix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", applix_floppies, "35dd", applix_state::floppy_formats)

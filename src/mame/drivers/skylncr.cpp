@@ -1656,15 +1656,15 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* 1x M5M82C255, or 2x PPI8255 */
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN1");
+	ppi0.in_pb_callback().set_ioport("IN2");
+	ppi0.in_pc_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW2");
+	ppi1.in_pb_callback().set_ioport("IN3");
+	ppi1.in_pc_callback().set_ioport("IN4");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 

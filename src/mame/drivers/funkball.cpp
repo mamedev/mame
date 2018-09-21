@@ -806,9 +806,9 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	rs232.dsr_handler().set("uart", FUNC(ns16550_device::dsr_w));
 	rs232.cts_handler().set("uart", FUNC(ns16550_device::cts_w));
 
-	MCFG_INTEL_28F320J5_ADD("u29")
-	MCFG_INTEL_28F320J5_ADD("u30")
-	MCFG_INTEL_28F320J5_ADD("u3")
+	INTEL_28F320J5(config, "u29");
+	INTEL_28F320J5(config, "u30");
+	INTEL_28F320J5(config, "u3");
 MACHINE_CONFIG_END
 
 ROM_START( funkball )

@@ -369,13 +369,13 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
-	m_tms->data_w(space, 0, data);
+	m_tms->data_w(data);
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pa_r)
 {
-	return m_tms->status_r(space, 0);
+	return m_tms->status_r();
 }
 
 
@@ -745,7 +745,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	m_outlatch->q_out_cb<6>().set(FUNC(atarisy1_state::coin_counter_right_w));
 	m_outlatch->q_out_cb<7>().set(FUNC(atarisy1_state::coin_counter_left_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
 	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)

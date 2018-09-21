@@ -379,18 +379,18 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("d71055c_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, isa8_ibm_mfc_device, ppi0_i_a))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi0_o_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, isa8_ibm_mfc_device, ppi0_i_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi0_o_c))
+	I8255(config, m_d71055c_0);
+	m_d71055c_0->in_pa_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_i_a));
+	m_d71055c_0->out_pb_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_o_b));
+	m_d71055c_0->in_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_i_c));
+	m_d71055c_0->out_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_o_c));
 
-	MCFG_DEVICE_ADD("d71055c_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi1_o_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, isa8_ibm_mfc_device, ppi1_i_b))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi1_o_c))
+	I8255(config, m_d71055c_1);
+	m_d71055c_1->out_pa_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_o_a));
+	m_d71055c_1->in_pb_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_i_b));
+	m_d71055c_1->out_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_o_c));
 
-	MCFG_DEVICE_ADD("d71051", I8251, 0)
+	I8251(config, "d71051", 0);
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, write_usart_clock))

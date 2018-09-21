@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(deadang_state::deadang)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -407,10 +407,10 @@ void ecb_grip21_device::kb_w(uint8_t data)
 
 MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_Z80_DAISY_CHAIN(grip_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(grip_mem)
-	MCFG_DEVICE_IO_MAP(grip_io)
+	z80_device& z80(Z80(config, Z80_TAG, XTAL(16'000'000)/4));
+	z80.set_daisy_config(grip_daisy_chain);
+	z80.set_addrmap(AS_PROGRAM, &ecb_grip21_device::grip_mem);
+	z80.set_addrmap(AS_IO, &ecb_grip21_device::grip_io);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::white())
@@ -438,11 +438,11 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 
 //  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL(16'000'000)/4)
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecb_grip21_device, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecb_grip21_device, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecb_grip21_device, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecb_grip21_device, ppi_pc_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(ecb_grip21_device::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(ecb_grip21_device::ppi_pa_w));
+	m_ppi->in_pb_callback().set(FUNC(ecb_grip21_device::ppi_pb_r));
+	m_ppi->out_pc_callback().set(FUNC(ecb_grip21_device::ppi_pc_w));
 
 	Z80STI(config, m_sti, XTAL(16'000'000)/4);
 	m_sti->out_int_cb().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);

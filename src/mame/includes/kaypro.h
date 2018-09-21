@@ -96,7 +96,7 @@ private:
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;

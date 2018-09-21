@@ -812,8 +812,7 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_DEVICE_IO_MAP(dunhuang_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(5));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

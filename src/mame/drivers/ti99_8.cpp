@@ -680,7 +680,7 @@ WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 
 WRITE8_MEMBER( ti99_8_state::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset == IDLE_OP) return;
 	else
 		LOGMASKED(LOG_WARN, "External operation %s not implemented on TI-99/8 board\n", extop[offset]);

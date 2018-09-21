@@ -612,6 +612,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/am79c90.h,MACHINES["AM79C90"] = true
+---------------------------------------------------
+
+if (MACHINES["AM79C90"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am79c90.cpp",
+		MAME_DIR .. "src/devices/machine/am79c90.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/am9513.h,MACHINES["AM9513"] = true
 ---------------------------------------------------
 
@@ -3163,6 +3175,18 @@ if (MACHINES["DP8390"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/dp8390.cpp",
 		MAME_DIR .. "src/devices/machine/dp8390.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/dp83932c.h,MACHINES["DP83932C"] = true
+---------------------------------------------------
+
+if (MACHINES["DP83932C"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/dp83932c.cpp",
+		MAME_DIR .. "src/devices/machine/dp83932c.h",
 	}
 end
 

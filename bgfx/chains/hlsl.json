@@ -390,6 +390,29 @@
 			],
 			"output": "internal"
 		},
+		{
+			"effect": "hlsl/scanline",
+			"name": "Scanline Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "scanline_alpha", "value": 0 }
+			],
+			"uniforms": [
+				{ "uniform": "u_scanline_alpha",         "slider": "scanline_alpha" },
+				{ "uniform": "u_scanline_scale",         "slider": "scanline_scale" },
+				{ "uniform": "u_scanline_bright_scale",  "slider": "scanline_bright_scale" },
+				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
+				{ "uniform": "u_scanline_height",        "slider": "scanline_height" },
+				{ "uniform": "u_scanline_variation",     "slider": "scanline_variation" },
+				{ "uniform": "u_scanline_jitter",        "slider": "scanline_jitter_amount" },
+				{ "uniform": "u_jitter_amount",          "parameter": "jitter" },
+				{ "uniform": "u_time",                   "parameter": "time" }
+			],
+			"input": [
+				{ "sampler": "s_tex",    "target": "internal" }
+			],
+			"output": "internal"
+		},
 		{	"effect": "hlsl/defocus",
 			"name": "Defocus Pass",
 			"disablewhen": [
@@ -440,19 +463,12 @@
 			"name": "Non-Bloom Post Pass",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",    "value": 0 },
-				{ "type": "slider", "condition": "equal", "combine": "and", "name": "scanline_alpha", "value": 0.0 },
 				{ "type": "slider", "condition": "equal", "combine": "and", "name": "shadow_alpha",   "value": 0.0 },
 				{ "type": "slider", "condition": "equal", "combine": "and", "name": "humbar_alpha",   "value": 0.0 },
 				{ "type": "slider", "condition": "equal", "combine": "and", "name": "floor",          "value": [ 0, 0, 0 ] },
 				{ "type": "slider", "condition": "equal", "combine": "and", "name": "power",          "value": [ 0, 0, 0 ] }
 			],
 			"uniforms": [
-				{ "uniform": "u_scanline_alpha",         "slider": "scanline_alpha" },
-				{ "uniform": "u_scanline_scale",         "slider": "scanline_scale" },
-				{ "uniform": "u_scanline_bright_scale",  "slider": "scanline_bright_scale" },
-				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
-				{ "uniform": "u_scanline_height",        "slider": "scanline_height" },
-				{ "uniform": "u_scanline_variation",     "slider": "scanline_variation" },
 				{ "uniform": "u_shadow_tile_mode",       "slider": "shadow_tile_mode" },
 				{ "uniform": "u_shadow_alpha",           "slider": "shadow_alpha" },
 				{ "uniform": "u_shadow_count",           "slider": "shadow_uv_count" },
@@ -462,8 +478,6 @@
 				{ "uniform": "u_humbar_hertz_rate",      "slider": "humbar_hertz_rate" },
 				{ "uniform": "u_floor",                  "slider": "floor" },
 				{ "uniform": "u_power",                  "slider": "power" },
-				{ "uniform": "u_scanline_jitter",        "slider": "scanline_jitter_amount" },
-				{ "uniform": "u_jitter_amount",          "parameter": "jitter" },
 				{ "uniform": "u_time",                   "parameter": "time" }
 			],
 			"input": [

@@ -1290,7 +1290,7 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MB3773_ADD("watchdog") // IC95
+	MB3773(config, "watchdog"); // IC95
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", MASTER_CLOCK/8));
 	io.in_pa_callback().set_ioport("P1");

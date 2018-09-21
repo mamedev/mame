@@ -1510,10 +1510,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",                         "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ctribeua,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 2)", MACHINE_SUPPORTS_SAVE )

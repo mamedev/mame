@@ -277,7 +277,6 @@ Few other notes:
 #include "emu.h"
 #include "includes/m5.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
@@ -1407,10 +1406,10 @@ void brno_state::machine_reset()
 
 MACHINE_CONFIG_START(m5_state::m5)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 14.318181_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(m5_mem)
-	MCFG_DEVICE_IO_MAP(m5_io)
-	MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m5_state::m5_mem);
+	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
+	m_maincpu->set_daisy_config(m5_daisy_chain);
 
 	MCFG_DEVICE_ADD(Z80_FD5_TAG, Z80, 14.318181_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
@@ -1422,8 +1421,8 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 14.318181_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 14.318181_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
 	// ZC2 = EXCLK
 
@@ -1437,12 +1436,12 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("m5_cass")
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, m5_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, m5_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, m5_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, m5_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, m5_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(m5_state::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(m5_state::ppi_pa_w));
+	m_ppi->out_pb_callback().set(FUNC(m5_state::ppi_pb_w));
+	m_ppi->in_pc_callback().set(FUNC(m5_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(m5_state::ppi_pc_w));
 
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
@@ -1503,10 +1502,8 @@ MACHINE_CONFIG_START(brno_state::brno)
 	m5(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(m5_mem_brno)
-	MCFG_DEVICE_IO_MAP(brno_io)
-//  MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
+	m_maincpu->set_addrmap(AS_PROGRAM, &brno_state::m5_mem_brno);
+	m_maincpu->set_addrmap(AS_IO, &brno_state::brno_io);
 
 
 	//remove devices used for fd5 floppy
@@ -1522,7 +1519,7 @@ MACHINE_CONFIG_START(brno_state::brno)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// floppy
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
+	WD2797(config, m_fdc, 1_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats)

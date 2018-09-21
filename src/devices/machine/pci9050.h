@@ -15,30 +15,20 @@
 
 #include "machine/pci.h"
 
-#define MCFG_PCI9050_SET_MAP(id, map) \
-	downcast<pci9050_device *>(device)->set_map(id, address_map_constructor(&map, #map, this), this);
-
-#define MCFG_PCI9050_USER_INPUT_CALLBACK(_write) \
-	downcast<pci9050_device &>(*device).set_user_input_callback(DEVCB_##_write);
-
-#define MCFG_PCI9050_USER_OUTPUT_CALLBACK(_read) \
-	downcast<pci9050_device &>(*device).set_user_output_callback(DEVCB_##_read);
-
 class pci9050_device : public pci_device
 {
 public:
 	pci9050_device(const machine_config &mconfig, const char *tag, device_t *device, uint32_t clock);
 
-	template <class Object> devcb_base &set_user_input_callback(Object &&cb) { return m_user_input_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_user_output_callback(Object &&cb) { return m_user_output_handler.set_callback(std::forward<Object>(cb)); }
+	auto user_input_callback() { return m_user_input_handler.bind(); }
+	auto user_output_callback() { return m_user_output_handler.bind(); }
 
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 
 protected:
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 	virtual void device_reset() override;
-
-	void postload(void);
 
 private:
 	void map(address_map &map);

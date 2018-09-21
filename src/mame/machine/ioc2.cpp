@@ -10,12 +10,12 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ioc2.h"
 
-/*static*/ const char *ioc2_device::SCC_TAG = "scc";
-/*static*/ const char *ioc2_device::PI1_TAG = "pi1";
-/*static*/ const char *ioc2_device::KBDC_TAG = "kbdc";
-/*static*/ const char *ioc2_device::PIT_TAG = "pit";
-/*static*/ const char *ioc2_device::RS232A_TAG = "rs232a";
-/*static*/ const char *ioc2_device::RS232B_TAG = "rs232b";
+/*static*/ char const *const ioc2_device::SCC_TAG = "scc";
+/*static*/ char const *const ioc2_device::PI1_TAG = "pi1";
+/*static*/ char const *const ioc2_device::KBDC_TAG = "kbdc";
+/*static*/ char const *const ioc2_device::PIT_TAG = "pit";
+/*static*/ char const *const ioc2_device::RS232A_TAG = "rs232a";
+/*static*/ char const *const ioc2_device::RS232B_TAG = "rs232b";
 
 /*static*/ const XTAL ioc2_device::SCC_PCLK = 10_MHz_XTAL;
 /*static*/ const XTAL ioc2_device::SCC_RXA_CLK = 3.6864_MHz_XTAL; // Needs verification

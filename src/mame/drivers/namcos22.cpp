@@ -3759,26 +3759,28 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_DEVICE_PROGRAM_MAP(namcos22_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22_interrupt)
 
-	MCFG_DEVICE_ADD("master", TMS32025,SS22_MASTER_CLOCK) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
-	MCFG_DEVICE_DATA_MAP(master_dsp_data)
-	MCFG_DEVICE_IO_MAP(master_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, pdp_status_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DR_IN_CB(READ16(*this, namcos22_state, master_serial_io_r))
+	tms32025_device& master(TMS32025(config, m_master, SS22_MASTER_CLOCK)); /* ? */
+	master.set_addrmap(AS_PROGRAM, &namcos22_state::master_dsp_program);
+	master.set_addrmap(AS_DATA, &namcos22_state::master_dsp_data);
+	master.set_addrmap(AS_IO, &namcos22_state::master_dsp_io);
+	master.bio_in_cb().set(FUNC(namcos22_state::pdp_status_r));
+	master.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
+	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
+	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
+	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("slave", TMS32025,SS22_MASTER_CLOCK) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
-	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
-	MCFG_DEVICE_IO_MAP(slave_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, dsp_bioz_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DX_OUT_CB(WRITE16(*this, namcos22_state, slave_serial_io_w))
+	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK)); /* ? */
+	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
+	slave.set_addrmap(AS_DATA, &namcos22_state::slave_dsp_data);
+	slave.set_addrmap(AS_IO, &namcos22_state::slave_dsp_io);
+	slave.bio_in_cb().set(FUNC(namcos22_state::dsp_bioz_r));
+	slave.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
+	slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
+	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
+	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
@@ -3828,26 +3830,28 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_DEVICE_PROGRAM_MAP(namcos22s_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22s_interrupt)
 
-	MCFG_DEVICE_ADD("master", TMS32025,SS22_MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
-	MCFG_DEVICE_DATA_MAP(master_dsp_data)
-	MCFG_DEVICE_IO_MAP(master_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, pdp_status_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DR_IN_CB(READ16(*this, namcos22_state, master_serial_io_r))
+	tms32025_device& master(TMS32025(config, m_master, SS22_MASTER_CLOCK));
+	master.set_addrmap(AS_PROGRAM, &namcos22_state::master_dsp_program);
+	master.set_addrmap(AS_DATA, &namcos22_state::master_dsp_data);
+	master.set_addrmap(AS_IO, &namcos22_state::master_dsp_io);
+	master.bio_in_cb().set(FUNC(namcos22_state::pdp_status_r));
+	master.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
+	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
+	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
+	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("slave", TMS32025,SS22_MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
-	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
-	MCFG_DEVICE_IO_MAP(slave_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, dsp_bioz_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DX_OUT_CB(WRITE16(*this, namcos22_state, slave_serial_io_w))
+	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK));
+	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
+	slave.set_addrmap(AS_DATA, &namcos22_state::slave_dsp_data);
+	slave.set_addrmap(AS_IO, &namcos22_state::slave_dsp_io);
+	slave.bio_in_cb().set(FUNC(namcos22_state::dsp_bioz_r));
+	slave.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
+	slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
+	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
+	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)

@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	m_mainlatch->q_out_cb<6>().set(FUNC(timeplt_state::coin_counter_2_w));
 	m_mainlatch->q_out_cb<7>().set_nop(); // PAY OUT - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

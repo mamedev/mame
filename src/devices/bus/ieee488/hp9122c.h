@@ -118,6 +118,7 @@ private:
 	DECLARE_WRITE8_MEMBER(fdc_write);
 
 	void cpu_map(address_map &map);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_cpu;
 	required_device<i8291a_device> m_i8291a;
@@ -143,6 +144,8 @@ private:
 
 	bool m_ds0;
 	bool m_ds1;
+
+	emu_timer *m_motor_timer;
 };
 
 // device type definition

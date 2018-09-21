@@ -32,7 +32,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -67,25 +67,26 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(qvt103_state::qvt103)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(29'376'000) / 9) // divider guessed
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void qvt103_state::qvt103(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(29'376'000) / 9); // divider guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &qvt103_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &qvt103_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(29'376'000) / 9)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(29'376'000) / 9));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dart_device& dart(Z80DART(config, "dart", XTAL(29'376'000) / 9));
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(29'376'000) * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(29'376'000), 170 * 9, 0, 132 * 9, 320, 0, 300)
-	MCFG_SCREEN_UPDATE_DRIVER(qvt103_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(29'376'000) * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300);
+	//screen.set_raw(XTAL(29'376'000), 170 * 9, 0, 132 * 9, 320, 0, 300);
+	screen.set_screen_update(FUNC(qvt103_state::screen_update));
 
-	MCFG_DEVICE_ADD("kbdmcu", I8741, XTAL(6'000'000))
-MACHINE_CONFIG_END
+	I8741(config, "kbdmcu", XTAL(6'000'000));
+}
 
 /**************************************************************************************************************
 

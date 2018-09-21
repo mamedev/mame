@@ -5,7 +5,7 @@
     Hazeltine 1500
     original machine (c) 1977 Hazeltine Corporation
 
-    perliminary driver by Ryan Holtz
+    preliminary driver by Ryan Holtz
 
 TODO (roughly in order of importance):
     - Figure out the correct keyboard decoding.
@@ -762,19 +762,19 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "tvinterq", "tvinterq", hazl1500_state, tvinterq_cb, "")
 
 	/* keyboard controller */
-	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, hazl1500_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, hazl1500_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, hazl1500_state, ay3600_data_ready_w))
+	AY3600(config, m_kbdc, 0);
+	m_kbdc->x0().set_ioport("X0");
+	m_kbdc->x1().set_ioport("X1");
+	m_kbdc->x2().set_ioport("X2");
+	m_kbdc->x3().set_ioport("X3");
+	m_kbdc->x4().set_ioport("X4");
+	m_kbdc->x5().set_ioport("X5");
+	m_kbdc->x6().set_ioport("X6");
+	m_kbdc->x7().set_ioport("X7");
+	m_kbdc->x8().set_ioport("X8");
+	m_kbdc->shift().set(FUNC(hazl1500_state::ay3600_shift_r));
+	m_kbdc->control().set(FUNC(hazl1500_state::ay3600_control_r));
+	m_kbdc->data_ready().set(FUNC(hazl1500_state::ay3600_data_ready_w));
 MACHINE_CONFIG_END
 
 

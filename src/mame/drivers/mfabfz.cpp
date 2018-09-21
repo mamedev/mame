@@ -78,18 +78,15 @@ void mfabfz_state::mfabfz_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xbe, 0xbe).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xbf, 0xbf).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xbe, 0xbf).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 void mfabfz_state::mfabfz85_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */

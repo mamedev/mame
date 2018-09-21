@@ -184,22 +184,22 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vector06_state, vector06_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, vector06_state, vector06_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vector06_state, vector06_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, vector06_state, vector06_8255_portc_r))
+	I8255(config, m_ppi8255);
+	m_ppi8255->in_pb_callback().set(FUNC(vector06_state::vector06_8255_portb_r));
+	m_ppi8255->in_pc_callback().set(FUNC(vector06_state::vector06_8255_portc_r));
+	m_ppi8255->out_pa_callback().set(FUNC(vector06_state::vector06_8255_porta_w));
+	m_ppi8255->out_pb_callback().set(FUNC(vector06_state::vector06_8255_portb_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vector06_state, vector06_romdisk_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, vector06_state, vector06_romdisk_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vector06_state, vector06_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vector06_state, vector06_romdisk_portc_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->in_pb_callback().set(FUNC(vector06_state::vector06_romdisk_portb_r));
+	m_ppi8255_2->out_pa_callback().set(FUNC(vector06_state::vector06_romdisk_porta_w));
+	m_ppi8255_2->out_pb_callback().set(FUNC(vector06_state::vector06_romdisk_portb_w));
+	m_ppi8255_2->out_pc_callback().set(FUNC(vector06_state::vector06_romdisk_portc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_DEVICE_ADD("wd1793", KR1818VG93, 1_MHz_XTAL)
+	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)

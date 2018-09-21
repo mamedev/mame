@@ -163,7 +163,7 @@ MACHINE_CONFIG_START(aztarac_state::aztarac)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

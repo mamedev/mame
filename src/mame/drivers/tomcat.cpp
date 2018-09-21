@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 

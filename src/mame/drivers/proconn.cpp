@@ -134,7 +134,7 @@ private:
 
 	// devices
 	optional_device<s16lf01_device> m_vfd;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device_array<z80pio_device, 5> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<z80sio_device> m_z80sio;
@@ -266,10 +266,11 @@ void proconn_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(proconn_state::proconn)
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
-	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(proconn_map)
-	MCFG_DEVICE_IO_MAP(proconn_portmap)
+	Z80(config, m_maincpu, 4000000); /* ?? Mhz */
+	m_maincpu->set_daisy_config(z80_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &proconn_state::proconn_map);
+	m_maincpu->set_addrmap(AS_IO, &proconn_state::proconn_portmap);
+
 	MCFG_S16LF01_ADD("vfd",0)
 
 	Z80PIO(config, m_z80pio[0], 4000000); /* ?? Mhz */
@@ -317,8 +318,8 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 	m_z80pio[4]->out_pb_callback().set(FUNC(proconn_state::pio_5_m_out_pb_w));
 	m_z80pio[4]->out_brdy_callback().set(FUNC(proconn_state::pio_5_m_out_brdy_w));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_z80ctc, 4000000);
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80SIO(config, m_z80sio, 4000000); /* ?? Mhz */
 

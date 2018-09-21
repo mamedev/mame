@@ -507,27 +507,27 @@ MACHINE_CONFIG_START(guab_state::guab)
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.irq_callback().set_inputline("maincpu", 3);
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi1(I8255(config, "i8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pb_callback().set_ioport("IN1");
+	ppi1.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, guab_state, output1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, guab_state, output2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, guab_state, output3_w))
+	i8255_device &ppi2(I8255(config, "i8255_2"));
+	ppi2.out_pa_callback().set(FUNC(guab_state::output1_w));
+	ppi2.out_pb_callback().set(FUNC(guab_state::output2_w));
+	ppi2.out_pc_callback().set(FUNC(guab_state::output3_w));
 
-	MCFG_DEVICE_ADD("i8255_3", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, guab_state, output4_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, guab_state, output5_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, guab_state, output6_w))
+	i8255_device &ppi3(I8255(config, "i8255_3"));
+	ppi3.out_pa_callback().set(FUNC(guab_state::output4_w));
+	ppi3.out_pb_callback().set(FUNC(guab_state::output5_w));
+	ppi3.out_pc_callback().set(FUNC(guab_state::output6_w));
 
-	MCFG_DEVICE_ADD("i8255_4", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, guab_state, sn76489_ready_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, guab_state, sn76489_buffer_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, guab_state, system_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, guab_state, watchdog_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, guab_state, watchdog_w))
+	i8255_device &ppi4(I8255(config, "i8255_4"));
+	ppi4.in_pa_callback().set(FUNC(guab_state::sn76489_ready_r));
+	ppi4.out_pa_callback().set(FUNC(guab_state::sn76489_buffer_w));
+	ppi4.out_pb_callback().set(FUNC(guab_state::system_w));
+	ppi4.in_pc_callback().set(FUNC(guab_state::watchdog_r));
+	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
 	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
 	acia1.txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
@@ -546,8 +546,8 @@ MACHINE_CONFIG_START(guab_state::guab)
 	ACIA6850(config, "acia6850_2", 0);
 
 	// floppy
-	MCFG_DEVICE_ADD("fdc", WD1773, 8000000)
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", 6))
+	WD1773(config, m_fdc, 8000000);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, 6);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)

@@ -1553,8 +1553,7 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0x0f, 0x0f).portr("KEY15");
 	map(0x00, 0x02).w(FUNC(pc8801_state::pc8801_pcg8100_w));
 	map(0x10, 0x10).w(FUNC(pc8801_state::pc8801_rtc_w));
-	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)); /* RS-232C and CMT */
-	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)); /* RS-232C and CMT */
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::pc8801_txt_cmt_ctrl_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::pc8801_gfx_ctrl_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::pc8801_misc_ctrl_r), FUNC(pc8801_state::pc8801_misc_ctrl_w));
@@ -2359,17 +2358,17 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_slave", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_slave", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8801_state, cpu_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8801_state, cpu_8255_c_w))
+	i8255_device &d8255_master(I8255(config, "d8255_master"));
+	d8255_master.in_pa_callback().set("d8255_slave", FUNC(i8255_device::pb_r));
+	d8255_master.in_pb_callback().set("d8255_slave", FUNC(i8255_device::pa_r));
+	d8255_master.in_pc_callback().set(FUNC(pc8801_state::cpu_8255_c_r));
+	d8255_master.out_pc_callback().set(FUNC(pc8801_state::cpu_8255_c_w));
 
-	MCFG_DEVICE_ADD("d8255_slave", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_master", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_master", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8801_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8801_state, fdc_8255_c_w))
+	i8255_device &d8255_slave(I8255(config, "d8255_slave"));
+	d8255_slave.in_pa_callback().set("d8255_master", FUNC(i8255_device::pb_r));
+	d8255_slave.in_pb_callback().set("d8255_master", FUNC(i8255_device::pa_r));
+	d8255_slave.in_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_r));
+	d8255_slave.out_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_w));
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))

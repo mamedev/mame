@@ -358,10 +358,10 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_DEVICE_IO_MAP(homerun_iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, homerun_state, homerun_scrollhi_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, homerun_state, homerun_scrolly_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, homerun_state, homerun_scrollx_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(homerun_state::homerun_scrollhi_w));
+	ppi.out_pb_callback().set(FUNC(homerun_state::homerun_scrolly_w));
+	ppi.out_pc_callback().set(FUNC(homerun_state::homerun_scrollx_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1835,8 +1835,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
 	MCFG_DEVICE_ADD("dacvol", DISCRETE, taitosj_dacvol_discrete)

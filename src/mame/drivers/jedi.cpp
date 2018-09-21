@@ -354,7 +354,7 @@ MACHINE_CONFIG_START(jedi_state::jedi)
 	outlatch.q_out_cb<6>().set(FUNC(jedi_state::audio_reset_w));
 	outlatch.q_out_cb<7>().set(FUNC(jedi_state::video_off_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	jedi_video(config);

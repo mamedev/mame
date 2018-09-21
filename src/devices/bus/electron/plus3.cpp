@@ -67,12 +67,9 @@ ROM_END
 
 MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", WD1770, 16_MHz_XTAL / 2)
-	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	FLOPPY_CONNECTOR(config, m_floppy0, electron_floppies, "35dd", floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, electron_floppies, nullptr, floppy_formats).enable_sound(true);
 
 	/* pass-through */
 	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)

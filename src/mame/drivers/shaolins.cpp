@@ -199,7 +199,7 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(shaolins_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shaolins_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

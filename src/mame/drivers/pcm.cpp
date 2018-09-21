@@ -98,7 +98,7 @@ private:
 	bool m_cone;
 	uint8_t m_85;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio_s;
 	required_device<z80pio_device> m_pio_u;
 	required_device<z80ctc_device> m_ctc_s;
@@ -258,10 +258,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pcm_state::pcm)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'000'000) /4)
-	MCFG_DEVICE_PROGRAM_MAP(pcm_mem)
-	MCFG_DEVICE_IO_MAP(pcm_io)
-	MCFG_Z80_DAISY_CHAIN(pcm_daisy_chain)
+	Z80(config, m_maincpu, XTAL(10'000'000) /4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcm_state::pcm_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcm_state::pcm_io);
+	m_maincpu->set_daisy_config(pcm_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

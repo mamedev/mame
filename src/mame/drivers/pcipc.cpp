@@ -26,10 +26,11 @@
 #include "machine/i82371sb.h"
 #include "video/mga2064w.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
-#include "bus/rs232/terminal.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "machine/fdc37c93x.h"
 
 class pcipc_state : public driver_device
@@ -50,6 +51,8 @@ public:
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 private:
+	void pcipc_map(address_map &map);
+	void pcipc_map_io(address_map &map);
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_w);
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_ver40_rev6_w);
 	DECLARE_WRITE8_MEMBER(boot_state_award_w);
@@ -479,10 +482,14 @@ static void isa_internal_devices(device_slot_interface &device)
 
 static void isa_com(device_slot_interface &device)
 {
-	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
 void pcipc_state::superio_config(device_t *device)
@@ -490,7 +497,7 @@ void pcipc_state::superio_config(device_t *device)
 	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
 	fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -501,8 +508,20 @@ void pcipc_state::superio_config(device_t *device)
 	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
+void pcipc_state::pcipc_map(address_map &map)
+{
+	map.unmap_value_high();
+}
+
+void pcipc_state::pcipc_map_io(address_map &map)
+{
+	map.unmap_value_high();
+}
+
 MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_DEVICE_ADD("maincpu", PENTIUM, 90000000)
+	MCFG_DEVICE_PROGRAM_MAP(pcipc_map)
+	MCFG_DEVICE_IO_MAP(pcipc_map_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 	MCFG_I386_SMIACT(WRITELINE("pci:00.0", i82439hx_host_device, smi_act_w))
 
@@ -525,7 +544,7 @@ MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "microsoft_mouse")
+	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "logitech_mouse")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd1_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd1_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr1_w))

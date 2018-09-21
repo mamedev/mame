@@ -1755,7 +1755,7 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	m_outlatch->q_out_cb<3>().set_output("led0").invert(); // LED 1
 	m_outlatch->q_out_cb<4>().set_output("led1").invert(); // LED 2
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* timer */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", centiped_state, generate_interrupt, "screen", 0, 16)
@@ -1968,7 +1968,7 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 	m_outlatch->q_out_cb<4>().set_output("led1").invert();
 	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

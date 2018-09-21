@@ -90,6 +90,7 @@ void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "echosp").front_center();
 	TMS5220(config, m_tms, 640000);
+	// echo+ has a TSP5220C soldered down on it
 	m_tms->add_route(ALL_OUTPUTS, "echosp", 1.0);
 }
 
@@ -413,7 +414,7 @@ uint8_t a2bus_echoplus_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			return 0x1f | m_tms->read_status();
+			return 0x1f | m_tms->status_r();
 	}
 
 	return 0;
@@ -424,7 +425,7 @@ void a2bus_echoplus_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-			m_tms->write_data(data);
+			m_tms->data_w(data);
 			break;
 	}
 }

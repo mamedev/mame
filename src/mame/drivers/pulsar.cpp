@@ -78,7 +78,7 @@ private:
 	void mem_map(address_map &map);
 
 	floppy_image_device *m_floppy;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -211,26 +211,27 @@ void pulsar_state::init_pulsar()
 
 MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pulsar_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pulsar_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
+
 	MCFG_MACHINE_RESET_OVERRIDE(pulsar_state, pulsar)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pulsar_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pulsar_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));
+	ppi.out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));
+	ppi.in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));
 
 	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("dart", Z80DART, 4_MHz_XTAL)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80dart_device& dart(Z80DART(config, "dart", 4_MHz_XTAL));
+	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	dart.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	dart.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
@@ -244,7 +245,7 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	brg.ft_handler().set("dart", FUNC(z80dart_device::txcb_w));
 	brg.ft_handler().append("dart", FUNC(z80dart_device::rxcb_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1797, 4_MHz_XTAL / 2)
+	FD1797(config, m_fdc, 4_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)

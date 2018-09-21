@@ -391,13 +391,13 @@ MACHINE_CONFIG_START(special_state::special)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specialist_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specialist_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rks_cassette_formats)
@@ -420,17 +420,16 @@ MACHINE_CONFIG_START(special_state::specialp)
 	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(special_state::specialm)
+void special_state::specialm(machine_config &config)
+{
 	special(config);
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specimx_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
-MACHINE_CONFIG_END
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specimx_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
+}
 
 MACHINE_CONFIG_START(special_state::specimx)
 	special(config);
@@ -462,22 +461,21 @@ MACHINE_CONFIG_START(special_state::specimx)
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("custom", specimx_sound_device, set_input_ch2))
 
-	MCFG_DEVICE_REPLACE("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specimx_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specimx_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, special_state, fdc_drq))
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","special_flop")
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("128K").set_default_value(0);
+	RAM(config, m_ram).set_default_size("128K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(special_state::erik)
@@ -514,21 +512,21 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("special_cass")
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, special_state, specialist_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, special_state, specialist_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specialist_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, special_state, fdc_drq))
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("192K").set_default_value(0);
+	RAM(config, m_ram).set_default_size("192K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -48,6 +48,9 @@ public:
 	template<class Object> devcb_base &set_irqack_cb(Object &&cb) { return m_irqack_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_refresh_cb(Object &&cb) { return m_refresh_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_halt_cb(Object &&cb) { return m_halt_cb.set_callback(std::forward<Object>(cb)); }
+	auto irqack_cb() { return m_irqack_cb.bind(); }
+	auto refresh_cb() { return m_refresh_cb.bind(); }
+	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

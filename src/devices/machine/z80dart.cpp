@@ -467,7 +467,7 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 	, m_rx_first(0)
 	, m_rx_break(0)
 	, m_rx_rr0_latch(0)
-	, m_rxd(0)
+	, m_rxd(1)
 	, m_ri(0)
 	, m_cts(0)
 	, m_dcd(0)
@@ -802,7 +802,7 @@ void z80dart_channel::control_write(uint8_t data)
 
 			if (!m_dcd) m_rr[0] |= RR0_DCD;
 			if (m_ri) m_rr[0] |= RR0_RI;
-			if (m_cts) m_rr[0] |= RR0_CTS;
+			if (!m_cts) m_rr[0] |= RR0_CTS;
 
 			m_rx_rr0_latch = 0;
 
@@ -932,6 +932,8 @@ void z80dart_channel::control_write(uint8_t data)
 		else
 		{
 			// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
+			if (m_rr[1] & RR1_ALL_SENT)
+				set_rts(1);
 			m_rts = 0;
 		}
 

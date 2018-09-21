@@ -606,19 +606,19 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_PIT8253_CLK2(XTAL(1'843'200))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw12_state, pit_out2_w))
 
-	MCFG_DEVICE_ADD(AY3600PRO002_TAG, AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, bw12_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, bw12_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, bw12_state, ay3600_data_ready_w))
+	AY3600(config, m_kbc, 0);
+	m_kbc->x0().set_ioport("X0");
+	m_kbc->x1().set_ioport("X1");
+	m_kbc->x2().set_ioport("X2");
+	m_kbc->x3().set_ioport("X3");
+	m_kbc->x4().set_ioport("X4");
+	m_kbc->x5().set_ioport("X5");
+	m_kbc->x6().set_ioport("X6");
+	m_kbc->x7().set_ioport("X7");
+	m_kbc->x8().set_ioport("X8");
+	m_kbc->shift().set(FUNC(bw12_state::ay3600_shift_r));
+	m_kbc->control().set(FUNC(bw12_state::ay3600_control_r));
+	m_kbc->data_ready().set(FUNC(bw12_state::ay3600_data_ready_w));
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))

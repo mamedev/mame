@@ -309,8 +309,7 @@ void tsispch_state::i8086_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x02FFF).mirror(0x34000).ram(); // verified; 6264*2 sram, only first 3/4 used
-	map(0x03000, 0x03000).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x03002, 0x03002).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x03000, 0x03003).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	map(0x03400, 0x03400).mirror(0x341FE).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
 	map(0x03401, 0x03401).mirror(0x341FE).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits

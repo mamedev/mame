@@ -372,9 +372,9 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	m_pia_2->irqa_handler().set(FUNC(dgn_beta_state::d_pia2_irq_a));
 	m_pia_2->irqb_handler().set(FUNC(dgn_beta_state::d_pia2_irq_b));
 
-	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_drq_w))
+	WD2797(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

@@ -1925,7 +1925,7 @@ MACHINE_CONFIG_START(tmnt_state::cuebrick)
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1980,7 +1980,7 @@ MACHINE_CONFIG_START(tmnt_state::mia)
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2045,7 +2045,7 @@ MACHINE_CONFIG_START(tmnt_state::tmnt)
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,tmnt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2113,7 +2113,7 @@ MACHINE_CONFIG_START(tmnt_state::punkshot)
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2166,7 +2166,7 @@ MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2226,7 +2226,7 @@ MACHINE_CONFIG_START(tmnt_state::blswhstl)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2303,7 +2303,7 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2372,7 +2372,7 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2442,7 +2442,7 @@ MACHINE_CONFIG_START(tmnt_state::tmnt2)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2502,7 +2502,7 @@ MACHINE_CONFIG_START(tmnt_state::ssriders)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

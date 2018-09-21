@@ -227,11 +227,11 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 	ADDRESS_MAP_BANK(config, "page2").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 	ADDRESS_MAP_BANK(config, "page3").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pengadvb_state, pengadvb_ppi_port_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pengadvb_state, pengadvb_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pengadvb_state, pengadvb_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pengadvb_state, pengadvb_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_a_r));
+	ppi.out_pa_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_c_w));
 
 	/* video hardware */
 	tms9128_device &vdp(TMS9128(config, "tms9128", XTAL(10'738'635)));

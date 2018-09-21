@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_DEVICE_PROGRAM_MAP(galpanic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -279,8 +279,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanica)
 	MCFG_KANEKO_HIT_TYPE(0)
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 

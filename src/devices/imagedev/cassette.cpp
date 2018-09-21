@@ -379,7 +379,7 @@ std::string cassette_image_device::call_display()
 		int n;
 		double position, length;
 		cassette_state uistate;
-		static const char *shapes[] = { u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
+		static char const *const shapes[] = { u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
 
 		// figure out where we are in the cassette
 		position = get_position();

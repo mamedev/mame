@@ -19,7 +19,7 @@ uint32_t st62xx_disassembler::opcode_alignment() const
 
 std::string st62xx_disassembler::reg_name(const uint8_t reg)
 {
-	static const char* REG_NAMES[256] =
+	static char const *const REG_NAMES[256] =
 	{
 		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,
 		nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,  nullptr, nullptr, nullptr, nullptr,

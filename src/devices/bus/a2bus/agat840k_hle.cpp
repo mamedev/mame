@@ -59,16 +59,16 @@ MACHINE_CONFIG_START(a2bus_agat840k_hle_device::device_add_mconfig)
 	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, a2bus_agat840k_hle_device, index_1_w))
 
-	MCFG_DEVICE_ADD("d14", I8255, 0)
+	I8255(config, m_d14);
 	// PA not connected
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, a2bus_agat840k_hle_device, d14_i_b)) // status signals from drive
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a2bus_agat840k_hle_device, d14_o_c)) // control
+	m_d14->in_pb_callback().set(FUNC(a2bus_agat840k_hle_device::d14_i_b)); // status signals from drive
+	m_d14->out_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d14_o_c)); // control
 
-	MCFG_DEVICE_ADD("d15", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, a2bus_agat840k_hle_device, d15_i_a)) // read data
-//  MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, a2bus_agat840k_hle_device, d15_o_b)) // write data
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, a2bus_agat840k_hle_device, d15_i_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a2bus_agat840k_hle_device, d15_o_c))
+	I8255(config, m_d15);
+	m_d15->in_pa_callback().set(FUNC(a2bus_agat840k_hle_device::d15_i_a)); // read data
+//  m_d15->out_pb_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_b)); // write data
+	m_d15->in_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_i_c));
+	m_d15->out_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_c));
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

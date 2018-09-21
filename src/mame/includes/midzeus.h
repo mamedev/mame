@@ -11,6 +11,7 @@
 #include "machine/timekpr.h"
 #include "emupal.h"
 #include "screen.h"
+#include "machine/midwayic.h"
 
 class midzeus_state : public driver_device
 {
@@ -21,25 +22,33 @@ public:
 		m_ram_base(*this, "ram_base"),
 		m_firewire(*this, "firewire"),
 		m_tms32031_control(*this, "tms32031_ctl"),
-		m_zeusbase(*this, "zeusbase") ,
+		m_zeusbase(*this, "zeusbase"),
 		m_m48t35(*this, "m48t35"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_ioasic(*this, "ioasic"),
+		m_io_analog(*this, "ANALOG%u", 0U),
+		m_io_gun_x(*this, "GUNX%u", 1U),
+		m_io_gun_y(*this, "GUNY%u", 1U),
+		m_io_trackx(*this, "TRACKX1"),
+		m_io_tracky(*this, "TRACKY1"),
+		m_io_49way_x(*this, "49WAYX"),
+		m_io_49way_y(*this, "49WAYY"),
+		m_io_keypad(*this, "KEYPAD"),
 		m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
+
+	//static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
+	static constexpr int BEAM_DY = 3;
+	static constexpr int BEAM_DX = 3;
+	static constexpr int BEAM_XOFFS = 40; // table in the code indicates an offset of 20 with a beam height of 7
 
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
 	optional_shared_ptr<uint32_t> m_firewire;
 	required_shared_ptr<uint32_t> m_tms32031_control;
 	optional_shared_ptr<uint32_t> m_zeusbase;
-	optional_device<timekeeper_device> m_m48t35;
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	output_finder<7> m_digits;
-	emu_timer *m_display_irq_off_timer;
 
 	DECLARE_WRITE32_MEMBER(cmos_w);
 	DECLARE_READ32_MEMBER(cmos_r);
@@ -78,7 +87,35 @@ public:
 	void invasn(machine_config &config);
 	void mk4(machine_config &config);
 	void zeus_map(address_map &map);
+protected:
+	optional_device<timekeeper_device> m_m48t35;
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+	required_device<midway_ioasic_device> m_ioasic;
+	optional_ioport_array<4> m_io_analog;
+	optional_ioport_array<2> m_io_gun_x;
+	optional_ioport_array<2> m_io_gun_y;
+	optional_ioport m_io_trackx;
+	optional_ioport m_io_tracky;
+	optional_ioport m_io_49way_x;
+	optional_ioport m_io_49way_y;
+	optional_ioport m_io_keypad;
+	output_finder<7> m_digits;
+	emu_timer *m_display_irq_off_timer;
+	uint8_t            crusnexo_leds_select;
+	uint32_t           disk_asic[0x10];
+	uint32_t           disk_asic_jr[0x10];
+
+	uint8_t cmos_protected;
+
+	emu_timer *timer[2];
 private:
+	uint32_t           gun_control;
+	uint8_t            gun_irq_state;
+	emu_timer *        gun_timer[2];
+	int32_t            gun_x[2], gun_y[2];
+	uint8_t            keypad_select;
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
 	void zeus_register16_w(offs_t offset, uint16_t data, bool logit);

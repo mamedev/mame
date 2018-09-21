@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 	MCFG_RP5H01_ADD("rp5h01")
-	MCFG_M6M80011AP_ADD("m6m80011ap")
+	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

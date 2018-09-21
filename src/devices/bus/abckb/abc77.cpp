@@ -140,8 +140,7 @@ MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, abc77_device, prog_w))
 
 	// watchdog
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL(4'608'000)/3/5/4096))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(XTAL(4'608'000)/3/5/4096));
 
 	// discrete sound
 	SPEAKER(config, "mono").front_center();

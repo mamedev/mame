@@ -172,10 +172,10 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	ctc.zc_callback<1>().set("dart2", FUNC(z80dart_device::rxtxcb_w));
 	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, 4'000'000) // A = terminal; B = aux
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	z80dart_device& dart1(Z80DART(config, "dart1", 4'000'000)); // A = terminal; B = aux
+	dart1.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	dart1.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	dart1.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("dart1", z80dart_device, rxa_w))
@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_RS232_RI_HANDLER(WRITELINE("dart1", z80dart_device, ria_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("dart1", z80dart_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("dart2", Z80DART, 4'000'000) // RS232 ports
+	Z80DART(config, "dart2", 4'000'000); // RS232 ports
 
 	z80pio_device& pio1(Z80PIO(config, "pio1", 4'000'000));
 	pio1.out_pa_callback().set(FUNC(dmax8000_state::port0c_w));
@@ -191,9 +191,9 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 
 	Z80PIO(config, "pio2", 4'000'000);
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 2'000'000) // no idea
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dmax8000_state, fdc_drq_w))
+	FD1793(config, m_fdc, 2'000'000); // no idea
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 

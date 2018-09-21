@@ -95,8 +95,7 @@ void selz80_state::selz80_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -242,12 +241,12 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
-	MCFG_DEVICE_ADD("i8279", I8279, 5000000 / 2) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, selz80_state, scanlines_w))         // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, selz80_state, digit_w))           // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, selz80_state, kbd_r))                 // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                                    // Shift key
-	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
+	i8279_device &kbdc(I8279(config, "i8279", 5000000 / 2)); // based on divider
+	kbdc.out_sl_callback().set(FUNC(selz80_state::scanlines_w));	// scan SL lines
+	kbdc.out_disp_callback().set(FUNC(selz80_state::digit_w));		// display A&B
+	kbdc.in_rl_callback().set(FUNC(selz80_state::kbd_r));			// kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);						// Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(selz80_state::dagz80)

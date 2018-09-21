@@ -145,7 +145,7 @@ MACHINE_CONFIG_START(ht68k_state::ht68k)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681", mc68681_device, rx_a_w))
 
-	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL)
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)

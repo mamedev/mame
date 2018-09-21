@@ -74,7 +74,7 @@ private:
 	bool m_cassbit;
 	virtual void machine_reset() override;
 	//virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_colorram;
@@ -208,10 +208,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(z9001_state::z9001)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(z9001_mem)
-	MCFG_DEVICE_IO_MAP(z9001_io)
-	MCFG_Z80_DAISY_CHAIN(z9001_daisy_chain)
+	Z80(config, m_maincpu, XTAL(9'830'400) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z9001_state::z9001_mem);
+	m_maincpu->set_addrmap(AS_IO, &z9001_state::z9001_io);
+	m_maincpu->set_daisy_config(z9001_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -242,10 +242,10 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(9'830'400) / 4)); // keyboard PIO
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(9'830'400) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, z9001_state, cass_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(9'830'400) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(z9001_state::cass_w));
+	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

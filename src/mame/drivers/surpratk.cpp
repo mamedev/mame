@@ -178,7 +178,7 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&surpratk_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

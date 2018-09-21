@@ -38,6 +38,7 @@ public:
 	gp_1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi")
 		, m_ctc(*this, "ctc")
 		, m_sn(*this, "snsnd")
 		, m_io_dsw0(*this, "DSW0")
@@ -71,7 +72,8 @@ private:
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	required_device<z80ctc_device> m_ctc;
 	optional_device<sn76477_device> m_sn;
 	required_ioport m_io_dsw0;
@@ -96,7 +98,7 @@ void gp_1_state::gp_1_map(address_map &map)
 void gp_1_state::gp_1_io(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x04, 0x07).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -435,10 +437,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(gp_1_state::gp_1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2457600)
-	MCFG_DEVICE_PROGRAM_MAP(gp_1_map)
-	MCFG_DEVICE_IO_MAP(gp_1_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 2457600);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gp_1_state::gp_1_map);
+	m_maincpu->set_addrmap(AS_IO, &gp_1_state::gp_1_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -449,13 +451,13 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_1_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_1_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_1_state, portc_w))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(gp_1_state::porta_w));
+	m_ppi->in_pb_callback().set(FUNC(gp_1_state::portb_r));
+	m_ppi->out_pc_callback().set(FUNC(gp_1_state::portc_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset
+	Z80CTC(config, m_ctc, 2457600);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 
@@ -478,11 +480,7 @@ MACHINE_CONFIG_START(gp_1_state::gp_1s)
 	MCFG_SN76477_ENABLE(1)                            // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_REMOVE("ppi")
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_1_state, portas_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_1_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_1_state, portc_w))
+	m_ppi->out_pa_callback().set(FUNC(gp_1_state::portas_w));
 MACHINE_CONFIG_END
 
 

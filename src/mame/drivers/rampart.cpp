@@ -347,8 +347,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
@@ -359,7 +358,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", rampart_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */

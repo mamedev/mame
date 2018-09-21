@@ -321,7 +321,7 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00000, 0x00000).mirror(0x8).rw(FUNC(tandy2k_state::enable_r), FUNC(tandy2k_state::enable_w));
 	map(0x00002, 0x00002).mirror(0x8).w(FUNC(tandy2k_state::dma_mux_w));
 	map(0x00004, 0x00004).mirror(0x8).rw(FUNC(tandy2k_state::fldtc_r), FUNC(tandy2k_state::fldtc_w));
-	map(0x00010, 0x00013).mirror(0xc).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0x00ff);
+	map(0x00010, 0x00013).mirror(0xc).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x00030, 0x00033).mirror(0xc).m(m_fdc, FUNC(i8272a_device::map)).umask16(0x00ff);
 	map(0x00040, 0x00047).mirror(0x8).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x00050, 0x00057).mirror(0x8).rw(m_i8255a, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -819,10 +819,10 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, tandy2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tandy2k_state, ppi_pc_w))
+	I8255A(config, m_i8255a);
+	m_i8255a->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255a->in_pb_callback().set(FUNC(tandy2k_state::ppi_pb_r));
+	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

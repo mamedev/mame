@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(thoop2_state::thoop2)
 	m_outlatch->q_out_cb<4>().set_nop(); // unknown. Sound related?
 	m_outlatch->q_out_cb<5>().set_nop(); // unknown
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

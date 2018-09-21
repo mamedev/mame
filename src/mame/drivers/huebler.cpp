@@ -313,10 +313,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(amu880_state::amu880)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'000'000)/4) // U880D
-	MCFG_DEVICE_PROGRAM_MAP(amu880_mem)
-	MCFG_DEVICE_IO_MAP(amu880_io)
-	MCFG_Z80_DAISY_CHAIN(amu880_daisy_chain)
+	Z80(config, m_maincpu, XTAL(10'000'000)/4); // U880D
+	m_maincpu->set_addrmap(AS_PROGRAM, &amu880_state::amu880_mem);
+	m_maincpu->set_addrmap(AS_IO, &amu880_state::amu880_io);
+	m_maincpu->set_daisy_config(amu880_daisy_chain);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
 
@@ -329,21 +329,21 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(10'000'000)/4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, amu880_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(m_z80sio, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, amu880_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(10'000'000)/4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(amu880_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(m_z80sio, FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<2>().set(FUNC(amu880_state::ctc_z2_w));
 
 	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(10'000'000)/4));
-	pio1.out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(10'000'000)/4));
-	pio2.out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80SIO0(config, m_z80sio, XTAL(10'000'000)/4); // U856
 	m_z80sio->out_txda_callback().set(FUNC(amu880_state::cassette_w));
-	m_z80sio->out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	m_z80sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

@@ -347,8 +347,7 @@ void pc100_state::pc100_io(address_map &map)
 	map(0x20, 0x23).r(FUNC(pc100_state::pc100_key_r)).umask16(0x00ff); //i/o, keyboard, mouse
 	map(0x22, 0x22).w(FUNC(pc100_state::pc100_output_w)); //i/o, keyboard, mouse
 	map(0x24, 0x24).w(FUNC(pc100_state::pc100_tc_w)); //i/o, keyboard, mouse
-	map(0x28, 0x28).rw("uart8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x2a, 0x2a).rw("uart8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x28, 0x2b).rw("uart8251", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x30, 0x30).rw(FUNC(pc100_state::pc100_shift_r), FUNC(pc100_state::pc100_shift_w)); // crtc shift
 	map(0x38, 0x38).w(FUNC(pc100_state::pc100_crtc_addr_w)); //crtc address reg
 	map(0x3a, 0x3a).w(FUNC(pc100_state::pc100_crtc_data_w)); //crtc data reg
@@ -648,15 +647,15 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, rtc_porta_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc100_state, rtc_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, rtc_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(pc100_state::rtc_porta_w));
+	ppi1.in_pc_callback().set(FUNC(pc100_state::rtc_portc_r));
+	ppi1.out_pc_callback().set(FUNC(pc100_state::rtc_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, lower_mask_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc100_state, upper_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, crtc_bank_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(pc100_state::lower_mask_w));
+	ppi2.out_pb_callback().set(FUNC(pc100_state::upper_mask_w));
+	ppi2.out_pc_callback().set(FUNC(pc100_state::crtc_bank_w));
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

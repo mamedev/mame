@@ -1539,7 +1539,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000/* ? */, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -3315,37 +3315,74 @@ void raiden2_state::init_zeroteam()
 
 /* GAME DRIVERS */
 
-// rev numbers at end of the line just indicate which sets are the same code revisions (just a region byte change), they don't reflect the actual order of release
-GAME( 1993, raiden2,    0,        raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 1)", MACHINE_SUPPORTS_SAVE ) // rev 1
-GAME( 1993, raiden2u,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 2)", MACHINE_SUPPORTS_SAVE ) // ?
-GAME( 1993, raiden2g,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (Germany)", MACHINE_SUPPORTS_SAVE ) // rev 1
-GAME( 1993, raiden2hk,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (Hong Kong)", MACHINE_SUPPORTS_SAVE ) //  rev 1
-GAME( 1993, raiden2j,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Japan)", MACHINE_SUPPORTS_SAVE ) //  rev 1
-GAME( 1993, raiden2sw,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Switzerland)", MACHINE_SUPPORTS_SAVE ) // rev 1
-GAME( 1993, raiden2f,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (France)", MACHINE_SUPPORTS_SAVE ) // raiden2f & raiden2nl share same code base
-GAME( 1993, raiden2nl,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Holland)", MACHINE_SUPPORTS_SAVE ) // raiden2f & raiden2nl share same code base
-GAME( 1993, raiden2i,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Italy)", MACHINE_SUPPORTS_SAVE ) // rev 2
-GAME( 1993, raiden2k,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Korea)", MACHINE_SUPPORTS_SAVE )
+/* The Raiden 2 / DX sets are sorted by the checksums of the non-regional roms (the final program rom contains the region byte)
 
-GAME( 1993, raiden2e,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Korea?)", MACHINE_SUPPORTS_SAVE ) // rev 3 (Region 0x04) - Korea?, if regions are the same as RDX, no license or region message tho
-GAME( 1993, raiden2ea,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Japan?)", MACHINE_SUPPORTS_SAVE ) // rev 4 (Region 0x00) - Should be Japan, but the easy sets have no 'FOR USE IN JAPAN ONLY' display even when region is 00
-GAME( 1993, raiden2eu,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easy version, US set 2)", MACHINE_SUPPORTS_SAVE ) //  ^
-GAME( 1993, raiden2eua, raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easy version, US set 1)", MACHINE_SUPPORTS_SAVE ) // rev 3 and 4 mix?
-GAME( 1993, raiden2eg,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (easy version, Germany)", MACHINE_SUPPORTS_SAVE )
+   it's interesting to note that most Raiden DX sets are unique, very few differ only by region byte, but for Raiden 2 there are many where the program roms only differ by region byte
+   both Raiden 2 'harder' sets currently dumped are Korea region, but the Korea region byte does not determine the difficulty.
+*/
 
-GAME( 1993, raiden2dx,  raiden2,  raidendx, raiden2,  raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden II (harder, Raiden DX hardware)", MACHINE_SUPPORTS_SAVE )
+// Raiden 2 sets
 
+// Regular version - Sepia high score table background, regular tanks on first bridge
+
+// code rev with first rom having checksum 09475ec4
+GAME( 1993, raiden2,    0,        raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2g,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2hk,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2j,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2sw,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Switzerland)", MACHINE_SUPPORTS_SAVE )
+// code rev with first rom having checksum b16df955
+GAME( 1993, raiden2u,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (US, set 2)", MACHINE_SUPPORTS_SAVE )
+// code rev with first rom having checksum 53be3dd0
+GAME( 1993, raiden2f,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (France)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2nl,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Holland)", MACHINE_SUPPORTS_SAVE )
+// code rev with first rom having checksum c1fc70f5
+GAME( 1993, raiden2i,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Italy)", MACHINE_SUPPORTS_SAVE )
+
+// Easy version - Coloured high score table background, different enemy placement
+
+// code rev with first rom having checksum 2abc848c
+GAME( 1993, raiden2e,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easier, Korea)", MACHINE_SUPPORTS_SAVE ) // (Region 0x04) - Korea, if regions are the same as RDX, no license or region message tho
+// code rev with first rom having checksum ed1514e3 (using 4x program rom configuration, not 2) would have crc 2abc848c in 2 rom config, so same rev as above
+GAME( 1993, raiden2eua, raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, raiden2eg,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (easier, Germany)", MACHINE_SUPPORTS_SAVE )
+// code rev with first rom having checksum d7041be4
+GAME( 1993, raiden2ea,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easier, Japan)", MACHINE_SUPPORTS_SAVE ) // (Region 0x00) - Japan, but the easy sets have no 'FOR USE IN JAPAN ONLY' display even when region is 00
+GAME( 1993, raiden2eu,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US set 2)", MACHINE_SUPPORTS_SAVE ) //  ^
+
+// Harder version - Sepia high score table background, red tanks on first bridge
+
+// code rev with first rom having checksum 1fcc08cf
+GAME( 1993, raiden2k,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (harder, Korea)", MACHINE_SUPPORTS_SAVE ) // (Region 0x04) - Korea, no message displayed tho
+// code rev with first rom having checksum 413241e0 (using 4x program rom configuration, not 2, on Raiden DX hardware)
+GAME( 1993, raiden2dx,  raiden2,  raidendx, raiden2,  raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden II (harder, Raiden DX hardware, Korea)", MACHINE_SUPPORTS_SAVE ) // ^
+
+
+// Raiden DX sets
+
+// code rev with the first 3 roms having checksums 14d725fc, 5e7e45cb, f0a47e67
 GAME( 1994, raidendx,   0,        raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (UK)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxa1, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxa2, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxk,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxu,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden DX (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, raidendxg,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden DX (Germany)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, raidendxnl, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Holland)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, raidendxpt, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Portugal)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums 7624c36b, 4940fdf3, 6c495bcf
+GAME( 1994, raidendxa1, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 1)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums 22b155ae, 2be98ca8, b4785576
+GAME( 1994, raidendxa2, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 2)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums b5b32885, 7efd581d, 55ec0e1d
+GAME( 1994, raidendxk,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Korea)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums 53e63194, ec8d1647, 7dbfd73d
+GAME( 1994, raidendxu,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden DX (US)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums c589019a, b2222254, 60f04634
+GAME( 1994, raidendxnl, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Holland)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums 5af382e1, 899966fc, e7f08013
 GAME( 1994, raidendxj,  raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums 247e21c7, f2e9855a, fbab727f
 GAME( 1994, raidendxja, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu", "Raiden DX (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+// code rev with first 3 roms having checksums 2154c6ae, 73bb74b7, 50f0a6aa
 GAME( 1994, raidendxch, raidendx, raidendx, raidendx, raiden2_state, init_raidendx, ROT270, "Seibu Kaihatsu (Ideal International Development Corp license)", "Raiden DX (China)", MACHINE_SUPPORTS_SAVE ) // Region byte is 0x16, defined as "MAIN LAND CHINA" for this set only
+
+
+// Zero Team sets
 
 GAME( 1993, zeroteam,   0,        zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Fabtek license)", "Zero Team USA (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, zeroteama,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team (Japan?, earlier?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
@@ -3354,5 +3391,8 @@ GAME( 1993, zeroteamc,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zerote
 GAME( 1993, zeroteamd,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu (Dream Soft license)", "Zero Team (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, zeroteams,  zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Selection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, zeroteamsr, zeroteam, zeroteam, zeroteam, raiden2_state, init_zeroteam, ROT0,   "Seibu Kaihatsu", "Zero Team Suicide Revival Kit", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // reprograms the sprite decrypt data of the SEI251 only, no game code
+
+
+// X Se Dae Quiz sets
 
 GAME( 1995, xsedae,     0,        xsedae,   xsedae,   raiden2_state, init_xsedae,   ROT0,   "Dream Island", "X Se Dae Quiz (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

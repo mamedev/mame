@@ -707,10 +707,11 @@ static const char *const relay_sample_names[] =
 
 MACHINE_CONFIG_START(super80_state::super80)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(super80_map)
-	MCFG_DEVICE_IO_MAP(super80_io)
-	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &super80_state::super80_map);
+	m_maincpu->set_addrmap(AS_IO, &super80_state::super80_io);
+	m_maincpu->set_daisy_config(super80_daisy_chain);
+
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80)
 
 	Z80PIO(config, m_pio, MASTER_CLOCK/6);
@@ -794,10 +795,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(super80_state::super80v)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(super80v_map)
-	MCFG_DEVICE_IO_MAP(super80v_io)
-	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &super80_state::super80v_map);
+	m_maincpu->set_addrmap(AS_IO, &super80_state::super80v_io);
+	m_maincpu->set_daisy_config(super80_daisy_chain);
+
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80r)
 
 	Z80PIO(config, m_pio, MASTER_CLOCK/6);
@@ -869,8 +871,8 @@ MACHINE_CONFIG_START(super80_state::super80r)
 	m_dma->in_iorq_callback().set(FUNC(super80_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(super80_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 2_MHz_XTAL)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	WD2793(config, m_fdc, 2_MHz_XTAL);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)

@@ -58,7 +58,7 @@ private:
 	void ampro_io(address_map &map);
 	void ampro_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
 	required_device<wd1772_device> m_fdc;
@@ -154,10 +154,11 @@ void ampro_state::init_ampro()
 
 MACHINE_CONFIG_START(ampro_state::ampro)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ampro_mem)
-	MCFG_DEVICE_IO_MAP(ampro_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ampro_state::ampro_mem);
+	m_maincpu->set_addrmap(AS_IO, &ampro_state::ampro_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
+
 	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
 
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 16_MHz_XTAL / 8)); // 2MHz
@@ -180,7 +181,7 @@ MACHINE_CONFIG_START(ampro_state::ampro)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ampro")

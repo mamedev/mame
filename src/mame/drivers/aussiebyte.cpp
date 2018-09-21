@@ -497,10 +497,10 @@ void aussiebyte_state::machine_reset()
 
 MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(aussiebyte_map)
-	MCFG_DEVICE_IO_MAP(aussiebyte_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aussiebyte_state::aussiebyte_map);
+	m_maincpu->set_addrmap(AS_IO, &aussiebyte_state::aussiebyte_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -575,9 +575,9 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80sio_device, rxa_w))
 
-	MCFG_DEVICE_ADD("fdc", WD2797, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, aussiebyte_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, aussiebyte_state, fdc_drq_w))
+	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(aussiebyte_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(aussiebyte_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)

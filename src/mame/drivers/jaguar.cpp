@@ -1855,7 +1855,7 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	VT83C461(config, m_ide).options(cojag_devices, "hdd", nullptr, true);
 	m_ide->irq_handler().set(FUNC(jaguar_state::external_int));

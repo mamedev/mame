@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(boxer_state::boxer)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16)
 	MCFG_DEVICE_PROGRAM_MAP(boxer_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
