@@ -70,14 +70,19 @@ uint32_t sbus_bwtwo_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	for (int y = 0; y < 900; y++)
 	{
 		uint32_t *scanline = &bitmap.pix32(y);
+		uint8_t *line = vram + y * (1152/8);
 		for (int x = 0; x < 1152/8; x++)
 		{
-			const uint8_t pixels = vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
+			const uint8_t pixels = line[BYTE4_XOR_BE(x)];
 
-			for (int bit = 7; bit >= 0; bit--)
-			{
-				*scanline++ = palette[BIT(pixels, bit)];
-			}
+			*scanline++ = palette[BIT(pixels, 7)];
+			*scanline++ = palette[BIT(pixels, 6)];
+			*scanline++ = palette[BIT(pixels, 5)];
+			*scanline++ = palette[BIT(pixels, 4)];
+			*scanline++ = palette[BIT(pixels, 3)];
+			*scanline++ = palette[BIT(pixels, 2)];
+			*scanline++ = palette[BIT(pixels, 1)];
+			*scanline++ = palette[BIT(pixels, 0)];
 		}
 	}
 
