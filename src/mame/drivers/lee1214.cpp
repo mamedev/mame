@@ -48,7 +48,7 @@ void lee1214_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0003).rw("mpsc", FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w));
 	//map(0x0100, 0x0100).w("crtc", FUNC(mc6845_device::address_w));
-	//map(0x0101, 0x0101).w("crtc", FUNC(mc6845_device::register_w));
+	//map(0x0101, 0x0101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 void lee1214_state::machine_start()
@@ -69,7 +69,8 @@ void lee1214_state::lee1214(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lee1214_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lee1214_state::io_map);
 
-	I8274_NEW(config, "mpsc", 4'000'000);
+	i8274_new_device &mpsc(I8274_NEW(config, "mpsc", 4'000'000));
+	mpsc.out_int_callback().set("maincpu", FUNC(i80188_cpu_device::int0_w));
 
 	EEPROM_2816(config, "eeprom");
 }
