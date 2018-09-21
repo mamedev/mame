@@ -840,6 +840,11 @@ MACHINE_CONFIG_START(gaiden_state::raiga)
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gaiden_state, screen_vblank))
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::drgnbowl)

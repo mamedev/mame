@@ -69,6 +69,7 @@ void tecmo16_state::video_start()
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
 
 	/* set up sprites */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
@@ -93,6 +94,7 @@ VIDEO_START_MEMBER(tecmo16_state,ginkun)
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
 
 	/* set up sprites */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
@@ -115,6 +117,7 @@ VIDEO_START_MEMBER(tecmo16_state,riot)
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
 
 	/* set up sprites */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
@@ -219,6 +222,7 @@ uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
+	m_tile_bitmap_tx.fill(0, cliprect);
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
@@ -227,12 +231,9 @@ uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, m_tile_bitmap_tx, cliprect, 0, 0);
 
-	m_mixer->mix_bitmaps(screen, bitmap, cliprect, *m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)nullptr, &m_sprite_bitmap);
-
-	// todo, this should go through the mixer!
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
+	m_mixer->mix_bitmaps(screen, bitmap, cliprect, *m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, &m_tile_bitmap_tx, &m_sprite_bitmap);
 
 	return 0;
 }

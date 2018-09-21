@@ -52,6 +52,7 @@ private:
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
+	bitmap_ind16 m_tile_bitmap_tx;
 	int m_flipscreen;
 	int m_game_is_riot;
 	uint16_t m_scroll_x_w;

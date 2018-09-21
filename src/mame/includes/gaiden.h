@@ -64,6 +64,7 @@ private:
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
+	bitmap_ind16 m_tile_bitmap_tx;
 	uint16_t      m_tx_scroll_x;
 	uint16_t      m_tx_scroll_y;
 	uint16_t      m_bg_scroll_x;
@@ -74,6 +75,7 @@ private:
 	int8_t        m_bg_offset_y;
 	int8_t        m_fg_offset_y;
 	int8_t        m_spr_offset_y;
+	std::unique_ptr<uint16_t[]> m_spritebuffer[2];
 
 	/* misc */
 	int         m_sprite_sizey;
@@ -127,7 +129,9 @@ private:
 	DECLARE_VIDEO_START(gaiden);
 	DECLARE_VIDEO_START(drgnbowl);
 	DECLARE_VIDEO_START(raiga);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);
