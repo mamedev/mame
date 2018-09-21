@@ -14825,6 +14825,9 @@ hg_frd                          // Fruit Deuce
 @source:hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 
+@source:hazl1420.cpp
+hazl1420                        // Hazeltine 1420 (c) 1979
+
 @source:hcastle.cpp
 akumajou                        // GX768 (c) 1988 (Japan)
 akumajoun                       // GX768 (c) 1988 (Japan)
