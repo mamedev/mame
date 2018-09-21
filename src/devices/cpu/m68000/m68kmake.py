@@ -102,17 +102,11 @@ ea_info_table = {
 
 
 class Opcode:
-    def __init__(self, line, counters):
+    def __init__(self, line):
         entries = line.split()
         self.op_value = int(entries[0], 16)
         self.op_mask = int(entries[1], 16)
         self.name = entries[2]
-        if self.name in counters:
-            self.id = counters[self.name]
-            counters[self.name] += 1
-        else:
-            self.id = 0
-            counters[self.name] = 1
         self.size = entries[3]
         self.ea_allowed = entries[4]
         self.priv = [None] * CPU_COUNT
@@ -133,9 +127,9 @@ class Opcode:
     def append(self, line):
         self.body += line + '\n'
 
-    def generate(self, counters, handlers):
+    def generate(self, handlers):
         if self.name == 'bcc' or self.name == 'scc' or self.name == 'dbcc' or self.name == 'trapcc':
-            self.cc_variants(counters, handlers)
+            self.cc_variants(handlers)
         else:
             self.ea_variants(handlers)
 
@@ -169,17 +163,11 @@ class Opcode:
         if 'I' in ea_allowed:
             handlers.append(OpcodeHandler(self, 'i'))
 
-    def cc_variants(self, counters, handlers):
+    def cc_variants(self, handlers):
         bname = self.name[:-2]
         for cc in range(2, 16):
             op = copy.copy(self)
             op.name = bname + cc_table_dn[cc]
-            if op.name in counters:
-                op.id = counters[op.name]
-                counters[op.name] += 1
-            else:
-                op.id = 0
-                counters[op.name] = 1
             op.body = self.body.replace('M68KMAKE_CC', 'COND_%s()' % cc_table_up[cc]).replace('M68KMAKE_NOT_CC', 'COND_NOT_%s()' % cc_table_up[cc])
             op.op_mask |= 0x0f00
             op.op_value = (op.op_value & 0xf0ff) | (cc << 8)
@@ -210,7 +198,10 @@ class OpcodeHandler:
                 self.cycles[i] = op.cycles[i] + ea_cycle_table[ea_mode][i][size_order]
         self.op_value = op.op_value | ea_info_table[ea_mode][2]
         self.op_mask  = op.op_mask  | ea_info_table[ea_mode][1]
-        self.function_name = 'm68k_op_%s%s_%d%s' % (op.name, '' if op.size == '.' else '_' + op.size, op.id, '' if ea_mode == 'none' else '_' + ea_mode)
+        self.function_name = 'x%04x_%s%s%s_' % (self.op_value, op.name, '' if op.size == '.' else '_' + op.size, '' if ea_mode == 'none' else '_' + ea_mode)
+        for i in range(0, CPU_COUNT):
+            if self.cycles[i] != None:
+                self.function_name += cpu_names[i]
         self.bits = 0
         for i in range(0, 16):
             if (self.op_mask & (1 << i)) != 0:
@@ -237,7 +228,6 @@ class Info:
             sys.stderr.write('cannot read file %s [%s]\n' % (path, err))
             sys.exit(1)
 
-        self.counters = {}
         self.opcodes = []
         cur_opcode = None
         for line in f:
@@ -246,12 +236,12 @@ class Info:
                 if cur_opcode != None:
                     cur_opcode.append(line)
             elif line[0] != '#':
-                cur_opcode = Opcode(line, self.counters)
+                cur_opcode = Opcode(line)
                 self.opcodes.append(cur_opcode)
 
         self.opcode_handlers = []
         for op in self.opcodes:
-            op.generate(self.counters, self.opcode_handlers)
+            op.generate(self.opcode_handlers)
 
     def save_header(self, f):
         f.write("// Generated source, edits will be lost.  Run m68kmake.py instead\n")
