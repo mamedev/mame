@@ -765,33 +765,6 @@ static INPUT_PORTS_START( winrungp )
 	PORT_DIPSETTING(    0x00, "4M" )
 INPUT_PORTS_END
 
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,4),  /* number of tiles */
-	8,      /* bits per pixel */
-	{       /* plane offsets */
-		0,1,2,3,4,5,6,7
-	},
-	{ /* x offsets */
-		0*8,RGN_FRAC(1,4)+0*8,RGN_FRAC(2,4)+0*8,RGN_FRAC(3,4)+0*8,
-		1*8,RGN_FRAC(1,4)+1*8,RGN_FRAC(2,4)+1*8,RGN_FRAC(3,4)+1*8,
-		2*8,RGN_FRAC(1,4)+2*8,RGN_FRAC(2,4)+2*8,RGN_FRAC(3,4)+2*8,
-		3*8,RGN_FRAC(1,4)+3*8,RGN_FRAC(2,4)+3*8,RGN_FRAC(3,4)+3*8
-	},
-	{ /* y offsets */
-		0*32,1*32,2*32,3*32,
-		4*32,5*32,6*32,7*32,
-		8*32,9*32,10*32,11*32,
-		12*32,13*32,14*32,15*32
-	},
-	8*64 /* sprite offset */
-};
-
-static GFXDECODE_START( gfx_namcos21 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
-GFXDECODE_END
-
 WRITE8_MEMBER( namcos21_state::namcos2_sound_bankselect_w )
 {
 	m_audiobank->set_entry(data>>4);
