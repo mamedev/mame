@@ -2786,7 +2786,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/namcos21.cpp",
 	MAME_DIR .. "src/mame/drivers/namcos21_de.cpp",
 	MAME_DIR .. "src/mame/drivers/namcos21_c67.cpp",
-	MAME_DIR .. "src/mame/video/namcos21.cpp",
 	MAME_DIR .. "src/mame/video/namcos21_3d.cpp",
 	MAME_DIR .. "src/mame/video/namcos21_3d.h",
 	MAME_DIR .. "src/mame/machine/namcos21_dsp.cpp",
