@@ -512,25 +512,25 @@ READ32_MEMBER(sbus_cgsix_device::fbc_r)
 
 WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 {
-	static const char* misc_bdisp_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
-	static const char* misc_bread_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
-	static const char* misc_bwrite1_name[4] = { "IGNORE", "ENABLE", "DISABLE", "ILLEGAL" };
-	static const char* misc_bwrite0_name[4] = { "IGNORE", "ENABLE", "DISABLE", "ILLEGAL" };
-	static const char* misc_draw_name[4] = { "IGNORE", "RENDER", "PICK", "ILLEGAL" };
-	static const char* misc_data_name[4] = { "IGNORE", "COLOR8", "COLOR1", "HRMONO" };
-	static const char* misc_blit_name[4] = { "IGNORE", "NOSRC", "SRC", "ILLEGAL" };
-	static const char* rasterop_rop_name[16] =
+	static char const *const misc_bdisp_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
+	static char const *const misc_bread_name[4] = { "IGNORE", "0", "1", "ILLEGAL" };
+	static char const *const misc_bwrite1_name[4] = { "IGNORE", "ENABLE", "DISABLE", "ILLEGAL" };
+	static char const *const misc_bwrite0_name[4] = { "IGNORE", "ENABLE", "DISABLE", "ILLEGAL" };
+	static char const *const misc_draw_name[4] = { "IGNORE", "RENDER", "PICK", "ILLEGAL" };
+	static char const *const misc_data_name[4] = { "IGNORE", "COLOR8", "COLOR1", "HRMONO" };
+	static char const *const misc_blit_name[4] = { "IGNORE", "NOSRC", "SRC", "ILLEGAL" };
+	static char const *const rasterop_rop_name[16] =
 	{
 		"CLR", "SRC_NOR_DST", "NSRC_AND_DST", "NOT_SRC", "SRC_AND_NDST", "NOT_DST", "SRC_XOR_DST", "SRC_NAND_DST",
 		"SRC_AND_DST", "SRC_XNOR_DST", "DST", "NSRC_OR_DST", "SRC", "SRC_OR_NDST", "SRC_OR_DST", "SET"
 	};
-	static const char* rasterop_plot_name[2] = { "PLOT", "UNPLOT" };
-	static const char* rasterop_rast_name[2] = { "BOOL", "LINEAR" };
-	static const char* rasterop_attr_name[4] = { "IGNORE", "UNSUPP", "SUPP", "ILLEGAL" };
-	static const char* rasterop_polyg_name[4] = { "IGNORE", "OVERLAP", "NONOVERLAP", "ILLEGAL" };
-	static const char* rasterop_pattern_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
-	static const char* rasterop_pixel_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
-	static const char* rasterop_plane_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
+	static char const *const rasterop_plot_name[2] = { "PLOT", "UNPLOT" };
+	static char const *const rasterop_rast_name[2] = { "BOOL", "LINEAR" };
+	static char const *const rasterop_attr_name[4] = { "IGNORE", "UNSUPP", "SUPP", "ILLEGAL" };
+	static char const *const rasterop_polyg_name[4] = { "IGNORE", "OVERLAP", "NONOVERLAP", "ILLEGAL" };
+	static char const *const rasterop_pattern_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
+	static char const *const rasterop_pixel_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
+	static char const *const rasterop_plane_name[4] = { "IGNORE", "ZEROES", "ONES", "MASK" };
 
 	switch (offset)
 	{

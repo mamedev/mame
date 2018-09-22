@@ -20,8 +20,8 @@
 #include "bus/generic/slot.h"
 #include "bus/isa/fdc.h"
 #include "bus/pc_joy/pc_joy.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -512,8 +512,11 @@ static void pcjr_floppies(device_slot_interface &device)
 
 static void pcjr_com(device_slot_interface &device)
 {
-	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
-	device.option_add("mousesys_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
 }
 
 static const gfx_layout pc_8_charlayout =

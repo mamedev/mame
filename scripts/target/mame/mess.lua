@@ -324,6 +324,7 @@ VIDEOS["HUC6272"] = true
 VIDEOS["I8244"] = true
 VIDEOS["I82730"] = true
 VIDEOS["I8275"] = true
+VIDEOS["IMS_CVC"] = true
 --VIDEOS["M50458"] = true
 --VIDEOS["MB90082"] = true
 --VIDEOS["MB_VCU"] = true
@@ -420,6 +421,7 @@ MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
 MACHINES["CXD1095"] = true
 MACHINES["DP8390"] = true
+MACHINES["DP83932C"] = true
 --MACHINES["DS1204"] = true
 MACHINES["DS1302"] = true
 MACHINES["DS1315"] = true
@@ -574,6 +576,7 @@ MACHINES["SMIOC"] = true
 MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
+MACHINES["SUN4C_MMU"] = true
 MACHINES["TC0091LVC"] = true
 --MACHINES["TE7750"] = true
 MACHINES["TIMEKPR"] = true
@@ -1064,6 +1067,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"interton",
 		"intv",
 		"isc",
+		"jazz",
 		"kaypro",
 		"koei",
 		"kontron",
@@ -2340,6 +2344,14 @@ files {
 	MAME_DIR .. "src/mame/drivers/compucolor.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "jazz")
+files {
+	MAME_DIR .. "src/mame/drivers/jazz.cpp",
+	MAME_DIR .. "src/mame/includes/jazz.h",
+	MAME_DIR .. "src/mame/machine/jazz_mct_adr.cpp",
+	MAME_DIR .. "src/mame/machine/jazz_mct_adr.h",
+}
+
 createMESSProjects(_target, _subtarget, "kaypro")
 files {
 	MAME_DIR .. "src/mame/drivers/kaypro.cpp",
@@ -3348,6 +3360,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cvicny.cpp",
 	MAME_DIR .. "src/mame/drivers/datum.cpp",
 	MAME_DIR .. "src/mame/drivers/dolphunk.cpp",
+	MAME_DIR .. "src/mame/drivers/emma2.cpp",
 	MAME_DIR .. "src/mame/drivers/instruct.cpp",
 	MAME_DIR .. "src/mame/drivers/mk14.cpp",
 	MAME_DIR .. "src/mame/drivers/pro80.cpp",
@@ -3691,6 +3704,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/grfd2301.cpp",
 	MAME_DIR .. "src/mame/drivers/harriet.cpp",
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
+	MAME_DIR .. "src/mame/drivers/hazl1420.cpp",
 	MAME_DIR .. "src/mame/drivers/hprot1.cpp",
 	MAME_DIR .. "src/mame/drivers/hpz80unk.cpp",
 	MAME_DIR .. "src/mame/drivers/ht68k.cpp",
@@ -3707,6 +3721,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jonos.cpp",
 	MAME_DIR .. "src/mame/drivers/kron.cpp",
 	MAME_DIR .. "src/mame/drivers/leapster.cpp",
+	MAME_DIR .. "src/mame/drivers/lee1214.cpp",
 	MAME_DIR .. "src/mame/drivers/learnwin.cpp",
 	MAME_DIR .. "src/mame/drivers/lft.cpp",
 	MAME_DIR .. "src/mame/drivers/lg-dvd.cpp",

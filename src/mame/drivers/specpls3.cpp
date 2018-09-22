@@ -341,11 +341,17 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 void spectrum_state::init_plus3()
 {
 	m_floppy = 1;
+
+	// setup expansion slot
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void spectrum_state::init_plus2()
 {
 	m_floppy = 0;
+
+	// setup expansion slot
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 static void specpls3_floppies(device_slot_interface &device)

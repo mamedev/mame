@@ -442,7 +442,7 @@ WRITE8_MEMBER( ti99_4x_state::cruwrite )
 
 WRITE8_MEMBER( ti99_4x_state::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	// Some games (e.g. Slymoids) actually use IDLE for synchronization
 	if (offset == IDLE_OP) return;
 	else

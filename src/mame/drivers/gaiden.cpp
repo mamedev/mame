@@ -55,6 +55,11 @@ Notes:
   pixels behind the blended object and the object itself, and then adding
   the RGB values.
 
+- The location of the protection MCU (right next to the DIP switches, and
+  not populated on Ninja Gaiden) is marked “µPD8049” on the PCB. This has
+  found to actually be a 8749 (internal EPROM type) on Raiga and Tecmo
+  Knight/Wild Fang.
+
 todo:
 
 - make sure all of the protection accesses in raiga are handled correctly.
@@ -825,7 +830,7 @@ MACHINE_CONFIG_START(gaiden_state::wildfang)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wildfang_map)
 
-	MCFG_DEVICE_ADD("mcu", I8049, 4_MHz_XTAL)
+	MCFG_DEVICE_ADD("mcu", I8749, 4_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
@@ -834,7 +839,7 @@ MACHINE_CONFIG_START(gaiden_state::raiga)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(raiga_map)
 
-	MCFG_DEVICE_ADD("mcu", I8049, 4_MHz_XTAL)
+	MCFG_DEVICE_ADD("mcu", I8749, 4_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
@@ -1345,7 +1350,7 @@ ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Tecmo Knight
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
@@ -1376,7 +1381,7 @@ ROM_START( wildfangs ) /* Wild Fang - No title change option */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
@@ -1407,7 +1412,7 @@ ROM_START( tknight ) /* Tecmo Knight - No title change option */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
@@ -1435,7 +1440,7 @@ ROM_START( stratof )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -1463,7 +1468,7 @@ ROM_START( raiga )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8049 */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* protection NEC D8749 */
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )

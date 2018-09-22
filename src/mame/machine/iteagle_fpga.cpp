@@ -293,19 +293,19 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				m_cpu->eat_cycles(40);
 			}
 			if (ACCESSING_BITS_0_7) {
-				result |= m_scc1->cb_r(space, offset) << 0;
+				result |= m_scc1->cb_r(offset) << 0;
 				if (LOG_SERIAL) m_serial0_1.read_control(1);
 			}
 			if (ACCESSING_BITS_8_15) {
-				result |= m_scc1->ca_r(space, offset) << 8;
+				result |= m_scc1->ca_r(offset) << 8;
 				if (LOG_SERIAL) m_serial0_1.read_control(0);
 			}
 			if (ACCESSING_BITS_16_23) {
-				result |= m_scc1->db_r(space, offset) <<16;
+				result |= m_scc1->db_r(offset) <<16;
 				if (LOG_SERIAL) m_serial0_1.read_data(1);
 			}
 			if (ACCESSING_BITS_24_31) {
-				result |= m_scc1->da_r(space, offset) << 24;
+				result |= m_scc1->da_r(offset) << 24;
 				if (LOG_SERIAL) m_serial0_1.read_data(0);
 			}
 			if (0 && LOG_FPGA && m_prev_reg != offset)
@@ -390,20 +390,20 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			break;
 		case 0x0c/4:
 			if (ACCESSING_BITS_0_7) {
-				m_scc1->cb_w(space, offset, (data >> 0) & 0xff);
+				m_scc1->cb_w(offset, (data >> 0) & 0xff);
 				if (LOG_SERIAL) m_serial0_1.write_control((data >> 0) & 0xff, 1);
 			}
 			if (ACCESSING_BITS_8_15) {
-				m_scc1->ca_w(space, offset, (data >> 8) & 0xff);
+				m_scc1->ca_w(offset, (data >> 8) & 0xff);
 				if (LOG_SERIAL) m_serial0_1.write_control((data >> 8) & 0xff, 0);
 			}
 			if (ACCESSING_BITS_16_23) {
 				// Convert 0xd to 0xa
 				uint8_t byte = data >> 16;
 				if (byte==0xd)
-					m_scc1->db_w(space, offset, 0xa);
+					m_scc1->db_w(offset, 0xa);
 				else
-					m_scc1->db_w(space, offset, byte);
+					m_scc1->db_w(offset, byte);
 				if (LOG_SERIAL) {
 					m_serial0_1.write_data((data >> 16) & 0xff, 1);
 					if (m_serial0_1.get_tx_str(1).back() == 0xd) {
@@ -414,7 +414,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 				}
 			}
 			if (ACCESSING_BITS_24_31) {
-				m_scc1->da_w(space, offset, (data >> 24) & 0xff);
+				m_scc1->da_w(offset, (data >> 24) & 0xff);
 				if (LOG_SERIAL) m_serial0_1.write_data((data >> 24) & 0xff, 0);
 			}
 			if (1 && LOG_FPGA)

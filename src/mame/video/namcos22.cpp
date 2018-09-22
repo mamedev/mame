@@ -9,7 +9,7 @@
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
  *       it used to be much worse with the legacy_poly_manager
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
- *       airco22b may have a similar problem. (is this related to dsp? or cpu?)
+ *       is this related to dsp? or cpu?
  * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
  * - improve ss22 fogging:
  *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
@@ -1880,7 +1880,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 	// prepare alpha
 	uint8_t alpha_check12 = nthbyte(m_mixer, 0x12);
 	uint8_t alpha_check13 = nthbyte(m_mixer, 0x13);
-	uint8_t alpha_mask    = nthbyte(m_mixer, 0x14);
+	uint8_t alpha_mask    = nthbyte(m_mixer, 0x14) & 0xf;
 	uint8_t alpha_factor  = nthbyte(m_mixer, 0x15);
 
 	// prepare spot
@@ -1910,7 +1910,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 				if (alpha_factor)
 				{
 					uint8_t pen = src[x] & 0xff;
-					if ((pen & 0xf) == alpha_mask || pen == alpha_check12 || pen == alpha_check13)
+					if ((pen & 0xf) == alpha_mask || (pen >= alpha_check12 && pen <= alpha_check13))
 					{
 						rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
 					}

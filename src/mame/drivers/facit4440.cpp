@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /****************************************************************************
 
-    Skeleton driver for Facit 4440 Twist terminal.
+    Preliminary driver for Facit 4440 Twist terminal.
 
     The “Twist” sobriquet refers to the adjustable orientation of the
     monitor, whose normally black-on-white display has the dimensions of a
@@ -45,8 +45,10 @@ public:
 		, m_earom(*this, "earom%u", 0U)
 		, m_crtc(*this, "crtc")
 		, m_test(*this, "TEST")
+		, m_orientation(*this, "ORIENTATION")
 		, m_chargen(*this, "chargen")
-		, m_vidprom(*this, "vidprom")
+		, m_scanprom(*this, "scanprom")
+		, m_videoram(*this, "videoram")
 	{
 	}
 
@@ -74,9 +76,11 @@ private:
 	required_device<mc6845_device> m_crtc;
 
 	required_ioport m_test;
+	required_ioport m_orientation;
 
 	required_region_ptr<u8> m_chargen;
-	required_region_ptr<u8> m_vidprom;
+	required_region_ptr<u8> m_scanprom;
+	required_shared_ptr<u8> m_videoram;
 
 	u8 m_control_latch[3];
 };
@@ -130,7 +134,7 @@ u8 facit4440_state::misc_status_r()
 	status |= m_earom[1]->data_r() << 3;
 
 	status |= m_crtc->vsync_r() << 1;
-	// TODO: what should bit 0 be?
+	status |= m_orientation->read();
 
 	return status;
 }
@@ -143,6 +147,22 @@ WRITE_LINE_MEMBER(facit4440_state::vsync_w)
 
 MC6845_UPDATE_ROW(facit4440_state::update_row)
 {
+	offs_t base = ma / 5 * 6;
+	u32 *px = &bitmap.pix32(y);
+
+	for (int i = 0; i < x_count; i++)
+	{
+		u8 chr = m_videoram[(base + i) & 0x1fff];
+		rgb_t fg = rgb_t::white();
+		rgb_t bg = rgb_t::black();
+
+		// TODO: double-width scans based on attributes
+		u8 scan = m_scanprom[ra | (BIT(m_control_latch[1], 7) ? 0x20 : 0x00)];
+		u8 dots = m_chargen[(u16(chr) << 5) | (scan & 0x1f)];
+
+		for (int n = 8; n > 0; n--, dots <<= 1)
+			*px++ = BIT(dots, 7) ? fg : bg;
+	}
 }
 
 void facit4440_state::mem_map(address_map &map)
@@ -157,15 +177,15 @@ void facit4440_state::mem_map(address_map &map)
 	map(0x8000, 0x8050).nopw();
 	map(0xa000, 0xbfff).rom().region("testprg", 0);
 	map(0xa000, 0xa000).w(FUNC(facit4440_state::control_a000_w));
-	map(0xc000, 0xdfff).ram(); // 4x TMM2016AP-90
+	map(0xc000, 0xdfff).ram().share("videoram"); // 4x TMM2016AP-90
 	map(0xe000, 0xffff).ram(); // 4x TMM2016AP-90
 }
 
 void facit4440_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xec, 0xef).rw("dart2", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
-	map(0xf4, 0xf7).rw("dart1", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0xec, 0xef).rw("kbdart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0xf4, 0xf7).rw("iodart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0xf8, 0xfb).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -182,13 +202,18 @@ static INPUT_PORTS_START(facit4440)
 	PORT_CONFSETTING(0, DEF_STR(Off))
 	PORT_CONFSETTING(3, DEF_STR(On))
 	PORT_CONFSETTING(2, "Burn In")
+
+	PORT_START("ORIENTATION")
+	PORT_CONFNAME(1, 1, "Orientation")
+	PORT_CONFSETTING(0, "Portrait")
+	PORT_CONFSETTING(1, "Landscape")
 INPUT_PORTS_END
 
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
-	{ "dart1" },
-	{ "dart2" },
+	{ "iodart" },
+	{ "kbdart" },
 	{ nullptr }
 };
 
@@ -207,10 +232,10 @@ void facit4440_state::facit4440(machine_config &config)
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 32_MHz_XTAL / 8));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::txca_w));
-	ctc.zc_callback<1>().set("dart1", FUNC(z80dart_device::rxca_w));
-	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::txcb_w));
-	ctc.zc_callback<2>().append("dart1", FUNC(z80dart_device::rxcb_w));
+	ctc.zc_callback<0>().set("iodart", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<1>().set("iodart", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<2>().set("iodart", FUNC(z80dart_device::txcb_w));
+	ctc.zc_callback<2>().append("iodart", FUNC(z80dart_device::rxcb_w));
 
 	clock_device &baudclk(CLOCK(config, "baudclk", 2.4576_MHz_XTAL / 4));
 	baudclk.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
@@ -218,27 +243,29 @@ void facit4440_state::facit4440(machine_config &config)
 	baudclk.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
 
 	clock_device &keybclk(CLOCK(config, "keybclk", 2.4576_MHz_XTAL / 32)); // unclear
-	keybclk.signal_handler().set("dart2", FUNC(z80dart_device::txca_w));
-	keybclk.signal_handler().append("dart2", FUNC(z80dart_device::rxca_w));
+	keybclk.signal_handler().set("kbdart", FUNC(z80dart_device::txca_w));
+	keybclk.signal_handler().append("kbdart", FUNC(z80dart_device::rxca_w));
 
-	z80dart_device &dart1(Z80DART(config, "dart1", 32_MHz_XTAL / 8)); // Z80ADART
-	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	dart1.out_txda_callback().set("dart1", FUNC(z80dart_device::rxa_w)); // temporary loopback for testing
-	dart1.out_rtsa_callback().set("dart1", FUNC(z80dart_device::ctsa_w)); // temporary loopback for testing
-	dart1.out_dtra_callback().set("dart1", FUNC(z80dart_device::dcdb_w)); // temporary loopback for testing
-	dart1.out_txdb_callback().set("dart1", FUNC(z80dart_device::rxb_w)); // temporary loopback for testing
+	z80dart_device &iodart(Z80DART(config, "iodart", 32_MHz_XTAL / 8)); // Z80ADART
+	iodart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	iodart.out_txda_callback().set("iodart", FUNC(z80dart_device::rxa_w)); // temporary loopback for testing
+	iodart.out_rtsa_callback().set("iodart", FUNC(z80dart_device::ctsa_w)); // temporary loopback for testing
+	iodart.out_dtra_callback().set("iodart", FUNC(z80dart_device::dcdb_w)); // temporary loopback for testing
+	iodart.out_txdb_callback().set("iodart", FUNC(z80dart_device::rxb_w)); // temporary loopback for testing
 
-	z80dart_device &dart2(Z80DART(config, "dart2", 32_MHz_XTAL / 8)); // Z80ADART
-	dart2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	dart2.out_txda_callback().set("dart2", FUNC(z80dart_device::rxa_w)); // FIXME: serial keyboard needed here
+	z80dart_device &kbdart(Z80DART(config, "kbdart", 32_MHz_XTAL / 8)); // Z80ADART
+	kbdart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	kbdart.out_txda_callback().set("kbdart", FUNC(z80dart_device::rxa_w)); // FIXME: serial keyboard needed here
 	// Channel B is not used
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(FAKE_DOT_CLOCK, 103 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 621, 0, 592);
+	screen.set_raw(FAKE_DOT_CLOCK, 103 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 621, 0, 500);
+	//screen.set_raw(FAKE_DOT_CLOCK, 103 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 621, 0, 560);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	MC6845(config, m_crtc, FAKE_DOT_CLOCK / CHAR_WIDTH); // HD46505SP-2
 	m_crtc->set_char_width(CHAR_WIDTH);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_update_row_callback(FUNC(facit4440_state::update_row), this);
 	m_crtc->out_hsync_callback().set("ctc", FUNC(z80ctc_device::trg3));
 	m_crtc->out_vsync_callback().set(FUNC(facit4440_state::vsync_w));
@@ -258,8 +285,8 @@ ROM_START(facit4440)
 	ROM_LOAD("rom3.bin", 0x1000, 0x1000, CRC(a55a25d9) SHA1(c0d321e65f214adee01bf5f8c495b2518fa31b7b))
 	ROM_LOAD("rom4.bin", 0x2000, 0x1000, CRC(52004ef8) SHA1(50d6e2eb48f60db3a3c9d206fc40d3294b6adc0e))
 
-	ROM_REGION(0x0800, "vidprom", 0)
+	ROM_REGION(0x0800, "scanprom", 0)
 	ROM_LOAD("rom2.bin", 0x0000, 0x0800, CRC(9e1a190c) SHA1(fb08ee806f1056bcdfb5b08ea85995e1d3d01298))
 ROM_END
 
-COMP(1984, facit4440, 0, 0, facit4440, facit4440, facit4440_state, empty_init, "Facit", "4440 Twist (30M-F1)", MACHINE_IS_SKELETON)
+COMP(1984, facit4440, 0, 0, facit4440, facit4440, facit4440_state, empty_init, "Facit", "4440 Twist (30M-F1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

@@ -191,6 +191,10 @@ public:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	template<int Chip> DECLARE_READ8_MEMBER(segapcm_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ym2608_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ym2610_adpcm_a_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ym2610_adpcm_b_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(y8950_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(ymf278b_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(ymf271_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(ymz280b_rom_r);
@@ -353,6 +357,15 @@ private:
 	std::array<std::vector<uint8_t>, 0x40> m_data_streams;
 	std::array<std::vector<data_block>, 0x40> m_data_stream_blocks;
 
+	struct
+	{
+		uint8_t cmp_type;
+		uint8_t cmp_sub_type;
+		uint8_t bit_dec;
+		uint8_t bit_cmp;
+		std::vector<uint8_t> entries;
+	} m_dec_table;
+
 	uint32_t m_ym2612_stream_offset = 0U;
 
 	uint32_t m_multipcm_bank_l[2];
@@ -365,6 +378,7 @@ private:
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
 
+	int m_sega32x_channel_hack;
 	int m_nes_apu_channel_hack[2];
 };
 
@@ -405,6 +419,10 @@ public:
 	void soundchips16_map(address_map &map);
 	template<int Chip> void segapcm_map(address_map &map);
 	template<int Chip> void rf5c68_map(address_map &map);
+	template<int Chip> void ym2608_map(address_map &map);
+	template<int Chip> void ym2610_adpcm_a_map(address_map &map);
+	template<int Chip> void ym2610_adpcm_b_map(address_map &map);
+	template<int Chip> void y8950_map(address_map &map);
 	template<int Chip> void ymf278b_map(address_map &map);
 	template<int Chip> void ymf271_map(address_map &map);
 	template<int Chip> void ymz280b_map(address_map &map);
@@ -538,6 +556,7 @@ void vgmplay_device::device_reset()
 		s.timer->enable(false);
 	}
 
+	m_sega32x_channel_hack = 0;
 	m_nes_apu_channel_hack[0] = 0;
 	m_nes_apu_channel_hack[1] = 0;
 }
@@ -624,6 +643,8 @@ void vgmplay_device::blocks_clear()
 		m_data_streams[i].clear();
 		m_data_stream_blocks[i].clear();
 	}
+
+	m_dec_table.entries.clear();
 }
 
 uint32_t vgmplay_device::handle_data_block(uint32_t address)
@@ -657,8 +678,10 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 			uint8_t cmp_sub_type = m_file->read_byte(m_pc + 0x0e);
 			uint16_t add_val = m_file->read_word(m_pc + 0x0f);
 
-			if (cmp_sub_type == 0x02)
-				osd_printf_error("unhandled n-bit compressed stream size %x->%x type %02x bit_dec %02x bit_cmp %02x unsupported cmp_sub_type %02x add_val %04x\n", size, out_size, type - 0x40, bit_dec, bit_cmp, cmp_sub_type, add_val);
+			if (cmp_sub_type == 0x02 && m_dec_table.entries.size() == 0)
+				osd_printf_error("invalid n-bit compressed stream, no decompression table\n");
+			else if (cmp_sub_type == 0x02 && (m_dec_table.cmp_type != cmp_type || m_dec_table.cmp_sub_type != cmp_sub_type || m_dec_table.bit_dec != bit_dec || m_dec_table.bit_cmp != bit_cmp ))
+				osd_printf_error("invalid n-bit compressed stream, decompression table mismatch\n");
 			else
 			{
 				int in_pos = 0x11 - 0x07;
@@ -705,8 +728,15 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 							out_val = in_val + add_val;
 						else if (cmp_sub_type == 1)
 							out_val = (in_val << (bit_dec - bit_cmp)) + add_val;
+						else if (cmp_sub_type == 2)
+						{
+							if (bit_dec <= 8)
+								out_val = m_dec_table.entries[in_val];
+							else if (bit_dec <= 16)
+								out_val = m_dec_table.entries[in_val << 1] | (m_dec_table.entries[(in_val << 1) + 1] << 8);
+						}
 						else
-							osd_printf_error("unhandled n-bit compressed stream size %x->%x type %02x bit_dec %02x bit_cmp %02x unsupported cmp_sub_type %02x add_val %04x\n", size, out_size, type - 0x40, bit_dec, bit_cmp, cmp_sub_type, add_val);
+							osd_printf_error("invalid n-bit compressed stream size %x->%x type %02x bit_dec %02x bit_cmp %02x unsupported cmp_sub_type %02x add_val %04x\n", size, out_size, type - 0x40, bit_dec, bit_cmp, cmp_sub_type, add_val);
 
 						for (int i = 0; i < bit_dec; i += 8)
 						{
@@ -726,9 +756,17 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 		else
 			osd_printf_error("unhandled unknown %02x compressed stream size %x->%x type %02x\n", cmp_type, size, out_size, type - 0x40);
 	}
-	else if (type < 0x80)
-		osd_printf_error("unhandled compression table size %x\n", size);
-
+	else if (type == 0x7f)
+	{
+		m_dec_table.cmp_type = m_file->read_byte(m_pc + 0x07);
+		m_dec_table.cmp_sub_type = m_file->read_byte(m_pc + 0x08);
+		m_dec_table.bit_dec = m_file->read_byte(m_pc + 0x09);
+		m_dec_table.bit_cmp = m_file->read_byte(m_pc + 0x0a);
+	
+		m_dec_table.entries.resize(m_file->read_word(m_pc + 0x0b) * ((m_dec_table.bit_dec + 7) / 8));
+		for (size_t i = 0; i < m_dec_table.entries.size(); i++)
+			m_dec_table.entries[i] = m_file->read_byte(m_pc + 0x0d + i);
+	}
 	else if (type < 0xc0)
 	{
 		uint32_t rom_size = m_file->read_dword(m_pc + 7);
@@ -787,7 +825,7 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	int second = (type & 0x80) ? 1 : 0;
 	type &= 0x7f;
 
-	if (m_data_streams.size() <= type || m_data_streams[type].size() <= src + size)
+	if (m_data_streams.size() <= type || m_data_streams[type].size() < src + size)
 		osd_printf_error("invalid pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
 	else if (type == 0x01 && !second)
 	{
@@ -825,13 +863,33 @@ TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 	else
 		offset += s.position * s.step_size * s.byte_depth;
 
-	if (offset + s.byte_depth >= m_data_streams[s.bank].size())
+	if (offset + s.byte_depth > m_data_streams[s.bank].size())
 	{
-		osd_printf_error("stream_timer_expired %02x: stream beyond end %u>=%u\n", param, offset, uint32_t(m_data_streams[s.bank].size()));
+		osd_printf_error("stream_timer_expired %02x: stream beyond end %d/%d %u>=%u\n", param, s.position, s.length, offset, uint32_t(m_data_streams[s.bank].size()));
 		s.timer->enable(false);
 	}
+	else if (s.chip_type == LED_YM2612)
+	{
+		m_io->write_byte(A_YM2612_0 + 0 + ((s.port & 1) << 1), s.reg);
+		m_io->write_byte(A_YM2612_0 + 1 + ((s.port & 1) << 1), m_data_streams[s.bank][offset]);
+	}
+	else if (s.chip_type == LED_YM2608)
+	{
+		m_io->write_byte(A_YM2608_0 + 0 + ((s.port & 1) << 1), s.reg);
+		m_io->write_byte(A_YM2608_0 + 1 + ((s.port & 1) << 1), m_data_streams[s.bank][offset]);
+	}
 	else if (s.chip_type == LED_32X_PWM)
+	{
+		if (m_sega32x_channel_hack >= 0)
+		{
+			osd_printf_error("bad rip detected, enabling sega32x channels\n");
+			m_io16->write_word(A_32X_PWM, 5);
+
+			m_sega32x_channel_hack = -2;
+		}
+
 		m_io16->write_word(A_32X_PWM + (s.reg << 1), ((m_data_streams[s.bank][offset + 1] & 0xf) << 8) | m_data_streams[s.bank][offset]);
+	}
 	else if (s.chip_type == LED_OKIM6258)
 		m_io->write_byte(A_OKIM6258_0 + s.reg, m_data_streams[s.bank][offset]);
 	else
@@ -1380,10 +1438,24 @@ void vgmplay_device::execute_run()
 				uint8_t offset = m_file->read_byte(m_pc + 1);
 				uint8_t data = m_file->read_byte(m_pc + 2);
 
-				if ((offset & 0xf0) == 0 && data == 0)
+				if (m_sega32x_channel_hack >= 0)
 				{
-					osd_printf_error("bad rip detected, enabling sega32x channels\n");
-					data |= 5;
+					if ((offset & 0xf0) == 0)
+					{
+						if (data != 0)
+							m_sega32x_channel_hack = -1;
+					}
+					else
+					{
+						m_sega32x_channel_hack++;
+						if (m_sega32x_channel_hack == 32)
+						{
+							osd_printf_error("bad rip detected, enabling sega32x channels\n");
+							m_io16->write_word(A_32X_PWM, 5);
+
+							m_sega32x_channel_hack = -2;
+						}
+					}
 				}
 
 				m_io16->write_word(A_32X_PWM + ((offset & 0xf0) >> 3), ((offset & 0xf) << 8) | data);
@@ -1431,11 +1503,11 @@ void vgmplay_device::execute_run()
 						}
 					}
 				}
-				else if ((offset & 0x7f) == 0x15 && m_nes_apu_channel_hack[chip] == -2 && (m_file->read_byte(m_pc + 2) & 0x1f) != 0)
-				{
-					osd_printf_error("bad rip false positive, late enabling nesapu.%d channels\n", chip);
-					m_nes_apu_channel_hack[chip] = -1;
-				}
+				//else if ((offset & 0x7f) == 0x15 && m_nes_apu_channel_hack[chip] == -2 && (m_file->read_byte(m_pc + 2) & 0x1f) != 0)
+				//{
+				//	osd_printf_error("bad rip false positive, late enabling nesapu.%d channels %x/%x\n", chip, m_pc, m_io->read_dword(REG_SIZE));
+				//	m_nes_apu_channel_hack[chip] = -1;
+				//}
 
 				if (offset & 0x80)
 					m_io->write_byte(A_NESAPU_1 + (offset & 0x7f), m_file->read_byte(m_pc + 2));
@@ -1963,7 +2035,7 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			"ymf278b.%d rom",
 			"ymf271.%d rom",
 			"ymz280b.%d rom",
-			"ymf278b.%d rom",
+			"ymf278b.%d ram",
 			"y8950.%d delta-t rom",
 			"multipcm.%d rom",
 			"upd7759.%d rom",
@@ -2008,7 +2080,7 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		}
 		else if (type < 0x7f)
 			util::stream_format(stream, "unknown%02x.%d stream comp. data-block %x", type - 0x40, second, size);
-		else if (type < 0x80)
+		else if (type == 0x7f)
 			util::stream_format(stream, "decomp-table %x, %02x/%02x", size, opcodes.r8(pc + 7), opcodes.r8(pc + 8));
 		else if (type < 0x94)
 		{
@@ -2065,27 +2137,27 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		return 1 | SUPPORTED;
 
 	case 0x90:
-		util::stream_format(stream, "stream control %02x %02x %02x %02x\n", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
+		util::stream_format(stream, "stream control %02x %02x %02x %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
 		return 5 | SUPPORTED;
 
 	case 0x91:
-		util::stream_format(stream, "stream data %02x %02x %02x %02x\n", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
+		util::stream_format(stream, "stream data %02x %02x %02x %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
 		return 5 | SUPPORTED;
 
 	case 0x92:
-		util::stream_format(stream, "stream frequency %02x %d\n", opcodes.r8(pc + 1), opcodes.r32(pc + 2));
+		util::stream_format(stream, "stream frequency %02x %d", opcodes.r8(pc + 1), opcodes.r32(pc + 2));
 		return 6 | SUPPORTED;
 
 	case 0x93:
-		util::stream_format(stream, "stream start %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4), opcodes.r8(pc + 5), opcodes.r8(pc + 6), opcodes.r8(pc + 7), opcodes.r8(pc + 8), opcodes.r8(pc + 9), opcodes.r8(pc + 10));
+		util::stream_format(stream, "stream start %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4), opcodes.r8(pc + 5), opcodes.r8(pc + 6), opcodes.r8(pc + 7), opcodes.r8(pc + 8), opcodes.r8(pc + 9), opcodes.r8(pc + 10));
 		return 11 | SUPPORTED;
 
 	case 0x94:
-		util::stream_format(stream, "stream stop %02x\n", opcodes.r8(pc + 1));
+		util::stream_format(stream, "stream stop %02x", opcodes.r8(pc + 1));
 		return 2 | SUPPORTED;
 
 	case 0x95:
-		util::stream_format(stream, "stream start short %02x %02x %02x %02x\n", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
+		util::stream_format(stream, "stream start short %02x %02x %02x %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2), opcodes.r8(pc + 3), opcodes.r8(pc + 4));
 		return 5 | SUPPORTED;
 
 	case 0xa0:
@@ -2308,6 +2380,24 @@ READ8_MEMBER(vgmplay_device::segapcm_rom_r)
 }
 
 template<int Chip>
+READ8_MEMBER(vgmplay_device::ym2608_rom_r)
+{
+	return rom_r(Chip, 0x81, offset);
+}
+
+template<int Chip>
+READ8_MEMBER(vgmplay_device::ym2610_adpcm_a_rom_r)
+{
+	return rom_r(Chip, 0x82, offset);
+}
+
+template<int Chip>
+READ8_MEMBER(vgmplay_device::ym2610_adpcm_b_rom_r)
+{
+	return rom_r(Chip, 0x83, offset);
+}
+
+template<int Chip>
 READ8_MEMBER(vgmplay_device::ymf278b_rom_r)
 {
 	return rom_r(Chip, 0x84, offset);
@@ -2323,6 +2413,12 @@ template<int Chip>
 READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
 {
 	return rom_r(Chip, 0x86, offset);
+}
+
+template<int Chip>
+READ8_MEMBER(vgmplay_device::y8950_rom_r)
+{
+	return rom_r(Chip, 0x88, offset);
 }
 
 template<int Chip>
@@ -3176,6 +3272,30 @@ void vgmplay_state::rf5c68_map(address_map &map)
 }
 
 template<int Chip>
+void vgmplay_state::ym2608_map(address_map &map)
+{
+	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::ym2608_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::ym2610_adpcm_a_map(address_map &map)
+{
+	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::ym2610_adpcm_a_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::ym2610_adpcm_b_map(address_map &map)
+{
+	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::ym2610_adpcm_b_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::y8950_map(address_map &map)
+{
+	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::y8950_rom_r<Chip>));
+}
+
+template<int Chip>
 void vgmplay_state::ymf278b_map(address_map &map)
 {
 	map(0, 0x3fffff).r("vgmplay", FUNC(vgmplay_device::ymf278b_rom_r<Chip>));
@@ -3360,21 +3480,27 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	// TODO: prevent error.log spew
 	YM2608(config, m_ym2608[0], 0);
+	m_ym2608[0]->set_addrmap(0, &vgmplay_state::ym2608_map<0>);
 	m_ym2608[0]->add_route(ALL_OUTPUTS, "lspeaker", 1);
 	m_ym2608[0]->add_route(ALL_OUTPUTS, "rspeaker", 1);
 
 	YM2608(config, m_ym2608[1], 0);
+	m_ym2608[1]->set_addrmap(0, &vgmplay_state::ym2608_map<1>);
 	m_ym2608[1]->add_route(ALL_OUTPUTS, "lspeaker", 1);
 	m_ym2608[1]->add_route(ALL_OUTPUTS, "rspeaker", 1);
 
 	// TODO: prevent error.log spew
 	YM2610(config, m_ym2610[0], 0);
+	m_ym2610[0]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<0>);
+	m_ym2610[0]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<0>);
 	m_ym2610[0]->add_route(0, "lspeaker", 0.25);
 	m_ym2610[0]->add_route(0, "rspeaker", 0.25);
 	m_ym2610[0]->add_route(1, "lspeaker", 0.50);
 	m_ym2610[0]->add_route(2, "rspeaker", 0.50);
 
 	YM2610(config, m_ym2610[1], 0);
+	m_ym2610[1]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<1>);
+	m_ym2610[1]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<1>);
 	m_ym2610[1]->add_route(0, "lspeaker", 0.25);
 	m_ym2610[1]->add_route(0, "rspeaker", 0.25);
 	m_ym2610[1]->add_route(1, "lspeaker", 0.50);
@@ -3397,10 +3523,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_ym3526[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	Y8950(config, m_y8950[0], 0);
+	m_y8950[0]->set_addrmap(0, &vgmplay_state::y8950_map<0>);
 	m_y8950[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
 	m_y8950[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
 	Y8950(config, m_y8950[1], 0);
+	m_y8950[1]->set_addrmap(0, &vgmplay_state::y8950_map<1>);
 	m_y8950[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
 	m_y8950[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
@@ -3693,13 +3821,6 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
-	// TODO: change sound cores to device_rom_interface
-	ROM_REGION( 0x80000, "ym2608.0", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "ym2608.1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "ym2610.0", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "ym2610.1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "y8950.0", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "y8950.1", ROMREGION_ERASE00 )
 	// TODO: split up 32x to remove dependencies
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )
 	ROM_REGION( 0x4000, "slave", ROMREGION_ERASE00 )

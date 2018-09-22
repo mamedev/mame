@@ -977,7 +977,7 @@ std::string m68k_disassembler::d68040_cinv()
 	if(limit.first)
 		return limit.second;
 
-	static const char *cachetype[4] = { "nop", "data", "inst", "both" };
+	static char const *const cachetype[4] = { "nop", "data", "inst", "both" };
 
 	switch((m_cpu_ir>>3)&3)
 	{
@@ -1241,7 +1241,7 @@ std::string m68k_disassembler::d68040_cpush()
 	if(limit.first)
 		return limit.second;
 
-	static const char *cachetype[4] = { "nop", "data", "inst", "both" };
+	static char const *const cachetype[4] = { "nop", "data", "inst", "both" };
 
 	switch((m_cpu_ir>>3)&3)
 	{

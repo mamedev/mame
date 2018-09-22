@@ -108,7 +108,7 @@ enum srrr_flags
 	srrr_rr_mask=0x1f
 };
 
-static const unsigned int /*sound_buffer_size=65536*4,*/
+static unsigned int const /*sound_buffer_size=65536*4,*/
 													xa_sector_size=(18*28*8)<<1,
 													xa_buffer_sectors=16,
 													cdda_sector_size=2352,
@@ -132,7 +132,7 @@ static const unsigned int /*sound_buffer_size=65536*4,*/
 //
 //
 
-static const int filter_coef[5][2]=
+static int const filter_coef[5][2]=
 {
 	{ 0,0 },
 	{ 60,0 },
@@ -160,7 +160,7 @@ static const int filter_coef[5][2]=
 		_name##"0-15",                    \
 		_name##"16-23"
 
-	static const char *spu_register_names[256]=
+	static char const *const spu_register_names[256]=
 	{
 		_voice_registers(0),
 		_voice_registers(1),

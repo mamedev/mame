@@ -76,7 +76,6 @@ spectrum_uspeech_device::spectrum_uspeech_device(const machine_config &mconfig, 
 
 void spectrum_uspeech_device::device_start()
 {
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
 }
 
 
