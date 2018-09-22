@@ -29188,17 +29188,21 @@ sws93                           // (c) 1993 (Japan)
 valkyrie                        // (c) 1989 (Japan)
 
 @source:namcos21.cpp
-aircomb                         // (c) 1992 (US)
-aircombj                        // (c) 1992 (Japan)
-cybsled                         // (c) 1993 (World)
-cybsledj                        // (c) 1993 (Japan)
-driveyes                        // (c) 1992?
-solvalou                        // (c) 1991 (Japan)
-starblad                        // (c) 1991 (World)
-starbladj                       // (c) 1991 (Japan)
 winrun                          // (c) 1988
 winrun91                        // (c) 1991
 winrungp                        // (c) 1989
+
+@source:namcos21_c67.cpp
+aircomb                         // (c) 1992 (US)
+aircombj                        // (c) 1992 (Japan)
+cybsled                         // (c) 1993 (World)
+cybsleda                        // (c) 1993 (World)
+solvalou                        // (c) 1991 (Japan)
+starblad                        // (c) 1991 (World)
+starbladj                       // (c) 1991 (Japan)
+
+@source:namcos21_de.cpp
+driveyes                        // (c) 1992?
 
 @source:namcos22.cpp
 acedrvrw                        // (c) 1994
@@ -36126,7 +36130,8 @@ suprlocoo                       // (c) 1982 Sega
 @source:suprnova.cpp
 cyvern                          // 1998.02 (c) 1998 Kaneko (US)
 cyvernj                         // 1998.02 (c) 1998 Kaneko (Japan)
-galpani4                        // 1996.09 (c) 1996 Kaneko (Japan)
+galpani4                        // 1996.09 (c) 1996 Kaneko (Europe)
+galpani4j                       // 1996.09 (c) 1996 Kaneko (Japan)
 galpani4k                       // 1996.09 (c) 1996 Kaneko (Korea)
 galpanidx                       // 1996.09 (c) 1996 Kaneko (Asia)
 galpanis                        // 1997.04 (c) 1997 Kaneko (Europe)

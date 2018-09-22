@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /****************************************************************************
 
-    Skeleton driver for Lee Data 1214 terminal.
+    Skeleton driver for Lee Data 1214 terminal (IBM 3278-compatible).
 
 ****************************************************************************/
 

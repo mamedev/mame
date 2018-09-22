@@ -272,7 +272,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		return 0;
 	}
 
-	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	const u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
 
 	rectangle curs;

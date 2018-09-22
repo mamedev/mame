@@ -40,8 +40,7 @@ private:
 
 void hazl1420_state::prog_map(address_map &map)
 {
-	map(0x000, 0x7ff).rom().region("maincpu", 0);
-	map(0x800, 0xfff).rom().region("maincpu_ea", 0x800);
+	map(0x000, 0xfff).rom().region("maincpu", 0);
 }
 
 void hazl1420_state::io_map(address_map &map)
@@ -58,6 +57,59 @@ u32 hazl1420_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 }
 
 static INPUT_PORTS_START(hazl1420)
+	// DIP switches are on access panel above keyboard
+	// "SW1" and "SW2" are not actual names
+
+	PORT_START("SW1")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR(Unused)) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(0x01, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x00, DEF_STR(Unused)) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(0x02, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x1c, 0x18, "Baud Rate") PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(0x00, "110")
+	PORT_DIPSETTING(0x04, "300")
+	PORT_DIPSETTING(0x08, "600")
+	PORT_DIPSETTING(0x0c, "1200")
+	PORT_DIPSETTING(0x10, "1800")
+	PORT_DIPSETTING(0x14, "2400")
+	PORT_DIPSETTING(0x18, "4800")
+	PORT_DIPSETTING(0x1c, "9600")
+	PORT_DIPNAME(0x20, 0x00, "Lead-In") PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(0x00, "ESC")
+	PORT_DIPSETTING(0x20, "~")
+	PORT_DIPNAME(0xc0, 0xc0, "Parity") PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(0x00, "Odd")
+	PORT_DIPSETTING(0x40, "Even")
+	PORT_DIPSETTING(0x80, "1")
+	PORT_DIPSETTING(0xc0, "0")
+
+	PORT_START("SW2")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR(Unused)) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(0x01, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x00, "Cursor") PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(0x00, "Wraparound")
+	PORT_DIPSETTING(0x02, "No Wrap")
+	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused)) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, "Font") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(0x08, "Upper/Lower Case")
+	PORT_DIPSETTING(0x00, "Upper Case Only")
+	PORT_DIPNAME(0x10, 0x10, "Communication Mode") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(0x00, "Half Duplex")
+	PORT_DIPSETTING(0x10, "Full Duplex")
+	PORT_DIPNAME(0x20, 0x20, "Automatic LF/CR") PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(0x20, "Auto LF")
+	PORT_DIPSETTING(0x00, "Carriage Return")
+	PORT_DIPNAME(0x40, 0x40, "On Line") PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(0x40, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x00, DEF_STR(Unused)) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(0x80, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
 
 void hazl1420_state::hazl1420(machine_config &config)
@@ -79,10 +131,11 @@ void hazl1420_state::hazl1420(machine_config &config)
 }
 
 ROM_START(hazl1420)
-	ROM_REGION(0x0800, "maincpu", 0)
+	ROM_REGION(0x0800, "maincpu_internal", 0)
+	// This internal ROM seems to belong to some earlier program revision
 	ROM_LOAD("8049h.u19", 0x0000, 0x0800, CRC(81beb6de) SHA1(f272d1277f100af92384a4c4cec2c9db9424b603))
 
-	ROM_REGION(0x1000, "maincpu_ea", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("2716.u10", 0x0000, 0x0800, CRC(7c40ba24) SHA1(7575225adf1a06d66b079efcf0f4f9ee77fbddd4))
 	ROM_LOAD("8316.u11", 0x0800, 0x0800, CRC(1c112f09) SHA1(fa4973e99c6d66809cffef009c4869787089a774))
 
