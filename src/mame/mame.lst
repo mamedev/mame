@@ -29188,17 +29188,21 @@ sws93                           // (c) 1993 (Japan)
 valkyrie                        // (c) 1989 (Japan)
 
 @source:namcos21.cpp
+winrun                          // (c) 1988
+winrun91                        // (c) 1991
+winrungp                        // (c) 1989
+
+@source:namcos21_c67.cpp
 aircomb                         // (c) 1992 (US)
 aircombj                        // (c) 1992 (Japan)
 cybsled                         // (c) 1993 (World)
 cybsleda                        // (c) 1993 (World)
-driveyes                        // (c) 1992?
 solvalou                        // (c) 1991 (Japan)
 starblad                        // (c) 1991 (World)
 starbladj                       // (c) 1991 (Japan)
-winrun                          // (c) 1988
-winrun91                        // (c) 1991
-winrungp                        // (c) 1989
+
+@source:namcos21_de.cpp
+driveyes                        // (c) 1992?
 
 @source:namcos22.cpp
 acedrvrw                        // (c) 1994
