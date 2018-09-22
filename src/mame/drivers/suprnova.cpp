@@ -1919,7 +1919,7 @@ ROM_END
 
 GAME( 1996, skns,      0,        skns,  skns,     skns_state, empty_init,     ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // sound ROM wasn't dumped, it's probably different
 GAME( 1996, galpani4j, galpani4, sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)",  MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?
@@ -1927,7 +1927,7 @@ GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  RO
 
 GAME( 1996, jjparads,  skns,     sknsj, skns_1p,  skns_state, init_jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // sound ROM wasn't dumped, it's probably different
+GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 1)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanise, galpanis, sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanisj, galpanis, sknsj, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanisk, galpanis, sknsk, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", MACHINE_IMPERFECT_GRAPHICS )
