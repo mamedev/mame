@@ -32,15 +32,6 @@ device_spectrum_expansion_interface::device_spectrum_expansion_interface(const m
 }
 
 
-//-------------------------------------------------
-//  ~device_spectrum_expansion_interface - destructor
-//-------------------------------------------------
-
-device_spectrum_expansion_interface::~device_spectrum_expansion_interface()
-{
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -52,18 +43,10 @@ device_spectrum_expansion_interface::~device_spectrum_expansion_interface()
 spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPECTRUM_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
+	m_io(nullptr),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
-{
-}
-
-
-//-------------------------------------------------
-//  expansion_slot_device - destructor
-//-------------------------------------------------
-
-spectrum_expansion_slot_device::~spectrum_expansion_slot_device()
 {
 }
 
@@ -101,6 +84,15 @@ void spectrum_expansion_slot_device::device_start()
 
 void spectrum_expansion_slot_device::device_reset()
 {
+}
+
+//-------------------------------------------------
+//  set_io_space - set address space we are attached to
+//-------------------------------------------------
+
+void spectrum_expansion_slot_device::set_io_space(address_space *io)
+{
+	m_io = io;
 }
 
 //-------------------------------------------------
