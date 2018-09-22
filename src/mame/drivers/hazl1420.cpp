@@ -40,8 +40,7 @@ private:
 
 void hazl1420_state::prog_map(address_map &map)
 {
-	map(0x000, 0x7ff).rom().region("maincpu", 0);
-	map(0x800, 0xfff).rom().region("maincpu_ea", 0x800);
+	map(0x000, 0xfff).rom().region("maincpu", 0);
 }
 
 void hazl1420_state::io_map(address_map &map)
@@ -132,10 +131,11 @@ void hazl1420_state::hazl1420(machine_config &config)
 }
 
 ROM_START(hazl1420)
-	ROM_REGION(0x0800, "maincpu", 0)
+	ROM_REGION(0x0800, "maincpu_internal", 0)
+	// This internal ROM seems to belong to some earlier program revision
 	ROM_LOAD("8049h.u19", 0x0000, 0x0800, CRC(81beb6de) SHA1(f272d1277f100af92384a4c4cec2c9db9424b603))
 
-	ROM_REGION(0x1000, "maincpu_ea", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("2716.u10", 0x0000, 0x0800, CRC(7c40ba24) SHA1(7575225adf1a06d66b079efcf0f4f9ee77fbddd4))
 	ROM_LOAD("8316.u11", 0x0800, 0x0800, CRC(1c112f09) SHA1(fa4973e99c6d66809cffef009c4869787089a774))
 
