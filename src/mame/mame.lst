@@ -15279,6 +15279,9 @@ hp64k                           //
 @source:hp700.cpp
 hp700_92                        //
 
+@source:hp9825.cpp
+hp9825b                         // HP 9825B
+
 @source:hp9845.cpp
 hp9835a                         //
 hp9835b                         //
