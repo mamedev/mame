@@ -21436,6 +21436,7 @@ qtono1                          // 25/12/1990 (QUIZ 3) (c) 1991 Capcom (Japan)
 sbbros                          // 01/10/1990 (c) 1990 Mitchell + Capcom (US) not listed on Capcom's site
 spang                           // 14/09/1990 (c) 1990 Mitchell (World)
 spangbl                         // bootleg
+spangbl2                        // bootleg
 spangj                          // --/--/1990 (c) 1990 Mitchell (Japan)
 
 @source:mits680b.cpp
