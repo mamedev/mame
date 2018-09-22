@@ -437,12 +437,13 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 	MCFG_TECMO_SPRITE_GFX_REGION(2)
-	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
-	MCFG_TECMO_MIXER_SHIFTS(8,10,4)
-	MCFG_TECMO_MIXER_BLENDCOLS(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_REGULARCOLS( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOURCE( 0x1000 + 0x000, 0x1000 + 0x100)
-	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
+
+	TECMO_MIXER(config, m_mixer, 0);
+	m_mixer->set_mixer_shifts(8,10,4);
+	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
+	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
+	m_mixer->set_blendsource( 0x1000 + 0x000, 0x1000 + 0x100);
+	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -491,12 +492,13 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 	MCFG_TECMO_SPRITE_GFX_REGION(2)
-	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
-	MCFG_TECMO_MIXER_SHIFTS(12,14,8)
-	MCFG_TECMO_MIXER_BLENDCOLS(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_REGULARCOLS( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOURCE( 0x1000 + 0x000, 0x1000 + 0x100)
-	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
+
+	TECMO_MIXER(config, m_mixer, 0);
+	m_mixer->set_mixer_shifts(12,14,8);
+	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
+	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
+	m_mixer->set_blendsource( 0x1000 + 0x000, 0x1000 + 0x100);
+	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
 
 	/* sound hardware  - different? */
 	SPEAKER(config, "mono").front_center();

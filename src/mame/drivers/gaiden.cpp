@@ -787,13 +787,13 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 	MCFG_TECMO_SPRITE_GFX_REGION(3)
 
-	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
-	MCFG_TECMO_MIXER_SHIFTS(10,9,4)
-	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
-	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOURCE( 0x0800 + 0x000, 0x0800 + 0x200)
-	MCFG_TECMO_MIXER_REVSPRITETILE
-	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x200)
+	TECMO_MIXER(config, m_mixer, 0);
+	m_mixer->set_mixer_shifts(10,9,4);
+	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
+	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
+	m_mixer->set_blendsource( 0x0800 + 0x000, 0x0800 + 0x200);
+	m_mixer->set_revspritetile();
+	m_mixer->set_bgpen(0x000 + 0x200, 0x400 + 0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
 

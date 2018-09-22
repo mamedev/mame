@@ -27,8 +27,10 @@ tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *ta
 		m_txregular_comp(0),
 		m_spregular_comp(0),
 
-		m_revspritetile(0),
-		m_bgpen(0)
+		m_bgpen(0),
+		m_bgpen_blend(0),
+
+		m_revspritetile(0)
 
 {
 }
@@ -178,10 +180,16 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					{
 						if (m_sprbln)
 						{
-							// needs if bgpixel & 0xf check?
-
-							//fg isn't used, sprite is used and blended with bg? -- used on trail of ball / flippers (looks odd)  -- some ninja gaiden enemy deaths (when behind fg) (looks ok?)  (maybe we need to check for colour saturation?)
-							dd[x] = sum_colors(paldata, bgpixel + m_bgblend_comp, sprpixel + m_spblend_source);
+							if (bgpixel & 0xf)
+							{
+								//fg isn't used, sprite is used and blended with bg? -- used on trail of ball / flippers (looks odd)  -- some ninja gaiden enemy deaths (when behind fg) (looks ok?)  (maybe we need to check for colour saturation?)
+								dd[x] = sum_colors(paldata, bgpixel + m_bgblend_comp, sprpixel + m_spblend_source);
+							}
+							else
+							{
+								//fg isn't used, sprite is used and blended with bg? -- used on trail of ball / flippers (looks odd)  -- some ninja gaiden enemy deaths (when behind fg) (looks ok?)  (maybe we need to check for colour saturation?)
+								dd[x] = sum_colors(paldata, m_bgpen_blend, sprpixel + m_spblend_source);
+							}
 						}
 						else
 						{
@@ -214,10 +222,16 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 									dd[x] = sum_colors(paldata, fgpixel + m_fgblend_comp, sprpixel + m_spblend_source);
 								}
 							}
-							else // needs if bgpixel & 0xf check?
+							else if (bgpixel & 0xf)
 							{
 								// blended sprite over solid bg pixel
 								dd[x] = sum_colors(paldata, bgpixel + m_bgblend_comp, sprpixel + m_spblend_source);
+								//  dd[x] = machine().rand();
+							}
+							else
+							{
+								// blended sprite over solid bg pixel
+								dd[x] = sum_colors(paldata, m_bgpen_blend, sprpixel + m_spblend_source);
 								//  dd[x] = machine().rand();
 							}
 						}
@@ -255,10 +269,15 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 								dd[x] = sum_colors(paldata, fgpixel + m_fgblend_comp, sprpixel + m_spblend_source);
 							}
 						}
-						else // needs if bgpixel & 0xf check?
+						else if (bgpixel & 0xf)
 						{
 							// blended sprite over solid bg pixel
 							dd[x] = sum_colors(paldata, bgpixel + m_bgblend_comp, sprpixel + m_spblend_source);
+						}
+						else
+						{
+							// blended sprite over solid bg pixel
+							dd[x] = sum_colors(paldata, m_bgpen_blend, sprpixel + m_spblend_source);
 						}
 					}
 					else
@@ -279,9 +298,14 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 				{
 					if (fgbln)
 					{
-						// needs if bgpixel & 0xf check?
-						dd[x] = sum_colors(paldata, fgpixel + m_fgblend_source, bgpixel + m_bgblend_comp);
-
+						if (bgpixel & 0x0f)
+						{
+							dd[x] = sum_colors(paldata, fgpixel + m_fgblend_source, bgpixel + m_bgblend_comp);
+						}
+						else
+						{
+							dd[x] = sum_colors(paldata, fgpixel + m_fgblend_source, m_bgpen_blend);
+						}
 					}
 					else
 					{
