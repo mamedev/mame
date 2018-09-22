@@ -3747,3 +3747,15 @@ if (MACHINES["IOPTIMER"]~=null) then
 		MAME_DIR .. "src/devices/machine/ioptimer.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sun4c_mmu.h,MACHINES["SUN4C_MMU"] = true
+---------------------------------------------------
+
+if (MACHINES["SUN4C_MMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sun4c_mmu.cpp",
+		MAME_DIR .. "src/devices/machine/sun4c_mmu.h",
+	}
+end

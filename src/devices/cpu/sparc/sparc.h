@@ -10,6 +10,7 @@
 #pragma once
 
 #include "sparcdasm.h"
+#include "sparc_intf.h"
 
 #define SPARCV8         (1)
 #define LOG_FCODES      (0)
@@ -22,28 +23,18 @@
 #define MCFG_SPARC_ADD_ASI_DESC(desc) \
 	downcast<mb86901_device &>(*device).add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(desc); });
 
-class mb86901_device : public cpu_device, protected sparc_disassembler::config
+class mb86901_device : public cpu_device, public sparc_mmu_host_interface, protected sparc_disassembler::config
 {
 public:
 	mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	enum
-	{
-		AS_COUNT = 32,
-
-		AS_START = 128,
-		AS_END = AS_START + (AS_COUNT - 1)
-	};
-
-	template <typename T> void set_asi_addrmap(int asi, T &&obj)
-	{
-		set_addrmap(asi + AS_START, std::forward<T>(obj));
-	}
+	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
+	virtual void device_resolve_objects() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override;
@@ -63,7 +54,7 @@ public:
 
 	uint8_t get_asi() { return 0; }
 	uint32_t pc() { return m_pc; }
-	void set_mae() { m_mae = 1; }
+	void set_mae() override { m_mae = 1; }
 
 	void add_asi_desc(std::function<void (sparc_disassembler *)> f) { m_asi_desc_adder = f; }
 
@@ -92,7 +83,7 @@ protected:
 	void execute_mul(uint32_t op);
 	void execute_div(uint32_t op);
 #endif
-	void execute_group2(uint32_t op);
+	inline void execute_group2(uint32_t op);
 
 	void execute_load(uint32_t op);
 	void execute_store(uint32_t op);
@@ -100,7 +91,7 @@ protected:
 #if SPARCV8
 	void execute_swap(uint32_t op);
 #endif
-	void execute_group3(uint32_t op);
+	inline void execute_group3(uint32_t op);
 
 	bool evaluate_condition(uint32_t op);
 	void execute_bicc(uint32_t op);
@@ -111,26 +102,33 @@ protected:
 	void complete_instruction_execution(uint32_t op);
 	inline void dispatch_instruction(uint32_t op);
 	void complete_fp_execution(uint32_t /*op*/);
-	void execute_step();
+	inline void execute_step();
 
 	void reset_step();
 	void error_step();
 
+	enum running_mode
+	{
+		MODE_RESET,
+		MODE_ERROR,
+		MODE_EXECUTE
+	};
+
+	template <bool CHECK_DEBUG, running_mode MODE> void run_loop();
 #if LOG_FCODES
 	void indent();
 	void disassemble_ss1_fcode(uint32_t r5, uint32_t opcode, uint32_t handler_base, uint32_t entry_point, uint32_t stack);
 	void log_fcodes();
 #endif
 
+	required_device<sparc_mmu_interface> m_mmu;
+
 	// address spaces
-	std::string m_asi_names[AS_COUNT];
-	address_space_config m_asi_config[AS_COUNT];
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_access_cache[AS_COUNT];
     address_space_config m_default_config;
 
 	// memory access
-	uint32_t read_sized_word(uint8_t asi, uint32_t address, int size);
-	void write_sized_word(uint8_t asi, uint32_t address, uint32_t data, int size);
+	uint32_t read_sized_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask);
+	void write_sized_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask);
 
 	// helpers for the disassembler
 	virtual uint64_t get_reg_r(unsigned index) const override;
@@ -209,6 +207,7 @@ protected:
 
 	bool m_alu_op3_assigned[64];
 	bool m_ldst_op3_assigned[64];
+	bool m_alu_setcc[64];
 
 	// register windowing helpers
 	uint32_t* m_regs[32];
@@ -220,13 +219,12 @@ protected:
 	bool m_annul;
 	bool m_hold_bus;
 	int m_icount;
-	int m_fetch_space;
+	int m_stashed_icount;
+	int m_insn_space;
+	int m_data_space;
 
 	// debugger helpers
 	uint32_t m_dbgregs[24];
-
-	// address spaces
-	address_space *m_space[32];
 
 #if LOG_FCODES
 	uint32_t m_ss1_next_pc;
