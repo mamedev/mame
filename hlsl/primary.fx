@@ -8,9 +8,9 @@
 // Macros
 //-----------------------------------------------------------------------------
 
-#define LUT_TEXTURE_WIDTH 4096
-#define LUT_SIZE 64
-#define LUT_SCALE float2(1.0 / LUT_TEXTURE_WIDTH, 1.0 / LUT_SIZE)
+#define LUT_TEXTURE_WIDTH 4096.0f
+#define LUT_SIZE 64.0f
+#define LUT_SCALE float2(1.0f / LUT_TEXTURE_WIDTH, 1.0f / LUT_SIZE)
 
 //-----------------------------------------------------------------------------
 // Sampler Definitions
@@ -47,9 +47,11 @@ sampler2D LutSampler = sampler_state
 
 float3 apply_lut(float3 color)
 {
-	float3 lutcoord = float3((color.rg * (LUT_SIZE - 1) + 0.5) *
-		LUT_SCALE, color.b * (LUT_SIZE - 1));
+	// NOTE: Do not change the order of parameters here.
+	float3 lutcoord = float3((color.rg * (LUT_SIZE - 1.0f) + 0.5f) *
+		LUT_SCALE, color.b * (LUT_SIZE - 1.0f));
 	float shift = floor(lutcoord.z);
+
 	lutcoord.x += shift * LUT_SCALE.y;
 	color.rgb = lerp(tex2D(LutSampler, lutcoord.xy).rgb, tex2D(LutSampler,
 		float2(lutcoord.x + LUT_SCALE.y, lutcoord.y)).rgb,

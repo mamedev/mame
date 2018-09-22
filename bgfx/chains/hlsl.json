@@ -115,7 +115,9 @@
 		{ "type": "float", "name": "round_corner",     "text": "Rounded Corner Amount",     "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "smooth_border",    "text": "Smooth Border Amount",      "default": 0.03, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "vignetting",       "text": "Vignetting Amount",         "default": 0.08, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "reflection",       "text": "Reflection Amount",         "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" }
+		{ "type": "float", "name": "reflection",       "text": "Reflection Amount",         "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+
+		{ "type": "intenum", "name": "lut_enable", "text": "3D LUT", "default": 0, "max": 1, "min": 0, "step": 1, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] }
 	],
 
 	// parameters (optional): A list of procedurally-generated parameters that can be bound to entry uniforms.
@@ -509,6 +511,39 @@
 			],
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{
+			"effect": "misc/lut",
+			"name": "Apply LUT",
+			"disablewhen": [
+				{
+					"type": "slider",
+					"condition": "equal",
+					"combine": "or",
+					"name": "adjustments",
+					"value": 0
+				},
+				{
+					"type": "slider",
+					"condition": "equal",
+					"combine": "or",
+					"name": "lut_enable",
+					"value": 0
+				}
+			],
+			"input": [
+				{
+					"sampler": "s_tex",
+					"target": "internal"
+				},
+				{
+					"sampler": "s_3dlut",
+					"option": "bgfx_lut",
+					"bilinear": true,
+					"selection": "LUT Texture"
+				}
 			],
 			"output": "internal"
 		},
