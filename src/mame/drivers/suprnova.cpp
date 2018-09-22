@@ -1140,7 +1140,7 @@ ROM_START( cyvernj )
 	ROM_LOAD( "cv300-00.u4", 0x000000, 0x400000, CRC(fbeda465) SHA1(4d5066a22f4589b6b7f85b3e77c348d900ac4bdd) )
 ROM_END
 
-ROM_START( galpani4 )
+ROM_START( galpani4 ) // only main CPU and plds dumps were provided
 	SKNS_EUROPE
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
@@ -1160,11 +1160,11 @@ ROM_START( galpani4 )
 	/* 0x040000 - 0x3fffff empty? */
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
-	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) )
+	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) // to be verified
 
-	ROM_REGION( 0x2000, "plds", 0 )
-	ROM_LOAD( "skns-r09.u9",  0x0000, 0x0bde, CRC(e13f0ece) SHA1(e2e353f2e7d98b111575373e982123dfd4f05281) ) // Atmel ATF16V8B
-	ROM_LOAD( "skns-r11.u11", 0x1000, 0x0bde, CRC(e8cd5b35) SHA1(784d8dc517153e0a0f316aaa825f8bf99f324b77) ) // Atmel ATF16V8B
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "skns-r09.u9",  0x000, 0x117, CRC(b02058d9) SHA1(77d07e0f329fb1969aa4543cd124e36ad34b07ba) ) // Atmel ATF16V8B
+	ROM_LOAD( "skns-r11.u11", 0x200, 0x117, CRC(a9f05af4) SHA1(018684c1f9f7c2e1c86f0cb2db2ec7fb02e35cd8) ) // Atmel ATF16V8B
 ROM_END
 
 ROM_START( galpani4j )
@@ -1927,7 +1927,7 @@ GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  RO
 
 GAME( 1996, jjparads,  skns,     sknsj, skns_1p,  skns_state, init_jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // sound ROM wasn't dumped, it's probably different
 GAME( 1997, galpanise, galpanis, sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanisj, galpanis, sknsj, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanisk, galpanis, sknsk, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", MACHINE_IMPERFECT_GRAPHICS )
