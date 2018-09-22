@@ -111,22 +111,22 @@ void scramble_state::ckongs_map(address_map &map)
 
 READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
 {
-	return m_ppi8255_0->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_0->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 READ8_MEMBER(scramble_state::mars_ppi8255_1_r)
 {
-	return m_ppi8255_1->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_1->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_0_w)
 {
-	m_ppi8255_0->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_0->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
 {
-	m_ppi8255_1->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_1->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 void scramble_state::mars_map(address_map &map)

@@ -251,9 +251,9 @@ WRITE8_MEMBER( idsa_state::ppi_control_w )
 {
 	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
 	if (!BIT(data, 2))
-		m_ppi[0]->write(space, data & 0x03, m_ppi_data);
+		m_ppi[0]->write(data & 0x03, m_ppi_data);
 	if (!BIT(data, 3))
-		m_ppi[1]->write(space, data & 0x03, m_ppi_data);
+		m_ppi[1]->write(data & 0x03, m_ppi_data);
 }
 
 WRITE8_MEMBER( idsa_state::ppi_data_w )

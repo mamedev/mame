@@ -162,7 +162,7 @@ INPUT_PORTS_END
 READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_a )
 {
 	// Read data from the Z80 PIU
-	return m_d71055c_1->read_pa();
+	return m_d71055c_1->pa_r();
 }
 
 WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_b )
@@ -210,7 +210,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_a )
 READ8_MEMBER( isa8_ibm_mfc_device::ppi1_i_b )
 {
 	// Read data from the PC PIU
-	return m_d71055c_0->read_pb();
+	return m_d71055c_0->pb_r();
 }
 
 WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )
@@ -285,7 +285,7 @@ READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 		case 0x2:
 		case 0x3:
 		{
-			val = m_d71055c_0->read(space, offset);
+			val = m_d71055c_0->read(offset);
 			break;
 		}
 
@@ -317,7 +317,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
 		case 0x3:
 		{
 			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(1000));
-			m_d71055c_0->write(space, offset, data);
+			m_d71055c_0->write(offset, data);
 			break;
 		}
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
 		case 0x6:
 		case 0x7:
 		{
-			m_d8253->write(space, offset & 3, data);
+			m_d8253->write(offset & 3, data);
 			break;
 		}
 

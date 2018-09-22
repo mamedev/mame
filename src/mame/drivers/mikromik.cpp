@@ -102,7 +102,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 3:
-			data = m_pit->read(space, offset & 0x03);
+			data = m_pit->read(offset & 0x03);
 			break;
 
 		case 4:
@@ -171,7 +171,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 3:
-			m_pit->write(space, offset & 0x03, data);
+			m_pit->write(offset & 0x03, data);
 			break;
 
 		case 4:

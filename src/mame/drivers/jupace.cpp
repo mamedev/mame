@@ -313,22 +313,22 @@ WRITE8_MEMBER( ace_state::io_w )
 
 READ8_MEMBER( ace_state::ppi_pa_r )
 {
-	return m_ppi->read(space, 0);
+	return m_ppi->read(0);
 }
 
 READ8_MEMBER( ace_state::ppi_pb_r )
 {
-	return m_ppi->read(space, 1);
+	return m_ppi->read(1);
 }
 
 READ8_MEMBER( ace_state::ppi_pc_r )
 {
-	return m_ppi->read(space, 2);
+	return m_ppi->read(2);
 }
 
 READ8_MEMBER( ace_state::ppi_control_r )
 {
-	return m_ppi->read(space, 3);
+	return m_ppi->read(3);
 }
 
 
@@ -338,22 +338,22 @@ READ8_MEMBER( ace_state::ppi_control_r )
 
 WRITE8_MEMBER( ace_state::ppi_pa_w )
 {
-	m_ppi->write(space, 0, data);
+	m_ppi->write(0, data);
 }
 
 WRITE8_MEMBER( ace_state::ppi_pb_w )
 {
-	m_ppi->write(space, 1, data);
+	m_ppi->write(1, data);
 }
 
 WRITE8_MEMBER( ace_state::ppi_pc_w )
 {
-	m_ppi->write(space, 2, data);
+	m_ppi->write(2, data);
 }
 
 WRITE8_MEMBER( ace_state::ppi_control_w )
 {
-	m_ppi->write(space, 3, data);
+	m_ppi->write(3, data);
 }
 
 

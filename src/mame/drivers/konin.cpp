@@ -106,21 +106,13 @@ void konin_state::konin_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
 	map(0x80, 0x83).lrw8("ioppi_rw",
-						 [this](address_space &space, offs_t offset, u8 mem_mask) {
-							 return m_ioppi->read(space, offset^3, mem_mask);
-						 },
-						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-							 m_ioppi->write(space, offset^3, data, mem_mask);
-						 });
+		[this](offs_t offset) { return m_ioppi->read(offset^3); },
+		[this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); });
 	map(0xf6, 0xf6).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf7, 0xf7).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf8, 0xfb).lrw8("iopit_rw",
-						 [this](address_space &space, offs_t offset, u8 mem_mask) {
-							 return m_iopit->read(space, offset^3, mem_mask);
-						 },
-						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-							 m_iopit->write(space, offset^3, data, mem_mask);
-						 });
+		[this](offs_t offset) { return m_iopit->read(offset^3); },
+		[this](offs_t offset, u8 data) { m_iopit->write(offset^3, data); });
 }
 
 /* Input ports */

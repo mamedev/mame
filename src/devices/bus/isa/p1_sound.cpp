@@ -95,32 +95,32 @@ p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag,
 
 READ8_MEMBER(p1_sound_device::d14_r)
 {
-	return m_d14->read(space, offset >> 1);
+	return m_d14->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d14_w)
 {
-	m_d14->write(space, offset >> 1, data);
+	m_d14->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::d16_r)
 {
-	return m_d16->read(space, offset >> 1);
+	return m_d16->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d16_w)
 {
-	m_d16->write(space, offset >> 1, data);
+	m_d16->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::d17_r)
 {
-	return m_d17->read(space, offset >> 1);
+	return m_d17->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d17_w)
 {
-	m_d17->write(space, offset >> 1, data);
+	m_d17->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::adc_r)
