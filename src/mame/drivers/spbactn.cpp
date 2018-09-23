@@ -365,9 +365,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_spbactn )
-	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout,   0x0200, 16 + 240 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x0300, 16 + 128 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x0000, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout, 0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout, 0x0300, 16 + 128 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x0000,    0x100 )
 GFXDECODE_END
 
 

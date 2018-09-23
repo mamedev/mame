@@ -319,42 +319,29 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	4096,   /* 4096 characters */
+	RGN_FRAC(1,1),   /* 4096 characters */
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every char takes 32 consecutive bytes */
+	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	4*8*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
 	16,16,  /* 16*16 tiles */
-	8192,   /* 8192 tiles */
+	RGN_FRAC(1,1),   /* 8192 tiles */
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	128*8   /* every sprite takes 128 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	8,8,    /* 8*8 sprites */
-	32768,  /* 32768 sprites */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
+	{ STEP8(0,4), STEP8(4*8*8,4) },
+	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	4*8*8*2*2   /* every tile takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_tecmo16 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   1*16*16, 16   )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 0x1000 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 0x1000   )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 1*16*16,    16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,       0, 0x100 )
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout,       0, 0x100 )
 GFXDECODE_END
 
 /******************************************************************************/
