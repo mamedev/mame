@@ -54,7 +54,7 @@ public:
 
 	uint8_t get_asi() { return 0; }
 	uint32_t pc() { return m_pc; }
-	void set_mae() override { m_mae = 1; }
+	void set_mae() override { m_mae = true; }
 
 	void add_asi_desc(std::function<void (sparc_disassembler *)> f) { m_asi_desc_adder = f; }
 
@@ -71,7 +71,6 @@ protected:
 	void execute_taddcc(uint32_t op);
 	void execute_sub(uint32_t op);
 	void execute_tsubcc(uint32_t op);
-	void execute_logical(uint32_t op);
 	void execute_shift(uint32_t op);
 	void execute_mulscc(uint32_t op);
 	void execute_rdsr(uint32_t op);
@@ -85,7 +84,25 @@ protected:
 #endif
 	inline void execute_group2(uint32_t op);
 
-	void execute_load(uint32_t op);
+	inline void execute_ldd(uint32_t op);
+	inline void execute_ld(uint32_t op);
+	inline void execute_ldsh(uint32_t op);
+	inline void execute_lduh(uint32_t op);
+	inline void execute_ldsb(uint32_t op);
+	inline void execute_ldub(uint32_t op);
+	inline void execute_lddfpr(uint32_t op);
+	inline void execute_ldfpr(uint32_t op);
+	inline void execute_ldfsr(uint32_t op);
+	inline void execute_lddcpr(uint32_t op);
+	inline void execute_ldcpr(uint32_t op);
+	inline void execute_ldcsr(uint32_t op);
+	inline void execute_ldda(uint32_t op);
+	inline void execute_lda(uint32_t op);
+	inline void execute_ldsha(uint32_t op);
+	inline void execute_lduha(uint32_t op);
+	inline void execute_ldsba(uint32_t op);
+	inline void execute_lduba(uint32_t op);
+
 	void execute_store(uint32_t op);
 	void execute_ldstub(uint32_t op);
 #if SPARCV8
@@ -93,8 +110,21 @@ protected:
 #endif
 	inline void execute_group3(uint32_t op);
 
+	enum set_cc
+	{
+		NOCC = 0,
+		USECC
+	};
+
+	template <set_cc SETCC> void execute_and(const uint32_t op);
+	template <set_cc SETCC> void execute_or(const uint32_t op);
+	template <set_cc SETCC> void execute_xor(const uint32_t op);
+	template <set_cc SETCC> void execute_andn(const uint32_t op);
+	template <set_cc SETCC> void execute_orn(const uint32_t op);
+	template <set_cc SETCC> void execute_xnor(const uint32_t op);
+
 	bool evaluate_condition(uint32_t op);
-	void execute_bicc(uint32_t op);
+	inline void execute_bicc(uint32_t op);
 	void execute_ticc(uint32_t op);
 	void select_trap();
 	void execute_trap();
@@ -216,7 +246,7 @@ protected:
 	bool m_privileged_asr[32];
 	bool m_illegal_instruction_asr[32];
 	bool m_mae;
-	bool m_annul;
+	bool m_no_annul;
 	bool m_hold_bus;
 	int m_icount;
 	int m_stashed_icount;

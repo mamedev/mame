@@ -286,7 +286,7 @@ void mb86901_device::device_start()
 	state_add(SPARC_WIM,        "WIM",      m_wim).formatstr("%08X");
 	state_add(SPARC_TBR,        "TBR",      m_tbr).formatstr("%08X");
 	state_add(SPARC_Y,          "Y",        m_y).formatstr("%08X");
-	state_add(SPARC_ANNUL,      "ANNUL",    m_annul).formatstr("%01u");
+	state_add(SPARC_ANNUL,      "ANNUL",    m_no_annul).formatstr("%01u");
 	state_add(SPARC_ICC,        "icc",      m_icc).formatstr("%4s");
 	state_add(SPARC_CWP,        "CWP",      m_cwp).formatstr("%2d");
 	char regname[3] = "g0";
@@ -385,7 +385,7 @@ void mb86901_device::device_start()
 	save_item(NAME(m_et));
 	save_item(NAME(m_cwp));
 	save_item(NAME(m_mae));
-	save_item(NAME(m_annul));
+	save_item(NAME(m_no_annul));
 	save_item(NAME(m_hold_bus));
 
 	// set our instruction counter
@@ -431,7 +431,7 @@ void mb86901_device::device_reset()
 
 	MAE = false;
 	HOLD_BUS = false;
-	m_annul = false;
+	m_no_annul = true;
 
 	PC = 0;
 	nPC = 4;
@@ -444,7 +444,6 @@ void mb86901_device::device_reset()
 
 	PSR = PSR_S_MASK | PSR_PS_MASK;
 	m_s = true;
-	m_insn_space = 9;
 	m_data_space = 11;
 
 	for (int i = 0; i < 8; i++)
@@ -517,6 +516,30 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
+		case SPARC_ANNUL:
+			str = string_format("%01u", m_no_annul ? 0 : 1);
+			break;
+		case SPARC_CWP:
+			str = string_format("%2u", PSR & PSR_CWP_MASK);
+			break;
+		case SPARC_EC:
+			str = string_format("%01u", PSR & PSR_EC_MASK ? 1 : 0);
+			break;
+		case SPARC_EF:
+			str = string_format("%01u", PSR & PSR_EF_MASK ? 1 : 0);
+			break;
+		case SPARC_ET:
+			str = string_format("%01u", PSR & PSR_ET_MASK ? 1 : 0);
+			break;
+		case SPARC_PS:
+			str = string_format("%01u", PSR & PSR_PS_MASK ? 1 : 0);
+			break;
+		case SPARC_S:
+			str = string_format("%01u", PSR & PSR_S_MASK ? 1 : 0);
+			break;
+		case SPARC_PIL:
+			str = string_format("%02u", (PSR & PSR_PIL_MASK) >> PSR_PIL_SHIFT);
+			break;
 		case SPARC_ICC:
 			str = string_format("%c%c%c%c", ICC_N_SET ? 'n' : ' ', ICC_Z_SET ? 'z' : ' ', ICC_V_SET ? 'v' : ' ', ICC_C_SET ? 'c' : ' ');
 			break;
@@ -678,7 +701,7 @@ void mb86901_device::execute_add(uint32_t op)
 	else if (ADDX || ADDXCC)
 		result = rs1 + operand2 + ICC_C;
 
-	if (RD != 0)
+	if (RDBITS)
 		RDREG = result;
 
 	if (ADDCC || ADDXCC)
@@ -742,6 +765,8 @@ void mb86901_device::execute_taddcc(uint32_t op)
 	{
 		m_trap = 1;
 		m_tag_overflow = true;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -752,7 +777,7 @@ void mb86901_device::execute_taddcc(uint32_t op)
 	PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
 			(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
-	if (RD != 0)
+	if (RDBITS)
 		RDREG = result;
 
 	PC = nPC;
@@ -798,7 +823,7 @@ void mb86901_device::execute_sub(uint32_t op)
 	else if (SUBX || SUBXCC)
 		result = rs1 - operand2 - ICC_C;
 
-	if (RD != 0)
+	if (RDBITS)
 		RDREG = result;
 
 	if (SUBCC || SUBXCC)
@@ -863,6 +888,8 @@ void mb86901_device::execute_tsubcc(uint32_t op)
 	{
 		m_trap = 1;
 		m_tag_overflow = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -873,7 +900,7 @@ void mb86901_device::execute_tsubcc(uint32_t op)
 	PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
 			(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
-	if (RD != 0)
+	if (RDBITS)
 		RDREG = result;
 
 	PC = nPC;
@@ -881,76 +908,39 @@ void mb86901_device::execute_tsubcc(uint32_t op)
 }
 
 
-//-------------------------------------------------
-//  execute_logical - execute a logical-type
-//  opcode, and/or/xor/andn/orn/xnor
-//-------------------------------------------------
+/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Logical Instructions" (SPARCv8.pdf, pg. 169)
 
-void mb86901_device::execute_logical(uint32_t op)
+operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
+
+if ( AND or  ANDcc) then result <- r[rs1] and operand2
+if (ANDN or ANDNcc) then result <- r[rs1] and not operand2
+if (  OR or   ORcc) then result <- r[rs1] or operand2
+if ( ORN or  ORNcc) then result <- r[rs1] or not operand2
+if ( XOR or  XORcc) then result <- r[rs1] xor operand2
+if (XNOR or XNORcc) then result <- r[rs1] xor not operand2;
+next;
+
+if (rd != 0) then r[rd] <- result;
+
+if (ANDcccc or ANDNcc or ORcc or ORNcc or XORcc or XNORcc) then (
+	N <- result<31>;
+	Z <- if (result = 0) then 1 else 0;
+	V <- 0
+	C <- 0
+);
+*/
+
+template <mb86901_device::set_cc SETCC>
+void mb86901_device::execute_and(const uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Logical Instructions" (SPARCv8.pdf, pg. 169)
-
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	if ( AND or  ANDcc) then result <- r[rs1] and operand2
-	if (ANDN or ANDNcc) then result <- r[rs1] and not operand2
-	if (  OR or   ORcc) then result <- r[rs1] or operand2
-	if ( ORN or  ORNcc) then result <- r[rs1] or not operand2
-	if ( XOR or  XORcc) then result <- r[rs1] xor operand2
-	if (XNOR or XNORcc) then result <- r[rs1] xor not operand2;
-	next;
-
-	if (rd != 0) then r[rd] <- result;
-
-	if (ANDcccc or ANDNcc or ORcc or ORNcc or XORcc or XNORcc) then (
-	    N <- result<31>;
-	    Z <- if (result = 0) then 1 else 0;
-	    V <- 0
-	    C <- 0
-	);
-	*/
-
-	const uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
-	const uint32_t op3 = OP3;
-
-	uint32_t result = 0;
-	switch (op3)
-	{
-		case OP3_AND:
-		case OP3_ANDCC:
-			result = RS1REG & operand2;
-			break;
-		case OP3_ANDN:
-		case OP3_ANDNCC:
-			result = RS1REG & ~operand2;
-			break;
-		case OP3_OR:
-		case OP3_ORCC:
-			result = RS1REG | operand2;
-			break;
-		case OP3_ORN:
-		case OP3_ORNCC:
-			result = RS1REG | ~operand2;
-			break;
-		case OP3_XOR:
-		case OP3_XORCC:
-			result = RS1REG ^ operand2;
-			break;
-		case OP3_XNOR:
-		case OP3_XNORCC:
-			result = RS1REG ^ ~operand2;
-			break;
-	}
-
-	if (RD != 0)
-		RDREG = result;
-
-	if (m_alu_setcc[op3])
+	const uint32_t result = RS1REG & (USEIMM ? SIMM13 : RS2REG);
+	if (RDBITS) RDREG = result;
+	if (SETCC)
 	{
 		CLEAR_ICC;
 		if (result & 0x80000000)
 			PSR |= PSR_N_MASK;
-		else if (result == 0)
+		else if (!result)
 			PSR |= PSR_Z_MASK;
 	}
 
@@ -958,6 +948,95 @@ void mb86901_device::execute_logical(uint32_t op)
 	nPC = nPC + 4;
 }
 
+template <mb86901_device::set_cc SETCC>
+void mb86901_device::execute_or(const uint32_t op)
+{
+	const uint32_t result = RS1REG | (USEIMM ? SIMM13 : RS2REG);
+	if (RDBITS) RDREG = result;
+	if (SETCC)
+	{
+		CLEAR_ICC;
+		if (result & 0x80000000)
+			PSR |= PSR_N_MASK;
+		else if (!result)
+			PSR |= PSR_Z_MASK;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+template <mb86901_device::set_cc SETCC>
+void mb86901_device::execute_xor(const uint32_t op)
+{
+	const uint32_t result = RS1REG ^ (USEIMM ? SIMM13 : RS2REG);
+	if (RDBITS) RDREG = result;
+	if (SETCC)
+	{
+		CLEAR_ICC;
+		if (result & 0x80000000)
+			PSR |= PSR_N_MASK;
+		else if (!result)
+			PSR |= PSR_Z_MASK;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+template <mb86901_device::set_cc SETCC>
+void mb86901_device::execute_andn(const uint32_t op)
+{
+	const uint32_t result = RS1REG & ~(USEIMM ? SIMM13 : RS2REG);
+	if (RDBITS) RDREG = result;
+	if (SETCC)
+	{
+		CLEAR_ICC;
+		if (result & 0x80000000)
+			PSR |= PSR_N_MASK;
+		else if (!result)
+			PSR |= PSR_Z_MASK;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+template <mb86901_device::set_cc SETCC>
+void mb86901_device::execute_orn(const uint32_t op)
+{
+	const uint32_t result = RS1REG | ~(USEIMM ? SIMM13 : RS2REG);
+	if (RDBITS) RDREG = result;
+	if (SETCC)
+	{
+		CLEAR_ICC;
+		if (result & 0x80000000)
+			PSR |= PSR_N_MASK;
+		else if (!result)
+			PSR |= PSR_Z_MASK;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+template <mb86901_device::set_cc SETCC>
+void mb86901_device::execute_xnor(const uint32_t op)
+{
+	const uint32_t result = RS1REG ^ ~(USEIMM ? SIMM13 : RS2REG);
+	if (RDBITS) RDREG = result;
+	if (SETCC)
+	{
+		CLEAR_ICC;
+		if (result & 0x80000000)
+			PSR |= PSR_N_MASK;
+		else if (!result)
+			PSR |= PSR_Z_MASK;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
 
 //-------------------------------------------------
 //  execute_shift - execute a shift-type opcode,
@@ -979,12 +1058,15 @@ void mb86901_device::execute_shift(uint32_t op)
 	*/
 	uint32_t shift_count = USEIMM ? (SIMM13 & 31) : (RS2REG & 31);
 
-	if (SLL && RD != 0)
-		RDREG = RS1REG << shift_count;
-	else if (SRL && RD != 0)
-		RDREG = uint32_t(RS1REG) >> shift_count;
-	else if (SRA && RD != 0)
-		RDREG = int32_t(RS1REG) >> shift_count;
+	if (RDBITS)
+	{
+		if (SLL)
+			RDREG = RS1REG << shift_count;
+		else if (SRL)
+			RDREG = uint32_t(RS1REG) >> shift_count;
+		else if (SRA)
+			RDREG = int32_t(RS1REG) >> shift_count;
+	}
 
 	PC = nPC;
 	nPC = nPC + 4;
@@ -1027,7 +1109,7 @@ void mb86901_device::execute_mulscc(uint32_t op)
 	uint32_t result = operand1 + operand2;
 	Y = ((RS1REG & 1) ? 0x80000000 : 0) | (Y >> 1);
 
-	if (RD != 0)
+	if (RDBITS)
 		RDREG = result;
 
 	CLEAR_ICC;
@@ -1072,16 +1154,20 @@ void mb86901_device::execute_rdsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 	else if (m_illegal_instruction_asr[RS1])
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
-	if (RD != 0)
+	if (RDBITS)
 	{
 		if (RDASR)
 		{
@@ -1171,12 +1257,16 @@ void mb86901_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 		else if (m_illegal_instruction_asr[RD])
 		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 		else
@@ -1192,12 +1282,16 @@ void mb86901_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 		else if ((result & 31) >= NWINDOWS)
 		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 
@@ -1209,12 +1303,10 @@ void mb86901_device::execute_wrsr(uint32_t op)
 		m_s = PSR & PSR_S_MASK;
 		if (m_s)
 		{
-			m_insn_space = 9;
 			m_data_space = 11;
 		}
 		else
 		{
-			m_insn_space = 8;
 			m_data_space = 10;
 		}
 
@@ -1227,6 +1319,8 @@ void mb86901_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 
@@ -1240,6 +1334,8 @@ void mb86901_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 
@@ -1306,6 +1402,8 @@ void mb86901_device::execute_rett(uint32_t op)
 		{
 			m_illegal_instruction = 1;
 		}
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 	else if (IS_USER)
@@ -1354,14 +1452,12 @@ void mb86901_device::execute_rett(uint32_t op)
 	{
 		PSR |= PSR_S_MASK;
 		m_s = true;
-		m_insn_space = 9;
 		m_data_space = 11;
 	}
 	else
 	{
 		PSR &= ~PSR_S_MASK;
 		m_s = false;
-		m_insn_space = 8;
 		m_data_space = 10;
 	}
 
@@ -1418,6 +1514,8 @@ void mb86901_device::execute_saverestore(uint32_t op)
 		{
 			m_trap = 1;
 			m_window_overflow = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 
@@ -1432,6 +1530,8 @@ void mb86901_device::execute_saverestore(uint32_t op)
 		{
 			m_trap = 1;
 			m_window_underflow = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 
@@ -1442,7 +1542,7 @@ void mb86901_device::execute_saverestore(uint32_t op)
 
 	update_gpr_pointers();
 
-	if (RD != 0)
+	if (RDBITS)
 		RDREG = result;
 
 	PC = nPC;
@@ -1476,10 +1576,12 @@ void mb86901_device::execute_jmpl(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 	}
 	else
 	{
-		if (RD != 0)
+		if (RDBITS)
 			RDREG = PC;
 		PC = nPC;
 		nPC = jump_address;
@@ -1521,18 +1623,40 @@ inline void mb86901_device::execute_group2(uint32_t op)
 			break;
 
 		case OP3_AND:
+			execute_and<NOCC>(op);
+			break;
 		case OP3_OR:
+			execute_or<NOCC>(op);
+			break;
 		case OP3_XOR:
+			execute_xor<NOCC>(op);
+			break;
 		case OP3_ANDN:
+			execute_andn<NOCC>(op);
+			break;
 		case OP3_ORN:
+			execute_orn<NOCC>(op);
+			break;
 		case OP3_XNOR:
+			execute_xnor<NOCC>(op);
+			break;
 		case OP3_ANDCC:
+			execute_and<USECC>(op);
+			break;
 		case OP3_ORCC:
+			execute_or<USECC>(op);
+			break;
 		case OP3_XORCC:
+			execute_xor<USECC>(op);
+			break;
 		case OP3_ANDNCC:
+			execute_andn<USECC>(op);
+			break;
 		case OP3_ORNCC:
+			execute_orn<USECC>(op);
+			break;
 		case OP3_XNORCC:
-			execute_logical(op);
+			execute_xnor<USECC>(op);
 			break;
 
 		case OP3_MULSCC:
@@ -1566,6 +1690,8 @@ inline void mb86901_device::execute_group2(uint32_t op)
 				//printf("fpop @ %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_fp_disabled = 1;
+				m_stashed_icount = m_icount;
+				m_icount = 0;
 			}
 			complete_fp_execution(op);
 			return;
@@ -1613,6 +1739,8 @@ inline void mb86901_device::execute_group2(uint32_t op)
 			logerror("fpop @ %08x: %08x\n", PC, op);
 			m_trap = 1;
 			m_cp_disabled = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 #endif
 
@@ -1620,6 +1748,8 @@ inline void mb86901_device::execute_group2(uint32_t op)
 			logerror("illegal instruction at %08x: %08x\n", PC, op);
 			m_trap = 1;
 			m_illegal_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			break;
 	}
 }
@@ -1772,12 +1902,16 @@ void mb86901_device::execute_store(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 	else if (USEIMM && (STDA || STA || STHA || STBA))
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -1797,18 +1931,24 @@ void mb86901_device::execute_store(uint32_t op)
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 	if ((STC || STDC || STCSR || STDCQ) && (!(PSR & PSR_EC_MASK) || !m_bp_cp_present))
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
 	if ((STH || STHA) && ((address & 1) != 0))
 	{
 		m_trap = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		m_mem_address_not_aligned = 1;
 		return;
 	}
@@ -1816,12 +1956,16 @@ void mb86901_device::execute_store(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 	else if ((STD || STDA || STDF || STDFQ || STDC || STDCQ) && ((address & 7) != 0))
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -1831,6 +1975,8 @@ void mb86901_device::execute_store(uint32_t op)
 		m_trap = 1;
 		m_fp_exception = 1;
 		m_ftt = m_fpu_sequence_err;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 	if (STDCQ)
@@ -1838,6 +1984,8 @@ void mb86901_device::execute_store(uint32_t op)
 		// assume no coprocessor queue for now
 		m_trap = 1;
 		m_cp_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		// { possibly additional implementation-dependent actions }
 		return;
 	}
@@ -1846,6 +1994,8 @@ void mb86901_device::execute_store(uint32_t op)
 		m_trap = 1;
 		m_fp_exception = 1;
 		m_ftt = 0xff;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -1950,6 +2100,8 @@ void mb86901_device::execute_store(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -1982,6 +2134,8 @@ void mb86901_device::execute_store(uint32_t op)
 		{
 			m_trap = 1;
 			m_data_access_exception = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 	}
@@ -1990,761 +2144,925 @@ void mb86901_device::execute_store(uint32_t op)
 	nPC = nPC + 4;
 }
 
-//-------------------------------------------------
-//  execute_load - execute a load-type opcode
-//-------------------------------------------------
+/* The SPARC Instruction Manual: Version 8, page 163, "Appendix C - ISP Descriptions - C.9. Instruction Defintions - Load Instructions" (SPARCv8.pdf, pg. 160)
 
-void mb86901_device::execute_load(uint32_t op)
-{
-	/* The SPARC Instruction Manual: Version 8, page 163, "Appendix C - ISP Descriptions - C.9. Instruction Defintions - Load Instructions" (SPARCv8.pdf, pg. 160)
-
-	if (LDD or LD or LDSH or LDUH or LDSB or LDUB or LDDF or LDF or LDFSR or LDDC or LDC or LDCSR) then (
-	    address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-	    addr_space <- (if (S = 0) then 10 else 11)
-	) else if (LDDA or LDA or LDSHA or LDUHA or LDSBA or LDUBA) then (
-	    if (S = 0) then (
-	        trap <- 1;
-	        privileged_instruction <- 1
-	    ) else if (i = 1) then (
-	        trap <- 1;
-	        illegal_instruction <- 1
-	    ) else (
-	        address <- r[rs1] + r[rs2];
-	        addr_space <- asi
-	    )
+if (LDD or LD or LDSH or LDUH or LDSB or LDUB or LDDF or LDF or LDFSR or LDDC or LDC or LDCSR) then (
+	address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
+	addr_space <- (if (S = 0) then 10 else 11)
+) else if (LDDA or LDA or LDSHA or LDUHA or LDSBA or LDUBA) then (
+	if (S = 0) then (
+		trap <- 1;
+		privileged_instruction <- 1
+	) else if (i = 1) then (
+		trap <- 1;
+		illegal_instruction <- 1
+	) else (
+		address <- r[rs1] + r[rs2];
+		addr_space <- asi
 	)
+)
+next;
+if (trap = 0) then (
+	if ( (LDF or LDDF or LDFSR) and ((EF = 0) or (bp_FPU_present = 0)) then (
+		trap <- 1;
+		fp_disabled <- 1
+	) else if ( (LDC or LDDC or LDCSR) and ((EC = 0) or (bp_CP_present = 0)) then (
+		trap <- 1;
+		cp_disabled <- 1
+	) else if ( ( (LDD or LDDA or LDDF or LDDC) and (address<2:0> != 0)) or
+		((LD or LDA or LDF or LDFSR or LDC or LDCSR) and (address<1:0> != 0)) or
+		((LDSH or LDSHA or LDUH or LDUHA) and address<0> != 0) ) then (
+		trap <- 1;
+		mem_address_not_aligned <- 1
+	) else if (LDDF and (rd<0> != 0)) then (
+		trap <- 1;
+		fp_exception <- 1;
+		ftt <- invalid_fpr_register
+	) else if ((LDF or LDDF or LDFSR) and (an FPU sequence error is detected)) then (
+		trap <- 1;
+		fp_exception <- 1;
+		ftt <- sequence_error
+	) else if ((LDC or LDDC or LDCSR) and (a CP sequence error is detected)) then (
+		trap <- 1;
+		cp_exception <- 1;
+		{ possibly additional implementation-dependent actions }
+	)
+);
+next;
+if (trap = 0) then {
+	(data, MAE) <- memory_read(addr_space, address);
 	next;
-	if (trap = 0) then (
-	    if ( (LDF or LDDF or LDFSR) and ((EF = 0) or (bp_FPU_present = 0)) then (
-	        trap <- 1;
-	        fp_disabled <- 1
-	    ) else if ( (LDC or LDDC or LDCSR) and ((EC = 0) or (bp_CP_present = 0)) then (
-	        trap <- 1;
-	        cp_disabled <- 1
-	    ) else if ( ( (LDD or LDDA or LDDF or LDDC) and (address<2:0> != 0)) or
-	        ((LD or LDA or LDF or LDFSR or LDC or LDCSR) and (address<1:0> != 0)) or
-	        ((LDSH or LDSHA or LDUH or LDUHA) and address<0> != 0) ) then (
-	        trap <- 1;
-	        mem_address_not_aligned <- 1
-	    ) else if (LDDF and (rd<0> != 0)) then (
-	        trap <- 1;
-	        fp_exception <- 1;
-	        ftt <- invalid_fpr_register
-	    ) else if ((LDF or LDDF or LDFSR) and (an FPU sequence error is detected)) then (
-	        trap <- 1;
-	        fp_exception <- 1;
-	        ftt <- sequence_error
-	    ) else if ((LDC or LDDC or LDCSR) and (a CP sequence error is detected)) then (
-	        trap <- 1;
-	        cp_exception <- 1;
-	        { possibly additional implementation-dependent actions }
-	    )
-	);
+	if (MAE = 1) then (
+		trap <- 1;
+		data_access_exception <- 1;
+	) else (
+		if (LDSB or LDSBA or LDUB or LDUBA) then (
+			if      (address<1:0> = 0) then byte <- data<31:24>
+			else if (address<1:0> = 1) then byte <- data<23:16>
+			else if (address<1:0> = 2) then byte <- data<15: 8>
+			else if (address<1:0> = 3) then byte <- data< 7: 0>
+			next;
+			if (LDSB or LDSBA) then
+				word0 <- sign_extend_byte(byte)
+			else
+				word0 <- zero_extend_byte(byte)
+		) else if (LDSH or LDSHA or LDUH or LDUHA) then (
+			if      (address<1:0> = 0) then halfword <- data<31:16>
+			else if (address<1:0> = 2) then halfword <- data<15: 0>
+			next;
+			if (LDSH or LDSHA) then
+				word0 <- sign_extend_halfword(halfword)
+			else
+				word0 <- zero_extend_halfword(halfword)
+		) else
+			word0 <- data
+	)
+);
+next;
+if (trap = 0) then (
+	if ( (rd != 0) and (LD or LDA or LDSH or LDSHA
+		or LDUHA or LDUH or LDSB or LDSBA or LDUB or LDUBA) ) then
+			r[rd] <- word0
+	else if (LDF) then f[rd] <- word0
+	else if (LDC) then { implementation-dependent actions }
+	else if (LDFSR) then FSR <- word0
+	else if (LDCSR) then CSR <- word0
+	else if (LDD or LDDA) then r[rd and 11110] <- word0
+	else if (LDDF) then f[rd and 11110] <- word0
+	else if (LDDC) then { implementation-dependent actions }
+);
+next;
+if (((trap = 0) and (LDD or LDDA or LDDF or LDDC)) then (
+	(word1, MAE) <- memory_read(addr_space, address + 4);
 	next;
-	if (trap = 0) then {
-	    (data, MAE) <- memory_read(addr_space, address);
-	    next;
-	    if (MAE = 1) then (
-	        trap <- 1;
-	        data_access_exception <- 1;
-	    ) else (
-	        if (LDSB or LDSBA or LDUB or LDUBA) then (
-	            if      (address<1:0> = 0) then byte <- data<31:24>
-	            else if (address<1:0> = 1) then byte <- data<23:16>
-	            else if (address<1:0> = 2) then byte <- data<15: 8>
-	            else if (address<1:0> = 3) then byte <- data< 7: 0>
-	            next;
-	            if (LDSB or LDSBA) then
-	                word0 <- sign_extend_byte(byte)
-	            else
-	                word0 <- zero_extend_byte(byte)
-	        ) else if (LDSH or LDSHA or LDUH or LDUHA) then (
-	            if      (address<1:0> = 0) then halfword <- data<31:16>
-	            else if (address<1:0> = 2) then halfword <- data<15: 0>
-	            next;
-	            if (LDSH or LDSHA) then
-	                word0 <- sign_extend_halfword(halfword)
-	            else
-	                word0 <- zero_extend_halfword(halfword)
-	        ) else
-	            word0 <- data
-	    )
-	);
-	next;
-	if (trap = 0) then (
-	    if ( (rd != 0) and (LD or LDA or LDSH or LDSHA
-	        or LDUHA or LDUH or LDSB or LDSBA or LDUB or LDUBA) ) then
-	            r[rd] <- word0
-	    else if (LDF) then f[rd] <- word0
-	    else if (LDC) then { implementation-dependent actions }
-	    else if (LDFSR) then FSR <- word0
-	    else if (LDCSR) then CSR <- word0
-	    else if (LDD or LDDA) then r[rd and 11110] <- word0
-	    else if (LDDF) then f[rd and 11110] <- word0
-	    else if (LDDC) then { implementation-dependent actions }
-	);
-	next;
-	if (((trap = 0) and (LDD or LDDA or LDDF or LDDC)) then (
-	    (word1, MAE) <- memory_read(addr_space, address + 4);
-	    next;
-	    if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
-	        trap <- 1;
-	        data_access_exception <- 1 )
-	    else if (LDD or LDDA) then r[rd or 1] <- word1
-	    else if (LDDF) then f[rd or 1] <- word1
-	    else if (LDDC) then { implementation-dependent actions }
-	);
-	*/
+	if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
+		trap <- 1;
+		data_access_exception <- 1 )
+	else if (LDD or LDDA) then r[rd or 1] <- word1
+	else if (LDDF) then f[rd or 1] <- word1
+	else if (LDDC) then { implementation-dependent actions }
+);
+*/
+
+inline void mb86901_device::execute_ldd(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (address & 7)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+	}
+
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+		RDREG = data;
+
+	const uint32_t word1 = m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	REG(RD | 1) = word1;
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ld(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+		RDREG = data;
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldsh(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (address & 1)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
 
 	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
-	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask16[address & 2]);
 
-	switch (OP3)
+	if (m_mae)
 	{
-		case OP3_LDD:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (address & 7)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-			}
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-				RDREG = data;
-
-			const uint32_t word1 = m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			REG(RD | 1) = word1;
-			break;
-		}
-		case OP3_LD:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (address & 3)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-				RDREG = data;
-			break;
-		}
-		case OP3_LDSH:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (address & 1)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask16[address & 2]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = (int32_t)data >> 16;
-				else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 16;
-			}
-			break;
-		}
-		case OP3_LDUH:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (address & 1)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask16[address & 2]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = data >> 16;
-				else if ((address & 3) == 2) RDREG = data & 0xffff;
-			}
-			break;
-		}
-		case OP3_LDSB:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask8[address & 3]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = (int32_t)data >> 24;
-				else if ((address & 3) == 1) RDREG = ((int32_t)data << 8) >> 24;
-				else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 24;
-				else if ((address & 3) == 3) RDREG = ((int32_t)data << 24) >> 24;
-			}
-			break;
-		}
-		case OP3_LDUB:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask8[address & 3]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = data >> 24;
-				else if ((address & 3) == 1) RDREG = (data >> 16) & 0xff;
-				else if ((address & 3) == 2) RDREG = (data >>  8) & 0xff;
-				else if ((address & 3) == 3) RDREG = data & 0xff;
-			}
-			break;
-		}
-		case OP3_LDDFPR:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0)
-			{
-				m_trap = 1;
-				m_fp_disabled = 1;
-				return;
-			}
-
-			if (address & 7)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			if (RD & 1)
-			{
-				m_trap = 1;
-				m_fp_exception = 1;
-				m_ftt = 0xff;
-				return;
-			}
-
-			if (m_fpu_sequence_err)
-			{
-				m_trap = 1;
-				m_fp_exception = 1;
-				m_ftt = m_fpu_sequence_err;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			FREG(RD & 0x1e) = data;
-
-			const uint32_t word1 = m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			FREG(RD | 1) = word1;
-			break;
-		}
-		case OP3_LDFPR:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0)
-			{
-				m_trap = 1;
-				m_fp_disabled = 1;
-				return;
-			}
-
-			if (address & 3)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			if (m_fpu_sequence_err)
-			{
-				m_trap = 1;
-				m_fp_exception = 1;
-				m_ftt = m_fpu_sequence_err;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			FDREG = data;
-			break;
-		}
-		case OP3_LDFSR:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0)
-			{
-				m_trap = 1;
-				m_fp_disabled = 1;
-				return;
-			}
-
-			if (address & 3)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			if (m_fpu_sequence_err)
-			{
-				m_trap = 1;
-				m_fp_exception = 1;
-				m_ftt = m_fpu_sequence_err;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			FSR = data;
-			break;
-		}
-		case OP3_LDDCPR:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (!(PSR & PSR_EC_MASK) || !m_bp_cp_present)
-			{
-				m_trap = 1;
-				m_cp_disabled = 1;
-				return;
-			}
-
-			if (address & 7)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			if (m_cp_sequence_err)
-			{
-				m_trap = 1;
-				m_cp_exception = 1;
-				// possibly additional implementation-dependent actions
-				return;
-			}
-
-			m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			// implementation-dependent actions
-
-			m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			// implementation-dependent actions
-			break;
-		}
-		case OP3_LDCPR:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (!(PSR & PSR_EC_MASK) || !m_bp_cp_present)
-			{
-				m_trap = 1;
-				m_cp_disabled = 1;
-				return;
-			}
-
-			if (address & 3)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			if (m_cp_sequence_err)
-			{
-				m_trap = 1;
-				m_cp_exception = 1;
-				// possibly additional implementation-dependent actions
-				return;
-			}
-
-			m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			// implementation-dependent actions
-			break;
-		}
-		case OP3_LDCSR:
-		{
-			const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-
-			if (!(PSR & PSR_EC_MASK) || !m_bp_cp_present)
-			{
-				m_trap = 1;
-				m_cp_disabled = 1;
-				return;
-			}
-
-			if (address & 3)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			if (m_cp_sequence_err)
-			{
-				m_trap = 1;
-				m_cp_exception = 1;
-				// possibly additional implementation-dependent actions
-				return;
-			}
-
-			m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
-
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			// implementation-dependent actions
-			break;
-		}
-		case OP3_LDDA:
-		{
-			if (IS_USER)
-			{
-				m_trap = 1;
-				m_privileged_instruction = 1;
-				return;
-			}
-			else if (USEIMM)
-			{
-				m_trap = 1;
-				m_illegal_instruction = 1;
-				return;
-			}
-
-			const uint32_t address = RS1REG + RS2REG;
-			const uint32_t addr_space = ASI;
-
-			if (address & 7)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(addr_space, address >> 2, 0xffffffff);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-				RDREG = data;
-
-			uint32_t word1 = m_mmu->read_asi(addr_space, (address + 4) >> 2, 0xffffffff);
-			if (MAE)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			REG(RD | 1) = word1;
-			break;
-		}
-		case OP3_LDA:
-		{
-			if (IS_USER)
-			{
-				m_trap = 1;
-				m_privileged_instruction = 1;
-				return;
-			}
-			else if (USEIMM)
-			{
-				m_trap = 1;
-				m_illegal_instruction = 1;
-				return;
-			}
-
-			const uint32_t address = RS1REG + RS2REG;
-
-			if (address & 3)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(ASI, address >> 2, 0xffffffff);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-				RDREG = data;
-			break;
-		}
-		case OP3_LDSHA:
-		{
-			if (IS_USER)
-			{
-				m_trap = 1;
-				m_privileged_instruction = 1;
-				return;
-			}
-			else if (USEIMM)
-			{
-				m_trap = 1;
-				m_illegal_instruction = 1;
-				return;
-			}
-
-			const uint32_t address = RS1REG + RS2REG;
-
-			if (address & 1)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask16[address & 2]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = (int32_t)data >> 16;
-				else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 16;
-			}
-			break;
-		}
-		case OP3_LDUHA:
-		{
-			if (IS_USER)
-			{
-				m_trap = 1;
-				m_privileged_instruction = 1;
-				return;
-			}
-			else if (USEIMM)
-			{
-				m_trap = 1;
-				m_illegal_instruction = 1;
-				return;
-			}
-
-			const uint32_t address = RS1REG + RS2REG;
-			if (address & 1)
-			{
-				m_trap = 1;
-				m_mem_address_not_aligned = 1;
-				return;
-			}
-
-			const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask16[address & 2]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = data >> 16;
-				else if ((address & 3) == 2) RDREG = data & 0xffff;
-			}
-			break;
-		}
-		case OP3_LDSBA:
-		{
-			if (IS_USER)
-			{
-				m_trap = 1;
-				m_privileged_instruction = 1;
-				return;
-			}
-			else if (USEIMM)
-			{
-				m_trap = 1;
-				m_illegal_instruction = 1;
-				return;
-			}
-
-			const uint32_t address = RS1REG + RS2REG;
-			const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask8[address & 3]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = (int32_t)data >> 24;
-				else if ((address & 3) == 1) RDREG = ((int32_t)data << 8) >> 24;
-				else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 24;
-				else if ((address & 3) == 3) RDREG = ((int32_t)data << 24) >> 24;
-			}
-			break;
-		}
-		case OP3_LDUBA:
-		{
-			if (IS_USER)
-			{
-				m_trap = 1;
-				m_privileged_instruction = 1;
-				return;
-			}
-			else if (USEIMM)
-			{
-				m_trap = 1;
-				m_illegal_instruction = 1;
-				return;
-			}
-
-			const uint32_t address = RS1REG + RS2REG;
-			const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask8[address & 3]);
-
-			if (m_mae)
-			{
-				m_trap = 1;
-				m_data_access_exception = 1;
-				return;
-			}
-
-			if (RD != 0)
-			{
-				if ((address & 3) == 0) RDREG = data >> 24;
-				else if ((address & 3) == 1) RDREG = (data >> 16) & 0xff;
-				else if ((address & 3) == 2) RDREG = (data >>  8) & 0xff;
-				else if ((address & 3) == 3) RDREG = data & 0xff;
-			}
-			break;
-		}
-		default:
-			break;
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		if ((address & 3) == 0) RDREG = (int32_t)data >> 16;
+		else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 16;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_lduh(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (address & 1)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask16[address & 2]);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		if ((address & 3) == 0) RDREG = data >> 16;
+		else if ((address & 3) == 2) RDREG = data & 0xffff;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldsb(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask8[address & 3]);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		if ((address & 3) == 0) RDREG = (int32_t)data >> 24;
+		else if ((address & 3) == 1) RDREG = ((int32_t)data << 8) >> 24;
+		else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 24;
+		else if ((address & 3) == 3) RDREG = ((int32_t)data << 24) >> 24;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldub(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
+	const uint32_t byte_idx = address & 3;
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask8[byte_idx]);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		static const int shifts[4] = { 24, 16, 8, 0 };
+		RDREG = (uint8_t)(data >> shifts[byte_idx]);
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_lddfpr(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0)
+	{
+		m_trap = 1;
+		m_fp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (address & 7)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RD & 1)
+	{
+		m_trap = 1;
+		m_fp_exception = 1;
+		m_ftt = 0xff;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (m_fpu_sequence_err)
+	{
+		m_trap = 1;
+		m_fp_exception = 1;
+		m_ftt = m_fpu_sequence_err;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	FREG(RD & 0x1e) = data;
+
+	const uint32_t word1 = m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	FREG(RD | 1) = word1;
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldfpr(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0)
+	{
+		m_trap = 1;
+		m_fp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (m_fpu_sequence_err)
+	{
+		m_trap = 1;
+		m_fp_exception = 1;
+		m_ftt = m_fpu_sequence_err;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	FDREG = data;
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldfsr(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0)
+	{
+		m_trap = 1;
+		m_fp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (m_fpu_sequence_err)
+	{
+		m_trap = 1;
+		m_fp_exception = 1;
+		m_ftt = m_fpu_sequence_err;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	FSR = data;
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_lddcpr(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (!(PSR & PSR_EC_MASK) || !m_bp_cp_present)
+	{
+		m_trap = 1;
+		m_cp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (address & 7)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (m_cp_sequence_err)
+	{
+		m_trap = 1;
+		m_cp_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		// possibly additional implementation-dependent actions
+		return;
+	}
+
+	m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	// implementation-dependent actions
+
+	m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	// implementation-dependent actions
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldcpr(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (!(PSR & PSR_EC_MASK) || !m_bp_cp_present)
+	{
+		m_trap = 1;
+		m_cp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (m_cp_sequence_err)
+	{
+		m_trap = 1;
+		m_cp_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		// possibly additional implementation-dependent actions
+		return;
+	}
+
+	m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	// implementation-dependent actions
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldcsr(uint32_t op)
+{
+	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+
+	if (!(PSR & PSR_EC_MASK) || !m_bp_cp_present)
+	{
+		m_trap = 1;
+		m_cp_disabled = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (m_cp_sequence_err)
+	{
+		m_trap = 1;
+		m_cp_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		// possibly additional implementation-dependent actions
+		return;
+	}
+
+	m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	// implementation-dependent actions
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldda(uint32_t op)
+{
+	if (IS_USER)
+	{
+		m_trap = 1;
+		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	else if (USEIMM)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t address = RS1REG + RS2REG;
+	const uint32_t addr_space = ASI;
+
+	if (address & 7)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t data = m_mmu->read_asi(addr_space, address >> 2, 0xffffffff);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+		RDREG = data;
+
+	uint32_t word1 = m_mmu->read_asi(addr_space, (address + 4) >> 2, 0xffffffff);
+	if (MAE)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	REG(RD | 1) = word1;
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_lda(uint32_t op)
+{
+	if (IS_USER)
+	{
+		m_trap = 1;
+		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	else if (USEIMM)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t address = RS1REG + RS2REG;
+
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, 0xffffffff);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+		RDREG = data;
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldsha(uint32_t op)
+{
+	if (IS_USER)
+	{
+		m_trap = 1;
+		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	else if (USEIMM)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t address = RS1REG + RS2REG;
+
+	if (address & 1)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
+	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask16[address & 2]);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		if ((address & 3) == 0) RDREG = (int32_t)data >> 16;
+		else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 16;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_lduha(uint32_t op)
+{
+	if (IS_USER)
+	{
+		m_trap = 1;
+		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	else if (USEIMM)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	const uint32_t address = RS1REG + RS2REG;
+	if (address & 1)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
+	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask16[address & 2]);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		if ((address & 3) == 0) RDREG = data >> 16;
+		else if ((address & 3) == 2) RDREG = data & 0xffff;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_ldsba(uint32_t op)
+{
+	if (IS_USER)
+	{
+		m_trap = 1;
+		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	else if (USEIMM)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
+	const uint32_t address = RS1REG + RS2REG;
+	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask8[address & 3]);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		if ((address & 3) == 0) RDREG = (int32_t)data >> 24;
+		else if ((address & 3) == 1) RDREG = ((int32_t)data << 8) >> 24;
+		else if ((address & 3) == 2) RDREG = ((int32_t)data << 16) >> 24;
+		else if ((address & 3) == 3) RDREG = ((int32_t)data << 24) >> 24;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
+}
+
+inline void mb86901_device::execute_lduba(uint32_t op)
+{
+	if (IS_USER)
+	{
+		m_trap = 1;
+		m_privileged_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	else if (USEIMM)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
+	const uint32_t address = RS1REG + RS2REG;
+	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask8[address & 3]);
+
+	if (m_mae)
+	{
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
+	if (RDBITS)
+	{
+		if ((address & 3) == 0) RDREG = data >> 24;
+		else if ((address & 3) == 1) RDREG = (data >> 16) & 0xff;
+		else if ((address & 3) == 2) RDREG = (data >>  8) & 0xff;
+		else if ((address & 3) == 3) RDREG = data & 0xff;
 	}
 
 	PC = nPC;
@@ -2831,12 +3149,16 @@ void mb86901_device::execute_ldstub(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 		else if (USEIMM)
 		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 		else
@@ -2864,6 +3186,8 @@ void mb86901_device::execute_ldstub(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -2875,6 +3199,8 @@ void mb86901_device::execute_ldstub(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
 		return;
 	}
 
@@ -2895,7 +3221,7 @@ void mb86901_device::execute_ldstub(uint32_t op)
 	{
 		word = data & 0xff;
 	}
-	if (RD != 0)
+	if (RDBITS)
 		RDREG = word;
 
 	PC = nPC;
@@ -2924,24 +3250,58 @@ inline void mb86901_device::execute_group3(uint32_t op)
 	switch (OP3)
 	{
 		case OP3_LD:
+			execute_ld(op);
+			break;
 		case OP3_LDUB:
+			execute_ldub(op);
+			break;
 		case OP3_LDUH:
+			execute_lduh(op);
+			break;
 		case OP3_LDD:
+			execute_ldd(op);
+			break;
 		case OP3_LDSB:
+			execute_ldsb(op);
+			break;
 		case OP3_LDSH:
+			execute_ldsh(op);
+			break;
 		case OP3_LDA:
+			execute_lda(op);
+			break;
 		case OP3_LDUBA:
+			execute_lduba(op);
+			break;
 		case OP3_LDUHA:
+			execute_lduha(op);
+			break;
 		case OP3_LDDA:
+			execute_ldda(op);
+			break;
 		case OP3_LDSBA:
+			execute_ldsba(op);
+			break;
 		case OP3_LDSHA:
+			execute_ldsha(op);
+			break;
 		case OP3_LDFPR:
+			execute_ldfpr(op);
+			break;
 		case OP3_LDFSR:
+			execute_ldfsr(op);
+			break;
 		case OP3_LDDFPR:
+			execute_lddfpr(op);
+			break;
 		case OP3_LDCPR:
+			execute_ldcpr(op);
+			break;
 		case OP3_LDCSR:
+			execute_ldcsr(op);
+			break;
 		case OP3_LDDCPR:
-			execute_load(op);
+			execute_lddcpr(op);
 			break;
 
 		case OP3_ST:
@@ -2979,6 +3339,8 @@ inline void mb86901_device::execute_group3(uint32_t op)
 			logerror("illegal instruction at %08x: %08x\n", PC, op);
 			m_trap = 1;
 			m_illegal_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			break;
 	}
 
@@ -2996,28 +3358,39 @@ inline void mb86901_device::execute_group3(uint32_t op)
 
 bool mb86901_device::evaluate_condition(uint32_t op)
 {
-	bool take = false;
-	bool n = ICC_N_SET;
-	bool z = ICC_Z_SET;
-	bool v = ICC_V_SET;
-	bool c = ICC_C_SET;
+	// COND 	& 8
+	// 0		8
+	// bn		ba
+	// bz		bne
+	// ble		bg
+	// bl		bge
+	// bleu		bgu
+	// bcs		bcc
+	// bneg		bpos
+	// bvs		bvc
 
-	switch(COND & 7)                            // COND & 8
-	{                                           // 0        8
-		case 0:     take = false; break;        // bn       ba
-		case 1:     take = z; break;            // bz       bne
-		case 2:     take = z | (n ^ z); break;  // ble      bg
-		case 3:     take = n ^ v; break;        // bl       bge
-		case 4:     take = c | z; break;        // bleu     bgu
-		case 5:     take = c; break;            // bcs      bcc
-		case 6:     take = n; break;            // bneg     bpos
-		case 7:     take = v; break;            // bvs      bvc
+	switch(COND)
+	{
+		case 0:     return false;
+		case 1:     return ICC_Z_SET;
+		case 2:     return ICC_Z_SET || (ICC_N != ICC_Z);
+		case 3:     return (ICC_N != ICC_V);
+		case 4:     return ICC_C_SET || ICC_Z_SET;
+		case 5:     return ICC_C_SET;
+		case 6:     return ICC_N_SET;
+		case 7:     return ICC_V_SET;
+
+		case 8:     return true;
+		case 9:     return ICC_Z_CLEAR;
+		case 10:    return ICC_Z_CLEAR && ICC_N_CLEAR;
+		case 11:    return (ICC_N == ICC_V);
+		case 12:    return ICC_C_CLEAR && ICC_Z_CLEAR;
+		case 13:    return ICC_C_CLEAR;
+		case 14:    return ICC_N_CLEAR;
+		case 15:    return ICC_V_CLEAR;
 	}
 
-	if (COND & 8)
-		take = !take;
-
-	return take;
+	return false;
 }
 
 
@@ -3066,13 +3439,13 @@ void mb86901_device::execute_bicc(uint32_t op)
 	{
 		nPC = pc + DISP22;
 		if (COND == COND_BA && ANNUL)
-			m_annul = 1;
+			m_no_annul = false;
 	}
 	else
 	{
 		nPC = nPC + 4;
 		if (ANNUL)
-			m_annul = 1;
+			m_no_annul = false;
 	}
 }
 
@@ -3129,6 +3502,8 @@ void mb86901_device::execute_ticc(uint32_t op)
 			m_trap = 1;
 			m_trap_instruction = 1;
 			m_ticc_trap_type = trap_number & 0x7f;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 		}
 		else
 		{
@@ -3330,7 +3705,6 @@ void mb86901_device::execute_trap()
 
 		PSR |= PSR_S_MASK;
 		m_s = true;
-		m_insn_space = 9;
 		m_data_space = 11;
 
 		int cwp = PSR & PSR_CWP_MASK;
@@ -3341,7 +3715,7 @@ void mb86901_device::execute_trap()
 
 		update_gpr_pointers();
 
-		if (m_annul == 0)
+		if (m_no_annul)
 		{
 			REG(17) = PC;
 			REG(18) = nPC;
@@ -3350,7 +3724,7 @@ void mb86901_device::execute_trap()
 		{
 			REG(17) = nPC;
 			REG(18) = nPC + 4;
-			m_annul = 0;
+			m_no_annul = true;
 		}
 
 		if (!m_reset_trap)
@@ -3426,6 +3800,8 @@ inline void mb86901_device::dispatch_instruction(uint32_t op)
 				logerror("fbfcc at %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_fp_disabled = 1;
+				m_stashed_icount = m_icount;
+				m_icount = 0;
 				return;
 			}
 			break;
@@ -3436,6 +3812,8 @@ inline void mb86901_device::dispatch_instruction(uint32_t op)
 				logerror("cbccc @ %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_cp_disabled = 1;
+				m_stashed_icount = m_icount;
+				m_icount = 0;
 				return;
 			}
 			return;
@@ -3444,6 +3822,8 @@ inline void mb86901_device::dispatch_instruction(uint32_t op)
 			logerror("illegal instruction at %08x: %08x\n", PC, op);
 			m_trap = 1;
 			m_illegal_instruction = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
 			return;
 		}
 		break;
@@ -3537,29 +3917,10 @@ inline void mb86901_device::execute_step()
 	    )
 	)
 	*/
-	if (m_bp_reset_in)
-	{
-		m_execute_mode = 0;
-		m_error_mode = 0;
-		m_reset_mode = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-		return;
-	}
-	else if (m_et && (m_bp_irl == 15 || m_bp_irl > m_pil))
-	{
-		m_trap = 1;
-		m_interrupt_level = m_bp_irl;
-	}
-
-	if (m_trap)
-	{
-		execute_trap();
-	}
 
 	// write-state-register delay not yet implemented
 
-	const uint32_t op = m_mmu->read_asi(m_insn_space, PC >> 2, 0xffffffff);
+	const uint32_t op = m_mmu->fetch_insn(m_s, PC >> 2);
 
 #if LOG_FCODES
 	//if (m_log_fcodes)
@@ -3568,23 +3929,23 @@ inline void mb86901_device::execute_step()
 	}
 #endif
 
-	if (MAE && !m_annul)
+	if (m_no_annul)
 	{
-		m_trap = 1;
-		m_instruction_access_exception = 1;
+		if (MAE)
+		{
+			m_trap = 1;
+			m_instruction_access_exception = 1;
+			m_stashed_icount = m_icount;
+			m_icount = 0;
+			return;
+		}
+		dispatch_instruction(op);
 	}
 	else
 	{
-		if (!m_annul)
-		{
-			dispatch_instruction(op);
-		}
-		else
-		{
-			m_annul = 0;
-			PC = nPC;
-			nPC = nPC + 4;
-		}
+		m_no_annul = true;
+		PC = nPC;
+		nPC = nPC + 4;
 	}
 }
 
@@ -3695,8 +4056,28 @@ void mb86901_device::execute_run()
 {
 	bool debug = machine().debug_flags & DEBUG_FLAG_ENABLED;
 
+	if (m_bp_reset_in)
+	{
+		m_execute_mode = 0;
+		m_error_mode = 0;
+		m_reset_mode = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	else if (m_et && (m_bp_irl == 15 || m_bp_irl > m_pil))
+	{
+		m_trap = 1;
+		m_interrupt_level = m_bp_irl;
+	}
+
 	do
 	{
+		if (m_trap)
+		{
+			execute_trap();
+		}
+
 		if (debug)
 		{
 			if (m_reset_mode)
