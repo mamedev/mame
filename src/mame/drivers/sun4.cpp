@@ -476,12 +476,12 @@
 #define DMA_BYTE_COUNT  (2)
 #define DMA_XTAL        (25_MHz_XTAL)
 
-#define AUXIO_DENSITY	(0x20)
-#define AUXIO_DISK_CHG	(0x10)
-#define AUXIO_DRIVE_SEL	(0x08)
-#define AUXIO_TC		(0x04)
-#define AUXIO_EJECT		(0x02)
-#define AUXIO_LED		(0x01)
+#define AUXIO_DENSITY   (0x20)
+#define AUXIO_DISK_CHG  (0x10)
+#define AUXIO_DRIVE_SEL (0x08)
+#define AUXIO_TC        (0x04)
+#define AUXIO_EJECT     (0x02)
+#define AUXIO_LED       (0x01)
 
 namespace
 {

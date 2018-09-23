@@ -627,7 +627,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
 	m_c123tmap->set_maskregion_tag(NAMCOFL_TILEMASKREGION);
 	m_c123tmap->set_gfxregion(NAMCOFL_TILEGFX);
-		
+
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->set_palette(m_palette);
 

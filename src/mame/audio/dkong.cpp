@@ -1333,8 +1333,8 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	 *   P2.Bit2-0  -> select the 256 byte bank for external ROM
 	 */
 
-	LATCH8(config, m_dev_vp2);		/* virtual latch for port B */
-	m_dev_vp2->set_xorvalue(0x20);	/* signal is inverted       */
+	LATCH8(config, m_dev_vp2);      /* virtual latch for port B */
+	m_dev_vp2->set_xorvalue(0x20);  /* signal is inverted       */
 	m_dev_vp2->read_cb<5>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
 	m_dev_vp2->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_DISCHARGE_INV>));
 
@@ -1372,8 +1372,8 @@ MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
 	MCFG_MCS48_PORT_P2_IN_CB(CONSTANT(0))
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
-	latch8_device &vp1(LATCH8(config, "virtual_p1"));	/* virtual latch for port A */
-	vp1.set_xorvalue(0x80);								/* signal is inverted       */
+	latch8_device &vp1(LATCH8(config, "virtual_p1"));   /* virtual latch for port A */
+	vp1.set_xorvalue(0x80);                             /* signal is inverted       */
 	vp1.read_cb<7>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
 	vp1.read_cb<6>().set("tms", FUNC(m58817_device::status_r));
 
@@ -1405,8 +1405,8 @@ MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
 
 	latch8_device &dev_4h(LATCH8(config, "ls259.4h"));
 
-	LATCH8(config, m_dev_vp2);		/* virtual latch for port B */
-	m_dev_vp2->set_xorvalue(0x70);	/* all signals are inverted */
+	LATCH8(config, m_dev_vp2);      /* virtual latch for port B */
+	m_dev_vp2->set_xorvalue(0x70);  /* all signals are inverted */
 	m_dev_vp2->read_cb<6>().set(dev_4h, FUNC(latch8_device::bit1_r));
 	m_dev_vp2->read_cb<5>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
 	m_dev_vp2->read_cb<4>().set(m_dev_6h, FUNC(latch8_device::bit6_r));

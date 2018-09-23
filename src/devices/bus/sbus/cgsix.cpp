@@ -106,23 +106,23 @@ uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst)
 		uint8_t value = 0;
 		switch (rop)
 		{
-			case ROP_CLR:								break;
-			case ROP_SRC_NOR_DST:	value = ~(s | d);	break;
-			case ROP_NSRC_AND_DST:	value = ~s & d;		break;
-			case ROP_NOT_SRC:		value = ~s;			break;
-			case ROP_SRC_AND_NDST:	value = s & ~d;		break;
-			case ROP_NOT_DST:		value = ~d;			break;
-			case ROP_SRC_XOR_DST:	value = s ^ d;		break;
-			case ROP_SRC_NAND_DST:	value = ~(s & d);	break;
-			case ROP_SRC_AND_DST:	value = s & d;		break;
-			case ROP_SRC_XNOR_DST:	value = ~(s ^ d);	break;
-			case ROP_DST:			value = d;			break;
-			case ROP_NSRC_OR_DST:	value = ~s | d;		break;
-			case ROP_SRC:			value = s;			break;
-			case ROP_SRC_OR_NDST:	value = s | ~d;		break;
-			case ROP_SRC_OR_DST:	value = s | d;		break;
-			case ROP_SET:			value = 0xff;		break;
-			default:				value = 0;			break;
+			case ROP_CLR:                               break;
+			case ROP_SRC_NOR_DST:   value = ~(s | d);   break;
+			case ROP_NSRC_AND_DST:  value = ~s & d;     break;
+			case ROP_NOT_SRC:       value = ~s;         break;
+			case ROP_SRC_AND_NDST:  value = s & ~d;     break;
+			case ROP_NOT_DST:       value = ~d;         break;
+			case ROP_SRC_XOR_DST:   value = s ^ d;      break;
+			case ROP_SRC_NAND_DST:  value = ~(s & d);   break;
+			case ROP_SRC_AND_DST:   value = s & d;      break;
+			case ROP_SRC_XNOR_DST:  value = ~(s ^ d);   break;
+			case ROP_DST:           value = d;          break;
+			case ROP_NSRC_OR_DST:   value = ~s | d;     break;
+			case ROP_SRC:           value = s;          break;
+			case ROP_SRC_OR_NDST:   value = s | ~d;     break;
+			case ROP_SRC_OR_DST:    value = s | d;      break;
+			case ROP_SET:           value = 0xff;       break;
+			default:                value = 0;          break;
 		}
 		result |= value & mask;
 	}

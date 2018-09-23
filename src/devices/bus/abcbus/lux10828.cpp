@@ -322,7 +322,7 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 
 void luxor_55_10828_device::device_add_mconfig(machine_config &config)
 {
- 	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
+	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_10828_device::luxor_55_10828_mem);
 	m_maincpu->set_addrmap(AS_IO, &luxor_55_10828_device::luxor_55_10828_io);
 	m_maincpu->set_daisy_config(daisy_chain);

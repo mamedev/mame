@@ -363,7 +363,7 @@ private:
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<sega315_5124_device> m_vdp2;
-	required_device<i8255_device>		 m_ppi;
+	required_device<i8255_device>        m_ppi;
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;

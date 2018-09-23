@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 /*
-	NOTES:
+    NOTES:
 
     Air Combat:
          priority issues
@@ -17,44 +17,44 @@ TODO:   Map lamps/vibration outputs as used by StarBlade (and possibly other tit
 DSP RAM is shared with the 68000 CPUs and master DSP.
 The memory map below reflects DSP RAM as seen by the 68000 CPUs.
 
-	0x200000: ROM:
-	0x200010: RAM:
-	0x200020: PTR:
-	0x200024: <checksum>
-	0x200028: <checksum>
-	0x200030: SMU: // "NO RESPONS" (DSP)
-	0x200040: IDC: // "NO RESPONS" (DSP)
-	0x200050: CPU: BOOTING..COMPLETE
-	0x200060: DSP:
-	0x200070: CRC: OK from cpu
-	0x200080: CRC:    from dsp
-	0x200090: ID:
-	0x2000a0: B-M:
-	0x2000b0: P-M:
-	0x2000c0: S-M:
-	0x200100    status: 2=upload needed, 4=error (abort)
-	0x200102    status
-	0x200104    0x0002
-	0x200106    addr written by main cpu
-	0x20010a    point rom checksum (starblade expects 0xed53)
-	0x20010c    point rom checksum (starblade expects 0xd5df)
-	0x20010e    1 : upload-code-to-dsp request trigger
-	0x200110    status
-	0x200112    status
-	0x200114    master dsp code size
-	0x200116    slave dsp code size
-	0x200120    upload source1 addr hi
-	0x200122    upload source1 addr lo
-	0x200124    upload source2 addr hi
-	0x200126    upload source2 addr lo
-	0x200200    enable
-	0x200202    status
-	0x200206    work page select
-	0x200208   0xa2c2 (air combat)
-	0x208000..0x2080ff  camera attributes for page#0
-	0x208200..0x208fff  3d object attribute display list for page#0
-	0x20c000..0x20c0ff  camera attributes for page#1
-	0x20c200..0x20cfff  3d object attribute display list for page#1
+    0x200000: ROM:
+    0x200010: RAM:
+    0x200020: PTR:
+    0x200024: <checksum>
+    0x200028: <checksum>
+    0x200030: SMU: // "NO RESPONS" (DSP)
+    0x200040: IDC: // "NO RESPONS" (DSP)
+    0x200050: CPU: BOOTING..COMPLETE
+    0x200060: DSP:
+    0x200070: CRC: OK from cpu
+    0x200080: CRC:    from dsp
+    0x200090: ID:
+    0x2000a0: B-M:
+    0x2000b0: P-M:
+    0x2000c0: S-M:
+    0x200100    status: 2=upload needed, 4=error (abort)
+    0x200102    status
+    0x200104    0x0002
+    0x200106    addr written by main cpu
+    0x20010a    point rom checksum (starblade expects 0xed53)
+    0x20010c    point rom checksum (starblade expects 0xd5df)
+    0x20010e    1 : upload-code-to-dsp request trigger
+    0x200110    status
+    0x200112    status
+    0x200114    master dsp code size
+    0x200116    slave dsp code size
+    0x200120    upload source1 addr hi
+    0x200122    upload source1 addr lo
+    0x200124    upload source2 addr hi
+    0x200126    upload source2 addr lo
+    0x200200    enable
+    0x200202    status
+    0x200206    work page select
+    0x200208   0xa2c2 (air combat)
+    0x208000..0x2080ff  camera attributes for page#0
+    0x208200..0x208fff  3d object attribute display list for page#0
+    0x20c000..0x20c0ff  camera attributes for page#1
+    0x20c200..0x20cfff  3d object attribute display list for page#1
 
        Starblade Cybersled AirCombat22 Solvalou
 [400]:= 00 0000   00 0000   00 0000    00 0000
@@ -105,7 +105,7 @@ quad primitives (n x 5 words) - color code and four vertex indices
 
 -----------------------------------------------------------------------
 Board 1 : DSP Board - 1st PCB. (Uppermost)
-DSP : 1 x Master TMS320C25 (C67) 4 x Slave TMS320C25 (C67) each connected to a Namco Custom chip 342 
+DSP : 1 x Master TMS320C25 (C67) 4 x Slave TMS320C25 (C67) each connected to a Namco Custom chip 342
 OSC: 40.000MHz
 RAM: HM62832 x 2, M5M5189 x 4, ISSI IS61C68 x 16
 ROMS: TMS27C040
@@ -318,7 +318,7 @@ private:
 	required_device<namco_c148_device> m_master_intc;
 	required_device<namco_c148_device> m_slave_intc;
 	required_device<c140_device> m_c140;
-	required_device<namco_c355spr_device> m_c355spr; 
+	required_device<namco_c355spr_device> m_c355spr;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
@@ -785,7 +785,7 @@ MACHINE_START_MEMBER(namcos21_c67_state,namcos21)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
 	m_audiobank->set_entry(0);
-	
+
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_c67_state::screen_scanline)
@@ -1255,7 +1255,7 @@ void namcos21_c67_state::init_solvalou()
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
 
-// uses 5x TMS320C25 (C67, has internal ROM - dumped) 
+// uses 5x TMS320C25 (C67, has internal ROM - dumped)
 GAME( 1991, starblad,  0,        starblad, starblad,   namcos21_c67_state, empty_init,    ROT0,    "Namco", "Starblade (ST2, World)",                     MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starbladj, starblad, starblad, starblad,   namcos21_c67_state, empty_init,    ROT0,    "Namco", "Starblade (ST1, Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, solvalou,  0,        solvalou, s21default, namcos21_c67_state, init_solvalou, ROT0,    "Namco", "Solvalou (SV1, Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

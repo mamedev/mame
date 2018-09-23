@@ -106,7 +106,7 @@ void dkmb_state::main_map(address_map &map)
 	map(0x020c0000, 0x020c0007).ram(); // write
 	map(0x020c0010, 0x020c0017).r(FUNC(dkmb_state::unk_20c0010_r)); // read
 
-    map(0x04090000, 0x0409ffff).ram(); // size uncertain
+	map(0x04090000, 0x0409ffff).ram(); // size uncertain
 
 	// map(0xff000000, 0xff0fffff) // looks like flash ROM access, mirror of main ROM or just checking if extra exist?
 	// map(0xff800000, 0xff8fffff) // looks like flash ROM access, mirror of main ROM or just checking if extra exist?
@@ -145,12 +145,12 @@ ROM_START( dkmb )
 
 	ROM_REGION( 0x1000, "pic", 0 )
 	/*
-		Intel HEX format dump.  When converted to binary using
-		"srec_cat.exe 12c508.u12 -intel -o 12c508.bin -binary"
-		this contains only the string
-		"Copyright 2001 Core Technologies why are you looking in here?"
-		in the first 0x80 bytes, which is the unprotected area of the PIC.
-		the rest is blank, therefore protected and a bad dump
+	    Intel HEX format dump.  When converted to binary using
+	    "srec_cat.exe 12c508.u12 -intel -o 12c508.bin -binary"
+	    this contains only the string
+	    "Copyright 2001 Core Technologies why are you looking in here?"
+	    in the first 0x80 bytes, which is the unprotected area of the PIC.
+	    the rest is blank, therefore protected and a bad dump
 	*/
 	ROM_LOAD("12c508.u12", 0x000, 0x09db, BAD_DUMP CRC(3adb3e33) SHA1(36a96886d83b64633eea83e57bdfa8a20c6d4f6a) )
 ROM_END

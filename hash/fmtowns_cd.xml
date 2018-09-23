@@ -9963,7 +9963,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- iso + mp3 source, needs to be replaced with a proper dump -->
 	<software name="visitor">
 		<!--

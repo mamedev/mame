@@ -765,7 +765,7 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 		m_dec_table.cmp_sub_type = m_file->read_byte(m_pc + 0x08);
 		m_dec_table.bit_dec = m_file->read_byte(m_pc + 0x09);
 		m_dec_table.bit_cmp = m_file->read_byte(m_pc + 0x0a);
-	
+
 		m_dec_table.entries.resize(m_file->read_word(m_pc + 0x0b) * ((m_dec_table.bit_dec + 7) / 8));
 		for (size_t i = 0; i < m_dec_table.entries.size(); i++)
 			m_dec_table.entries[i] = m_file->read_byte(m_pc + 0x0d + i);
@@ -1526,8 +1526,8 @@ void vgmplay_device::execute_run()
 				}
 				//else if ((offset & 0x7f) == 0x15 && m_nes_apu_channel_hack[chip] == -2 && (m_file->read_byte(m_pc + 2) & 0x1f) != 0)
 				//{
-				//	osd_printf_error("bad rip false positive, late enabling nesapu.%d channels %x/%x\n", chip, m_pc, m_io->read_dword(REG_SIZE));
-				//	m_nes_apu_channel_hack[chip] = -1;
+				//  osd_printf_error("bad rip false positive, late enabling nesapu.%d channels %x/%x\n", chip, m_pc, m_io->read_dword(REG_SIZE));
+				//  m_nes_apu_channel_hack[chip] = -1;
 				//}
 
 				if (offset & 0x80)

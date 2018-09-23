@@ -9,7 +9,7 @@
     - nForce 415-D northbridge
     - nForce MCP-D southbridge (with integrated APU)
     - ITE IT8703F-A SuperIO
-	- Asus AS99127F chip
+    - Asus AS99127F chip
   - An AMD Athlon XP processor
   - An IDE hard disk
   - A floppy disk drive
@@ -173,7 +173,7 @@ MACHINE_CONFIG_START(nforcepc_state::nforcepc)
 	MCFG_DEVICE_IO_MAP(nforce_map_io)
 	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
 	MCFG_DEVICE_ADD(":pci:00.0", CRUSH11, 0, "maincpu", 2 * 1024 * 1024)
-	/*	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
+	/*  MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 	MCFG_I386_SMIACT(WRITELINE("pci:00.0", i82439hx_host_device, smi_act_w))
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));

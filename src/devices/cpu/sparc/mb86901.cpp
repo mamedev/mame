@@ -50,7 +50,7 @@ mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, MB86901, tag, owner, clock)
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 {
-    m_default_config = address_space_config("program", ENDIANNESS_BIG, 32, 32);
+	m_default_config = address_space_config("program", ENDIANNESS_BIG, 32, 32);
 }
 
 
@@ -471,8 +471,8 @@ void mb86901_device::device_reset()
 
 device_memory_interface::space_config_vector mb86901_device::memory_space_config() const
 {
-    space_config_vector config_vector;
-    config_vector.push_back(std::make_pair(AS_PROGRAM, &m_default_config));
+	space_config_vector config_vector;
+	config_vector.push_back(std::make_pair(AS_PROGRAM, &m_default_config));
 	return config_vector;
 }
 
@@ -3376,26 +3376,26 @@ void mb86901_device::execute_trap()
 /* The SPARC Instruction Manual: Version 8, page 159, "Appendix C - ISP Descriptions - C.6. Instruction Dispatch" (SPARCv8.pdf, pg. 156)
 
 illegal_IU_instr :- (
-	if ( ( (op == 00) and (op2 == 000) ) { UNIMP instruction }
-	   or
-	   ( ((op=11) or (op=10)) and (op3=unassigned) )
-	   then 1 else 0
+    if ( ( (op == 00) and (op2 == 000) ) { UNIMP instruction }
+       or
+       ( ((op=11) or (op=10)) and (op3=unassigned) )
+       then 1 else 0
 
 if (illegal_IU_instr = 1) then (
-	trap <- 1
-	illegal_instruction <- 1
+    trap <- 1
+    illegal_instruction <- 1
 );
 if ((FPop1 or FPop2 or FBfcc) and ((EF = 0) or (bp_FPU_present = 0))) then (
-	trap <- 1;
-	fp_disabled <- 1
+    trap <- 1;
+    fp_disabled <- 1
 );
 if (CPop1 or CPop2 or CBccc) and ((EC = 0) or (bp_CP_present = 0))) then (
-	trap <- 1;
-	cp_disabled <- 1
+    trap <- 1;
+    cp_disabled <- 1
 );
 next;
 if (trap = 0) then (
-	{ code for specific instruction, defined below }
+    { code for specific instruction, defined below }
 );
 */
 
@@ -3653,8 +3653,8 @@ void mb86901_device::run_loop()
 	{
 		/*if (HOLD_BUS)
 		{
-			m_icount--;
-			continue;
+		    m_icount--;
+		    continue;
 		}*/
 
 		if (CHECK_DEBUG)

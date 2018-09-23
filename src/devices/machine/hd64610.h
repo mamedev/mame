@@ -69,9 +69,9 @@ private:
 	devcb_write_line        m_out_irq_cb;
 	devcb_write_line        m_out_1hz_cb;
 
-	uint8_t m_regs[0x10];	// Internal registers
-	int     m_hline_state;	// H-Start/Stop line
-	int     m_irq_out;		// alarm output
+	uint8_t m_regs[0x10];   // Internal registers
+	int     m_hline_state;  // H-Start/Stop line
+	int     m_irq_out;      // alarm output
 
 	emu_timer *m_counter_timer;
 };

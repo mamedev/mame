@@ -124,7 +124,7 @@ protected:
 	required_device<sparc_mmu_interface> m_mmu;
 
 	// address spaces
-    address_space_config m_default_config;
+	address_space_config m_default_config;
 
 	// memory access
 	uint32_t read_sized_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask);

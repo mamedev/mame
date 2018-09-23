@@ -9,7 +9,7 @@ used by Star Blade, Cybersled
 
 TODO: handle protection properly and with callbacks
       handle splitting of workload across slaves
-	  remove hacks!
+      remove hacks!
       some of the list processing should probably be in the 3d device, split it out
 
 */

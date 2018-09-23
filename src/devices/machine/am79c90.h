@@ -4,10 +4,10 @@
 
     AMD Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE)
 
-	TODO:
-		- Communication with the outside world
-		- Error handling
-		- Clocks
+    TODO:
+        - Communication with the outside world
+        - Error handling
+        - Clocks
 
 ******************************************************************************
                             _____   _____

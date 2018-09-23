@@ -71,7 +71,7 @@ uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind1
 		{
 			m_c123tmap->draw(screen, bitmap, cliprect, pri >> 1);
 		}
-		
+
 		m_c355spr->draw(screen, bitmap, cliprect, pri );
 	}
 

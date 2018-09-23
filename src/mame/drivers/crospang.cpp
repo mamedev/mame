@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(crospang_state::pitapat)
 	crospang(config);
 
 	// can't be 14'318'181 / 2 as the inputs barely respond and the background graphics glitch badly when the screen fills, doesn't appear to be a vblank bit anywhere to negate this either, P12 reated part
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(14'318'181)) 
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(14'318'181))
 	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
 

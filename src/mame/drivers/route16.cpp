@@ -1043,7 +1043,7 @@ ROM_START( jongpute )
 	ROM_REGION( 0x10000, "cpu2", 0 )
 	ROM_LOAD( "j6",           0x0000, 0x1000, CRC(54b349b0) SHA1(e5620b85a24a35d995860c7121f1ddf16f7ea168) )
 
-    /* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
+	/* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
 	ROM_REGION( 0x1000, "unknown", 0 )
 	ROM_LOAD( "j1",           0x0000, 0x1000, CRC(6d6ba272) SHA1(a4efd8daddbbf595ee46484578f544d7ed84e090) )
 

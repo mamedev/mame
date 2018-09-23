@@ -167,12 +167,12 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 	config.set_default_layout(layout_sdk85);
 
 	/* Devices */
-	i8279_device &kdc(I8279(config, "kdc", 6.144_MHz_XTAL / 2));		// Keyboard/Display Controller (A13)
-	kdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE);	// irq
-	kdc.out_sl_callback().set(FUNC(sdk85_state::scanlines_w));			// scan SL lines
-	kdc.out_disp_callback().set(FUNC(sdk85_state::digit_w));			// display A&B
-	kdc.in_rl_callback().set(FUNC(sdk85_state::kbd_r));					// kbd RL lines
-	kdc.in_shift_callback().set_constant(1);							// Shift key
+	i8279_device &kdc(I8279(config, "kdc", 6.144_MHz_XTAL / 2));        // Keyboard/Display Controller (A13)
+	kdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE);  // irq
+	kdc.out_sl_callback().set(FUNC(sdk85_state::scanlines_w));          // scan SL lines
+	kdc.out_disp_callback().set(FUNC(sdk85_state::digit_w));            // display A&B
+	kdc.in_rl_callback().set(FUNC(sdk85_state::kbd_r));                 // kbd RL lines
+	kdc.in_shift_callback().set_constant(1);                            // Shift key
 	kdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 

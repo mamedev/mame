@@ -8,7 +8,7 @@
     TODO:
     - Make this to actually work!
     - Is RAM shared with a specific CPU other than master/slave?
-	- is this another MCU with internal ROM?
+    - is this another MCU with internal ROM?
 
 ***************************************************************************/
 
