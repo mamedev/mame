@@ -146,7 +146,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	//I8243(config, m_ioexp[0]);
 	//I8243(config, m_ioexp[1]);
 
-	INS8250(config, "ace", 1'843'200);
+	INS8250(config, "ace", 2'764'800);
 
 	//DP8350(config, "crtc", 10.92_MHz_XTAL);
 
