@@ -106,7 +106,7 @@ protected:
 	address_space *m_space;
 
 	devcb_write_line    m_irq_cb[7];
-	devcb_write32		m_buserr;
+	devcb_write32       m_buserr;
 
 	device_sbus_card_interface *m_device_list[3];
 

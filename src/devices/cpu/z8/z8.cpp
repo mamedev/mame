@@ -358,7 +358,7 @@ uint8_t z8_device::register_read(uint8_t offset)
 		{
 		case Z8_P01M_P1_MODE_OUTPUT:
 			data = m_output[offset];
-            break;
+			break;
 		case Z8_P01M_P1_MODE_INPUT:
 			mask = 0xff;
 			break;

@@ -386,10 +386,10 @@ MACHINE_CONFIG_START(icecold_state::icecold)
 	pia2.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	i8279_device &kbdc(I8279(config, "i8279", XTAL(6'000'000)/4));
-	kbdc.out_irq_callback().set("pia0", FUNC(pia6821_device::cb1_w));	// irq
-	kbdc.out_sl_callback().set(FUNC(icecold_state::scanlines_w));		// scan SL lines
-	kbdc.out_disp_callback().set(FUNC(icecold_state::digit_w));			// display A&B
-	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));				// kbd RL lines
+	kbdc.out_irq_callback().set("pia0", FUNC(pia6821_device::cb1_w));   // irq
+	kbdc.out_sl_callback().set(FUNC(icecold_state::scanlines_w));       // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(icecold_state::digit_w));         // display A&B
+	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sint_timer", icecold_state, icecold_sint_timer, attotime::from_hz(30))

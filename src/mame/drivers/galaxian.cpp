@@ -6468,14 +6468,14 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
- 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("8910.0", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
- 	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
+	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 

@@ -16,7 +16,7 @@ class namcos21_dsp_c67_device : public device_t
 {
 public:
 	enum
-	{	/* Namco System21 */
+	{   /* Namco System21 */
 		NAMCOS21_AIRCOMBAT = 0x4000,
 		NAMCOS21_STARBLADE,
 		NAMCOS21_CYBERSLED,
@@ -29,7 +29,7 @@ public:
 	template <typename T> void set_renderer_tag(T &&tag) { m_renderer.set_tag(std::forward<T>(tag)); }
 	template <class Object> devcb_base &set_yield_hack_callback(Object &&cb) { return m_yield_hack_cb.set_callback(std::forward<Object>(cb)); }
 	auto yield_hack_callback() { return m_yield_hack_cb.bind(); }
-	
+
 	void set_gametype(int gametype) { m_gametype = gametype; }
 
 	DECLARE_READ16_MEMBER(dspram16_r);

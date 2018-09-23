@@ -1064,7 +1064,7 @@ void galaxian_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &
 {
 	/* current schematics are unreadable, assuming like Turtles */
 	bitmap.fill(rgb_t(m_background_red * 0x55, m_background_green * 0x47, m_background_blue * 0x55), cliprect);
- 	scramble_draw_stars(bitmap, cliprect, 256);
+	scramble_draw_stars(bitmap, cliprect, 256);
 }
 
 

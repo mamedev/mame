@@ -1855,7 +1855,7 @@ MACHINE_RESET_MEMBER(zn_state,bam2)
 MACHINE_CONFIG_START(zn_state::bam2)
 	zn1_2mb_vram(config);
 	gameboard_cat702(config);
-	
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::bam2_map);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, bam2)
@@ -2395,7 +2395,7 @@ void zn_state::atlus_snd_map(address_map &map)
 MACHINE_CONFIG_START(zn_state::coh1001l)
 	zn1_2mb_vram(config);
 	gameboard_cat702(config);
-	
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1001l_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, M68000, XTAL(10'000'000))
@@ -2452,7 +2452,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1002v)
 MACHINE_CONFIG_START(zn_state::coh1002v)
 	zn1_2mb_vram(config);
 	gameboard_cat702(config);
-	
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1002v_map);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002v)

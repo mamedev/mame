@@ -457,7 +457,7 @@ Custom Chips:                       Final Lap   Assault     LuckyWld    System21
     C45     Land Generator            *                       *
     C65     I/O Controller (older)    *           *
     C67     TMS320C25 (DSP int rom)
-	C68     I/O Controller (newer)                            *           *
+    C68     I/O Controller (newer)                            *           *
     C70                                                                               *
     C95                               *           *
     C102    ROZ:Memory Access Control             *
@@ -3908,7 +3908,7 @@ ROM_END
 
    Changes seem to be related to the trackside advertising banners.  This was around the same time Super Monaco GP was forced to
    remove 'real' advertising banners, so could be related.
-  
+
    The changed graphic ROM has tiles for an additional 'awaiting entry' screen, but it is unclear where they are used,
    the same tiles in the fx2 set are blank, assuming that one isn't a bad dump.
 

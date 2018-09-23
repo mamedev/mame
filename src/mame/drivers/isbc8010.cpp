@@ -225,11 +225,11 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 
 	/* Devices */
 //  i8279_device &kbdc(I8279(config, "i8279", 3100000)); // based on divider
-//  kbdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE);	// irq
-//  kbdc.out_sl_callback().set(FUNC(sdk80_state::scanlines_w));			// scan SL lines
-//  kbdc.out_disp_callback().set(FUNC(sdk80_state::digit_w));			// display A&B
-//  kbdc.in_rl_callback().set(FUNC(sdk80_state::kbd_r));				// kbd RL lines
-//  kbdc.in_shift_callback().set_constant(1);							// Shift key
+//  kbdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE); // irq
+//  kbdc.out_sl_callback().set(FUNC(sdk80_state::scanlines_w));         // scan SL lines
+//  kbdc.out_disp_callback().set(FUNC(sdk80_state::digit_w));           // display A&B
+//  kbdc.in_rl_callback().set(FUNC(sdk80_state::kbd_r));                // kbd RL lines
+//  kbdc.in_shift_callback().set_constant(1);                           // Shift key
 //  kbdc.in_ctrl_callback().set_constant(1);
 
 MACHINE_CONFIG_END

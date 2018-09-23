@@ -1695,7 +1695,7 @@ void x68ksupr_state::x68ksupr(machine_config &config)
 
 void x68ksupr_state::x68kxvi(machine_config &config)
 {
-	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.333_MHz_XTAL / 2);	/* 16 MHz (nominally) */
+	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.333_MHz_XTAL / 2); /* 16 MHz (nominally) */
 	x68ksupr_base(config);
 }
 

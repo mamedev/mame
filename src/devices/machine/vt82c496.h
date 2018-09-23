@@ -20,7 +20,7 @@ public:
 	// construction/destruction
 	vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
- 	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ramtag(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_isatag(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
 

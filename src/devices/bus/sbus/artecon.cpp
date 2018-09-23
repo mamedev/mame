@@ -4,12 +4,12 @@
 
     Artecon SB-300P 3-serial 1-parallel SBus card skeleton
 
-	The Artecon SB series of SBus cards uses up to 4 Cirrus Logic
-	CL-CD1400 Four-Channel Serial/Parallel Communications Engines.
+    The Artecon SB series of SBus cards uses up to 4 Cirrus Logic
+    CL-CD1400 Four-Channel Serial/Parallel Communications Engines.
 
-	Each chip supports up to four full-duplex serial channels, or three
-	full-duplex serial channels and one high-speed bidirectional parallel
-	channel.
+    Each chip supports up to four full-duplex serial channels, or three
+    full-duplex serial channels and one high-speed bidirectional parallel
+    channel.
 
 ***************************************************************************/
 

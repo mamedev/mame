@@ -341,11 +341,11 @@ template uint32_t sun4c_mmu_device::insn_data_r<sun4c_mmu_device::SUPER_DATA>(co
 template <sun4c_mmu_device::insn_data_mode MODE>
 uint32_t sun4c_mmu_device::insn_data_r(const uint32_t offset, const uint32_t mem_mask)
 {
-    // supervisor program fetches in boot state are special
-    if (m_fetch_bootrom && MODE == SUPER_INSN)
-    {
-        return m_rom_ptr[offset & 0x1ffff];
-    }
+	// supervisor program fetches in boot state are special
+	if (m_fetch_bootrom && MODE == SUPER_INSN)
+	{
+		return m_rom_ptr[offset & 0x1ffff];
+	}
 
 	// it's translation time
 	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];
@@ -474,7 +474,7 @@ void sun4c_mmu_device::insn_data_w(const uint32_t offset, const uint32_t data, c
 	else
 	{
 		//logerror("sun4c: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), data, offset <<2, m_cpu->pc());
-        m_host->set_mae();
+		m_host->set_mae();
 		m_buserr[0] |= 0x8080;    // write cycle, invalid PTE
 		m_buserr[1] = offset << 2;
 		if (mem_mask != ~0 && mem_mask != 0xffff0000 && mem_mask != 0xff000000)

@@ -41,7 +41,7 @@ Winning Run
     posirq effects for bitmap layer not working
 
 
-	NOTES:
+    NOTES:
 
     Winning Run
     Winning Run 91
@@ -270,7 +270,7 @@ Filter Board
         |-------CONN------|
 
 ****************************
- 
+
 */
 
 #include "emu.h"
@@ -324,7 +324,7 @@ public:
 
 	void configure_c148_standard(machine_config &config);
 	void winrun(machine_config &config);
-	
+
 	void init_winrun();
 
 private:
@@ -539,7 +539,7 @@ void namcos21_state::winrun_master_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x180000, 0x183fff).rw(FUNC(namcos21_state::namcos2_68k_eeprom_r), FUNC(namcos21_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	
+
 	// DSP Related
 	map(0x250000, 0x25ffff).ram().share("namcos21dsp:winrun_polydata");
 	map(0x260000, 0x26ffff).ram(); /* unused? */
@@ -548,7 +548,7 @@ void namcos21_state::winrun_master_map(address_map &map)
 	map(0x3c0000, 0x3c1fff).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_68k_dspcomram_r), FUNC(namcos21_dsp_device::winrun_68k_dspcomram_w));
 	map(0x400000, 0x400001).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_control_w));
 	map(0x440000, 0x440001).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_data_r), FUNC(namcos21_dsp_device::pointram_data_w));
-	
+
 	map(0x600000, 0x60ffff).ram().share("gpu_comram");
 	map(0x800000, 0x87ffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");

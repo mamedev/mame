@@ -11,20 +11,20 @@ Driver's Eyes works,
 
     -The left, center and right screens have separate programs and boards, each would work independently.
     About projection angles of left and right screen, the angle is correct on "DRIVER'S EYES" title screen, however in the tracks of demo mode it doesn't seem correct.
-	(probably wants angle sent by main board?)
+    (probably wants angle sent by main board?)
 
     -On demo screen, should fog effects be turned off?
 
-	NOTES:
+    NOTES:
 
-	Driver's Eyes
-		not yet working
+    Driver's Eyes
+        not yet working
 
-	TODO:
+    TODO:
 
     Driver's Eyes
         add communications for Left and Right screen (linked C139 or something else?)
- 
+
 */
 
 #include "emu.h"
@@ -84,7 +84,7 @@ private:
 	required_device<namco_c148_device> m_master_intc;
 	required_device<namco_c148_device> m_slave_intc;
 	required_device<c140_device> m_c140;
-	required_device<namco_c355spr_device> m_c355spr; 
+	required_device<namco_c355spr_device> m_c355spr;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)	
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 
@@ -385,7 +385,7 @@ void namco_de_pcbstack_device::driveyes_master_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); /* private work RAM */
 	map(0x180000, 0x183fff).rw(FUNC(namco_de_pcbstack_device::namcos2_68k_eeprom_r), FUNC(namco_de_pcbstack_device::namcos2_68k_eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	
+
 	// DSP related
 	map(0x250000, 0x25ffff).ram().share("namcos21dsp:winrun_polydata");
 	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::winrun_dspbios_w));
@@ -542,7 +542,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
 
-	PORT_START("pcb_1:MCUH") 
+	PORT_START("pcb_1:MCUH")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -630,7 +630,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("pcb_0:MCUB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("pcb_0:MCUH") 
+	PORT_START("pcb_0:MCUH")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("pcb_0:AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -682,7 +682,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("pcb_2:MCUB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("pcb_2:MCUH") 
+	PORT_START("pcb_2:MCUH")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("pcb_2:AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -710,12 +710,12 @@ static INPUT_PORTS_START( driveyes )
 INPUT_PORTS_END
 
 /*
-	Note, only the main screen PCB stack has voice roms populated
-	the sound program also differs on the side screen sets
+    Note, only the main screen PCB stack has voice roms populated
+    the sound program also differs on the side screen sets
 
-	pcb_0 = left
-	pcb_1 = center
-	pcb_2 = right
+    pcb_0 = left
+    pcb_1 = center
+    pcb_2 = right
 */
 
 ROM_START( driveyes )
