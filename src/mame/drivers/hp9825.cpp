@@ -59,6 +59,7 @@ public:
 	hp9825_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this , "cpu")
+		, m_cursor_timer(*this , "cursor_timer")
 		, m_io_key(*this , "KEY%u" , 0)
 		, m_shift_key(*this , "KEY_SHIFT")
 		, m_display(*this , "char_%u_%u" , 0U , 0U)
@@ -70,6 +71,7 @@ public:
 
 private:
 	required_device<hp_09825_67907_cpu_device> m_cpu;
+	required_device<timer_device> m_cursor_timer;
 	required_ioport_array<4> m_io_key;
 	required_ioport m_shift_key;
 	output_finder<32 , 7> m_display;
@@ -127,7 +129,8 @@ void hp9825_state::machine_reset()
 	m_display_on = false;
 	m_display_idx = 0;
 	m_rpl_cursor = false;
-	m_cursor_blink = false;
+	m_cursor_timer->reset();
+	m_cursor_blink = true;
 	update_display();
 	m_scancode = 0;
 	m_key_pressed = false;
@@ -155,7 +158,7 @@ void hp9825_state::cpu_mem_map(address_map &map)
 
 READ16_MEMBER(hp9825_state::kb_scancode_r)
 {
-// TODO:
+    // TODO:
 	uint8_t res = m_scancode;
 	if (m_shift_key->read()) {
 		BIT_SET(res , 7);
@@ -169,6 +172,8 @@ WRITE16_MEMBER(hp9825_state::disp_w)
 	// TODO:
 	if (m_display_on) {
 		m_display_on = false;
+		m_cursor_timer->reset();
+		m_cursor_blink = true;
 		m_display_idx = 0;
 		update_display();
 	}
@@ -187,6 +192,9 @@ WRITE16_MEMBER(hp9825_state::kdp_control_w)
 	bool regen_display = false;
 	if (BIT(data , 1) && !m_display_on) {
 		m_display_on = true;
+		// Cursor should blink at 2^-19 the KDP clock
+		attotime cursor_half_period{ attotime::from_ticks(262144 , KDP_CLOCK) };
+		m_cursor_timer->adjust(cursor_half_period , 0 , cursor_half_period);
 		regen_display = true;
 	}
 	if (BIT(data , 6) && !m_rpl_cursor) {
@@ -489,8 +497,7 @@ MACHINE_CONFIG_START(hp9825_state::hp9825b)
 	m_cpu->set_addrmap(AS_IO , &hp9825_state::cpu_io_map);
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp9825_state::irq_callback));
 
-	// Cursor should blink at 2^-18 the KDP clock
-	TIMER(config , "cursor_timer" , 0).configure_periodic(timer_device::expired_delegate(FUNC(hp9825_state::cursor_blink) , this) , attotime::from_ticks(262144 , KDP_CLOCK));
+	TIMER(config , m_cursor_timer , 0).configure_generic(timer_device::expired_delegate(FUNC(hp9825_state::cursor_blink) , this));
 
 	// Keyboard scan timer. A scan of the whole keyboard should take 2^14 KDP clocks.
 	TIMER(config , "kb_timer" , 0).configure_periodic(timer_device::expired_delegate(FUNC(hp9825_state::kb_scan) , this) , attotime::from_ticks(16384 , KDP_CLOCK));
