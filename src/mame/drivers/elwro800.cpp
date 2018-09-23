@@ -277,7 +277,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		return m_i8255->read(space, (offset & 0x03) ^ 0x03);
+		return m_i8255->read((offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
@@ -325,7 +325,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		m_i8255->write(space, (offset & 0x03) ^ 0x03, data);
+		m_i8255->write((offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{

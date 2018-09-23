@@ -320,18 +320,18 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		break;
 	case 0x10c:
 		if(ACCESSING_BITS_0_7)
-			m_pic->write(space,0,data & 0xff);
+			m_pic->write(0,data & 0xff);
 		break;
 	case 0x10d:
 		if(ACCESSING_BITS_0_7)
-			m_pic->write(space,1,data & 0xff);
+			m_pic->write(1,data & 0xff);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
-			m_pit->write(space,offset-0x110,data & 0xff);
+			m_pit->write(offset-0x110,data & 0xff);
 		break;
 	case 0x141:
 		// bit 1 enables speaker?
@@ -392,18 +392,18 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		break;
 	case 0x10c:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pic->read(space,0);
+			ret = m_pic->read(0);
 		break;
 	case 0x10d:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pic->read(space,1);
+			ret = m_pic->read(1);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pit->read(space,offset-0x110);
+			ret = m_pit->read(offset-0x110);
 		break;
 	case 0x141:
 		ret = m_periph141;
@@ -522,7 +522,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
-				m_fdc_timer->write(space,offset-0x08,data & 0xff);
+				m_fdc_timer->write(offset-0x08,data & 0xff);
 			break;
 		case 0x10:
 		case 0x11:
@@ -541,7 +541,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x1a:
 		case 0x1b:
 			if(ACCESSING_BITS_0_7)
-				m_hdc_timer->write(space,offset-0x18,data & 0xff);
+				m_hdc_timer->write(offset-0x18,data & 0xff);
 			break;
 	}
 }
@@ -571,7 +571,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
-				ret = m_fdc_timer->read(space,offset-0x08);
+				ret = m_fdc_timer->read(offset-0x08);
 			break;
 		case 0x10:
 		case 0x11:
@@ -590,7 +590,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x1a:
 		case 0x1b:
 			if(ACCESSING_BITS_0_7)
-				ret = m_hdc_timer->read(space,offset-0x18);
+				ret = m_hdc_timer->read(offset-0x18);
 			break;
 	}
 

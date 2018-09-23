@@ -380,6 +380,7 @@ private:
 
 	int m_sega32x_channel_hack;
 	int m_nes_apu_channel_hack[2];
+	uint8_t m_c6280_channel[2];
 };
 
 DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
@@ -559,6 +560,8 @@ void vgmplay_device::device_reset()
 	m_sega32x_channel_hack = 0;
 	m_nes_apu_channel_hack[0] = 0;
 	m_nes_apu_channel_hack[1] = 0;
+	m_c6280_channel[0] = 0;
+	m_c6280_channel[1] = 0;
 }
 
 void vgmplay_device::pulse_act_led(act_led led)
@@ -868,10 +871,21 @@ TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 		osd_printf_error("stream_timer_expired %02x: stream beyond end %d/%d %u>=%u\n", param, s.position, s.length, offset, uint32_t(m_data_streams[s.bank].size()));
 		s.timer->enable(false);
 	}
+	else if (s.chip_type == LED_SN76496)
+	{
+		m_io->write_byte(A_SN76496_0, (s.reg & 0xf0) | (m_data_streams[s.bank][offset] & 0xf));
+		if ((s.reg & 0x10) == 0)
+			m_io->write_byte(A_SN76496_0, ((m_data_streams[s.bank][offset + 1] & 3) << 4) | (m_data_streams[s.bank][offset] >> 4));
+	}
 	else if (s.chip_type == LED_YM2612)
 	{
 		m_io->write_byte(A_YM2612_0 + 0 + ((s.port & 1) << 1), s.reg);
 		m_io->write_byte(A_YM2612_0 + 1 + ((s.port & 1) << 1), m_data_streams[s.bank][offset]);
+	}
+	else if (s.chip_type == LED_YM2203)
+	{
+		m_io->write_byte(A_YM2203_0 + 0 + ((s.port & 1) << 1), s.reg);
+		m_io->write_byte(A_YM2203_0 + 1 + ((s.port & 1) << 1), m_data_streams[s.bank][offset]);
 	}
 	else if (s.chip_type == LED_YM2608)
 	{
@@ -889,6 +903,16 @@ TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 		}
 
 		m_io16->write_word(A_32X_PWM + (s.reg << 1), ((m_data_streams[s.bank][offset + 1] & 0xf) << 8) | m_data_streams[s.bank][offset]);
+	}
+	else if (s.chip_type == LED_C6280)
+	{
+		if (s.port != 0xff)
+			m_io->write_byte(A_C6280_0 + (s.reg >> 4), s.port);
+
+		m_io->write_byte(A_C6280_0 + (s.reg & 0xf), m_data_streams[s.bank][offset]);
+
+		if (s.port != 0xff && s.port != m_c6280_channel[0])
+			m_io->write_byte(A_C6280_0 + (s.reg >> 4), m_c6280_channel[0]);
 	}
 	else if (s.chip_type == LED_OKIM6258)
 		m_io->write_byte(A_OKIM6258_0 + s.reg, m_data_streams[s.bank][offset]);
@@ -1148,10 +1172,7 @@ void vgmplay_device::execute_run()
 					s.port = m_file->read_byte(m_pc + 3);
 					s.reg = m_file->read_byte(m_pc + 4);
 
-					if (s.chip_type == LED_32X_PWM)
-						s.byte_depth = 2;
-					else
-						s.byte_depth = 1;
+					s.byte_depth = ((s.chip_type == LED_SN76496 && (s.reg & 0x10) == 0) || s.chip_type == LED_32X_PWM) ? 2 : 1;
 
 					if (s.timer->enabled())
 					{
@@ -1569,6 +1590,8 @@ void vgmplay_device::execute_run()
 			{
 				pulse_act_led(LED_C6280);
 				uint8_t offset = m_file->read_byte(m_pc + 1);
+				if ((offset & 0x7f) == 0)
+					m_c6280_channel[BIT(offset, 7)] = m_file->read_byte(m_pc + 2);
 				if (offset & 0x80)
 					m_io->write_byte(A_C6280_1 + (offset & 0x7f), m_file->read_byte(m_pc + 2));
 				else

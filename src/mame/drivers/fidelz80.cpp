@@ -1203,7 +1203,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 {
 	u8 data = 0xff; // open bus
 	if (~offset & 4)
-		data &= m_ppi8255->read(space, offset & 3);
+		data &= m_ppi8255->read(offset & 3);
 	if (~offset & 8)
 		data &= m_z80pio->read(space, offset & 3);
 
@@ -1213,7 +1213,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 {
 	if (~offset & 4)
-		m_ppi8255->write(space, offset & 3, data);
+		m_ppi8255->write(offset & 3, data);
 	if (~offset & 8)
 		m_z80pio->write(space, offset & 3, data);
 }

@@ -95,7 +95,7 @@ void acorn_vib_device::device_reset()
 
 	space.install_readwrite_handler(0x0c00, 0x0c0f, 0, 0x10, 0, read8sm_delegate(FUNC(via6522_device::read), m_via6522.target()), write8sm_delegate(FUNC(via6522_device::write), m_via6522.target()));
 	space.install_readwrite_handler(0x0c20, 0x0c21, 0, 0x1e, 0, read8_delegate(FUNC(acia6850_device::read), m_acia.target()), write8_delegate(FUNC(acia6850_device::write), m_acia.target()));
-	space.install_readwrite_handler(0x0c40, 0x0c43, 0, 0x1c, 0, read8_delegate(FUNC(i8255_device::read), m_ppi8255.target()), write8_delegate(FUNC(i8255_device::write), m_ppi8255.target()));
+	space.install_readwrite_handler(0x0c40, 0x0c43, 0, 0x1c, 0, read8sm_delegate(FUNC(i8255_device::read), m_ppi8255.target()), write8sm_delegate(FUNC(i8255_device::write), m_ppi8255.target()));
 }
 
 

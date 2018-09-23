@@ -690,14 +690,14 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 
 		case 2:
 			if (ACCESSING_BITS_0_7)
-				return m_pit[0]->read(space, offset & 3);
+				return m_pit[0]->read(offset & 3);
 			break;
 
 		case 3:
 			if (m_type <= TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					return m_pit[1]->read(space, offset & 3);
+					return m_pit[1]->read(offset & 3);
 			}
 			else if (m_type == TYPE_WSF)
 				return m_ymsnd->read(space, offset);
@@ -707,7 +707,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 			if (m_type == TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					return m_pit[2]->read(space, offset & 3);
+					return m_pit[2]->read(offset & 3);
 			}
 			else
 				logerror("%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
@@ -735,14 +735,14 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 
 		case 2:
 			if (ACCESSING_BITS_0_7)
-				m_pit[0]->write(space, offset & 3, data);
+				m_pit[0]->write(offset & 3, data);
 			break;
 
 		case 3:
 			if (m_type <= TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					m_pit[1]->write(space, offset & 3, data);
+					m_pit[1]->write(offset & 3, data);
 			}
 			else if(m_type == TYPE_WSF)
 				m_ymsnd->write(space, offset, data);
@@ -752,7 +752,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 			if (m_type == TYPE_REDLINE)
 			{
 				if (ACCESSING_BITS_0_7)
-					m_pit[2]->write(space, offset & 3, data);
+					m_pit[2]->write(offset & 3, data);
 			}
 			else if (mem_mask == 0xffff)
 			{

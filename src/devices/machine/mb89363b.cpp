@@ -120,17 +120,17 @@ WRITE8_MEMBER(mb89363b_device::i8255_b_port_c_w) { m_out_b_pc_cb(space, offset, 
 READ8_MEMBER( mb89363b_device::read )
 {
 	if (offset & 4)
-		return m_i8255_b->read(space, offset & 3);
+		return m_i8255_b->read(offset & 3);
 	else
-		return m_i8255_a->read(space, offset & 3);
+		return m_i8255_a->read(offset & 3);
 }
 
 WRITE8_MEMBER( mb89363b_device::write )
 {
 	if (offset & 4)
-		m_i8255_b->write(space, offset & 3, data);
+		m_i8255_b->write(offset & 3, data);
 	else
-		m_i8255_a->write(space, offset & 3, data);
+		m_i8255_a->write(offset & 3, data);
 }
 
 

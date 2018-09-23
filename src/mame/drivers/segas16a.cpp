@@ -247,7 +247,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return m_i8255->read(space, offset & 3);
+			return m_i8255->read(offset & 3);
 
 		case 0x1000/2:
 		{
@@ -627,7 +627,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255->write(param >> 8, param & 0xff);
 			break;
 	}
 }

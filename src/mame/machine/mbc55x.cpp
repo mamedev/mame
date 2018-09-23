@@ -42,12 +42,12 @@ static int instruction_hook(device_t &device, offs_t curpc);
 
 READ8_MEMBER( mbc55x_state::ppi8255_r )
 {
-	return m_ppi->read(space, offset>>1);
+	return m_ppi->read(offset>>1);
 }
 
 WRITE8_MEMBER( mbc55x_state::ppi8255_w )
 {
-	m_ppi->write(space, offset>>1, data);
+	m_ppi->write(offset>>1, data);
 }
 
 READ8_MEMBER( mbc55x_state::mbc55x_ppi_porta_r )
@@ -109,22 +109,22 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_usart_w )
 
 READ8_MEMBER(mbc55x_state::mbcpic8259_r)
 {
-	return m_pic->read(space, offset>>1);
+	return m_pic->read(offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 {
-	m_pic->write(space, offset>>1, data);
+	m_pic->write(offset>>1, data);
 }
 
 READ8_MEMBER(mbc55x_state::mbcpit8253_r)
 {
-	return m_pit->read(space, offset >> 1);
+	return m_pit->read(offset >> 1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
 {
-	m_pit->write(space, offset >> 1, data);
+	m_pit->write(offset >> 1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )

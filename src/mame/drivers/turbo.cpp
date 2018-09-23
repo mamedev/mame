@@ -469,7 +469,7 @@ READ8_MEMBER(turbo_state::buckrog_port_3_r)
 
 TIMER_CALLBACK_MEMBER(turbo_state::delayed_i8255_w)
 {
-	m_i8255_0->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+	m_i8255_0->write(param >> 8, param & 0xff);
 }
 
 

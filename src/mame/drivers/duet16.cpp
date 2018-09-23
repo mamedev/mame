@@ -94,12 +94,12 @@ void duet16_state::machine_reset()
 
 READ8_MEMBER(duet16_state::pic_r)
 {
-	return m_pic->read(space, offset ^ 1, mem_mask);
+	return m_pic->read(offset ^ 1);
 }
 
 WRITE8_MEMBER(duet16_state::pic_w)
 {
-	m_pic->write(space, offset ^ 1, data);
+	m_pic->write(offset ^ 1, data);
 }
 
 WRITE8_MEMBER(duet16_state::fdcctrl_w)

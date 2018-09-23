@@ -2227,16 +2227,16 @@ READ8_MEMBER(apple2gs_state::c000_r)
 			return m_speed;
 
 		case 0x38:  // SCCBREG
-			return m_scc->cb_r(space, 0);
+			return m_scc->cb_r(0);
 
 		case 0x39:  // SCCAREG
-			return m_scc->ca_r(space, 0);
+			return m_scc->ca_r(0);
 
 		case 0x3a:  // SCCBDATA
-			return m_scc->db_r(space, 0);
+			return m_scc->db_r(0);
 
 		case 0x3b:  // SCCADATA
-			return m_scc->da_r(space, 0);
+			return m_scc->da_r(0);
 
 		case 0x3c:  // SOUNDCTL
 			return m_sndglu_ctrl;
@@ -2549,19 +2549,19 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 			break;
 
 		case 0x38:  // SCCBREG
-			m_scc->cb_w(space, 0, data);
+			m_scc->cb_w(0, data);
 			break;
 
 		case 0x39:  // SCCAREG
-			m_scc->ca_w(space, 0, data);
+			m_scc->ca_w(0, data);
 			break;
 
 		case 0x3a:  // SCCBDATA
-			m_scc->db_w(space, 0, data);
+			m_scc->db_w(0, data);
 			break;
 
 		case 0x3b:  // SCCADATA
-			m_scc->da_w(space, 0, data);
+			m_scc->da_w(0, data);
 			break;
 
 		case 0x3c:  // SOUNDCTL

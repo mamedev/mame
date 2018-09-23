@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_AMS3, bbc_ams3_device, "bbc_ams3", "AMS 3&quot; Microdrive Disc System")
+DEFINE_DEVICE_TYPE(BBC_AMS3, bbc_ams3_device, "bbc_ams3", "AMS 3\" Microdrive Disc System")
 
 
 //-------------------------------------------------

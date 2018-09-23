@@ -5,7 +5,7 @@
 Emma and Emma II by L.J.Technical Systems
 These were produced by L.J.Electronics Ltd, Norwich in 1979.
 
-2018-09-20 Skeleton driver.
+2018-09-20 Working driver.
 
 We don't have roms for the Emma, so only the Emma II is emulated.
 
@@ -39,7 +39,10 @@ and 16k of static RAM.
 
 To Do:
 - Cassette LED doesn't work.
+- Display should blank if PB0 not being pulsed.
 - Code up the expansion unit (rom is there but no schematic exists)
+- Need software.
+
 
 ****************************************************************************/
 

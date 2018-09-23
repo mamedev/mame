@@ -831,12 +831,12 @@ READ16_MEMBER(x68k_state::sysport_r)
 
 WRITE16_MEMBER(x68k_state::ppi_w)
 {
-	m_ppi->write(space,offset & 0x03,data);
+	m_ppi->write(offset & 0x03,data);
 }
 
 READ16_MEMBER(x68k_state::ppi_r)
 {
-	return m_ppi->read(space,offset & 0x03);
+	return m_ppi->read(offset & 0x03);
 }
 
 

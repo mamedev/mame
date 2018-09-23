@@ -377,7 +377,7 @@ uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
-				data = m_pic->read(space, offset & 0x01);
+				data = m_pic->read(offset & 0x01);
 				break;
 
 			case 6: // not used
@@ -486,7 +486,7 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, uin
 
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
-				m_pic->write(space, offset & 0x01, data);
+				m_pic->write(offset & 0x01, data);
 				break;
 
 			case 6: // Par. port cntrl.

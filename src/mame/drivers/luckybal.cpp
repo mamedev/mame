@@ -394,12 +394,12 @@ WRITE8_MEMBER(luckybal_state::port90_bitswap_w)
 
 READ8_MEMBER(luckybal_state::ppi_bitswap_r)
 {
-	return bitswap<8>(m_ppi->read(space, offset), 6, 7, 4, 5, 2, 3, 0, 1);
+	return bitswap<8>(m_ppi->read(offset), 6, 7, 4, 5, 2, 3, 0, 1);
 }
 
 WRITE8_MEMBER(luckybal_state::ppi_bitswap_w)
 {
-	m_ppi->write(space, offset, bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1));
+	m_ppi->write(offset, bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1));
 }
 
 WRITE8_MEMBER(luckybal_state::output_port_a_w)
@@ -428,7 +428,7 @@ WRITE8_MEMBER(luckybal_state::output_port_b_w)
 READ8_MEMBER(luckybal_state::input_port_c_r)
 {
 	uint8_t mux_player, sel_line, bit5, bit6, bit7, ret;
-	sel_line = m_ppi->read_pb() & 0x7f;
+	sel_line = m_ppi->pb_r() & 0x7f;
 	mux_player = m_latch[0]->output_state();
 
 	bit5 = BIT(m_aux->read(), sel_line & 0x07) ? 0xff : 0xdf;                   // Operator & Page.

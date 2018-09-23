@@ -614,10 +614,10 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
 	if(io_port >= 0x08 && io_port <= 0x0b)
-		return m_ppi0->read(space, io_port & 3);
+		return m_ppi0->read(io_port & 3);
 	else
 	if(io_port >= 0x0c && io_port <= 0x0f)
-		return m_ppi1->read(space, io_port & 3);
+		return m_ppi1->read(io_port & 3);
 //  else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
 	else
 	if(io_port >= 0x18 && io_port <= 0x1b)
@@ -626,7 +626,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 	if(io_port >= 0x20 && io_port <= 0x23)
 	{
 		pasopia_nmi_trap();
-		return m_ppi2->read(space, io_port & 3);
+		return m_ppi2->read(io_port & 3);
 	}
 	else
 	if(io_port >= 0x28 && io_port <= 0x2b)
@@ -663,10 +663,10 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
 	if(io_port >= 0x08 && io_port <= 0x0b)
-		m_ppi0->write(space, io_port & 3, data);
+		m_ppi0->write(io_port & 3, data);
 	else
 	if(io_port >= 0x0c && io_port <= 0x0f)
-		m_ppi1->write(space, io_port & 3, data);
+		m_ppi1->write(io_port & 3, data);
 	else
 	if(io_port >= 0x10 && io_port <= 0x11)
 		pasopia7_6845_w(space, io_port-0x10, data);
@@ -676,7 +676,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	else
 	if(io_port >= 0x20 && io_port <= 0x23)
 	{
-		m_ppi2->write(space, io_port & 3, data);
+		m_ppi2->write(io_port & 3, data);
 		pasopia_nmi_trap();
 	}
 	else

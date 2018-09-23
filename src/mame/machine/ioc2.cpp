@@ -260,7 +260,7 @@ READ32_MEMBER( ioc2_device::read )
 		case TIMER_COUNT1_REG:
 		case TIMER_COUNT2_REG:
 		case TIMER_CONTROL_REG:
-			return m_pit->read(space, offset - TIMER_COUNT0_REG);
+			return m_pit->read(offset - TIMER_COUNT0_REG);
 	}
 
 	return 0;
@@ -386,7 +386,7 @@ WRITE32_MEMBER( ioc2_device::write )
 		case TIMER_COUNT1_REG:
 		case TIMER_COUNT2_REG:
 		case TIMER_CONTROL_REG:
-			m_pit->write(space, offset - TIMER_COUNT0_REG, data & 0xff);
+			m_pit->write(offset - TIMER_COUNT0_REG, data & 0xff);
 			return;
 	}
 }

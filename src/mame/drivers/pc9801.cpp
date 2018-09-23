@@ -784,8 +784,8 @@ WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
 		uint8_t por;
 		/* reset POR bit */
 		// TODO: is there any other way that doesn't involve direct r/w of ppi address?
-		por = m_ppi_sys->read(space, 2) & ~0x20;
-		m_ppi_sys->write(space, 2, por);
+		por = m_ppi_sys->read(2) & ~0x20;
+		m_ppi_sys->write(2, por);
 		m_maincpu->set_input_line(INPUT_LINE_A20, CLEAR_LINE);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
@@ -1026,12 +1026,12 @@ READ8_MEMBER( pc9801_state::midi_r )
 
 READ8_MEMBER(pc9801_state::pic_r)
 {
-	return ((offset >= 4) ? m_pic2 : m_pic1)->read(space, offset & 3);
+	return ((offset >= 4) ? m_pic2 : m_pic1)->read(offset & 3);
 }
 
 WRITE8_MEMBER(pc9801_state::pic_w)
 {
-	((offset >= 4) ? m_pic2 : m_pic1)->write(space, offset & 3, data);
+	((offset >= 4) ? m_pic2 : m_pic1)->write(offset & 3, data);
 }
 
 READ16_MEMBER(pc9801_state::grcg_gvram_r)

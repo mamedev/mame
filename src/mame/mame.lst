@@ -9777,6 +9777,7 @@ spacewar                        // (c) 1977
 speedfrk                        // (c) 1979 Vectorbeam
 starcas                         // (c) 1980
 starcas1                        // (c) 1980
+starcasc                        // (c) 1980
 starcase                        // (c) 1980 Cinematronics (Mottoeis license)
 starcasp                        // (c) 1980 prototype
 starhawk                        // (c) 1979
@@ -29154,7 +29155,7 @@ finallapjb                      // 87.12 Final Lap
 finallapjc                      // 87.12 Final Lap
 finehour                        // (c) 1989 (Japan)
 fourtrax                        // 89.11
-fourtraxj						// 89.11
+fourtraxj                       // 89.11
 fourtraxa                       // 89.11
 gollygho                        // 91.7  Golly Ghost
 kyukaidk                        // (c) 1990 (Japan, new version)
@@ -36284,7 +36285,7 @@ teddybbo                        // 834-5712 (c) 1985 (S1)
 teddybbobl                      // bootleg
 thetogyu                        // 834-5478 (c) 1984 Sega / Coreland (S1)
 tokisens                        // (c) 1987
-tokisensa						//
+tokisensa                       //
 ufosensi                        // 834-6659 (S2)
 ufosensib                       // bootleg
 upndown                         // (c) 1983 (S1)
@@ -38165,6 +38166,7 @@ vendetta2pw                     // GX081 (c) 1991 (World)
 vendettan                       // GX081 (c) 1991 (Japan)
 vendettar                       // GX081 (c) 1991 (World)
 vendettaz                       // GX081 (c) 1991 (World)
+vendettaun                      // GX081 (c) 1991 (World)
 
 @source:vertigo.cpp
 topgunnr                        // (c) 1986

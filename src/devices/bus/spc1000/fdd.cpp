@@ -215,7 +215,7 @@ WRITE8_MEMBER(spc1000_fdd_exp_device::write)
 		switch (offset)
 		{
 			case 0:
-				m_ppi->write(space, 1, data);
+				m_ppi->write(1, data);
 				break;
 			case 2:
 				m_i8255_0_pc = data;

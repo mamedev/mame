@@ -40,14 +40,14 @@ READ16_MEMBER( i80130_device::io_r )
 	case 0: case 1:
 		if (ACCESSING_BITS_0_7)
 		{
-			data = m_pic->read(space, offset & 0x01);
+			data = m_pic->read(offset & 0x01);
 		}
 		break;
 
 	case 4: case 5: case 6: case 7:
 		if (ACCESSING_BITS_0_7)
 		{
-			data = m_pit->read(space, offset & 0x03);
+			data = m_pit->read(offset & 0x03);
 		}
 		break;
 	}
@@ -62,14 +62,14 @@ WRITE16_MEMBER( i80130_device::io_w )
 	case 0: case 1:
 		if (ACCESSING_BITS_0_7)
 		{
-			m_pic->write(space, offset & 0x01, data & 0xff);
+			m_pic->write(offset & 0x01, data & 0xff);
 		}
 		break;
 
 	case 4: case 5: case 6: case 7:
 		if (ACCESSING_BITS_0_7)
 		{
-			m_pit->write(space, offset & 0x03, data & 0xff);
+			m_pit->write(offset & 0x03, data & 0xff);
 		}
 		break;
 	}

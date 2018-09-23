@@ -196,22 +196,22 @@ WRITE_LINE_MEMBER(imds2_state::ipc_intr_w)
 
 READ8_MEMBER(imds2_state::ipcsyspic_r)
 {
-	return m_ipcsyspic->read(space, !BIT(offset, 0));
+	return m_ipcsyspic->read(!BIT(offset, 0));
 }
 
 READ8_MEMBER(imds2_state::ipclocpic_r)
 {
-	return m_ipclocpic->read(space, !BIT(offset, 0));
+	return m_ipclocpic->read(!BIT(offset, 0));
 }
 
 WRITE8_MEMBER(imds2_state::ipcsyspic_w)
 {
-	m_ipcsyspic->write(space, !BIT(offset, 0), data);
+	m_ipcsyspic->write(!BIT(offset, 0), data);
 }
 
 WRITE8_MEMBER(imds2_state::ipclocpic_w)
 {
-	m_ipclocpic->write(space, !BIT(offset, 0), data);
+	m_ipclocpic->write(!BIT(offset, 0), data);
 }
 
 void imds2_state::driver_start()

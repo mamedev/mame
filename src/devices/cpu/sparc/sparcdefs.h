@@ -105,7 +105,7 @@
 #define SHCNT32 (op & 31)
 #define SHCNT64 (op & 63)
 #define IAMODE  (op & 0x7)
-#define USEIMM  ((op >> 13) & 1)
+#define USEIMM  (op & (1 << 13))
 #define USEEXT  ((op >> 12) & 1)
 
 
