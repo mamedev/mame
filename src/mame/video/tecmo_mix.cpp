@@ -128,7 +128,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 							dd[x] = paldata[fgpixel + m_fgregular_comp];
 						}
 					}
-					else if (bgpixel & 0x0f)
+					else if (bgpixel & 0xf)
 					{
 						// solid BG
 						dd[x] = paldata[bgpixel + m_bgregular_comp];
@@ -294,11 +294,11 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					// solid TX
 					dd[x] = paldata[txpixel + m_txregular_comp];
 				}
-				else if (fgpixel & 0x0f)
+				else if (fgpixel & 0xf)
 				{
 					if (fgbln)
 					{
-						if (bgpixel & 0x0f)
+						if (bgpixel & 0xf)
 						{
 							dd[x] = sum_colors(paldata, fgpixel + m_fgblend_source, bgpixel + m_bgblend_comp);
 						}
@@ -312,7 +312,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 						dd[x] = paldata[fgpixel + m_fgregular_comp];
 					}
 				}
-				else if (bgpixel & 0x0f)
+				else if (bgpixel & 0xf)
 				{
 					dd[x] = paldata[bgpixel + m_bgregular_comp];
 				}
