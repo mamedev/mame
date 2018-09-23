@@ -239,7 +239,7 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 
 READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 {
-	switch (m_mcu->p2_r(space, 0) & 0xf0)
+	switch (m_mcu->p2_r() & 0xf0)
 	{
 	case 0x40:
 		return m_soundlatch[1]->read(space, 0);
@@ -255,7 +255,7 @@ READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 WRITE8_MEMBER(atetris_mcu_state::mcu_p2_w)
 {
 	if ((data & 0xc0) == 0x80)
-		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r(space, 0));
+		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r());
 }
 
 WRITE8_MEMBER(atetris_mcu_state::mcu_reg_w)
