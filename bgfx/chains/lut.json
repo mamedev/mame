@@ -1,4 +1,4 @@
-{	
+{
 	"name": "3D LUT",
 	"author": "W. M. Martinez",
 	"targets": [
@@ -25,7 +25,8 @@
 				}, {
 					"sampler": "s_3dlut",
 					"option": "bgfx_lut",
-					"bilinear": true,
+					"bilinear": false,
+					"clamp": true,
 					"selection": "LUT Texture"
 				}
 			],

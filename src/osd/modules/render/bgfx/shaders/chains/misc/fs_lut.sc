@@ -18,7 +18,7 @@ void main()
 	vec3 color = bp.rgb;
 	// NOTE: Do not change the order of parameters here.
 	vec3 lutcoord = vec3(color.rg * ((LUT_SIZE - 1.0f) + 0.5f) *
-		LUT_SCALE, color.b * (LUT_SIZE - 1.0f));
+		LUT_SCALE, (LUT_SIZE - 1.0f) * color.b);
 	float shift = floor(lutcoord.z);
 
 	lutcoord.x += shift * LUT_SCALE.y;
