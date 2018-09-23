@@ -9,8 +9,9 @@
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/bankdev.h"
 //#include "machine/i8243.h"
-//#include "machine/ins8250.h"
+#include "machine/ins8250.h"
 //#include "video/dp8350.h"
 #include "screen.h"
 
@@ -20,6 +21,7 @@ public:
 	hazl1420_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bankdev(*this, "bankdev")
 	{
 	}
 
@@ -29,14 +31,23 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	void p2_w(u8 data);
+
 	void prog_map(address_map &map);
 	void io_map(address_map &map);
+	void bank_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<mcs48_cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_bankdev;
 	//required_device_array<i8243_device, 2> m_ioexp;
 };
+
+void hazl1420_state::p2_w(u8 data)
+{
+	m_bankdev->set_bank(data & 0x0f);
+}
 
 void hazl1420_state::prog_map(address_map &map)
 {
@@ -45,6 +56,13 @@ void hazl1420_state::prog_map(address_map &map)
 
 void hazl1420_state::io_map(address_map &map)
 {
+	map(0x00, 0xff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
+
+void hazl1420_state::bank_map(address_map &map)
+{
+	map(0x800, 0x807).mirror(0x10).rw("ace", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0xc48, 0xc48).ram();
 }
 
 void hazl1420_state::machine_start()
@@ -117,11 +135,18 @@ void hazl1420_state::hazl1420(machine_config &config)
 	I8049(config, m_maincpu, 11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hazl1420_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &hazl1420_state::io_map);
+	m_maincpu->p2_out_cb().set(FUNC(hazl1420_state::p2_w));
+
+	ADDRESS_MAP_BANK(config, m_bankdev);
+	m_bankdev->set_addrmap(0, &hazl1420_state::bank_map);
+	m_bankdev->set_data_width(8);
+	m_bankdev->set_addr_width(12);
+	m_bankdev->set_stride(0x100);
 
 	//I8243(config, m_ioexp[0]);
 	//I8243(config, m_ioexp[1]);
 
-	//INS8250(config, "ace", 1'843'200);
+	INS8250(config, "ace", 1'843'200);
 
 	//DP8350(config, "crtc", 10.92_MHz_XTAL);
 
