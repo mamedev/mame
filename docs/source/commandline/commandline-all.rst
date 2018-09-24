@@ -349,6 +349,12 @@ Configuration Options
 Core Search Path Options
 ------------------------
 
+.. _mame-commandline-homepath:
+
+**-homepath** *<path>*
+
+	Specifies a path within which to find the plugins base folder. The default is '.' (that is, in the same directory as the MAME executable).
+
 .. _mame-commandline-rompath:
 
 **-rompath** / **-rp** *<path>*
@@ -415,7 +421,12 @@ Core Search Path Options
 
 	Specifies a list of paths within which to find language files for localized UI text.
 
+.. _mame-commandline-swpath:
 
+**-swpath** *<path>*
+
+	Specifies a path within which to find loose software to be used by emulation.
+	
 
 Core Output Directory Options
 -----------------------------
@@ -712,29 +723,29 @@ Core Video Options
 **-video** *<bgfx|gdi|d3d|opengl|soft|accel|none>*
 
 |
-|	Specifies which video subsystem to use for drawing. Options here depend on the operating system and whether this is an SDL-compiled version of MAME.
+|   Specifies which video subsystem to use for drawing. Options here depend on the operating system and whether this is an SDL-compiled version of MAME.
 |
 |   Generally Available:
 |
 |	Using '**bgfx**' specifies the new hardware accelerated renderer.
-|   Using '**opengl**' tells MAME to render video using OpenGL acceleration.
-|   Using '**none**' displays no windows and does no drawing. This is primarily present for doing CPU benchmarks without the overhead of the video system.
+|	Using '**opengl**' tells MAME to render video using OpenGL acceleration.
+|	Using '**none**' displays no windows and does no drawing. This is primarily present for doing CPU benchmarks without the overhead of the video system.
 |
-|	On Windows:
+|   On Windows:
 |
-|   Using '**gdi**' here, tells MAME to render video using older standard Windows graphics drawing calls. This is the slowest but most compatible option on older versions of Windows.
-|   Using '**d3d**' tells MAME to use Direct3D for rendering. This produces the better quality output than gdi and enables additional rendering options. It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better.
+|	Using '**gdi**' here, tells MAME to render video using older standard Windows graphics drawing calls. This is the slowest but most compatible option on older versions of Windows.
+|	Using '**d3d**' tells MAME to use Direct3D for rendering. This produces the better quality output than gdi and enables additional rendering options. It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better.
 |
 |   On other platforms (including SDL on Windows):
 |
 |	Using '**accel**' tells MAME to render video using SDL's 2D acceleration if possible.
-|   Using '**soft**' uses software rendering for video output. This isn't as fast or as nice as OpenGL but will work on any platform.
+|	Using '**soft**' uses software rendering for video output. This isn't as fast or as nice as OpenGL but will work on any platform.
 |
 |   Defaults:
 |
-|   The default on Windows is **d3d**.
-|   The default for Mac OS X is '*opengl*' because OS X is guaranteed to have a compliant OpenGL stack.
-|   The default on all other systems is '*soft*'.
+|	The default on Windows is **d3d**.
+|	The default for Mac OS X is '*opengl*' because OS X is guaranteed to have a compliant OpenGL stack.
+|	The default on all other systems is '*soft*'.
 
 
 .. _mame-commandline-numscreens:
@@ -915,6 +926,18 @@ Core Artwork Options
 
 	Enables/disables the display of marquees. The default is ON (*-use_marquees*).
 
+.. _mame-commandline-fallbackartwork:
+
+**-fallback_artwork**
+
+	Specifies fallback artwork if no external artwork or internal driver layout is defined.
+
+.. _mame-commandline-overrideartwork:
+
+**-override_artwork**
+
+	Specifies override artwork for external artwork and internal driver layout.
+
 
 
 Core Screen Options
@@ -957,15 +980,21 @@ Core Vector Options
 
 .. _mame-commandline-noantialias:
 
-**-[no]antialias** / **-[no]aa**
+**-beam_width_min** *<width>*
 
-	Enables antialiased line rendering for vector systems. The default is ON (*-antialias*).
+	Sets the vector beam minimum width.
 
 .. _mame-commandline-beam:
 
-**-beam** *<width>*
+**-beam_width_max** *<width>*
 
-	Sets the width of the vectors. This is a scaling factor against the standard vector width. A value of 1.0 will keep the default vector line width. Smaller values will reduce the width, and larger values will increase the width. The default is *1.0*.
+	Sets the vector beam maximum width.
+
+.. _mame-commandline-beamintensityweight:
+
+**-beam_intensity_weight** *<weight>*
+
+	Sets the vector beam intensity weight.
 
 .. _mame-commandline-flicker:
 
@@ -1372,6 +1401,12 @@ Core Communication Options
 
 	Remote port to connect to. This can be any traditional communications port as an unsigned 16-bit integer (0-65535). The default value is "*15122*".
 
+.. _mame-commandline-commframesync:
+
+**-[no]comm_framesync**
+
+	Synchronize frames between the communications network. The default is OFF (*-nocomm_framesync*)".
+
 
 
 Core Misc Options
@@ -1424,6 +1459,12 @@ Core Misc Options
 
 	Specifies the name of a font file to use for the UI font. If this font cannot be found or cannot be loaded, the system will fall back to its built-in UI font. On some platforms *fontname* can be a system font name instead of a BDF font file. The default is *default* (use the OSD-determined default font).
 
+.. _mame-commandline-ui:
+
+**-ui** *<type>*
+
+	Specifies the type of UI to use, either 'simple' or 'cabinet'.  The default is Cabinet (*-ui cabinet*).
+
 .. _mame-commandline-ramsize:
 
 **-ramsize** *[n]*
@@ -1442,6 +1483,23 @@ Core Misc Options
 
 	Displays a mouse cursor when using the built-in UI for MAME. The default is (*-noui_mouse*).
 
+.. _mame-commandline-language:
+
+**-language** *<language>*
+
+	Specify a localization language found in the *languagepath* tree.
+
+.. _mame-commandline-nvramsave:
+
+**-nvram_save**
+
+	Save the NVRAM from being overwitten on exit.  The default of OFF (*-nonvram_save*).
+
+
+
+Scripting Options
+-----------------
+
 .. _mame-commandline-autobootcommand:
 
 **-autoboot_command** *"<command>"*
@@ -1454,16 +1512,56 @@ Core Misc Options
 
 **-autoboot_delay** *[n]*
 
-    Timer delay (in seconds) to trigger command execution on autoboot.
+	Timer delay (in seconds) to trigger command execution on autoboot.
 
 .. _mame-commandline-autobootscript:
 
 **-autoboot_script** / **-script** *[filename.lua]*
 
-    File containing scripting to execute after machine boot.
+	File containing scripting to execute after machine boot.
 
-.. _mame-commandline-language:
+.. _mame-commandline-console:
 
-**-language** *<language>*
+**-console**
 
-	Specify a localization language found in the *languagepath* tree.
+	Enables emulator Lua Console window. The default of OFF (*-noconsole*).
+
+.. _mame-commandline-plugins:
+
+**-plugins**
+
+	Enable the use of Lua Plugins.  The default is ON (*-plugins*).
+
+.. _mame-plugin:
+
+**-plugin* *[plugin shortname]*
+
+	A list of Lua Plugins to enable, comma separated.
+
+.. _mame-commandline-noplugin:
+
+**-noplugin** *[plugin shortname]*
+
+	A list of Lua Plugins to disable, comma separated.
+
+
+
+HTTP SERVER OPTIONS
+-------------------
+.. _mame-commandline-http:
+
+**-http**
+
+	Enable HTTP server. The default is OFF (*-nohttp*).
+
+.. _mame-commandline-httpport:
+
+**-http_port** *[port]*
+
+	Choose HTTP server port. The default is *8080*.
+
+.. _mame-commandline-httproot:
+
+**-http_root** *[rootfolder]*
+
+	Choose HTTP server document root. The default os *web*.
