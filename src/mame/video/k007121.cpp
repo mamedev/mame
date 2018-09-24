@@ -206,10 +206,12 @@ WRITE8_MEMBER( k007121_device::ctrl_w )
  *   4  | ----xxx- | sprite size 000=16x16 001=16x8 010=8x16 011=8x8 100=32x32
  *   4  | -------x | x position (high bit)
  *
- * Flack Attack uses a different, "wider" layout with 32 bytes per sprite,
+ * Flak Attack uses a different, "wider" layout with 32 bytes per sprite,
  * mapped as follows, and the priority order is reversed. Maybe it is a
  * compatibility mode with an older custom IC. It is not known how this
  * alternate layout is selected.
+ * TODO: this is actually because it uses a nasty dual chip configuration,
+ * DMA triggered every two frames by reg [3] bit 3 
  *
  * 0 -> e
  * 1 -> f
@@ -273,6 +275,13 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
 		int x,y, ex, ey, flipx, flipy, destx, desty;
 
+		// priority (Flak Attack)
+		if ((source[9] & 1) != pri_mask)
+		{
+			source += inc;
+			continue;
+		}
+		
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
 
@@ -325,7 +334,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 						desty = sy + y * 8;
 					}
 
-					if (pri_mask != -1)
+					if (pri_mask != -1 && is_flakatck == false)
 						gfx->prio_transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
@@ -343,7 +352,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 			}
 		}
-
+ 
 		source += inc;
 	}
 }
