@@ -235,6 +235,11 @@ void ins8250_uart_device::clear_int(int flag)
 	update_interrupt();
 }
 
+READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
+{
+	return !BIT(m_regs.iir, 0);
+}
+
 // Baud rate generator is reset after writing to either byte of divisor latch
 void ins8250_uart_device::update_baud_rate()
 {

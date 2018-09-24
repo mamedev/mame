@@ -72,10 +72,11 @@ void sbus_bwtwo_device::install_device()
 
 uint32_t sbus_bwtwo_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	uint8_t *line = &m_vram[0];
+
 	for (int y = 0; y < 900; y++)
 	{
 		uint32_t *scanline = &bitmap.pix32(y);
-		uint8_t *line = &m_vram[y * 1152/8];
 		for (int x = 0; x < 1152/8; x++)
 		{
 			memcpy(scanline, m_mono_lut[*line], sizeof(uint32_t) * 8);

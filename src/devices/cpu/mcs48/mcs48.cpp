@@ -1375,17 +1375,6 @@ WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
 }
 
 
-READ8_MEMBER(mcs48_cpu_device::p1_r)
-{
-	return m_p1;
-}
-
-READ8_MEMBER(mcs48_cpu_device::p2_r)
-{
-	return m_p2;
-}
-
-
 /***************************************************************************
     GENERAL CONTEXT ACCESS
 ***************************************************************************/
