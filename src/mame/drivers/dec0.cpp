@@ -2363,7 +2363,7 @@ ROM_START( drgninjab2 )
 	ROM_LOAD( "a15.7b",   0x8000, 0x8000, CRC(82007af2) SHA1(f0db1b1dab199df402a7590e56d4d5ab4baca803) ) // 99.612427%
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 68705 microcontroller */
-	ROM_LOAD( "mc68705r3p",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "68705r3.0m",     0x0000, 0x1000, CRC(7231dd7eb9b5152a287e1bcceb3c3a0b35f441af) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "a22.9m",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) // 99.996948%
@@ -3797,7 +3797,7 @@ GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgni
 GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
 GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, init_ffantasybl, ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
-GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
+GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text), 68705 dumped but not hooked up
 
 // these are different to the above but quite similar to each other
 GAME( 1988, automat,    robocop,  automat,    robocop,    dec0_automat_state, empty_init,   ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
