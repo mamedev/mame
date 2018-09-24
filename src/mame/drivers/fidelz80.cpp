@@ -597,7 +597,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t0_r);
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
-	template<int Shift> void vbrc_ioexp_port_w(uint8_t data);
+	template<int P> void vbrc_ioexp_port_w(uint8_t data);
 	void vbrc_main_io(address_map &map);
 	void vbrc_main_map(address_map &map);
 
