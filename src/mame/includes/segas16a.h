@@ -95,7 +95,7 @@ private:
 	DECLARE_READ8_MEMBER( sound_data_r );
 	DECLARE_WRITE8_MEMBER( n7751_command_w );
 	DECLARE_WRITE8_MEMBER( n7751_control_w );
-	DECLARE_WRITE8_MEMBER( n7751_rom_offset_w );
+	template<int Shift> void n7751_rom_offset_w(uint8_t data);
 
 	// N7751 sound generator CPU read/write handlers
 	DECLARE_READ8_MEMBER( n7751_rom_r );
