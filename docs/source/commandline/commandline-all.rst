@@ -353,7 +353,7 @@ Core Search Path Options
 
 **-homepath** *<path>*
 
-	Specifies a path within which to find the plugins base folder. The default is '.' (that is, in the same directory as the MAME executable).
+	Specifies a path where the base 'plugins' folder is to be found. The default is '.' (that is, in the current working directory).
 
 .. _mame-commandline-rompath:
 
@@ -395,7 +395,7 @@ Core Search Path Options
 
 **-fontpath** *<path>*
 
-	Specifies a list of paths within which to find .BDF font files. Multiple paths can be specified by separating them with semicolons. The default is '.' (that is, search in the same directory as the MAME executable).
+	Specifies a list of paths within which to find .BDF font files. Multiple paths can be specified by separating them with semicolons. The default is '.' (that is, search in the current working directory).
 
 .. _mame-commandline-cheatpath:
 
@@ -1491,9 +1491,9 @@ Core Misc Options
 
 .. _mame-commandline-nvramsave:
 
-**-nvram_save**
+**-[no]nvram_save**
 
-	Save the NVRAM from being overwitten on exit.  The default of OFF (*-nonvram_save*).
+	Save the NVRAM contents when exiting machine emulation. By turning this off, you can retain your previous NVRAM contents as any current changes made will not be saved. The default of ON (*-nvram_save*).
 
 
 
