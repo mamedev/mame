@@ -746,7 +746,7 @@ Core Video Options
 |	The default on Windows is **d3d**.
 |	The default for Mac OS X is '*opengl*' because OS X is guaranteed to have a compliant OpenGL stack.
 |	The default on all other systems is '*soft*'.
-
+|
 
 .. _mame-commandline-numscreens:
 
@@ -1522,7 +1522,7 @@ Scripting Options
 
 .. _mame-commandline-console:
 
-**-console**
+**-[no]console**
 
 	Enables emulator Lua Console window. The default of OFF (*-noconsole*).
 
@@ -1534,7 +1534,7 @@ Scripting Options
 
 .. _mame-plugin:
 
-**-plugin* *[plugin shortname]*
+**-plugin** *[plugin shortname]*
 
 	A list of Lua Plugins to enable, comma separated.
 
@@ -1550,7 +1550,7 @@ HTTP SERVER OPTIONS
 -------------------
 .. _mame-commandline-http:
 
-**-http**
+**-[no]http**
 
 	Enable HTTP server. The default is OFF (*-nohttp*).
 
