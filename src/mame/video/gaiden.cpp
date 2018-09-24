@@ -111,7 +111,7 @@ VIDEO_START_MEMBER(gaiden_state,raiga)
 	/* set up sprites */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	m_spritebuffer[0] = make_unique_clear<uint16_t[]>(0x2000/2); // raiga has double-buffered sprites
+	m_spritebuffer[0] = make_unique_clear<uint16_t[]>(0x2000/2); // raiga has triple-buffered sprites
 	m_spritebuffer[1] = make_unique_clear<uint16_t[]>(0x2000/2);
 
 	save_pointer(NAME(m_spritebuffer[0]), 0x2000/2);
