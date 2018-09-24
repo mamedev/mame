@@ -13,7 +13,8 @@ driver by Hau, Nicola Salmoria
 special thanks to Nekomata, NTD & code-name'Siberia'
 
 TODO:
-- wrong background in fstarfrc title (Video ref. -> https://www.youtube.com/watch?v=EXBTNk-0ejk)
+- wrong background in fstarfrc title
+  (Video ref. -> https://www.youtube.com/watch?v=EXBTNk-0ejk , https://www.youtube.com/watch?v=5iZtgWqUz6c)
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
@@ -368,6 +369,7 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tecmo16_state, screen_vblank))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo16)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)

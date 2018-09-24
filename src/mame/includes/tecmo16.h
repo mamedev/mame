@@ -61,6 +61,7 @@ private:
 	uint16_t m_scroll2_y_w;
 	uint16_t m_scroll_char_x_w;
 	uint16_t m_scroll_char_y_w;
+	std::unique_ptr<uint16_t[]> m_spritebuffer[2];
 
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_WRITE16_MEMBER(colorram_w);
@@ -84,6 +85,7 @@ private:
 	DECLARE_VIDEO_START(riot);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void save_state();
 
