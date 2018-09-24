@@ -209,7 +209,7 @@ void hp_hybrid_cpu_device::device_start()
 		state_add(HPHYBRID_IV, "IV", m_reg_IV);
 		state_add(HPHYBRID_PA, "PA", m_reg_PA[ 0 ]);
 		state_add(HPHYBRID_W, "W", m_reg_W).noshow();
-		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%9s");
+		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%12s");
 		state_add(HPHYBRID_DMAPA , "DMAPA" , m_dmapa).noshow();
 		state_add(HPHYBRID_DMAMA , "DMAMA" , m_dmama).noshow();
 		state_add(HPHYBRID_DMAC , "DMAC" , m_dmac).noshow();
@@ -918,9 +918,10 @@ bool hp_hybrid_cpu_device::execute_emc(uint16_t opcode , uint16_t& next_pc)
 void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	if (entry.index() == STATE_GENFLAGS) {
-		str = string_format("%s %s %c %c",
+		str = string_format("%s %s %s %c %c",
 							BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
 							BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
+							BIT(m_flags , HPHYBRID_DC_BIT) ? "DC":"..",
 							BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
 							BIT(m_flags , HPHYBRID_C_BIT) ? 'E':'.');
 	}
@@ -1474,16 +1475,16 @@ void hp_hybrid_cpu_device::do_mpy(void)
 {
 	// Count 0->1 and 1->0 transitions in A register
 	// Correct timing needs this count as real hw uses Booth's algorithm for multiplication
-	unsigned transitions = 0;
 	uint16_t tmp = m_reg_A;
+	uint16_t mask = ~0;
 	for (unsigned i = 0; i < 16 && tmp; ++i) {
 		if (BIT(tmp , 0)) {
-			tmp = ~tmp;
-			transitions++;
+			tmp ^= mask;
+			m_icount -= 2;
 		}
 		tmp >>= 1;
+		mask >>= 1;
 	}
-	logerror("MPY A%04x T=%u\n" , m_reg_A , transitions);
 
 	int32_t a = (int16_t)m_reg_A;
 	int32_t b = (int16_t)m_reg_B;
@@ -1492,7 +1493,7 @@ void hp_hybrid_cpu_device::do_mpy(void)
 	m_reg_A = (uint16_t)(p & 0xffff);
 	m_reg_B = (uint16_t)((p >> 16) & 0xffff);
 
-	m_icount -= (59 + 2 * transitions);
+	m_icount -= 59;
 }
 
 // ********************************************************************************

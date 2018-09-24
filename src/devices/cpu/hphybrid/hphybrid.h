@@ -10,6 +10,12 @@
 // discrete implementation of the 1960s into a multi-chip module (hence the "hybrid" name).
 // This emulator currently supports the 5061-3001, 5061-3011 and 09825-67907 versions.
 //
+// |       *CPU* | *Addr bits* | *Multi-indirect* | *BPC* | *IOC* | *EMC* | *AEC* | *Used in* |
+// |-------------+-------------+------------------+-------+-------+-------+-------+-----------|
+// | 09825-67907 | 15          | Y                | Y     | Y     | Y     | N     | HP 9825   |
+// |   5061-3001 | 16 (+ext)   | N                | Y     | Y     | Y     | Y     | HP 9845   |
+// |   5061-3011 | 16          | N                | Y     | Y     | N     | N     | HP 64000  |
+//
 // For this emulator I mainly relied on these sources:
 // - "The how they do dat manual": this manual has way more than you will ever want to know
 //   about the hybrid processors. It often gets to the single transistor detail level..
