@@ -18,6 +18,7 @@ To Do:
 - CPU clock
 - unknown status bits? eg. hopper
 - color overlay as seen on flyer upright cabinet
+- no lamp for 'Deal' is this correct?
 
 When booted, press Key out (mapped to W by default) to get it going.
 
@@ -30,6 +31,7 @@ When booted, press Key out (mapped to W by default) to get it going.
 #include "screen.h"
 #include "emupal.h"
 
+#include "video21.lh"
 
 class video21_state : public driver_device
 {
@@ -39,11 +41,21 @@ public:
 		, m_maincpu(*this,"maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void video21(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+
+	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_WRITE8_MEMBER(lamp1_w);
+	DECLARE_WRITE8_MEMBER(lamp2_w);
+
+	void clear_lamps(device_t &device);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
@@ -51,6 +63,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
+	
+	int m_offcounter;
+	output_finder<24> m_lamps;
 };
 
 
@@ -86,6 +101,48 @@ uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+WRITE8_MEMBER(video21_state::unk_w)
+{
+	// doesn't appear to be lamps
+	logerror("%s: unk_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(video21_state::lamp1_w)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		m_lamps[i+0] = BIT(data, 7-i);
+	}
+	m_offcounter = 8;
+}
+
+WRITE8_MEMBER(video21_state::lamp2_w)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		m_lamps[i+8] = BIT(data, 7-i);
+	}
+	m_offcounter = 8;
+}
+
+void video21_state::clear_lamps(device_t &device)
+{
+	// the game stops writing the lamp values in certain situations and expects the lamps to turn off automatically (decay?)
+	// eg. if you select 'take' in the 'take' or 'stand' choice
+
+	if (m_offcounter > 0)
+		m_offcounter--;
+
+	if (m_offcounter == 0)
+	{
+		for (int i = 0; i < 16; i++)
+		{
+			m_lamps[i] = 0;
+		}
+	}
+}
+
+
 void video21_state::mem_map(address_map &map) {
 	map(0x0000,0x0fff).rom().mirror(0x3000);
 	map(0xe000,0xe3ff).ram().share("videoram");
@@ -93,9 +150,9 @@ void video21_state::mem_map(address_map &map) {
 }
 
 void video21_state::io_map(address_map &map) {
-	map(0x02,0x02).nopw();  // lots of unknown writes, might be some kind of dac
-	map(0x04,0x04);  //.w unknown write
-	map(0x08,0x08);  //.w unknown write
+	map(0x02,0x02).w(FUNC(video21_state::unk_w));  // lots of unknown writes, might be some kind of dac
+	map(0x04,0x04).w(FUNC(video21_state::lamp1_w));
+	map(0x08,0x08).w(FUNC(video21_state::lamp2_w));
 	map(0x41,0x41).portr("IN41");
 	map(0x42,0x42).portr("IN42");
 	map(0x44,0x44).portr("IN44");
@@ -128,8 +185,8 @@ static INPUT_PORTS_START( video21 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("IN42")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
@@ -180,12 +237,18 @@ static GFXDECODE_START( gfx_video21 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, video21_charlayout, 0, 1 )
 GFXDECODE_END
 
+void video21_state::machine_start()
+{
+	m_lamps.resolve();
+}
+
 void video21_state::video21(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080A(config, m_maincpu, 20.79_MHz_XTAL / 10); // crystal confirmed but divisor unknown (divider appears to be 74LS160)
 	m_maincpu->set_addrmap(AS_PROGRAM, &video21_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &video21_state::io_map);
+	m_maincpu->set_periodic_int(FUNC(video21_state::clear_lamps), attotime::from_hz(240));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -220,4 +283,4 @@ ROM_START( video21 )
 	ROM_LOAD_NIB_LOW ( "lich_gfx.43", 0x0000, 0x0400, CRC(0ecb0aab) SHA1(7f3f1b93a5d38828ae3e97e5f8ef1a6a96dc798b) )
 ROM_END
 
-GAME(1980, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NO_SOUND)
+GAMEL(1980, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NO_SOUND, layout_video21)
