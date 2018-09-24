@@ -97,6 +97,9 @@ History:
 #include "emu.h"
 #include "machine/ins8250.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(INS8250,  ins8250_device, "ins8250",  "National Semiconductor INS8250 UART")
 DEFINE_DEVICE_TYPE(NS16450,  ns16450_device, "ns16450",  "National Semiconductor NS16450 UART")
 DEFINE_DEVICE_TYPE(NS16550,  ns16550_device, "ns16550",  "National Semiconductor NS16550 UART")
@@ -243,6 +246,7 @@ READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
 // Baud rate generator is reset after writing to either byte of divisor latch
 void ins8250_uart_device::update_baud_rate()
 {
+	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
 	set_rate(clock(), m_regs.dl * 16);
 
 	// FIXME: Baud rate generator should not affect transmitter or receiver, but device_serial_interface resets them regardless.
