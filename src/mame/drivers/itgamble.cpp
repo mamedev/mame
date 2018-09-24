@@ -664,6 +664,93 @@ ROM_START( bookthr )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) //same as Abacus
 ROM_END
 
+/*
+CPUs
+1x  H8/3048 HD64F3048F16        ic1     16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  U6295       ic24    4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x  LM358N      ic27    Dual Operational Amplifier - sound
+1x  TDA2003         ic26    Audio Amplifier - sound
+1x  oscillator  30.0MHz     osc1
+1x  red resonator ZTB1000J      x1
+1x  oscillator  32.768  small piggyback X1 (close to DS1302)
+ROMs
+1x  MX26C1000   1   dumped
+2x  M27C4001    2,3     dumped
+RAMs
+2x  MB8464C-70L     ic13,ic14
+PLDs
+1x  ispLSI2064-80LJ     ic12    read protected
+Others
+
+1x 28x2 JAMMA edge connector
+1x 12 legs connector (CN1)
+1x 12 DIP switches bank (CN2,CN3)
+1x trimmer (P1 VOLUME)
+1x trimmer (P2 SPARK)
+1x battery 3.6V (BAT1)
+Notes
+
+PCB is marked: "CE H83048" on component side
+PCB is marked: "H83048 bottom" on solder side
+PCB is labeled: "WORLD CUP Versione 1.5" on component side
+*/
+
+ROM_START( wcup )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "wcup_ver1.5_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_LOAD( "world cup 2.ic18", 0x000000, 0x80000, CRC(4524445b) SHA1(50ec31ac9e4cd807fd4bf3d667644ed662681782) )
+	ROM_LOAD( "world cup 3.ic17", 0x080000, 0x80000, CRC(0df1af40) SHA1(f5050533e5a9cf2113e5aeffaeca23c7572cafae) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) ) // same as laperlag
+ROM_END
+
+/*
+CPUs
+1x  H8/3048 HD64F3048F16        ic17    16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  M6295       ic15    4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x  LM358N      ic13    Dual Operational Amplifier - sound
+1x  TDA2003         ic8     Audio Amplifier - sound
+1x  oscillator  30.0MHz     osc1
+1x  blu resonator 1000J         x1
+1x  oscillator K0SoF        x2 (close to DS1302)
+ROMs
+1x  M27C1001    1   dumped
+2x  M27C4001    2,3     dumped
+RAMs
+2x  CY62256LL-70SNC     ic25,ic26
+PLDs
+1x  ispLSI2064-80LJ     ic24    read protected
+Others
+
+1x 28x2 JAMMA edge connector
+1x 12 legs connector (CN2)
+1x trimmer (P1 VOLUME)
+1x trimmer (P2 SPARK)
+1x battery 3.6V (BAT1)
+Notes
+
+PCB is marked: "CE ND2001" on component side
+PCB is marked: "ND2001 Rev. 1.0" and "bottom" on solder side
+PCB is labeled: "WORLD CUP Versione 1.4" and "Non Rimuovere PASSED 12/2001 Garanzia 6 MESI" on component side
+---
+It is the same game as World Cup (Ver 1.5) but on a different PCB revision/layout with more RAM
+*/
+
+ROM_START( wcup14 )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "wcup_ver1.4_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_LOAD( "world cup 2.ic18", 0x000000, 0x80000, CRC(4524445b) SHA1(50ec31ac9e4cd807fd4bf3d667644ed662681782) )
+	ROM_LOAD( "world cup 3.ic17", 0x080000, 0x80000, CRC(0df1af40) SHA1(f5050533e5a9cf2113e5aeffaeca23c7572cafae) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) ) // same as laperlag
+ROM_END
+
 /********** DIFFERENT HARDWARE **********/
 
 
@@ -721,6 +808,8 @@ GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, itgamble_state, empty_init, R
 GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
 GAME( 200?, abacus,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "<unknown>",             "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
 GAME( 200?, bookthr,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
+GAME( 2001, wcup,     0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.5)",           MACHINE_IS_SKELETON )
+GAME( 2001, wcup14,   wcup,    itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.4)",           MACHINE_IS_SKELETON )
 
 /* different hardware */
 GAME( 2000, mnumber,  0,       mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )
