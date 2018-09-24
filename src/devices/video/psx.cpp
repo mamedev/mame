@@ -1045,7 +1045,8 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 			WRITE_PIXEL( \
 				p_n_redshade[ p_n_redlevel[ n_bgr ] | n_r.w.h ] | \
 				p_n_greenshade[ p_n_greenlevel[ n_bgr ] | n_g.w.h ] | \
-				p_n_blueshade[ p_n_bluelevel[ n_bgr ] | n_b.w.h ] ) \
+				p_n_blueshade[ p_n_bluelevel[ n_bgr ] | n_b.w.h ] | \
+				( n_bgr & 0x8000 ) ) \
 		} \
 		p_vram++; \
 		PIXELUPDATE \
@@ -1060,7 +1061,8 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 				WRITE_PIXEL( \
 					p_n_redtrans[ p_n_f[ p_n_redlevel[ n_bgr ] | n_r.w.h ] | p_n_redb[ *( p_vram ) ] ] | \
 					p_n_greentrans[ p_n_f[ p_n_greenlevel[ n_bgr ] | n_g.w.h ] | p_n_greenb[ *( p_vram ) ] ] | \
-					p_n_bluetrans[ p_n_f[ p_n_bluelevel[ n_bgr ] | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] ) \
+					p_n_bluetrans[ p_n_f[ p_n_bluelevel[ n_bgr ] | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] | \
+					0x8000 ) \
 			} \
 			else \
 			{ \
