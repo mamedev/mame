@@ -98,8 +98,10 @@ void flkatck_state::flkatck_map(address_map &map)
 	map(0x0008, 0x03ff).ram();                                                                 /* RAM */
 	map(0x0400, 0x041f).rw(FUNC(flkatck_state::flkatck_ls138_r), FUNC(flkatck_state::flkatck_ls138_w));                         /* inputs, DIPS, bankswitch, counters, sound command */
 	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette"); /* palette */
-	map(0x1000, 0x1fff).ram();                                                                 /* RAM */
-	map(0x2000, 0x3fff).ram().w(FUNC(flkatck_state::flkatck_k007121_w)).share("k007121_ram");                    /* Video RAM (007121) */
+	map(0x1000, 0x17ff).ram();                                                                 /* RAM */
+	map(0x1800, 0x1fff).ram().share("spriteram");                                            /* RAM */
+	map(0x2000, 0x2fff).ram().w(FUNC(flkatck_state::vram_w)).share("vram");                    /* Video RAM (007121) */
+	map(0x3000, 0x3fff).ram();
 	map(0x4000, 0x5fff).bankr("bank1");                                                            /* banked ROM */
 	map(0x6000, 0xffff).rom();                                                                 /* ROM */
 }
