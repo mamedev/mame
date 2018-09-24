@@ -978,13 +978,13 @@ Core Screen Options
 Core Vector Options
 -------------------
 
-.. _mame-commandline-noantialias:
+.. _mame-commandline-beamwidthmin:
 
 **-beam_width_min** *<width>*
 
 	Sets the vector beam minimum width.
 
-.. _mame-commandline-beam:
+.. _mame-commandline-beamwidthmax:
 
 **-beam_width_max** *<width>*
 
