@@ -25,6 +25,7 @@ DEFINE_DEVICE_TYPE(I8243, i8243_device, "i8243", "Intel 8243 I/O Expander")
 
 i8243_device::i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8243, tag, owner, clock)
+	, m_p{0, 0, 0, 0}
 	, m_p2out(0x0f), m_p2(0x0f), m_opcode(0), m_prog(1), m_cs(0)
 	, m_readhandler{{*this}, {*this}, {*this}, {*this}}
 	, m_writehandler{{*this}, {*this}, {*this}, {*this}}
@@ -41,6 +42,13 @@ void i8243_device::device_start()
 		cb.resolve();
 	for (auto &cb : m_writehandler)
 		cb.resolve();
+
+	save_item(NAME(m_p));
+	save_item(NAME(m_p2out));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_opcode));
+	save_item(NAME(m_prog));
+	save_item(NAME(m_cs));
 }
 
 
