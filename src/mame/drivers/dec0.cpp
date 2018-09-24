@@ -2363,7 +2363,7 @@ ROM_START( drgninjab2 )
 	ROM_LOAD( "a15.7b",   0x8000, 0x8000, CRC(82007af2) SHA1(f0db1b1dab199df402a7590e56d4d5ab4baca803) ) // 99.612427%
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 68705 microcontroller */
-	ROM_LOAD( "68705r3.0m",     0x0000, 0x1000, CRC(7231dd7eb9b5152a287e1bcceb3c3a0b35f441af) )
+	ROM_LOAD( "68705r3.0m",     0x0000, 0x1000, CRC(34bc5e7f) SHA1(7231dd7eb9b5152a287e1bcceb3c3a0b35f441af) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "a22.9m",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) // 99.996948%
