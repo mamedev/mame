@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Acho A. Tang,R. Belmont
+// copyright-holders:Acho A. Tang,R. Belmont, Valley Bell
 /*********************************************************
 
 Irem GA20 PCM Sound Chip
@@ -25,6 +25,9 @@ Revisions:
 
 02-03-2007 R. Belmont
 - Cleaned up faux x86 assembly.
+
+09-25-2018 Valley Bell
+- rewrote channel update to make data 0 act as sample terminator
 
 *********************************************************/
 
@@ -122,74 +125,35 @@ void iremga20_device::rom_bank_updated()
 
 void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	uint32_t rate[4], pos[4], frac[4], end[4], vol[4], play[4];
 	stream_sample_t *outL, *outR;
-	int i, sampleout;
 
-	/* precache some values */
-	for (i=0; i < 4; i++)
-	{
-		rate[i] = m_channel[i].rate;
-		pos[i] = m_channel[i].pos;
-		frac[i] = m_channel[i].frac;
-		end[i] = m_channel[i].end - 0x20;
-		vol[i] = m_channel[i].volume;
-		play[i] = m_channel[i].play;
-	}
-
-	i = samples;
 	outL = outputs[0];
 	outR = outputs[1];
 
-	for (i = 0; i < samples; i++)
+	for (int i = 0; i < samples; i++)
 	{
-		sampleout = 0;
+		stream_sample_t sampleout = 0;
 
-		// update the 4 channels inline
-		if (play[0])
+		for (auto & ch : m_channel)
 		{
-			sampleout += (read_byte(pos[0]) - 0x80) * vol[0];
-			frac[0] += rate[0];
-			pos[0] += frac[0] >> 24;
-			frac[0] &= 0xffffff;
-			play[0] = (pos[0] < end[0]);
-		}
-		if (play[1])
-		{
-			sampleout += (read_byte(pos[1]) - 0x80) * vol[1];
-			frac[1] += rate[1];
-			pos[1] += frac[1] >> 24;
-			frac[1] &= 0xffffff;
-			play[1] = (pos[1] < end[1]);
-		}
-		if (play[2])
-		{
-			sampleout += (read_byte(pos[2]) - 0x80) * vol[2];
-			frac[2] += rate[2];
-			pos[2] += frac[2] >> 24;
-			frac[2] &= 0xffffff;
-			play[2] = (pos[2] < end[2]);
-		}
-		if (play[3])
-		{
-			sampleout += (read_byte(pos[3]) - 0x80) * vol[3];
-			frac[3] += rate[3];
-			pos[3] += frac[3] >> 24;
-			frac[3] &= 0xffffff;
-			play[3] = (pos[3] < end[3]);
+			if (ch.play)
+			{
+				int sample = read_byte(ch.pos);
+				if (sample == 0x00) // check for sample end marker
+					ch.play = 0;
+				else
+					sampleout += (sample - 0x80) * (int32_t)ch.volume;
+				ch.frac += ch.rate;
+				ch.pos += (ch.frac >> 24);
+				ch.frac &= ((1 << 24) - 1);
+				if (ch.pos >= ch.end)   // for safety (the actual chip probably doesn't check this)
+					ch.play = 0;
+			}
 		}
 
 		sampleout >>= 2;
 		outL[i] = sampleout;
 		outR[i] = sampleout;
-	}
-
-	/* update the regs now */
-	for (i=0; i < 4; i++)
-	{
-		m_channel[i].pos = pos[i];
-		m_channel[i].frac = frac[i];
-		m_channel[i].play = play[i];
 	}
 }
 
@@ -215,16 +179,16 @@ WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 			m_channel[channel].start = ((m_channel[channel].start)&0x00ff0) | (data<<12);
 			break;
 
-		case 2: /* end address low */
+		case 2: /* end? address low */
 			m_channel[channel].end = ((m_channel[channel].end)&0xff000) | (data<<4);
 			break;
 
-		case 3: /* end address high */
+		case 3: /* end? address high */
 			m_channel[channel].end = ((m_channel[channel].end)&0x00ff0) | (data<<12);
 			break;
 
 		case 4:
-			m_channel[channel].rate = 0x1000000 / (256 - data);
+			m_channel[channel].rate = (1 << 24) / (256 - data);
 			break;
 
 		case 5: //AT: gain control
