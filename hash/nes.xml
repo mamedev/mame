@@ -6301,7 +6301,7 @@
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-CF"/>
 		<info name="release" value="19870730"/>
-		<info name="alt_title" value="チェスター・フィールド  箱・説明書無し"/>
+		<info name="alt_title" value="チェスター・フィールド 暗黒神への挑戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -6758,7 +6758,7 @@
 		<publisher>Toho</publisher>
 		<info name="serial" value="THF-TU"/>
 		<info name="release" value="19870314"/>
-		<info name="alt_title" value="タッチ ミステリー・オブトライアングル"/>
+		<info name="alt_title" value="タッチ ミステリー・オブ・トライアングル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
