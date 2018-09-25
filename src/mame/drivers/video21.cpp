@@ -12,11 +12,10 @@ Video Ram = 7 x 2102 (bit 7 omitted). Main Ram = 2x MCM145101 (=M5101L).
 The game has sound (there's a LM380N visible), looks like there's a bunch of TTL chips
 involved, and a 555.
 
-To Do:
+TODO:
 - improve sound, it's definitely beeper pitch control, but sounds offtune
-- identify all dips (7 total), there should be one for amusement/casino, and probably also win chance
+- identify all dips (7 total)
 - confirm CPU clock
-- unknown status bits? eg. hopper
 - color overlay as seen on flyer upright cabinet
 
 When booted, press Key out (mapped to W by default) to get it going.
@@ -47,6 +46,7 @@ public:
 	{ }
 
 	void video21(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_coinout_r);
 
 protected:
 	virtual void machine_start() override;
@@ -55,6 +55,11 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(lamp1_w);
 	DECLARE_WRITE8_MEMBER(lamp2_w);
+
+	int m_hopper_motor;
+	int m_hopper_coin;
+	emu_timer *m_hopper_timer;
+	TIMER_CALLBACK_MEMBER(hopper_coinout);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
@@ -100,6 +105,14 @@ uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+TIMER_CALLBACK_MEMBER(video21_state::hopper_coinout)
+{
+	m_hopper_coin = param;
+
+	if (m_hopper_motor || m_hopper_coin)
+		m_hopper_timer->adjust(attotime::from_msec(100), m_hopper_coin ^ 1);
+}
+
 WRITE8_MEMBER(video21_state::sound_w)
 {
 	// beeper pitch
@@ -109,14 +122,30 @@ WRITE8_MEMBER(video21_state::sound_w)
 
 WRITE8_MEMBER(video21_state::lamp1_w)
 {
+	// d1-d3: coincounters
+	machine().bookkeeping().coin_counter_w(0, data & 0x04); // coin in
+	machine().bookkeeping().coin_counter_w(1, data & 0x08); // keeper coin out
+	machine().bookkeeping().coin_counter_w(2, data & 0x02); // hopper coin out
+
+	// d4: hopper motor
+	if (!m_hopper_motor && BIT(data, 4))
+		m_hopper_timer->adjust(attotime::from_msec(100), 1);
+	m_hopper_motor = BIT(data, 4);
+
+	// lamps:
+	// d5: take/stand(which?)
+	// d6: take/stand(which?)
+	// d7: start
 	for (int i = 0; i < 8; i++)
 		m_lamps[i+0] = BIT(data, 7-i);
-
-	// TODO: also hopper out
 }
 
 WRITE8_MEMBER(video21_state::lamp2_w)
 {
+	// lamps:
+	// d5: bet
+	// d6: accept win/double(which?)
+	// d7: accept win/double(which?)
 	for (int i = 0; i < 8; i++)
 		m_lamps[i+8] = BIT(data, 7-i);
 }
@@ -138,6 +167,11 @@ void video21_state::io_map(address_map &map) {
 }
 
 
+CUSTOM_INPUT_MEMBER(video21_state::hopper_coinout_r)
+{
+	return m_hopper_coin;
+}
+
 static INPUT_PORTS_START( video21 )
 	PORT_START("IN41")
 	PORT_DIPNAME( 0x01, 0x01, "41b0" )
@@ -149,9 +183,9 @@ static INPUT_PORTS_START( video21 )
 	PORT_DIPNAME( 0x04, 0x04, "41b2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "41b3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Win Mode" )
+	PORT_DIPSETTING(    0x08, "Amusement" ) // winnings get added to credits
+	PORT_DIPSETTING(    0x00, "Casino" ) // winnings go to coin out
 	PORT_DIPNAME( 0x10, 0x10, "41b4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -170,9 +204,7 @@ static INPUT_PORTS_START( video21 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_DIPNAME( 0x40, 0x40, "42b6" ) // some hopper status?
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, video21_state, hopper_coinout_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN44")
@@ -188,7 +220,7 @@ static INPUT_PORTS_START( video21 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Or Nothing")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Accept") // transfer winnings to credits
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Accept Win")
 	PORT_DIPNAME( 0x80, 0x80, "Max Bet" )
 	PORT_DIPSETTING(    0x80, "10" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -214,7 +246,16 @@ GFXDECODE_END
 
 void video21_state::machine_start()
 {
+	m_hopper_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(video21_state::hopper_coinout),this));
+
 	m_lamps.resolve();
+
+	// zerofill/register for savestates
+	m_hopper_motor = 0;
+	m_hopper_coin = 0;
+
+	save_item(NAME(m_hopper_motor));
+	save_item(NAME(m_hopper_coin));
 }
 
 void video21_state::video21(machine_config &config)
@@ -240,7 +281,6 @@ void video21_state::video21(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
-
 
 
 ROM_START( video21 )
