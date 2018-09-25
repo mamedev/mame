@@ -19,6 +19,7 @@ To Do:
 - unknown status bits? eg. hopper
 - color overlay as seen on flyer upright cabinet
 - no lamp for 'Deal' is this correct?
+- If you win, it hangs. This is why it's marked as GNW.
 
 When booted, press Key out (mapped to W by default) to get it going.
 
@@ -283,4 +284,4 @@ ROM_START( video21 )
 	ROM_LOAD_NIB_LOW ( "lich_gfx.43", 0x0000, 0x0400, CRC(0ecb0aab) SHA1(7f3f1b93a5d38828ae3e97e5f8ef1a6a96dc798b) )
 ROM_END
 
-GAMEL(1980, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NO_SOUND, layout_video21)
+GAMEL(1980, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_video21)
