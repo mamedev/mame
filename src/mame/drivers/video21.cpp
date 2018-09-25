@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert, hap
 /****************************************************************************************
 
 2018-09-15
@@ -13,11 +13,11 @@ The game has sound (there's a LM380N visible), looks like there's a bunch of TTL
 involved, and a 555.
 
 To Do:
-- Sound
+- improve sound, it's definitely beeper pitch control, but sounds offtune
+- identify all dips (7 total), there should be one for amusement/casino, and probably also win chance
 - confirm CPU clock
 - unknown status bits? eg. hopper
 - color overlay as seen on flyer upright cabinet
-- If you win, it hangs. This is why it's marked as GNW.
 
 When booted, press Key out (mapped to W by default) to get it going.
 
@@ -26,8 +26,11 @@ When booted, press Key out (mapped to W by default) to get it going.
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/nvram.h"
+#include "sound/beep.h"
+
 #include "screen.h"
 #include "emupal.h"
+#include "speaker.h"
 
 #include "video21.lh"
 
@@ -39,6 +42,7 @@ public:
 		, m_maincpu(*this,"maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_beeper(*this, "beeper")
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -55,10 +59,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-
+	optional_device<beep_device> m_beeper;
 	output_finder<24> m_lamps;
 };
 
@@ -97,8 +102,9 @@ uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 WRITE8_MEMBER(video21_state::sound_w)
 {
-	// seems like sound beeper pitch (FF is off)
-	logerror("%s: sound_w %02x\n", machine().describe_context(), data);
+	// beeper pitch
+	m_beeper->set_state(data != 0xff); // FF is off
+	m_beeper->set_clock(4 * data);
 }
 
 WRITE8_MEMBER(video21_state::lamp1_w)
@@ -133,7 +139,7 @@ void video21_state::io_map(address_map &map) {
 
 
 static INPUT_PORTS_START( video21 )
-	PORT_START("IN41") // dips and tilt
+	PORT_START("IN41")
 	PORT_DIPNAME( 0x01, 0x01, "41b0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -181,12 +187,8 @@ static INPUT_PORTS_START( video21 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_DIPNAME( 0x20, 0x20, "44b5" ) // double or nothing?
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "44b6" ) // take winnings?
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Or Nothing")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Accept") // transfer winnings to credits
 	PORT_DIPNAME( 0x80, 0x80, "Max Bet" )
 	PORT_DIPSETTING(    0x80, "10" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -235,7 +237,8 @@ void video21_state::video21(machine_config &config)
 	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
-	// TODO
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -256,4 +259,4 @@ ROM_START( video21 )
 	ROM_LOAD_NIB_LOW ( "43", 0x0000, 0x0400, CRC(0ecb0aab) SHA1(7f3f1b93a5d38828ae3e97e5f8ef1a6a96dc798b) )
 ROM_END
 
-GAMEL(1980?, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_video21)
+GAMEL(1980?, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_video21)

@@ -40,19 +40,6 @@
     </text>
   </element>
 
-  <element name="Out0_04" defstate="0">
-    <rect state="1">
-      <color red="0.80" green="0.80" blue="0.80" />
-    </rect>
-    <rect state="0">
-      <color red="0.10" green="0.10" blue="0.10" />
-    </rect>
-    <text string="Cabinet?">
-      <color red="0.0" green="0.0" blue="0.0" />
-      <bounds x="0.1" y="0.25" width="0.8" height="0.5" />
-    </text>
-  </element>
-
   <element name="Out1_20" defstate="0">
     <rect state="1">
       <color red="0.80" green="0.80" blue="0.80" />
@@ -66,23 +53,55 @@
     </text>
   </element>
 
+  <element name="Out1_40" defstate="0">
+    <rect state="1">
+      <color red="0.80" green="0.80" blue="0.80" />
+    </rect>
+    <rect state="0">
+      <color red="0.10" green="0.10" blue="0.10" />
+    </rect>
+    <text string="Accept">
+      <color red="0.0" green="0.0" blue="0.0" />
+      <bounds x="0.1" y="0.25" width="0.8" height="0.5" />
+    </text>
+  </element>
+
+  <element name="Out1_80" defstate="0">
+    <rect state="1">
+      <color red="0.80" green="0.80" blue="0.80" />
+    </rect>
+    <rect state="0">
+      <color red="0.10" green="0.10" blue="0.10" />
+    </rect>
+    <text string="Double">
+      <color red="0.0" green="0.0" blue="0.0" />
+      <bounds x="0.1" y="0.25" width="0.8" height="0.5" />
+    </text>
+  </element>
+
 
   <view name="Button Lamps">
     <screen index="0">
       <bounds left="0" top="0" right="4" bottom="3" />
     </screen>
 
-    <bezel name="lamp0" element="Out0_80" inputtag="IN42" inputmask="0x04">
+    <bezel name="lamp10" element="Out1_20" inputtag="IN44" inputmask="0x10">
       <bounds x="0.00" y="3.10" width="0.20" height="0.14" />
     </bezel>
-    <bezel name="lamp1" element="Out0_40" inputtag="IN42" inputmask="0x08">
+    <bezel name="lamp0" element="Out0_80" inputtag="IN42" inputmask="0x04">
       <bounds x="0.25" y="3.10" width="0.20" height="0.14" />
     </bezel>
-    <bezel name="lamp2" element="Out0_20" inputtag="IN42" inputmask="0x10">
+    <bezel name="lamp1" element="Out0_40" inputtag="IN42" inputmask="0x08">
       <bounds x="0.50" y="3.10" width="0.20" height="0.14" />
     </bezel>
-    <bezel name="lamp10" element="Out1_20" inputtag="IN44" inputmask="0x10">
-      <bounds x="2.50" y="3.10" width="0.20" height="0.14" />
+    <bezel name="lamp2" element="Out0_20" inputtag="IN42" inputmask="0x10">
+      <bounds x="0.75" y="3.10" width="0.20" height="0.14" />
+    </bezel>
+    <bezel name="lamp8" element="Out1_40" inputtag="IN44" inputmask="0x40">
+      <bounds x="1.00" y="3.10" width="0.20" height="0.14" />
+    </bezel>
+    <bezel name="lamp9" element="Out1_80" inputtag="IN44" inputmask="0x20">
+      <bounds x="1.25" y="3.10" width="0.20" height="0.14" />
     </bezel>
 
   </view>
