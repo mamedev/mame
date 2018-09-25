@@ -26,9 +26,6 @@ protected:
 	virtual void device_clock_changed() override;
 
 private:
-	void update_timer();
-	attotime period();
-
 	int m_signal;
 	emu_timer *m_timer;
 
