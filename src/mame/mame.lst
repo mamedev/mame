@@ -31973,9 +31973,10 @@ neiva                           //
 pkscram                         // (c) 1993 Cosmo Electronics Corporation
 
 @source:pktgaldx.cpp
-pktgaldx                        // MAZ (c) 1993 Data East (Euro v3.00)
+pktgaldx                        // MAZ (c) 1992 Data East (Euro v3.00)
+pktgaldxa                       // MAZ (c) 1992 Data East (Asia v3.00)
 pktgaldxb                       // bootleg
-pktgaldxj                       // MAZ (c) 1993
+pktgaldxj                       // MAZ (c) 1993 Nihon System inc (Japan v3.00)
 
 @source:plan80.cpp
 plan80                          //
