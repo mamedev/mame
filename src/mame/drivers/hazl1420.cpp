@@ -12,7 +12,7 @@
 #include "machine/bankdev.h"
 #include "machine/i8243.h"
 #include "machine/ins8250.h"
-//#include "video/dp8350.h"
+#include "video/dp8350.h"
 #include "screen.h"
 
 class hazl1420_state : public driver_device
@@ -23,7 +23,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "bankdev")
 		, m_ioexp(*this, "ioexp%u", 0U)
-		, m_screen(*this, "screen")
+		, m_crtc(*this, "crtc")
 	{
 	}
 
@@ -46,7 +46,7 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device_array<i8243_device, 2> m_ioexp;
-	required_device<screen_device> m_screen;
+	required_device<dp8350_device> m_crtc;
 };
 
 void hazl1420_state::p1_w(u8 data)
@@ -57,7 +57,7 @@ void hazl1420_state::p1_w(u8 data)
 
 u8 hazl1420_state::p2_r()
 {
-	u8 result = m_screen->vblank() ? 0xf0 : 0xe0;
+	u8 result = 0xe0 | (m_crtc->vblank_r() << 4);
 	result |= m_ioexp[0]->p2_r() & m_ioexp[1]->p2_r();
 	return result;
 }
@@ -187,12 +187,11 @@ void hazl1420_state::hazl1420(machine_config &config)
 
 	INS8250(config, "ace", 2'764'800);
 
-	//DP8350(config, "crtc", 10.92_MHz_XTAL);
+	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen");
+	m_crtc->vblank_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(10.92_MHz_XTAL, 700, 0, 560, 260, 0, 240);
 	screen.set_screen_update(FUNC(hazl1420_state::screen_update));
-	screen.screen_vblank().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 }
 
 ROM_START(hazl1420)
