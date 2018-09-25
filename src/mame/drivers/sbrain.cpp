@@ -46,7 +46,7 @@ To Do:
 #include "machine/wd_fdc.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
-//#include "video/dp8350.h"
+#include "video/dp8350.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -62,6 +62,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
+		, m_crtc(*this, "crtc")
 		, m_u0(*this, "uart0")
 		, m_u1(*this, "uart1")
 		, m_ppi(*this, "ppi")
@@ -113,6 +114,7 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
+	required_device<dp8350_device> m_crtc;
 	required_device<i8251_device> m_u0;
 	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
@@ -217,6 +219,8 @@ d7 : reverse video
 */
 WRITE8_MEMBER( sbrain_state::ppi_pa_w )
 {
+	m_crtc->refresh_control(BIT(data, 6));
+
 	m_porta = data;
 }
 
@@ -516,7 +520,6 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				}
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
 				*p++ = BIT(gfx, 6);
 				*p++ = BIT(gfx, 5);
 				*p++ = BIT(gfx, 4);
@@ -546,16 +549,12 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(sbrain_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	//MCFG_DEVICE_ADD("crtc", DP8350, 10.92_MHz_XTAL)
+	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
