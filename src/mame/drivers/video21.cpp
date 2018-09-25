@@ -16,7 +16,6 @@ TODO:
 - improve sound, it's definitely beeper pitch control, but sounds offtune
 - identify all dips (7 total)
 - confirm CPU clock
-- color overlay as seen on flyer upright cabinet
 
 When booted, press Key out (mapped to W by default) to get it going.
 
@@ -69,7 +68,7 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	optional_device<beep_device> m_beeper;
-	output_finder<24> m_lamps;
+	output_finder<6> m_lamps;
 };
 
 
@@ -136,7 +135,7 @@ WRITE8_MEMBER(video21_state::lamp1_w)
 	// d5: take/stand(which?)
 	// d6: take/stand(which?)
 	// d7: start
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 3; i++)
 		m_lamps[i+0] = BIT(data, 7-i);
 }
 
@@ -146,8 +145,8 @@ WRITE8_MEMBER(video21_state::lamp2_w)
 	// d5: bet
 	// d6: accept win/double(which?)
 	// d7: accept win/double(which?)
-	for (int i = 0; i < 8; i++)
-		m_lamps[i+8] = BIT(data, 7-i);
+	for (int i = 0; i < 3; i++)
+		m_lamps[i+3] = BIT(data, 7-i);
 }
 
 
