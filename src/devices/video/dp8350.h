@@ -44,6 +44,8 @@ class dp835x_device : public device_t, public device_video_interface
 {
 public:
 	// device configuration
+	auto hsync_callback() { return m_hsync_callback.bind(); }
+	auto vsync_callback() { return m_vsync_callback.bind(); }
 	auto vblank_callback() { return m_vblank_callback.bind(); }
 	void set_half_shift(bool half_shift) { m_half_shift = half_shift; }
 
@@ -52,6 +54,8 @@ public:
 	void register_load(u8 rs, u16 addr);
 
 	// read handlers
+	DECLARE_READ_LINE_MEMBER(hsync_r);
+	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ_LINE_MEMBER(vblank_r);
 
 protected:
@@ -74,7 +78,11 @@ protected:
 private:
 	// internal helpers
 	void reconfigure_screen();
-	void screen_vblank(screen_device &screen, bool state);
+
+	// timer callbacks
+	TIMER_CALLBACK_MEMBER(hsync_update);
+	TIMER_CALLBACK_MEMBER(vsync_update);
+	TIMER_CALLBACK_MEMBER(vblank_update);
 
 	// mask parameters
 	const int m_char_width;                 // character field cell size (width in dots)
@@ -99,12 +107,20 @@ private:
 	bool m_half_shift;                      // adjust screen parameters to allow half-dot shifting
 
 	// device callbacks
-	//devcb_write_line m_hsync_callback;    // horizontal sync output (polarity may vary by type)
-	//devcb_write_line m_vsync_callback;    // vertical sync output (polarity may vary by type)
+	devcb_write_line m_hsync_callback;      // horizontal sync output (polarity may vary by type)
+	devcb_write_line m_vsync_callback;      // vertical sync output (polarity may vary by type)
 	devcb_write_line m_vblank_callback;     // vertical blanking output (polarity may vary by type)
 
 	// internal registers and control parameters
 	bool m_60hz_refresh;                    // refresh rate selector (true = f1, false = f0)
+
+	// timers
+	emu_timer *m_hsync_on_timer;
+	emu_timer *m_hsync_off_timer;
+	emu_timer *m_vsync_on_timer;
+	emu_timer *m_vsync_off_timer;
+	emu_timer *m_vblank_on_timer;
+	emu_timer *m_vblank_off_timer;
 };
 
 // ======================> dp8350_device

@@ -63,7 +63,7 @@ void hazl1420_state::p1_w(u8 data)
 
 u8 hazl1420_state::p2_r()
 {
-	u8 result = 0xe0 | (m_crtc->vblank_r() << 4);
+	u8 result = 0xe0 | (m_crtc->hsync_r() << 4);
 	result |= m_ioexp[0]->p2_r() & m_ioexp[1]->p2_r();
 	return result;
 }
@@ -293,6 +293,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	m_maincpu->p2_out_cb().append(m_ioexp[1], FUNC(i8243_device::p2_w));
 	m_maincpu->prog_out_cb().set(m_ioexp[0], FUNC(i8243_device::prog_w));
 	m_maincpu->prog_out_cb().append(m_ioexp[1], FUNC(i8243_device::prog_w));
+	m_maincpu->t0_in_cb().set(m_crtc, FUNC(dp8350_device::vblank_r));
 	m_maincpu->t1_in_cb().set("ace", FUNC(ins8250_device::intrpt_r));
 
 	ADDRESS_MAP_BANK(config, m_bankdev);
@@ -315,7 +316,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	INS8250(config, "ace", 2'764'800);
 
 	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen");
-	m_crtc->vblank_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_crtc->hsync_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(hazl1420_state::screen_update));
