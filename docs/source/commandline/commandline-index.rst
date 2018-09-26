@@ -338,7 +338,7 @@ Scripting Options
 | :ref:`noplugin <mame-commandline-noplugin>`
 
 
-HTTP SERVER OPTIONS
+HTTP Server Options
 -------------------
 
 | :ref:`http <mame-commandline-http>`

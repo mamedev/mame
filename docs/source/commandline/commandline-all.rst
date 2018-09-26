@@ -1405,7 +1405,7 @@ Core Communication Options
 
 **-[no]comm_framesync**
 
-	Synchronize frames between the communications network. The default is OFF (*-nocomm_framesync*)".
+	Synchronize frames between the communications network. The default is OFF (*-nocomm_framesync*).
 
 
 
@@ -1532,7 +1532,7 @@ Scripting Options
 
 	Enable the use of Lua Plugins.  The default is ON (*-plugins*).
 
-.. _mame-plugin:
+.. _mame-commandline-plugin:
 
 **-plugin** *[plugin shortname]*
 
@@ -1546,7 +1546,7 @@ Scripting Options
 
 
 
-HTTP SERVER OPTIONS
+HTTP Server Options
 -------------------
 .. _mame-commandline-http:
 
