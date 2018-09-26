@@ -2706,6 +2706,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 		uint32_t data_start = version >= 0x150 ? r32(0x34) + 0x34 : 0x40;
 		int volbyte = version >= 0x160 && data_start >= 0x7d ? r8(0x7c) : 0;
+		logerror("Volume %02x\n", volbyte);
 
 		if (volbyte == 0xc1) // 0x00~0xc0 0~192, 0xc1 -64, 0xc2~0xff -62~-1
 			volbyte = -0x40;
