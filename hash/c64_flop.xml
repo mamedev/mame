@@ -57,7 +57,8 @@
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="bill_budge.d64" size="174848" crc="d42c40b4" sha1="75b0a166b29e9ed3834c95acc1f263a084062f5f" offset="0" />
+				<!-- something special about the last sector -->
+				<rom name="bill_budge.d64" size="174848" crc="d42c40b4" sha1="75b0a166b29e9ed3834c95acc1f263a084062f5f" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -316,23 +317,6 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rambo_iii[taito_1989](vmax3)(!).g64" size="333744" crc="8e34cbc7" sha1="a83030d9a46a5a7a33b9cfedf6adf0b778f7262b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Flippy disks. The other side is for Atari 8-bit. -->
-	<software name="sargon3">
-		<description>Sargon III</description>
-		<year>1985</year>
-		<publisher>Hayden Software Company</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="sargon_iii.d64" size="174848" crc="b18720a1" sha1="4001e2ac78fda39df59508e66c2620d415c15214" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="great_game_and_chess_problems_c64.d64" size="174848" crc="129fa72a" sha1="22e8709081125000b24ea2f3485e19e3af21ed4e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
