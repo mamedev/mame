@@ -72,20 +72,15 @@ dp835x_device::dp835x_device(const machine_config &mconfig, device_type type, co
 	, m_hsync_active(hsync_active)
 	, m_vsync_active(vsync_active)
 	, m_vblank_active(vblank_active)
+	, m_hsync_callback(*this)
+	, m_vsync_callback(*this)
 	, m_vblank_callback(*this)
 	, m_60hz_refresh(true)
 {
-	// many parameters are not used yet
-	(void)m_vsync_delay;
-	(void)m_vsync_width;
-	(void)m_hsync_delay;
-	(void)m_hsync_width;
-	(void)m_vblank_stop;
+	// some parameters are not used yet
 	(void)m_cursor_on_all_lines;
 	(void)m_lbc_0_width;
 	(void)m_hsync_serration;
-	(void)m_hsync_active;
-	(void)m_vsync_active;
 }
 
 
@@ -150,8 +145,8 @@ void dp835x_device::device_config_complete()
 
 void dp835x_device::device_resolve_objects()
 {
-	//m_hsync_callback.resolve_safe();
-	//m_vsync_callback.resolve_safe();
+	m_hsync_callback.resolve_safe();
+	m_vsync_callback.resolve_safe();
 	m_vblank_callback.resolve_safe();
 }
 
@@ -162,8 +157,15 @@ void dp835x_device::device_resolve_objects()
 
 void dp835x_device::device_start()
 {
-	screen().register_vblank_callback(vblank_state_delegate(&dp835x_device::screen_vblank, this));
+	// create timers
+	m_hsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::hsync_update), this));
+	m_hsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::hsync_update), this));
+	m_vsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::vsync_update), this));
+	m_vsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::vsync_update), this));
+	m_vblank_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::vblank_update), this));
+	m_vblank_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::vblank_update), this));
 
+	// save state
 	save_item(NAME(m_60hz_refresh));
 }
 
@@ -197,25 +199,67 @@ void dp835x_device::reconfigure_screen()
 	int dots_per_line = m_char_width * m_chars_per_line;
 	int dots_per_row = m_char_width * m_chars_per_row;
 	int lines_per_frame = m_char_height * m_rows_per_frame + m_vblank_interval[m_60hz_refresh ? 1 : 0];
-	attoseconds_t refresh = clocks_to_attotime(lines_per_frame * dots_per_line).as_attoseconds();
+	attotime refresh = clocks_to_attotime(lines_per_frame * dots_per_line);
 
 	if (m_half_shift)
 	{
 		rectangle visarea(0, 2 * dots_per_row - 1, 0, m_char_height * m_rows_per_frame - 1);
-		screen().configure(2 * dots_per_line, lines_per_frame, visarea, refresh);
+		screen().configure(2 * dots_per_line, lines_per_frame, visarea, refresh.as_attoseconds());
 	}
 	else
 	{
 		rectangle visarea(0, dots_per_row - 1, 0, m_char_height * m_rows_per_frame - 1);
-		screen().configure(dots_per_line, lines_per_frame, visarea, refresh);
+		screen().configure(dots_per_line, lines_per_frame, visarea, refresh.as_attoseconds());
 	}
 
 	logerror("Frame rate refresh: %.2f Hz (f%d); horizontal rate scan: %.4f kHz; character rate: %.4f MHz; dot rate: %.5f MHz\n",
-		ATTOSECONDS_TO_HZ(refresh),
+		ATTOSECONDS_TO_HZ(refresh.as_attoseconds()),
 		m_60hz_refresh ? 1 : 0,
 		clock() / (dots_per_line * 1000.0),
 		clock() / (m_char_width * 1000000.0),
 		clock() / 1000000.0);
+
+	// get current screen position
+	int hpos = screen().hpos();
+	int vpos = screen().vpos();
+
+	// set horizontal sync timers
+	int hsync_begin = (dots_per_row + m_char_width * m_hsync_delay) * (m_half_shift ? 2 : 1);
+	int hsync_end = hsync_begin + m_char_width * m_hsync_width * (m_half_shift ? 2 : 1);
+	if (hpos > hsync_begin)
+		hsync_begin += dots_per_line * (m_half_shift ? 2 : 1);
+	m_hsync_on_timer->adjust(clocks_to_attotime(hsync_begin - hpos) / (m_half_shift ? 2 : 1), m_hsync_active, clocks_to_attotime(dots_per_line));
+	if (hpos > hsync_end)
+		hsync_end += dots_per_line * (m_half_shift ? 2 : 1);
+	m_hsync_off_timer->adjust(clocks_to_attotime(hsync_end - hpos) / (m_half_shift ? 2 : 1), !m_hsync_active, clocks_to_attotime(dots_per_line));
+
+	// calculate vertical sync and blanking parameters
+	int hblank_begin = dots_per_row * (m_half_shift ? 2 : 1);
+	int vblank_begin = m_char_height * m_rows_per_frame - 1;
+	int vsync_begin = vblank_begin + m_vsync_delay[m_60hz_refresh ? 1 : 0];
+	int vsync_end = vsync_begin + m_vsync_width[m_60hz_refresh ? 1 : 0];
+	int vblank_end = lines_per_frame - m_vblank_stop - 1;
+	logerror("vblank_begin: %d; vsync_begin: %d; vsync_end: %d; vblank_end: %d; vpos: %d\n", vblank_begin, vsync_begin, vsync_end, vblank_end, vpos);
+	if (hpos > hblank_begin)
+	{
+		hblank_begin += dots_per_line * (m_half_shift ? 2 : 1);
+		vpos++;
+	}
+	attotime until_hblank = clocks_to_attotime(hblank_begin - hpos) / (m_half_shift ? 2 : 1);
+
+	// set vertical sync and blanking timers
+	if (vpos > vsync_begin)
+		vsync_begin += lines_per_frame;
+	m_vsync_on_timer->adjust(clocks_to_attotime((vsync_begin - vpos) * dots_per_line) + until_hblank, m_vsync_active, refresh);
+	if (vpos > vsync_end)
+		vsync_end += lines_per_frame;
+	m_vsync_off_timer->adjust(clocks_to_attotime((vsync_end - vpos) * dots_per_line) + until_hblank, !m_vsync_active, refresh);
+	if (vpos > vblank_begin)
+		vblank_begin += lines_per_frame;
+	m_vblank_on_timer->adjust(clocks_to_attotime((vblank_begin - vpos) * dots_per_line) + until_hblank, m_vblank_active, refresh);
+	if (vpos > vblank_end)
+		vblank_end += lines_per_frame;
+	m_vblank_off_timer->adjust(clocks_to_attotime((vblank_end - vpos) * dots_per_line) + until_hblank, !m_vblank_active, refresh);
 }
 
 
@@ -270,20 +314,72 @@ void dp835x_device::register_load(u8 rs, u16 addr)
 
 
 //-------------------------------------------------
+//  hsync_r - report horizontal sync state
+//-------------------------------------------------
+
+READ_LINE_MEMBER(dp835x_device::hsync_r)
+{
+	if (m_hsync_on_timer->remaining() > m_hsync_off_timer->remaining())
+		return m_hsync_active;
+	else
+		return !m_hsync_active;
+}
+
+
+//-------------------------------------------------
+//  vblank_r - report vertical sync state
+//-------------------------------------------------
+
+READ_LINE_MEMBER(dp835x_device::vsync_r)
+{
+	if (m_vsync_on_timer->remaining() > m_vsync_off_timer->remaining())
+		return m_vsync_active;
+	else
+		return !m_vsync_active;
+}
+
+
+//-------------------------------------------------
 //  vblank_r - report vertical blanking state
 //-------------------------------------------------
 
 READ_LINE_MEMBER(dp835x_device::vblank_r)
 {
-	return bool(screen().vblank()) == m_vblank_active;
+	if (m_vblank_on_timer->remaining() > m_vblank_off_timer->remaining())
+		return m_vblank_active;
+	else
+		return !m_vblank_active;
 }
 
 
 //-------------------------------------------------
-//  screen_vblank - vertical blanking handler
+//  hsync_update - update state of horizontal
+//  sync output
 //-------------------------------------------------
 
-void dp835x_device::screen_vblank(screen_device &screen, bool state)
+TIMER_CALLBACK_MEMBER(dp835x_device::hsync_update)
 {
-	m_vblank_callback(state == m_vblank_active);
+	m_hsync_callback(param);
+}
+
+
+//-------------------------------------------------
+//  vsync_update - update state of vertical
+//  sync output
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(dp835x_device::vsync_update)
+{
+	m_vsync_callback(param);
+}
+
+
+//-------------------------------------------------
+//  vblank_update - update state of vertical
+//  blanking output
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(dp835x_device::vblank_update)
+{
+	m_vblank_callback(param);
 }

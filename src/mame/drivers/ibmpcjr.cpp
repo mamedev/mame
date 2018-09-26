@@ -22,6 +22,8 @@
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/terminal.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -517,6 +519,8 @@ static void pcjr_com(device_slot_interface &device)
 	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
 	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal",SERIAL_TERMINAL);
+	device.option_add("null_modem",NULL_MODEM);
 }
 
 static const gfx_layout pc_8_charlayout =
