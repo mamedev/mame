@@ -640,13 +640,13 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			//TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, data | 0x8, "Serial Status 1",  nullptr);
 			//TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, m_smioc->m_status, "(Real)Serial Status 1", nullptr);
 
-			data = m_smioc->m_status;
+			data = m_smioc->GetStatus();
 			break;
 
 		case 0x0870: /* Serial status or DMA status 2 (0x70, device 0x24) */
 			//if(TRACE_SMIOC) logerror("m_serial_status2 = %04X \n", m_serial_status2);
 			//TRACE_SMIOC_READ(offset << 2 | 0x5FF00000, m_serial_status2, "Serial Status 2", nullptr);
-			data = m_smioc->m_status2;
+			data = m_smioc->GetStatus2();
 			break;
 		/* SMIOC region (0x9C, device 0x27) */
 
@@ -802,6 +802,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Command", nullptr);
 			break;
 		case 0xC098: /* Serial DMA output address */
+			m_smioc->SetDmaParameter(smiocdma_sendaddress, data);
 			m_smioc->m_dmaSendAddress = data;
 			smioc_out_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
 			if(TRACE_SMIOC) logerror("Serial output address: %08X PC: %08X\n", smioc_out_addr, m_maincpu->pc());
@@ -809,6 +810,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			break;
 		/* SMIOC region (0x9C, device 27) - Input */
 		case 0x409C: /* Serial DMA write length */
+			m_smioc->SetDmaParameter(smiocdma_sendlength, data);
 			m_smioc->m_dmaSendLength = data;
 			smioc_dma_w_length = (~data+1) & 0xFFFF;
 			if(TRACE_SMIOC) logerror("Serial DMA write length: %08X PC: %08X\n", smioc_dma_w_length, m_maincpu->pc());
@@ -816,12 +818,14 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Write Length", nullptr);
 			break;
 		case 0x809C: /* Serial DMA input address */
+			m_smioc->SetDmaParameter(smiocdma_recvaddress, data);
 			smioc_in_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
 			if(TRACE_SMIOC) logerror("Serial input address: %08X PC: %08X\n", smioc_out_addr, m_maincpu->pc());
 			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial In Address", nullptr);
 			break;
 		case 0xC09C: /* Serial DMA read length */
 			smioc_dma_r_length = (~data+1) & 0xFFFF;
+			m_smioc->SetDmaParameter(smiocdma_recvlength, data);
 			if(TRACE_SMIOC) logerror("Serial DMA read length: %08X PC: %08X\n", smioc_dma_r_length, m_maincpu->pc());
 			if(smioc_dma_r_length > 0x400) smioc_dma_r_length = 0x400;
 			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Read Length", nullptr);

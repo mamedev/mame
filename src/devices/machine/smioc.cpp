@@ -108,7 +108,8 @@ const tiny_rom_entry *smioc_device::device_rom_region() const
 void smioc_device::smioc_mem(address_map &map)
 {
 	map(0x00000, 0x07FFF).ram().share("smioc_ram");
-	map(0x40000, 0x4FFFF).rw(FUNC(smioc_device::ram2_mmio_r), FUNC(smioc_device::ram2_mmio_w));
+	//map(0x40000, 0x4FFFF).rw(FUNC(smioc_device::ram2_mmio_r), FUNC(smioc_device::ram2_mmio_w));
+	map(0x40000, 0x4FFFF).rw(FUNC(smioc_device::ram2_mmio_r), FUNC(smioc_device::ram2_mmio_w)); // 4kb of ram in the 0x4xxxx window, mainly used by the board's logic to proxy command parameters and data.
 	map(0x50000, 0x5FFFF).rw(FUNC(smioc_device::dma68k_r), FUNC(smioc_device::dma68k_w));
 	map(0xC0080, 0xC008F).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Probably RAM DMA
 	map(0xC0090, 0xC009F).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
@@ -282,7 +283,7 @@ void smioc_device::SendCommand(u16 command)
 	// Invalidate status if we hit a command.
 	m_status = 0;
 	m_statusvalid = false;
-
+	m_enable_hacky_status = false;
 
 	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
 	m_smioccpu->int2_w(CLEAR_LINE);
@@ -306,20 +307,47 @@ void smioc_device::SendCommand2(u16 command)
 
 }
 
+u16 smioc_device::GetStatus()
+{
+	if (!m_statusvalid && m_enable_hacky_status)
+	{
+		m_status_hack_counter = (m_status_hack_counter + 1) & 0x0F;
+		if (m_status_hack_counter == 0)
+		{
+			//m_wordcount = 1;
+			//return 0x8040;
+		}
+
+	}
+	return m_status | 0x0008;
+}
+u16 smioc_device::GetStatus2()
+{
+	if (m_status2 == 0 && m_deviceBusy == 0)
+	{
+		//return 0x8040;
+	}
+	return m_status2 | 0x0008;
+}
+
 
 void smioc_device::ClearStatus()
 {
 	m_status = 0;
 	m_statusvalid = false;
 	if (m_statusrequest)
+	{
 		AdvanceStatus();
+	}
 }
 void smioc_device::ClearStatus2()
 {
-	m_requestFlags_11D |= 0x20; // bit 5 - E2E 0x100
-	m_smioccpu->int2_w(HOLD_LINE);
-
 	m_status2 = 0;
+	m_statusvalid2 = false;
+	if (m_statusrequest2)
+	{
+		AdvanceStatus2();
+	}
 }
 
 void smioc_device::ClearParameter()
@@ -338,6 +366,47 @@ void smioc_device::ClearParameter2()
 
 	m_wordcount2 = 0;
 }
+void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
+{
+	int baseAddress = -1;
+	int p4offset = 0xC0; // The address offset from port 0 to port 4
+	switch (param)
+	{
+	case smiocdma_sendaddress: // Send to SMIOC - For Serial TX data
+		baseAddress = 0xCD8;
+		break;
+	case smiocdma_sendlength:
+		baseAddress = 0xCE8;
+		break;
+
+	case smiocdma_recvaddress: // Recv from SMIOC - For Serial RX data
+		baseAddress = 0xCF0;
+		break;
+
+	case smiocdma_recvlength:
+		baseAddress = 0xCF8;
+		break;
+	}
+
+	if (baseAddress != -1)
+	{
+		int portOffset = (m_activePortIndex & 1) * 4 + (m_activePortIndex & 2) + ((m_activePortIndex & 4) ? p4offset : 0);
+
+		int address = baseAddress + portOffset;
+
+		m_logic_ram[address] = value & 0xFF;
+		m_logic_ram[address + 1] = (value >> 8) & 0xFF;
+
+		const char* paramNames[] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
+		const char* paramName = "?";
+		if (param >= 0 && param < (sizeof(paramNames) / sizeof(*paramNames)))
+		{
+			paramName = paramNames[param];
+		}
+
+		logerror("%s SetDmaParameter %d (%s) ram2[0x%04x] = %04X\n", machine().time().as_string(), param, paramName, address, value);
+	}
+}
 
 
 
@@ -355,7 +424,7 @@ void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_n
 READ8_MEMBER(smioc_device::ram2_mmio_r)
 {
 	const char * description = "";
-	u8 data = 0;
+	u8 data = m_logic_ram[offset & 0xFFF];
 	switch (offset)
 	{
 
@@ -426,6 +495,8 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 {
 	const char * description = "";
+
+	m_logic_ram[offset & 0xFFF] = data;
 
 	switch (offset) // Offset based on C0100 register base
 	{
@@ -578,6 +649,11 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 	case 0x12: // C0112 - Set to 1 after providing a status(2?) - Acknowledge by hardware by raising bit 5 in C011D (SMIOC E2E flag 0x100)
 		//m_requestFlags_11D |= 0x20; // bit 5
 		//m_smioccpu->int2_w(HOLD_LINE);
+		m_statusrequest2 = true;
+		if (!m_statusvalid2)
+		{
+			AdvanceStatus2();
+		}
 		logerror("%s C0112 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
@@ -594,6 +670,7 @@ void smioc_device::AdvanceStatus()
 {
 	m_status = m_shadowstatus | 0x0040;
 	m_statusvalid = true;
+	m_enable_hacky_status = true;
 	if (m_statusrequest)
 	{
 		m_requestFlags_11D |= 0x10; // bit 4
@@ -601,6 +678,18 @@ void smioc_device::AdvanceStatus()
 		m_smioccpu->int2_w(HOLD_LINE);
 	}
 	m_statusrequest = false;
+}
+void smioc_device::AdvanceStatus2()
+{
+	m_status2 = m_shadowstatus2 | 0x0040;
+	m_statusvalid2 = true;
+	if (m_statusrequest2)
+	{
+		m_requestFlags_11D |= 0x20; // bit 5
+		m_smioccpu->int2_w(CLEAR_LINE);
+		m_smioccpu->int2_w(HOLD_LINE);
+	}
+	m_statusrequest2 = false;
 }
 
 

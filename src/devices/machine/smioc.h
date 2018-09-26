@@ -20,6 +20,14 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+enum smioc_dma_parameter_t
+{
+	smiocdma_sendaddress=0, // Send to SMIOC - For Serial TX data
+	smiocdma_sendlength,
+	smiocdma_recvaddress, // Recv from SMIOC - For Serial RX data
+	smiocdma_recvlength
+};
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -78,13 +86,20 @@ public:
 
 	void SendCommand(u16 command);
 	void SendCommand2(u16 command);
+	u16 GetStatus();
+	u16 GetStatus2();
 	void ClearStatus();
 	void ClearStatus2();
 	void ClearParameter();
 	void ClearParameter2();
 
-	void AdvanceStatus();
+	bool m_enable_hacky_status;
+	int m_status_hack_counter;
 
+	void AdvanceStatus();
+	void AdvanceStatus2();
+
+	void SetDmaParameter(smioc_dma_parameter_t param, u16 value);
 
 protected:
 	/* Device-level overrides */
@@ -107,6 +122,8 @@ private:
 	required_device<scc2698b_device> m_scc2698b;
 
 	required_shared_ptr<uint8_t> m_smioc_ram;
+	
+	u8 m_logic_ram[4096]; // 4kb of ram in the 0x4xxxx window, mainly used by the board's logic to proxy command parameters and data.
 
 	void smioc_mem(address_map &map);
 
