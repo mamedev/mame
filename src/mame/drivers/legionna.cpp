@@ -54,7 +54,7 @@ Denjin Makai
 Godzilla
 --------
 
-The COP-MCU appears to write to the work ram area,otherwise it resets in mid-animation
+The COP-MCU appears to write to the work ram area, otherwise it resets in mid-animation
 of the title screen.
 
 
@@ -146,7 +146,7 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x10045c, 0x10045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 
 //  map(0x100470, 0x100471).rw(FUNC(legionna_state::cop_tile_bank_2_r), FUNC(legionna_state::cop_tile_bank_2_w));
-//  map(0x100474, 0x100475).w(m_raiden2cop, FUNC(raiden2cop_device::...)); // this gets set to a pointer to spriteram (relative to start of ram) on all games excecpt raiden 2, where it isn't set
+//  map(0x100474, 0x100475).w(m_raiden2cop, FUNC(raiden2cop_device::...)); // this gets set to a pointer to spriteram (relative to start of ram) on all games except raiden 2, where it isn't set
 	map(0x100476, 0x100477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
 	map(0x100478, 0x100479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
 	map(0x10047a, 0x10047b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_size_w));
@@ -1774,6 +1774,48 @@ ROM_START( heatbrl2 )
 	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
+ROM_START( heatbrl3 ) // only the maincpu and audiocpu ROMs were provided for this set. This is the only known set with a different audiocpu ROM, though it's quite similar.
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD32_BYTE( "barrel_1.u025.9k",   0x00000, 0x20000, CRC(b360c9cd) SHA1(3722c7220f99c28ac47ef5abac027ac62f838caa) )
+	ROM_LOAD32_BYTE( "barrel_2.u024.9m",   0x00001, 0x20000, CRC(06730aac) SHA1(451ebe6fdc9f983b05cfd20c5b6e89f2c1e7d17a) )
+	ROM_LOAD32_BYTE( "barrel_3.u026.9f",   0x00002, 0x20000, CRC(63fff651) SHA1(4bf060e3338fce8d0eecdcb7418d353ca3616382) )
+	ROM_LOAD32_BYTE( "barrel_4.u023.9h",   0x00003, 0x20000, CRC(7a119fd5) SHA1(ffccb7cec9b6f420edb658705a7434041854e77e) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
+	ROM_LOAD( "u1110.a6", 0x00000, 0x08000, CRC(790bdba4) SHA1(9030ddcf06b632a53ec49cbb7c94d1a5195e0316) ) // no label
+	ROM_CONTINUE(               0x10000, 0x08000 )  /* banked stuff */
+	ROM_COPY( "audiocpu", 0x000000,    0x18000, 0x08000 )
+
+	ROM_REGION( 0x020000, "char", 0 )   /* chars */
+	ROM_LOAD16_BYTE( "barrel_6.u077.5t", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
+	ROM_LOAD16_BYTE( "barrel_5.u072.5v", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+
+	ROM_REGION( 0x200000, "sprite", 0 )   /* sprites */
+	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+
+	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
+	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
+
+	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+
+	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
+	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+
+	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
+	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+
+	ROM_REGION( 0x200, "proms", 0 )     /* Priority */
+	ROM_LOAD( "heat07.u0910",   0x000000, 0x000200, CRC(265eccc8) SHA1(cf650c69f97b887251b5079e5518497721692af3) ) /* N82S147N type BPROM */
+
+	ROM_REGION( 0x080000, "user1", 0 )  /* SEI300 data rom */
+	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
+ROM_END
+
 ROM_START( heatbrlo )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD32_BYTE( "barrel.1h",   0x00000, 0x20000, CRC(d5a85c36) SHA1(421a42863faa940057ed5637748f791152a15502) )
@@ -1907,12 +1949,13 @@ ROM_START( heatbrle )
 	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
+
 /*
 
 Godzilla
 Banpresto 1993
 
-This game runs on Seibu hardware, similar to Legionairre.
+This game runs on Seibu hardware, similar to Legionnaire.
 
 PCB Layout
 |----------------------------------------------------|
@@ -2006,7 +2049,7 @@ Denjin Makai
 Banpresto, 1994
 
 This game runs on early 90's Seibu hardware.
-(i.e. Raiden II, Godzilla, Seibu Cup Soccer, Legionairre, Heated Barrel etc).
+(i.e. Raiden II, Godzilla, Seibu Cup Soccer, Legionnaire, Heated Barrel etc).
 The PCB looks to have been converted from some other game (a lot of flux traces are
 left on the PCB). The game might be a simple ROM swap for some other Seibu-based game.
 
@@ -2580,7 +2623,7 @@ ROM_END
 
    In Seibu Cup Soccer Selection the only way I've found to not display debug text is by changing this
    area, and for Olympic Soccer '92 it appears to be the only way to get the Olympic Soccer '92 titles
-   to be used instead of the reagular Seibu Cup Soccer one (and AFAIK both dumps are confirmed to show
+   to be used instead of the regular Seibu Cup Soccer one (and AFAIK both dumps are confirmed to show
    that on hardware, as are all early versions with the advertising boards of dubious legality)
 
    You can also enable other debug menus by patching this area of ROM, but some initial tests appear to
@@ -2634,7 +2677,7 @@ void legionna_state::init_legiongfx()
 void legionna_state::init_godzilla()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	// TODO: some game elements doesn't collide properly, @see seibucop.cpp
+	// TODO: some game elements don't collide properly, @see seibucop.cpp
 	ROM[(0xbe0e + 0x0a)/2] = 0xb000;
 	ROM[(0xbe0e + 0x1a)/2] = 0xb800;
 	ROM[(0xbb0a + 0x0a)/2] = 0xb000;
@@ -2649,6 +2692,7 @@ GAME( 1992, legionnaj, legionna, legionna, legionna, legionna_state, init_legion
 
 GAME( 1992, heatbrl,   0,        heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version 3)", 0 )
 GAME( 1992, heatbrl2,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version 2)", 0 )
+GAME( 1992, heatbrl3,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version ?)", 0 )
 GAME( 1992, heatbrlo,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World old version)", 0 )
 GAME( 1992, heatbrlu,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (US)", 0 )
 GAME( 1992, heatbrle,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
