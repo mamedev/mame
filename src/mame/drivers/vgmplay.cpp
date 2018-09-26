@@ -2933,7 +2933,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 			volume /= (float)chip_count;
 
 		m_lspeaker->set_output_gain(volume); // TODO : Volume is related to chip number
-		m_rspeaker->set_output_gain(volume); // TODO : Volume is related to chip number
+		m_rspeaker->set_output_gain(volume);
 
 		//for (auto &stream : machine().sound().streams())
 		//  if (stream->sample_rate() != 0)
