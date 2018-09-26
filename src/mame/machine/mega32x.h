@@ -32,8 +32,6 @@ public:
 
 	// configuration
 	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
-	void set_ldac_output_gain(float gain) { m_ldac->set_output_gain(ALL_OUTPUTS, gain); }
-	void set_rdac_output_gain(float gain) { m_rdac->set_output_gain(ALL_OUTPUTS, gain); }
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
