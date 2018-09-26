@@ -1532,7 +1532,7 @@ Scripting Options
 
 	Enable the use of Lua Plugins.  The default is ON (*-plugins*).
 
-.. _mame-plugin:
+.. _mame-commandline-plugin:
 
 **-plugin** *[plugin shortname]*
 
