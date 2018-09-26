@@ -33344,6 +33344,7 @@ diner_l1                        //
 diner_l2                        //
 diner_l3                        //
 diner_l4                        //
+diner_p0                        //
 gs_la3                          //
 gs_lg6                          //
 gs_lu3                          //
@@ -39102,6 +39103,7 @@ cc_104                          //
 cc_12                           //
 cc_13                           //
 congo_11                        //
+congo_11s10                     //
 congo_13                        //
 congo_20                        //
 congo_21                        //
@@ -39308,6 +39310,7 @@ fs_sp2                          //
 i500_10r                        //
 i500_11b                        //
 i500_11r                        //
+jb_04a                          //
 jb_10b                          //
 jb_10r                          //
 jm_05r                          //
