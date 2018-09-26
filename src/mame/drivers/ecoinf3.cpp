@@ -675,69 +675,69 @@ MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	MCFG_DEVICE_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_DEVICE_ADD("ppi8255_a", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_a_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_a_write_a_strobedat0))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_a_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_a_write_b_strobedat1))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_a_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_a_write_c_strobe))
+	i8255_device &ppia(I8255(config, "ppi8255_a"));
+	ppia.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_read_a));
+	ppia.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_write_a_strobedat0));
+	ppia.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_read_b));
+	ppia.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_write_b_strobedat1));
+	ppia.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_read_c));
+	ppia.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_write_c_strobe));
 
-	MCFG_DEVICE_ADD("ppi8255_b", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_b_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_b_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_b_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_b_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_b_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_b_write_c))
+	i8255_device &ppib(I8255(config, "ppi8255_b"));
+	ppib.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_b_read_a));
+	ppib.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_b_write_a));
+	ppib.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_b_read_b));
+	ppib.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_b_write_b));
+	ppib.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_b_read_c));
+	ppib.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_b_write_c));
 
-	MCFG_DEVICE_ADD("ppi8255_c", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_c_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_c_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_c_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_c_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_c_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_c_write_c))
+	i8255_device &ppic(I8255(config, "ppi8255_c"));
+	ppic.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_c_read_a));
+	ppic.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_c_write_a));
+	ppic.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_c_read_b));
+	ppic.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_c_write_b));
+	ppic.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_c_read_c));
+	ppic.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_c_write_c));
 
-	MCFG_DEVICE_ADD("ppi8255_d", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_d_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_d_write_a_reel01))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_d_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_d_write_b_reel23))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_d_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_d_write_c))
+	i8255_device &ppid(I8255(config, "ppi8255_d"));
+	ppid.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_d_read_a));
+	ppid.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_d_write_a_reel01));
+	ppid.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_d_read_b));
+	ppid.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_d_write_b_reel23));
+	ppid.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_d_read_c));
+	ppid.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_d_write_c));
 
-	MCFG_DEVICE_ADD("ppi8255_e", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_e_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_e_write_a_alpha_display))    // alpha display characters
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_e_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_e_write_b))  // not written at an appropriate time for it to be a 'send' address for the text
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_e_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_e_write_c))  // not written at an appropriate time for it to be a 'send' address for the text
+	i8255_device &ppie(I8255(config, "ppi8255_e"));
+	ppie.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_e_read_a));
+	ppie.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display));    // alpha display characters
+	ppie.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_e_read_b));
+	ppie.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_e_write_b));  // not written at an appropriate time for it to be a 'send' address for the text
+	ppie.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_e_read_c));
+	ppie.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_e_write_c));  // not written at an appropriate time for it to be a 'send' address for the text
 
-	MCFG_DEVICE_ADD("ppi8255_f", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_f_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_f_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_f_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_f_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_f_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_f_write_c))
+	i8255_device &ppif(I8255(config, "ppi8255_f"));
+	ppif.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_f_read_a));
+	ppif.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_f_write_a));
+	ppif.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_f_read_b));
+	ppif.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_f_write_b));
+	ppif.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_f_read_c));
+	ppif.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_f_write_c));
 
-	MCFG_DEVICE_ADD("ppi8255_g", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_g_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_g_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_g_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_g_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_g_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_g_write_c))
+	i8255_device &ppig(I8255(config, "ppi8255_g"));
+	ppig.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_g_read_a));
+	ppig.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_g_write_a));
+	ppig.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_g_read_b));
+	ppig.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_g_write_b));
+	ppig.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_g_read_c));
+	ppig.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_g_write_c));
 
-	MCFG_DEVICE_ADD("ppi8255_h", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_h_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_h_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_h_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_h_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_h_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_h_write_c))
+	i8255_device &ppih(I8255(config, "ppi8255_h"));
+	ppih.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_read_a));
+	ppih.out_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_write_a));
+	ppih.in_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_read_b));
+	ppih.out_pb_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_write_b));
+	ppih.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_read_c));
+	ppih.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_write_c));
 
 	MCFG_DEVICE_ADD("reel0", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<0>))

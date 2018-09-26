@@ -478,8 +478,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_DEVICE_PROGRAM_MAP(sandscrp_soundmem)
 	MCFG_DEVICE_IO_MAP(sandscrp_soundport)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

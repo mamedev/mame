@@ -598,10 +598,10 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(15'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg2))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(15'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, 0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg2));
+	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(15'000'000) / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, 0);

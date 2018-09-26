@@ -734,13 +734,13 @@ uint32_t seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_
 	set_pens();
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000, 1);
+	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000);
 	return 0;
 }
 
 
 /* For games with 1 or 2 tilemaps */
-void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
+void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size )
 {
 	const rectangle &visarea = screen.visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
@@ -833,7 +833,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 
 			if (order & 4)
 			{
@@ -851,7 +851,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 		}
 	}
 	else
@@ -860,7 +860,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 
 			if ((order & 4) && m_paletteram[1] != nullptr)
 			{
@@ -898,7 +898,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 			}
 
-			if (layers_ctrl & 8) m_seta001->draw_sprites(screen,bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8) m_seta001->draw_sprites(screen,bitmap,cliprect,sprite_bank_size);
 		}
 	}
 
@@ -906,7 +906,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint32_t seta_state::screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	seta_layers_update(screen, bitmap, cliprect, 0x1000, 1 );
+	seta_layers_update(screen, bitmap, cliprect, 0x1000 );
 	return 0;
 }
 
@@ -916,7 +916,7 @@ uint32_t setaroul_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(0x0, cliprect);
 
 	if (m_led & 0x80)
-		seta_layers_update(screen, bitmap, cliprect, 0x800, 1 );
+		seta_layers_update(screen, bitmap, cliprect, 0x800 );
 
 	return 0;
 }

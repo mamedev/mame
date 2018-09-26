@@ -759,7 +759,7 @@ MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Floppy */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL) // TODO: Verify 8MHz UKI crystal assumed to be used
+	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")

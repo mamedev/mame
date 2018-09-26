@@ -225,7 +225,7 @@ DEFINE_DEVICE_TYPE(S3C44B0, s3c44b0_device, "s3c44b0", "Samsung S3C44B0 SoC")
 s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S3C44B0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_cpu(nullptr)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_port_r_cb(*this)
 	, m_port_w_cb(*this)
 	, m_scl_w_cb(*this)
@@ -256,8 +256,6 @@ s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, d
 
 void s3c44b0_device::device_start()
 {
-	m_cpu = machine().device<cpu_device>("maincpu");
-
 	m_port_r_cb.resolve();
 	m_port_w_cb.resolve();
 	m_scl_w_cb.resolve();
@@ -331,8 +329,6 @@ void s3c44b0_device::device_start()
 	save_item(NAME(m_lcd.vpos_max));
 	save_item(NAME(m_lcd.vpos_end));
 	save_item(NAME(m_lcd.frame_time));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(s3c44b0_device::s3c44b0_postload), this));
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -446,7 +442,13 @@ void s3c44b0_device::device_start()
 }
 
 
-void s3c44b0_device::s3c44b0_postload()
+//-------------------------------------------------
+//  device_post_load - called after the loading a
+//  saved state, so that registered variables can
+//  be expaneded as necessary
+//-------------------------------------------------
+
+void s3c44b0_device::device_post_load()
 {
 	m_lcd.frame_period = HZ_TO_ATTOSECONDS(m_lcd.framerate);
 	m_lcd.scantime = m_lcd.frame_period / m_lcd.vpos_end;

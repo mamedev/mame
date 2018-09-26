@@ -71,7 +71,7 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<via6522_device> m_via;
+	optional_device<via6522_device> m_via; // sftm, wcbowl and gt games don't have the via
 	required_device<es5506_device> m_ensoniq;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

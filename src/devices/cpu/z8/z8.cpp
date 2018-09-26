@@ -12,7 +12,6 @@
 
     - strobed I/O
     - expose register file to disassembler
-    - decimal adjust instruction
     - timer Tin/Tout modes
     - serial
     - instruction pipeline
@@ -322,16 +321,28 @@ uint8_t z8_device::register_read(uint8_t offset)
 	case Z8_REGISTER_P0:
 		switch (P01M & Z8_P01M_P0L_MODE_MASK)
 		{
-		case Z8_P01M_P0L_MODE_OUTPUT:   data = m_output[offset] & 0x0f;     break;
-		case Z8_P01M_P0L_MODE_INPUT:    mask = 0x0f;                                break;
-		default: /* A8...A11 */         data = 0x0f;                                break;
+		case Z8_P01M_P0L_MODE_OUTPUT:
+			data = m_output[offset] & 0x0f;
+			break;
+		case Z8_P01M_P0L_MODE_INPUT:
+			mask = 0x0f;
+			break;
+		default: /* A8...A11 */
+			data = 0x0f;
+			break;
 		}
 
 		switch (P01M & Z8_P01M_P0H_MODE_MASK)
 		{
-		case Z8_P01M_P0H_MODE_OUTPUT:   data |= m_output[offset] & 0xf0;    break;
-		case Z8_P01M_P0H_MODE_INPUT:    mask |= 0xf0;                               break;
-		default: /* A12...A15 */        data |= 0xf0;                               break;
+		case Z8_P01M_P0H_MODE_OUTPUT:
+			data |= m_output[offset] & 0xf0;
+			break;
+		case Z8_P01M_P0H_MODE_INPUT:
+			mask |= 0xf0;
+			break;
+		default: /* A12...A15 */
+			data |= 0xf0;
+			break;
 		}
 
 		if (!(P3M & Z8_P3M_P0_STROBED))
@@ -345,9 +356,15 @@ uint8_t z8_device::register_read(uint8_t offset)
 	case Z8_REGISTER_P1:
 		switch (P01M & Z8_P01M_P1_MODE_MASK)
 		{
-		case Z8_P01M_P1_MODE_OUTPUT:    data = m_output[offset];            break;
-		case Z8_P01M_P1_MODE_INPUT:     mask = 0xff;                                break;
-		default: /* AD0..AD7 */         data = 0xff;                                break;
+		case Z8_P01M_P1_MODE_OUTPUT:
+			data = m_output[offset];
+			break;
+		case Z8_P01M_P1_MODE_INPUT:
+			mask = 0xff;
+			break;
+		default: /* AD0..AD7 */
+			data = 0xff;
+			break;
 		}
 
 		if ((P3M & Z8_P3M_P33_P34_MASK) != Z8_P3M_P33_P34_DAV1_RDY1)
@@ -371,10 +388,10 @@ uint8_t z8_device::register_read(uint8_t offset)
 
 	case Z8_REGISTER_P3:
 		// TODO: special port 3 modes
-		if (!(P3M & 0x7c))
-		{
+		//if (!(P3M & 0x7c))
+		//{
 			mask = 0x0f;
-		}
+		//}
 
 		if (mask) m_input[offset] = m_input_cb[3](0, mask);
 
@@ -440,10 +457,10 @@ void z8_device::register_write(uint8_t offset, uint8_t data)
 		m_output[offset] = data;
 
 		// TODO: special port 3 modes
-		if (!(P3M & 0x7c))
-		{
+		//if (!(P3M & 0x7c))
+		//{
 			mask = 0xf0;
-		}
+		//}
 
 		if (mask) m_output_cb[3](0, data & mask, mask);
 		break;
@@ -523,7 +540,7 @@ uint8_t z8_device::get_intermediate_register(int offset)
 
 void z8_device::stack_push_byte(uint8_t src)
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 1 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 1;
@@ -545,7 +562,7 @@ void z8_device::stack_push_byte(uint8_t src)
 
 void z8_device::stack_push_word(uint16_t src)
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 2 (predecrement)
 		uint8_t sp = register_read(Z8_REGISTER_SPL) - 2;
@@ -567,7 +584,7 @@ void z8_device::stack_push_word(uint16_t src)
 
 uint8_t z8_device::stack_pop_byte()
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
 		uint8_t sp = register_read(Z8_REGISTER_SPL);
@@ -593,7 +610,7 @@ uint8_t z8_device::stack_pop_byte()
 
 uint16_t z8_device::stack_pop_word()
 {
-	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (P01M & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
 		uint8_t sp = register_read(Z8_REGISTER_SPL);

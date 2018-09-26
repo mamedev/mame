@@ -130,4 +130,18 @@
 		</part>
 	</software>
 
+	<software name="psystem">
+		<description>P-System</description>
+		<year>1984</year>
+		<publisher>Acornsoft/TDI</publisher>
+		<info name="release" value="SNB26" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="P-System (1)"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Acornsoft P-System.ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

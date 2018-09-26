@@ -1365,11 +1365,11 @@ MACHINE_CONFIG_START(videopkr_state::bpoker)
 	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
 	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	//MCFG_I8255_OUT_PORTA_CB()
-	//MCFG_I8255_IN_PORTB_CB()
-	//MCFG_I8255_OUT_PORTC_CB()
-	//MCFG_I8255_IN_PORTC_CB()
+	I8255A(config, "ppi");
+	//ppi.out_pa_callback()
+	//ppi.in_pb_callback()
+	//ppi.out_pc_callback()
+	//ppi.in_pc_callback()
 MACHINE_CONFIG_END
 
 

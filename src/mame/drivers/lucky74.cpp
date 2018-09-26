@@ -1475,24 +1475,24 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 
 	// Each 82C255 behaves like 2x 8255 (in mode 0). Since MAME doesn't support it yet, I replaced
 	// both 82C255 with 4x 8255...
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
 	// Port C write: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN2");
+	ppi1.in_pc_callback().set_ioport("IN4");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set_ioport("DSW1");
+	ppi2.in_pb_callback().set_ioport("DSW2");
+	ppi2.in_pc_callback().set_ioport("DSW3");
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW4"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lucky74_state, lamps_a_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lucky74_state, lamps_b_w))
+	i8255_device &ppi3(I8255A(config, "ppi8255_3"));
+	ppi3.in_pa_callback().set_ioport("DSW4");
+	ppi3.out_pb_callback().set(FUNC(lucky74_state::lamps_a_w));
+	ppi3.out_pc_callback().set(FUNC(lucky74_state::lamps_b_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

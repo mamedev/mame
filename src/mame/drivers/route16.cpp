@@ -1043,7 +1043,7 @@ ROM_START( jongpute )
 	ROM_REGION( 0x10000, "cpu2", 0 )
 	ROM_LOAD( "j6",           0x0000, 0x1000, CRC(54b349b0) SHA1(e5620b85a24a35d995860c7121f1ddf16f7ea168) )
 
-    /* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
+	/* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
 	ROM_REGION( 0x1000, "unknown", 0 )
 	ROM_LOAD( "j1",           0x0000, 0x1000, CRC(6d6ba272) SHA1(a4efd8daddbbf595ee46484578f544d7ed84e090) )
 
@@ -1107,5 +1107,5 @@ GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,  
 GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )  // sampling voice is not emulated
+GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

@@ -905,11 +905,11 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(m_soundbrd, monsterb_sound_device, sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(m_soundbrd, monsterb_sound_device, sound_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(m_soundbrd, monsterb_sound_device, n7751_status_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(m_soundbrd, monsterb_sound_device, n7751_command_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(m_soundbrd, FUNC(monsterb_sound_device::sound_a_w));
+	ppi.out_pb_callback().set(m_soundbrd, FUNC(monsterb_sound_device::sound_b_w));
+	ppi.in_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::n7751_status_r));
+	ppi.out_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::n7751_command_w));
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
@@ -960,9 +960,9 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTB_CB(IOPORT("FC"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segag80r_state, sindbadm_misc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pb_callback().set_ioport("FC");
+	ppi.out_pc_callback().set(FUNC(segag80r_state::sindbadm_misc_w));
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)

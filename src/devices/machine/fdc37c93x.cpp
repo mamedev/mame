@@ -250,21 +250,25 @@ MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
 	// parallel port
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_parallel_w))
+
 	// serial ports
-	MCFG_DEVICE_ADD("uart_0", NS16450, XTAL(1'843'200)) // or NS16550 ?
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, fdc37c93x_device, irq_serial1_w))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(*this, fdc37c93x_device, txd_serial1_w))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(*this, fdc37c93x_device, dtr_serial1_w))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(*this, fdc37c93x_device, rts_serial1_w))
-	MCFG_DEVICE_ADD("uart_1", NS16450, XTAL(1'843'200))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, fdc37c93x_device, irq_serial2_w))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(*this, fdc37c93x_device, txd_serial2_w))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(*this, fdc37c93x_device, dtr_serial2_w))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(*this, fdc37c93x_device, rts_serial2_w))
+	NS16450(config, pc_serial1_comdev, XTAL(1'843'200)); // or NS16550 ?
+	pc_serial1_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial1_w));
+	pc_serial1_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial1_w));
+	pc_serial1_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial1_w));
+	pc_serial1_comdev->out_rts_callback().set(FUNC(fdc37c93x_device::rts_serial1_w));
+
+	NS16450(config, pc_serial2_comdev, XTAL(1'843'200));
+	pc_serial2_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial2_w));
+	pc_serial2_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial2_w));
+	pc_serial2_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial2_w));
+	pc_serial2_comdev->out_rts_callback().set(FUNC(fdc37c93x_device::rts_serial2_w));
+
 	// RTC
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_rtc_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config, "rtc"));
+	rtc.irq().set(FUNC(fdc37c93x_device::irq_rtc_w));
+	rtc.set_century_index(0x32);
+
 	// keyboard
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);

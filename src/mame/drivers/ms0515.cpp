@@ -538,16 +538,16 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
 
-	MCFG_DEVICE_ADD("vg93", KR1818VG93, 1000000)
+	KR1818VG93(config, m_fdc, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ms0515_state, ms0515_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ms0515_state, ms0515_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ms0515_state, ms0515_portc_w))
+	i8255_device &ppi(I8255(config, "ppi8255_1"));
+	ppi.out_pa_callback().set(FUNC(ms0515_state::ms0515_porta_w));
+	ppi.in_pb_callback().set(FUNC(ms0515_state::ms0515_portb_r));
+	ppi.out_pc_callback().set(FUNC(ms0515_state::ms0515_portc_w));
 
 	// serial connection to printer
 	I8251(config, m_i8251line, 0);

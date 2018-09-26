@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plygonet)
 
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, polygonet_state, k054539_nmi_gen))

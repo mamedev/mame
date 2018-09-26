@@ -249,17 +249,15 @@
 class a400_state : public atari_common_state
 {
 public:
-	a400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atari_common_state(mconfig, type, tag),
+	a400_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atari_common_state(mconfig, type, tag),
 		m_ram(*this, RAM_TAG),
 		m_pia(*this, "pia"),
 		m_dac(*this, "dac"),
 		m_region_maincpu(*this, "maincpu"),
-		m_0000(*this, "0000"),
-		m_8000(*this, "8000"),
-		m_a000(*this, "a000"),
 		m_cart(*this, "cartleft"),
-		m_cart2(*this, "cartright") { }
+		m_cart2(*this, "cartright")
+	{ }
 
 	void atari_common_nodac(machine_config &config);
 	void atari_common(machine_config &config);
@@ -328,9 +326,9 @@ private:
 	required_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
-	optional_memory_bank m_0000;
-	optional_memory_bank m_8000;
-	optional_memory_bank m_a000;
+	memory_bank *m_0000 = nullptr;
+	memory_bank *m_8000 = nullptr;
+	memory_bank *m_a000 = nullptr;
 	optional_device<a800_cart_slot_device> m_cart;
 	optional_device<a800_cart_slot_device> m_cart2;
 
@@ -338,7 +336,7 @@ private:
 	int m_last_offs;
 	uint8_t m_mmu, m_ext_bank;
 
-	void setup_ram(int bank,uint32_t size);
+	void setup_ram(int bank, uint32_t size);
 	void setup_cart(a800_cart_slot_device *slot);
 };
 
@@ -1739,33 +1737,38 @@ void a400_state::setup_ram(int bank, uint32_t size)
 
 	switch (bank)
 	{
-		case 0: // 0x0000-0x7fff
-			ram_top = std::min(size, uint32_t(0x8000)) - 1;
-			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
-			if (m_0000 == nullptr)
-				m_0000.findit(false);
-			m_0000->set_base(m_ram->pointer());
-			break;
-		case 1: // 0x8000-0x9fff
-			ram_top = std::min(size, uint32_t(0xa000)) - 1;
-			if (ram_top > 0x8000)
-			{
-				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
-				if (m_8000 == nullptr)
-					m_8000.findit(false);
-				m_8000->set_base(m_ram->pointer() + 0x8000);
-			}
-			break;
-		case 2: // 0xa000-0xbfff
-			ram_top = std::min(size, uint32_t(0xc000)) - 1;
-			if (ram_top > 0xa000)
-			{
-				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");
-				if (m_a000 == nullptr)
-					m_a000.findit(false);
-				m_a000->set_base(m_ram->pointer() + 0xa000);
-			}
-			break;
+	case 0: // 0x0000-0x7fff
+		ram_top = std::min(size, uint32_t(0x8000)) - 1;
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
+		m_0000 = membank("0000");
+		m_0000->set_base(m_ram->pointer());
+		break;
+	case 1: // 0x8000-0x9fff
+		ram_top = std::min(size, uint32_t(0xa000)) - 1;
+		if (ram_top > 0x8000)
+		{
+			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
+			m_8000 = membank("8000");
+			m_8000->set_base(m_ram->pointer() + 0x8000);
+		}
+		else
+		{
+			m_8000 = nullptr;
+		}
+		break;
+	case 2: // 0xa000-0xbfff
+		ram_top = std::min(size, uint32_t(0xc000)) - 1;
+		if (ram_top > 0xa000)
+		{
+			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");
+			m_a000 = membank("a000");
+			m_a000->set_base(m_ram->pointer() + 0xa000);
+		}
+		else
+		{
+			m_a000 = nullptr;
+		}
+		break;
 	}
 }
 
@@ -1832,76 +1835,76 @@ WRITE8_MEMBER(a400_state::disable_cart)
 	{
 		switch (m_cart->get_cart_type())
 		{
-			case A800_PHOENIX:
-			case A800_BLIZZARD:
-				if (!m_cart_disabled)
-					m_cart_disabled = 1;
-				break;
-			case A800_OSS034M:
-			case A800_OSS043M:
-			case A800_EXPRESS:
-			case A800_DIAMOND:
-			case A800_WILLIAMS:
-				// use m_cart_disabled & m_last_offs to avoid continuous remapping of
-				// the memory space in some games (e.g. dropzone)
-				if (offset & 0x8 && !m_cart_disabled)
-					m_cart_disabled = 1;
-				else if (!(offset & 0x8))
-				{
-					if (m_cart_disabled)
-						m_cart_disabled = 0;
-
-					if ((offset & 0x7) != m_last_offs)
-					{
-						// we enter here only if we are writing to a different offset than last time
-						m_last_offs = offset & 0x7;
-						m_cart->write_d5xx(space, offset, data);
-					}
-				}
-				break;
-			case A800_TURBO64:
-			case A800_TURBO128:
-				if (offset & 0x10 && !m_cart_disabled)
-					m_cart_disabled = 1;
-				else if (!(offset & 0x10))
-				{
-					if (m_cart_disabled)
-						m_cart_disabled = 0;
-
-					if ((offset & 0x0f) != m_last_offs)
-					{
-						// we enter here only if we are writing to a different offset than last time
-						m_last_offs = offset & 0x0f;
-						m_cart->write_d5xx(space, offset & 0x0f, data);
-					}
-				}
-				break;
-			case A800_SPARTADOS:
-				// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
-				m_cart->write_d5xx(space, offset, data);
-				break;
-			case A800_OSSM091:
-			case A800_OSS8K:
-				if ((offset & 0x9) == 0x08)
-					m_cart_disabled = 1;
-				else
-				{
+		case A800_PHOENIX:
+		case A800_BLIZZARD:
+			if (!m_cart_disabled)
+				m_cart_disabled = 1;
+			break;
+		case A800_OSS034M:
+		case A800_OSS043M:
+		case A800_EXPRESS:
+		case A800_DIAMOND:
+		case A800_WILLIAMS:
+			// use m_cart_disabled & m_last_offs to avoid continuous remapping of
+			// the memory space in some games (e.g. dropzone)
+			if (offset & 0x8 && !m_cart_disabled)
+				m_cart_disabled = 1;
+			else if (!(offset & 0x8))
+			{
+				if (m_cart_disabled)
 					m_cart_disabled = 0;
+
+				if ((offset & 0x7) != m_last_offs)
+				{
+					// we enter here only if we are writing to a different offset than last time
+					m_last_offs = offset & 0x7;
 					m_cart->write_d5xx(space, offset, data);
 				}
-				break;
-			case A800_MICROCALC:
-				m_cart_helper = (m_cart_helper + 1) % 5;
-				if (m_cart_helper == 4)
-					m_cart_disabled = 1;
-				else
-				{
+			}
+			break;
+		case A800_TURBO64:
+		case A800_TURBO128:
+			if (offset & 0x10 && !m_cart_disabled)
+				m_cart_disabled = 1;
+			else if (!(offset & 0x10))
+			{
+				if (m_cart_disabled)
 					m_cart_disabled = 0;
-					m_cart->write_d5xx(space, offset, m_cart_helper);
+
+				if ((offset & 0x0f) != m_last_offs)
+				{
+					// we enter here only if we are writing to a different offset than last time
+					m_last_offs = offset & 0x0f;
+					m_cart->write_d5xx(space, offset & 0x0f, data);
 				}
-				break;
-			default:
-				break;
+			}
+			break;
+		case A800_SPARTADOS:
+			// writes with offset & 8 are also used to enable/disable the subcart, so they go through!
+			m_cart->write_d5xx(space, offset, data);
+			break;
+		case A800_OSSM091:
+		case A800_OSS8K:
+			if ((offset & 0x9) == 0x08)
+				m_cart_disabled = 1;
+			else
+			{
+				m_cart_disabled = 0;
+				m_cart->write_d5xx(space, offset, data);
+			}
+			break;
+		case A800_MICROCALC:
+			m_cart_helper = (m_cart_helper + 1) % 5;
+			if (m_cart_helper == 4)
+				m_cart_disabled = 1;
+			else
+			{
+				m_cart_disabled = 0;
+				m_cart->write_d5xx(space, offset, m_cart_helper);
+			}
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -1915,83 +1918,83 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 	{
 		switch (slot->get_cart_type())
 		{
-			case A800_8K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-				break;
-			case A800_8K_RIGHT:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x9fff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
-				break;
-			case A800_16K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-				break;
-			case A800_BBSB:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0x9fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-				break;
-			case A800_OSS034M:
-			case A800_OSS043M:
-			case A800_OSSM091:
-			case A800_OSS8K:
-			case A800_TURBO64:
-			case A800_TURBO128:
-			case A800_PHOENIX:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_EXPRESS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd570, 0xd57f, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_DIAMOND:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5d0, 0xd5df, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_WILLIAMS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd50f, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_SPARTADOS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5e0, 0xd5ef, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_BLIZZARD:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_8000), this), write8_delegate(FUNC(a400_state::special_write_8000), this));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_MICROCALC:
-				// this can also disable ROM when reading in 0xd500-0xd5ff
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8_delegate(FUNC(a400_state::read_d5xx), this), write8_delegate(FUNC(a400_state::disable_cart), this));
-				break;
-			case A800_TELELINK2:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0x90ff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0xd501, 0xd501, read8_delegate(FUNC(a800_cart_slot_device::read_d5xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd502, 0xd502, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
-				break;
-			case A800_XEGS:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
-				break;
-			case A5200_4K:
-			case A5200_8K:
-			case A5200_16K:
-			case A5200_32K:
-			case A5200_16K_2CHIPS:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0xbfff);
-				break;
-			case A5200_BBSB:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
-				m_maincpu->space(AS_PROGRAM).unmap_write(0x6000, 0xbfff);
-				break;
+		case A800_8K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+			break;
+		case A800_8K_RIGHT:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x9fff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
+			break;
+		case A800_16K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
+			break;
+		case A800_BBSB:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0x9fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+			break;
+		case A800_OSS034M:
+		case A800_OSS043M:
+		case A800_OSSM091:
+		case A800_OSS8K:
+		case A800_TURBO64:
+		case A800_TURBO128:
+		case A800_PHOENIX:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_EXPRESS:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd570, 0xd57f, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_DIAMOND:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5d0, 0xd5df, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_WILLIAMS:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd50f, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_SPARTADOS:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd5e0, 0xd5ef, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_BLIZZARD:
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_8000), this), write8_delegate(FUNC(a400_state::special_write_8000), this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_MICROCALC:
+			// this can also disable ROM when reading in 0xd500-0xd5ff
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff, read8_delegate(FUNC(a400_state::special_read_a000), this), write8_delegate(FUNC(a400_state::special_write_a000), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd500, 0xd5ff, read8_delegate(FUNC(a400_state::read_d5xx), this), write8_delegate(FUNC(a400_state::disable_cart), this));
+			break;
+		case A800_TELELINK2:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0x90ff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd501, 0xd501, read8_delegate(FUNC(a800_cart_slot_device::read_d5xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd502, 0xd502, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
+			break;
+		case A800_XEGS:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a800_cart_slot_device::write_d5xx),(a800_cart_slot_device*)slot));
+			break;
+		case A5200_4K:
+		case A5200_8K:
+		case A5200_16K:
+		case A5200_32K:
+		case A5200_16K_2CHIPS:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0xbfff);
+			break;
+		case A5200_BBSB:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(a800_cart_slot_device::read_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(a800_cart_slot_device::write_80xx),(a800_cart_slot_device*)slot));
+			m_maincpu->space(AS_PROGRAM).unmap_write(0x6000, 0xbfff);
+			break;
 		}
 	}
 }

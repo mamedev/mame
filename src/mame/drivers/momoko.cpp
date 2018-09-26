@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/4)  /* 2.5MHz */
 	MCFG_DEVICE_PROGRAM_MAP(momoko_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

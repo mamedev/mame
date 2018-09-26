@@ -36,7 +36,7 @@ class i8212_device : public device_t
 
 public:
 	// construction/destruction
-	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_di_rd_callback(Object &&cb) { return m_read_di.set_callback(std::forward<Object>(cb)); }
@@ -56,7 +56,6 @@ public:
 	DECLARE_WRITE8_MEMBER(strobe);
 
 	// line write handlers
-	DECLARE_WRITE_LINE_MEMBER(md_w);
 	DECLARE_WRITE_LINE_MEMBER(stb_w);
 
 protected:

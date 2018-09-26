@@ -135,10 +135,8 @@ void isbc_state::rpc86_io(address_map &map)
 	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x00dc, 0x00dc).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00de, 0x00de).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void isbc_state::isbc8605_io(address_map &map)
@@ -169,10 +167,8 @@ void isbc_state::isbc_io(address_map &map)
 	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x00dc, 0x00dc).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00de, 0x00de).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void isbc_state::isbc286_io(address_map &map)
@@ -342,7 +338,7 @@ MACHINE_CONFIG_START(isbc_state::isbc86)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
 	I8251(config, m_uart8251, 0);
 	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -375,7 +371,7 @@ MACHINE_CONFIG_START(isbc_state::rpc86)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
 	I8251(config, m_uart8251, 0);
 	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -453,10 +449,10 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc286_tmr2_w))
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8("cent_status_in", input_buffer_device, bus_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isbc_state, ppi_c_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.in_pb_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+	ppi.out_pc_callback().set(FUNC(isbc_state::ppi_c_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, isbc_state, write_centronics_ack))

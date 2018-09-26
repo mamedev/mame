@@ -191,9 +191,9 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 
 	Z80PIO(config, "pio2", 4'000'000);
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 2'000'000) // no idea
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dmax8000_state, fdc_drq_w))
+	FD1793(config, m_fdc, 2'000'000); // no idea
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 

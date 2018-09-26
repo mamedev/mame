@@ -40,8 +40,7 @@ void pp01_state::pp01_io(address_map &map)
 {
 	map(0xc0, 0xc3).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
 	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
-	map(0xc8, 0xc8).mirror(2).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc9, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xcc, 0xcf).w(FUNC(pp01_state::pp01_video_write_mode_w));
 	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));
@@ -235,16 +234,16 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pp01_state, pp01_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pp01_state, pp01_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pp01_state, pp01_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pp01_state, pp01_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pp01_state, pp01_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pp01_state, pp01_8255_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_r));
+	ppi.out_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_w));
+	ppi.in_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_r));
+	ppi.out_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_w));
+	ppi.in_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_r));
+	ppi.out_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_w));
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 /* ROM definition */

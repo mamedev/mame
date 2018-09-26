@@ -6779,6 +6779,38 @@ ROM_END
 
 ROM_START( raphero )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "3",      0x00000, 0x80000, CRC(3257bfbd) SHA1(12ba7bbbf811c9a574a7751979edaaf1f33b0764) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* tmp90c841 */
+	ROM_LOAD( "rhp94099.2",    0x00000, 0x20000, CRC(fe01ece1) SHA1(c469fb79f2774089848c814f92ddd3c9e384050f) )
+
+	ROM_REGION( 0x020000, "fgtile", 0 )
+	ROM_LOAD( "rhp94099.1",    0x000000, 0x020000, CRC(55a7a011) SHA1(87ded56bfdd38cbf8d3bd8b3789831f768550a12) )   /* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "bgtile", 0 )
+	ROM_LOAD( "rhp94099.4", 0x000000, 0x200000,  CRC(076eee7b) SHA1(7c315fe33d0fcd92e0ce2f274996c8059228b005) ) /* 16x16 tiles */
+
+	ROM_REGION( 0x600000, "sprites", 0 ) /* sprites */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.8", 0x000000, 0x200000, CRC(49892f07) SHA1(2f5d20cd193cffcba9041aa11d6665adebeffffa) )  /* 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  /* 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  /* 16x16 tiles */
+
+	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
+	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  /* all banked */
+
+	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  /* all banked */
+	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "prom1.u19",      0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) ) /* unknown */
+	ROM_LOAD( "prom2.u53",      0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) ) /* unknown */
+	ROM_LOAD( "prom3.u60",      0x0200, 0x0100, CRC(304f98c6) SHA1(8dfd9bf719087ec30c83efe95c4561666c7d1801) ) /* unknown */
+ROM_END
+
+ROM_START( rapheroa )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rhp94099.3",      0x00000, 0x80000, CRC(ec9b4f05) SHA1(e5bd797620dc449fd78b41d87e9ba5a764eb8b44) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* tmp90c841 */
@@ -8206,9 +8238,9 @@ GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state, init_
 GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
 GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, Sound system isn't hooked up correctly for this set
 
-/* arcadia was a name conflict to the Emerson Arcadia 2001 in mess */
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
-GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero", 0 )    // ^^
+GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^
+GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all romsets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb,   0,        bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )

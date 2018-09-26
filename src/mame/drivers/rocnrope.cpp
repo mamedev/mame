@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	mainlatch.q_out_cb<4>().set(FUNC(rocnrope_state::coin_counter_2_w));
 	mainlatch.q_out_cb<7>().set(FUNC(rocnrope_state::irq_mask_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

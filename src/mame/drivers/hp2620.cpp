@@ -10,7 +10,7 @@ Skeleton driver for HP-2620 series display terminals.
 #include "cpu/z80/z80.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
-//#include "video/dp8350.h"
+#include "video/dp8350.h"
 #include "screen.h"
 
 class hp2620_state : public driver_device
@@ -19,6 +19,7 @@ public:
 	hp2620_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
 		, m_p_chargen(*this, "chargen")
 		, m_nvram(*this, "nvram")
 	{ }
@@ -32,6 +33,7 @@ private:
 	DECLARE_WRITE8_MEMBER(keydisp_w);
 	DECLARE_READ8_MEMBER(sysstat_r);
 	DECLARE_WRITE8_MEMBER(modem_w);
+	void crtc_w(offs_t offset, u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -39,6 +41,7 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<dp8367_device> m_crtc;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_nvram;
 };
@@ -77,9 +80,15 @@ WRITE8_MEMBER(hp2620_state::modem_w)
 {
 }
 
+void hp2620_state::crtc_w(offs_t offset, u8 data)
+{
+	m_crtc->register_load(data & 3, offset & 0xfff);
+}
+
 void hp2620_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom().region("maincpu", 0);
+	map(0x8000, 0xbfff).w(FUNC(hp2620_state::crtc_w));
 	map(0xc000, 0xffff).ram();
 }
 
@@ -107,10 +116,10 @@ void hp2620_state::hp2622(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (A7 tied to GND) + battery (+ wait states)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.7715_MHz_XTAL, 1035, 0, 720, 415, 0, 390); // 498 total lines in 50 Hz mode
 	screen.set_screen_update(FUNC(hp2620_state::screen_update));
 
-	//DP8367(config, "crtc", 25.7715_MHz_XTAL).set_screen("screen");
+	DP8367(config, m_crtc, 25.7715_MHz_XTAL).set_screen("screen");
+	m_crtc->set_half_shift(true);
 
 	mos6551_device &acia(MOS6551(config, "acia", 0)); // SY6551
 	acia.set_xtal(25.7715_MHz_XTAL / 14); // 1.84 MHz

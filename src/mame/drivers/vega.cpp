@@ -184,7 +184,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 		case 0:  /* 00-03 */
 		{
 			/* PPI 8255 /CS */
-			m_i8255->write(space, (m_p2_data>>6)&3, data);
+			m_i8255->write((m_p2_data>>6)&3, data);
 		}
 		break;
 
@@ -313,7 +313,7 @@ READ8_MEMBER(vega_state::extern_r)
 	{
 		case 0: /* PPI 8255 /CS */
 		{
-			return m_i8255->read( space, m_p2_data>>6); /* A6,A7 -> A0,A1 */
+			return m_i8255->read(m_p2_data>>6); /* A6,A7 -> A0,A1 */
 		}
 
 		case 1: /* 04-07 */
@@ -808,19 +808,19 @@ MACHINE_CONFIG_START(vega_state::vega)
 	MCFG_MCS48_PORT_PROG_OUT_CB(NOOP) /* prog - inputs CLK */
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, vega_state, txtram_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vega_state, txtram_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vega_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, vega_state, randomizer))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vega_state, ppi_pc_w))
+	I8255A(config, m_i8255);
+	m_i8255->in_pa_callback().set(FUNC(vega_state::txtram_r));
+	m_i8255->in_pb_callback().set_ioport("IN0");
+	m_i8255->in_pc_callback().set(FUNC(vega_state::randomizer));
+	m_i8255->out_pa_callback().set(FUNC(vega_state::txtram_w));
+	m_i8255->out_pb_callback().set(FUNC(vega_state::ppi_pb_w));
+	m_i8255->out_pc_callback().set(FUNC(vega_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD( "ins8154", INS8154, 0 )
-	MCFG_INS8154_IN_A_CB(READ8(*this, vega_state, ins8154_pa_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(*this, vega_state, ins8154_pa_w))
-	MCFG_INS8154_IN_B_CB(READ8(*this, vega_state, ins8154_pb_r))
-	MCFG_INS8154_OUT_B_CB(WRITE8(*this, vega_state, ins8154_pb_w))
+	INS8154(config, m_ins8154);
+	m_ins8154->in_a().set(FUNC(vega_state::ins8154_pa_r));
+	m_ins8154->out_a().set(FUNC(vega_state::ins8154_pa_w));
+	m_ins8154->in_b().set(FUNC(vega_state::ins8154_pb_r));
+	m_ins8154->out_b().set(FUNC(vega_state::ins8154_pb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

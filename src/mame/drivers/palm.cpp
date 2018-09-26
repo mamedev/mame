@@ -207,15 +207,14 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_DEVICE_ADD( MC68328_TAG, MC68328, 0 ) // lsi device
-	MCFG_MC68328_CPU("maincpu")
-	MCFG_MC68328_OUT_PORT_F_CB(WRITE8(*this, palm_state, palm_port_f_out)) // Port F Output
-	MCFG_MC68328_IN_PORT_C_CB(READ8(*this, palm_state, palm_port_c_in)) // Port C Input
-	MCFG_MC68328_IN_PORT_F_CB(READ8(*this, palm_state, palm_port_f_in)) // Port F Input
-	MCFG_MC68328_OUT_PWM_CB(WRITELINE("dac", dac_bit_interface, write))
-	MCFG_MC68328_OUT_SPIM_CB(WRITE16(*this, palm_state, palm_spim_out))
-	MCFG_MC68328_IN_SPIM_CB(READ16(*this, palm_state, palm_spim_in))
-	MCFG_MC68328_SPIM_XCH_TRIGGER_CB(WRITELINE(*this, palm_state, palm_spim_exchange))
+	MC68328(config, m_lsi, 0, "maincpu"); // on-board peripherals
+	m_lsi->out_port_f().set(FUNC(palm_state::palm_port_f_out));
+	m_lsi->in_port_c().set(FUNC(palm_state::palm_port_c_in));
+	m_lsi->in_port_f().set(FUNC(palm_state::palm_port_f_in));
+	m_lsi->out_pwm().set("dac", FUNC(dac_bit_interface::write));
+	m_lsi->out_spim().set(FUNC(palm_state::palm_spim_out));
+	m_lsi->in_spim().set(FUNC(palm_state::palm_spim_in));
+	m_lsi->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palm )

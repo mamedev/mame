@@ -524,10 +524,11 @@ MACHINE_CONFIG_START(at_state::neat)
 	atvga(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(neat_io)
-	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc")); // TODO: move this into the cs8221
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
+	rtc.set_century_index(0x32);
+
 	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "bios");
 MACHINE_CONFIG_END
 
@@ -634,18 +635,23 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_DEVICE_IO_MAP(megapc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
-	MCFG_WD7600_ADD("wd7600", 50_MHz_XTAL / 2, ":maincpu", ":isa", ":bios", ":keybc")
-	MCFG_WD7600_HOLD(WRITELINE(*this, megapc_state, wd7600_hold));
-	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
-	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
-	MCFG_WD7600_CPURESET(INPUTLINE("maincpu", INPUT_LINE_RESET));
-	MCFG_WD7600_A20M(INPUTLINE("maincpu", INPUT_LINE_A20));
+	WD7600(config, m_wd7600, 50_MHz_XTAL / 2);
+	m_wd7600->set_cputag(m_maincpu);
+	m_wd7600->set_isatag("isa");
+	m_wd7600->set_ramtag(m_ram);
+	m_wd7600->set_biostag("bios");
+	m_wd7600->set_keybctag("keybc");
+	m_wd7600->hold_callback().set(FUNC(megapc_state::wd7600_hold));
+	m_wd7600->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_wd7600->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_wd7600->cpureset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_wd7600->a20m_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	// isa dma
-	MCFG_WD7600_IOR(READ16(*this, megapc_state, wd7600_ior))
-	MCFG_WD7600_IOW(WRITE16(*this, megapc_state, wd7600_iow))
-	MCFG_WD7600_TC(WRITE8(*this, megapc_state, wd7600_tc))
+	m_wd7600->ior_callback().set(FUNC(megapc_state::wd7600_ior));
+	m_wd7600->iow_callback().set(FUNC(megapc_state::wd7600_iow));
+	m_wd7600->tc_callback().set(FUNC(megapc_state::wd7600_tc));
 	// speaker
-	MCFG_WD7600_SPKR(WRITELINE(*this, megapc_state, wd7600_spkr))
+	m_wd7600->spkr_callback().set(FUNC(megapc_state::wd7600_spkr));
 
 	// on board devices
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
@@ -753,10 +759,9 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
 
-	MCFG_DEVICE_REMOVE("mb:rtc")
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
+	rtc.set_century_index(0x32);
 
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M");
 
@@ -778,9 +783,10 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_VT82C496_ADD("chipset")
-	MCFG_VT82C496_CPU("maincpu")
-	MCFG_VT82C496_REGION("isa")
+	vt82c496_device &chipset(VT82C496(config, "chipset"));
+	chipset.set_cputag(m_maincpu);
+	chipset.set_ramtag(m_ram);
+	chipset.set_isatag("isa");
 MACHINE_CONFIG_END
 
 // Compaq Portable III

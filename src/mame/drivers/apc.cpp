@@ -309,7 +309,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_pit->read(space, (offset & 6) >> 1);
+		res = m_pit->read((offset & 6) >> 1);
 	else
 	{
 		if(offset & 4)
@@ -318,7 +318,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 			res = 0xff;
 		}
 		else
-			res = m_i8259_s->read(space, (offset & 2) >> 1);
+			res = m_i8259_s->read((offset & 2) >> 1);
 	}
 
 	return res;
@@ -327,13 +327,13 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 WRITE8_MEMBER(apc_state::apc_port_28_w)
 {
 	if(offset & 1)
-		m_pit->write(space, (offset & 6) >> 1, data);
+		m_pit->write((offset & 6) >> 1, data);
 	else
 	{
 		if(offset & 4)
 			printf("Write undefined port %02x\n",offset+0x28);
 		else
-			m_i8259_s->write(space, (offset & 2) >> 1, data);
+			m_i8259_s->write((offset & 2) >> 1, data);
 	}
 }
 

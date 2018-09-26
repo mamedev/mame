@@ -2122,10 +2122,8 @@ WRITE8_MEMBER( towns_state::towns_serial_w )
 	switch(offset)
 	{
 		case 0:
-			m_i8251->data_w(space,0,data);
-			break;
 		case 1:
-			m_i8251->control_w(space,0,data);
+			m_i8251->write(offset, data);
 			break;
 		case 4:
 			m_serial_irq_enable = data;
@@ -2140,9 +2138,8 @@ READ8_MEMBER( towns_state::towns_serial_r )
 	switch(offset)
 	{
 		case 0:
-			return m_i8251->data_r(space,0);
 		case 1:
-			return m_i8251->status_r(space,0);
+			return m_i8251->read(offset);
 		case 3:
 			return m_serial_irq_source;
 		default:
@@ -2819,9 +2816,9 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8'000'000 / 4)  // clock unknown
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_drq_w))
+	MB8877(config, m_fdc, 8'000'000 / 4);  // clock unknown
+	m_fdc->intrq_wr_callback().set(FUNC(towns_state::mb8877a_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(towns_state::mb8877a_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("fd_list","fmtowns_flop")
@@ -2842,22 +2839,22 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_FMSCSI_IRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_irq))
 	MCFG_FMSCSI_DRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_drq))
 
-	MCFG_DEVICE_ADD("dma_1", UPD71071, 0)
-	MCFG_UPD71071_CPU("maincpu")
-	MCFG_UPD71071_CLOCK(4000000)
-	MCFG_UPD71071_DMA_READ_0_CB(READ16(*this, towns_state, towns_fdc_dma_r))
-	MCFG_UPD71071_DMA_READ_1_CB(READ16(*this, towns_state, towns_scsi_dma_r))
-	MCFG_UPD71071_DMA_READ_3_CB(READ16(*this, towns_state, towns_cdrom_dma_r))
-	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
-	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
-	MCFG_DEVICE_ADD("dma_2", UPD71071, 0)
-	MCFG_UPD71071_CPU("maincpu")
-	MCFG_UPD71071_CLOCK(4000000)
-	MCFG_UPD71071_DMA_READ_0_CB(READ16(*this, towns_state, towns_fdc_dma_r))
-	MCFG_UPD71071_DMA_READ_1_CB(READ16(*this, towns_state, towns_scsi_dma_r))
-	MCFG_UPD71071_DMA_READ_3_CB(READ16(*this, towns_state, towns_cdrom_dma_r))
-	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
-	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
+	UPD71071(config, m_dma[0], 0);
+	m_dma[0]->set_cpu_tag("maincpu");
+	m_dma[0]->set_clock(4000000);
+	m_dma[0]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
+	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[0]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
+	m_dma[0]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
+	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	UPD71071(config, m_dma[1], 0);
+	m_dma[1]->set_cpu_tag("maincpu");
+	m_dma[1]->set_clock(4000000);
+	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
+	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
+	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
+	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 

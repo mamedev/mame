@@ -46,7 +46,7 @@ To Do:
 #include "machine/wd_fdc.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
-//#include "video/dp8350.h"
+#include "video/dp8350.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -62,6 +62,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
+		, m_crtc(*this, "crtc")
 		, m_u0(*this, "uart0")
 		, m_u1(*this, "uart1")
 		, m_ppi(*this, "ppi")
@@ -113,6 +114,7 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
+	required_device<dp8350_device> m_crtc;
 	required_device<i8251_device> m_u0;
 	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
@@ -138,12 +140,10 @@ void sbrain_state::sbrain_mem(address_map &map)
 void sbrain_state::sbrain_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(6).rw(m_u0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x48, 0x4f).r(FUNC(sbrain_state::port48_r)); //chr_int_latch
 	map(0x50, 0x57).r(FUNC(sbrain_state::port50_r));
-	map(0x58, 0x58).mirror(6).rw(m_u1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x59, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x58, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x60).mirror(7).w("brg", FUNC(com8116_device::stt_str_w));
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -219,6 +219,8 @@ d7 : reverse video
 */
 WRITE8_MEMBER( sbrain_state::ppi_pa_w )
 {
+	m_crtc->refresh_control(BIT(data, 6));
+
 	m_porta = data;
 }
 
@@ -518,7 +520,6 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				}
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
 				*p++ = BIT(gfx, 6);
 				*p++ = BIT(gfx, 5);
 				*p++ = BIT(gfx, 4);
@@ -548,16 +549,12 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(sbrain_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	//MCFG_DEVICE_ADD("crtc", DP8350, 10.92_MHz_XTAL)
+	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -565,13 +562,13 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sbrain_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sbrain_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, sbrain_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sbrain_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, sbrain_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sbrain_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(sbrain_state::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(sbrain_state::ppi_pa_w));
+	m_ppi->in_pb_callback().set(FUNC(sbrain_state::ppi_pb_r));
+	m_ppi->out_pb_callback().set(FUNC(sbrain_state::ppi_pb_w));
+	m_ppi->in_pc_callback().set(FUNC(sbrain_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(sbrain_state::ppi_pc_w));
 
 	I8251(config, m_u0, 0);
 
@@ -583,7 +580,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	brg.ft_handler().set(m_u1, FUNC(i8251_device::write_txc));
 	brg.ft_handler().append(m_u1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 16_MHz_XTAL / 16)
+	FD1791(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

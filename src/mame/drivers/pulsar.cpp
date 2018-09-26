@@ -219,11 +219,11 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_MACHINE_RESET_OVERRIDE(pulsar_state, pulsar)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pulsar_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pulsar_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));
+	ppi.out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));
+	ppi.in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));
 
 	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	brg.ft_handler().set("dart", FUNC(z80dart_device::txcb_w));
 	brg.ft_handler().append("dart", FUNC(z80dart_device::rxcb_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1797, 4_MHz_XTAL / 2)
+	FD1797(config, m_fdc, 4_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)

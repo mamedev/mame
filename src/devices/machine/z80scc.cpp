@@ -2590,10 +2590,10 @@ void z80scc_channel::m_tx_fifo_rp_step()
 		}
 }
 
-READ8_MEMBER (z80scc_device::da_r)  { return m_chanA->data_read(); }
-WRITE8_MEMBER (z80scc_device::da_w) { m_chanA->data_write(data); }
-READ8_MEMBER (z80scc_device::db_r)  { return m_chanB->data_read(); }
-WRITE8_MEMBER (z80scc_device::db_w) { m_chanB->data_write(data); }
+uint8_t z80scc_device::da_r(offs_t offset)            { return m_chanA->data_read(); }
+void z80scc_device::da_w(offs_t offset, uint8_t data) { m_chanA->data_write(data); }
+uint8_t z80scc_device::db_r(offs_t offset)            { return m_chanB->data_read(); }
+void z80scc_device::db_w(offs_t offset, uint8_t data) { m_chanB->data_write(data); }
 
 //-------------------------------------------------
 //  data_write - write data register

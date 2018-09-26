@@ -363,15 +363,15 @@ public:
 	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
 
 	/* Definitions moved to z80scc.c for enhancements */
-	DECLARE_READ8_MEMBER( da_r );  // { return m_chanA->data_read(); }
-	DECLARE_WRITE8_MEMBER( da_w ); // { m_chanA->data_write(data); }
-	DECLARE_READ8_MEMBER( db_r );  // { return m_chanB->data_read(); }
-	DECLARE_WRITE8_MEMBER( db_w ); // { m_chanB->data_write(data); }
+	uint8_t da_r(offs_t offset);
+	void da_w(offs_t offset, uint8_t data);
+	uint8_t db_r(offs_t offset);
+	void db_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( ca_r ) { return m_chanA->control_read(); }
-	DECLARE_WRITE8_MEMBER( ca_w ) { m_chanA->control_write(data); }
-	DECLARE_READ8_MEMBER( cb_r ) { return m_chanB->control_read(); }
-	DECLARE_WRITE8_MEMBER( cb_w ) { m_chanB->control_write(data); }
+	uint8_t ca_r(offs_t offset)            { return m_chanA->control_read(); }
+	void ca_w(offs_t offset, uint8_t data) { m_chanA->control_write(data); }
+	uint8_t cb_r(offs_t offset)            { return m_chanB->control_read(); }
+	void cb_w(offs_t offset, uint8_t data) { m_chanB->control_write(data); }
 
 	DECLARE_READ8_MEMBER( zbus_r );
 	DECLARE_WRITE8_MEMBER( zbus_w );

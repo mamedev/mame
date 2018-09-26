@@ -855,8 +855,7 @@ void nc100_state::nc100_io(address_map &map)
 	map(0x91, 0x9f).r(FUNC(nc100_state::nc_irq_status_r));
 	map(0xa0, 0xaf).r(FUNC(nc100_state::nc100_card_battery_status_r));
 	map(0xb0, 0xb9).r(FUNC(nc100_state::nc_key_data_in_r));
-	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 }
 
@@ -1259,8 +1258,7 @@ void nc200_state::nc200_io(address_map &map)
 	map(0x90, 0x90).rw(FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
 	map(0xa0, 0xa0).r(FUNC(nc200_state::nc200_card_battery_status_r));
 	map(0xb0, 0xb9).r(FUNC(nc200_state::nc_key_data_in_r));
-	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
 	map(0xe0, 0xe1).m("upd765", FUNC(upd765a_device::map));
 }

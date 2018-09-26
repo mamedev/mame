@@ -23,25 +23,6 @@
 #pragma once
 
 
-#define MCFG_TMS32025_BIO_IN_CB(_devcb) \
-	downcast<tms32025_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
-
-#define MCFG_TMS32025_HOLD_IN_CB(_devcb) \
-	downcast<tms32025_device &>(*device).set_hold_in_cb(DEVCB_##_devcb); /* HOLD input */
-
-#define MCFG_TMS32025_HOLD_ACK_OUT_CB(_devcb) \
-	downcast<tms32025_device &>(*device).set_hold_ack_out_cb(DEVCB_##_devcb); /* HOLD Acknowledge output */
-
-#define MCFG_TMS32025_XF_OUT_CB(_devcb) \
-	downcast<tms32025_device &>(*device).set_xf_out_cb(DEVCB_##_devcb); /* XF output  */
-
-#define MCFG_TMS32025_DR_IN_CB(_devcb) \
-	downcast<tms32025_device &>(*device).set_dr_in_cb(DEVCB_##_devcb); /* Serial Data  Receive  input  */
-
-#define MCFG_TMS32025_DX_OUT_CB(_devcb) \
-	downcast<tms32025_device &>(*device).set_dx_out_cb(DEVCB_##_devcb); /* Serial Data  Transmit output */
-
-
 /****************************************************************************
  *  Interrupt constants
  */
@@ -82,14 +63,17 @@ class tms32025_device : public cpu_device
 public:
 	// construction/destruction
 	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class Object> devcb_base &set_bio_in_cb(Object &&cb) { return m_bio_in.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_hold_in_cb(Object &&cb) { return m_hold_in.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_hold_ack_out_cb(Object &&cb) { return m_hold_ack_out.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_xf_out_cb(Object &&cb) { return m_xf_out.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_dr_in_cb(Object &&cb) { return m_dr_in.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_dx_out_cb(Object &&cb) { return m_dx_out.set_callback(std::forward<Object>(cb)); }
+	auto bio_in_cb() { return m_bio_in.bind(); }
+	auto hold_in_cb() { return m_hold_in.bind(); }
+	auto hold_ack_out_cb() { return m_hold_ack_out.bind(); }
+	auto xf_out_cb() { return m_xf_out.bind(); }
+	auto dr_in_cb() { return m_dr_in.bind(); }
+	auto dx_out_cb() { return m_dx_out.bind(); }
+
+	void set_mp_mc(bool state) { m_mp_mc = state; }
 
 	DECLARE_READ16_MEMBER( drr_r);
 	DECLARE_WRITE16_MEMBER(drr_w);
@@ -104,10 +88,11 @@ public:
 	DECLARE_READ16_MEMBER( greg_r);
 	DECLARE_WRITE16_MEMBER(greg_w);
 
+	//void tms32025_program(address_map &map);
 	void tms32025_data(address_map &map);
 	void tms32026_data(address_map &map);
 protected:
-	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map);
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -128,6 +113,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void common_reset();
 
@@ -373,6 +360,8 @@ protected:
 	void zals();
 	inline int process_IRQs();
 	inline void process_timer(int clocks);
+
+	bool m_mp_mc;
 };
 
 
@@ -388,7 +377,6 @@ protected:
 	virtual void cnfp() override;
 	virtual void conf() override;
 };
-
 
 DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
 DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)

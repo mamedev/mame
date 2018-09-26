@@ -1463,7 +1463,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 
 	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	ADC0809(config, m_adc8, 1000000); // unknown clock
 	m_adc8->in_callback<0>().set_ioport("8BADC.0");

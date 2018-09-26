@@ -548,15 +548,15 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_PIT8253_CLK1(PIT_CLOCK1)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
 
-	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amusco_state, output_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, amusco_state, output_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amusco_state, output_c_w))
+	i8255_device &ppi_outputs(I8255(config, "ppi_outputs"));
+	ppi_outputs.out_pa_callback().set(FUNC(amusco_state::output_a_w));
+	ppi_outputs.out_pb_callback().set(FUNC(amusco_state::output_b_w));
+	ppi_outputs.out_pc_callback().set(FUNC(amusco_state::output_c_w));
 
-	MCFG_DEVICE_ADD("ppi_inputs", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi_inputs(I8255(config, "ppi_inputs"));
+	ppi_inputs.in_pa_callback().set_ioport("IN0");
+	ppi_inputs.in_pb_callback().set_ioport("IN1");
+	ppi_inputs.in_pc_callback().set_ioport("IN2");
 
 	i8155_device &i8155a(I8155(config, "lpt_interface", 0));
 	i8155a.out_pa_callback().set(FUNC(amusco_state::lpt_data_w));

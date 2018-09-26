@@ -285,11 +285,11 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	m_maincpu->set_periodic_int(FUNC(polyplay_state::nmi_handler), attotime::from_hz(100)); /* A302 - zero cross detection from AC (50Hz) */
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, POLYPLAY_MAIN_CLOCK / 4) /* UB857D */
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, polyplay_state, ctc_zc0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, polyplay_state, ctc_zc1_w))
-	//MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, polyplay_state, ctc_zc2_w))
+	Z80CTC(config, m_z80ctc, POLYPLAY_MAIN_CLOCK / 4); /* UB857D */
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80ctc->zc_callback<0>().set(FUNC(polyplay_state::ctc_zc0_w));
+	m_z80ctc->zc_callback<1>().set(FUNC(polyplay_state::ctc_zc1_w));
+	//m_z80ctc->zc_callback<2>().set(FUNC(polyplay_state::ctc_zc2_w));
 
 	Z80PIO(config, m_z80pio, POLYPLAY_MAIN_CLOCK / 4); /* UB855D */
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

@@ -732,19 +732,19 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(m_pio, z80pio_device, pa_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dmac, z80dma_device, rdy_w))
+	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 
@@ -820,19 +820,19 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(m_pio, z80pio_device, pa_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dmac, z80dma_device, rdy_w))
+	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 

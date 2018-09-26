@@ -368,13 +368,13 @@ MACHINE_CONFIG_START(mpf1_state::mpf1)
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(3'579'545)/2));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(3'579'545)/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, XTAL(3'579'545)/2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mpf1_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pa_callback().set(FUNC(mpf1_state::ppi_pa_r));
+	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
+	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
@@ -402,13 +402,13 @@ MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(3'579'545)/2));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(3'579'545)/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, XTAL(3'579'545)/2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mpf1_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pa_callback().set(FUNC(mpf1_state::ppi_pa_r));
+	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
+	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
@@ -442,13 +442,13 @@ MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 2500000));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 2500000);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mpf1_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pa_callback().set(FUNC(mpf1_state::ppi_pa_r));
+	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
+	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)

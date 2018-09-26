@@ -320,11 +320,12 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(luxor_55_10828_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(luxor_55_10828_mem)
-	MCFG_DEVICE_IO_MAP(luxor_55_10828_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void luxor_55_10828_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_10828_device::luxor_55_10828_mem);
+	m_maincpu->set_addrmap(AS_IO, &luxor_55_10828_device::luxor_55_10828_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -333,13 +334,13 @@ MACHINE_CONFIG_START(luxor_55_10828_device::device_add_mconfig)
 	m_pio->in_pb_callback().set(FUNC(luxor_55_10828_device::pio_pb_r));
 	m_pio->out_pb_callback().set(FUNC(luxor_55_10828_device::pio_pb_w));
 
-	MCFG_DEVICE_ADD(MB8876_TAG, MB8876, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_drq_w))
+	MB8876(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats);
+}
 
 
 //-------------------------------------------------

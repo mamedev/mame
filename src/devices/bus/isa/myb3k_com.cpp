@@ -101,20 +101,17 @@ void isa8_myb3k_com_device::device_reset()
 	{
 		// IO base factory setting is 0x540
 		uint32_t base = m_iobase->read();
-		m_isa->install_device(base, base,
-					read8_delegate(FUNC(i8251_device::data_r), subdevice<i8251_device>("usart")),
-					write8_delegate(FUNC(i8251_device::data_w), subdevice<i8251_device>("usart")) );
-		m_isa->install_device(base + 1, base + 1,
-					read8_delegate(FUNC(i8251_device::status_r), subdevice<i8251_device>("usart")),
-					write8_delegate(FUNC(i8251_device::control_w), subdevice<i8251_device>("usart")) );
+		m_isa->install_device(base, base + 1,
+					read8sm_delegate(FUNC(i8251_device::read), m_usart.target()),
+					write8sm_delegate(FUNC(i8251_device::write), m_usart.target()) );
 
 		m_isa->install_device(base + 2, base + 2,
 					read8_delegate(FUNC(isa8_myb3k_com_device::dce_status), this),
 					write8_delegate(FUNC(isa8_myb3k_com_device::dce_control), this) );
 
 		m_isa->install_device(base + 4, base + 7,
-					read8_delegate(FUNC(pit8253_device::read), subdevice<pit8253_device>("pit")),
-					write8_delegate(FUNC(pit8253_device::write), subdevice<pit8253_device>("pit")) );
+					read8sm_delegate(FUNC(pit8253_device::read), subdevice<pit8253_device>("pit")),
+					write8sm_delegate(FUNC(pit8253_device::write), subdevice<pit8253_device>("pit")) );
 
 		m_irq = m_isairq->read();
 		m_installed = true;

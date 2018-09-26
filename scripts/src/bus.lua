@@ -107,12 +107,12 @@ if (BUSES["ACORN"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/acorn/bus.cpp",
 		MAME_DIR .. "src/devices/bus/acorn/bus.h",
-		MAME_DIR .. "src/devices/bus/acorn/atom/sid.cpp",
-		MAME_DIR .. "src/devices/bus/acorn/atom/sid.h",
 		MAME_DIR .. "src/devices/bus/acorn/atom/discpack.cpp",
 		MAME_DIR .. "src/devices/bus/acorn/atom/discpack.h",
 		MAME_DIR .. "src/devices/bus/acorn/atom/econet.cpp",
 		MAME_DIR .. "src/devices/bus/acorn/atom/econet.h",
+		MAME_DIR .. "src/devices/bus/acorn/atom/sid.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/atom/sid.h",
 		MAME_DIR .. "src/devices/bus/acorn/cms/4080term.cpp",
 		MAME_DIR .. "src/devices/bus/acorn/cms/4080term.h",
 		MAME_DIR .. "src/devices/bus/acorn/cms/fdc.cpp",
@@ -273,10 +273,14 @@ if (BUSES["BBC_FDC"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/ams.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/ams.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/microware.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/microware.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
@@ -294,6 +298,8 @@ if (BUSES["BBC_ANALOGUE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/bitstik.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/bitstik.h",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.h",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/cfa3000a.cpp",
@@ -347,8 +353,6 @@ if (BUSES["BBC_TUBE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_6502.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_6502.h",
-		MAME_DIR .. "src/devices/bus/bbc/tube/tube_65c102.cpp",
-		MAME_DIR .. "src/devices/bus/bbc/tube/tube_65c102.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80186.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80186.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80286.cpp",
@@ -2022,8 +2026,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/rs232.h",
 		MAME_DIR .. "src/devices/bus/rs232/pty.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/pty.h",
-		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.cpp",
-		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.h",
+		MAME_DIR .. "src/devices/bus/rs232/hlemouse.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/rs232/sun_kbd.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/sun_kbd.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.cpp",
@@ -3028,6 +3032,44 @@ if (BUSES["SUNKBD"]~=null) then
 		MAME_DIR .. "src/devices/bus/sunkbd/hlekbd.h",
 		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.cpp",
 		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sunmouse/sunmouse.h,BUSES["SUNMOUSE"] = true
+---------------------------------------------------
+
+if (BUSES["SUNMOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sunmouse/hlemouse.cpp",
+		MAME_DIR .. "src/devices/bus/sunmouse/hlemouse.h",
+		MAME_DIR .. "src/devices/bus/sunmouse/sunmouse.cpp",
+		MAME_DIR .. "src/devices/bus/sunmouse/sunmouse.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sbus/sbus.h,BUSES["SBUS"] = true
+---------------------------------------------------
+
+if (BUSES["SBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sbus/artecon.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/artecon.h",
+		MAME_DIR .. "src/devices/bus/sbus/bwtwo.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/bwtwo.h",
+		MAME_DIR .. "src/devices/bus/sbus/cgsix.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/cgsix.h",
+		MAME_DIR .. "src/devices/bus/sbus/cgthree.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/cgthree.h",
+		MAME_DIR .. "src/devices/bus/sbus/hme.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/hme.h",
+		MAME_DIR .. "src/devices/bus/sbus/sunpc.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/sunpc.h",
+		MAME_DIR .. "src/devices/bus/sbus/sbus.cpp",
+		MAME_DIR .. "src/devices/bus/sbus/sbus.h",
 	}
 end
 

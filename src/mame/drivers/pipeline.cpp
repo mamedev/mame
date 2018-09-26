@@ -373,19 +373,19 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_DEVICE_ADD("mcu", M68705R3, 7372800/2)
 	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pipeline_state, mcu_portA_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 7372800/2 /* same as "audiocpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 7372800/2 /* same as "audiocpu" */));
+	ctc.intr_callback().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("P1");
 	// PORT B Write - related to sound/music : check code at 0x1c0a
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pipeline_state, vidctrl_w))
+	ppi0.out_pc_callback().set(FUNC(pipeline_state::vidctrl_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pipeline_state, protection_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pipeline_state, protection_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
+	ppi1.in_pb_callback().set_ioport("DSW2");
+	ppi1.in_pc_callback().set(FUNC(pipeline_state::protection_r));
+	ppi1.out_pc_callback().set(FUNC(pipeline_state::protection_w));
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 

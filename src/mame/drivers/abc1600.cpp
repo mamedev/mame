@@ -933,9 +933,9 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 
 	E0516(config, E050_C16PC_TAG, 32.768_kHz_XTAL);
 
-	MCFG_DEVICE_ADD(SAB1797_02P_TAG, FD1797, 64_MHz_XTAL / 64)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_cio, z8536_device, pb7_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, abc1600_state, fdc_drq_w))
+	FD1797(config, m_fdc, 64_MHz_XTAL / 64);
+	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
+	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, nullptr,    floppy_image_device::default_floppy_formats)

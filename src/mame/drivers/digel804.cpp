@@ -693,6 +693,23 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 /*
+"Hardware Revisions"
+For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes)
+which revison the hardware is is shown on the sticker on the bottom.
+
+known features:
+
+1.0 - ?
+1.1 - does not support driving pin 1 of the socket, i.e. max size is 27256; pin 1 is pulled high; several components unpopulated
+1.2 - ?
+1.3 - ?
+1.4 - ?
+1.5 - does support driving pin 1
+1.6 - does support driving pin 1
+
+*/
+
+/*
 For the 82S23A/MMI6330-equivalent mapper PROM at D30:
 
 z80 a11 -> prom a0
@@ -734,7 +751,7 @@ near to the mapper prom at D30 has the pinout:
 If the ram expansion is not installed (i.e. only 32k of base ram on the mainboard), there is a jumper present between pins 5 and 6
 */
 
-ROM_START(digel804) // address mapper 804-1-4
+ROM_START(digel804) // pcb v2.0; address mapper 804-1-4
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("1-04__76f1.27128.d41", 0x0000, 0x4000, CRC(61b50b61) SHA1(ad717fcbf3387b0a8fb0546025d3c527792eb3f0))
 	// the second rom here is loaded bizarrely: the first 3/4 appears at e000-f7ff and the last 1/4 appears at d800-dfff
@@ -744,7 +761,7 @@ ROM_START(digel804) // address mapper 804-1-4
 	ROM_LOAD("804-1-4.82s23a.d30", 0x0000, 0x0020, CRC(f961beb1) SHA1(f2ec89375e656eeabc30246d42741cf718fb0f91)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
 
-ROM_START(ep804) // address mapper 804-1-2
+ROM_START(ep804) // pcb v1.0; address mapper 804-1-2
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1
@@ -757,6 +774,10 @@ ROM_START(ep804) // address mapper 804-1-2
 	ROM_SYSTEM_BIOS( 2, "ep804_v2.21", "Wavetek/Digelec EP804 FWv2.21") // hardware 1.5 NOTE: this may use the address mapper 804-1-3 which is not dumped!
 	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.d41", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(2))
 	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.d42", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "promicron2k_v2.3", "Celectronic Berlin/Digelec promicron 2000 FWv2.3") // hardware 1.6
+	ROMX_LOAD("2023__1-03__be7d.m5l2764k.d41", 0x0000, 0x2000, CRC(8e5182f1) SHA1(e8409b6ace80fdaad862e6c06975aeabcf728f97), ROM_BIOS(3))
+	ROMX_LOAD("2023__2-03__c73e.m5l2764k.d42", 0x2000, 0x2000, CRC(ff7d959b) SHA1(75718fc1d98969739911cc51b6d5fef74b530e36), ROM_BIOS(3))
+	// on the promicron 2000, the bprom at d30 is an unlabeled TB18S030N part, but has the same contents as 804-1-2.mmi_6330-in.d30 below. it is possible the sticker fell off.
 	ROM_REGION(0x20, "proms", 0)
 	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30dd4721) SHA1(e4b2f5756118be4c8ab56c708dc4f42469c7e51b)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END

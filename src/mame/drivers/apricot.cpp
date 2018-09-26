@@ -458,9 +458,9 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// floppy
-	MCFG_DEVICE_ADD("ic68", WD2797, 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, apricot_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("ic71", i8089_device, drq1_w))
+	WD2797(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(apricot_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(m_iop, FUNC(i8089_device::drq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats)
 
@@ -473,9 +473,10 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apricot_state::apricotxi)
+void apricot_state::apricotxi(machine_config &config)
+{
 	apricot(config);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

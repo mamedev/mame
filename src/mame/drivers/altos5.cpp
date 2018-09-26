@@ -468,9 +468,9 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
-	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, altos5_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
+	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(altos5_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)

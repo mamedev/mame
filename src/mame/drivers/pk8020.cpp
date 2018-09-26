@@ -211,16 +211,16 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8020_state, pk8020_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pk8020_state, pk8020_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pk8020_state, pk8020_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_portc_w))
+	I8255(config, m_ppi8255_1);
+	m_ppi8255_1->in_pa_callback().set(FUNC(pk8020_state::pk8020_porta_r));
+	m_ppi8255_1->out_pb_callback().set(FUNC(pk8020_state::pk8020_portb_w));
+	m_ppi8255_1->in_pc_callback().set(FUNC(pk8020_state::pk8020_portc_r));
+	m_ppi8255_1->out_pc_callback().set(FUNC(pk8020_state::pk8020_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_2_portc_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->out_pc_callback().set(FUNC(pk8020_state::pk8020_2_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
+	I8255(config, m_ppi8255_3);
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(20_MHz_XTAL / 10)
@@ -245,8 +245,8 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 
 	I8251(config, m_lan, 0);
 
-	MCFG_DEVICE_ADD("wd1793", FD1793, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259", pic8259_device, ir7_w))
+	FD1793(config, m_wd1793, 20_MHz_XTAL / 20);
+	m_wd1793->intrq_wr_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0); // 64 + 4*48 + 2 = 258
+	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258
 MACHINE_CONFIG_END
 
 /* ROM definition */

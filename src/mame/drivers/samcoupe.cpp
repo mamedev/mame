@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, SAMCOUPE_XTAL_X1/3)
+	WD1772(config, m_fdc, SAMCOUPE_XTAL_X1/3);
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")

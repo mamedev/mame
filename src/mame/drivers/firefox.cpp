@@ -684,8 +684,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	latch1.q_out_cb<6>().set_output("led2").invert();
 	latch1.q_out_cb<7>().set_output("led3").invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_XTAL/8/16/16/16/16))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_XTAL/8/16/16/16/16));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firefox)

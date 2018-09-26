@@ -919,11 +919,11 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, amstrad )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amstrad_state, amstrad_ppi_portc_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(amstrad_state::amstrad_ppi_porta_r));
+	ppi.out_pa_callback().set(FUNC(amstrad_state::amstrad_ppi_porta_w));
+	ppi.in_pb_callback().set(FUNC(amstrad_state::amstrad_ppi_portb_r));
+	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1041,11 +1041,11 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
 
-	MCFG_DEVICE_ADD("ppi8255", AMS40489_PPI, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amstrad_state, amstrad_ppi_portc_w))
+	ams40489_ppi_device &ppi(AMS40489_PPI(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(amstrad_state::amstrad_ppi_porta_r));
+	ppi.out_pa_callback().set(FUNC(amstrad_state::amstrad_ppi_porta_w));
+	ppi.in_pb_callback().set(FUNC(amstrad_state::amstrad_ppi_portb_r));
+	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1119,11 +1119,11 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )
 
-	MCFG_DEVICE_ADD("ppi8255", AMS40489_PPI, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amstrad_state, amstrad_ppi_portc_w))
+	ams40489_ppi_device &ppi(AMS40489_PPI(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(amstrad_state::amstrad_ppi_porta_r));
+	ppi.out_pa_callback().set(FUNC(amstrad_state::amstrad_ppi_porta_w));
+	ppi.in_pb_callback().set(FUNC(amstrad_state::amstrad_ppi_portb_r));
+	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

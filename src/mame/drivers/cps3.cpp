@@ -2452,68 +2452,75 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 }
 
 
-MACHINE_CONFIG_START(cps3_state::simm1_64mbit)
-	MCFG_FUJITSU_29F016A_ADD("simm1.0")
-	MCFG_FUJITSU_29F016A_ADD("simm1.1")
-	MCFG_FUJITSU_29F016A_ADD("simm1.2")
-	MCFG_FUJITSU_29F016A_ADD("simm1.3")
-MACHINE_CONFIG_END
+void cps3_state::simm1_64mbit(machine_config &config)
+{
+	FUJITSU_29F016A(config, "simm1.0");
+	FUJITSU_29F016A(config, "simm1.1");
+	FUJITSU_29F016A(config, "simm1.2");
+	FUJITSU_29F016A(config, "simm1.3");
+}
 
-MACHINE_CONFIG_START(cps3_state::simm2_64mbit)
-	MCFG_FUJITSU_29F016A_ADD("simm2.0")
-	MCFG_FUJITSU_29F016A_ADD("simm2.1")
-	MCFG_FUJITSU_29F016A_ADD("simm2.2")
-	MCFG_FUJITSU_29F016A_ADD("simm2.3")
-MACHINE_CONFIG_END
+void cps3_state::simm2_64mbit(machine_config &config)
+{
+	FUJITSU_29F016A(config, "simm2.0");
+	FUJITSU_29F016A(config, "simm2.1");
+	FUJITSU_29F016A(config, "simm2.2");
+	FUJITSU_29F016A(config, "simm2.3");
+}
 
-MACHINE_CONFIG_START(cps3_state::simm3_128mbit)
-	MCFG_FUJITSU_29F016A_ADD("simm3.0")
-	MCFG_FUJITSU_29F016A_ADD("simm3.1")
-	MCFG_FUJITSU_29F016A_ADD("simm3.2")
-	MCFG_FUJITSU_29F016A_ADD("simm3.3")
-	MCFG_FUJITSU_29F016A_ADD("simm3.4")
-	MCFG_FUJITSU_29F016A_ADD("simm3.5")
-	MCFG_FUJITSU_29F016A_ADD("simm3.6")
-	MCFG_FUJITSU_29F016A_ADD("simm3.7")
-MACHINE_CONFIG_END
+void cps3_state::simm3_128mbit(machine_config &config)
+{
+	FUJITSU_29F016A(config, "simm3.0");
+	FUJITSU_29F016A(config, "simm3.1");
+	FUJITSU_29F016A(config, "simm3.2");
+	FUJITSU_29F016A(config, "simm3.3");
+	FUJITSU_29F016A(config, "simm3.4");
+	FUJITSU_29F016A(config, "simm3.5");
+	FUJITSU_29F016A(config, "simm3.6");
+	FUJITSU_29F016A(config, "simm3.7");
+}
 
-MACHINE_CONFIG_START(cps3_state::simm4_128mbit)
-	MCFG_FUJITSU_29F016A_ADD("simm4.0")
-	MCFG_FUJITSU_29F016A_ADD("simm4.1")
-	MCFG_FUJITSU_29F016A_ADD("simm4.2")
-	MCFG_FUJITSU_29F016A_ADD("simm4.3")
-	MCFG_FUJITSU_29F016A_ADD("simm4.4")
-	MCFG_FUJITSU_29F016A_ADD("simm4.5")
-	MCFG_FUJITSU_29F016A_ADD("simm4.6")
-	MCFG_FUJITSU_29F016A_ADD("simm4.7")
-MACHINE_CONFIG_END
+void cps3_state::simm4_128mbit(machine_config &config)
+{
+	FUJITSU_29F016A(config, "simm4.0");
+	FUJITSU_29F016A(config, "simm4.1");
+	FUJITSU_29F016A(config, "simm4.2");
+	FUJITSU_29F016A(config, "simm4.3");
+	FUJITSU_29F016A(config, "simm4.4");
+	FUJITSU_29F016A(config, "simm4.5");
+	FUJITSU_29F016A(config, "simm4.6");
+	FUJITSU_29F016A(config, "simm4.7");
+}
 
-MACHINE_CONFIG_START(cps3_state::simm5_128mbit)
-	MCFG_FUJITSU_29F016A_ADD("simm5.0")
-	MCFG_FUJITSU_29F016A_ADD("simm5.1")
-	MCFG_FUJITSU_29F016A_ADD("simm5.2")
-	MCFG_FUJITSU_29F016A_ADD("simm5.3")
-	MCFG_FUJITSU_29F016A_ADD("simm5.4")
-	MCFG_FUJITSU_29F016A_ADD("simm5.5")
-	MCFG_FUJITSU_29F016A_ADD("simm5.6")
-	MCFG_FUJITSU_29F016A_ADD("simm5.7")
-MACHINE_CONFIG_END
+void cps3_state::simm5_128mbit(machine_config &config)
+{
+	FUJITSU_29F016A(config, "simm5.0");
+	FUJITSU_29F016A(config, "simm5.1");
+	FUJITSU_29F016A(config, "simm5.2");
+	FUJITSU_29F016A(config, "simm5.3");
+	FUJITSU_29F016A(config, "simm5.4");
+	FUJITSU_29F016A(config, "simm5.5");
+	FUJITSU_29F016A(config, "simm5.6");
+	FUJITSU_29F016A(config, "simm5.7");
+}
 
-MACHINE_CONFIG_START(cps3_state::simm5_32mbit)
-	MCFG_FUJITSU_29F016A_ADD("simm5.0")
-	MCFG_FUJITSU_29F016A_ADD("simm5.1")
-MACHINE_CONFIG_END
+void cps3_state::simm5_32mbit(machine_config &config)
+{
+	FUJITSU_29F016A(config, "simm5.0");
+	FUJITSU_29F016A(config, "simm5.1");
+}
 
-MACHINE_CONFIG_START(cps3_state::simm6_128mbit)
-	MCFG_FUJITSU_29F016A_ADD("simm6.0")
-	MCFG_FUJITSU_29F016A_ADD("simm6.1")
-	MCFG_FUJITSU_29F016A_ADD("simm6.2")
-	MCFG_FUJITSU_29F016A_ADD("simm6.3")
-	MCFG_FUJITSU_29F016A_ADD("simm6.4")
-	MCFG_FUJITSU_29F016A_ADD("simm6.5")
-	MCFG_FUJITSU_29F016A_ADD("simm6.6")
-	MCFG_FUJITSU_29F016A_ADD("simm6.7")
-MACHINE_CONFIG_END
+void cps3_state::simm6_128mbit(machine_config &config)
+{
+	FUJITSU_29F016A(config, "simm6.0");
+	FUJITSU_29F016A(config, "simm6.1");
+	FUJITSU_29F016A(config, "simm6.2");
+	FUJITSU_29F016A(config, "simm6.3");
+	FUJITSU_29F016A(config, "simm6.4");
+	FUJITSU_29F016A(config, "simm6.5");
+	FUJITSU_29F016A(config, "simm6.6");
+	FUJITSU_29F016A(config, "simm6.7");
+}
 
 MACHINE_CONFIG_START(cps3_state::cps3)
 	/* basic machine hardware */
@@ -2527,8 +2534,8 @@ MACHINE_CONFIG_START(cps3_state::cps3)
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
 
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
+	wd33c93_device& wd33c93(WD33C93(config, "wd33c93"));
+	wd33c93.set_scsi_port("scsi");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1108,17 +1108,17 @@ void bulletf_state::machine_reset()
 
 MACHINE_CONFIG_START(bullet_state::bullet)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bullet_mem)
-	MCFG_DEVICE_IO_MAP(bullet_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bullet_state::bullet_mem);
+	m_maincpu->set_addrmap(AS_IO, &bullet_state::bullet_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bullet_state, dart_rxtxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(bullet_state::dart_rxtxca_w));
+	m_ctc->zc_callback<1>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(4.9152_MHz_XTAL /4))
 
@@ -1146,9 +1146,9 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	pio.in_pb_callback().set(FUNC(bullet_state::pio_pb_r));
 
-	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_dart, z80dart_device, dcda_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bullet_state, fdc_drq_w))
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(m_dart, FUNC(z80dart_device::dcda_w));
+	m_fdc->drq_wr_callback().set(FUNC(bullet_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
@@ -1187,17 +1187,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bulletf_state::bulletf)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bulletf_mem)
-	MCFG_DEVICE_IO_MAP(bulletf_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bulletf_state::bulletf_mem);
+	m_maincpu->set_addrmap(AS_IO, &bulletf_state::bulletf_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bullet_state, dart_rxtxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(bullet_state::dart_rxtxca_w));
+	m_ctc->zc_callback<1>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(4.9152_MHz_XTAL / 4))
 
@@ -1227,9 +1227,9 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	pio.out_ardy_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	pio.out_brdy_callback().set(FUNC(bulletf_state::cstrb_w));
 
-	MCFG_DEVICE_ADD(MB8877_TAG, MB8877, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_dart, z80dart_device, rib_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bullet_state, fdc_drq_w))
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(m_dart, FUNC(z80dart_device::rib_w));
+	m_fdc->drq_wr_callback().set(FUNC(bullet_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, nullptr,    floppy_image_device::default_floppy_formats)

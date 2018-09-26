@@ -44,6 +44,8 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 private:
+
+	WRITE_LINE_MEMBER(vblank_w);
 	const address_space_config m_space_config;
 	void map(address_map &map);
 

@@ -48,12 +48,9 @@ void vector4_state::vector4_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x02, 0x02).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x03, 0x03).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x04, 0x04).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x05, 0x05).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x06, 0x06).rw("uart3", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x07, 0x07).rw("uart3", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x02, 0x03).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x04, 0x05).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x06, 0x07).rw("uart3", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */

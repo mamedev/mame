@@ -371,8 +371,8 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	m_maincpu->out_txda_callback().set("recorder", FUNC(rs232_port_device::write_txd));
 	m_maincpu->out_txdb_callback().set("player1", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("external_ctc", Z80CTC, 12_MHz_XTAL / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "external_ctc", 12_MHz_XTAL / 2));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80sio0_device& sio(Z80SIO0(config, "external_sio", 12_MHz_XTAL / 2));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

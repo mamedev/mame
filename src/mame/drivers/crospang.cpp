@@ -379,7 +379,7 @@ static INPUT_PORTS_START( pitapat )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") // this and the following dip might be difficulty related. By having one or both of them on, most of the times you win the first round without doing anything
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(crospang_state::pitapat)
 	crospang(config);
 
 	// can't be 14'318'181 / 2 as the inputs barely respond and the background graphics glitch badly when the screen fills, doesn't appear to be a vblank bit anywhere to negate this either, P12 reated part
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(14'318'181)) 
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(14'318'181))
 	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
 

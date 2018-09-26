@@ -328,8 +328,7 @@ void fk1_state::fk1_io(address_map &map)
 	map(0x10, 0x13).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x20, 0x23).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x30).rw(FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
-	map(0x40, 0x40).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x50, 0x50).rw(FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
 	map(0x60, 0x63).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x70, 0x70).rw(FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
@@ -439,27 +438,27 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	MCFG_PIT8253_CLK2(0)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out2))
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_1_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_1_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_1_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_1_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_1_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_1_c_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set(FUNC(fk1_state::fk1_ppi_1_a_r));
+	ppi1.out_pa_callback().set(FUNC(fk1_state::fk1_ppi_1_a_w));
+	ppi1.in_pb_callback().set(FUNC(fk1_state::fk1_ppi_1_b_r));
+	ppi1.out_pb_callback().set(FUNC(fk1_state::fk1_ppi_1_b_w));
+	ppi1.in_pc_callback().set(FUNC(fk1_state::fk1_ppi_1_c_r));
+	ppi1.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_1_c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_2_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_2_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_2_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_2_c_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(fk1_state::fk1_ppi_2_a_w));
+	ppi2.in_pb_callback().set(FUNC(fk1_state::fk1_ppi_2_b_r));
+	ppi2.in_pc_callback().set(FUNC(fk1_state::fk1_ppi_2_c_r));
+	ppi2.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_2_c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_3_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_3_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_3_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_3_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_3_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_3_c_w))
+	i8255_device &ppi3(I8255(config, "ppi8255_3"));
+	ppi3.in_pa_callback().set(FUNC(fk1_state::fk1_ppi_3_a_r));
+	ppi3.out_pa_callback().set(FUNC(fk1_state::fk1_ppi_3_a_w));
+	ppi3.in_pb_callback().set(FUNC(fk1_state::fk1_ppi_3_b_r));
+	ppi3.out_pb_callback().set(FUNC(fk1_state::fk1_ppi_3_b_w));
+	ppi3.in_pc_callback().set(FUNC(fk1_state::fk1_ppi_3_c_r));
+	ppi3.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_3_c_w));
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)

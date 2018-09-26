@@ -203,14 +203,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			return m_uart->status_r(space, 0) << 8;
-		}
-		else
-		{
-			return m_uart->data_r(space, 0) << 8;
-		}
+		return m_uart->read(offset & 1) << 8;
 	}
 }
 
@@ -221,14 +214,7 @@ WRITE16_MEMBER( compis_state::pcs6_2_3_w )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			m_uart->control_w(space, 0, data >> 8);
-		}
-		else
-		{
-			m_uart->data_w(space, 0, data >> 8);
-		}
+		m_uart->write(offset & 1, data >> 8);
 	}
 }
 
@@ -421,7 +407,7 @@ void compis_state::compis2_mem(address_map &map)
 void compis_state::compis_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(I8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(MM58174A_TAG, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
 	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
@@ -774,10 +760,10 @@ MACHINE_CONFIG_START(compis_state::compis)
 	MCFG_PIT8253_CLK2(15.36_MHz_XTAL/8)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
 
-	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, compis_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, compis_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->in_pb_callback().set(FUNC(compis_state::ppi_pb_r));
+	m_ppi->out_pc_callback().set(FUNC(compis_state::ppi_pc_w));
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(COMPIS_KEYBOARD_TAG, FUNC(compis_keyboard_device::si_w));

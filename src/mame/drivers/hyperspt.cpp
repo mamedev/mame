@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

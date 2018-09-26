@@ -379,8 +379,8 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	NVRAM(config, "nvram1").set_custom_handler(FUNC(micronic_state::nvram_init));  // base ram
 	NVRAM(config, "nvram2").set_custom_handler(FUNC(micronic_state::nvram_init));  // additional ram banks
 
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, micronic_state, mc146818_irq))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(FUNC(micronic_state::mc146818_irq));
 MACHINE_CONFIG_END
 
 /* ROM definition */

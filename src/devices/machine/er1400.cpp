@@ -291,7 +291,13 @@ void er1400_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case PROPAGATION_TIMER:
-		m_data_output = (m_code_input == 5) ? BIT(m_data_register, 13) : false;
+		if (m_code_input == 5)
+		{
+			m_data_output = BIT(m_data_register, 13);
+			LOG("Data output %d bit\n", m_data_output);
+		}
+		else
+			m_data_output = false;
 		break;
 	}
 }
@@ -345,6 +351,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 			break;
 
 		case 3: // accept address
+			LOG("Accepting address %d bit\n", m_data_input);
 			m_address_register = (m_address_register << 1) | m_data_input;
 			m_address_register &= 0xfffff;
 			break;
@@ -367,6 +374,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 			break;
 
 		case 7: // accept data
+			LOG("Accepting data %d bit\n", m_data_input);
 			m_data_register = (m_data_register & 0x1fff) << 1;
 			m_data_register |= m_data_input;
 			break;

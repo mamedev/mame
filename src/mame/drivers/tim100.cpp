@@ -59,10 +59,8 @@ void tim100_state::tim100_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom(); // 2764 at U16
 	map(0x2000, 0x27ff).ram().share("videoram"); // 2KB static ram CDM6116A at U15
-	map(0x6000, 0x6000).rw("uart_u17", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x6001, 0x6001).rw("uart_u17", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x8000, 0x8000).rw("uart_u18", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x8001, 0x8001).rw("uart_u18", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x6000, 0x6001).rw("uart_u17", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x8000, 0x8001).rw("uart_u18", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa000, 0xa000).nopw();   // continuously writes 00 here
 	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }

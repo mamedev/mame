@@ -219,8 +219,7 @@ void mc1502_state::mc1502_map(address_map &map)
 void mc1502_state::mc1502_io(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0028, 0x0028).rw(m_upd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0029, 0x0029).rw(m_upd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0028, 0x0029).rw(m_upd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw(m_ppi8255n1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0068, 0x006B).rw(m_ppi8255n2, FUNC(i8255_device::read), FUNC(i8255_device::write));    // keyboard poll
@@ -250,17 +249,17 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mc1502_state, mc1502_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portc_w))
+	I8255(config, m_ppi8255n1);
+	m_ppi8255n1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255n1->out_pb_callback().set(FUNC(mc1502_state::mc1502_ppi_portb_w));
+	m_ppi8255n1->in_pc_callback().set(FUNC(mc1502_state::mc1502_ppi_portc_r));
+	m_ppi8255n1->out_pc_callback().set(FUNC(mc1502_state::mc1502_ppi_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255n2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mc1502_state, mc1502_kppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, bus_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portc_w))
+	I8255(config, m_ppi8255n2);
+	m_ppi8255n2->in_pa_callback().set(FUNC(mc1502_state::mc1502_kppi_porta_r));
+	m_ppi8255n2->out_pb_callback().set(FUNC(mc1502_state::mc1502_kppi_portb_w));
+	m_ppi8255n2->in_pc_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+	m_ppi8255n2->out_pc_callback().set(FUNC(mc1502_state::mc1502_kppi_portc_w));
 
 	I8251(config, m_upd8251, 0);
 	m_upd8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

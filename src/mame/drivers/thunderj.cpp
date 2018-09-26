@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* perfect synchronization due to shared RAM */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

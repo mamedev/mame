@@ -102,19 +102,20 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(s100_dj2db_device::device_add_mconfig)
+void s100_dj2db_device::device_add_mconfig(machine_config &config)
+{
 	COM8116(config, m_dbrg, 5.0688_MHz_XTAL);
 	m_dbrg->fr_handler().set(FUNC(s100_dj2db_device::fr_w));
 
-	MCFG_DEVICE_ADD(MB8866_TAG, MB8866, 10_MHz_XTAL / 5)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, s100_dj2db_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, s100_dj2db_device, fdc_drq_w))
+	MB8866(config, m_fdc, 10_MHz_XTAL / 5);
+	m_fdc->intrq_wr_callback().set(FUNC(s100_dj2db_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(s100_dj2db_device::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
+}
 
 
 //-------------------------------------------------

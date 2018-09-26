@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(bzone_state::bzone_base)
 	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

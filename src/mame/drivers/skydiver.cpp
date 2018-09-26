@@ -352,8 +352,7 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	MCFG_DEVICE_PROGRAM_MAP(skydiver_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(skydiver_state, interrupt,  5*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)    // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);    // 128V clocks the same as VBLANK
 
 	f9334_device &latch1(F9334(config, "latch1")); // F12
 	latch1.q_out_cb<0>().set(FUNC(skydiver_state::lamp_s_w));

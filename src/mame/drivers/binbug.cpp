@@ -564,9 +564,9 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(8'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000) / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

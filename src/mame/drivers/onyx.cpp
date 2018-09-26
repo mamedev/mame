@@ -67,7 +67,7 @@ private:
 	DECLARE_MACHINE_RESET(c8002);
 	void z8002_m1_w(uint8_t data);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu; // z8002 or z80 depending on driver
 	optional_device_array<z80sio_device, 5> m_sio;
 	optional_device_array<z80ctc_device, 3> m_ctc;
 	optional_device_array<z80pio_device, 2> m_pio;
@@ -138,16 +138,17 @@ void onyx_state::subio(address_map &map)
 
 MACHINE_CONFIG_START(onyx_state::c8002)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8002, XTAL(4'000'000) )
-	//MCFG_Z80_DAISY_CHAIN(main_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(c8002_mem)
-	//MCFG_DEVICE_DATA_MAP(c8002_data)
-	MCFG_DEVICE_IO_MAP(c8002_io)
+	z8002_device& maincpu(Z8002(config, m_maincpu, XTAL(4'000'000)));
+	//maincpu.set_daisy_config(main_daisy_chain);
+	maincpu.set_addrmap(AS_PROGRAM, &onyx_state::c8002_mem);
+	//maincpu.set_addrmap(AS_DATA, &onyx_state::c8002_data);
+	maincpu.set_addrmap(AS_IO, &onyx_state::c8002_io);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(4'000'000) )
-	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(submem)
-	MCFG_DEVICE_IO_MAP(subio)
+	z80_device& subcpu(Z80(config, "subcpu", XTAL(4'000'000)));
+	//subcpu.set_daisy_config(sub_daisy_chain);
+	subcpu.set_addrmap(AS_PROGRAM, &onyx_state::submem);
+	subcpu.set_addrmap(AS_IO, &onyx_state::subio);
+
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	clock_device &sio1_clock(CLOCK(config, "sio1_clock", 307200));
@@ -251,10 +252,11 @@ void onyx_state::c5000_io(address_map &map)
 
 MACHINE_CONFIG_START(onyx_state::c5000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4 )
-	//MCFG_Z80_DAISY_CHAIN(sub_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(c5000_mem)
-	MCFG_DEVICE_IO_MAP(c5000_io)
+	z80_device& maincpu(Z80(config, m_maincpu, XTAL(16'000'000) / 4));
+	//maincpu.set_daisy_config(sub_daisy_chain);
+	maincpu.set_addrmap(AS_PROGRAM, &onyx_state::c5000_mem);
+	maincpu.set_addrmap(AS_IO, &onyx_state::c5000_io);
+
 	//MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 614400)

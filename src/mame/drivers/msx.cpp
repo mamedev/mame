@@ -1288,39 +1288,44 @@ static void msx_floppies(device_slot_interface &device)
 	device.option_add("35ssdd", FLOPPY_35_SSDD);
 }
 
-MACHINE_CONFIG_START(msx_state::msx_fd1793)
-	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+void msx_state::msx_fd1793(machine_config &config)
+{
+	fd1793_device& fdc(FD1793(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_wd2793_force_ready)
+void msx_state::msx_wd2793_force_ready(machine_config &config)
+{
 	// From NMS8245 schematics:
 	// READY + HLT - pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+	wd2793_device& fdc(WD2793(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_wd2793)
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
-MACHINE_CONFIG_END
+void msx_state::msx_wd2793(machine_config &config)
+{
+	WD2793(config, "fdc", 4_MHz_XTAL / 4);
+}
 
-MACHINE_CONFIG_START(msx_state::msx_mb8877a)
+void msx_state::msx_mb8877a(machine_config & config)
+{
 	// From CF-3300 FDC schematic:
 	// READY + HLT - pulled high
 	// -DDEN - pulled low
-	MCFG_DEVICE_ADD("fdc", MB8877, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+	mb8877_device& fdc(MB8877(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
 MACHINE_CONFIG_START(msx_state::msx_tc8566af)
 	MCFG_TC8566AF_ADD("fdc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(msx_state::msx_microsol)
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-MACHINE_CONFIG_END
+void msx_state::msx_microsol(machine_config &config)
+{
+	wd2793_device& fdc(WD2793(config, "fdc", 4_MHz_XTAL / 4));
+	fdc.set_force_ready(true);
+}
 
 MACHINE_CONFIG_START(msx_state::msx_1_35_ssdd_drive)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_state::floppy_formats)
@@ -1353,10 +1358,10 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(msx_state::msx_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(msx_state::msx_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1414,15 +1419,17 @@ MACHINE_CONFIG_START(msx_state::msx2)
 	MCFG_DEVICE_IO_MAP(msx2_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(msx_state::msx_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(msx_state::msx_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", 0x20000, 21.477272_MHz_XTAL)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", 21.477272_MHz_XTAL)
+	V9938(config, m_v9938, 21.477272_MHz_XTAL);
+	m_v9938->set_screen_ntsc("screen");
+	m_v9938->set_vram_size(0x20000);
+	m_v9938->int_cb().set(FUNC(msx_state::msx_irq_source0));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1471,15 +1478,17 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 	MCFG_DEVICE_IO_MAP(msx2p_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(msx_state::msx_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(msx_state::msx_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(msx_state::msx_ppi_port_c_w));
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, 21.477272_MHz_XTAL)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", 21.477272_MHz_XTAL)
+	V9958(config, m_v9958, 21.477272_MHz_XTAL);
+	m_v9958->set_screen_ntsc("screen");
+	m_v9958->set_vram_size(0x20000);
+	m_v9958->int_cb().set(FUNC(msx_state::msx_irq_source0));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1521,11 +1530,11 @@ MACHINE_CONFIG_START(msx_state::msx2p)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(msx_state::msx2_pal)
+void msx_state::msx2_pal(machine_config &config)
+{
 	msx2(config);
-	MCFG_DEVICE_REMOVE("screen")
-	MCFG_V99X8_SCREEN_ADD_PAL("screen", "v9938", 21.477272_MHz_XTAL)
-MACHINE_CONFIG_END
+	m_v9938->set_screen_pal("screen");
+}
 
 
 /***************************************************************************
@@ -1601,7 +1610,7 @@ MACHINE_CONFIG_START(msx_state::canonv8)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 3, 1)   /* 8KB RAM */
 	MCFG_MSX_SLOT_RAM_8KB
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot12", 3, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
 	msx1_cartlist(config);
 MACHINE_CONFIG_END
@@ -1622,7 +1631,7 @@ MACHINE_CONFIG_START(msx_state::canonv10)
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 2, 0, 3, 1)   /* 16KB RAM */
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot12", 3, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
 	msx1_cartlist(config);
 MACHINE_CONFIG_END
@@ -4679,8 +4688,8 @@ MACHINE_CONFIG_START(msx_state::canonv30f)
 	// S-1985 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000) // BIOS
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartridge1", 1, 0)
-	MCFG_MSX_LAYOUT_CARTRIDGE("cartridge2", 2, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
+	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000) // EXT
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0xc000) // DISK
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 128KB Mapper RAM

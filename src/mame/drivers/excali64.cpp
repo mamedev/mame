@@ -136,8 +136,7 @@ void excali64_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).r(FUNC(excali64_state::port00_r));
-	map(0x10, 0x10).mirror(0x0e).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x20, 0x23).mirror(0x0c).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -571,11 +570,11 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, excali64_state, write_uart_clock))
 	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 16) /* Timer 2: not used */
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w)) // parallel port
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, excali64_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, excali64_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, excali64_state, ppic_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w)); // parallel port
+	ppi.out_pb_callback().set(FUNC(excali64_state::ppib_w));
+	ppi.in_pc_callback().set(FUNC(excali64_state::ppic_r));
+	ppi.out_pc_callback().set(FUNC(excali64_state::ppic_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -602,8 +601,8 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
+	WD2793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats)

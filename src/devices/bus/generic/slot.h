@@ -189,7 +189,17 @@ protected:
 class generic_socket_device : public generic_slot_device
 {
 public:
-	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts)
+		: generic_socket_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		opts(*this);
+		set_fixed(false);
+		set_interface(intf);
+		set_extensions(exts);
+	}
+
+	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual iodevice_t image_type() const override { return IO_ROM; }
 };

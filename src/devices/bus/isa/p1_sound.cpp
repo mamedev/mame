@@ -95,32 +95,32 @@ p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag,
 
 READ8_MEMBER(p1_sound_device::d14_r)
 {
-	return m_d14->read(space, offset >> 1);
+	return m_d14->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d14_w)
 {
-	m_d14->write(space, offset >> 1, data);
+	m_d14->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::d16_r)
 {
-	return m_d16->read(space, offset >> 1);
+	return m_d16->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d16_w)
 {
-	m_d16->write(space, offset >> 1, data);
+	m_d16->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::d17_r)
 {
-	return m_d17->read(space, offset >> 1);
+	return m_d17->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d17_w)
 {
-	m_d17->write(space, offset >> 1, data);
+	m_d17->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::adc_r)
@@ -165,11 +165,11 @@ void p1_sound_device::device_start()
 		write8_delegate(FUNC(p1_sound_device::dac_w), this));
 
 	m_isa->install_memory(0xee000, 0xee000,
-		read8_delegate(FUNC(i8251_device::data_r), (i8251_device*)m_midi),
-		write8_delegate(FUNC(i8251_device::data_w), (i8251_device*)m_midi));
+		read8smo_delegate(FUNC(i8251_device::data_r), m_midi.target()),
+		write8smo_delegate(FUNC(i8251_device::data_w), m_midi.target()));
 	m_isa->install_memory(0xee002, 0xee002,
-		read8_delegate(FUNC(i8251_device::status_r), (i8251_device*)m_midi),
-		write8_delegate(FUNC(i8251_device::control_w), (i8251_device*)m_midi));
+		read8smo_delegate(FUNC(i8251_device::status_r), m_midi.target()),
+		write8smo_delegate(FUNC(i8251_device::control_w), m_midi.target()));
 
 	// sync generator
 	m_isa->install_memory(0xef000, 0xef007,

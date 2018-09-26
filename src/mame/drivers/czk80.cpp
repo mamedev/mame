@@ -198,11 +198,11 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, czk80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, czk80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, czk80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(czk80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(czk80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(czk80_state::ctc_z2_w));
 
 	z80dart_device& dart(Z80DART(config, "dart", XTAL(16'000'000) / 4));
 	//dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));

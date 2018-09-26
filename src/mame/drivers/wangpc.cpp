@@ -1314,17 +1314,17 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_pit->set_clk<2>(500000);
 	m_pit->out_handler<2>().set(FUNC(wangpc_state::pit2_w));
 
-	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE("wangpckb", wangpc_keyboard_device, write_rxd))
-	MCFG_IM6402_DR_CALLBACK(WRITELINE(*this, wangpc_state, uart_dr_w))
-	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(*this, wangpc_state, uart_tbre_w))
+	IM6402(config, m_uart, 62500*16, 62500*16);
+	m_uart->tro_callback().set("wangpckb", FUNC(wangpc_keyboard_device::write_rxd));
+	m_uart->dr_callback().set(FUNC(wangpc_state::uart_dr_w));
+	m_uart->tbre_callback().set(FUNC(wangpc_state::uart_tbre_w));
 
-	MCFG_DEVICE_ADD(SCN2661_TAG, MC2661, 0)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(*this, wangpc_state, epci_irq_w))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(WRITELINE(*this, wangpc_state, epci_irq_w))
+	MC2661(config, m_epci, 0);
+	m_epci->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_epci->rxrdy_handler().set(FUNC(wangpc_state::epci_irq_w));
+	m_epci->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_epci->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_epci->txemt_dschg_handler().set(FUNC(wangpc_state::epci_irq_w));
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, wangpc_state, fdc_irq))

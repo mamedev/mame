@@ -87,12 +87,12 @@ MACHINE_CONFIG_START(spc1000_fdd_exp_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(sd725_mem)
 	MCFG_DEVICE_IO_MAP(sd725_io)
 
-	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_master", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_master", i8255_device, pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spc1000_fdd_exp_device, i8255_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, spc1000_fdd_exp_device, i8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spc1000_fdd_exp_device, i8255_c_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(m_ppi, FUNC(i8255_device::pb_r));
+	m_ppi->in_pb_callback().set(m_ppi, FUNC(i8255_device::pa_r));
+	m_ppi->out_pb_callback().set(FUNC(spc1000_fdd_exp_device::i8255_b_w));
+	m_ppi->in_pc_callback().set(FUNC(spc1000_fdd_exp_device::i8255_c_r));
+	m_ppi->out_pc_callback().set(FUNC(spc1000_fdd_exp_device::i8255_c_w));
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("upd765", true, true)
@@ -137,7 +137,7 @@ spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, co
 	device_spc1000_card_interface(mconfig, *this),
 	m_cpu(*this, "fdccpu"),
 	m_fdc(*this, "upd765"),
-	m_pio(*this, "d8255_master"),
+	m_ppi(*this, "d8255_master"),
 	m_fd0(nullptr), m_fd1(nullptr), m_timer_tc(nullptr), m_i8255_0_pc(0), m_i8255_1_pc(0), m_i8255_portb(0)
 {
 }
@@ -184,7 +184,7 @@ void spc1000_fdd_exp_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 READ8_MEMBER(spc1000_fdd_exp_device::read)
 {
-	// this should be m_pio->read on the whole 0x00-0x03 range?
+	// this should be m_ppi->read on the whole 0x00-0x03 range?
 	if (offset >= 3)
 		return 0xff;
 	else
@@ -209,13 +209,13 @@ READ8_MEMBER(spc1000_fdd_exp_device::read)
 
 WRITE8_MEMBER(spc1000_fdd_exp_device::write)
 {
-	// this should be m_pio->write on the whole 0x00-0x03 range?
+	// this should be m_ppi->write on the whole 0x00-0x03 range?
 	if (offset < 3)
 	{
 		switch (offset)
 		{
 			case 0:
-				m_pio->write(space, 1, data);
+				m_ppi->write(1, data);
 				break;
 			case 2:
 				m_i8255_0_pc = data;

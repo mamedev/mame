@@ -533,8 +533,7 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 48_MHz_XTAL/8/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
 
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // typical Taito 74ls392
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // typical Taito 74ls392
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

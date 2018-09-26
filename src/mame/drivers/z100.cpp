@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(z100_state::z100)
 
 	PIA6821(config, m_pia1, 0);
 
-	MCFG_DEVICE_ADD("z207_fdc", FD1797, 1_MHz_XTAL)
+	FD1797(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)

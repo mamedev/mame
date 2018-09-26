@@ -482,8 +482,7 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128);
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 
 	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
 	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)

@@ -88,7 +88,7 @@ MACHINE_CONFIG_START(nichisnd_device::device_add_mconfig)
 	audiocpu.out_pb_callback().set("dac1", FUNC(dac_byte_interface::data_w));
 	audiocpu.out_pc_callback().set("dac2", FUNC(dac_byte_interface::data_w));
 	audiocpu.out_pe_callback().set(FUNC(nichisnd_device::soundlatch_clear_w));
-	audiocpu.zc0_callback().set(FUNC(tmpz84c011_device::trg3));
+	audiocpu.zc0_callback().set("audiocpu", FUNC(tmpz84c011_device::trg3));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

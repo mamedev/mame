@@ -430,8 +430,7 @@ void einstein_state::einstein_io(address_map &map)
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
 	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
 	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
-	map(0x10, 0x10).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
 	map(0x21, 0x21).mirror(0xff00).w(FUNC(einstein_state::adcint_msk_w));
@@ -596,11 +595,11 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	pio.out_pb_callback().set("user", FUNC(einstein_userport_device::write));
 	pio.out_brdy_callback().set("user", FUNC(einstein_userport_device::brdy_w));
 
-	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, einstein_state, int_w<1>))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(IC_I060, i8251_device, write_txc))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(IC_I060, i8251_device, write_rxc))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(IC_I058, z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, IC_I058, XTAL_X002 / 2));
+	ctc.intr_callback().set(FUNC(einstein_state::int_w<1>));
+	ctc.zc_callback<0>().set(IC_I060, FUNC(i8251_device::write_txc));
+	ctc.zc_callback<1>().set(IC_I060, FUNC(i8251_device::write_rxc));
+	ctc.zc_callback<2>().set(IC_I058, FUNC(z80ctc_device::trg3));
 
 	clock_device &ctc_trigger(CLOCK(config, "ctc_trigger", XTAL_X002 / 4));
 	ctc_trigger.signal_handler().set(IC_I058, FUNC(z80ctc_device::trg0));
@@ -659,7 +658,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
 
 	// floppy
-	MCFG_DEVICE_ADD(IC_I042, WD1770, XTAL_X002)
+	WD1770(config, m_fdc, XTAL_X002);
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)

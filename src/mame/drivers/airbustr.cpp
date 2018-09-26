@@ -583,8 +583,7 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -624,11 +623,11 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(airbustr_state::airbustrb)
+void airbustr_state::airbustrb(machine_config &config)
+{
 	airbustr(config);
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0)) // no protection device or watchdog
-MACHINE_CONFIG_END
+	m_watchdog->set_time(attotime::from_seconds(0)); // no protection device or watchdog
+}
 
 
 /* ROMs */

@@ -318,8 +318,8 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 	m_z80pio[4]->out_pb_callback().set(FUNC(proconn_state::pio_5_m_out_pb_w));
 	m_z80pio[4]->out_brdy_callback().set(FUNC(proconn_state::pio_5_m_out_brdy_w));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_z80ctc, 4000000);
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80SIO(config, m_z80sio, 4000000); /* ?? Mhz */
 

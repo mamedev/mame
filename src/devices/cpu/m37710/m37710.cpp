@@ -692,7 +692,7 @@ WRITE8_MEMBER(m37710_cpu_device::m37710_internal_w)
 	}
 }
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes[4] =
 {
 	m37710i_opcodes_M0X0,
 	m37710i_opcodes_M0X1,
@@ -700,7 +700,7 @@ const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes[4] =
 	m37710i_opcodes_M1X1,
 };
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes2[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes2[4] =
 {
 	m37710i_opcodes42_M0X0,
 	m37710i_opcodes42_M0X1,
@@ -708,7 +708,7 @@ const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes2[4] =
 	m37710i_opcodes42_M1X1,
 };
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes3[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes3[4] =
 {
 	m37710i_opcodes89_M0X0,
 	m37710i_opcodes89_M0X1,

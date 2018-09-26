@@ -75,6 +75,7 @@ public:
 		m_intube(*this, "intube"),
 		m_extube(*this, "extube"),
 		m_1mhzbus(*this, "1mhzbus"),
+		m_userport(*this, "userport"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
 		m_i8271(*this, "i8271"),
@@ -168,12 +169,12 @@ public:
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(adlc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
+	DECLARE_WRITE_LINE_MEMBER(lpstb_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
@@ -205,8 +206,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp4_load) { return bbc_load_rom(image, m_exp4); }
 
 	image_init_result bbcm_load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp1_load) { return bbcm_load_cart(image, m_exp1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp2_load) { return bbcm_load_cart(image, m_exp2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_cart1_load) { return bbcm_load_cart(image, m_exp1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_cart2_load) { return bbcm_load_cart(image, m_exp2); }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -271,6 +272,7 @@ public: // HACK FOR MC6845
 	optional_device<bbc_tube_slot_device> m_intube;
 	optional_device<bbc_tube_slot_device> m_extube;
 	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
+	optional_device<bbc_userport_slot_device> m_userport;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;

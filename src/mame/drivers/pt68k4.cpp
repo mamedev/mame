@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
-	MCFG_DEVICE_ADD(WDFDC_TAG, WD1772, 16_MHz_XTAL / 2)
+	WD1772(config, m_wdfdc, 16_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 

@@ -19,6 +19,7 @@ class smc91c9x_device : public device_t,public device_network_interface
 {
 public:
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );

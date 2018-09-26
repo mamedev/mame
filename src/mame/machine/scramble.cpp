@@ -93,9 +93,9 @@ READ8_MEMBER(scramble_state::cavelon_banksw_r )
 	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		return m_ppi8255_0->read(space, offset - 0x0100);
+		return m_ppi8255_0->read(offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return m_ppi8255_1->read(space, offset - 0x0200);
+		return m_ppi8255_1->read(offset - 0x0200);
 
 	return 0xff;
 }
@@ -105,9 +105,9 @@ WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
 	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		m_ppi8255_0->write(space, offset - 0x0100, data);
+		m_ppi8255_0->write(offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		m_ppi8255_1->write(space, offset - 0x0200, data);
+		m_ppi8255_1->write(offset - 0x0200, data);
 }
 
 

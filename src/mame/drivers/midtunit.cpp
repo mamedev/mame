@@ -606,7 +606,7 @@ MACHINE_CONFIG_START(midtunit_state::tunit_core)
 	MCFG_MACHINE_RESET_OVERRIDE(midtunit_state,midtunit)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)

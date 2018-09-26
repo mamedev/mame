@@ -85,5 +85,5 @@ uint8_t einstein_speech_device::read()
 void einstein_speech_device::write(uint8_t data)
 {
 	if (BIT(data, 7) == 0)
-		m_sp0256->ald_w(machine().dummy_space(), 0, data & 0x3f);
+		m_sp0256->ald_w(data & 0x3f);
 }

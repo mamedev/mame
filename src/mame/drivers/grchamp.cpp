@@ -755,8 +755,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
@@ -764,7 +763,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(grchamp_state, grchamp)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update)

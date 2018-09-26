@@ -921,10 +921,10 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/16)
 	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_c_w))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(zaxxon_state::zaxxon_sound_a_w));
+	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::zaxxon_sound_b_w));
+	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::zaxxon_sound_c_w));
 
 	LS259(config, m_mainlatch[0]); // U55 on Zaxxon IC Board A
 	m_mainlatch[0]->q_out_cb<0>().set(FUNC(zaxxon_state::coin_enable_w)); // COIN EN A
@@ -1040,10 +1040,10 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(congo_map)
 
-	MCFG_DEVICE_REPLACE("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, congo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, congo_sound_c_w))
+	m_ppi->in_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_ppi->out_pa_callback().set_nop();
+	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::congo_sound_b_w));
+	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::congo_sound_c_w));
 
 	// U52 on Control Board
 	m_mainlatch[0]->q_out_cb<5>().set(FUNC(zaxxon_state::bg_enable_w)); // BEN

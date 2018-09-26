@@ -575,9 +575,9 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80sio_device, rxa_w))
 
-	MCFG_DEVICE_ADD("fdc", WD2797, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, aussiebyte_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, aussiebyte_state, fdc_drq_w))
+	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(aussiebyte_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(aussiebyte_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)

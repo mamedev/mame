@@ -274,16 +274,16 @@ MACHINE_CONFIG_START(hardbox_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(hardbox_io)
 
 	// devices
-	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi0_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi0_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi0_pc_r))
+	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
+	ppi0.in_pa_callback().set(FUNC(hardbox_device::ppi0_pa_r));
+	ppi0.out_pb_callback().set(FUNC(hardbox_device::ppi0_pb_w));
+	ppi0.in_pc_callback().set(FUNC(hardbox_device::ppi0_pc_r));
 
-	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi1_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi1_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi1_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, hardbox_device, ppi1_pc_w))
+	i8255_device &ppi1(I8255A(config, I8255_1_TAG));
+	ppi1.in_pa_callback().set(FUNC(hardbox_device::ppi1_pa_r));
+	ppi1.out_pb_callback().set(FUNC(hardbox_device::ppi1_pb_w));
+	ppi1.in_pc_callback().set(FUNC(hardbox_device::ppi1_pc_r));
+	ppi1.out_pc_callback().set(FUNC(hardbox_device::ppi1_pc_w));
 
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")

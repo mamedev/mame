@@ -228,8 +228,7 @@ void sf7000_state::sf7000_io_map(address_map &map)
 	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
 	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe8, 0xe8).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe9, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe8, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /***************************************************************************
@@ -636,10 +635,10 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD(UPD9255_1_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sf7000_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sf7000_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
+	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
+	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 
 	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
 	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

@@ -546,8 +546,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -592,8 +591,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_DEVICE_PROGRAM_MAP(champbas_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -705,8 +703,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -770,8 +767,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // champbasj 8201 on pcb, though unused
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

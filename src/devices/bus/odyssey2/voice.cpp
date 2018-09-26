@@ -88,7 +88,7 @@ WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
 WRITE8_MEMBER(o2_voice_device::io_write)
 {
 	if (data & 0x20)
-		m_speech->ald_w(space, 0, offset & 0x7f);
+		m_speech->ald_w(offset & 0x7f);
 	else
 		m_speech->reset();
 }

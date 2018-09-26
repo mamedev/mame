@@ -196,9 +196,10 @@ MACHINE_CONFIG_START(exp85_state::exp85)
 	/* devices */
 	I8155(config, I8155_TAG, 6.144_MHz_XTAL/2);
 
-	MCFG_DEVICE_ADD(I8355_TAG, I8355, 6.144_MHz_XTAL/2)
-	MCFG_I8355_IN_PA_CB(READ8(*this, exp85_state, i8355_a_r))
-	MCFG_I8355_OUT_PA_CB(WRITE8(*this, exp85_state, i8355_a_w))
+	i8355_device &i8355(I8355(config, I8355_TAG, 6.144_MHz_XTAL/2));
+	i8355.in_pa().set(FUNC(exp85_state::i8355_a_r));
+	i8355.out_pa().set(FUNC(exp85_state::i8355_a_w));
+
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 

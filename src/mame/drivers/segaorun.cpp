@@ -642,7 +642,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return m_i8255->read(space, offset & 3);
+			return m_i8255->read(offset & 3);
 
 		case 0x10/2:
 		{
@@ -678,7 +678,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				m_i8255->write(space, offset & 3, data);
+				m_i8255->write(offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -1159,15 +1159,15 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, segaorun_state, bankmotor_limit_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segaorun_state, unknown_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, segaorun_state, unknown_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segaorun_state, bankmotor_control_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, segaorun_state, unknown_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segaorun_state, video_control_w))
+	I8255(config, m_i8255);
+	m_i8255->in_pa_callback().set(FUNC(segaorun_state::bankmotor_limit_r));
+	m_i8255->out_pa_callback().set(FUNC(segaorun_state::unknown_porta_w));
+	m_i8255->in_pb_callback().set(FUNC(segaorun_state::unknown_portb_r));
+	m_i8255->out_pb_callback().set(FUNC(segaorun_state::bankmotor_control_w));
+	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
+	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
 	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK/4)
 	MCFG_SEGA_315_5195_CPU("maincpu")
@@ -1245,14 +1245,12 @@ MACHINE_CONFIG_START(segaorun_state::shangon)
 	outrun_base(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REMOVE("i8255")
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, segaorun_state, unknown_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segaorun_state, unknown_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, segaorun_state, unknown_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segaorun_state, unknown_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, segaorun_state, unknown_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segaorun_state, video_control_w))
+	m_i8255->in_pa_callback().set(FUNC(segaorun_state::unknown_porta_r));
+	m_i8255->out_pa_callback().set(FUNC(segaorun_state::unknown_porta_w));
+	m_i8255->in_pb_callback().set(FUNC(segaorun_state::unknown_portb_r));
+	m_i8255->out_pb_callback().set(FUNC(segaorun_state::unknown_portb_w));
+	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
+	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

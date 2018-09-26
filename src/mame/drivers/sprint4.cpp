@@ -385,11 +385,10 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_DEVICE_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(sprint4_cpu_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint4_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint4_state, screen_vblank))

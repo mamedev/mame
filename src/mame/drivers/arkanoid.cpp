@@ -1351,8 +1351,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_DEVICE_PROGRAM_MAP(arkanoid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
 	m_mcuintf->portb_r_cb().set_ioport("MUX");
@@ -1429,7 +1428,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_DEVICE_PROGRAM_MAP(hexa_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1501,10 +1500,10 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 /* rom numbering, with guesses for version numbers and missing roms:
-    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED, arkatayt and arkangc and
-               maybe arkanoidjbl may actually be bootlegs of this undumped
-               version, so it might be possible to 'restore' this version by
-              'de-bootlegging' those sets?)
+    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED; it has been rumored that arkatayt
+               and arkangc and maybe arkanoidjbl might actually be bootlegs of this
+               undumped version, so, if true, it might be possible to 'restore' this
+               version by 'de-bootlegging' those sets.)
     A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar and World
     A75 02   = Z80 code 2/2 v1.0 Japan (has 'Notice: This game is for use in Japan only' screen)
     A75 03   = GFX 1/3
@@ -1526,7 +1525,7 @@ MACHINE_CONFIG_END
     A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (verified. dumped from MCU)
     A75 21   = Z80 code v2.0 1/2 Japan w/level select
     A75 22   = Z80 code v2.0 2/2 Japan w/level select
-    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED)
     A75 24   = Z80 code v2.1 1/2 Japan
     A75 25   = Z80 code v2.1 2/2 Japan
     A75 26   = MC68705P5 MCU code, v2.1 Japan (verified. dumped from MCU)

@@ -2284,8 +2284,7 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_vid_state, timer_irq,  1000)           // generate 1000 IRQ's per second
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
@@ -3754,8 +3753,7 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_awp_state, timer_irq,  1000)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
@@ -3814,8 +3812,7 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_dmd_state, timer_irq,  1000)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))

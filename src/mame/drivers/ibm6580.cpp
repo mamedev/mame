@@ -701,10 +701,8 @@ void ibm6580_state::ibm6580_io(address_map &map)
 	map(0x0040, 0x005f).rw(FUNC(ibm6580_state::p40_r), FUNC(ibm6580_state::p40_w)).umask16(0x00ff);
 	map(0x0070, 0x007f).unmaprw();
 	map(0x0120, 0x0127).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0140, 0x0140).rw("upd8251a", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0142, 0x0142).rw("upd8251a", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x0160, 0x0160).rw("upd8251b", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0162, 0x0162).rw("upd8251b", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0140, 0x0143).rw("upd8251a", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x0160, 0x0163).rw("upd8251b", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x4000, 0x400f).unmaprw();
 	map(0x5000, 0x500f).unmaprw();
 	map(0x6000, 0x601f).unmaprw();
@@ -904,11 +902,11 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, ibm6580_state, ppi_a_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ibm6580_state, led_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ibm6580_state, ppi_c_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ibm6580_state, ppi_c_r))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(ibm6580_state::ppi_a_r));
+	ppi.out_pb_callback().set(FUNC(ibm6580_state::led_w));
+	ppi.out_pc_callback().set(FUNC(ibm6580_state::ppi_c_w));
+	ppi.in_pc_callback().set(FUNC(ibm6580_state::ppi_c_r));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 
@@ -918,13 +916,13 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	m_kbd->out_strobe_handler().set(FUNC(ibm6580_state::kb_strobe_w));
 	m_kbd->out_strobe_handler().append(m_ppi8255, FUNC(i8255_device::pc4_w));
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(14'745'600)/3)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, ibm6580_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(UPD765_TAG, upd765a_device, tc_line_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, ibm6580_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, ibm6580_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(UPD765_TAG, upd765a_device, mdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(UPD765_TAG, upd765a_device, mdma_w))
+	I8257(config, m_dma8257, XTAL(14'745'600)/3);
+	m_dma8257->out_hrq_cb().set(FUNC(ibm6580_state::hrq_w));
+	m_dma8257->out_tc_cb().set(UPD765_TAG, FUNC(upd765a_device::tc_line_w));
+	m_dma8257->in_memr_cb().set(FUNC(ibm6580_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(ibm6580_state::memory_write_byte));
+	m_dma8257->in_ior_cb<0>().set(UPD765_TAG, FUNC(upd765a_device::mdma_r));
+	m_dma8257->out_iow_cb<0>().set(UPD765_TAG, FUNC(upd765a_device::mdma_w));
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, ibm6580_state, floppy_intrq))

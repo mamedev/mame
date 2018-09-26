@@ -288,12 +288,12 @@ MACHINE_CONFIG_START(pc1500_state::pc1500)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
 
-	MCFG_DEVICE_ADD("lh5810", LH5810, 0)
-	MCFG_LH5810_PORTA_R_CB(READ8(*this, pc1500_state, port_a_r))
-	MCFG_LH5810_PORTA_W_CB(WRITE8(*this, pc1500_state, kb_matrix_w))
-	MCFG_LH5810_PORTB_R_CB(READ8(*this, pc1500_state, port_b_r))
-	MCFG_LH5810_PORTC_W_CB(WRITE8(*this, pc1500_state, port_c_w))
-	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
+	lh5810_device &ioports(LH5810(config, "lh5810"));
+	ioports.porta_r().set(FUNC(pc1500_state::port_a_r));
+	ioports.porta_w().set(FUNC(pc1500_state::kb_matrix_w));
+	ioports.portb_r().set(FUNC(pc1500_state::port_b_r));
+	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
+	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
 	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 MACHINE_CONFIG_END

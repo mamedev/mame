@@ -1678,7 +1678,7 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	NVRAM(config, "backup2", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MB3773_ADD("watchdog")
+	MB3773(config, "watchdog");
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")

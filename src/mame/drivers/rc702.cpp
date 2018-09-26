@@ -15,7 +15,7 @@ ToDo:
 - Other things
 
 Issues:
-- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 1)
+- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 0)
 
 
 ****************************************************************************************************************/
@@ -77,6 +77,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	DECLARE_PALETTE_INIT(rc702);
 	void kbd_put(u8 data);
 
 	void rc702_io(address_map &map);
@@ -241,10 +242,11 @@ WRITE8_MEMBER( rc702_state::port1c_w )
 }
 
 // monitor is orange even when powered off
-static const rgb_t our_palette[3] = {
-	rgb_t(0xc0, 0x60, 0x00), // off
-	rgb_t(0xff, 0xb4, 0x00), // on
-};
+PALETTE_INIT_MEMBER(rc702_state, rc702)
+{
+	palette.set_pen_color(0, rgb_t(0xc0, 0x60, 0x00));
+	palette.set_pen_color(1, rgb_t(0xff, 0xb4, 0x00));
+}
 
 void rc702_state::init_rc702()
 {
@@ -253,7 +255,6 @@ void rc702_state::init_rc702()
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
-	m_palette->set_pen_colors(0, our_palette, ARRAY_LENGTH(our_palette));
 }
 
 I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
@@ -388,6 +389,7 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	crtc.irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
 	crtc.drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(rc702_state, rc702)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

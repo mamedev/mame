@@ -255,11 +255,11 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	config.set_default_layout(layout_poly880);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(7'372'800)/16)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, poly880_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, poly880_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(7'372'800)/16));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(poly880_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(poly880_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg3));
 
 	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(7'372'800)/16));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

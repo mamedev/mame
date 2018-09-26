@@ -81,7 +81,7 @@ void validity_checker::validate_tag(const char *tag)
 		osd_printf_error("Invalid generic tag '%s' used\n", tag);
 
 	// scan for invalid characters
-	static const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
+	static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
 	for (const char *p = tag; *p != 0; p++)
 	{
 		// only lower-case permitted

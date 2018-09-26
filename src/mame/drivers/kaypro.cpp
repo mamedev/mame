@@ -262,10 +262,10 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	sio.out_rtsa_callback().set("serial", FUNC(rs232_port_device::write_rts));
 	sio.out_txdb_callback().set("kbd", FUNC(kaypro_10_keyboard_device::txd_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1793(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
+	m_fdc->set_force_ready(true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -358,10 +358,10 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	brg.ft_handler().set("sio_2", FUNC(z80sio_device::rxca_w));
 	brg.ft_handler().append("sio_2", FUNC(z80sio_device::txca_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
+	m_fdc->set_force_ready(true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)

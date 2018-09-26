@@ -345,11 +345,11 @@ MACHINE_CONFIG_START(lc80_state::lc80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
 	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -382,11 +382,11 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
 	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

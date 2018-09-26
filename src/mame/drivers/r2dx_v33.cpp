@@ -829,7 +829,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
@@ -854,11 +854,11 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'636'363)/8)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)

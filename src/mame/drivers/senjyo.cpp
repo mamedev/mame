@@ -564,10 +564,10 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(senjyo_state::pio_pa_r));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 2000000 /* same as "sub" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, senjyo_state, sound_line_clock))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 2000000 /* same as "sub" */));
+	ctc.intr_callback().set_inputline("sub", INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().set(FUNC(senjyo_state::sound_line_clock));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

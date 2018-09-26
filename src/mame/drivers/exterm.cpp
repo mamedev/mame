@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 
 	MCFG_TIMER_DRIVER_ADD(m_nmi_timer, exterm_state, master_sound_nmi_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048+32768)

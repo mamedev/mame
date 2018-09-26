@@ -1100,13 +1100,13 @@ MACHINE_CONFIG_START(apollo_state::common)
 	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
 
-	MCFG_DEVICE_ADD(APOLLO_RTC_TAG, MC146818, 32.768_kHz_XTAL)
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	// FIXME: is this interrupt really only connected on DN3000?
-	//MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
-	MCFG_MC146818_UTC(true)
-	MCFG_MC146818_BINARY(false)
-	MCFG_MC146818_24_12(false)
-	MCFG_MC146818_EPOCH(0)
+	//m_rtc->irq().set(FUNC(apollo_state::apollo_rtc_irq_function));
+	m_rtc->set_use_utc(true);
+	m_rtc->set_binary(false);
+	m_rtc->set_24hrs(false);
+	m_rtc->set_epoch(0);
 
 	MCFG_APOLLO_NI_ADD(APOLLO_NI_TAG, 0)
 

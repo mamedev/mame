@@ -325,9 +325,9 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// floppy
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_drq_w))
+	WD2797(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(dragon_alpha_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(dragon_alpha_state::fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_alpha_floppies, "dd", dragon_alpha_state::dragon_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

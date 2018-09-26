@@ -149,7 +149,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_ctc->out_handler<2>().set(FUNC(cs4031_device::ctc_out2_w));
 
 	DS12885(config, m_rtc);
-	m_rtc->irq_callback().set(m_intc2, FUNC(pic8259_device::ir0_w));
+	m_rtc->irq().set(m_intc2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 }
 
@@ -262,17 +262,17 @@ void cs4031_device::device_start()
 
 	// install i/o accesses
 	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);
-	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8_delegate(FUNC(pic8259_device::read), &(*m_intc1)), write8_delegate(FUNC(pic8259_device::write), &(*m_intc1)), 0x0000ffff);
+	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8sm_delegate(FUNC(pic8259_device::read), &(*m_intc1)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_intc1)), 0x0000ffff);
 	m_space_io->install_write_handler(0x0020, 0x0023, write8_delegate(FUNC(cs4031_device::config_address_w), this), 0x00ff0000);
 	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8_delegate(FUNC(cs4031_device::config_data_r), this), write8_delegate(FUNC(cs4031_device::config_data_w), this), 0xff000000);
-	m_space_io->install_readwrite_handler(0x0040, 0x0043, read8_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
+	m_space_io->install_readwrite_handler(0x0040, 0x0043, read8sm_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8sm_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::keyb_data_r), this), write8_delegate(FUNC(cs4031_device::keyb_data_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::portb_r), this), write8_delegate(FUNC(cs4031_device::portb_w), this), 0x0000ff00);
 	m_space_io->install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(cs4031_device::keyb_status_r), this), write8_delegate(FUNC(cs4031_device::keyb_command_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0070, 0x0073, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(cs4031_device::rtc_w), this), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(cs4031_device::dma_page_r), this), write8_delegate(FUNC(cs4031_device::dma_page_w), this), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0090, 0x0093, read8_delegate(FUNC(cs4031_device::sysctrl_r), this), write8_delegate(FUNC(cs4031_device::sysctrl_w), this), 0x00ff0000);
-	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8_delegate(FUNC(pic8259_device::read), &(*m_intc2)), write8_delegate(FUNC(pic8259_device::write), &(*m_intc2)), 0x0000ffff);
+	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8sm_delegate(FUNC(pic8259_device::read), &(*m_intc2)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_intc2)), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(cs4031_device::dma2_r),this), write8_delegate(FUNC(cs4031_device::dma2_w),this), 0xffffffff);
 }
 

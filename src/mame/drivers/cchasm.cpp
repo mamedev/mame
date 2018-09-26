@@ -157,12 +157,12 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cchasm_state::sound_memmap);
 	m_audiocpu->set_addrmap(AS_IO, &cchasm_state::sound_portmap);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 3584229 /* same as "audiocpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, cchasm_state, ctc_timer_1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, cchasm_state, ctc_timer_2_w))
+	Z80CTC(config, m_ctc, 3584229 /* same as "audiocpu" */);
+	m_ctc->intr_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<1>().set(FUNC(cchasm_state::ctc_timer_1_w));
+	m_ctc->zc_callback<2>().set(FUNC(cchasm_state::ctc_timer_2_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

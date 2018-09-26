@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 	MCFG_DEVICE_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
 	MCFG_DEVICE_PROGRAM_MAP(pingpong_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pingpong_state, pingpong_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

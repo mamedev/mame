@@ -2955,7 +2955,7 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
-//  map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));   // Protection (not in wits)
+	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
 	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
 	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
@@ -6069,17 +6069,6 @@ static INPUT_PORTS_START( thunderl )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( thunderlbl )
-	PORT_INCLUDE(thunderl)
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
 /***************************************************************************
                                 Thundercade (US)
 ***************************************************************************/
@@ -8034,7 +8023,7 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
@@ -8101,7 +8090,7 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -8568,7 +8557,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(setaroul_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
@@ -8623,7 +8612,7 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8667,7 +8656,7 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(extdwnhl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8731,7 +8720,7 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 #endif  // __uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 #if __uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -8803,7 +8792,7 @@ MACHINE_CONFIG_START(seta_state::jjsquawk)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8879,7 +8868,7 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kamenrid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
@@ -9063,7 +9052,7 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9103,7 +9092,7 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	MCFG_DEVICE_PROGRAM_MAP(magspeed_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
@@ -9318,7 +9307,7 @@ MACHINE_CONFIG_START(seta_state::rezon)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9607,7 +9596,7 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 #endif  // __uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 #if __uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -9661,7 +9650,7 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9831,8 +9820,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
 	MCFG_DEVICE_PROGRAM_MAP(jockeyc_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2.0)) // jockeyc: watchdog test error if over 2.5s
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2.0)); // jockeyc: watchdog test error if over 2.5s
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -12132,7 +12120,7 @@ GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_ini
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
 GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderlbl,seta_state,     empty_init,     ROT90,  "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
@@ -12172,9 +12160,9 @@ GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_ini
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawko, jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
 

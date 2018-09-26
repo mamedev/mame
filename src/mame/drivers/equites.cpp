@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
