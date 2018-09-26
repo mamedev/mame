@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	MCFG_PROF80_MMU_ADD(m_mmu, prof80_mmu)
 
 	// RTC
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	// FDC
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
@@ -471,12 +471,12 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 
 	// DEMUX latches
 	LS259(config, m_flra);
-	m_flra->q_out_cb<0>().set(UPD1990A_TAG, FUNC(upd1990a_device::data_in_w)); // TDI
-	m_flra->q_out_cb<0>().append(UPD1990A_TAG, FUNC(upd1990a_device::c0_w)); // C0
-	m_flra->q_out_cb<1>().set(UPD1990A_TAG, FUNC(upd1990a_device::c1_w)); // C1
-	m_flra->q_out_cb<2>().set(UPD1990A_TAG, FUNC(upd1990a_device::c2_w)); // C2
+	m_flra->q_out_cb<0>().set(m_rtc, FUNC(upd1990a_device::data_in_w)); // TDI
+	m_flra->q_out_cb<0>().append(m_rtc, FUNC(upd1990a_device::c0_w)); // C0
+	m_flra->q_out_cb<1>().set(m_rtc, FUNC(upd1990a_device::c1_w)); // C1
+	m_flra->q_out_cb<2>().set(m_rtc, FUNC(upd1990a_device::c2_w)); // C2
 	m_flra->q_out_cb<3>().set(FUNC(prof80_state::ready_w)); // READY
-	m_flra->q_out_cb<4>().set(UPD1990A_TAG, FUNC(upd1990a_device::clk_w)); // TCK
+	m_flra->q_out_cb<4>().set(m_rtc, FUNC(upd1990a_device::clk_w)); // TCK
 	m_flra->q_out_cb<5>().set(FUNC(prof80_state::inuse_w)); // IN USE
 	m_flra->q_out_cb<6>().set(FUNC(prof80_state::motor_w)); // _MOTOR
 	m_flra->q_out_cb<7>().set(FUNC(prof80_state::select_w)); // SELECT
@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	m_flrb->q_out_cb<3>().set(m_rs232a, FUNC(rs232_port_device::write_txd)); // TX
 	m_flrb->q_out_cb<4>().set(FUNC(prof80_state::mstop_w)); // _MSTOP
 	m_flrb->q_out_cb<5>().set(m_rs232b, FUNC(rs232_port_device::write_txd)); // TXP
-	m_flrb->q_out_cb<6>().set(UPD1990A_TAG, FUNC(upd1990a_device::stb_w)); // TSTB
+	m_flrb->q_out_cb<6>().set(m_rtc, FUNC(upd1990a_device::stb_w)); // TSTB
 	m_flrb->q_out_cb<7>().set(m_mmu, FUNC(prof80_mmu_device::mme_w)); // MME
 
 	// ECB bus

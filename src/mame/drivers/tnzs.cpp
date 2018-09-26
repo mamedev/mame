@@ -1603,12 +1603,13 @@ MACHINE_CONFIG_START(extrmatn_state::extrmatn)
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(extrmatn_state::plumppop)
+void extrmatn_state::plumppop(machine_config &config)
+{
 	extrmatn(config);
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("AN1")
-	MCFG_UPD4701_PORTY("AN2")
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("AN1");
+	m_upd4701->set_porty_tag("AN2");
+}
 
 MACHINE_CONFIG_START(arknoid2_state::arknoid2)
 	plumppop(config);
@@ -1720,9 +1721,9 @@ MACHINE_CONFIG_START(jpopnics_state::jpopnics)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(jpopnics_sub_map)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("AN1")
-	MCFG_UPD4701_PORTY("AN2")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("AN1");
+	m_upd4701->set_porty_tag("AN2");
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

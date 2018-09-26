@@ -971,7 +971,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_dmac->out_dack_callback<3>().set(FUNC(apc_state::apc_dack3_w));
 
 	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
-	MCFG_UPD1990A_ADD(m_rtc, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	MCFG_UPD765A_ADD(m_fdc, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(m_i8259_s, pic8259_device, ir4_w))

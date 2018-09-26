@@ -1938,13 +1938,13 @@ MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
 	MCFG_DEVICE_MODIFY("subcpu")
 	MCFG_DEVICE_PROGRAM_MAP(hotrod_cpu2_map)
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0) // IC4 on 834-6510 I/O board
-	MCFG_UPD4701_PORTX("DIAL1")
-	MCFG_UPD4701_PORTY("DIAL2")
+	upd4701_device &upd1(UPD4701A(config, "upd1")); // IC4 on 834-6510 I/O board
+	upd1.set_portx_tag("DIAL1");
+	upd1.set_porty_tag("DIAL2");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0) // IC1
-	MCFG_UPD4701_PORTX("DIAL3")
-	MCFG_UPD4701_PORTY("DIAL4")
+	upd4701_device &upd2(UPD4701A(config, "upd2")); // IC1
+	upd2.set_portx_tag("DIAL3");
+	upd2.set_porty_tag("DIAL4");
 
 	MCFG_DEVICE_ADD("adc1", MSM6253, 0) // IC5 - 33k/33p R/C clock
 	MCFG_MSM6253_IN0_ANALOG_PORT("PEDAL1")
@@ -1969,9 +1969,9 @@ MACHINE_CONFIG_START(segas24_state::system24_floppy_fd_upd)
 	MCFG_DEVICE_MODIFY("subcpu")
 	MCFG_DEVICE_PROGRAM_MAP(roughrac_cpu2_map)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // IC4 on 834-6510-01 I/O board
-	MCFG_UPD4701_PORTX("DIAL1")
-	MCFG_UPD4701_PORTY("DIAL2")
+	upd4701_device &upd4701(UPD4701A(config, "upd4701")); // IC4 on 834-6510 I/O board
+	upd4701.set_portx_tag("DIAL1");
+	upd4701.set_porty_tag("DIAL2");
 MACHINE_CONFIG_END
 
 void segas24_state::dcclub(machine_config &config)

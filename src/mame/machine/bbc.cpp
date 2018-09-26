@@ -968,7 +968,7 @@ WRITE_LINE_MEMBER(bbc_state::lpstb_w)
   BBC Joystick Support
 **************************************/
 
-UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
+int bbc_state::BBC_get_analogue_input(int channel_number)
 {
 	if (m_analog)
 		return ((0xff - m_analog->ch_r(channel_number)) << 8);
@@ -976,7 +976,7 @@ UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
 		return 0xff;
 }
 
-UPD7002_EOC(bbc_state::BBC_uPD7002_EOC)
+void bbc_state::BBC_uPD7002_EOC(int data)
 {
 	m_via6522_0->write_cb1(data);
 }
