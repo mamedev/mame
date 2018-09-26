@@ -2713,6 +2713,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 			volbyte -= 0x100;
 
 		float volume = powf(2.0f, float(volbyte) / float(0x20));
+		uint32_t chip_count = 0;
 
 		uint32_t extra_header_start = version >= 0x170 && data_start >= 0xc0 && r32(0xbc) ? r32(0xbc) + 0xbc : 0;
 		uint32_t header_size = extra_header_start ? extra_header_start : data_start;
@@ -2741,10 +2742,11 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 							break;
 						}
 					}
+
+				chip_count++;
 			}
 
 			device.set_unscaled_clock(c & ~0xc0000000);
-			device.set_output_gain((c & ~0xc0000000) ? volume : 0); // TODO : Volume is related to chip number
 
 			return (c & 0x80000000) != 0;
 		});
@@ -2924,6 +2926,14 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		for (device_t &child : subdevices())
 			if (child.clock() != 0)
 				logerror("%s %d\n", child.tag(), child.clock());
+
+		if (chip_count == 0)
+			volume = 0.0f;
+		else
+			volume /= (float)chip_count;
+
+		m_lspeaker->set_output_gain(volume); // TODO : Volume is related to chip number
+		m_rspeaker->set_output_gain(volume); // TODO : Volume is related to chip number
 
 		//for (auto &stream : machine().sound().streams())
 		//  if (stream->sample_rate() != 0)
