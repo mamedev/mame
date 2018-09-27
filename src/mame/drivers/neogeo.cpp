@@ -1963,7 +1963,8 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_stereo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
+void ngarcade_base_state::neogeo_arcade(machine_config &config)
+{
 	neogeo_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngarcade_base_state::neogeo_main_map);
@@ -1973,10 +1974,10 @@ MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK));
 
-	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
+	UPD4990A(config, m_upd4990a);
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(ngarcade_base_state::neogeo_mono)

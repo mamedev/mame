@@ -288,6 +288,7 @@ VIDEOS["CESBLIT"] = true
 VIDEOS["CRTC_EGA"] = true
 --VIDEOS["DL1416"] = true
 VIDEOS["DM9368"] = true
+VIDEOS["DP8350"] = true
 --VIDEOS["EF9340_1"] = true
 --VIDEOS["EF9345"] = true
 --VIDEOS["EF9364"] = true
@@ -1743,14 +1744,15 @@ files {
 	MAME_DIR .. "src/mame/includes/fantland.h",
 	MAME_DIR .. "src/mame/video/fantland.cpp",
 	MAME_DIR .. "src/mame/drivers/mwarr.cpp",
+	MAME_DIR .. "src/mame/drivers/stlforce.cpp",
+	MAME_DIR .. "src/mame/includes/stlforce.h",
+	MAME_DIR .. "src/mame/video/edevices.cpp",
+	MAME_DIR .. "src/mame/video/edevices.h",	
 	MAME_DIR .. "src/mame/drivers/mugsmash.cpp",
 	MAME_DIR .. "src/mame/includes/mugsmash.h",
 	MAME_DIR .. "src/mame/video/mugsmash.cpp",
 	MAME_DIR .. "src/mame/drivers/ppmast93.cpp",
 	MAME_DIR .. "src/mame/drivers/pzletime.cpp",
-	MAME_DIR .. "src/mame/drivers/stlforce.cpp",
-	MAME_DIR .. "src/mame/includes/stlforce.h",
-	MAME_DIR .. "src/mame/video/stlforce.cpp",
 	MAME_DIR .. "src/mame/drivers/twins.cpp",
 }
 

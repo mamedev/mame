@@ -41,6 +41,8 @@ Notes:
 
     Driver by David Haywood and Bryan McPhail
 
+NOTE: Hold down both Player1 & Player2 Start buttons during boot up to see version & region
+
 */
 
 /*
@@ -339,7 +341,7 @@ void pktgaldx_state::machine_start()
 MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2) // The clock input is 14.000MHz on pin 6
 	MCFG_DEVICE_PROGRAM_MAP(pktgaldx_map)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
@@ -388,11 +390,11 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
@@ -435,38 +437,56 @@ MACHINE_CONFIG_END
 
 ROM_START( pktgaldx )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
-	ROM_LOAD16_WORD_SWAP( "ke00-2.12a",    0x00000, 0x80000, CRC(b04baf3a) SHA1(680d1b4ab4b6edef36cd96a60539fb7c2dac9637) )
+	ROM_LOAD16_WORD_SWAP( "ke00-2.12a",    0x00000, 0x80000, CRC(b04baf3a) SHA1(680d1b4ab4b6edef36cd96a60539fb7c2dac9637) ) /* Version 3.00 Euro */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "maz-02.2h",    0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
+	ROM_LOAD( "maz-02.2h", 0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "maz-00.1b",    0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
-	ROM_LOAD16_BYTE( "maz-01.3b",    0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
+	ROM_LOAD16_BYTE( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
+	ROM_LOAD16_BYTE( "maz-01.3b", 0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "ke01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
+	ROM_LOAD( "ke01.14f", 0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */
-	ROM_LOAD( "maz-03.13f",    0x00000, 0x100000, CRC(a313c964) SHA1(4a3664c4e2c44a017a0ab6a6d4361799cbda57b5) )
+	ROM_LOAD( "maz-03.13f", 0x00000, 0x100000, CRC(a313c964) SHA1(4a3664c4e2c44a017a0ab6a6d4361799cbda57b5) )
 ROM_END
 
 ROM_START( pktgaldxj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
-	ROM_LOAD16_WORD_SWAP( "kg00-2.12a",    0x00000, 0x80000, CRC(62dc4137) SHA1(23887dc3f6e7c4cdcb1bf4f4c87fe3cbe8cdbe69) )
+	ROM_LOAD16_WORD_SWAP( "kg00-2.12a",    0x00000, 0x80000, CRC(62dc4137) SHA1(23887dc3f6e7c4cdcb1bf4f4c87fe3cbe8cdbe69) ) /* Version 3.00 Japan */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "maz-02.2h",    0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
+	ROM_LOAD( "maz-02.2h", 0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "maz-00.1b",    0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
-	ROM_LOAD16_BYTE( "maz-01.3b",    0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
+	ROM_LOAD16_BYTE( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
+	ROM_LOAD16_BYTE( "maz-01.3b", 0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "ke01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
+	ROM_LOAD( "ke01.14f", 0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */
-	ROM_LOAD( "maz-03.13f",    0x00000, 0x100000, CRC(a313c964) SHA1(4a3664c4e2c44a017a0ab6a6d4361799cbda57b5) )
+	ROM_LOAD( "maz-03.13f", 0x00000, 0x100000, CRC(a313c964) SHA1(4a3664c4e2c44a017a0ab6a6d4361799cbda57b5) )
+ROM_END
+
+ROM_START( pktgaldxa )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
+	ROM_LOAD16_WORD_SWAP( "rom.12a",   0x00000, 0x80000, CRC(c4c7cc68) SHA1(d3841459096a37ffd96fbf9017d3176893034c01) ) /* Version 3.00 Asia - Need to verify label */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "maz-02.2h", 0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
+	ROM_LOAD16_BYTE( "maz-01.3b", 0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "ke01.14f", 0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
+
+	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */
+	ROM_LOAD( "maz-03.13f", 0x00000, 0x100000, CRC(a313c964) SHA1(4a3664c4e2c44a017a0ab6a6d4361799cbda57b5) )
 ROM_END
 
 ROM_START( pktgaldxb )
@@ -475,19 +495,19 @@ ROM_START( pktgaldxb )
 	ROM_LOAD16_BYTE( "5.bin", 0x00001, 0x80000, CRC(64cb4c33) SHA1(02f988f558113dd9a77079dee59e23583394fa98) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "11.bin",    0x000000, 0x80000, CRC(a8c8f1fd) SHA1(9fd5fa500967a1bd692abdbeef89ce195c8aecd4) )
-	ROM_LOAD16_BYTE( "6.bin",     0x000001, 0x80000, CRC(0e3335a1) SHA1(2d6899336302d222e8404dde159e64911a8f94e6) )
-	ROM_LOAD16_BYTE( "10.bin",    0x100000, 0x80000, CRC(9dd743a9) SHA1(dbc3e2bd044dbf21b04c174bd860969ee53b4050) )
-	ROM_LOAD16_BYTE( "7.bin",     0x100001, 0x80000, CRC(0ebf12b5) SHA1(17b6c2ce21de3671d75d89a41317efddf5b49339) )
-	ROM_LOAD16_BYTE( "9.bin",     0x200001, 0x80000, CRC(078f371c) SHA1(5b510a0f7f50c55cce1ffcc8f2e9c3432b23e352) )
-	ROM_LOAD16_BYTE( "8.bin",     0x200000, 0x80000, CRC(40f5a032) SHA1(c2ad585ddbc3ef40c6214cb30b4d78a2cd0a9446) )
+	ROM_LOAD16_BYTE( "11.bin", 0x000000, 0x80000, CRC(a8c8f1fd) SHA1(9fd5fa500967a1bd692abdbeef89ce195c8aecd4) )
+	ROM_LOAD16_BYTE( "6.bin",  0x000001, 0x80000, CRC(0e3335a1) SHA1(2d6899336302d222e8404dde159e64911a8f94e6) )
+	ROM_LOAD16_BYTE( "10.bin", 0x100000, 0x80000, CRC(9dd743a9) SHA1(dbc3e2bd044dbf21b04c174bd860969ee53b4050) )
+	ROM_LOAD16_BYTE( "7.bin",  0x100001, 0x80000, CRC(0ebf12b5) SHA1(17b6c2ce21de3671d75d89a41317efddf5b49339) )
+	ROM_LOAD16_BYTE( "9.bin",  0x200001, 0x80000, CRC(078f371c) SHA1(5b510a0f7f50c55cce1ffcc8f2e9c3432b23e352) )
+	ROM_LOAD16_BYTE( "8.bin",  0x200000, 0x80000, CRC(40f5a032) SHA1(c2ad585ddbc3ef40c6214cb30b4d78a2cd0a9446) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "kg01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) ) // 1.bin on the bootleg
+	ROM_LOAD( "1.bin", 0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */
-	ROM_LOAD( "3.bin",    0x00000, 0x80000, CRC(4638747b) SHA1(56d79cd8d4d7b41b71f1e942b5a5bf1bafc5c6e7) )
-	ROM_LOAD( "2.bin",    0x80000, 0x80000, CRC(f841d995) SHA1(0ef2f8fd9be62b979862c3688e7aad34c7b0404d) )
+	ROM_LOAD( "3.bin", 0x00000, 0x80000, CRC(4638747b) SHA1(56d79cd8d4d7b41b71f1e942b5a5bf1bafc5c6e7) )
+	ROM_LOAD( "2.bin", 0x80000, 0x80000, CRC(f841d995) SHA1(0ef2f8fd9be62b979862c3688e7aad34c7b0404d) )
 ROM_END
 
 
@@ -498,6 +518,7 @@ void pktgaldx_state::init_pktgaldx()
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
 }
 
-GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, empty_init,    ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldxa, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Asia v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, empty_init,    ROT0, "bootleg",                                      "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

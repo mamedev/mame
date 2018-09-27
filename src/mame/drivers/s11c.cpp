@@ -298,6 +298,16 @@ ROM_START(diner_l1)
 	ROM_LOAD("dinr_u20.l1", 0x30000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
 ROM_END
 
+ROM_START(diner_p0)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dinr_u26.pa0", 0x4000, 0x4000, CRC(dbf5de09) SHA1(55ca30bdf6e6e482f3ce5891b866103492fa3754))
+	ROM_LOAD("dinr_u27.pa0", 0x8000, 0x8000, CRC(9875d16e) SHA1(fbbab61cc9e8e3f7a1bf1428ad50ad3c13f0f120))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
+	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
+	ROM_LOAD("dinr_u20.l1", 0x30000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
+ROM_END
+
 /*--------------------
 / Dr. Dude 11/90
 /--------------------*/
@@ -594,6 +604,7 @@ GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,  
 GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)

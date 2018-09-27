@@ -27,29 +27,16 @@
 #pragma once
 
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
-
-#define MCFG_UPD4701_PORTX(_tag) \
-	downcast<upd4701_device &>(*device).set_portx_tag(_tag);
-#define MCFG_UPD4701_PORTY(_tag) \
-	downcast<upd4701_device &>(*device).set_porty_tag(_tag);
-#define MCFG_UPD4701_CF_CALLBACK(_devcb) \
-	devcb = downcast<upd4701_device &>(*device).set_cf_cb(DEVCB_##_devcb);
-#define MCFG_UPD4701_SF_CALLBACK(_devcb) \
-	devcb = downcast<upd4701_device &>(*device).set_sf_cb(DEVCB_##_devcb);
-
 class upd4701_device : public device_t
 {
 public:
-	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
-	void set_portx_tag(const char *tag) { m_portx.set_tag(tag); }
-	void set_porty_tag(const char *tag) { m_porty.set_tag(tag); }
-	template<class Object> devcb_base &set_cf_cb(Object &&cb) { return m_cf_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_sf_cb(Object &&cb) { return m_sf_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_portx_tag(T &&tag) { m_portx.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_porty_tag(T &&tag) { m_porty.set_tag(std::forward<T>(tag)); }
+	auto cf_cb() { return m_cf_cb.bind(); }
+	auto sf_cb() { return m_sf_cb.bind(); }
 
 	void x_add(s16 data);
 	void y_add(s16 data);

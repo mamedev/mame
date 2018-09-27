@@ -247,13 +247,13 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P1X")
-	MCFG_UPD4701_PORTY("P1Y")
+	UPD4701A(config, m_upd[0]);
+	m_upd[0]->set_portx_tag("P1X");
+	m_upd[0]->set_porty_tag("P1Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P2X")
-	MCFG_UPD4701_PORTY("P2Y")
+	UPD4701A(config, m_upd[1]);
+	m_upd[1]->set_portx_tag("P2X");
+	m_upd[1]->set_porty_tag("P2Y");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

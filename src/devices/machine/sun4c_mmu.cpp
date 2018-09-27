@@ -75,6 +75,14 @@ void sun4c_mmu_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
+uint32_t sun4c_mmu_device::fetch_insn(const bool supervisor, const uint32_t offset)
+{
+	if (supervisor)
+		return insn_data_r<SUPER_INSN>(offset, 0xffffffff);
+	else
+		return insn_data_r<USER_INSN>(offset, 0xffffffff);
+}
+
 uint32_t sun4c_mmu_device::read_asi(uint8_t asi, uint32_t offset, uint32_t mem_mask)
 {
 	//logerror("read_asi %d: %08x & %08x\n", asi, offset << 2, mem_mask);
@@ -341,11 +349,11 @@ template uint32_t sun4c_mmu_device::insn_data_r<sun4c_mmu_device::SUPER_DATA>(co
 template <sun4c_mmu_device::insn_data_mode MODE>
 uint32_t sun4c_mmu_device::insn_data_r(const uint32_t offset, const uint32_t mem_mask)
 {
-	// supervisor program fetches in boot state are special
-	if (m_fetch_bootrom && MODE == SUPER_INSN)
-	{
-		return m_rom_ptr[offset & 0x1ffff];
-	}
+    // supervisor program fetches in boot state are special
+    if (MODE == SUPER_INSN && m_fetch_bootrom)
+    {
+        return m_rom_ptr[offset & 0x1ffff];
+    }
 
 	// it's translation time
 	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];

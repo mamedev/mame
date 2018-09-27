@@ -541,7 +541,7 @@ void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 	if (operation != EXPANDER_OP_READ)
 		port_w(2, m_p2 = (m_p2 & 0xf0) | (m_a & 0x0f));
 	else
-		m_a = port_r(2) | 0x0f;
+		m_a = port_r(2) & 0x0f;
 
 	/* generate low-to-high transition on PROG line */
 	prog_w(1);
@@ -1372,17 +1372,6 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
-}
-
-
-READ8_MEMBER(mcs48_cpu_device::p1_r)
-{
-	return m_p1;
-}
-
-READ8_MEMBER(mcs48_cpu_device::p2_r)
-{
-	return m_p2;
 }
 
 

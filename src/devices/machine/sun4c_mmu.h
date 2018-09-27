@@ -32,6 +32,9 @@ public:
 	template <typename T> void set_rom(T &&rom_tag) { m_rom.set_tag(std::forward<T>(rom_tag)); }
 	template <typename T> void set_scc(T &&scc_tag) { m_scc.set_tag(std::forward<T>(scc_tag)); }
 
+	auto type1_r() { return m_type1_r.bind(); }
+	auto type1_w() { return m_type1_w.bind(); }
+
 	enum insn_data_mode
 	{
 		USER_INSN,
@@ -43,13 +46,11 @@ public:
 	template <insn_data_mode MODE> uint32_t insn_data_r(const uint32_t offset, const uint32_t mem_mask);
 	template <insn_data_mode MODE> void insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 
-	auto type1_r() { return m_type1_r.bind(); }
-	auto type1_w() { return m_type1_w.bind(); }
-
 	// sparc_mmu_device overrides
+	uint32_t fetch_insn(const bool supervisor, const uint32_t offset) override;
 	uint32_t read_asi(uint8_t asi, uint32_t offset, uint32_t mem_mask) override;
 	void write_asi(uint8_t asi, uint32_t offset, uint32_t data, uint32_t mem_mask) override;
-	void set_host(sparc_mmu_host_interface *host) override { logerror("Setting host\n"); m_host = host; }
+	void set_host(sparc_mmu_host_interface *host) override { m_host = host; }
 
 protected:
 	static const device_timer_id TIMER_RESET = 0;
