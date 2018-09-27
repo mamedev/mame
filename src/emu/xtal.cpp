@@ -319,6 +319,7 @@ const double XTAL::known_xtals[] = {
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
+	 37'980'000, /* 37.98_MHz_XTAL         Falco 5220 */
 	 38'769'220, /* 38.76922_MHz_XTAL      Namco System 21 video board */
 	 38'863'630, /* 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video */
 	 39'321'600, /* 39.3216_MHz_XTAL       Sun 2/120 */
