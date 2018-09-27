@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER(cave_state::sound_irq_gen)
 
 /* Reads the cause of the interrupt and clears the state */
 
-READ16_MEMBER(cave_state::irq_cause_r)
+u16 cave_state::irq_cause_r(offs_t offset)
 {
 	int result = 0x0003;
 
@@ -217,12 +217,12 @@ READ16_MEMBER(cave_state::irq_cause_r)
 /*  We need a FIFO buffer for sailormn, where the inter-CPUs
     communication is *really* tight */
 
-READ8_MEMBER(cave_state::soundflags_r)
+u8 cave_state::soundflags_r()
 {
 	// bit 2 is low: can read command (lo)
 	// bit 3 is low: can read command (hi)
-//  return  (m_sound_flag1 ? 0 : 4) |
-//          (m_sound_flag2 ? 0 : 8) ;
+//  return  (m_sound_flag[0] ? 0 : 4) |
+//          (m_sound_flag[1] ? 0 : 8) ;
 return 0;
 }
 
@@ -230,8 +230,8 @@ READ16_MEMBER(cave_state::soundflags_ack_r)
 {
 	// bit 0 is low: can write command
 	// bit 1 is low: can read answer
-//  return  ((m_sound_flag1 | m_sound_flag2) ? 1 : 0) |
-//          ((m_soundbuf_wptr != m_soundbuf_rptr) ? 0 : 2) ;
+//  return  ((m_sound_flag[0] | m_sound_flag[1]) ? 1 : 0) |
+//          (m_soundbuf_empty ? 0 : 2) ;
 
 	return m_soundbuf_empty ? 2 : 0;
 }
@@ -239,8 +239,8 @@ READ16_MEMBER(cave_state::soundflags_ack_r)
 /* Main CPU: write a 16 bit sound latch and generate a NMI on the sound CPU */
 WRITE16_MEMBER(cave_state::sound_cmd_w)
 {
-//  m_sound_flag1 = 1;
-//  m_sound_flag2 = 1;
+//  m_sound_flag[0] = 1;
+//  m_sound_flag[1] = 1;
 	m_soundlatch->write(space, offset, data, mem_mask);
 	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
@@ -248,14 +248,14 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
 READ8_MEMBER(cave_state::soundlatch_lo_r)
 {
-//  m_sound_flag1 = 0;
+//  m_sound_flag[0] = 0;
 	return m_soundlatch->read(space, offset, 0x00ff) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 READ8_MEMBER(cave_state::soundlatch_hi_r)
 {
-//  m_sound_flag2 = 0;
+//  m_sound_flag[1] = 0;
 	return m_soundlatch->read(space, offset, 0xff00) >> 8;
 }
 
@@ -300,51 +300,45 @@ WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::eeprom_msb_w)
+void cave_state::eeprom_w(u8 data)
 {
-	if (data & ~0xfe00)
+	if (data & ~0xfe)
 		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
 
-	if (ACCESSING_BITS_8_15)  // even address
-	{
-		machine().bookkeeping().coin_lockout_w(1,~data & 0x8000);
-		machine().bookkeeping().coin_lockout_w(0,~data & 0x4000);
-		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
-		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 7));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 6));
+	machine().bookkeeping().coin_counter_w(1, BIT( data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT( data, 4));
 
-		// latch the bit
-		m_eeprom->di_write((data & 0x0800) >> 11);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 3));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(cave_state::sailormn_eeprom_msb_w)
+void cave_state::sailormn_eeprom_w(u8 data)
 {
-	sailormn_tilebank_w(data & 0x0100);
-	eeprom_msb_w(space, offset, data & ~0x0100, mem_mask);
+	sailormn_tilebank_w(BIT(data, 0));
+	eeprom_w(data & ~0x01);
 }
 
-WRITE16_MEMBER(cave_state::hotdogst_eeprom_msb_w)
+void cave_state::hotdogst_eeprom_w(u8 data)
 {
-	if (ACCESSING_BITS_8_15)  // even address
-	{
-		// latch the bit
-		m_eeprom->di_write((data & 0x0800) >> 11);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 3));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(cave_state::ppsatan_eeprom_msb_w)
+void cave_state::ppsatan_eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data & ~0x000f)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -365,62 +359,50 @@ WRITE16_MEMBER(cave_state::ppsatan_eeprom_msb_w)
 }
 
 
-WRITE16_MEMBER(cave_state::eeprom_lsb_w)
+void cave_state::guwange_eeprom_w(u8 data)
 {
-	if (data & ~0x00ef)
+	if (data & ~0xef)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
-	if (ACCESSING_BITS_0_7)  // odd address
-	{
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0008);
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0004);
-		machine().bookkeeping().coin_counter_w(1,  data & 0x0002);
-		machine().bookkeeping().coin_counter_w(0,  data & 0x0001);
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
 
-		// latch the bit
-		m_eeprom->di_write((data & 0x80) >> 7);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 7));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*  - No eeprom or lockouts */
-WRITE16_MEMBER(cave_state::gaia_coin_lsb_w)
+void cave_state::gaia_coin_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)  // odd address
-	{
-		machine().bookkeeping().coin_counter_w(1, data & 0x0002);
-		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-	}
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
 /*  - No coin lockouts
-    - Writing 0xcf00 shouldn't send a 1 bit to the eeprom   */
-WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
+    - Writing 0xcf shouldn't send a 1 bit to the eeprom   */
+void cave_state::metmqstr_eeprom_w(u8 data)
 {
-	if (data & ~0xff00)
-		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 
-	if (ACCESSING_BITS_8_15)  // even address
+	if (BIT(~data, 0))
 	{
-		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
-		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
+		// latch the bit
+		m_eeprom->di_write(BIT(data, 3));
 
-		if (~data & 0x0100)
-		{
-			// latch the bit
-			m_eeprom->di_write((data & 0x0800) >> 11);
+		// reset line asserted: reset.
+		m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
-			// reset line asserted: reset.
-			m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-
-			// clock line asserted: write latch or select next bit to read
-			m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-		}
+		// clock line asserted: write latch or select next bit to read
+		m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -436,6 +418,7 @@ template<int Chip>
 WRITE16_MEMBER(cave_state::vram_w)
 {
 	uint16_t *VRAM = m_vram[Chip];
+	int TDIM = m_tiledim[Chip];
 	tilemap_t *TILEMAP = m_tilemap[Chip];
 
 	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
@@ -443,7 +426,7 @@ WRITE16_MEMBER(cave_state::vram_w)
 
 	COMBINE_DATA(&VRAM[offset]);
 	offset /= 2;
-	if (offset < 0x1000 / 4)    // 16x16 tilemap
+	if ((offset < 0x1000 / 4) && (TDIM))    // 16x16 tilemap
 	{
 		offset = (offset % (512 / 16)) * 2 + (offset / (512 / 16)) * (512 / 8) * 2;
 		TILEMAP->mark_tile_dirty(offset + 0);
@@ -451,7 +434,7 @@ WRITE16_MEMBER(cave_state::vram_w)
 		TILEMAP->mark_tile_dirty(offset + 0 + 512 / 8);
 		TILEMAP->mark_tile_dirty(offset + 1 + 512 / 8);
 	}
-	else if (offset >= 0x4000 / 4)      // 8x8 tilemap
+	else if ((offset >= 0x4000 / 4) && (!TDIM))      // 8x8 tilemap
 		TILEMAP->mark_tile_dirty(offset - 0x4000 / 4);
 }
 
@@ -508,7 +491,7 @@ void cave_state::dfeveron_map(address_map &map)
 	map(0xa00000, 0xa00005).ram().share("vctrl.1");                                                             // Layer 1 Control
 	map(0xb00000, 0xb00001).portr("IN0");                                                                       // Inputs
 	map(0xb00002, 0xb00003).portr("IN1");                                                                       // Inputs + EEPROM
-	map(0xc00000, 0xc00001).w(FUNC(cave_state::eeprom_msb_w));                                                  // EEPROM
+	map(0xc00000, 0xc00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -533,7 +516,7 @@ void cave_state::ddonpach_map(address_map &map)
 	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
 	map(0xd00000, 0xd00001).portr("IN0");                                                                       // Inputs
 	map(0xd00002, 0xd00003).portr("IN1");                                                                       // Inputs + EEPROM
-	map(0xe00000, 0xe00001).w(FUNC(cave_state::eeprom_msb_w));                                                  // EEPROM
+	map(0xe00000, 0xe00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -548,7 +531,7 @@ READ16_MEMBER(cave_state::donpachi_videoregs_r)
 		case 0:
 		case 1:
 		case 2:
-		case 3: return irq_cause_r(space, offset, 0xffff);
+		case 3: return irq_cause_r(offset);
 
 		default:    return 0x0000;
 	}
@@ -572,7 +555,7 @@ void cave_state::donpachi_map(address_map &map)
 	map(0xb00020, 0xb0002f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);                           //
 	map(0xc00000, 0xc00001).portr("IN0");                                                                          // Inputs
 	map(0xc00002, 0xc00003).portr("IN1");                                                                          // Inputs + EEPROM
-	map(0xd00000, 0xd00001).w(FUNC(cave_state::eeprom_msb_w));                                                     // EEPROM
+	map(0xd00000, 0xd00000).w(FUNC(cave_state::eeprom_w));                                                         // EEPROM
 }
 
 
@@ -597,7 +580,7 @@ void cave_state::esprade_map(address_map &map)
 	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
 	map(0xd00000, 0xd00001).portr("IN0");                                                                       // Inputs
 	map(0xd00002, 0xd00003).portr("IN1");                                                                       // Inputs + EEPROM
-	map(0xe00000, 0xe00001).w(FUNC(cave_state::eeprom_msb_w));                                                  // EEPROM
+	map(0xe00000, 0xe00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -624,7 +607,7 @@ void cave_state::gaia_map(address_map &map)
 	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                                             // Layer 2 Control
 	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
 	map(0xd00010, 0xd00011).portr("IN0");                                                                       // Inputs
-	map(0xd00010, 0xd00011).w(FUNC(cave_state::gaia_coin_lsb_w));                                               // Coin counter only
+	map(0xd00011, 0xd00011).w(FUNC(cave_state::gaia_coin_w));                                                   // Coin counter only
 	map(0xd00012, 0xd00013).portr("IN1");                                                                       // Inputs
 	map(0xd00014, 0xd00015).portr("DSW");                                                                       // Dips
 	map(0xd00014, 0xd00015).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                              // Watchdog?
@@ -651,10 +634,10 @@ void cave_state::guwange_map(address_map &map)
 	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                                             // Layer 2 Control
 /**/map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
 	map(0xd00010, 0xd00011).portr("IN0");                                                                       // Inputs
-	map(0xd00010, 0xd00011).w(FUNC(cave_state::eeprom_lsb_w));                                                  // EEPROM
+	map(0xd00011, 0xd00011).w(FUNC(cave_state::guwange_eeprom_w));                                              // EEPROM
 	map(0xd00012, 0xd00013).portr("IN1");                                                                       // Inputs + EEPROM
-//  AM_RANGE(0xd00012, 0xd00013) AM_WRITENOP                                                                    // ?
-//  AM_RANGE(0xd00014, 0xd00015) AM_WRITENOP                                                                    // ? $800068 in dfeveron ? probably Watchdog
+//  map(0xd00012, 0xd00013).nopw();                                                                             // ?
+//  map(0xd00014, 0xd00015).nopw();                                                                             // ? $800068 in dfeveron ? probably Watchdog
 }
 
 
@@ -672,14 +655,14 @@ void cave_state::hotdogst_map(address_map &map)
 	map(0x980000, 0x987fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                  // Layer 2
 	map(0xa80000, 0xa8007f).writeonly().share("videoregs.0");                                      // Video Regs
 	map(0xa80000, 0xa80007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
-//  AM_RANGE(0xa8006e, 0xa8006f) AM_READ(soundlatch_ack_r)                                         // From Sound CPU
+//  map(0xa8006e, 0xa8006f).r(FUNC(cave_state::soundlatch_ack_r));                                 // From Sound CPU
 	map(0xa8006e, 0xa8006f).w(FUNC(cave_state::sound_cmd_w));                                      // To Sound CPU
 	map(0xb00000, 0xb00005).ram().share("vctrl.0");                                                // Layer 0 Control
 	map(0xb80000, 0xb80005).ram().share("vctrl.1");                                                // Layer 1 Control
 	map(0xc00000, 0xc00005).ram().share("vctrl.2");                                                // Layer 2 Control
 	map(0xc80000, 0xc80001).portr("IN0");                                                          // Inputs
 	map(0xc80002, 0xc80003).portr("IN1");                                                          // Inputs + EEPROM
-	map(0xd00000, 0xd00001).w(FUNC(cave_state::hotdogst_eeprom_msb_w));                            // EEPROM
+	map(0xd00000, 0xd00000).w(FUNC(cave_state::hotdogst_eeprom_w));                                // EEPROM
 	map(0xd00002, 0xd00003).nopw();                                                                // ???
 	map(0xf00000, 0xf0ffff).ram().share("spriteram.0");                                            // Sprites
 }
@@ -720,7 +703,7 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 }
 
 
-WRITE16_MEMBER(cave_state::korokoro_eeprom_msb_w)
+void cave_state::korokoro_eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data & ~0x7000)
 	{
@@ -759,12 +742,12 @@ void cave_state::korokoro_map(address_map &map)
 	map(0x1c0000, 0x1c007f).writeonly().share("videoregs.0");                                      // Video Regs
 	map(0x1c0000, 0x1c0007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
 	map(0x200000, 0x207fff).writeonly().share("paletteram.0");                                     // Palette
-//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8("ymz", ymz280b_device, read, 0x00ff)                  // YMZ280
+//  map(0x240000, 0x240003).r("ymz", FUNC(ymz280b_device::read)).umask16(0x00ff);                  // YMZ280
 	map(0x240000, 0x240003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);                 // YMZ280
 	map(0x280000, 0x280001).portr("IN0");                                                          // Inputs + ???
 	map(0x280002, 0x280003).portr("IN1");                                                          // Inputs + EEPROM
 	map(0x280008, 0x280009).w(FUNC(cave_state::korokoro_leds_w));                                  // Leds
-	map(0x28000a, 0x28000b).w(FUNC(cave_state::korokoro_eeprom_msb_w));                            // EEPROM
+	map(0x28000a, 0x28000b).w(FUNC(cave_state::korokoro_eeprom_w));                                // EEPROM
 	map(0x28000c, 0x28000d).nopw();                                                                // 0 (watchdog?)
 	map(0x300000, 0x30ffff).ram();                                                                 // RAM
 }
@@ -780,7 +763,7 @@ void cave_state::crusherm_map(address_map &map)
 	map(0x280000, 0x280001).portr("IN0");                                                          // Inputs + ???
 	map(0x280002, 0x280003).portr("IN1");                                                          // Inputs + EEPROM
 	map(0x280008, 0x280009).w(FUNC(cave_state::korokoro_leds_w));                                  // Leds
-	map(0x28000a, 0x28000b).w(FUNC(cave_state::korokoro_eeprom_msb_w));                            // EEPROM
+	map(0x28000a, 0x28000b).w(FUNC(cave_state::korokoro_eeprom_w));                                // EEPROM
 	map(0x28000c, 0x28000d).nopw();                                                                // 0 (watchdog?)
 	map(0x300000, 0x30007f).writeonly().share("videoregs.0");                                      // Video Regs
 	map(0x300000, 0x300007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
@@ -806,7 +789,7 @@ void cave_state::mazinger_map(address_map &map)
 	map(0x700000, 0x700005).ram().share("vctrl.0");                                                // Layer 0 Control
 	map(0x800000, 0x800001).portr("IN0");                                                          // Inputs
 	map(0x800002, 0x800003).portr("IN1");                                                          // Inputs + EEPROM
-	map(0x900000, 0x900001).w(FUNC(cave_state::eeprom_msb_w));                                     // EEPROM
+	map(0x900000, 0x900000).w(FUNC(cave_state::eeprom_w));                                         // EEPROM
 	map(0xc08000, 0xc0ffff).ram().share("paletteram.0");                                           // Palette
 	map(0xd00000, 0xd7ffff).rom().region("user1", 0);                                              // extra data ROM
 }
@@ -839,7 +822,7 @@ void cave_state::metmqstr_map(address_map &map)
 	map(0xc00000, 0xc00005).ram().share("vctrl.0");                                                // Layer 0 Control
 	map(0xc80000, 0xc80001).portr("IN0");                                                          // Inputs
 	map(0xc80002, 0xc80003).portr("IN1");                                                          // Inputs + EEPROM
-	map(0xd00000, 0xd00001).w(FUNC(cave_state::metmqstr_eeprom_msb_w));                            // EEPROM
+	map(0xd00000, 0xd00000).w(FUNC(cave_state::metmqstr_eeprom_w));                                // EEPROM
 	map(0xf00000, 0xf0ffff).ram().share("spriteram.0");                                            // Sprites
 }
 
@@ -933,13 +916,13 @@ void cave_state::ppsatan_map(address_map &map)
 	// Left Screen (Player 2)
 	map(0x080000, 0x080005).ram().share("vctrl.1");                                                           // Layer Control
 	map(0x100000, 0x107fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                             // Layer
-//  AM_RANGE(0x180000, 0x1803ff) AM_RAM                                                                       // Palette (Tilemaps)
-//  AM_RANGE(0x187800, 0x188fff) AM_RAM AM_SHARE("paletteram.1")                                              // Palette (Sprites)
+//  map(0x180000, 0x1803ff).ram()                                                                             // Palette (Tilemaps)
+//  map(0x187800, 0x188fff).ram().share("paletteram.1");                                                      // Palette (Sprites)
 	map(0x180000, 0x188fff).ram().share("paletteram.1");                                                      // Palette
 	map(0x1c0000, 0x1c7fff).ram().share("spriteram.1");                                                       // Sprites
 	map(0x200000, 0x200001).portr("SYSTEM");                                                                  // DSW + (unused) EEPROM
 	map(0x200000, 0x200001).w(FUNC(cave_state::ppsatan_out_w));                                               // Outputs + OKI banking
-	map(0x200002, 0x200003).rw(FUNC(cave_state::ppsatan_touch2_r), FUNC(cave_state::ppsatan_eeprom_msb_w));   // Touch Screen + (unused) EEPROM
+	map(0x200002, 0x200003).rw(FUNC(cave_state::ppsatan_touch2_r), FUNC(cave_state::ppsatan_eeprom_w));       // Touch Screen + (unused) EEPROM
 	map(0x200004, 0x200005).rw(FUNC(cave_state::ppsatan_touch1_r), FUNC(cave_state::ppsatan_io_mux_w));       // Touch Screen
 	map(0x200006, 0x200007).nopw();                                                                           // Lev. 2 IRQ Ack?
 	map(0x2c0000, 0x2c007f).writeonly().share("videoregs.1");                                                 // Video Regs
@@ -951,8 +934,8 @@ void cave_state::ppsatan_map(address_map &map)
 	// Right Screen (Player 1)
 	map(0x480000, 0x480005).ram().share("vctrl.2");                                                           // Layer Control
 	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                             // Layer
-//  AM_RANGE(0x580000, 0x5803ff) AM_RAM                                                                       // Palette (Tilemaps)
-//  AM_RANGE(0x587800, 0x588fff) AM_RAM //AM_SHARE("paletteram.2")                                            // Palette (Sprites)
+//  map(0x580000, 0x5803ff).ram()                                                                             // Palette (Tilemaps)
+//  map(0x587800, 0x588fff).ram().share("paletteram.2");                                                      // Palette (Sprites)
 	map(0x580000, 0x588fff).ram().share("paletteram.2");                                                      // Palette
 	map(0x5c0000, 0x5c7fff).ram().share("spriteram.2");                                                       // Sprites
 	map(0x6c0000, 0x6c007f).writeonly().share("videoregs.2");                                                 // Video Regs
@@ -960,8 +943,8 @@ void cave_state::ppsatan_map(address_map &map)
 	// Top Screen
 	map(0x880000, 0x880005).ram().share("vctrl.0");                                                           // Layer Control
 	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                             // Layer
-//  AM_RANGE(0x980000, 0x9803ff) AM_RAM                                                                       // Palette (Tilemaps)
-//  AM_RANGE(0x987800, 0x988fff) AM_RAM AM_SHARE("paletteram.0")                                              // Palette (Sprites)
+//  map(0x980000, 0x9803ff).ram();                                                                            // Palette (Tilemaps)
+//  map(0x987800, 0x988fff).ram().share("paletteram.0");                                                      // Palette (Sprites)
 	map(0x980000, 0x988fff).ram().share("paletteram.0");                                                      // Palette
 	map(0x9c0000, 0x9c7fff).ram().share("spriteram.0");                                                       // Sprites
 	map(0xac0000, 0xac007f).writeonly().share("videoregs.0");                                                 // Video Regs
@@ -1002,7 +985,7 @@ void cave_state::pwrinst2_map(address_map &map)
 	map(0x500000, 0x500001).portr("IN0");                                                          // Inputs
 	map(0x500002, 0x500003).portr("IN1");                                                          //
 	map(0x600000, 0x6fffff).rom().region("user1", 0);                                              // extra data ROM space
-	map(0x700000, 0x700001).w(FUNC(cave_state::eeprom_msb_w));                                     // EEPROM
+	map(0x700000, 0x700000).w(FUNC(cave_state::eeprom_w));                                         // EEPROM
 	map(0x800000, 0x807fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                  // Layer 2
 	map(0x880000, 0x887fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
 	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                  // Layer 1
@@ -1045,7 +1028,7 @@ void cave_state::sailormn_map(address_map &map)
 	map(0x510000, 0x510001).ram();                                                        // (agallet)
 	map(0x600000, 0x600001).r(FUNC(cave_state::sailormn_input0_r));                       // Inputs + Watchdog!
 	map(0x600002, 0x600003).portr("IN1");                                                 // Inputs + EEPROM
-	map(0x700000, 0x700001).w(FUNC(cave_state::sailormn_eeprom_msb_w));                   // EEPROM
+	map(0x700000, 0x700000).w(FUNC(cave_state::sailormn_eeprom_w));                       // EEPROM
 	map(0x800000, 0x807fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
 	map(0x880000, 0x887fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
 	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
@@ -1079,8 +1062,8 @@ void cave_state::tekkencw_map(address_map &map)
 	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
 	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
-	map(0xe00000, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1102,8 +1085,8 @@ void cave_state::tekkenbs_map(address_map &map)
 	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
 	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
-	map(0xe00000, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1111,37 +1094,31 @@ void cave_state::tekkenbs_map(address_map &map)
                             Tobikose! Jumpman
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::tjumpman_eeprom_lsb_w)
+void cave_state::tjumpman_eeprom_w(u8 data)
 {
-	if (data & ~0x0038)
+	if (data & ~0x38)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
-	if (ACCESSING_BITS_0_7)  // odd address
-	{
-		// latch the bit
-		m_eeprom->di_write((data & 0x0020) >> 5);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 5));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x0008) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x0010) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(cave_state::tjumpman_leds_w)
+void cave_state::tjumpman_leds_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_led_outputs[0] = BIT(data, 0); // suru
-		m_led_outputs[1] = BIT(data, 1); // shinai
-		m_led_outputs[2] = BIT(data, 2); // payout
-		m_led_outputs[3] = BIT(data, 3); // go
-		m_led_outputs[4] = BIT(data, 4); // 1 bet
-		m_led_outputs[5] = BIT(data, 5); // medal
-		m_hopper = BIT(data, 6);  // hopper
-		m_led_outputs[6] = BIT(data, 7); // 3 bet
-	}
+	m_led_outputs[0] = BIT(data, 0); // suru
+	m_led_outputs[1] = BIT(data, 1); // shinai
+	m_led_outputs[2] = BIT(data, 2); // payout
+	m_led_outputs[3] = BIT(data, 3); // go
+	m_led_outputs[4] = BIT(data, 4); // 1 bet
+	m_led_outputs[5] = BIT(data, 5); // medal
+	m_hopper = BIT(data, 6);  // hopper
+	m_led_outputs[6] = BIT(data, 7); // 3 bet
 
 //  popmessage("led %04X", data);
 }
@@ -1166,8 +1143,8 @@ void cave_state::tjumpman_map(address_map &map)
 	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
 	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
-	map(0xe00000, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1175,18 +1152,15 @@ void cave_state::tjumpman_map(address_map &map)
                                    Pac-Slot
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::pacslot_leds_w)
+void cave_state::pacslot_leds_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_led_outputs[0] = data & 0x0001; // pac-man
-		m_led_outputs[1] = data & 0x0002; // ms. pac-man
-		m_led_outputs[2] = data & 0x0004; // payout
-		m_led_outputs[3] = data & 0x0008; // start
-		m_led_outputs[4] = data & 0x0010; // bet
-		m_led_outputs[5] = data & 0x0020; // medal
-		m_hopper = data & 0x0040;  // hopper
-	}
+	m_led_outputs[0] = data & 0x0001; // pac-man
+	m_led_outputs[1] = data & 0x0002; // ms. pac-man
+	m_led_outputs[2] = data & 0x0004; // payout
+	m_led_outputs[3] = data & 0x0008; // start
+	m_led_outputs[4] = data & 0x0010; // bet
+	m_led_outputs[5] = data & 0x0020; // medal
+	m_hopper = data & 0x0040;  // hopper
 
 //  popmessage("led %04X", data);
 }
@@ -1205,8 +1179,8 @@ void cave_state::pacslot_map(address_map &map)
 	map(0x700000, 0x700001).portr("IN0");                                                          // Inputs + EEPROM + Hopper
 	map(0x700002, 0x700003).portr("IN1");                                                          // Inputs
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                   // Leds + Hopper
-	map(0xe00000, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                   // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1231,7 +1205,7 @@ void cave_state::paceight_map(address_map &map)
 	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
 	map(0xc00000, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                   // Leds + Hopper
-	map(0xe00000, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 /***************************************************************************
@@ -1251,7 +1225,7 @@ void cave_state::uopoko_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("paletteram.0");                                                        // Palette
 	map(0x900000, 0x900001).portr("IN0");                                                                       // Inputs
 	map(0x900002, 0x900003).portr("IN1");                                                                       // Inputs + EEPROM
-	map(0xa00000, 0xa00001).w(FUNC(cave_state::eeprom_msb_w));                                                  // EEPROM
+	map(0xa00000, 0xa00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -1265,7 +1239,7 @@ void cave_state::uopoko_map(address_map &map)
 ***************************************************************************/
 
 template<int Mask>
-WRITE8_MEMBER(cave_state::z80_rombank_w)
+void cave_state::z80_rombank_w(u8 data)
 {
 	if (data & ~Mask)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
@@ -1274,7 +1248,7 @@ WRITE8_MEMBER(cave_state::z80_rombank_w)
 }
 
 template<int Mask>
-WRITE8_MEMBER(cave_state::oki1_bank_w)
+void cave_state::oki1_bank_w(u8 data)
 {
 	int bank1 = (data >> 0) & Mask;
 	int bank2 = (data >> 4) & Mask;
@@ -1283,7 +1257,7 @@ WRITE8_MEMBER(cave_state::oki1_bank_w)
 }
 
 template<int Mask>
-WRITE8_MEMBER(cave_state::oki2_bank_w)
+void cave_state::oki2_bank_w(u8 data)
 {
 	int bank1 = (data >> 0) & Mask;
 	int bank2 = (data >> 4) & Mask;
@@ -1398,7 +1372,7 @@ void cave_state::pwrinst2_sound_portmap(address_map &map)
 	map(0x10, 0x17).w("nmk112", FUNC(nmk112_device::okibank_w));                            // Samples bank
 	map(0x40, 0x41).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));     //
 	map(0x50, 0x50).w(FUNC(cave_state::soundlatch_ack_w));                                  // To Main CPU
-//  AM_RANGE(0x51, 0x51) AM_WRITENOP                                                        // ?? volume
+//  map(0x51, 0x51).nopw();                                                                 // ?? volume
 	map(0x60, 0x60).r(FUNC(cave_state::soundlatch_hi_r));                                   // From Main CPU
 	map(0x70, 0x70).r(FUNC(cave_state::soundlatch_lo_r));                                   //
 	map(0x80, 0x80).w(FUNC(cave_state::z80_rombank_w<0x07>));                               // ROM bank
@@ -1462,10 +1436,7 @@ static INPUT_PORTS_START( cave )
 	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )  // sw? exit service mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )  // sw? enter & exit service mode
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")   // Player 2
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -1478,12 +1449,8 @@ static INPUT_PORTS_START( cave )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /* Gaia Crusaders, no EEPROM. Has DIPS */
@@ -1508,11 +1475,7 @@ static INPUT_PORTS_START( gaia )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0fc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:1")
@@ -1629,18 +1592,8 @@ static INPUT_PORTS_START( guwange )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1651,35 +1604,15 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(10)   // bit 0x0080 of leds
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 )  // round  button (choose)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )  // square button (select in service mode / medal out in game)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0fe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service medal out?
 	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,korokoro_hopper_r, nullptr) // motor / hopper status ???
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xefff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1695,16 +1628,13 @@ static INPUT_PORTS_START( tekkencw )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Action" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10)                                   // medal (impulse needed to coin up reliably)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1720,24 +1650,20 @@ static INPUT_PORTS_START( tekkenbs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Start" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tjumpman )
 	PORT_START("IN0")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x06, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
@@ -1745,9 +1671,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -1770,16 +1694,13 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state, tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( "Ms. Pac-Man" ) PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( paceight )
@@ -1796,12 +1717,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ppsatan )
 	PORT_START("SYSTEM")   // $200000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 ) // advance in service mode
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0072, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:1,2")
@@ -1861,9 +1779,9 @@ static const gfx_layout layout_8x8x6 =
 	8,8,
 	RGN_FRAC(1,1),
 	6,
-	{8,9, 0,1,2,3},
+	{STEP2(8,1),STEP4(0,1)},
 	{0*4,1*4,4*4,5*4,8*4,9*4,12*4,13*4},
-	{0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64},
+	{STEP8(0,8*8)},
 	8*8*8
 };
 
@@ -1886,9 +1804,9 @@ static const gfx_layout layout_8x8x8 =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{8,9,10,11, 0,1,2,3},
+	{STEP4(8,1),STEP4(0,1)},
 	{0*4,1*4,4*4,5*4,8*4,9*4,12*4,13*4},
-	{0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64},
+	{STEP8(0,8*8)},
 	8*8*8
 };
 

@@ -101,35 +101,35 @@ private:
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
-	DECLARE_READ16_MEMBER(irq_cause_r);
-	DECLARE_READ8_MEMBER(soundflags_r);
+	u16 irq_cause_r(offs_t offset);
+	u8 soundflags_r();
 	DECLARE_READ16_MEMBER(soundflags_ack_r);
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_READ8_MEMBER(soundlatch_lo_r);
 	DECLARE_READ8_MEMBER(soundlatch_hi_r);
 	DECLARE_READ16_MEMBER(soundlatch_ack_r);
 	DECLARE_WRITE8_MEMBER(soundlatch_ack_w);
-	DECLARE_WRITE16_MEMBER(gaia_coin_lsb_w);
+	void gaia_coin_w(u8 data);
 	DECLARE_READ16_MEMBER(donpachi_videoregs_r);
 	DECLARE_WRITE16_MEMBER(korokoro_leds_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(pwrinst2_vctrl_w);
 	DECLARE_READ16_MEMBER(sailormn_input0_r);
-	DECLARE_WRITE16_MEMBER(tjumpman_leds_w);
-	DECLARE_WRITE16_MEMBER(pacslot_leds_w);
-	template<int Mask> DECLARE_WRITE8_MEMBER(z80_rombank_w);
-	template<int Mask> DECLARE_WRITE8_MEMBER(oki1_bank_w);
-	template<int Mask> DECLARE_WRITE8_MEMBER(oki2_bank_w);
+	void tjumpman_leds_w(u8 data);
+	void pacslot_leds_w(u8 data);
+	template<int Mask> void z80_rombank_w(u8 data);
+	template<int Mask> void oki1_bank_w(u8 data);
+	template<int Mask> void oki2_bank_w(u8 data);
 	template<int Chip> DECLARE_WRITE16_MEMBER(vram_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(vram_8x8_w);
-	DECLARE_WRITE16_MEMBER(eeprom_msb_w);
-	DECLARE_WRITE16_MEMBER(sailormn_eeprom_msb_w);
-	DECLARE_WRITE16_MEMBER(hotdogst_eeprom_msb_w);
-	DECLARE_WRITE16_MEMBER(eeprom_lsb_w);
-	DECLARE_WRITE16_MEMBER(metmqstr_eeprom_msb_w);
-	DECLARE_WRITE16_MEMBER(korokoro_eeprom_msb_w);
+	void eeprom_w(u8 data);
+	void sailormn_eeprom_w(u8 data);
+	void hotdogst_eeprom_w(u8 data);
+	void guwange_eeprom_w(u8 data);
+	void metmqstr_eeprom_w(u8 data);
+	void korokoro_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	DECLARE_READ16_MEMBER(pwrinst2_eeprom_r);
-	DECLARE_WRITE16_MEMBER(tjumpman_eeprom_lsb_w);
-	DECLARE_WRITE16_MEMBER(ppsatan_eeprom_msb_w);
+	void tjumpman_eeprom_w(u8 data);
+	void ppsatan_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	DECLARE_WRITE16_MEMBER(ppsatan_io_mux_w);
 	DECLARE_READ16_MEMBER(ppsatan_touch1_r);
 	DECLARE_READ16_MEMBER(ppsatan_touch2_r);
@@ -264,8 +264,7 @@ private:
 	int          m_soundbuf_rptr;
 	uint8_t      m_soundbuf_data[32];
 	bool         m_soundbuf_empty;
-	//uint8_t    m_sound_flag1;
-	//uint8_t    m_sound_flag2;
+	//uint8_t    m_sound_flag[2];
 
 	/* game specific */
 	// sailormn
