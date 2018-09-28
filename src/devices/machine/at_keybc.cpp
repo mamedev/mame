@@ -199,7 +199,7 @@ inline void at_kbc_device_base::set_kbd_clk_out(u8 state)
 inline void at_kbc_device_base::set_kbd_data_out(u8 state)
 {
 	if (state != m_kbd_data_out)
-		m_kbd_clk_cb(m_kbd_data_out = state);
+		m_kbd_data_cb(m_kbd_data_out = state);
 }
 
 inline u8 at_kbc_device_base::kbd_clk_r() const
@@ -360,7 +360,7 @@ inline void ps2_keyboard_controller_device::set_mouse_clk_out(u8 state)
 inline void ps2_keyboard_controller_device::set_mouse_data_out(u8 state)
 {
 	if (state != m_mouse_data_out)
-		m_mouse_clk_cb(m_mouse_data_out = state);
+		m_mouse_data_cb(m_mouse_data_out = state);
 }
 
 inline u8 ps2_keyboard_controller_device::mouse_clk_r() const
