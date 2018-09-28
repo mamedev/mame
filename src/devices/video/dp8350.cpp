@@ -7,13 +7,17 @@
     These dedicated CRTC devices are “programmable” by specifying a
     long list of mask parameters. The number of parameters adjustable
     through software is relatively small, there being no dedicated
-    microprocessor data bus.
+    microprocessor data bus. In practice, however, the CPU's D0 and
+    D1 are usually tied to the Register Select lines, due to shared
+    use of the address bus for DMA purposes.
 
     National released the DP8350 and a few other standard versions.
     DP8367 appears to have originally been a custom mask variant
     ordered by Hewlett-Packard, though it is listed as option “I” in
     later datasheets; its parameters have been derived from the
-    information presented in Manual Part No. 13220-91087.
+    information presented in Manual Part No. 13220-91087. (The 8367
+    designation also comes from there, since the actual IC is merely
+    marked with its HP part number, 1820-2373.)
 
         Variant     Dot rate      Monitor type
         -------     --------      ------------
@@ -292,21 +296,21 @@ void dp835x_device::register_load(u8 rs, u16 addr)
 	{
 	case 0:
 	default:
-		// No Select
+		// A = 0, B = 0: No Select
 		break;
 
 	case 1:
-		// Top-of-Page
+		// A = 0, B = 1: Top-of-Page
 		logerror("Top-of-Page Register = %03X\n", addr);
 		break;
 
 	case 2:
-		// Row Start
+		// A = 1, B = 0: Row Start (also Top-of-Page during vertical blanking)
 		logerror("Row Start Register = %03X\n", addr);
 		break;
 
 	case 3:
-		// Cursor
+		// A = 1, B = 1: Cursor
 		logerror("Cursor Register = %03X\n", addr);
 		break;
 	}
