@@ -1932,8 +1932,9 @@ void namcos22_state::namcos22s_am(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x400000, 0x40001f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
-	map(0x410000, 0x413fff).ram(); /* C139 SCI buffer */
-	map(0x420000, 0x42000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly(); /* C139 SCI registers */
+	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
+	map(0x420000, 0x42000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly(); // C139 SCI registers
+	map(0x430000, 0x430003).nopw(); // more leds?
 	map(0x440000, 0x440003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
 	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
@@ -1941,7 +1942,7 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x800000, 0x800003).w(FUNC(namcos22_state::namcos22s_chipselect_w));
 	map(0x810000, 0x81000f).ram().share("czattr");
 	map(0x810200, 0x8103ff).rw(FUNC(namcos22_state::namcos22s_czram_r), FUNC(namcos22_state::namcos22s_czram_w));
-	map(0x820000, 0x8202ff).nopw(); /* leftover of old (non-super) video mixer device */
+	map(0x820000, 0x8202ff).nopw(); // leftover of old (non-super) video mixer device
 	map(0x824000, 0x8243ff).ram().share("video_mixer");
 	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
 	map(0x860000, 0x860007).rw(FUNC(namcos22_state::namcos22s_spotram_r), FUNC(namcos22_state::namcos22s_spotram_w));
@@ -1950,10 +1951,10 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
 	map(0x900000, 0x90ffff).ram().share("vics_data");
 	map(0x940000, 0x94007f).rw(FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
-	map(0x980000, 0x9affff).ram().share("spriteram"); /* C374 */
-	map(0xa04000, 0xa0bfff).ram().share("shareram"); /* COM RAM */
+	map(0x980000, 0x9affff).ram().share("spriteram"); // C374
+	map(0xa04000, 0xa0bfff).ram().share("shareram"); // COM RAM
 	map(0xc00000, 0xc1ffff).rw(FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
-	map(0xe00000, 0xe3ffff).ram(); /* workram */
+	map(0xe00000, 0xe3ffff).ram(); // workram
 }
 
 

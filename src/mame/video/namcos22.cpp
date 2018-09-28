@@ -20,11 +20,10 @@
  *       + dirtdash speedometer has wrong colors when in the jungle level
  *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level (possibly just a game bug?)
  * - add layer enable in system 22, see bugs in cybrcomm and victlapw
- * - window clipping is wrong in acedrvrw, victlapw
+ * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors)
  * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
- * - alpinr2b skiier selection screen should have mirrored models (easiest to see with cursor on the red pants guy). specular reflection?
  * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
  *       czram contents is rather odd here and partly cleared (probably the cause?):
@@ -756,10 +755,10 @@ float namcos22_state::dspfloat_to_nativefloat(uint32_t val)
 	return result;
 }
 
-/* modal rendering properties */
+/* model rendering properties */
 void namcos22_state::matrix3d_multiply(float a[4][4], float b[4][4])
 {
-	float temp[4][4];
+	float result[4][4];
 
 	for (int row = 0; row < 4;  row++)
 	{
@@ -770,22 +769,38 @@ void namcos22_state::matrix3d_multiply(float a[4][4], float b[4][4])
 			{
 				sum += a[row][i] * b[i][col];
 			}
-			temp[row][col] = sum;
+			result[row][col] = sum;
 		}
 	}
 
-	memcpy(a, temp, sizeof(temp));
+	memcpy(a, result, sizeof(result));
 }
 
 void namcos22_state::matrix3d_identity(float m[4][4])
 {
-	for (int r = 0; r < 4; r++)
+	for (int row = 0; row < 4; row++)
 	{
-		for (int c = 0; c < 4; c++)
+		for (int col = 0; col < 4; col++)
 		{
-			m[r][c] = (r == c) ? 1.0 : 0.0;
+			m[row][col] = (row == col) ? 1.0 : 0.0;
 		}
 	}
+}
+
+void namcos22_state::matrix3d_apply_reflection(float m[4][4])
+{
+	if (!m_reflection)
+		return;
+
+	float r[4][4];
+	matrix3d_identity(r);
+
+	if (m_reflection & 0x10)
+		r[0][0] = -1.0;
+	if (m_reflection & 0x20)
+		r[1][1] = -1.0;
+
+	matrix3d_multiply(m, r);
 }
 
 void namcos22_state::transform_point(float *vx, float *vy, float *vz, float m[4][4])
@@ -987,16 +1002,19 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 	}
 
 	/* backface cull one-sided polygons */
-	if (flags & 0x0020 &&
-		(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
-		(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
-		(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y))) >= 0 &&
-
-		(v[0].x*((v[2].z*v[3].y)-(v[2].y*v[3].z)))+
-		(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
-		(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y))) >= 0)
+	if (flags & 0x0020)
 	{
-		return;
+		double c1 =
+			(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
+			(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
+			(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y)));
+		double c2 =
+			(v[0].x*((v[2].z*v[3].y)-(v[2].y*v[3].z)))+
+			(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
+			(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y)));
+
+		if ((m_reflection && c1 <= 0 && c2 <= 0) || (!m_reflection && c1 >= 0 && c2 >= 0))
+			return;
 	}
 
 	for (i = 0; i < 4; i++)
@@ -1245,21 +1263,13 @@ void namcos22_state::blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][
 
 /*******************************************************************************/
 
-/**
- * 0xfffd
- * 0x0: transform
- * 0x1
- * 0x2
- * 0x5: transform
- * >=0x45: draw primitive
- */
 void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 {
 	/*
 	    bb0003 or 3b0003
 
 	    14.00c8            light.ambient     light.power
-	    01.0000            ?                 light.dx
+	    01.0000            reflection,?      light.dx
 	    06.5a82            window priority   light.dy
 	    00.a57e            ?                 light.dz
 
@@ -1280,6 +1290,7 @@ void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 	m_camera_ly = dspfixed_to_nativefloat(src[0x3]);
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
+	m_reflection = src[0x2] >> 16 & 0x30; // z too?
 	m_absolute_priority = src[0x3] >> 16;
 	m_camera_vx = (int16_t)(src[5] >> 16);
 	m_camera_vy = (int16_t)(src[5] & 0xffff);
@@ -1299,11 +1310,20 @@ void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 	m_viewmatrix[1][2] = dspfixed_to_nativefloat(src[0x13]);
 	m_viewmatrix[2][2] = dspfixed_to_nativefloat(src[0x14]);
 
+	matrix3d_apply_reflection(m_viewmatrix);
 	transform_normal(&m_camera_lx, &m_camera_ly, &m_camera_lz, m_viewmatrix);
 }
 
 void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t *src)
 {
+	/**
+	* 0xfffd
+	* 0x0: transform
+	* 0x1
+	* 0x2
+	* 0x5: transform
+	* >=0x45: draw primitive
+	*/
 	if (m_PrimitiveID >= 0x45)
 	{
 		float m[4][4]; /* row major */
@@ -1349,6 +1369,8 @@ void namcos22_state::slavesim_handle_300000(const int32_t *src)
 	m_viewmatrix[0][2] = dspfixed_to_nativefloat(src[7]);
 	m_viewmatrix[1][2] = dspfixed_to_nativefloat(src[8]);
 	m_viewmatrix[2][2] = dspfixed_to_nativefloat(src[9]);
+
+	matrix3d_apply_reflection(m_viewmatrix);
 }
 
 void namcos22_state::slavesim_handle_233002(const int32_t *src)
@@ -1396,7 +1418,7 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 				break;
 
 			case 0x10:
-				slavesim_handle_233002(src); /* set modal rendering options */
+				slavesim_handle_233002(src); /* set model rendering options */
 				break;
 
 			case 0x0a:

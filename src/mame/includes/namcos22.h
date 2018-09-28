@@ -6,6 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_INCLUDES_NAMCOS22_H
+#define MAME_INCLUDES_NAMCOS22_H
+
+#pragma once
+
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
 #include "video/rgbutil.h"
@@ -382,6 +387,7 @@ private:
 
 	void matrix3d_multiply(float a[4][4], float b[4][4]);
 	void matrix3d_identity(float m[4][4]);
+	void matrix3d_apply_reflection(float m[4][4]);
 	void transform_point(float *vx, float *vy, float *vz, float m[4][4]);
 	void transform_normal(float *nx, float *ny, float *nz, float m[4][4]);
 	void register_normals(int32_t addr, float m[4][4]);
@@ -521,6 +527,7 @@ private:
 	int32_t m_objectshift;
 	uint16_t m_PrimitiveID;
 	float m_viewmatrix[4][4];
+	uint8_t m_reflection;
 	uint8_t m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES];
 	int32_t m_SurfaceNormalFormat;
 	unsigned m_LitSurfaceCount;
@@ -545,3 +552,5 @@ private:
 	int m_camera_ambient; // 0.0..1.0
 	int m_camera_power;   // 0.0..1.0
 };
+
+#endif // MAME_INCLUDES_NAMCOS22_H
