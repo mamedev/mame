@@ -68,7 +68,7 @@ MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85230_device, dcdb_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85230_device, rxb_w))
 
-	PC_LPT(config, m_pi1, 0);
+	PC_LPT(config, m_pi1);
 
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);

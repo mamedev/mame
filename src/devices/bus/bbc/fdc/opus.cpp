@@ -91,8 +91,7 @@ ROM_END
 
 void bbc_opus8272_device::device_add_mconfig(machine_config &config)
 {
-	I8272A(config, m_fdc, 0);
-	m_fdc->set_ready_line_connected(true);
+	I8272A(config, m_fdc, true);
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_opus8272_device::fdc_intrq_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats).enable_sound(true);

@@ -419,9 +419,9 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_PIT8253_CLK2(XTAL(16'000'000)/16)
 
 	// floppy disk controller
-	MCFG_UPD765A_ADD("fdc", true, true) // Rockwell R7675P
-	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
-	//MCFG_UPD765_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	UPD765A(config, "fdc", true, true); // Rockwell R7675P
+	//fdc.intrq_wr_callback().set("pic1", FUNC(pic8259_device::ir6_w));
+	//fdc.drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 

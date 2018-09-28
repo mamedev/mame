@@ -490,9 +490,9 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	m_pit->set_clk<2>(6.144_MHz_XTAL/2/2);
 	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, /* 16_MHz_XTAL/2/2 */ true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST55_LINE))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq3_w))
+	UPD765A(config, m_fdc, /* 16_MHz_XTAL/2/2, */ true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)

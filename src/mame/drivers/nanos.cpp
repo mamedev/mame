@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	m_pio->out_pb_callback().set(FUNC(nanos_state::port_b_w));
 
 	/* UPD765 */
-	MCFG_UPD765A_ADD(m_fdc, false, true)
+	UPD765A(config, m_fdc, false, true);
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats)
 
 	/* internal ram */

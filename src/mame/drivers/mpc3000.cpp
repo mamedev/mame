@@ -213,9 +213,9 @@ void mpc3000_state::mpc3000(machine_config &config)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mpc3000_state, mpc3000)
 
-	MCFG_UPD72065_ADD("upd72068", true, true) // TODO: upd72068 supports motor control
-	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("maincpu", v53a_device, ir?_w))
-	//MCFG_UPD765_DRQ_CALLBACK(WRITELINE("maincpu", v53a_device, drq?_w))
+	UPD72065(config, m_fdc, 0, true, true); // TODO: upd72068 supports motor control
+	//m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(v53a_device::ir?_w));
+	//m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::drq?_w));
 
 	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
 	pit.set_clk<0>(16_MHz_XTAL / 4);

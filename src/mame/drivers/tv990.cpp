@@ -399,8 +399,8 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 	m_uart1->out_tx_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart1->out_int_callback().set(FUNC(tv990_state::uart1_irq));
 
-	MCFG_DEVICE_ADD(LPT_TAG, PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, tv990_state, lpt_irq))
+	pc_lpt_device &lpt(PC_LPT(config, LPT_TAG));
+	lpt.irq_handler().set(FUNC(tv990_state::lpt_irq));
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(UART0_TAG, ns16450_device, rx_w))

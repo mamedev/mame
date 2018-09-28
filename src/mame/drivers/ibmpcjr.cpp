@@ -611,12 +611,12 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
  */
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_pic8259, pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12)
 	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pcjr_state, out2_changed))
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_DEVICE_ADD(m_pic8259, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, pcjr_state, pic8259_set_int_line))
 
 	i8255_device &ppi(I8255(config, "ppi8255"));
@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	uart.out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
 	uart.out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
 	uart.out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
-	uart.out_int_callback().set("pic8259", FUNC(pic8259_device::ir3_w));
+	uart.out_int_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD( "serport", RS232_PORT, pcjr_com, nullptr )
 	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
@@ -651,8 +651,8 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
+	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
+	lpt0.irq_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -660,7 +660,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_CASSETTE_ADD( "cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_UPD765A_ADD("fdc", false, false)
+	UPD765A(config, m_fdc, false, false);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
