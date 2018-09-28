@@ -12647,6 +12647,9 @@ royalpk2                        //
 @source:facit4440.cpp
 facit4440                       // 1984
 
+@source:falco5220.cpp
+falco5220                       // 1987
+
 @source:famibox.cpp
 famibox                         // 1986
 
@@ -15839,6 +15842,8 @@ euro2k2s                        // (c) 2002 Nazionale Elettronica
 laperla                         // (c) 2002 Nazionale Elettronica
 laperlag                        // (c) 2001 Nazionale Elettronica
 mnumber                         // (c) 200? M.M. - B.R.L.
+wcup                            // (c) 2001 Nazionale Elettronica
+wcup14                          // (c) 2001 Nazionale Elettronica
 
 @source:itt3030.cpp
 itt3030                         //
@@ -18012,6 +18017,7 @@ grainbow                        // (c) 1993 Banpresto
 grainbowk                       // (c) 1993 Banpresto
 heatbrl                         // (c) 1992 Tad (World version 3)
 heatbrl2                        // (c) 1992 Tad (World version 2)
+heatbrl3                        // (c) 1992 Tad (World version ?)
 heatbrle                        // (c) 1992 Tad (Electronic Devices license)
 heatbrlo                        // (c) 1992 Tad (World)
 heatbrlu                        // (c) 1992 Tad (US)
@@ -31971,9 +31977,10 @@ neiva                           //
 pkscram                         // (c) 1993 Cosmo Electronics Corporation
 
 @source:pktgaldx.cpp
-pktgaldx                        // MAZ (c) 1993 Data East (Euro v3.00)
+pktgaldx                        // MAZ (c) 1992 Data East (Euro v3.00)
+pktgaldxa                       // MAZ (c) 1992 Data East (Asia v3.00)
 pktgaldxb                       // bootleg
-pktgaldxj                       // MAZ (c) 1993
+pktgaldxj                       // MAZ (c) 1993 Nihon System inc (Japan v3.00)
 
 @source:plan80.cpp
 plan80                          //
@@ -33341,6 +33348,7 @@ diner_l1                        //
 diner_l2                        //
 diner_l3                        //
 diner_l4                        //
+diner_p0                        //
 gs_la3                          //
 gs_lg6                          //
 gs_lu3                          //
@@ -39099,6 +39107,7 @@ cc_104                          //
 cc_12                           //
 cc_13                           //
 congo_11                        //
+congo_11s10                     //
 congo_13                        //
 congo_20                        //
 congo_21                        //
@@ -39305,6 +39314,7 @@ fs_sp2                          //
 i500_10r                        //
 i500_11b                        //
 i500_11r                        //
+jb_04a                          //
 jb_10b                          //
 jb_10r                          //
 jm_05r                          //

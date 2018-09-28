@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(pc1500_state::pc1500)
 	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
 	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
-	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 MACHINE_CONFIG_END
 
 

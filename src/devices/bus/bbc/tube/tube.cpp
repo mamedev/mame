@@ -113,7 +113,6 @@ WRITE8_MEMBER(bbc_tube_slot_device::host_w)
 
 // slot devices
 #include "tube_6502.h"
-#include "tube_65c102.h"
 #include "tube_80186.h"
 #include "tube_80286.h"
 //#include "tube_a500.h"

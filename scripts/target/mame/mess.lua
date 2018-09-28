@@ -297,6 +297,7 @@ VIDEOS["CRT9212"] = true
 VIDEOS["CRTC_EGA"] = true
 VIDEOS["DL1416"] = true
 VIDEOS["DM9368"] = true
+VIDEOS["DP8350"] = true
 VIDEOS["EF9340_1"] = true
 VIDEOS["EF9345"] = true
 VIDEOS["EF9364"] = true
@@ -3693,6 +3694,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/eurocom2.cpp",
 	MAME_DIR .. "src/mame/drivers/excali64.cpp",
 	MAME_DIR .. "src/mame/drivers/facit4440.cpp",
+	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",

@@ -1014,7 +1014,7 @@ void cps3_state::cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rg
 
 uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y,x, count;
+	int x, count;
 	attoseconds_t period = screen.frame_period().attoseconds();
 	rectangle visarea = screen.visible_area();
 
@@ -1298,25 +1298,36 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 //      m_palette->set_pen_color(offset,m_mame_colours[palreadbase+offset]);
 //  }
 
-	// fg layer
+	// fg layer (TODO: this could be handled with an actual tilemap)
 	{
 		// bank select? (sfiii2 intro)
-		if (m_ss_bank_base & 0x01000000) count = 0x000;
-		else count = 0x800;
+		int bank = 0x800;
+		if (m_ss_bank_base & 0x01000000) bank = 0x000;
 
-		for (y=0;y<32;y++)
+		for (int line = cliprect.top(); line < cliprect.bottom(); line++)
 		{
-			for (x=0;x<64;x++)
+			rectangle clip = cliprect;
+			clip.min_y = clip.max_y = line;
+
+			int y = line / 8;
+			count = (y * 64) + bank;
+
+			// 'combo meter' in JoJo games uses rowscroll
+			int rowscroll = m_ss_ram[((line - 1) & 0x1ff) + 0x4000 / 4] >> 16;
+
+			for (x = 0; x < 64; x++)
 			{
 				uint32_t data = m_ss_ram[count]; // +0x800 = 2nd bank, used on sfiii2 intro..
 				uint32_t tile = (data >> 16) & 0x1ff;
-				int pal = (data&0x003f) >> 1;
+				int pal = (data & 0x003f) >> 1;
 				int flipx = (data & 0x0080) >> 7;
 				int flipy = (data & 0x0040) >> 6;
 				pal += m_ss_pal_base << 5;
-				tile+=0x200;
+				tile += 0x200;
 
-				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,nullptr,0);
+				cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000, nullptr, 0);
+				cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, 512 + (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000, nullptr, 0);
+
 				count++;
 			}
 		}
@@ -1324,9 +1335,17 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
+/*
+	SSRAM 0x0000 - 0x1fff tilemap layout bank 0
+	      0x2000 - 0x3fff tilemap layout bank 1
+		  0x4000 - 0x7fff rowscroll (banked?)
+		  0x8000 - 0xffff tile character definitions
+
+*/
+
 READ32_MEMBER(cps3_state::cps3_ssram_r)
 {
-	if (offset>0x8000/4)
+	if (offset>=0x8000/4)
 		return little_endianize_int32(m_ss_ram[offset]);
 	else
 		return m_ss_ram[offset];
@@ -1334,7 +1353,7 @@ READ32_MEMBER(cps3_state::cps3_ssram_r)
 
 WRITE32_MEMBER(cps3_state::cps3_ssram_w)
 {
-	if (offset>0x8000/4)
+	if (offset>=0x8000/4)
 	{
 		// we only want to endian-flip the character data, the tilemap info is fine
 		data = little_endianize_int32(data);

@@ -2407,7 +2407,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	FLOPPY_CONNECTOR(config, "upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
 	pc9801_sasi(config);
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_w));
@@ -2434,7 +2434,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
 
 	pc9801_ide(config);
-	MCFG_UPD4990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
+	UPD4990A(config, m_rtc);
 
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
 

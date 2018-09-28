@@ -705,7 +705,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_UPD1990A_ADD("rtc", XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("ctc1", z80ctc_device, trg0))

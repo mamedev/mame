@@ -2827,9 +2827,9 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX")
-	MCFG_UPD4701_PORTY("TRACKY")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("TRACKX");
+	m_upd4701->set_porty_tag("TRACKY");
 
 	WATCHDOG_TIMER(config, "watchdog");
 

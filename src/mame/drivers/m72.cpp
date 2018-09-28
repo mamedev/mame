@@ -2111,13 +2111,13 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACK0_X");
+	m_upd4701[0]->set_porty_tag("TRACK0_Y");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACK1_X");
+	m_upd4701[1]->set_porty_tag("TRACK1_Y");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)

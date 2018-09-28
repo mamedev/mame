@@ -935,9 +935,9 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	m_via6522_1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
-	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
-	MCFG_UPD7002_GET_ANALOGUE_CB(bbc_state, BBC_get_analogue_input)
-	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
+	UPD7002(config, m_upd7002, 0);
+	m_upd7002->set_get_analogue_callback(FUNC(bbc_state::BBC_get_analogue_input), this);
+	m_upd7002->set_eoc_callback(FUNC(bbc_state::BBC_uPD7002_EOC), this);
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
@@ -1368,9 +1368,9 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	m_acia_clock->signal_handler().set(FUNC(bbc_state::write_acia_clock));
 
 	/* adc */
-	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
-	MCFG_UPD7002_GET_ANALOGUE_CB(bbc_state, BBC_get_analogue_input)
-	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
+	UPD7002(config, m_upd7002, 0);
+	m_upd7002->set_get_analogue_callback(FUNC(bbc_state::BBC_get_analogue_input), this);
+	m_upd7002->set_eoc_callback(FUNC(bbc_state::BBC_uPD7002_EOC), this);
 
 	/* system via */
 	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);

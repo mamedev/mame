@@ -81,7 +81,7 @@
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
         code1d,b            RTC self check bad
         gticlub2            Attract mode works. Coins up. Hangs in car selection.
-        gticlub2ea          Doesn't boot: bad CHD?
+        gticlub2ea          Asks for password.
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC) - with IRQ3 crashes at first 3d frame
         mocapglf            Security code error
         mocapb,j            Crash after self checks
@@ -2553,8 +2553,8 @@ ROM_START(gticlub2ea) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, BAD_DUMP CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
 
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "941a02", 0,  NO_DUMP )
+	DISK_REGION( "ata:0:hdd:image" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
 ROM_END
 
 /* This CF card has sticker B41C02 */

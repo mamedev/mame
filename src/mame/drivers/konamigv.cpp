@@ -229,8 +229,8 @@ void konamigv_state::btchamp_map(address_map &map)
 	konamigv_map(map);
 
 	map(0x1f380000, 0x1f3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
-	map(0x1f680080, 0x1f680087).r("upd1", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
-	map(0x1f680080, 0x1f680087).r("upd2", FUNC(upd4701_device::read_xy)).umask32(0x00ff00ff);
+	map(0x1f680080, 0x1f680087).r(m_btc_trackball[0], FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
+	map(0x1f680080, 0x1f680087).r(m_btc_trackball[1], FUNC(upd4701_device::read_xy)).umask32(0x00ff00ff);
 	map(0x1f680088, 0x1f680089).w(FUNC(konamigv_state::btc_trackball_w));
 	map(0x1f6800e0, 0x1f6800e3).nopw();
 }
@@ -518,9 +518,9 @@ MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	FUJITSU_29F016A(config, "flash2");
 	FUJITSU_29F016A(config, "flash3");
 
-	MCFG_DEVICE_ADD("upd", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	upd4701_device &upd(UPD4701A(config, "upd"));
+	upd.set_portx_tag("TRACK0_X");
+	upd.set_porty_tag("TRACK0_Y");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( simpbowl )
@@ -555,13 +555,13 @@ MACHINE_CONFIG_START(konamigv_state::btchamp)
 
 	SHARP_LH28F400(config, "flash");
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	UPD4701A(config, m_btc_trackball[0]);
+	m_btc_trackball[0]->set_portx_tag("TRACK0_X");
+	m_btc_trackball[0]->set_porty_tag("TRACK0_Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	UPD4701A(config, m_btc_trackball[1]);
+	m_btc_trackball[1]->set_portx_tag("TRACK1_X");
+	m_btc_trackball[1]->set_porty_tag("TRACK1_Y");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( btchamp )

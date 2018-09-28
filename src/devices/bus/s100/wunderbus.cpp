@@ -132,7 +132,8 @@ MACHINE_CONFIG_START(s100_wunderbus_device::device_add_mconfig)
 	MCFG_RS232_RI_HANDLER(WRITELINE(m_ace3, ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(m_ace3, ins8250_uart_device, cts_w))
 
-	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL(32'768), NOOP, WRITELINE(DEVICE_SELF, s100_wunderbus_device, rtc_tp_w))
+	UPD1990A(config, m_rtc);
+	m_rtc->tp_callback().set(FUNC(s100_wunderbus_device::rtc_tp_w));
 MACHINE_CONFIG_END
 
 

@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
 	m_dma->out_iow_cb<2>().set(UPD3301_TAG, FUNC(upd3301_device::dack_w));
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
 	m_dma->out_iow_cb<2>().set(UPD3301_TAG, FUNC(upd3301_device::dack_w));
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
