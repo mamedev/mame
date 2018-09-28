@@ -14,7 +14,10 @@ special thanks to Nekomata, NTD & code-name'Siberia'
 
 TODO:
 - wrong background in fstarfrc title
-  (Video ref. -> https://www.youtube.com/watch?v=EXBTNk-0ejk , https://www.youtube.com/watch?v=5iZtgWqUz6c)
+  (Video ref. ->
+  https://www.youtube.com/watch?v=EXBTNk-0ejk,
+  https://www.youtube.com/watch?v=5iZtgWqUz6c,
+  https://www.youtube.com/watch?v=cgj81VA7j_Y)
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
