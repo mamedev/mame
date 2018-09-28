@@ -129,6 +129,35 @@ uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst)
 	return result;
 }
 
+void sbus_cgsix_device::handle_font_poke()
+{
+	if (fbc_misc_draw() != FBC_MISC_DRAW_RENDER)
+	{
+		logerror("handle_font_poke: Unsupported font draw mode %d, abandoning draw\n", fbc_misc_draw());
+		return;
+	}
+
+	const uint32_t daddr = m_fbc.m_y0 * 1152;
+	uint8_t *vram = (uint8_t*)&m_vram[0];
+	vram += daddr;
+	const int width = (int)m_fbc.m_x1 - (int)m_fbc.m_x0;
+	const uint32_t font = m_fbc.m_font;
+	uint32_t x = m_fbc.m_x0;
+	logerror("Width: %d, bits %d to %d\n", width, 31, 31 - width);
+	for (int bit = 31; bit >= (31 - width); bit--)
+	{
+		const uint8_t src = BIT(font, bit) ? 0xff : 0x00;
+		const uint8_t dst = vram[BYTE4_XOR_BE(x)];
+		vram[BYTE4_XOR_BE(x)]= perform_rasterop(src, dst);
+		x++;
+		if (x >= 1152) break;
+	}
+	m_fbc.m_x0 += m_fbc.m_autoincx;
+	m_fbc.m_x1 += m_fbc.m_autoincx;
+	m_fbc.m_y0 += m_fbc.m_autoincy;
+	m_fbc.m_y1 += m_fbc.m_autoincy;
+}
+
 // NOTE: This is basically untested, and probably full of bugs!
 void sbus_cgsix_device::handle_draw_command()
 {
@@ -158,15 +187,15 @@ void sbus_cgsix_device::handle_draw_command()
 		vertex_t &v0 = m_fbc.m_prim_buf[vindex++];
 		vertex_t &v1 = m_fbc.m_prim_buf[vindex++];
 
-		for (uint32_t y = v0.m_absy; y < v1.m_absy; y++)
+		for (uint32_t y = v0.m_absy; y <= v1.m_absy; y++)
 		{
-			const uint32_t line = y * (m_fbc.m_clip_maxx + 1);
-			for (uint32_t x = v0.m_absx; x < v1.m_absx; x++)
+			uint8_t *line = &vram[y * 1152];
+			for (uint32_t x = v0.m_absx; x <= v1.m_absx; x++)
 			{
-				const uint8_t src = vram[line + x];
+				const uint32_t native_x = BYTE4_XOR_BE(x);
+				const uint8_t src = line[native_x];
 				const uint8_t dst = src;
-				const uint8_t result = perform_rasterop(src, dst);
-				vram[line + x] = result;
+				line[native_x] = perform_rasterop(src, dst);
 			}
 		}
 	}
@@ -177,7 +206,7 @@ void sbus_cgsix_device::handle_draw_command()
 void sbus_cgsix_device::handle_blit_command()
 {
 	uint8_t *vram = (uint8_t*)&m_vram[0];
-	const uint32_t fbw = (m_fbc.m_clip_maxx + 1);
+	const uint32_t fbw = 1152;//(m_fbc.m_clip_maxx + 1);
 	logerror("Copying from %d,%d-%d,%d to %d,%d-%d,%d, width %d, height %d\n"
 		, m_fbc.m_x0, m_fbc.m_y0
 		, m_fbc.m_x1, m_fbc.m_y1
@@ -188,17 +217,18 @@ void sbus_cgsix_device::handle_blit_command()
 	uint32_t dsty = m_fbc.m_y2;
 	for (; srcy < m_fbc.m_y1; srcy++, dsty++)
 	{
-		uint32_t srcy_index = srcy * fbw;
-		uint32_t dsty_index = dsty * fbw;
+		uint8_t *srcline = &vram[srcy * fbw];
+		uint8_t *dstline = &vram[dsty * fbw];
 		uint32_t srcx = m_fbc.m_x0;
 		uint32_t dstx = m_fbc.m_x2;
 		for (; srcx < m_fbc.m_x1; srcx++, dstx++)
 		{
-			const uint8_t src = vram[srcy_index + srcx];
-			const uint8_t dst = vram[dsty_index + dstx];
+			const uint32_t native_dstx = BYTE4_XOR_BE(dstx);
+			const uint8_t src = srcline[BYTE4_XOR_BE(srcx)];
+			const uint8_t dst = dstline[native_dstx];
 			const uint8_t result = perform_rasterop(src, dst);
 			//logerror("vram[%d] = %02x\n", result);
-			vram[dsty_index + dstx] = result;
+			dstline[native_dstx] = result;
 		}
 	}
 }
@@ -565,9 +595,12 @@ WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 			//COMBINE_DATA(&m_fbc.m_blit_status);
 			break;
 		case FBC_FONT:
+		{
 			logerror("fbc_w: FONT = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_font);
+			handle_font_poke();
 			break;
+		}
 
 		case FBC_X0:
 			logerror("fbc_w: X0 = %08x & %08x\n", data, mem_mask);

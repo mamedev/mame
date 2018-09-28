@@ -45,8 +45,9 @@ protected:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint8_t perform_rasterop(uint8_t src, uint8_t dst);
-	void handle_blit_command();
+	void handle_font_poke();
 	void handle_draw_command();
+	void handle_blit_command();
 
 	void base_map(address_map &map);
 
