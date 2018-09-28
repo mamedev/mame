@@ -673,7 +673,7 @@ private:
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 
-	required_device<i82072_device> m_fdc;
+	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<am79c90_device> m_lance;
 	required_device<nscsi_bus_device> m_scsibus;
@@ -1145,7 +1145,7 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x03000000, 0x0300000f).rw(FUNC(sun4_state::timer_r), FUNC(sun4_state::timer_w)).mirror(0xfffff0);
 	map(0x05000000, 0x05000003).rw(FUNC(sun4_state::irq_r), FUNC(sun4_state::irq_w));
 	map(0x06000000, 0x0607ffff).rom().region("user1", 0);
-	map(0x07200000, 0x07200003).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
+	map(0x07200000, 0x07200007).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
 	map(0x07400003, 0x07400003).rw(FUNC(sun4_state::auxio_r), FUNC(sun4_state::auxio_w));
 	map(0x08000000, 0x08000003).r(FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
 	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
@@ -1300,11 +1300,21 @@ READ8_MEMBER( sun4_state::fdc_r )
 
 	switch(offset)
 	{
-		case 0: // Main Status (R)
+		case 0: // Main Status (R, 82072)
 			return m_fdc->msr_r(space, 0, 0xff);
 
-		case 1: // FIFO Data Port (R)
+		case 1: // FIFO Data Port (R, 82072)
+		case 5: // FIFO Data Port (R, 82077)
 			return m_fdc->fifo_r(space, 0, 0xff);
+
+		case 2: // Digital Output Register (R, 82077)
+			return m_fdc->dor_r(space, 0, 0xff);
+
+		case 4: // Main Status Register (R, 82077)
+			return m_fdc->msr_r(space, 0, 0xff);
+
+		case 7:// Digital Input Register (R, 82077)
+			return m_fdc->dir_r(space, 0, 0xff);
 
 		default:
 			break;
@@ -1317,12 +1327,18 @@ WRITE8_MEMBER( sun4_state::fdc_w )
 {
 	switch(offset)
 	{
-		case 0: // Data Rate Select Register (W)
+		case 0: // Data Rate Select Register (W, 82072)
+		case 4: // Data Rate Select Register (W, 82077)
 			m_fdc->dsr_w(space, 0, data, 0xff);
 			break;
 
-		case 1: // FIFO Data Port (W)
+		case 1: // FIFO Data Port (W, 82072)
+		case 5: // FIFO Data Port (W, 82077)
 			m_fdc->fifo_w(space, 0, data, 0xff);
+			break;
+
+		case 7: // Configuration Control REgister (W, 82077)
+			m_fdc->ccr_w(space, 0, data, 0xff);
 			break;
 
 		default:
@@ -1541,7 +1557,6 @@ void sun4_state::dma_check_interrupts()
 	if (old_irq != m_dma_irq)
 	{
 		//logerror("m_dma_irq %d because irq_or_err_pending:%d and irq_enabled:%d\n", m_dma_irq ? 1 : 0, irq_or_err_pending, irq_enabled);
-		logerror("dma\n");
 		m_maincpu->set_input_line(SPARC_IRQ3, m_dma_irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -1890,7 +1905,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
-	I82072(config, m_fdc, 24_MHz_XTAL);
+	N82077AA(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->set_ready_line_connected(false);
 	m_fdc->intrq_wr_callback().set(FUNC(sun4_state::fdc_irq));
 	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", sun4_state::floppy_formats);
