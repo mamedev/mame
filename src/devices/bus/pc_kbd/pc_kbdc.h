@@ -43,13 +43,13 @@ public:
 	// construction/destruction
 	pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// inline configuration
 	void set_pc_kbdc_slot(device_t *kbdc_device) { m_kbdc_device = kbdc_device; }
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	// configuration
 	device_t *m_kbdc_device;
 };
@@ -84,8 +84,8 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	void update_clock_state();
 	void update_data_state();
@@ -93,13 +93,13 @@ protected:
 	devcb_write_line    m_out_clock_cb;
 	devcb_write_line    m_out_data_cb;
 
-	int                         m_clock_state;
-	int                         m_data_state;
+	int8_t m_clock_state;
+	int8_t m_data_state;
 
-	int                         m_mb_clock_state;
-	int                         m_mb_data_state;
-	int                         m_kb_clock_state;
-	int                         m_kb_data_state;
+	uint8_t m_mb_clock_state;
+	uint8_t m_mb_data_state;
+	uint8_t m_kb_clock_state;
+	uint8_t m_kb_data_state;
 
 	device_pc_kbd_interface     *m_keyboard;
 };
@@ -115,14 +115,9 @@ class device_pc_kbd_interface : public device_slot_card_interface
 {
 	friend class pc_kbdc_device;
 public:
-	// construction/destruction
-	device_pc_kbd_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_pc_kbd_interface();
 
 	void set_pc_kbdc_device();
-
-	int clock_signal() { return m_pc_kbdc ? m_pc_kbdc->clock_signal() : 1; }
-	int data_signal() { return m_pc_kbdc ? m_pc_kbdc->data_signal() : 1; }
 
 	//
 	// Override the clock_write and data_write methods in a keyboard implementation
@@ -134,6 +129,11 @@ public:
 	void set_pc_kbdc(device_t *kbdc_device) { m_pc_kbdc = dynamic_cast<pc_kbdc_device *>(kbdc_device); }
 
 protected:
+	device_pc_kbd_interface(const machine_config &mconfig, device_t &device);
+
+	int clock_signal() const { return m_pc_kbdc ? m_pc_kbdc->clock_signal() : 1; }
+	int data_signal() const { return m_pc_kbdc ? m_pc_kbdc->data_signal() : 1; }
+
 	pc_kbdc_device          *m_pc_kbdc;
 	const char              *m_pc_kbdc_tag;
 };

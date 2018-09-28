@@ -153,8 +153,8 @@ void jazz_state::jazz(machine_config &config)
 
 	// pc keyboard controller?
 	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::keyboard_clock_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::keyboard_data_w));
+	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
 	// keyboard port
 	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", 0));
@@ -164,9 +164,9 @@ void jazz_state::jazz(machine_config &config)
 
 	// at keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	m_kbdc->system_reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_kbdc->keyboard_clock_cb().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->keyboard_data_cb().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	G364(config, m_ramdac, 0);
 }
