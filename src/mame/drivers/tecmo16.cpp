@@ -56,6 +56,7 @@ void tecmo16_state::fstarfrc_map(address_map &map)
 	map(0x150030, 0x150031).portr("DSW2").nopw();   /* ??? */
 	map(0x150040, 0x150041).portr("DSW1");
 	map(0x150050, 0x150051).portr("P1_P2");
+//  map(0x160000, 0x160001).nopr();   /* ??? */
 	map(0x160000, 0x160001).w(FUNC(tecmo16_state::scroll_char_x_w));
 	map(0x16000c, 0x16000d).w(FUNC(tecmo16_state::scroll_x_w));
 	map(0x160012, 0x160013).w(FUNC(tecmo16_state::scroll_y_w));
