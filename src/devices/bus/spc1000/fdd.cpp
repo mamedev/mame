@@ -84,8 +84,8 @@ void spc1000_fdd_exp_device::device_add_mconfig(machine_config &config)
 {
 	// sub CPU (5 inch floppy drive)
 	Z80(config, m_cpu, XTAL(4'000'000));
-	m_cpu->set_addrmap(AS_PROGRAM, spc1000_fdd_exp_device::sd725_mem);
-	m_cpu->set_addrmap(AS_IO, spc1000_fdd_exp_device::sd725_io);
+	m_cpu->set_addrmap(AS_PROGRAM, &spc1000_fdd_exp_device::sd725_mem);
+	m_cpu->set_addrmap(AS_IO, &spc1000_fdd_exp_device::sd725_io);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(m_ppi, FUNC(i8255_device::pb_r));
