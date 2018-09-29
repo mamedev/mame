@@ -887,6 +887,8 @@ READ32_MEMBER( sun4_state::sun4_segment_map_r )
 		return m_curr_segmap[(offset>>16) & 0xfff]<<16;
 	else if (mem_mask == 0xff000000)
 		return m_curr_segmap[(offset>>16) & 0xfff]<<24;
+	else if (mem_mask == 0xffffffff)
+		return m_curr_segmap[(offset>>16) & 0xfff];
 	else
 		logerror("sun4: read segment map w/ unknown mask %08x\n", mem_mask);
 	return 0x0;
@@ -1440,16 +1442,10 @@ WRITE8_MEMBER( sun4_state::irq_w )
 
 	if (BIT(changed, 0))
 	{
-		if (BIT(m_irq_reg, 7))
-		{
-			//logerror("Changing interrupt enable, %s IRQ14\n", BIT(data, 0) && BIT(m_counter[2] | m_counter[3], 31) ? "asserting" : "deasserting");
-			m_maincpu->set_input_line(SPARC_IRQ14, BIT(data, 0) && BIT(m_counter[2] | m_counter[3], 31) ? ASSERT_LINE : CLEAR_LINE);
-		}
-		if (BIT(m_irq_reg, 5))
-		{
-			//logerror("Changing interrupt enable, %s IRQ10\n", BIT(data, 0) && BIT(m_counter[0] | m_counter[1], 31) ? "asserting" : "deasserting");
-			m_maincpu->set_input_line(SPARC_IRQ10, BIT(data, 0) && BIT(m_counter[0] | m_counter[1], 31) ? ASSERT_LINE : CLEAR_LINE);
-		}
+		if (BIT(m_irq_reg, 7) && BIT(m_counter[2] | m_counter[3], 31))
+			m_maincpu->set_input_line(SPARC_IRQ14, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(m_irq_reg, 5) && BIT(m_counter[0] | m_counter[1], 31))
+			m_maincpu->set_input_line(SPARC_IRQ10, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 		if (BIT(m_irq_reg, 3))
 			m_maincpu->set_input_line(SPARC_IRQ6, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 		if (BIT(m_irq_reg, 2))
@@ -1459,16 +1455,10 @@ WRITE8_MEMBER( sun4_state::irq_w )
 	}
 	else if (BIT(m_irq_reg, 0))
 	{
-		if (BIT(changed, 7))
-		{
-			//logerror("Changing IRQ14 enable, %s IRQ14\n", BIT(data, 7) && BIT(m_counter[2] | m_counter[3], 31) ? "asserting" : "deasserting");
-			m_maincpu->set_input_line(SPARC_IRQ14, BIT(m_irq_reg, 7) && BIT(m_counter[2] | m_counter[3], 31) ? ASSERT_LINE : CLEAR_LINE);
-		}
-		if (BIT(changed, 5))
-		{
-			//logerror("Changing IRQ10 enable, %s IRQ10\n", BIT(data, 7) && BIT(m_counter[0] | m_counter[1], 31) ? "asserting" : "deasserting");
-			m_maincpu->set_input_line(SPARC_IRQ10, BIT(m_irq_reg, 5) && BIT(m_counter[0] | m_counter[1], 31) ? ASSERT_LINE : CLEAR_LINE);
-		}
+		if (BIT(changed, 7) && BIT(m_counter[2] | m_counter[3], 31))
+			m_maincpu->set_input_line(SPARC_IRQ14, BIT(m_irq_reg, 7) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(changed, 5) && BIT(m_counter[0] | m_counter[1], 31))
+			m_maincpu->set_input_line(SPARC_IRQ10, BIT(m_irq_reg, 5) ? ASSERT_LINE : CLEAR_LINE);
 		if (BIT(changed, 3))
 			m_maincpu->set_input_line(SPARC_IRQ6, BIT(m_irq_reg, 3) ? ASSERT_LINE : CLEAR_LINE);
 		if (BIT(changed, 2))
