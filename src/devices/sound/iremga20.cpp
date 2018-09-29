@@ -150,9 +150,12 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				else
 				{
 					sampleout += (sample - 0x80) * (int32_t)ch.volume;
-					ch.frac += ch.rate;
-					ch.pos += (ch.frac >> 24);
-					ch.frac &= ((1 << 24) - 1);
+					ch.frac--;
+					if (ch.frac <= ch.rate)
+					{
+						ch.pos++;
+						ch.frac += 0x100 - ch.rate;
+					}
 				}
 			}
 		}
@@ -182,7 +185,7 @@ WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 	switch (offset & 0x7)
 	{
 		case 4:
-			m_channel[ch].rate = (1 << 24) / (256 - data);
+			m_channel[ch].rate = data;
 			break;
 
 		case 5:
@@ -196,7 +199,7 @@ WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 				m_channel[ch].play = 1;
 				m_channel[ch].pos = (m_regs[ch << 3 | 0] | m_regs[ch << 3 | 1] << 8) << 4;
 				m_channel[ch].end = (m_regs[ch << 3 | 2] | m_regs[ch << 3 | 3] << 8) << 4;
-				m_channel[ch].frac = 0;
+				m_channel[ch].frac = 0x100;
 			}
 			else
 				m_channel[ch].play = 0;
