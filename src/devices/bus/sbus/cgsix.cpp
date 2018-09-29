@@ -84,7 +84,7 @@ void sbus_cgsix_device::device_start()
 	save_item(NAME(m_fbc.m_pixel_mask));
 
 	save_item(NAME(m_fbc.m_patt_align));
-	save_item(NAME(m_fbc.m_pattern[8]));
+	save_item(NAME(m_fbc.m_pattern));
 
 	save_item(NAME(m_fbc.m_ipoint_absx));
 	save_item(NAME(m_fbc.m_ipoint_absy));
