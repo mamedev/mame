@@ -119,6 +119,7 @@ uint32_t flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind1
 {
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
+	// TODO: reversed polarity? Hard to say, fwiw Combat School uses this in reverse ...
 	uint16_t sprite_buffer = (m_k007121->ctrlram_r(3) & 8) * 0x100;
 	
 	if (m_flipscreen)
