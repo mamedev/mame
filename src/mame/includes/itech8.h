@@ -92,7 +92,6 @@ protected:
 	uint8_t m_blitter_int;
 	uint8_t m_tms34061_int;
 	uint8_t m_periodic_int;
-	uint8_t m_sound_data;
 	uint8_t m_pia_porta_data;
 	uint8_t m_pia_portb_data;
 	uint8_t m_z80_ctrl;
