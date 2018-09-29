@@ -2048,6 +2048,9 @@ void sun4_state::sun4_50(machine_config &config)
 {
 	sun4c(config);
 
+	m_mmu->set_ctx_mask(0xf);
+	m_mmu->set_pmeg_mask(0xff);
+
 	m_mmu->set_clock(40'000'000);
 	m_maincpu->set_clock(40'000'000);
 
@@ -2075,6 +2078,7 @@ void sun4_state::sun4_65(machine_config &config)
 	m_sbus_slot[0]->set_clock(25'000'000);
 	m_sbus_slot[1]->set_clock(25'000'000);
 	m_sbus_slot[2]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_default_option("bwtwo");
 }
 
 void sun4_state::sun4_75(machine_config &config)
