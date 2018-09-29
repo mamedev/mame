@@ -345,7 +345,7 @@ protected:
 		uint32_t m_a;
 	};
 
-	enum prim_type
+	enum prim_type : uint32_t
 	{
 		PRIM_POINT = 0,
 		PRIM_LINE,
@@ -462,7 +462,7 @@ protected:
 
 		vertex_t m_prim_buf[0x1000]; // unknown size
 		uint32_t m_vertex_count;
-		prim_type m_curr_prim_type;
+		uint32_t m_curr_prim_type;
 	};
 
 	required_memory_region m_rom;

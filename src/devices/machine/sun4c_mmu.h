@@ -21,8 +21,8 @@ public:
 	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t ctx_mask, uint8_t pmeg_mask)
 		: sun4c_mmu_device(mconfig, tag, owner, clock)
 	{
-		m_ctx_mask = ctx_mask;
-		m_pmeg_mask = pmeg_mask;
+		set_ctx_mask(ctx_mask);
+		set_pmeg_mask(pmeg_mask);
 	}
 
 	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -34,6 +34,9 @@ public:
 
 	auto type1_r() { return m_type1_r.bind(); }
 	auto type1_w() { return m_type1_w.bind(); }
+
+	void set_ctx_mask(uint8_t ctx_mask) { m_ctx_mask = ctx_mask; }
+	void set_pmeg_mask(uint8_t pmeg_mask) { m_pmeg_mask = pmeg_mask; }
 
 	enum insn_data_mode
 	{

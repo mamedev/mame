@@ -42,6 +42,37 @@ void sun4c_mmu_device::device_start()
 	// allocate timer for system reset
 	m_reset_timer = timer_alloc(TIMER_RESET);
 	m_reset_timer->adjust(attotime::never);
+
+	for (int i = 0; i < 16; i++)
+	{
+		save_item(NAME(m_segmap[i]), i);
+		save_item(NAME(m_segmap_masked[i]), i);
+	}
+
+	for (int i = 0; i < 16384; i++)
+	{
+		save_item(NAME(m_pagemap[i].valid), i);
+		save_item(NAME(m_pagemap[i].writable), i);
+		save_item(NAME(m_pagemap[i].supervisor), i);
+		save_item(NAME(m_pagemap[i].uncached), i);
+		save_item(NAME(m_pagemap[i].accessed), i);
+		save_item(NAME(m_pagemap[i].modified), i);
+		save_item(NAME(m_pagemap[i].page), i);
+		save_item(NAME(m_pagemap[i].type), i);
+	}
+
+	save_item(NAME(m_cachetags));
+	save_item(NAME(m_cachedata));
+	save_item(NAME(m_ram_size));
+	save_item(NAME(m_ram_size_words));
+	save_item(NAME(m_context));
+	save_item(NAME(m_context_masked));
+	save_item(NAME(m_system_enable));
+	save_item(NAME(m_fetch_bootrom));
+	save_item(NAME(m_buserr));
+	save_item(NAME(m_page_valid));
+	save_item(NAME(m_ctx_mask));
+	save_item(NAME(m_pmeg_mask));
 }
 
 void sun4c_mmu_device::device_reset()

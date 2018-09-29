@@ -47,7 +47,6 @@ sbus_bwtwo_device::sbus_bwtwo_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, SBUS_BWTWO, tag, owner, clock)
 	, device_sbus_card_interface(mconfig, *this)
 	, m_rom(*this, "prom")
-	//, m_vram(*this, "vram")
 	, m_screen(*this, "screen")
 {
 }
@@ -55,6 +54,7 @@ sbus_bwtwo_device::sbus_bwtwo_device(const machine_config &mconfig, const char *
 void sbus_bwtwo_device::device_start()
 {
 	m_vram = std::make_unique<uint8_t[]>(0x100000);
+	save_pointer(NAME(m_vram), 0x100000);
 
 	for (int i = 0; i < 0x100; i++)
 	{

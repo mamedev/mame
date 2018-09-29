@@ -36,6 +36,128 @@ sbus_cgsix_device::sbus_cgsix_device(const machine_config &mconfig, device_type 
 void sbus_cgsix_device::device_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(m_vram_size / 4);
+
+	save_pointer(NAME(m_vram), m_vram_size / 4);
+	save_item(NAME(m_vram_size));
+
+	save_item(NAME(m_fbc.m_clip_check));
+	save_item(NAME(m_fbc.m_status));
+	save_item(NAME(m_fbc.m_draw_status));
+	save_item(NAME(m_fbc.m_blit_status));
+	save_item(NAME(m_fbc.m_font));
+
+	save_item(NAME(m_fbc.m_x0));
+	save_item(NAME(m_fbc.m_y0));
+	save_item(NAME(m_fbc.m_z0));
+	save_item(NAME(m_fbc.m_color0));
+	save_item(NAME(m_fbc.m_x1));
+	save_item(NAME(m_fbc.m_y1));
+	save_item(NAME(m_fbc.m_z1));
+	save_item(NAME(m_fbc.m_color1));
+	save_item(NAME(m_fbc.m_x2));
+	save_item(NAME(m_fbc.m_y2));
+	save_item(NAME(m_fbc.m_z2));
+	save_item(NAME(m_fbc.m_color2));
+	save_item(NAME(m_fbc.m_x3));
+	save_item(NAME(m_fbc.m_y3));
+	save_item(NAME(m_fbc.m_z3));
+	save_item(NAME(m_fbc.m_color3));
+
+	save_item(NAME(m_fbc.m_raster_offx));
+	save_item(NAME(m_fbc.m_raster_offy));
+
+	save_item(NAME(m_fbc.m_autoincx));
+	save_item(NAME(m_fbc.m_autoincy));
+
+	save_item(NAME(m_fbc.m_clip_minx));
+	save_item(NAME(m_fbc.m_clip_miny));
+
+	save_item(NAME(m_fbc.m_clip_maxx));
+	save_item(NAME(m_fbc.m_clip_maxy));
+
+	save_item(NAME(m_fbc.m_fcolor));
+	save_item(NAME(m_fbc.m_bcolor));
+
+	save_item(NAME(m_fbc.m_rasterop));
+
+	save_item(NAME(m_fbc.m_plane_mask));
+	save_item(NAME(m_fbc.m_pixel_mask));
+
+	save_item(NAME(m_fbc.m_patt_align));
+	save_item(NAME(m_fbc.m_pattern[8]));
+
+	save_item(NAME(m_fbc.m_ipoint_absx));
+	save_item(NAME(m_fbc.m_ipoint_absy));
+	save_item(NAME(m_fbc.m_ipoint_absz));
+	save_item(NAME(m_fbc.m_ipoint_relx));
+	save_item(NAME(m_fbc.m_ipoint_rely));
+	save_item(NAME(m_fbc.m_ipoint_relz));
+	save_item(NAME(m_fbc.m_ipoint_r));
+	save_item(NAME(m_fbc.m_ipoint_g));
+	save_item(NAME(m_fbc.m_ipoint_b));
+	save_item(NAME(m_fbc.m_ipoint_a));
+
+	save_item(NAME(m_fbc.m_iline_absx));
+	save_item(NAME(m_fbc.m_iline_absy));
+	save_item(NAME(m_fbc.m_iline_absz));
+	save_item(NAME(m_fbc.m_iline_relx));
+	save_item(NAME(m_fbc.m_iline_rely));
+	save_item(NAME(m_fbc.m_iline_relz));
+	save_item(NAME(m_fbc.m_iline_r));
+	save_item(NAME(m_fbc.m_iline_g));
+	save_item(NAME(m_fbc.m_iline_b));
+	save_item(NAME(m_fbc.m_iline_a));
+
+	save_item(NAME(m_fbc.m_itri_absx));
+	save_item(NAME(m_fbc.m_itri_absy));
+	save_item(NAME(m_fbc.m_itri_absz));
+	save_item(NAME(m_fbc.m_itri_relx));
+	save_item(NAME(m_fbc.m_itri_rely));
+	save_item(NAME(m_fbc.m_itri_relz));
+	save_item(NAME(m_fbc.m_itri_r));
+	save_item(NAME(m_fbc.m_itri_g));
+	save_item(NAME(m_fbc.m_itri_b));
+	save_item(NAME(m_fbc.m_itri_a));
+
+	save_item(NAME(m_fbc.m_iquad_absx));
+	save_item(NAME(m_fbc.m_iquad_absy));
+	save_item(NAME(m_fbc.m_iquad_absz));
+	save_item(NAME(m_fbc.m_iquad_relx));
+	save_item(NAME(m_fbc.m_iquad_rely));
+	save_item(NAME(m_fbc.m_iquad_relz));
+	save_item(NAME(m_fbc.m_iquad_r));
+	save_item(NAME(m_fbc.m_iquad_g));
+	save_item(NAME(m_fbc.m_iquad_b));
+	save_item(NAME(m_fbc.m_iquad_a));
+
+	save_item(NAME(m_fbc.m_irect_absx));
+	save_item(NAME(m_fbc.m_irect_absy));
+	save_item(NAME(m_fbc.m_irect_absz));
+	save_item(NAME(m_fbc.m_irect_relx));
+	save_item(NAME(m_fbc.m_irect_rely));
+	save_item(NAME(m_fbc.m_irect_relz));
+	save_item(NAME(m_fbc.m_irect_r));
+	save_item(NAME(m_fbc.m_irect_g));
+	save_item(NAME(m_fbc.m_irect_b));
+	save_item(NAME(m_fbc.m_irect_a));
+
+	save_item(NAME(m_fbc.m_vertex_count));
+
+	for (int i = 0; i < 0x1000; i++)
+	{
+		save_item(NAME(m_fbc.m_prim_buf[i].m_absx), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_absy), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_absz), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_relx), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_rely), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_relz), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_r), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_g), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_b), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_a), i);
+	}
+
+	save_item(NAME(m_fbc.m_curr_prim_type));
 }
 
 void sbus_cgsix_device::device_reset()
