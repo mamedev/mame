@@ -129,7 +129,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
 	DECLARE_WRITE8_MEMBER(pia_portb_out);
 	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
-	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(grom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	void page_w(u8 data);
