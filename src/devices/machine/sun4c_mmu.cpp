@@ -73,6 +73,9 @@ void sun4c_mmu_device::device_start()
 	save_item(NAME(m_page_valid));
 	save_item(NAME(m_ctx_mask));
 	save_item(NAME(m_pmeg_mask));
+	save_item(NAME(m_ram_set_mask));
+	save_item(NAME(m_ram_set_base));
+	save_item(NAME(m_populated_ram_words));
 }
 
 void sun4c_mmu_device::device_reset()
@@ -81,6 +84,29 @@ void sun4c_mmu_device::device_reset()
 	m_ram_ptr = (uint32_t *)m_ram->pointer();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 2;
+	const uint32_t num_16meg_sets = m_ram_size / 0x1000000;
+	const uint32_t leftover_4meg_size = m_ram_size % 0x1000000;
+	const uint32_t num_4meg_sets = leftover_4meg_size / 0x400000;
+	uint32_t base = 0;
+	uint32_t set = 0;
+	for (; set < num_16meg_sets; set++)
+	{
+		m_ram_set_base[set] = base;
+		m_ram_set_mask[set] = 0x003fffff;
+		base += 0x1000000 >> 2;
+	}
+	for (; set < num_16meg_sets+num_4meg_sets; set++)
+	{
+		m_ram_set_base[set] = base;
+		m_ram_set_mask[set] = 0x000fffff;
+		base += 0x400000 >> 2;
+	}
+	for (; set < 4; set++)
+	{
+		m_ram_set_mask[set] = 0;
+		m_ram_set_base[set] = 0;
+	}
+	m_populated_ram_words = (num_16meg_sets + num_4meg_sets) * (0x1000000 >> 2);
 
 	m_context = 0;
 	m_context_masked = 0;
@@ -403,9 +429,13 @@ uint32_t sun4c_mmu_device::insn_data_r(const uint32_t offset, const uint32_t mem
 		{
 		case 0: // type 0 space
 			//return m_type0space->read32(space, tmp, mem_mask);
-			if (tmp < 0x1000000 >> 2)
+			if (tmp < m_populated_ram_words)
 			{
-				return m_ram_ptr[tmp];
+				const uint32_t set = (tmp >> 22) & 3;
+				const uint32_t addr_mask = m_ram_set_mask[set];
+				const uint32_t masked_addr = m_ram_set_base[set] + (tmp & addr_mask);
+				//printf("mask %08x, masked %08x\n", addr_mask, masked_addr);
+				return m_ram_ptr[masked_addr];
 			}
 			else if (tmp >= 0x4000000 >> 2 && tmp < 0x10000000 >> 2)
 			{
@@ -487,9 +517,13 @@ void sun4c_mmu_device::insn_data_w(const uint32_t offset, const uint32_t data, c
 		switch (entry.type)
 		{
 		case 0: // type 0
-			if (tmp < 0x1000000 >> 2)
+			if (tmp < m_populated_ram_words)
 			{
-				COMBINE_DATA((m_ram_ptr + tmp));
+				const uint32_t set = (tmp >> 22) & 3;
+				const uint32_t addr_mask = m_ram_set_mask[set];
+				const uint32_t masked_addr = m_ram_set_base[set] + (tmp & addr_mask);
+				COMBINE_DATA((m_ram_ptr + masked_addr));
+				//printf("mask %08x, masked %08x\n", addr_mask, masked_addr);
 			}
 			else if (tmp >= 0x4000000 >> 2 && tmp < 0x10000000 >> 2)
 			{

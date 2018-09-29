@@ -1876,7 +1876,9 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	m_mmu->set_scc(m_scc2);
 	m_maincpu->set_mmu(m_mmu);
 
-	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	m_ram->set_default_value(0x00);
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
@@ -1949,7 +1951,8 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	m_mmu->set_scc(m_scc2);
 	m_maincpu->set_mmu(m_mmu);
 
-	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
+	RAM(config, m_ram).set_default_size("16M").set_default_value(0x00);
+	m_ram->set_extra_options("4M,8M,12M,16M,20M,24M,28M,32M,36M,40M,48M,52M,64M");
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
@@ -2016,6 +2019,8 @@ void sun4_state::sun4_20(machine_config &config)
 {
 	sun4c(config);
 
+	m_ram->set_extra_options("4M,8M,12M,16M");
+
 	m_sbus_slot[0]->set_fixed(true);
 	m_sbus_slot[1]->set_fixed(true);
 	m_sbus_slot[2]->set_default_option("bwtwo");
@@ -2025,6 +2030,8 @@ void sun4_state::sun4_20(machine_config &config)
 void sun4_state::sun4_40(machine_config &config)
 {
 	sun4c(config);
+
+	m_ram->set_extra_options("4M,8M,12M,16M,20M,24M,32M,36M,48M");
 
 	m_mmu->set_clock(25'000'000);
 	m_maincpu->set_clock(25'000'000);
