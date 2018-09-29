@@ -2581,6 +2581,41 @@ ROM_START( rimrockn12 )
 ROM_END
 
 
+ROM_START( rimrockn12b )
+	ROM_REGION( 0x34000, "maincpu", 0 )
+	ROM_LOAD( "rbba-1.u5", 0x04000, 0x4000, CRC(f99561a8) SHA1(ee59b934839ef5599bb393e0860d54c95f6df1b0) ) // ZX2880JL
+	ROM_CONTINUE(          0x10000, 0x4000 )
+	ROM_CONTINUE(          0x1c000, 0x4000 )
+	ROM_CONTINUE(          0x28000, 0xc000 )
+	ROM_CONTINUE(          0x2c000, 0x8000 )
+	ROM_COPY( "maincpu",   0x2c000, 0x08000, 0x8000 )
+	ROM_COPY( "maincpu",   0x2c000, 0x14000, 0x8000 )
+	ROM_COPY( "maincpu",   0x2c000, 0x20000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "rrbsndv1.u27", 0x08000, 0x8000, CRC(8eda5f53) SHA1(f256544a8c87125587719460ed0fef14efef9015) ) // Found on a double-sized ROM (27C512) with its first half empty
+
+	ROM_REGION( 0x100000, "grom", 0 )
+	ROM_LOAD( "rbb-grom00", 0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
+	ROM_LOAD( "rbb-grom01", 0x40000, 0x40000, CRC(864cc269) SHA1(06f92889cd20881faeb59ec06ca1578ead2294f4) )
+	ROM_LOAD( "rbb-grom02", 0x80000, 0x40000, CRC(34e567d5) SHA1(d0eb6fd0da8b9c3bfe7d4ecfb4bd903e4926b63a) )
+	ROM_LOAD( "rbb-grom03", 0xc0000, 0x40000, CRC(fd18045d) SHA1(a1b98e4a2aa6f3cd33a3e2f5744160e05cc9f8d1) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "rbb-srom0", 0x00000, 0x40000, CRC(7ad42be0) SHA1(c9b519bad3c5c9a3315d1bf3292cc30ee0771db7) )
+
+	/* Unused */
+	ROM_REGION( 0x0096b, "plds", 0 )
+	ROM_LOAD( "a-palce16v8h.u53", 0x00000, 0x00117, NO_DUMP ) // Undumped (solderded)
+	ROM_LOAD( "a-palce16v8q.u45", 0x00117, 0x00117, NO_DUMP ) // Undumped (solderded)
+	ROM_LOAD( "a-palce16v8h.u14", 0x0022e, 0x00117, NO_DUMP ) // Undumped (solderded)
+	ROM_LOAD( "a-gal22v10.u55",   0x00345, 0x002e1, NO_DUMP ) // Undumped (solderded)
+	ROM_LOAD( "a-palce16v8h.u65", 0x00626, 0x00117, NO_DUMP ) // Undumped (solderded)
+	ROM_LOAD( "a-palce16v8h.u50", 0x0073d, 0x00117, NO_DUMP ) // Undumped (solderded)
+	ROM_LOAD( "b-palce16v8h.u29", 0x00854, 0x00117, NO_DUMP ) // Undumped (solderded)
+ROM_END
+
+
 ROM_START( ninclown )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prog1", 0x00000, 0x20000, CRC(fabfdcd2) SHA1(7a9852838cf7772d8f8f956b03823c4222520a5a) )
@@ -2783,10 +2818,11 @@ GAME( 1991, pegglet,    peggle,   hstennis_lo,       pegglet,  itech8_state, ini
 GAME( 1992, neckneck,   0,        hstennis_lo,       neckneck, itech8_state, init_neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn,   0,        rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
-GAME( 1991, rimrockn20, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
-GAME( 1991, rimrockn16, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
-GAME( 1991, rimrockn12, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn,    0,        rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
+GAME( 1991, rimrockn20,  rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
+GAME( 1991, rimrockn16,  rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn12,  rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "bootleg",                        "Rim Rockin' Basketball (V1.2, bootleg)", 0 )
 
 /* Ninja Clowns-style PCB */
 GAME( 1991, ninclown,   0,        ninclown,          ninclown, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
