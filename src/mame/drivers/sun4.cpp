@@ -755,15 +755,16 @@ private:
 	uint8_t m_diag;
 	int m_arch;
 
-	emu_timer *m_c0_timer, *m_c1_timer;
+	attotime m_c0_last_read_time;
+	attotime m_c1_last_read_time;
+	emu_timer *m_c0_timer;
+	emu_timer *m_c1_timer;
 	emu_timer *m_reset_timer;
 
 	void dma_check_interrupts();
 	void dma_transfer();
 	void dma_transfer_write();
 	void dma_transfer_read();
-
-	void start_timer(int num);
 
 	void l2p_command(int ref, const std::vector<std::string> &params);
 	void fcodes_command(int ref, const std::vector<std::string> &params);
@@ -789,7 +790,7 @@ READ32_MEMBER( sun4_state::sun4_system_r )
 			return m_cachetags[offset&0xfff];
 
 		case 9: // (d-)cache data
-			logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
+			//logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 			return 0xffffffff;
 
 		case 0xf:   // UART bypass
@@ -803,7 +804,7 @@ READ32_MEMBER( sun4_state::sun4_system_r )
 
 		case 0:
 		default:
-			logerror("sun4: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
+			//logerror("sun4: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
 			return 0;
 	}
 }
@@ -822,9 +823,9 @@ WRITE32_MEMBER( sun4_state::sun4_system_w )
 
 			if (m_system_enable & ENA_RESET)
 			{
-				m_reset_timer->adjust(attotime::from_usec(1));
+				m_reset_timer->adjust(attotime::from_usec(1), 0);
 				m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
-				logerror("%s: Asserting reset line\n", machine().describe_context());
+				//logerror("%s: Asserting reset line\n", machine().describe_context());
 			}
 			//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 			if (m_system_enable & ENA_RESET)
@@ -860,7 +861,7 @@ WRITE32_MEMBER( sun4_state::sun4_system_w )
 			return;
 
 		case 9: // cache data
-			logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+			//logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 			return;
 
 		case 0xf:   // UART bypass
@@ -874,7 +875,7 @@ WRITE32_MEMBER( sun4_state::sun4_system_w )
 
 		case 0: // IDPROM
 		default:
-			logerror("sun4: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x)\n", data, offset<<2, mem_mask, m_maincpu->pc());
+			//logerror("sun4: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x)\n", data, offset<<2, mem_mask, m_maincpu->pc());
 			return;
 	}
 }
@@ -966,7 +967,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 			return m_type1space->read32(space, tmp, mem_mask);
 
 		default:
-			logerror("sun4: access to unhandled memory type\n");
+			//logerror("sun4: access to unhandled memory type\n");
 			return 0;
 		}
 	}
@@ -974,7 +975,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 	{
 		if (!machine().side_effects_disabled())
 		{
-			logerror("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), offset <<2, m_maincpu->pc());
+			//logerror("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), offset <<2, m_maincpu->pc());
 			m_maincpu->set_mae();
 			m_buserr[0] |= 0x80;    // invalid PTE
 			m_buserr[0] &= ~0x8000; // read
@@ -1026,13 +1027,13 @@ WRITE32_MEMBER( sun4_state::sun4_insn_data_w )
 			return;
 
 		default:
-			logerror("sun4: access to memory type not defined in sun4c\n");
+			//logerror("sun4: access to memory type not defined in sun4\n");
 			return;
 		}
 	}
 	else
 	{
-		logerror("sun4: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), data, offset <<2, m_maincpu->pc());
+		//logerror("sun4: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), data, offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
 		//m_buserr[0] = 0x8;    // invalid PTE
 		//m_buserr[1] = offset<<2;
@@ -1184,6 +1185,11 @@ void sun4_state::machine_reset()
 	m_dma_tc_read = false;
 	m_dma_pack_register = 0;
 
+	m_c0_last_read_time = attotime::zero;
+	m_c1_last_read_time = attotime::zero;
+	m_counter[0] = 1 << 10;
+	m_counter[2] = 1 << 10;
+
 	memset(m_counter, 0, sizeof(m_counter));
 	memset(m_dma, 0, sizeof(m_dma));
 }
@@ -1207,8 +1213,8 @@ void sun4_state::machine_start()
 	// allocate timers for the built-in two channel timer
 	m_c0_timer = timer_alloc(TIMER_0);
 	m_c1_timer = timer_alloc(TIMER_1);
-	m_c0_timer->adjust(attotime::never);
-	m_c1_timer->adjust(attotime::never);
+	m_c0_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
+	m_c1_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
 
 	// allocate timer for system reset
 	m_reset_timer = timer_alloc(TIMER_RESET);
@@ -1417,6 +1423,7 @@ WRITE8_MEMBER( sun4_state::auxio_w )
 
 READ8_MEMBER( sun4_state::irq_r )
 {
+	//logerror("%02x from IRQ\n", m_irq_reg);
 	return m_irq_reg;
 }
 
@@ -1433,10 +1440,16 @@ WRITE8_MEMBER( sun4_state::irq_w )
 
 	if (BIT(changed, 0))
 	{
-		if (BIT(m_irq_reg, 7) && BIT(m_counter[2] | m_counter[3], 31))
-			m_maincpu->set_input_line(SPARC_IRQ14, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-		if (BIT(m_irq_reg, 5) && BIT(m_counter[0] | m_counter[1], 31))
-			m_maincpu->set_input_line(SPARC_IRQ10, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(m_irq_reg, 7))
+		{
+			//logerror("Changing interrupt enable, %s IRQ14\n", BIT(data, 0) && BIT(m_counter[2] | m_counter[3], 31) ? "asserting" : "deasserting");
+			m_maincpu->set_input_line(SPARC_IRQ14, BIT(data, 0) && BIT(m_counter[2] | m_counter[3], 31) ? ASSERT_LINE : CLEAR_LINE);
+		}
+		if (BIT(m_irq_reg, 5))
+		{
+			//logerror("Changing interrupt enable, %s IRQ10\n", BIT(data, 0) && BIT(m_counter[0] | m_counter[1], 31) ? "asserting" : "deasserting");
+			m_maincpu->set_input_line(SPARC_IRQ10, BIT(data, 0) && BIT(m_counter[0] | m_counter[1], 31) ? ASSERT_LINE : CLEAR_LINE);
+		}
 		if (BIT(m_irq_reg, 3))
 			m_maincpu->set_input_line(SPARC_IRQ6, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 		if (BIT(m_irq_reg, 2))
@@ -1446,10 +1459,16 @@ WRITE8_MEMBER( sun4_state::irq_w )
 	}
 	else if (BIT(m_irq_reg, 0))
 	{
-		if (BIT(changed, 7) && BIT(m_counter[2] | m_counter[3], 31))
-			m_maincpu->set_input_line(SPARC_IRQ14, BIT(m_irq_reg, 7) ? ASSERT_LINE : CLEAR_LINE);
-		if (BIT(changed, 5) && BIT(m_counter[0] | m_counter[1], 31))
-			m_maincpu->set_input_line(SPARC_IRQ10, BIT(m_irq_reg, 5) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(changed, 7))
+		{
+			//logerror("Changing IRQ14 enable, %s IRQ14\n", BIT(data, 7) && BIT(m_counter[2] | m_counter[3], 31) ? "asserting" : "deasserting");
+			m_maincpu->set_input_line(SPARC_IRQ14, BIT(m_irq_reg, 7) && BIT(m_counter[2] | m_counter[3], 31) ? ASSERT_LINE : CLEAR_LINE);
+		}
+		if (BIT(changed, 5))
+		{
+			//logerror("Changing IRQ10 enable, %s IRQ10\n", BIT(data, 7) && BIT(m_counter[0] | m_counter[1], 31) ? "asserting" : "deasserting");
+			m_maincpu->set_input_line(SPARC_IRQ10, BIT(m_irq_reg, 5) && BIT(m_counter[0] | m_counter[1], 31) ? ASSERT_LINE : CLEAR_LINE);
+		}
 		if (BIT(changed, 3))
 			m_maincpu->set_input_line(SPARC_IRQ6, BIT(m_irq_reg, 3) ? ASSERT_LINE : CLEAR_LINE);
 		if (BIT(changed, 2))
@@ -1478,28 +1497,40 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	switch (id)
 	{
 		case TIMER_0:
-			//printf("Timer 0 expired\n");
-			m_counter[0] = 0x80000000 | (1 << 10);
-			m_counter[1] |= 0x80000000;
-			//m_c0_timer->adjust(attotime::never);
-			start_timer(0);
-			if ((m_irq_reg & 0x21) == 0x21)
+			//logerror("Timer 0 expired\n");
+			m_counter[0] += 1 << 10;
+			if ((m_counter[0] & 0x7fffffff) == (m_counter[1] & 0x7fffffff))
 			{
-				m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
-				//printf("Taking INT10\n");
+				m_counter[0] = 0x80000000 | (1 << 10);
+				m_counter[1] |= 0x80000000;
+				if ((m_irq_reg & 0x21) == 0x21)
+				{
+					m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
+					//logerror("Taking INT10\n");
+				}
+				else
+				{
+					//logerror("Not taking INT10\n");
+				}
 			}
 			break;
 
 		case TIMER_1:
-			//printf("Timer 1 expired\n");
-			m_counter[2] = 0x80000000 | (1 << 10);
-			m_counter[3] |= 0x80000000;
-			start_timer(1);
-			//m_c1_timer->adjust(attotime::never);
-			if ((m_irq_reg & 0x81) == 0x81)
+			//logerror("Timer 1 expired\n");
+			m_counter[2] += 1 << 10;
+			if ((m_counter[2] & 0x7fffffff) == (m_counter[3] & 0x7fffffff))
 			{
-				m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
-				//printf("Taking INT14\n");
+				m_counter[2] = 0x80000000 | (1 << 10);
+				m_counter[3] |= 0x80000000;
+				if ((m_irq_reg & 0x81) == 0x81)
+				{
+					m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
+					//logerror("Taking INT14\n");
+				}
+				else
+				{
+					//logerror("Not taking INT14\n");
+				}
 			}
 			break;
 
@@ -1513,51 +1544,33 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ32_MEMBER( sun4_state::timer_r )
 {
-	uint32_t ret = m_counter[offset];
+	const uint32_t ret = m_counter[offset];
 
 	// reading limt 0
 	if (offset == 0)
 	{
-		//printf("Read timer counter 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer counter 0 (%x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
-	if (offset == 1)
+	else if (offset == 1)
 	{
-		//printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer limit 0 (%08x) @ %x, mask %08x, clearing IRQ10\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[0] &= ~0x80000000;
 		m_counter[1] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ10, CLEAR_LINE);
 	}
-
-	if (offset == 2)
+	else if (offset == 2)
 	{
-		//printf("Read timer counter 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer counter 1 (%x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
-	if (offset == 3)
+	else if (offset == 3)
 	{
-		//printf("Read timer limit 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer limit 1 (%08x) @ %x, mask %08x, clearing IRQ14\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[2] &= ~0x80000000;
 		m_counter[3] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ14, CLEAR_LINE);
 	}
+
 	return ret;
-}
-
-void sun4_state::start_timer(int num)
-{
-	int period = (m_counter[num * 2 + 1] >> 10) & 0x1fffff;
-	if (period == 0)
-		period = 0x200000;
-
-	//printf("Setting limit %d period to %d us\n", num, period);
-
-	if (num == 0)
-	{
-		m_c0_timer->adjust(attotime::from_usec(period));
-	}
-	else
-	{
-		m_c1_timer->adjust(attotime::from_usec(period));
-	}
 }
 
 WRITE32_MEMBER( sun4_state::timer_w )
@@ -1566,26 +1579,26 @@ WRITE32_MEMBER( sun4_state::timer_w )
 
 	if (offset == 0)
 	{
-		printf("%08x to timer counter 0 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
+		//logerror("%08x to timer counter 0 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 	}
 
 	// writing limit 0
 	if (offset == 1)
 	{
+		//logerror("%08x to timer limit 0 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 		m_counter[0] = 1 << 10;
-		start_timer(0);
 	}
 
 	if (offset == 2)
 	{
-		printf("%08x to timer counter 1 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
+		//printf("%08x to timer counter 1 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 	}
 
 	// writing limit 1
 	if (offset == 3)
 	{
+		//logerror("%08x to timer limit 1 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 		m_counter[2] = 1 << 10;
-		start_timer(1);
 	}
 }
 
