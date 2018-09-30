@@ -19,7 +19,10 @@
  *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
  *       + dirtdash speedometer has wrong colors when in the jungle level
  *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
- * - add layer enable in system 22, see bugs in cybrcomm and victlapw
+ * - polygon layer stays visible sometimes when it shouldn't:
+ *       + cybrcomm/victlapw namco logo screen after attract demo
+ *       + airco22b title logo after attract demo
+ *       + aquajet namco logo/game over after ending
  * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors)
  * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
