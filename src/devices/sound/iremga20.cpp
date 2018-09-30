@@ -154,7 +154,7 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 					if (ch.counter <= ch.rate)
 					{
 						ch.pos++;
-						ch.counter += 0x100 - ch.rate;
+						ch.counter = 0x100;
 					}
 				}
 			}
