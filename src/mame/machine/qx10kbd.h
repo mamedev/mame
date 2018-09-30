@@ -29,7 +29,7 @@ private:
 	required_ioport_array<16> m_rows;
 	required_device<cpu_device> m_mcu;
 	emu_timer *m_bit_timer;
-	u8 m_line, m_rxd, m_clk;
+	u8 m_rxd;
 	int m_row, m_clk_state;
 };
 
