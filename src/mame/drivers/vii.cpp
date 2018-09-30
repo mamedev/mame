@@ -542,14 +542,14 @@ void spg2xx_game_state::do_dma(uint32_t len)
 	uint32_t src = m_video_regs[0x70];
 	uint32_t dst = m_video_regs[0x71] + 0x2c00;
 
-	printf("Video DMAing from %08x to %08x\n", src, dst);
+	//printf("Video DMAing from %08x to %08x\n", src, dst);
 	for (uint32_t j = 0; j < len; j++)
 	{
 		const uint16_t word = mem.read_word(src + j);
-		printf("%04x ", word);
+		//printf("%04x ", word);
 		mem.write_word(dst + j, word);
 	}
-	printf("\n");
+	//printf("\n");
 
 	m_video_regs[0x72] = 0;
 	//const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
@@ -822,14 +822,14 @@ void spg2xx_game_state::spg_do_dma(uint32_t len)
 	uint32_t src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
 	uint32_t dst = m_io_regs[0x103] & 0x3fff;
 
-	printf("CPU DMAing from %08x to %08x\n", src, dst);
+	//printf("CPU DMAing from %08x to %08x\n", src, dst);
 	for (uint32_t j = 0; j < len; j++)
 	{
 		const uint16_t word = mem.read_word(src + j);
-		printf("%04x ", word);
+		//printf("%04x ", word);
 		mem.write_word(dst + j, word);
 	}
-	printf("\n");
+	//printf("\n");
 
 	m_io_regs[0x102] = 0;
 }
@@ -952,7 +952,7 @@ WRITE16_MEMBER(spg2xx_game_state::io_w)
 
 	case 0x21: // IRQ Enable
 	{
-		printf("io_w: IRQ Control = %04x (%04x)\n", data, mem_mask);
+		verboselog(3, "io_w: IRQ Control = %04x (%04x)\n", data, mem_mask);
 		const uint16_t old = VII_IRQ_ENABLE & VII_IRQ_STATUS;
 		COMBINE_DATA(&VII_IRQ_ENABLE);
 		const uint16_t changed = old ^ (VII_IRQ_ENABLE & VII_IRQ_STATUS);
