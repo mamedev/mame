@@ -1181,8 +1181,10 @@
 #define VBSTART             (480)
 
 
-#define MCU_SPEEDUP         1                   /* mcu idle skipping */
-
+#define MCU_SPEEDUP         1    /* mcu idle skipping */
+#define SERIAL_IO_PERIOD    (60) /* lower DSP serial I/O period */
+// actual dsp serial freq is unknown, should be much higher than 60hz of course
+// serial comms doesn't work yet anyway
 
 /*********************************************************************************************/
 
@@ -1326,22 +1328,21 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 				if (data == 0)
 				{
 					/* disable DSPs */
-					m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					enable_slave_simulation(false);
+					master_enable(false);
+					slave_enable(false);
 					m_dsp_irq_enabled = false;
 				}
 				else if (data == 1)
 				{
 					/* enable dsp and rendering subsystem */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-					enable_slave_simulation(true);
+					master_enable(true);
+					slave_enable(true);
 					m_dsp_irq_enabled = true;
 				}
 				else if (data == 0xff)
 				{
 					/* used to upload game-specific code to master/slave dsps */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					master_enable(true);
 					m_dsp_irq_enabled = false;
 				}
 			}
@@ -1471,22 +1472,21 @@ WRITE8_MEMBER(namcos22_state::namcos22_system_controller_w)
 				if (data == 0)
 				{
 					/* disable DSPs */
-					m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					enable_slave_simulation(false);
+					master_enable(false);
+					slave_enable(false);
 					m_dsp_irq_enabled = false;
 				}
 				else if (data == 1)
 				{
 					/* enable dsp and rendering subsystem */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-					enable_slave_simulation(true);
+					master_enable(true);
+					slave_enable(true);
 					m_dsp_irq_enabled = true;
 				}
 				else if (data == 0xff)
 				{
 					/* used to upload game-specific code to master/slave dsps */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					master_enable(true);
 					m_dsp_irq_enabled = false;
 				}
 			}
@@ -1934,8 +1934,8 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x400000, 0x40001f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
 	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
 	map(0x420000, 0x42000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly(); // C139 SCI registers
-	map(0x430000, 0x430003).nopw(); // more leds?
-	map(0x440000, 0x440003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x430000, 0x430003).w(FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x440000, 0x440003).r(FUNC(namcos22_state::namcos22_dipswitch_r));
 	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0x700000, 0x70001f).rw(FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22s_system_controller_w));
@@ -2026,21 +2026,15 @@ void namcos22_state::alpinesa_am(address_map &map)
 
 // DSPs
 
-void namcos22_state::enable_slave_simulation(bool enable)
+void namcos22_state::master_enable(bool enable)
 {
+	m_master->set_input_line(INPUT_LINE_RESET, enable ? CLEAR_LINE : ASSERT_LINE);
+}
+
+void namcos22_state::slave_enable(bool enable)
+{
+	m_slave->set_input_line(INPUT_LINE_RESET, enable ? CLEAR_LINE : ASSERT_LINE);
 	m_slave_simulation_active = enable;
-}
-
-void namcos22_state::slave_halt()
-{
-	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	enable_slave_simulation(false);
-}
-
-void namcos22_state::slave_enable()
-{
-//  m_slave->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	enable_slave_simulation(true);
 }
 
 
@@ -2364,7 +2358,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 			switch (data)
 			{
 				case 0x00:
-					slave_halt();
+					slave_enable(false);
 					break;
 
 				case 0x01:
@@ -2376,7 +2370,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 					break;
 
 				case 0x03:
-					slave_enable();
+					slave_enable(true);
 					break;
 
 				case 0x04:
@@ -2384,7 +2378,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 
 				case 0x10:
 					/* serial i/o related? */
-					slave_enable();
+					slave_enable(true);
 					break;
 
 				default:
@@ -2448,37 +2442,22 @@ READ16_MEMBER(namcos22_state::master_serial_io_r)
 	return m_SerialDataSlaveToMasterCurrent;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_master_serial_irq)
+INTERRUPT_GEN_MEMBER(namcos22_state::dsp_vblank_irq)
 {
-	int scanline = param;
+	if (m_dsp_irq_enabled)
+		device.execute().set_input_line(TMS32025_INT0, HOLD_LINE);
+}
 
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
+{
 	if (m_dsp_irq_enabled)
 	{
 		m_SerialDataSlaveToMasterCurrent = m_SerialDataSlaveToMasterNext;
 
-		if (scanline == 480)
-		{
-			m_master->set_input_line(TMS32025_INT0, HOLD_LINE);
-		}
-		else if ((scanline % 2) == 0)
-		{
-			m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
-			m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
-		}
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_slave_serial_irq)
-{
-	int scanline = param;
-
-	if (m_dsp_irq_enabled)
-	{
-		if ((scanline % 2) == 0)
-		{
-			m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
-			m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
-		}
+		m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
+		m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
+		m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
+		m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
 	}
 }
 
@@ -3736,8 +3715,9 @@ GFXDECODE_END
 
 void namcos22_state::machine_reset()
 {
-	m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	master_enable(false);
+	slave_enable(false);
+	m_dsp_irq_enabled = false;
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_poly->reset();
@@ -3747,7 +3727,6 @@ void namcos22_state::machine_start()
 {
 	m_led.resolve();
 	m_cpuled.resolve();
-	m_slave_simulation_active = false;
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
 }
@@ -3769,8 +3748,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
 	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
+	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dsp_serial", namcos22_state, dsp_serial_pulse, attotime::from_hz(SERIAL_IO_PERIOD))
 
 	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK)); /* ? */
 	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
@@ -3781,8 +3760,6 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	MCFG_DEVICE_PROGRAM_MAP( mcu_s22_program)
@@ -3840,8 +3817,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
 	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
+	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dsp_serial", namcos22_state, dsp_serial_pulse, attotime::from_hz(SERIAL_IO_PERIOD))
 
 	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK));
 	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
@@ -3853,12 +3830,10 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
-
 	MCFG_DEVICE_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
 	MCFG_DEVICE_IO_MAP(mcu_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namcos22_state, mcu_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_irq", namcos22_state, mcu_irq, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")

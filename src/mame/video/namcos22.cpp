@@ -15,10 +15,10 @@
  *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
  *       + 100% fog if you start dirtdash at the hill level
  * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
- * - improve ss22 spot:
+ * - improve ss22 spot: the bugs hint toward an extra bg layer bank?
  *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
  *       + dirtdash speedometer has wrong colors when in the jungle level
- *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level (possibly just a game bug?)
+ *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
  * - add layer enable in system 22, see bugs in cybrcomm and victlapw
  * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors)
  * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
@@ -782,7 +782,7 @@ void namcos22_state::matrix3d_identity(float m[4][4])
 	{
 		for (int col = 0; col < 4; col++)
 		{
-			m[row][col] = (row == col) ? 1.0 : 0.0;
+			m[row][col] = (row == col) ? 1.0f : 0.0f;
 		}
 	}
 }
@@ -796,9 +796,9 @@ void namcos22_state::matrix3d_apply_reflection(float m[4][4])
 	matrix3d_identity(r);
 
 	if (m_reflection & 0x10)
-		r[0][0] = -1.0;
+		r[0][0] = -1.0f;
 	if (m_reflection & 0x20)
-		r[1][1] = -1.0;
+		r[1][1] = -1.0f;
 
 	matrix3d_multiply(m, r);
 }
@@ -1004,16 +1004,16 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 	/* backface cull one-sided polygons */
 	if (flags & 0x0020)
 	{
-		double c1 =
+		float c1 =
 			(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
 			(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
 			(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y)));
-		double c2 =
+		float c2 =
 			(v[0].x*((v[2].z*v[3].y)-(v[2].y*v[3].z)))+
 			(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
 			(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y)));
 
-		if ((m_reflection && c1 <= 0 && c2 <= 0) || (!m_reflection && c1 >= 0 && c2 >= 0))
+		if ((m_cullflip && c1 <= 0.0f && c2 <= 0.0f) || (!m_cullflip && c1 >= 0.0f && c2 >= 0.0f))
 			return;
 	}
 
@@ -1291,6 +1291,7 @@ void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
 	m_reflection = src[0x2] >> 16 & 0x30; // z too?
+	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
 	m_absolute_priority = src[0x3] >> 16;
 	m_camera_vx = (int16_t)(src[5] >> 16);
 	m_camera_vy = (int16_t)(src[5] & 0xffff);
@@ -1393,8 +1394,6 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 {
 	const int32_t *src = 0x300 + (int32_t *)m_polygonram.target();
 	int16_t len;
-
-	matrix3d_identity(m_viewmatrix);
 
 	if (m_is_ss22)
 	{
@@ -2374,6 +2373,8 @@ uint32_t namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rg
 
 void namcos22_state::init_tables()
 {
+	matrix3d_identity(m_viewmatrix);
+
 	m_dirtypal = std::make_unique<uint8_t[]>(0x8000/4);
 	memset(m_dirtypal.get(), 1, 0x8000/4);
 	memset(m_paletteram, 0, 0x8000);
