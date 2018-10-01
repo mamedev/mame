@@ -681,7 +681,17 @@ void mc6845_device::handle_line_timer()
 			new_vsync = false;
 		}
 	}
+	else
+	{
+		/* Check if VSYNC should be enabled */
+		if ( m_line_counter == m_vert_sync_pos )
+		{
+			m_vsync_width_counter = 0;
+			m_vsync_ff = 1;
 
+			new_vsync = true;
+		}
+	}
 	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
 	// The correct test would be:
 	// if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
@@ -703,15 +713,6 @@ void mc6845_device::handle_line_timer()
 		{
 			m_line_enable_ff = false;
 			m_current_disp_addr = m_disp_start_addr;
-		}
-
-		/* Check if VSYNC should be enabled */
-		if ( m_line_counter == m_vert_sync_pos )
-		{
-			m_vsync_width_counter = 0;
-			m_vsync_ff = 1;
-
-			new_vsync = true;
 		}
 	}
 	else
