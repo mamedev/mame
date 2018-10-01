@@ -236,16 +236,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	BaseColor.g = pow(BaseColor.g, Power.g);
 	BaseColor.b = pow(BaseColor.b, Power.b);
 
-	// Scanline Simulation (may not affect bloom)
-	if (!PrepareBloom)
+	// Hum Bar Simulation (may not affect vector screen)
+	if (!PrepareBloom && !VectorScreen && HumBarAlpha > 0.0f)
 	{
-		// Hum Bar Simulation (may not affect vector screen)
-		if (!VectorScreen && HumBarAlpha > 0.0f)
-		{
-			float HumBarStep = frac(TimeMilliseconds * HumBarDesync);
-			float HumBarBrightness = 1.0 - frac(BaseCoord.y + HumBarStep) * HumBarAlpha;
-			BaseColor.rgb *= HumBarBrightness;
-		}
+		float HumBarStep = frac(TimeMilliseconds * HumBarDesync);
+		float HumBarBrightness = 1.0 - frac(BaseCoord.y + HumBarStep) * HumBarAlpha;
+		BaseColor.rgb *= HumBarBrightness;
 	}
 
 	return BaseColor;

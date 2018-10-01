@@ -98,6 +98,10 @@
 #define WINOPTION_BLOOM_LEVEL6_WEIGHT       "bloom_lvl6_weight"
 #define WINOPTION_BLOOM_LEVEL7_WEIGHT       "bloom_lvl7_weight"
 #define WINOPTION_BLOOM_LEVEL8_WEIGHT       "bloom_lvl8_weight"
+#define WINOPTION_LUT_TEXTURE "lut_texture"
+#define WINOPTION_LUT_ENABLE "lut_enable"
+#define WINOPTION_UI_LUT_TEXTURE "ui_lut_texture"
+#define WINOPTION_UI_LUT_ENABLE "ui_lut_enable"
 
 // full screen options
 #define WINOPTION_TRIPLEBUFFER          "triplebuffer"
@@ -199,6 +203,10 @@ public:
 	const char *screen_floor() const { return value(WINOPTION_FLOOR); }
 	const char *screen_phosphor() const { return value(WINOPTION_PHOSPHOR); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
+	const char *screen_lut_texture() const { return value(WINOPTION_LUT_TEXTURE); }
+	bool screen_lut_enable() const { return bool_value(WINOPTION_LUT_ENABLE); }
+	const char *ui_lut_texture() const { return value(WINOPTION_UI_LUT_TEXTURE); }
+	bool ui_lut_enable() const { return bool_value(WINOPTION_UI_LUT_ENABLE); }
 
 	// full screen options
 	bool triple_buffer() const { return bool_value(WINOPTION_TRIPLEBUFFER); }

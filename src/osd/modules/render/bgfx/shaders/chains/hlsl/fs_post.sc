@@ -3,7 +3,7 @@ $input v_color0, v_texcoord0
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Scanline & Shadowmask Effect
+// Shadowmask Effect
 //-----------------------------------------------------------------------------
 
 #include "common.sh"
