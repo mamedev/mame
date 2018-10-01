@@ -55,7 +55,6 @@ Detailed list of bugs:
 - In the default bios (no cart loaded):
 -- The "MOTOR" option in the diagnostic menu does nothing when selected
 - Zone 60 / Wireless 60:
--- Auto Racing / Auto X, Dragon, some other games: some sprites are inverted or opaque where they should be transparent
 -- Basketball: emulator crashes when starting the game due to jumping to invalid code.
 
 
@@ -260,7 +259,7 @@ private:
 
 #define VERBOSE_LEVEL   (4)
 
-#define ENABLE_VERBOSE_LOG (0)
+#define ENABLE_VERBOSE_LOG (1)
 
 inline void spg2xx_game_state::verboselog(int n_level, const char *s_fmt, ...)
 {
@@ -374,7 +373,7 @@ void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, ui
 			bits &= 0xffff;
 
 			if ((ctrl & 0x0010) && yy < 240)
-				xx -= (int16_t)m_p_rowscroll[yy];
+				xx -= (int16_t)m_p_rowscroll[yy + 15];
 
 			xx &= 0x01ff;
 			if (xx >= 0x01c0)
@@ -547,9 +546,7 @@ void spg2xx_game_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &clip
 
 uint32_t spg2xx_game_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
-
-	memset(m_screenram, 0, sizeof(m_screenram));
+	memset(&m_screenram[320 * cliprect.min_y], 0, 3 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -561,9 +558,10 @@ uint32_t spg2xx_game_state::screen_update_vii(screen_device &screen, bitmap_rgb3
 			blit_sprites(bitmap, cliprect, i);
 	}
 
-	for (int y = 0; y < 240; y++)
+	bitmap.fill(0, cliprect);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = 0; x < 320; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			bitmap.pix32(y, x) = (m_screenram[x + 320 * y].r << 16) | (m_screenram[x + 320 * y].g << 8) | m_screenram[x + 320 * y].b;
 		}
@@ -1407,6 +1405,7 @@ void spg2xx_game_state::device_timer(emu_timer &timer, device_timer_id id, int p
 			{
 				check_video_irq();
 			}
+			m_screen->update_partial(m_screen->vpos());
 			break;
 		}
 	}
@@ -1592,9 +1591,10 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(320, 262);
+	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(spg2xx_game_state::screen_update_vii));
+	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->screen_vblank().set(FUNC(spg2xx_game_state::vii_vblank));
 
 	PALETTE(config, "palette", 32768);
