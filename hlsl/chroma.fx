@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:W. M. Martinez
 //-----------------------------------------------------------------------------
-// Phosphor Effect
+// Phosphor Chromaticity to sRGB Transform Effect
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -13,19 +13,6 @@ texture Diffuse;
 sampler DiffuseSampler = sampler_state
 {
 	Texture   = <Diffuse>;
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	AddressU = CLAMP;
-	AddressV = CLAMP;
-	AddressW = CLAMP;
-};
-
-texture LastPass;
-
-sampler PreviousSampler = sampler_state
-{
-	Texture   = <LastPass>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -61,7 +48,7 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Phosphor Vertex Shader
+// Chroma Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
@@ -90,26 +77,33 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Phosphor Pixel Shader
+// Chroma Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float DeltaTime = 0.0;
-uniform float3 Phosphor = float3(0.0, 0.0, 0.0);
+uniform float3 YGain = float3(0.2126, 0.7152, 0.0722);
+uniform float2 ChromaA = float2(0.630, 0.340);
+uniform float2 ChromaB = float2(0.310, 0.595);
+uniform float2 ChromaC = float2(0.155, 0.070);
 
-static const float F = 30.0;
+static const float3x3 XYZ_TO_sRGB = {
+	 3.2406, -1.5372, -0.4986,
+        -0.9689,  1.8758,  0.0415,
+	 0.0557, -0.2040,  1.0570
+};
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 CurrY = tex2D(DiffuseSampler, Input.TexCoord);
-	float3 PrevY = tex2D(PreviousSampler, Input.PrevCoord).rgb;
+	const float4 cin = tex2D(DiffuseSampler, Input.TexCoord);
+	float4 cout = float4(0.0, 0.0, 0.0, cin.a);
+	const float3x2 xy = { ChromaA, ChromaB, ChromaC };
 
-	PrevY[0] *= Phosphor[0] == 0.0 ? 0.0 : pow(Phosphor[0], F * DeltaTime);
-	PrevY[1] *= Phosphor[1] == 0.0 ? 0.0 : pow(Phosphor[1], F * DeltaTime);
-	PrevY[2] *= Phosphor[2] == 0.0 ? 0.0 : pow(Phosphor[2], F * DeltaTime);
-	float a = max(PrevY[0], CurrY[0]);
-	float b = max(PrevY[1], CurrY[1]);
-	float c = max(PrevY[2], CurrY[2]);
-	return Passthrough ? CurrY : float4(a, b, c, CurrY.a);
+	for (int i = 0; i < 3; ++i) {
+		const float Y = YGain[i] * cin[i];
+		const float X = xy[i].x * (Y / xy[i].y);
+		const float Z = (1.0 - xy[i].x - xy[i].y) * (Y / xy[i].y);
+		cout.rgb += mul(XYZ_TO_sRGB, float3(X, Y, Z));
+	}
+	return cout;
 }
 
 //-----------------------------------------------------------------------------

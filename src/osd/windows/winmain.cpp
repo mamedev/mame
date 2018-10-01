@@ -216,6 +216,12 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_POWER";fs_power",                               "1.0,1.0,1.0",       OPTION_STRING,     "signal power value (exponential)" },
 	{ WINOPTION_FLOOR";fs_floor",                               "0.0,0.0,0.0",       OPTION_STRING,     "signal floor level" },
 	{ WINOPTION_PHOSPHOR";fs_phosphor",                         "0.0,0.0,0.0",       OPTION_STRING,     "phosphorescence decay rate (0.0 is instant, 1.0 is forever)" },
+	{ WINOPTION_CHROMA_MODE,                                    "3",                 OPTION_INTEGER,    "Number of phosphors to use: 1 - monochrome, 2 - dichrome, 3 - trichrome (color)" },
+	{ WINOPTION_CHROMA_CONVERSION_GAIN,                         "0.299,0.587,0.114", OPTION_STRING,     "Gain to be applied when summing RGB signal for monochrome and dichrome modes" },
+	{ WINOPTION_CHROMA_A,                                       "0.64,0.33",         OPTION_STRING,     "Chromaticity coordinate for first phosphor" },
+	{ WINOPTION_CHROMA_B,                                       "0.30,0.60",         OPTION_STRING,     "Chromaticity coordinate for second phosphor" },
+	{ WINOPTION_CHROMA_C,                                       "0.15,0.06",         OPTION_STRING,     "Chromaticity coordinate for third phosphor" },
+	{ WINOPTION_CHROMA_Y_GAIN,                                  "0.2126,0.7152,0.0722", OPTION_STRING,  "Gain to be applied for each phosphor" },
 	/* NTSC simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
 	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",                 OPTION_BOOLEAN,    "enables YIQ-space HLSL post-processing" },
@@ -652,4 +658,3 @@ static int is_double_click_start(int argc)
 }
 
 #endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-

@@ -70,6 +70,12 @@
 #define WINOPTION_FLOOR                     "floor"
 #define WINOPTION_PHOSPHOR                  "phosphor_life"
 #define WINOPTION_SATURATION                "saturation"
+#define WINOPTION_CHROMA_MODE               "chroma_mode"
+#define WINOPTION_CHROMA_CONVERSION_GAIN    "chroma_conversion_gain"
+#define WINOPTION_CHROMA_A                  "chroma_a"
+#define WINOPTION_CHROMA_B                  "chroma_b"
+#define WINOPTION_CHROMA_C                  "chroma_c"
+#define WINOPTION_CHROMA_Y_GAIN             "chroma_y_gain"
 #define WINOPTION_YIQ_ENABLE                "yiq_enable"
 #define WINOPTION_YIQ_JITTER                "yiq_jitter"
 #define WINOPTION_YIQ_CCVALUE               "yiq_cc"
@@ -203,6 +209,12 @@ public:
 	const char *screen_floor() const { return value(WINOPTION_FLOOR); }
 	const char *screen_phosphor() const { return value(WINOPTION_PHOSPHOR); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
+	int screen_chroma_mode() const { return int_value(WINOPTION_CHROMA_MODE); }
+	const char *screen_chroma_a() const { return value(WINOPTION_CHROMA_A); }
+	const char *screen_chroma_b() const { return value(WINOPTION_CHROMA_B); }
+	const char *screen_chroma_c() const { return value(WINOPTION_CHROMA_C); }
+	const char *screen_chroma_conversion_gain() const { return value(WINOPTION_CHROMA_CONVERSION_GAIN); }
+	const char *screen_chroma_y_gain() const { return value(WINOPTION_CHROMA_Y_GAIN); }
 	const char *screen_lut_texture() const { return value(WINOPTION_LUT_TEXTURE); }
 	bool screen_lut_enable() const { return bool_value(WINOPTION_LUT_ENABLE); }
 	const char *ui_lut_texture() const { return value(WINOPTION_UI_LUT_TEXTURE); }
