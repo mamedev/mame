@@ -52,7 +52,7 @@ void qx10_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	auto &mcu(I8049(config, "mcu", 11_MHz_XTAL));
 	mcu.p1_out_cb().set(FUNC(qx10_keyboard_device::mcu_p1_w));
-	mcu.p2_out_cb().set([this](u8 data) { /* leds */ });
+	mcu.p2_out_cb().set([](u8 data) { /* leds */ });
 	mcu.bus_in_cb().set([this]() { return m_rows[m_row]->read(); });
 	mcu.t1_in_cb().set([this]() { return m_rxd; });
 	mcu.t0_in_cb().set([this]() { return m_clk_state; });
