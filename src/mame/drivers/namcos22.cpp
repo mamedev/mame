@@ -1203,10 +1203,8 @@ READ32_MEMBER(namcos22_state::namcos22_sci_r)
 	}
 }
 
-#if 0
 WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
 {
-	COMBINE_DATA(&m_sci_regs[offset]);
 	/*
 	20020000  2 R/W RX Status
 	            0x01 : Frame Error
@@ -1234,7 +1232,6 @@ WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
 	2002000e  2 W   TX FIFO Pointer (0x0000 - 0x1fff)
 	*/
 }
-#endif
 
 
 /* system controller (super system22)
@@ -1796,7 +1793,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     2002000c  2  R/W RX FIFO Pointer (0x0000 - 0x0fff)
 	 *     2002000e  2  W   TX FIFO Pointer (0x0000 - 0x1fff)
 	 */
-	map(0x20020000, 0x2002000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly();
+	map(0x20020000, 0x2002000f).rw(FUNC(namcos22_state::namcos22_sci_r), FUNC(namcos22_state::namcos22_sci_w));
 
 	/**
 	 * System Controller: Interrupt Control, Peripheral Control
@@ -1937,7 +1934,7 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x400000, 0x40001f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
 	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
-	map(0x420000, 0x42000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly(); // C139 SCI registers
+	map(0x420000, 0x42000f).rw(FUNC(namcos22_state::namcos22_sci_r), FUNC(namcos22_state::namcos22_sci_w)); // C139 SCI registers
 	map(0x430000, 0x430003).w(FUNC(namcos22_state::namcos22_cpuleds_w));
 	map(0x440000, 0x440003).r(FUNC(namcos22_state::namcos22_dipswitch_r));
 	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
@@ -1968,6 +1965,7 @@ READ32_MEMBER(namcos22_state::namcos22_gun_r)
 	uint16_t xpos = ioport("LIGHTX")->read();
 	uint16_t ypos = ioport("LIGHTY")->read();
 	// ypos is not completely understood yet, there should be a difference between case 1 and 2
+	// game determines real y = 430004 + 430008
 
 	switch (offset)
 	{
@@ -3216,13 +3214,13 @@ static INPUT_PORTS_START( cybrcomm )
 	    end up needing to change again too
 	    Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
 	*/
-	PORT_START("STICKY1")       /* VOLUME 0 */
+	PORT_START("STICKY1") /* VOLUME 1 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */
-	PORT_START("STICKY2")       /* VOLUME 0 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: vertical */
-	PORT_START("STICKX1")       /* VOLUME 0 */
+	PORT_START("STICKX1") /* VOLUME 2 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: horizontal */
-	PORT_START("STICKX2")       /* VOLUME 0 */
+	PORT_START("STICKY2") /* VOLUME 3 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: vertical */
+	PORT_START("STICKX2") /* VOLUME 4 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: horizontal */
 
 	PORT_START("DSW0")
@@ -3348,7 +3346,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Swing")
 
 	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Edge")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2) PORT_NAME("Steps Edge")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airco22 )
@@ -3368,22 +3366,22 @@ static INPUT_PORTS_START( airco22 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* Missile */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* Gun */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile Button")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(2)
 
 	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(2)
 
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_START("ADC.2") // throttle stick auto-centers
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_NAME("Throttle Stick")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cybrcycc )
@@ -3706,12 +3704,12 @@ static const gfx_layout namcos22_cg_layout =
 #undef XOR
 
 static GFXDECODE_START( gfx_namcos22 )
-	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( nullptr,   0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_super )
-	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( nullptr,   0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 	GFXDECODE_ENTRY( "sprite",  0, sprite_layout,        0, 0x80 )
 GFXDECODE_END

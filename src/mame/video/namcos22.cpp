@@ -1043,7 +1043,7 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 			else if (m_SurfaceNormalFormat == 0x4000)
 				m_LitSurfaceIndex++;
 			else
-				logerror("unknown normal format: 0x%x\n", m_SurfaceNormalFormat);
+				logerror("blit_single_quad:unknown normal format: 0x%x\n", m_SurfaceNormalFormat);
 		}
 		else if (packetformat & 0x40)
 		{
@@ -1355,7 +1355,7 @@ void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t 
 	}
 	else if (m_PrimitiveID != 0 && m_PrimitiveID != 2)
 	{
-		logerror("slavesim_handle_200002:unk code=0x%x\n", m_PrimitiveID);
+		logerror("slavesim_handle_200002:unknown code=0x%x\n", m_PrimitiveID);
 		// ridgerac title screen waving flag: 0x5
 	}
 }
@@ -1396,7 +1396,6 @@ void namcos22_state::slavesim_handle_233002(const int32_t *src)
 void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 {
 	const int32_t *src = 0x300 + (int32_t *)m_polygonram.target();
-	int16_t len;
 
 	if (m_is_ss22)
 	{
@@ -1409,9 +1408,15 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 
 	for (;;)
 	{
-		int16_t next;
+		/* hackery! commands should be streamed, not parsed here */
 		m_PrimitiveID = *src++;
-		len  = (int16_t)*src++;
+		uint16_t len = *src++;
+		int32_t index = src - (int32_t *)m_polygonram.target();
+		if ((index + len) >= 0x7fff)
+		{
+			logerror("simulate_slavedsp:buffer overflow len=0x%x code=0x%x addr=0x%x\n", len, m_PrimitiveID, index);
+			return;
+		}
 
 		switch (len)
 		{
@@ -1432,26 +1437,34 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 				break;
 
 			default:
-				logerror("unk 3d data(%d) addr=0x%x!", len, (int)(src-(int32_t*)m_polygonram.target()));
+			{
+				std::string polydata;
+				int i = 0;
+				for (; i < len && i < 0x20; i++)
 				{
-					int i;
-					for (i = 0; i < len; i++)
-					{
-						logerror(" %06x", src[i] & 0xffffff);
-					}
-					logerror("\n");
+					char h[8];
+					sprintf(h, " %06x", src[i] & 0xffffff);
+					polydata += h;
 				}
+				if (i < len)
+					polydata += " (...)";
+				logerror("simulate_slavedsp:unknown 3d data len=0x%x code=0x%x addr=0x%x!%s\n", len, m_PrimitiveID, index, polydata);
 				return;
+			}
 		}
 
-		/* hackery! commands should be streamed, not parsed here */
 		src += len;
 		src++; /* always 0xffff */
-		next = (int16_t)*src++; /* link to next command */
-		if ((next & 0x7fff) != (src - (int32_t *)m_polygonram.target()))
+		uint16_t next = 0x7fff & *src++; /* link to next command */
+		if (next != (index + len + 1 + 1))
 		{
 			/* end of list */
 			break;
+		}
+		if (next == 0x7fff)
+		{
+			logerror("simulate_slavedsp:buffer overflow next=0x7fff\n");
+			return;
 		}
 	}
 }

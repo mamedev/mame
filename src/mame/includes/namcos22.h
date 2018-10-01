@@ -333,6 +333,7 @@ private:
 	DECLARE_READ16_MEMBER(dsp_slave_portb_r);
 	DECLARE_WRITE16_MEMBER(dsp_slave_portb_w);
 	DECLARE_READ32_MEMBER(namcos22_sci_r);
+	DECLARE_WRITE32_MEMBER(namcos22_sci_w);
 	DECLARE_READ8_MEMBER(namcos22_system_controller_r);
 	DECLARE_WRITE8_MEMBER(namcos22s_system_controller_w);
 	DECLARE_WRITE8_MEMBER(namcos22_system_controller_w);
