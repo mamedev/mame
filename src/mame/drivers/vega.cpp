@@ -184,7 +184,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 		case 0:  /* 00-03 */
 		{
 			/* PPI 8255 /CS */
-			m_i8255->write(space, (m_p2_data>>6)&3, data);
+			m_i8255->write((m_p2_data>>6)&3, data);
 		}
 		break;
 
@@ -313,7 +313,7 @@ READ8_MEMBER(vega_state::extern_r)
 	{
 		case 0: /* PPI 8255 /CS */
 		{
-			return m_i8255->read( space, m_p2_data>>6); /* A6,A7 -> A0,A1 */
+			return m_i8255->read(m_p2_data>>6); /* A6,A7 -> A0,A1 */
 		}
 
 		case 1: /* 04-07 */

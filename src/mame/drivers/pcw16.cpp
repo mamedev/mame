@@ -1060,11 +1060,11 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set_inputline(m_maincpu, 0);
 
-	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw16_state, fdc_interrupt))
+	PC_FDC_SUPERIO(config, m_fdc);
+	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 

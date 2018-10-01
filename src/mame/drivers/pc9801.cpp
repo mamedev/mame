@@ -784,8 +784,8 @@ WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
 		uint8_t por;
 		/* reset POR bit */
 		// TODO: is there any other way that doesn't involve direct r/w of ppi address?
-		por = m_ppi_sys->read(space, 2) & ~0x20;
-		m_ppi_sys->write(space, 2, por);
+		por = m_ppi_sys->read(2) & ~0x20;
+		m_ppi_sys->write(2, por);
 		m_maincpu->set_input_line(INPUT_LINE_A20, CLEAR_LINE);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
@@ -1026,12 +1026,12 @@ READ8_MEMBER( pc9801_state::midi_r )
 
 READ8_MEMBER(pc9801_state::pic_r)
 {
-	return ((offset >= 4) ? m_pic2 : m_pic1)->read(space, offset & 3);
+	return ((offset >= 4) ? m_pic2 : m_pic1)->read(offset & 3);
 }
 
 WRITE8_MEMBER(pc9801_state::pic_w)
 {
-	((offset >= 4) ? m_pic2 : m_pic1)->write(space, offset & 3, data);
+	((offset >= 4) ? m_pic2 : m_pic1)->write(offset & 3, data);
 }
 
 READ16_MEMBER(pc9801_state::grcg_gvram_r)
@@ -2407,7 +2407,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	FLOPPY_CONNECTOR(config, "upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
 	pc9801_sasi(config);
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_w));
@@ -2434,7 +2434,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
 
 	pc9801_ide(config);
-	MCFG_UPD4990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
+	UPD4990A(config, m_rtc);
 
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
 

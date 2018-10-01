@@ -1055,9 +1055,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::next_fdc_base)
 	next_base(config);
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, next_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, next_state, fdc_drq))
+	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
+	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
+	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
 
 	// software list

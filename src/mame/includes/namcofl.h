@@ -55,10 +55,10 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<namco_c116_device> m_c116;
 	required_device<screen_device> m_screen;
-	required_device<namco_c123tmap_device> m_c123tmap; 
-	required_device<namco_c169roz_device> m_c169roz; 
-	required_device<namco_c355spr_device> m_c355spr; 
-    required_device<cpu_device> m_mcu;
+	required_device<namco_c123tmap_device> m_c123tmap;
+	required_device<namco_c169roz_device> m_c169roz;
+	required_device<namco_c355spr_device> m_c355spr;
+	required_device<cpu_device> m_mcu;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_in2;

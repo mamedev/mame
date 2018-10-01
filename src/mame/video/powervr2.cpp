@@ -1804,8 +1804,8 @@ void powervr2_device::process_ta_fifo()
 		if (paratype == 7)
 		{
 			if ((global_paratype == 5) ||
-			    (tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
-			    (tafifo_listtype == DISPLAY_LIST_TRANS_MOD))
+				(tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
+				(tafifo_listtype == DISPLAY_LIST_TRANS_MOD))
 			{
 				tafifo_vertexwords = 16;
 			}

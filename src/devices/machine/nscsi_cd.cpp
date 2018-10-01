@@ -124,7 +124,7 @@ void nscsi_cdrom_device::scsi_command()
 		 *    peripheral qualifier set to the value required in 8.2.5.1.
 		 *
 		 * If the logic from the specification above is applied, Sun SCSI probe
-		 * code gets confused and reports multiple valid logical units are 
+		 * code gets confused and reports multiple valid logical units are
 		 * attached; proper behaviour is produced when check condition status
 		 * is returned with sense data ILLEGAL REQUEST and LOGICAL UNIT NOT
 		 * SUPPORTED.

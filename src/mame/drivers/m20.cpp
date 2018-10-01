@@ -203,12 +203,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
-	return m_i8259->read(space, offset)<<1;
+	return m_i8259->read(offset)<<1;
 }
 
 WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
-	m_i8259->write(space, offset, (data>>1));
+	m_i8259->write(offset, (data>>1));
 }
 
 WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )

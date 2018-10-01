@@ -4,11 +4,11 @@
 
     Sun SunPC 5x86 Accelerator (501-4230) skeleton
 
-	Notable parts on board:
-	- 1x AMD AM27C256 PLCC ROM
-	- 1x Motorola SunPC Accelerator 100-3069-03, mfr/date AANL9732
-	- 6x Cypress CY7B185-10VC 64kBit Static RAM
-	- 1x AMD 5x86 (under heatsink; markings unknown)
+    Notable parts on board:
+    - 1x AMD AM27C256 PLCC ROM
+    - 1x Motorola SunPC Accelerator 100-3069-03, mfr/date AANL9732
+    - 6x Cypress CY7B185-10VC 64kBit Static RAM
+    - 1x AMD 5x86 (under heatsink; markings unknown)
 
 ***************************************************************************/
 

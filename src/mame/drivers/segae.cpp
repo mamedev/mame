@@ -363,7 +363,7 @@ private:
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<sega315_5124_device> m_vdp2;
-	required_device<i8255_device>		 m_ppi;
+	required_device<i8255_device>        m_ppi;
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
@@ -928,11 +928,12 @@ void systeme_state::hangonjr(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(systeme_state::hangonjr_port_fa_write)); // CD4051 selector input
 }
 
-MACHINE_CONFIG_START(systeme_state::ridleofp)
+void systeme_state::ridleofp(machine_config &config)
+{
 	systeme(config);
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // on 834-6193 I/O sub board
-	MCFG_UPD4701_PORTX("PAD1")
-	MCFG_UPD4701_PORTY("PAD2")
+	upd4701_device &upd4701(UPD4701A(config, "upd4701")); // on 834-6193 I/O sub board
+	upd4701.set_portx_tag("PAD1");
+	upd4701.set_porty_tag("PAD2");
 
 	i8255_device &ppi(*subdevice<i8255_device>("ppi"));
 	ppi.in_pa_callback().set("upd4701", FUNC(upd4701_device::d_r));
@@ -941,7 +942,7 @@ MACHINE_CONFIG_START(systeme_state::ridleofp)
 	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::ul_w)).bit(2);
 	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resetx_w)).bit(1); // or possibly bit 0
 	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resety_w)).bit(0); // or possibly bit 1
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(systeme_state::systemex)
 	systeme(config);

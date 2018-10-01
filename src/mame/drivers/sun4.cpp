@@ -476,12 +476,12 @@
 #define DMA_BYTE_COUNT  (2)
 #define DMA_XTAL        (25_MHz_XTAL)
 
-#define AUXIO_DENSITY	(0x20)
-#define AUXIO_DISK_CHG	(0x10)
-#define AUXIO_DRIVE_SEL	(0x08)
-#define AUXIO_TC		(0x04)
-#define AUXIO_EJECT		(0x02)
-#define AUXIO_LED		(0x01)
+#define AUXIO_DENSITY   (0x20)
+#define AUXIO_DISK_CHG  (0x10)
+#define AUXIO_DRIVE_SEL (0x08)
+#define AUXIO_TC        (0x04)
+#define AUXIO_EJECT     (0x02)
+#define AUXIO_LED       (0x01)
 
 namespace
 {
@@ -541,6 +541,7 @@ public:
 		, m_scsibus(*this, "scsibus")
 		, m_scsi(*this, "scsibus:7:ncr53c90a")
 		, m_sbus(*this, "sbus")
+		, m_sbus_slot(*this, "slot%u", 1U)
 		, m_type0space(*this, "type0")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
@@ -550,14 +551,16 @@ public:
 	}
 
 	void sun4c(machine_config &config);
+	void sun4_20(machine_config &config);
 	void sun4_40(machine_config &config);
+	void sun4_50(machine_config &config);
 	void sun4_60(machine_config &config);
+	void sun4_65(machine_config &config);
 	void sun4_75(machine_config &config);
 	void sun4(machine_config &config);
 
 	void init_sun4();
 	void init_sun4c();
-	void init_ss2();
 
 private:
 	virtual void machine_reset() override;
@@ -673,13 +676,14 @@ private:
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 
-	required_device<i82072_device> m_fdc;
+	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<am79c90_device> m_lance;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c90a_device> m_scsi;
 
 	optional_device<sbus_device> m_sbus;
+	optional_device_array<sbus_slot_device, 3> m_sbus_slot;
 	optional_device<address_map_bank_device> m_type0space;
 	optional_device<address_map_bank_device> m_type1space;
 	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_type1_cache;
@@ -751,15 +755,16 @@ private:
 	uint8_t m_diag;
 	int m_arch;
 
-	emu_timer *m_c0_timer, *m_c1_timer;
+	attotime m_c0_last_read_time;
+	attotime m_c1_last_read_time;
+	emu_timer *m_c0_timer;
+	emu_timer *m_c1_timer;
 	emu_timer *m_reset_timer;
 
 	void dma_check_interrupts();
 	void dma_transfer();
 	void dma_transfer_write();
 	void dma_transfer_read();
-
-	void start_timer(int num);
 
 	void l2p_command(int ref, const std::vector<std::string> &params);
 	void fcodes_command(int ref, const std::vector<std::string> &params);
@@ -785,7 +790,7 @@ READ32_MEMBER( sun4_state::sun4_system_r )
 			return m_cachetags[offset&0xfff];
 
 		case 9: // (d-)cache data
-			logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
+			//logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 			return 0xffffffff;
 
 		case 0xf:   // UART bypass
@@ -799,7 +804,7 @@ READ32_MEMBER( sun4_state::sun4_system_r )
 
 		case 0:
 		default:
-			logerror("sun4: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
+			//logerror("sun4: ASI 2 space unhandled read @ %x (PC=%x)\n", offset<<2, m_maincpu->pc());
 			return 0;
 	}
 }
@@ -818,9 +823,9 @@ WRITE32_MEMBER( sun4_state::sun4_system_w )
 
 			if (m_system_enable & ENA_RESET)
 			{
-				m_reset_timer->adjust(attotime::from_usec(1));
+				m_reset_timer->adjust(attotime::from_usec(1), 0);
 				m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
-				logerror("%s: Asserting reset line\n", machine().describe_context());
+				//logerror("%s: Asserting reset line\n", machine().describe_context());
 			}
 			//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 			if (m_system_enable & ENA_RESET)
@@ -856,7 +861,7 @@ WRITE32_MEMBER( sun4_state::sun4_system_w )
 			return;
 
 		case 9: // cache data
-			logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+			//logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 			return;
 
 		case 0xf:   // UART bypass
@@ -870,7 +875,7 @@ WRITE32_MEMBER( sun4_state::sun4_system_w )
 
 		case 0: // IDPROM
 		default:
-			logerror("sun4: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x)\n", data, offset<<2, mem_mask, m_maincpu->pc());
+			//logerror("sun4: ASI 2 space unhandled write %x @ %x (mask %08x, PC=%x)\n", data, offset<<2, mem_mask, m_maincpu->pc());
 			return;
 	}
 }
@@ -882,6 +887,8 @@ READ32_MEMBER( sun4_state::sun4_segment_map_r )
 		return m_curr_segmap[(offset>>16) & 0xfff]<<16;
 	else if (mem_mask == 0xff000000)
 		return m_curr_segmap[(offset>>16) & 0xfff]<<24;
+	else if (mem_mask == 0xffffffff)
+		return m_curr_segmap[(offset>>16) & 0xfff];
 	else
 		logerror("sun4: read segment map w/ unknown mask %08x\n", mem_mask);
 	return 0x0;
@@ -962,7 +969,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 			return m_type1space->read32(space, tmp, mem_mask);
 
 		default:
-			logerror("sun4: access to unhandled memory type\n");
+			//logerror("sun4: access to unhandled memory type\n");
 			return 0;
 		}
 	}
@@ -970,7 +977,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 	{
 		if (!machine().side_effects_disabled())
 		{
-			logerror("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), offset <<2, m_maincpu->pc());
+			//logerror("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), offset <<2, m_maincpu->pc());
 			m_maincpu->set_mae();
 			m_buserr[0] |= 0x80;    // invalid PTE
 			m_buserr[0] &= ~0x8000; // read
@@ -1022,13 +1029,13 @@ WRITE32_MEMBER( sun4_state::sun4_insn_data_w )
 			return;
 
 		default:
-			logerror("sun4: access to memory type not defined in sun4c\n");
+			//logerror("sun4: access to memory type not defined in sun4\n");
 			return;
 		}
 	}
 	else
 	{
-		logerror("sun4: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), data, offset <<2, m_maincpu->pc());
+		//logerror("sun4: INVALID PTE entry %d %08x accessed! data=%08x vaddr=%x PC=%x\n", entry_index, m_pagemap[entry_index].to_uint(), data, offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
 		//m_buserr[0] = 0x8;    // invalid PTE
 		//m_buserr[1] = offset<<2;
@@ -1145,7 +1152,7 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x03000000, 0x0300000f).rw(FUNC(sun4_state::timer_r), FUNC(sun4_state::timer_w)).mirror(0xfffff0);
 	map(0x05000000, 0x05000003).rw(FUNC(sun4_state::irq_r), FUNC(sun4_state::irq_w));
 	map(0x06000000, 0x0607ffff).rom().region("user1", 0);
-	map(0x07200000, 0x07200003).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
+	map(0x07200000, 0x07200007).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
 	map(0x07400003, 0x07400003).rw(FUNC(sun4_state::auxio_r), FUNC(sun4_state::auxio_w));
 	map(0x08000000, 0x08000003).r(FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
 	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
@@ -1180,6 +1187,11 @@ void sun4_state::machine_reset()
 	m_dma_tc_read = false;
 	m_dma_pack_register = 0;
 
+	m_c0_last_read_time = attotime::zero;
+	m_c1_last_read_time = attotime::zero;
+	m_counter[0] = 1 << 10;
+	m_counter[2] = 1 << 10;
+
 	memset(m_counter, 0, sizeof(m_counter));
 	memset(m_dma, 0, sizeof(m_dma));
 }
@@ -1203,12 +1215,56 @@ void sun4_state::machine_start()
 	// allocate timers for the built-in two channel timer
 	m_c0_timer = timer_alloc(TIMER_0);
 	m_c1_timer = timer_alloc(TIMER_1);
-	m_c0_timer->adjust(attotime::never);
-	m_c1_timer->adjust(attotime::never);
+	m_c0_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
+	m_c1_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
 
 	// allocate timer for system reset
 	m_reset_timer = timer_alloc(TIMER_RESET);
 	m_reset_timer->adjust(attotime::never);
+
+	for (int i = 0; i < 16; i++)
+	{
+		save_item(NAME(m_segmap[i]), i);
+		save_item(NAME(m_segmap_masked[i]), i);
+	}
+
+	for (int i = 0; i < 16384; i++)
+	{
+		save_item(NAME(m_pagemap[i].valid), i);
+		save_item(NAME(m_pagemap[i].writable), i);
+		save_item(NAME(m_pagemap[i].supervisor), i);
+		save_item(NAME(m_pagemap[i].uncached), i);
+		save_item(NAME(m_pagemap[i].accessed), i);
+		save_item(NAME(m_pagemap[i].modified), i);
+		save_item(NAME(m_pagemap[i].page), i);
+		save_item(NAME(m_pagemap[i].type), i);
+	}
+
+	save_item(NAME(m_cachetags));
+	save_item(NAME(m_cachedata));
+	save_item(NAME(m_ram_size));
+	save_item(NAME(m_ram_size_words));
+	save_item(NAME(m_context));
+	save_item(NAME(m_context_masked));
+	save_item(NAME(m_system_enable));
+	save_item(NAME(m_fetch_bootrom));
+	save_item(NAME(m_buserr));
+	save_item(NAME(m_page_valid));
+
+	save_item(NAME(m_auxio));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_dma));
+	save_item(NAME(m_dma_irq));
+	save_item(NAME(m_dma_tc_read));
+	save_item(NAME(m_dma_pack_register));
+	save_item(NAME(m_scsi_irq));
+	save_item(NAME(m_fdc_irq));
+
+	save_item(NAME(m_irq_reg));
+	save_item(NAME(m_scc1_int));
+	save_item(NAME(m_scc2_int));
+	save_item(NAME(m_diag));
+	save_item(NAME(m_arch));
 }
 
 READ32_MEMBER( sun4_state::ram_r )
@@ -1300,11 +1356,21 @@ READ8_MEMBER( sun4_state::fdc_r )
 
 	switch(offset)
 	{
-		case 0: // Main Status (R)
+		case 0: // Main Status (R, 82072)
 			return m_fdc->msr_r(space, 0, 0xff);
 
-		case 1: // FIFO Data Port (R)
+		case 1: // FIFO Data Port (R, 82072)
+		case 5: // FIFO Data Port (R, 82077)
 			return m_fdc->fifo_r(space, 0, 0xff);
+
+		case 2: // Digital Output Register (R, 82077)
+			return m_fdc->dor_r(space, 0, 0xff);
+
+		case 4: // Main Status Register (R, 82077)
+			return m_fdc->msr_r(space, 0, 0xff);
+
+		case 7:// Digital Input Register (R, 82077)
+			return m_fdc->dir_r(space, 0, 0xff);
 
 		default:
 			break;
@@ -1317,12 +1383,18 @@ WRITE8_MEMBER( sun4_state::fdc_w )
 {
 	switch(offset)
 	{
-		case 0: // Data Rate Select Register (W)
+		case 0: // Data Rate Select Register (W, 82072)
+		case 4: // Data Rate Select Register (W, 82077)
 			m_fdc->dsr_w(space, 0, data, 0xff);
 			break;
 
-		case 1: // FIFO Data Port (W)
+		case 1: // FIFO Data Port (W, 82072)
+		case 5: // FIFO Data Port (W, 82077)
 			m_fdc->fifo_w(space, 0, data, 0xff);
+			break;
+
+		case 7: // Configuration Control REgister (W, 82077)
+			m_fdc->ccr_w(space, 0, data, 0xff);
 			break;
 
 		default:
@@ -1353,6 +1425,7 @@ WRITE8_MEMBER( sun4_state::auxio_w )
 
 READ8_MEMBER( sun4_state::irq_r )
 {
+	//logerror("%02x from IRQ\n", m_irq_reg);
 	return m_irq_reg;
 }
 
@@ -1414,28 +1487,40 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	switch (id)
 	{
 		case TIMER_0:
-			//printf("Timer 0 expired\n");
-			m_counter[0] = 0x80000000 | (1 << 10);
-			m_counter[1] |= 0x80000000;
-			//m_c0_timer->adjust(attotime::never);
-			start_timer(0);
-			if ((m_irq_reg & 0x21) == 0x21)
+			//logerror("Timer 0 expired\n");
+			m_counter[0] += 1 << 10;
+			if ((m_counter[0] & 0x7fffffff) == (m_counter[1] & 0x7fffffff))
 			{
-				m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
-				//printf("Taking INT10\n");
+				m_counter[0] = 0x80000000 | (1 << 10);
+				m_counter[1] |= 0x80000000;
+				if ((m_irq_reg & 0x21) == 0x21)
+				{
+					m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
+					//logerror("Taking INT10\n");
+				}
+				else
+				{
+					//logerror("Not taking INT10\n");
+				}
 			}
 			break;
 
 		case TIMER_1:
-			//printf("Timer 1 expired\n");
-			m_counter[2] = 0x80000000 | (1 << 10);
-			m_counter[3] |= 0x80000000;
-			start_timer(1);
-			//m_c1_timer->adjust(attotime::never);
-			if ((m_irq_reg & 0x81) == 0x81)
+			//logerror("Timer 1 expired\n");
+			m_counter[2] += 1 << 10;
+			if ((m_counter[2] & 0x7fffffff) == (m_counter[3] & 0x7fffffff))
 			{
-				m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
-				//printf("Taking INT14\n");
+				m_counter[2] = 0x80000000 | (1 << 10);
+				m_counter[3] |= 0x80000000;
+				if ((m_irq_reg & 0x81) == 0x81)
+				{
+					m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
+					//logerror("Taking INT14\n");
+				}
+				else
+				{
+					//logerror("Not taking INT14\n");
+				}
 			}
 			break;
 
@@ -1449,51 +1534,33 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ32_MEMBER( sun4_state::timer_r )
 {
-	uint32_t ret = m_counter[offset];
+	const uint32_t ret = m_counter[offset];
 
 	// reading limt 0
 	if (offset == 0)
 	{
-		//printf("Read timer counter 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer counter 0 (%x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
-	if (offset == 1)
+	else if (offset == 1)
 	{
-		//printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer limit 0 (%08x) @ %x, mask %08x, clearing IRQ10\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[0] &= ~0x80000000;
 		m_counter[1] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ10, CLEAR_LINE);
 	}
-
-	if (offset == 2)
+	else if (offset == 2)
 	{
-		//printf("Read timer counter 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer counter 1 (%x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
-	if (offset == 3)
+	else if (offset == 3)
 	{
-		//printf("Read timer limit 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//logerror("Read timer limit 1 (%08x) @ %x, mask %08x, clearing IRQ14\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[2] &= ~0x80000000;
 		m_counter[3] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ14, CLEAR_LINE);
 	}
+
 	return ret;
-}
-
-void sun4_state::start_timer(int num)
-{
-	int period = (m_counter[num * 2 + 1] >> 10) & 0x1fffff;
-	if (period == 0)
-		period = 0x200000;
-
-	//printf("Setting limit %d period to %d us\n", num, period);
-
-	if (num == 0)
-	{
-		m_c0_timer->adjust(attotime::from_usec(period));
-	}
-	else
-	{
-		m_c1_timer->adjust(attotime::from_usec(period));
-	}
 }
 
 WRITE32_MEMBER( sun4_state::timer_w )
@@ -1502,26 +1569,26 @@ WRITE32_MEMBER( sun4_state::timer_w )
 
 	if (offset == 0)
 	{
-		printf("%08x to timer counter 0 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
+		//logerror("%08x to timer counter 0 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 	}
 
 	// writing limit 0
 	if (offset == 1)
 	{
+		//logerror("%08x to timer limit 0 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 		m_counter[0] = 1 << 10;
-		start_timer(0);
 	}
 
 	if (offset == 2)
 	{
-		printf("%08x to timer counter 1 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
+		//printf("%08x to timer counter 1 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 	}
 
 	// writing limit 1
 	if (offset == 3)
 	{
+		//logerror("%08x to timer limit 1 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
 		m_counter[2] = 1 << 10;
-		start_timer(1);
 	}
 }
 
@@ -1541,7 +1608,6 @@ void sun4_state::dma_check_interrupts()
 	if (old_irq != m_dma_irq)
 	{
 		//logerror("m_dma_irq %d because irq_or_err_pending:%d and irq_enabled:%d\n", m_dma_irq ? 1 : 0, irq_or_err_pending, irq_enabled);
-		logerror("dma\n");
 		m_maincpu->set_input_line(SPARC_IRQ3, m_dma_irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -1813,7 +1879,9 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	m_mmu->set_scc(m_scc2);
 	m_maincpu->set_mmu(m_mmu);
 
-	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	m_ram->set_default_value(0x00);
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
@@ -1873,11 +1941,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16'670'000)
+	MCFG_DEVICE_ADD(m_maincpu, MB86901, 20'000'000)
 	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
-	SUN4C_MMU(config, m_mmu, 16'670'000, 7, 0x7f);
+	SUN4C_MMU(config, m_mmu, 20'000'000, 7, 0x7f);
 	m_mmu->type1_r().set(m_type1space, FUNC(address_map_bank_device::read32));
 	m_mmu->type1_w().set(m_type1space, FUNC(address_map_bank_device::write32));
 	m_mmu->set_cpu(m_maincpu);
@@ -1886,11 +1954,12 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	m_mmu->set_scc(m_scc2);
 	m_maincpu->set_mmu(m_mmu);
 
-	RAM(config, RAM_TAG).set_default_size("16M").set_default_value(0x00);
+	RAM(config, m_ram).set_default_size("16M").set_default_value(0x00);
+	m_ram->set_extra_options("4M,8M,12M,16M,20M,24M,28M,32M,36M,40M,48M,52M,64M");
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
-	I82072(config, m_fdc, 24_MHz_XTAL);
+	N82077AA(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->set_ready_line_connected(false);
 	m_fdc->intrq_wr_callback().set(FUNC(sun4_state::fdc_irq));
 	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", sun4_state::floppy_formats);
@@ -1899,7 +1968,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	ADDRESS_MAP_BANK(config, m_type0space).set_map(&sun4_state::type0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
@@ -1941,57 +2010,89 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr53c90a", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); })
+
+	// SBus
+	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
+	SBUS_SLOT(config, m_sbus_slot[0], 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[1], 20'000'000, m_sbus, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[2], 20'000'000, m_sbus, sbus_cards, nullptr);
 MACHINE_CONFIG_END
+
+void sun4_state::sun4_20(machine_config &config)
+{
+	sun4c(config);
+
+	m_ram->set_extra_options("4M,8M,12M,16M");
+
+	m_sbus_slot[0]->set_fixed(true);
+	m_sbus_slot[1]->set_fixed(true);
+	m_sbus_slot[2]->set_default_option("bwtwo");
+	m_sbus_slot[2]->set_fixed(true);
+}
 
 void sun4_state::sun4_40(machine_config &config)
 {
 	sun4c(config);
 
+	m_ram->set_extra_options("4M,8M,12M,16M,20M,24M,32M,36M,48M");
+
 	m_mmu->set_clock(25'000'000);
 	m_maincpu->set_clock(25'000'000);
-	m_maincpu->set_mmu(m_mmu);
 
-	m_type1space->set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	m_sbus->set_clock(25'000'000);
+	m_sbus_slot[0]->set_clock(25'000'000);
+	m_sbus_slot[1]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_default_option("bwtwo");
+	m_sbus_slot[2]->set_fixed(true);
+}
 
-	// SBus
-	SBUS(config, m_sbus, 25'000'000, "maincpu", "type1");
-	SBUS_SLOT(config, "slot1", 25'000'000, m_sbus, sbus_cards, nullptr);
-	SBUS_SLOT(config, "slot2", 25'000'000, m_sbus, sbus_cards, nullptr);
-	SBUS_SLOT(config, "slot3", 25'000'000, m_sbus, sbus_cards, "bwtwo");
+void sun4_state::sun4_50(machine_config &config)
+{
+	sun4c(config);
+
+	m_mmu->set_ctx_mask(0xf);
+	m_mmu->set_pmeg_mask(0xff);
+
+	m_mmu->set_clock(40'000'000);
+	m_maincpu->set_clock(40'000'000);
+
+	m_sbus->set_clock(20'000'000);
+	m_sbus_slot[0]->set_clock(20'000'000);
+	m_sbus_slot[1]->set_clock(20'000'000);
+	m_sbus_slot[2]->set_clock(20'000'000);
+	m_sbus_slot[2]->set_default_option("turbogx"); // not accurate, should be gxp, not turbogx
+	m_sbus_slot[2]->set_fixed(true);
 }
 
 void sun4_state::sun4_60(machine_config &config)
 {
 	sun4c(config);
+}
 
-	m_mmu->set_clock(20'000'000);
-	m_maincpu->set_clock(20'000'000);
-	m_maincpu->set_mmu(m_mmu);
+void sun4_state::sun4_65(machine_config &config)
+{
+	sun4c(config);
 
-	m_type1space->set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
+	m_mmu->set_clock(25'000'000);
+	m_maincpu->set_clock(25'000'000);
 
-	// SBus
-	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
-	SBUS_SLOT(config, "slot1", 20'000'000, m_sbus, sbus_cards, nullptr);
-	SBUS_SLOT(config, "slot2", 20'000'000, m_sbus, sbus_cards, nullptr);
-	SBUS_SLOT(config, "slot3", 20'000'000, m_sbus, sbus_cards, nullptr);
+	m_sbus->set_clock(25'000'000);
+	m_sbus_slot[0]->set_clock(25'000'000);
+	m_sbus_slot[1]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_clock(25'000'000);
+	m_sbus_slot[2]->set_default_option("bwtwo");
 }
 
 void sun4_state::sun4_75(machine_config &config)
 {
 	sun4c(config);
 
+	m_mmu->set_ctx_mask(0xf);
+	m_mmu->set_pmeg_mask(0xff);
+
 	m_mmu->set_clock(40'000'000);
 	m_maincpu->set_clock(40'000'000);
-	m_maincpu->set_mmu(m_mmu);
-
-	m_type1space->set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
-
-	// SBus
-	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
-	SBUS_SLOT(config, "slot1", 20'000'000, m_sbus, sbus_cards, nullptr);
-	SBUS_SLOT(config, "slot2", 20'000'000, m_sbus, sbus_cards, nullptr);
-	SBUS_SLOT(config, "slot3", 20'000'000, m_sbus, sbus_cards, nullptr);
 }
 
 /*
@@ -2243,11 +2344,6 @@ void sun4_state::init_sun4c()
 	m_arch = ARCH_SUN4C;
 }
 
-void sun4_state::init_ss2()
-{
-	m_arch = ARCH_SUN4C;
-}
-
 /* Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                       FLAGS
@@ -2257,12 +2353,12 @@ COMP( 1987, sun4_300, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  
 COMP( 198?, sun4_400, 0,        0,      sun4,    sun4,  sun4_state, init_sun4,  "Sun Microsystems", "Sun 4/4x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4c
-COMP( 1990, sun4_40,  sun4_300, 0,      sun4_40, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1991, sun4_50,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 199?, sun4_20,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1989, sun4_60,  sun4_300, 0,      sun4_60, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, sun4_65,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, sun4_75,  sun4_300, 0,      sun4_75, sun4,  sun4_state, init_ss2,   "Sun Microsystems", "SPARCstation 2 (Sun 4/75)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_40,  sun4_300, 0,      sun4_40, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1991, sun4_50,  sun4_300, 0,      sun4_50, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 199?, sun4_20,  sun4_300, 0,      sun4_20, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, sun4_60,  sun4_300, 0,      sun4_60, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1990, sun4_65,  sun4_300, 0,      sun4_65, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_75,  sun4_300, 0,      sun4_75, sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 2 (Sun 4/75)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4m (using the SPARC "reference MMU", probably will go to a separate driver)
 COMP( 1992, sun_s10,  sun4_300, 0,      sun4c,   sun4,  sun4_state, init_sun4c, "Sun Microsystems", "SPARCstation 10 (Sun S10)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

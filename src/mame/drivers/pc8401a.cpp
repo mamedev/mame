@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));
 	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));
 	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));

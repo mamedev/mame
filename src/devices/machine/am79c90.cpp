@@ -4,10 +4,10 @@
 
     AMD Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE)
 
-	TODO:
-		- Communication with the outside world
-		- Error handling
-		- Clocks
+    TODO:
+        - Communication with the outside world
+        - Error handling
+        - Clocks
 
 *****************************************************************************/
 
@@ -512,7 +512,7 @@ WRITE16_MEMBER(am79c90_device::regs_w)
 					m_mode = init_block[0];
 					m_physical_addr = ((uint64_t)init_block[3] << 32) | ((uint64_t)init_block[2] << 16) | (uint64_t)init_block[1];
 					m_logical_addr_filter = ((uint64_t)init_block[7] << 48) | ((uint64_t)init_block[6] << 32)
-					                      | ((uint64_t)init_block[5] << 16) | (uint64_t)init_block[4];
+										  | ((uint64_t)init_block[5] << 16) | (uint64_t)init_block[4];
 					m_recv_ring_addr = (((uint32_t)init_block[9] << 16) | (uint32_t)init_block[8]) & 0x00fffff8;
 					m_recv_ring_addr |= 0xff000000;
 					m_transmit_ring_addr = (((uint32_t)init_block[11] << 16) | (uint32_t)init_block[10]) & 0x00fffff8;

@@ -16,7 +16,8 @@ class flkatck_state : public driver_device
 public:
 	flkatck_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_k007121_ram(*this, "k007121_ram"),
+		m_vram(*this, "vram"),
+		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121(*this, "k007121"),
@@ -29,7 +30,8 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_k007121_ram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_k007121_tilemap[2];
@@ -53,7 +55,7 @@ private:
 	DECLARE_WRITE8_MEMBER(flkatck_ls138_w);
 	DECLARE_READ8_MEMBER(multiply_r);
 	DECLARE_WRITE8_MEMBER(multiply_w);
-	DECLARE_WRITE8_MEMBER(flkatck_k007121_w);
+	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(flkatck_k007121_regs_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_A);
 	TILE_GET_INFO_MEMBER(get_tile_info_B);

@@ -251,7 +251,7 @@ void sshangha_state::sshanghab_map(address_map &map)
 	map(0x381000, 0x383fff).ram(); // unused palette area
 
 	map(0x3c0000, 0x3c07ff).ram().share(m_spriteram); // bootleg spriteram
-	map(0x3c0800, 0x3c0fff).ram().share(m_spriteram2); 
+	map(0x3c0800, 0x3c0fff).ram().share(m_spriteram2);
 
 	map(0xfec000, 0xff3fff).ram();
 	map(0xff4000, 0xff47ff).ram();
@@ -419,7 +419,7 @@ void sshangha_state::sshangha(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sshangha_state::sound_map);
 
-	
+
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

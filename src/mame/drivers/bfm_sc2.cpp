@@ -3,7 +3,7 @@
 // thanks-to: 'Re-Animator'
 /****************************************************************************************
 
-    bfm_sc2.c
+    bfm_sc2.cpp
 
     Bellfruit scorpion2/3 driver, (under heavy construction !!!)
 
@@ -7110,8 +7110,6 @@ ROM_START( sc2scshxgman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scxgm10.bin", 0x0000, 0x010000, CRC(f8c5bac8) SHA1(7858b2c8442b80b69598244870620d45042b7abb) )
 	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
-	ROM_LOAD( "scxgm10a.bin", 0x0000, 0x010000, CRC(deab7e4e) SHA1(472a55b0ba289b0f4e538bb4c8b826dede3a40bb) )
-//scxgm10b.bin identical
 	ROM_LOAD( "scxhiv1.gmn", 0x0000, 0x010000, CRC(c43c2f43) SHA1(8bd8b2a71f19d6fd1f96d6032d1b60bb75dcaeb8) )
 	ROM_LOAD( "scxhiv2.gmn", 0x0000, 0x010000, CRC(83a1ecc9) SHA1(b0176b25c97739442f3743136833d0e5fe51c03f) )
 	ROM_LOAD( "scxlov1.gm", 0x0000, 0x010000, CRC(e305ff5a) SHA1(0bbc1cfaf7c7aaf324c65fd22148437e2bd4ca1e) )

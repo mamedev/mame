@@ -2444,7 +2444,7 @@ ROM_START( tumbleb2 )
 
 	ROM_REGION( 0x100000, "sprgfx", 0 ) // in the 0.35 beta cycle this bootleg was added with the same sprite ROMs as the original, but a PCB was found with the following 27c208 ROMs
 	ROM_LOAD16_BYTE( "wj-6", 0x00000, 0x40000, CRC(ee91db18) SHA1(06a2f15228a8233b685506077ed1248cd5fc3bb3) ) // map-01.rom   [even]     IDENTICAL
-	ROM_LOAD16_BYTE( "wj-7", 0x00001, 0x40000, CRC(87cffb06) SHA1(db3adbbf33cdbff72b6c5ee1228c760cc4897ad0) ) // map-01.rom   [odd]      IDENTICAL 
+	ROM_LOAD16_BYTE( "wj-7", 0x00001, 0x40000, CRC(87cffb06) SHA1(db3adbbf33cdbff72b6c5ee1228c760cc4897ad0) ) // map-01.rom   [odd]      IDENTICAL
 	ROM_LOAD16_BYTE( "wj-4", 0x80000, 0x40000, CRC(79a29725) SHA1(c47366dedaf821f452d8e5394d426f18a79d615e) ) // map-00.rom   [even]     IDENTICAL
 	ROM_LOAD16_BYTE( "wj-5", 0x80001, 0x40000, CRC(dda8932e) SHA1(bd20806916cc5774a5cc70907d88c7ab4eb7ac14) ) // map-00.rom   [odd]      IDENTICAL
 	//ROM_LOAD( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )

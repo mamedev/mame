@@ -210,7 +210,7 @@ void sega_sk1100_device::device_start()
 
 READ8_MEMBER(sega_sk1100_device::peripheral_r)
 {
-	return m_ppi->read(space, offset & 0x03);
+	return m_ppi->read(offset & 0x03);
 }
 
 
@@ -220,7 +220,7 @@ READ8_MEMBER(sega_sk1100_device::peripheral_r)
 
 WRITE8_MEMBER(sega_sk1100_device::peripheral_w)
 {
-	m_ppi->write(space, offset & 0x03, data);
+	m_ppi->write(offset & 0x03, data);
 }
 
 

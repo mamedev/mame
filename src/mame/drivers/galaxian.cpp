@@ -867,8 +867,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
-	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
+	if (offset & 0x0100) result &= m_ppi8255[0]->read(offset & 3);
+	if (offset & 0x0200) result &= m_ppi8255[1]->read(offset & 3);
 	return result;
 }
 
@@ -876,8 +876,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
-	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
+	if (offset & 0x0100) m_ppi8255[0]->write(offset & 3, data);
+	if (offset & 0x0200) m_ppi8255[1]->write(offset & 3, data);
 }
 
 
@@ -972,7 +972,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x04) result &= m_ppi8255[2]->read(space, offset & 3);
+	if (offset & 0x04) result &= m_ppi8255[2]->read(offset & 3);
 	return result;
 }
 
@@ -980,7 +980,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) m_ppi8255[2]->write(space, offset & 3, data);
+	if (offset & 0x04) m_ppi8255[2]->write(offset & 3, data);
 	if (offset & 0x10) m_dac->write(data);
 }
 
@@ -1064,8 +1064,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x1000) result &= m_ppi8255[1]->read(space, (offset >> 1) & 3);
-	if (offset & 0x2000) result &= m_ppi8255[0]->read(space, (offset >> 1) & 3);
+	if (offset & 0x1000) result &= m_ppi8255[1]->read((offset >> 1) & 3);
+	if (offset & 0x2000) result &= m_ppi8255[0]->read((offset >> 1) & 3);
 	return result;
 }
 
@@ -1073,8 +1073,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) m_ppi8255[1]->write(space, (offset >> 1) & 3, data);
-	if (offset & 0x2000) m_ppi8255[0]->write(space, (offset >> 1) & 3, data);
+	if (offset & 0x1000) m_ppi8255[1]->write((offset >> 1) & 3, data);
+	if (offset & 0x2000) m_ppi8255[0]->write((offset >> 1) & 3, data);
 }
 
 
@@ -1129,8 +1129,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x1000) result &= m_ppi8255[0]->read(space, (offset >> 3) & 3);
-	if (offset & 0x2000) result &= m_ppi8255[1]->read(space, (offset >> 3) & 3);
+	if (offset & 0x1000) result &= m_ppi8255[0]->read((offset >> 3) & 3);
+	if (offset & 0x2000) result &= m_ppi8255[1]->read((offset >> 3) & 3);
 	return result;
 }
 
@@ -1138,8 +1138,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) m_ppi8255[0]->write(space, (offset >> 3) & 3, data);
-	if (offset & 0x2000) m_ppi8255[1]->write(space, (offset >> 3) & 3, data);
+	if (offset & 0x1000) m_ppi8255[0]->write((offset >> 3) & 3, data);
+	if (offset & 0x2000) m_ppi8255[1]->write((offset >> 3) & 3, data);
 }
 
 
@@ -1150,10 +1150,10 @@ WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255[0]->read(space, (offset >> 4) & 3); }
-READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255[1]->read(space, (offset >> 4) & 3); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255[0]->write(space, (offset >> 4) & 3, data); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write(space, (offset >> 4) & 3, data); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255[0]->read((offset >> 4) & 3); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255[1]->read((offset >> 4) & 3); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255[0]->write((offset >> 4) & 3, data); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write((offset >> 4) & 3, data); }
 
 
 
@@ -2191,8 +2191,8 @@ READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
 {
 	// same as theend, but accesses are scrambled
 	uint8_t result = 0xff;
-	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
-	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
+	if (offset & 0x0100) result &= m_ppi8255[0]->read(offset & 3);
+	if (offset & 0x0200) result &= m_ppi8255[1]->read(offset & 3);
 	return bitswap<8>(result, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
@@ -2200,8 +2200,8 @@ WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
 {
 	// same as theend, but accesses are scrambled
 	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
-	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
-	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
+	if (offset & 0x0100) m_ppi8255[0]->write(offset & 3, data);
+	if (offset & 0x0200) m_ppi8255[1]->write(offset & 3, data);
 }
 
 void galaxian_state::froggeram_map(address_map &map)
@@ -6468,14 +6468,14 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
- 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("8910.0", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
- 	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
+	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
@@ -10740,7 +10740,7 @@ ROM_START( froggrs )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-/* Video Dens Frogger */
+/* Hermatic Frogger, found on a Video Dens PCB */
 ROM_START( froggervd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frogvd_r1-libro-s1.ac9", 0x0000, 0x0800, CRC(81c2020e) SHA1(8c9292b399a408795e78b7dc5c706d3b526d3751) ) // 2716
@@ -12582,7 +12582,7 @@ GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, init_
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogg,       frogger,  frogg,      frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, init_froggrs,    ROT90,  "bootleg (Coin Music)", "Frogger (Coin Music, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, froggervd,   frogger,  froggervd,  frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg (Video Dens)", "Frogger (Video Dens, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggervd,   frogger,  froggervd,  frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg (Hermatic)", "Frogger (Hermatic, bootleg on Scramble hardware from Video Dens)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, quaak,       frogger,  quaak,      frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg", "Quaak (bootleg of Frogger)", MACHINE_SUPPORTS_SAVE ) // closest to Super Cobra hardware, presumably a bootleg from Germany (Quaak is the German frog sound)
 GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_quaak,      ROT90,  "bootleg", "Frogger (bootleg on Amigo? hardware)", MACHINE_SUPPORTS_SAVE ) // meant to be Amigo hardware, but maybe a different bootleg than the one we have?
 

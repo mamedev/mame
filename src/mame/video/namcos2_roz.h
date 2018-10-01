@@ -36,7 +36,7 @@ private:
 
 	TILE_GET_INFO_MEMBER( roz_tile_info );
 	tilemap_t *m_tilemap_roz;
-	
+
 	required_shared_ptr<uint16_t> m_rozram;
 	required_shared_ptr<uint16_t> m_roz_ctrl;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -363,19 +363,19 @@ WRITE8_MEMBER(istrebiteli_state::road_ctrl_w)
 
 READ8_MEMBER(istrebiteli_state::ppi0_r)
 {
-	return m_ppi0->read(space, offset ^ 3) ^ 0xff;
+	return m_ppi0->read(offset ^ 3) ^ 0xff;
 }
 WRITE8_MEMBER(istrebiteli_state::ppi0_w)
 {
-	m_ppi0->write(space, offset ^ 3, data ^ 0xff);
+	m_ppi0->write(offset ^ 3, data ^ 0xff);
 }
 READ8_MEMBER(istrebiteli_state::ppi1_r)
 {
-	return m_ppi1->read(space, offset ^ 3) ^ 0xff;
+	return m_ppi1->read(offset ^ 3) ^ 0xff;
 }
 WRITE8_MEMBER(istrebiteli_state::ppi1_w)
 {
-	m_ppi1->write(space, offset ^ 3, data ^ 0xff);
+	m_ppi1->write(offset ^ 3, data ^ 0xff);
 }
 
 WRITE8_MEMBER(istrebiteli_state::sound_w)

@@ -9,6 +9,8 @@ driver by smf and R. Belmont
 TODO:
 
 dvd check for bmiidx, bmiidxa, bmiidxc & bmiidxca
+ - 1st style (all variants, including club kit) connected over the mini-din8 (CN7) and dvd check requires RTS->CTS
+ - substream and above switched to standard serial connection (CN5)
 The first 128k of RF5C400 bank 0 is uploaded by the 68000, the rest is unused. It may be using 16J & 18J
 emulate dvd player and video mixing
 16seg led font
@@ -21,21 +23,26 @@ The following games are known to exist on this hardware (there may be more)
                                                                   Video CD      Security
 Game Title                            Year     Program CD       6/7/8 use DVD   Dongle      HDD label
 -----------------------------------------------------------------------------------------------------
-beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      *863 A02     ?
-beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      *863 A02     ?
-beatmania IIDX + DDR Club Kit         1999     896 JA ABM       *?             *?           ?
-beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       *?             *?           ?
-beatmania IIDX Substream              1999     *?               GC983 A04      *?           ?
-beatmania IIDX Club Version 2         1999     GE984 A01(BM)    *?             *984 A02     ?
+beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      *863 A02    863 HDD A01
+beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      *863 A02    863 HDD A01
+beatmania IIDX + DDR Club Kit         1999     896 JA ABM       GQ863 A04      *863 A02    863 HDD A01
+                                             + 896 JA A01
+beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       GQ863 A04      *863 A02    863 HDD A01
+                                             + 896 JA A01
+beatmania IIDX Substream              1999     GC983 A01        GC983 A04      *983 A02    983 HDD A01
+beatmania IIDX Substream (Asia)       1999     GC983-AA A01     GC983 A04      *983A A02   983 HDD A01
+beatmania IIDX Club Version 2         1999     GE984 A01(BM)    GC983 A04      *984 A02    983 HDD A01
                                              + GE984 A01(DDR)
-beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *?          *985 HDD A01
-beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   *?          *992 HDD A01
-beatmania IIDX 3rd Style(newer)       2000     GC992-JA C01     GC992-JA A04   *?          *992 HDD A01
+beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *985        985 HDD A01
+beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   *992        992 HDD A01
+beatmania IIDX 3rd Style(newer)       2000     GC992-JA B01     GC992-JA A04   *992        992 HDD A01
+beatmania IIDX 3rd Style(newest)      2000     GC992-JA C01     GC992-JA A04   *992        992 HDD A01
 beatmania IIDX 4th Style              2000     A03 JA A01       A03 JA A02     A03         A03 JA A03
-beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     A17         *A17 JA A03
-beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *?          B4U JA A03
-beatmania IIDX 6th Style(newer)       2001     B4U JA B01       B4U JA A02     *?          B4U JA A03
-beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *?          B44 JA A03
+beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     A17         A17 JA A03
+beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *B4U        B4U JA A03
+beatmania IIDX 6th Style(newer)       2001     B4U JA B01       B4U JA A02     *B4U        B4U JA A03
+beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *B44        B44 JA A03
+beatmania IIDX 7th Style(newer)       2002     B44 JA B01       B44 JA A02     *B44        B44 JA A03
 beatmania IIDX 8th Style              2002     C44 JA A01       C44 JA A02     *C44        C44 JA A03
 
 * = Not dumped.

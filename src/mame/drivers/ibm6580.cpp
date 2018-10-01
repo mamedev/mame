@@ -918,16 +918,16 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 
 	I8257(config, m_dma8257, XTAL(14'745'600)/3);
 	m_dma8257->out_hrq_cb().set(FUNC(ibm6580_state::hrq_w));
-	m_dma8257->out_tc_cb().set(UPD765_TAG, FUNC(upd765a_device::tc_line_w));
+	m_dma8257->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 	m_dma8257->in_memr_cb().set(FUNC(ibm6580_state::memory_read_byte));
 	m_dma8257->out_memw_cb().set(FUNC(ibm6580_state::memory_write_byte));
-	m_dma8257->in_ior_cb<0>().set(UPD765_TAG, FUNC(upd765a_device::mdma_r));
-	m_dma8257->out_iow_cb<0>().set(UPD765_TAG, FUNC(upd765a_device::mdma_w));
+	m_dma8257->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
+	m_dma8257->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, ibm6580_state, floppy_intrq))
-//  MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma8257", i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, false, false);
+	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));
+//	m_fdc->intrq_wr_callback().append("pic8259", FUNC(pic8259_device::ir4_w));
+	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 

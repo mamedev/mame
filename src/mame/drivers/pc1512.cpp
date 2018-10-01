@@ -559,8 +559,8 @@ READ8_MEMBER( pc1640_state::io_r )
 	bool decoded = false;
 
 	if      (                 addr <= 0x00f) { data = m_dmac->read(space, offset & 0x0f); decoded = true; }
-	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(space, offset & 0x01); decoded = true; }
-	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(space, offset & 0x03); decoded = true; }
+	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(offset & 0x01); decoded = true; }
+	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(offset & 0x03); decoded = true; }
 	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
 	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }

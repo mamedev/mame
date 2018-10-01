@@ -16,7 +16,7 @@ public:
 	void set_depth_reverse(bool reverse) { m_depth_reverse = reverse;  }
 
 	void set_framebuffer_size(int width, int height)
-	{ 
+	{
 		m_poly_frame_width = width;
 		m_poly_frame_height = height;
 		m_framebuffer_size_in_bytes = (sizeof(uint16_t)*m_poly_frame_width*m_poly_frame_height);

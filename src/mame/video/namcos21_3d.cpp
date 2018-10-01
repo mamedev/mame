@@ -258,10 +258,10 @@ void namcos21_3d_device::draw_quad(int sx[4], int sy[4], int zcode[4], int color
 	n21_vertex a, b, c, d;
 	int depthcueenable = 1;
 	/*
-		0x0000..0x1fff  sprite palettes (0x20 sets of 0x100 colors)
-		0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-		0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-		0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+	    0x0000..0x1fff  sprite palettes (0x20 sets of 0x100 colors)
+	    0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+	    0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+	    0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
 	*/
 
 

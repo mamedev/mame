@@ -47,7 +47,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 
 	DECLARE_READ8_MEMBER(n7751_rom_r);
-	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
+	template<int Shift> void n7751_rom_addr_w(uint8_t data);
+	void n7751_rom_select_w(uint8_t data);
 
 	required_device<n7751_device> m_audiocpu;
 	required_memory_region m_audiocpu_region;

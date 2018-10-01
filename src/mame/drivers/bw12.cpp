@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
-	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
+	UPD765A(config, m_fdc, false, true);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));

@@ -286,11 +286,11 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 
 	tzx_output_wave(buffer, start_pause_samples);
 	size += start_pause_samples;
-	
+
 	if (pause > 0)
-	{		
+	{
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
-		
+
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;

@@ -135,6 +135,7 @@ public:
 	SH2_DMA_KLUDGE_CB(dma_callback);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cps3_vbl_interrupt);
 	INTERRUPT_GEN_MEMBER(cps3_other_interrupt);

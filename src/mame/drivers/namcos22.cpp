@@ -1181,8 +1181,10 @@
 #define VBSTART             (480)
 
 
-#define MCU_SPEEDUP         1                   /* mcu idle skipping */
-
+#define MCU_SPEEDUP         1    /* mcu idle skipping */
+#define SERIAL_IO_PERIOD    (60) /* lower DSP serial I/O period */
+// actual dsp serial freq is unknown, should be much higher than 60hz of course
+// serial comms doesn't work yet anyway
 
 /*********************************************************************************************/
 
@@ -1317,6 +1319,10 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 		// reset mcu
 		case 0x16:
 			m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+
+			// timecris POST "SUBCPU START WAIT" needs high interleave
+			if (data && m_gametype == NAMCOS22_TIME_CRISIS)
+				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(150));
 			break;
 
 		// dsp control
@@ -1326,22 +1332,21 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 				if (data == 0)
 				{
 					/* disable DSPs */
-					m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					enable_slave_simulation(false);
+					master_enable(false);
+					slave_enable(false);
 					m_dsp_irq_enabled = false;
 				}
 				else if (data == 1)
 				{
 					/* enable dsp and rendering subsystem */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-					enable_slave_simulation(true);
+					master_enable(true);
+					slave_enable(true);
 					m_dsp_irq_enabled = true;
 				}
 				else if (data == 0xff)
 				{
 					/* used to upload game-specific code to master/slave dsps */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					master_enable(true);
 					m_dsp_irq_enabled = false;
 				}
 			}
@@ -1471,22 +1476,21 @@ WRITE8_MEMBER(namcos22_state::namcos22_system_controller_w)
 				if (data == 0)
 				{
 					/* disable DSPs */
-					m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-					enable_slave_simulation(false);
+					master_enable(false);
+					slave_enable(false);
 					m_dsp_irq_enabled = false;
 				}
 				else if (data == 1)
 				{
 					/* enable dsp and rendering subsystem */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-					enable_slave_simulation(true);
+					master_enable(true);
+					slave_enable(true);
 					m_dsp_irq_enabled = true;
 				}
 				else if (data == 0xff)
 				{
 					/* used to upload game-specific code to master/slave dsps */
-					m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					master_enable(true);
 					m_dsp_irq_enabled = false;
 				}
 			}
@@ -1932,16 +1936,17 @@ void namcos22_state::namcos22s_am(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x400000, 0x40001f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
-	map(0x410000, 0x413fff).ram(); /* C139 SCI buffer */
-	map(0x420000, 0x42000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly(); /* C139 SCI registers */
-	map(0x440000, 0x440003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
+	map(0x420000, 0x42000f).r(FUNC(namcos22_state::namcos22_sci_r)).writeonly(); // C139 SCI registers
+	map(0x430000, 0x430003).w(FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x440000, 0x440003).r(FUNC(namcos22_state::namcos22_dipswitch_r));
 	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0x700000, 0x70001f).rw(FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22s_system_controller_w));
 	map(0x800000, 0x800003).w(FUNC(namcos22_state::namcos22s_chipselect_w));
 	map(0x810000, 0x81000f).ram().share("czattr");
 	map(0x810200, 0x8103ff).rw(FUNC(namcos22_state::namcos22s_czram_r), FUNC(namcos22_state::namcos22s_czram_w));
-	map(0x820000, 0x8202ff).nopw(); /* leftover of old (non-super) video mixer device */
+	map(0x820000, 0x8202ff).nopw(); // leftover of old (non-super) video mixer device
 	map(0x824000, 0x8243ff).ram().share("video_mixer");
 	map(0x828000, 0x83ffff).ram().w(FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
 	map(0x860000, 0x860007).rw(FUNC(namcos22_state::namcos22s_spotram_r), FUNC(namcos22_state::namcos22s_spotram_w));
@@ -1950,10 +1955,10 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
 	map(0x900000, 0x90ffff).ram().share("vics_data");
 	map(0x940000, 0x94007f).rw(FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
-	map(0x980000, 0x9affff).ram().share("spriteram"); /* C374 */
-	map(0xa04000, 0xa0bfff).ram().share("shareram"); /* COM RAM */
+	map(0x980000, 0x9affff).ram().share("spriteram"); // C374
+	map(0xa04000, 0xa0bfff).ram().share("shareram"); // COM RAM
 	map(0xc00000, 0xc1ffff).rw(FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
-	map(0xe00000, 0xe3ffff).ram(); /* workram */
+	map(0xe00000, 0xe3ffff).ram(); // workram
 }
 
 
@@ -2025,21 +2030,15 @@ void namcos22_state::alpinesa_am(address_map &map)
 
 // DSPs
 
-void namcos22_state::enable_slave_simulation(bool enable)
+void namcos22_state::master_enable(bool enable)
 {
+	m_master->set_input_line(INPUT_LINE_RESET, enable ? CLEAR_LINE : ASSERT_LINE);
+}
+
+void namcos22_state::slave_enable(bool enable)
+{
+	m_slave->set_input_line(INPUT_LINE_RESET, enable ? CLEAR_LINE : ASSERT_LINE);
 	m_slave_simulation_active = enable;
-}
-
-void namcos22_state::slave_halt()
-{
-	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	enable_slave_simulation(false);
-}
-
-void namcos22_state::slave_enable()
-{
-//  m_slave->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	enable_slave_simulation(true);
 }
 
 
@@ -2363,7 +2362,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 			switch (data)
 			{
 				case 0x00:
-					slave_halt();
+					slave_enable(false);
 					break;
 
 				case 0x01:
@@ -2375,7 +2374,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 					break;
 
 				case 0x03:
-					slave_enable();
+					slave_enable(true);
 					break;
 
 				case 0x04:
@@ -2383,7 +2382,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 
 				case 0x10:
 					/* serial i/o related? */
-					slave_enable();
+					slave_enable(true);
 					break;
 
 				default:
@@ -2447,37 +2446,22 @@ READ16_MEMBER(namcos22_state::master_serial_io_r)
 	return m_SerialDataSlaveToMasterCurrent;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_master_serial_irq)
+INTERRUPT_GEN_MEMBER(namcos22_state::dsp_vblank_irq)
 {
-	int scanline = param;
+	if (m_dsp_irq_enabled)
+		device.execute().set_input_line(TMS32025_INT0, HOLD_LINE);
+}
 
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
+{
 	if (m_dsp_irq_enabled)
 	{
 		m_SerialDataSlaveToMasterCurrent = m_SerialDataSlaveToMasterNext;
 
-		if (scanline == 480)
-		{
-			m_master->set_input_line(TMS32025_INT0, HOLD_LINE);
-		}
-		else if ((scanline % 2) == 0)
-		{
-			m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
-			m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
-		}
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_slave_serial_irq)
-{
-	int scanline = param;
-
-	if (m_dsp_irq_enabled)
-	{
-		if ((scanline % 2) == 0)
-		{
-			m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
-			m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
-		}
+		m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
+		m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
+		m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
+		m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
 	}
 }
 
@@ -2750,12 +2734,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 	int scanline = param;
 
 	/* TODO: real sources of these */
-	if (scanline == 480)
-		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
-	else if (scanline == 500)
+	if (scanline == 0)
 		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-	else if (scanline == 0)
+	else if (scanline == 240)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+	else if (scanline == 480)
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
 
@@ -3735,8 +3719,9 @@ GFXDECODE_END
 
 void namcos22_state::machine_reset()
 {
-	m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	master_enable(false);
+	slave_enable(false);
+	m_dsp_irq_enabled = false;
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_poly->reset();
@@ -3746,7 +3731,6 @@ void namcos22_state::machine_start()
 {
 	m_led.resolve();
 	m_cpuled.resolve();
-	m_slave_simulation_active = false;
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
 }
@@ -3768,8 +3752,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
 	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
+	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dsp_serial", namcos22_state, dsp_serial_pulse, attotime::from_hz(SERIAL_IO_PERIOD))
 
 	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK)); /* ? */
 	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
@@ -3780,8 +3764,6 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	MCFG_DEVICE_PROGRAM_MAP( mcu_s22_program)
@@ -3795,7 +3777,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
 
@@ -3839,8 +3821,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
 	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
+	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dsp_serial", namcos22_state, dsp_serial_pulse, attotime::from_hz(SERIAL_IO_PERIOD))
 
 	tms32025_device& slave(TMS32025(config, m_slave, SS22_MASTER_CLOCK));
 	slave.set_addrmap(AS_PROGRAM, &namcos22_state::slave_dsp_program);
@@ -3852,20 +3834,16 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
-
 	MCFG_DEVICE_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
 	MCFG_DEVICE_IO_MAP(mcu_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namcos22_state, mcu_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_irq", namcos22_state, mcu_irq, "screen", 0, 240)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	EEPROM_2864(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
@@ -3996,14 +3974,14 @@ ROM_START( ridgerac )
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
-	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )//,CRC(d1b0eec6) SHA1(f66922c324dfc3ff408db7556c587ef90ca64c3b) )
-	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )//,CRC(bb695d89) SHA1(557bac9d2718519c1f69e374d0ef9a86a43fe86c) )
-	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )//,CRC(8f374c0a) SHA1(94ff8581de11a03ef86525155f8433bf5858b980) )
-	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )//,CRC(072a5c47) SHA1(86b8e973ae6b78197d685fe6d14722d8e2d0dfec) )
+	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
+	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
+	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
+	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
 
 	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )//,CRC(c15cb257) SHA1(0cb8f231c62ea37955be5d452a436a6e815af8e8) )
-	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )//,CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
+	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
 
 	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
 	ROM_LOAD( "rr1potl0.5b", 0x80000*0, 0x80000,CRC(3ac193e3) SHA1(ff213766f15e34dc1b25187b57d94e17930090a3) )
@@ -4042,14 +4020,14 @@ ROM_START( ridgeracb )
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
-	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )//,CRC(d1b0eec6) SHA1(f66922c324dfc3ff408db7556c587ef90ca64c3b) )
-	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )//,CRC(bb695d89) SHA1(557bac9d2718519c1f69e374d0ef9a86a43fe86c) )
-	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )//,CRC(8f374c0a) SHA1(94ff8581de11a03ef86525155f8433bf5858b980) )
-	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )//,CRC(072a5c47) SHA1(86b8e973ae6b78197d685fe6d14722d8e2d0dfec) )
+	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
+	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
+	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
+	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
 
 	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )//,CRC(c15cb257) SHA1(0cb8f231c62ea37955be5d452a436a6e815af8e8) )
-	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )//,CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
+	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
 
 	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
 	ROM_LOAD( "rr1potl0.5b", 0x80000*0, 0x80000,CRC(3ac193e3) SHA1(ff213766f15e34dc1b25187b57d94e17930090a3) )
@@ -4088,14 +4066,14 @@ ROM_START( ridgeracj )
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
-	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )//,CRC(d1b0eec6) SHA1(f66922c324dfc3ff408db7556c587ef90ca64c3b) )
-	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )//,CRC(bb695d89) SHA1(557bac9d2718519c1f69e374d0ef9a86a43fe86c) )
-	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )//,CRC(8f374c0a) SHA1(94ff8581de11a03ef86525155f8433bf5858b980) )
-	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )//,CRC(072a5c47) SHA1(86b8e973ae6b78197d685fe6d14722d8e2d0dfec) )
+	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
+	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
+	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
+	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
 
 	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )//,CRC(c15cb257) SHA1(0cb8f231c62ea37955be5d452a436a6e815af8e8) )
-	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )//,CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
+	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
 
 	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
 	ROM_LOAD( "rr1potl0.5b", 0x80000*0, 0x80000,CRC(3ac193e3) SHA1(ff213766f15e34dc1b25187b57d94e17930090a3) )
@@ -4134,14 +4112,14 @@ ROM_START( ridgerac3 )
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
-	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )//,CRC(d1b0eec6) SHA1(f66922c324dfc3ff408db7556c587ef90ca64c3b) )
-	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )//,CRC(bb695d89) SHA1(557bac9d2718519c1f69e374d0ef9a86a43fe86c) )
-	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )//,CRC(8f374c0a) SHA1(94ff8581de11a03ef86525155f8433bf5858b980) )
-	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )//,CRC(072a5c47) SHA1(86b8e973ae6b78197d685fe6d14722d8e2d0dfec) )
+	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
+	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
+	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
+	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
 
 	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )//,CRC(c15cb257) SHA1(0cb8f231c62ea37955be5d452a436a6e815af8e8) )
-	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )//,CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
+	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
 
 	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
 	ROM_LOAD( "rr1potl0.5b", 0x80000*0, 0x80000,CRC(3ac193e3) SHA1(ff213766f15e34dc1b25187b57d94e17930090a3) )

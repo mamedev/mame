@@ -110,8 +110,8 @@ void isa8_myb3k_com_device::device_reset()
 					write8_delegate(FUNC(isa8_myb3k_com_device::dce_control), this) );
 
 		m_isa->install_device(base + 4, base + 7,
-					read8_delegate(FUNC(pit8253_device::read), subdevice<pit8253_device>("pit")),
-					write8_delegate(FUNC(pit8253_device::write), subdevice<pit8253_device>("pit")) );
+					read8sm_delegate(FUNC(pit8253_device::read), subdevice<pit8253_device>("pit")),
+					write8sm_delegate(FUNC(pit8253_device::write), subdevice<pit8253_device>("pit")) );
 
 		m_irq = m_isairq->read();
 		m_installed = true;

@@ -2240,10 +2240,11 @@ MACHINE_CONFIG_END
 
 // Dance Dance Revolution
 
-MACHINE_CONFIG_START(ksys573_state::ddr)
+void ksys573_state::ddr(machine_config &config)
+{
 	k573a(config);
 	cassx(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ksys573_state::ddr2ml)
 	k573a(config);
@@ -2290,16 +2291,18 @@ MACHINE_CONFIG_END
 
 // Dancing Stage
 
-MACHINE_CONFIG_START(ksys573_state::dsfdcta)
+void ksys573_state::dsfdcta(machine_config &config)
+{
 	k573a(config);
 	pccard2_32mb(config);
 	cassyyi(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ksys573_state::dsftkd)
+void ksys573_state::dsftkd(machine_config &config)
+{
 	k573a(config);
 	cassyi(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ksys573_state::dsfdr)
 	k573d(config);
@@ -2346,10 +2349,11 @@ MACHINE_CONFIG_END
 
 // DrumMania
 
-MACHINE_CONFIG_START(ksys573_state::drmn)
+void ksys573_state::drmn(machine_config &config)
+{
 	k573a(config);
 	cassx(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ksys573_state::drmn2m)
 	k573d(config);
@@ -2371,34 +2375,39 @@ MACHINE_CONFIG_END
 
 // Guitar Freaks
 
-MACHINE_CONFIG_START(ksys573_state::gtrfrks)
+void ksys573_state::gtrfrks(machine_config &config)
+{
 	k573a(config);
 	cassx(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ksys573_state::gtrfrk2m)
+void ksys573_state::gtrfrk2m(machine_config &config)
+{
 	k573a(config);
 	cassyi(config);
 	pccard1_32mb(config); // HACK: The installation tries to check and erase 32mb but only flashes 16mb.
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ksys573_state::gtrfrk3m)
+void ksys573_state::gtrfrk3m(machine_config &config)
+{
 	k573d(config);
 	cassxzi(config);
 	pccard1_16mb(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ksys573_state::gtrfrk5m)
+void ksys573_state::gtrfrk5m(machine_config &config)
+{
 	k573d(config);
 	casszi(config);
 	pccard1_32mb(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ksys573_state::gtrfrk7m)
+void ksys573_state::gtrfrk7m(machine_config &config)
+{
 	k573d(config);
 	casszi(config);
 	pccard1_32mb(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ksys573_state::gtfrk10mb)
 	gtrfrk7m(config);
@@ -2407,20 +2416,22 @@ MACHINE_CONFIG_END
 
 // Miscellaneous
 
-MACHINE_CONFIG_START(ksys573_state::konami573x)
+void ksys573_state::konami573x(machine_config &config)
+{
 	konami573(config);
 	cassx(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ksys573_state::fbaitbc)
+void ksys573_state::fbaitbc(machine_config & config)
+{
 	konami573(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::fbaitbc_map);
 
-	MCFG_DEVICE_ADD(m_upd4701, UPD4701A, 0)
-	MCFG_UPD4701_PORTY("uPD4701_y")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_porty_tag("uPD4701_y");
 
 	cassx(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ksys573_state::hyperbbc)
 	konami573(config);
@@ -2446,11 +2457,12 @@ MACHINE_CONFIG_START(ksys573_state::salarymc)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { salarymc_cassette_install(device); } )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ksys573_state::gchgchmp)
+void ksys573_state::gchgchmp(machine_config &config)
+{
 	konami573(config);
 	pccard1_16mb(config);
 	cassx(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ksys573_state::pnchmn)
 	konami573(config);
@@ -2463,18 +2475,20 @@ MACHINE_CONFIG_START(ksys573_state::pnchmn)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { punchmania_cassette_install(device); } )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ksys573_state::pnchmn2)
+void ksys573_state::pnchmn2(machine_config &config)
+{
 	pnchmn(config);
 	pccard2_64mb(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ksys573_state::gunmania)
+void ksys573_state::gunmania(machine_config &config)
+{
 	konami573(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::gunmania_map);
 
 	DS2401( config, "gunmania_id" );
 	pccard2_32mb(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ksys573_state::dmx)
 	k573d(config);

@@ -121,7 +121,7 @@ void iq151_grafik_device::io_read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0xd0 && offset < 0xd4)
 	{
-		data = m_ppi8255->read(machine().dummy_space(), offset & 3);
+		data = m_ppi8255->read(offset & 3);
 	}
 	else if (offset == 0xd4)
 	{
@@ -140,7 +140,7 @@ void iq151_grafik_device::io_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xd0 && offset < 0xd4)
 	{
-		m_ppi8255->write(machine().dummy_space(), offset & 3, data);
+		m_ppi8255->write(offset & 3, data);
 	}
 	else if (offset == 0xd4)
 	{

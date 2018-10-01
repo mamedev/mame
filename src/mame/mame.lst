@@ -9808,6 +9808,7 @@ circusce                        // GX380 (c) 1984 + Centuri license
 @source:cischeat.cpp
 armchmp2                        // (c) 1992 Jaleco
 armchmp2o                       // (c) 1992 Jaleco
+armchmp2o2                      // (c) 1992 Jaleco
 bigrun                          // (c) 1989 Jaleco
 captflag                        // (c) 1993 Jaleco
 cischeat                        // (c) 1990 Jaleco
@@ -12645,6 +12646,9 @@ royalpk2                        //
 
 @source:facit4440.cpp
 facit4440                       // 1984
+
+@source:falco5220.cpp
+falco5220                       // 1987
 
 @source:famibox.cpp
 famibox                         // 1986
@@ -15785,6 +15789,7 @@ pegglet                         // (c) 1991 Strata/Incredible Technologies
 pokrdice                        // (c) 1991 Strata/Incredible Technologies
 rimrockn                        // (c) 1991 Strata/Incredible Technologies
 rimrockn12                      // (c) 1991 Strata/Incredible Technologies
+rimrockn12b                     // bootleg
 rimrockn16                      // (c) 1991 Strata/Incredible Technologies
 rimrockn20                      // (c) 1991 Strata/Incredible Technologies
 slikshot                        // (c) 1990 Grand Products/Incredible Technologies
@@ -15838,6 +15843,8 @@ euro2k2s                        // (c) 2002 Nazionale Elettronica
 laperla                         // (c) 2002 Nazionale Elettronica
 laperlag                        // (c) 2001 Nazionale Elettronica
 mnumber                         // (c) 200? M.M. - B.R.L.
+wcup                            // (c) 2001 Nazionale Elettronica
+wcup14                          // (c) 2001 Nazionale Elettronica
 
 @source:itt3030.cpp
 itt3030                         //
@@ -18011,6 +18018,7 @@ grainbow                        // (c) 1993 Banpresto
 grainbowk                       // (c) 1993 Banpresto
 heatbrl                         // (c) 1992 Tad (World version 3)
 heatbrl2                        // (c) 1992 Tad (World version 2)
+heatbrl3                        // (c) 1992 Tad (World version ?)
 heatbrle                        // (c) 1992 Tad (Electronic Devices license)
 heatbrlo                        // (c) 1992 Tad (World)
 heatbrlu                        // (c) 1992 Tad (US)
@@ -30288,7 +30296,8 @@ mustangs                        // UPL-90058 (c) 1990 UPL + Seoul Trading
 nouryoku                        // (c) 1995 Tecmo
 nouryokup                       // (c) 1995 Tecmo
 popspops                        // (c) 1999
-raphero                         // (c) 1994 Media Trading Corp
+raphero                         // (c) 1994 NMK
+rapheroa                        // (c) 1994 Media Trading Corp
 redfoxwp2                       // (c) 1998 (China)
 redfoxwp2a                      // (c) 1998 (China)
 redhawk                         // (c) 1997 New Vision Ent. license
@@ -31969,9 +31978,10 @@ neiva                           //
 pkscram                         // (c) 1993 Cosmo Electronics Corporation
 
 @source:pktgaldx.cpp
-pktgaldx                        // MAZ (c) 1993 Data East (Euro v3.00)
+pktgaldx                        // MAZ (c) 1992 Data East (Euro v3.00)
+pktgaldxa                       // MAZ (c) 1992 Data East (Asia v3.00)
 pktgaldxb                       // bootleg
-pktgaldxj                       // MAZ (c) 1993
+pktgaldxj                       // MAZ (c) 1993 Nihon System inc (Japan v3.00)
 
 @source:plan80.cpp
 plan80                          //
@@ -33339,6 +33349,7 @@ diner_l1                        //
 diner_l2                        //
 diner_l3                        //
 diner_l4                        //
+diner_p0                        //
 gs_la3                          //
 gs_lg6                          //
 gs_lu3                          //
@@ -38280,13 +38291,13 @@ vigilanto                       // (c) 1988 (US)
 
 @source:vii.cpp
 batmantv                        // The Batman, 2004
-vii                             // Chintendo / KenSingTon / Jungle Soft / Siatronics Vii
+vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 vsmile                          //
 vsmileb                         //
 vsmilef                         //
 vsmileg                         //
 walle                           //
-wireless                        // Wireless
+wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
 wlsair60                        // Wireless Air 60
 zone40                          // Zone 40
@@ -39097,6 +39108,7 @@ cc_104                          //
 cc_12                           //
 cc_13                           //
 congo_11                        //
+congo_11s10                     //
 congo_13                        //
 congo_20                        //
 congo_21                        //
@@ -39303,6 +39315,7 @@ fs_sp2                          //
 i500_10r                        //
 i500_11b                        //
 i500_11r                        //
+jb_04a                          //
 jb_10b                          //
 jb_10r                          //
 jm_05r                          //

@@ -193,8 +193,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(side_w);
 
-	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
-	UPD7002_EOC(BBC_uPD7002_EOC);
+	int BBC_get_analogue_input(int channel_number);
+	void BBC_uPD7002_EOC(int data);
 
 	void bbc_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);
 	void bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);

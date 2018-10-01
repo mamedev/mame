@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_UPD765A_ADD("upd765a", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525qd", a5105_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525qd", a5105_state::floppy_formats)

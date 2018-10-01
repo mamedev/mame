@@ -1011,9 +1011,9 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(PIC0_TAG, pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
-	MCFG_UPD765A_ADD(FDC_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(PIC0_TAG, pic8259_device, ir3_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(DMAC_TAG, i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir3_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
 

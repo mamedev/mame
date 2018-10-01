@@ -44,21 +44,15 @@ private:
 	struct channel_def
 	{
 		uint32_t rate;
-		uint32_t size;
-		uint32_t start;
 		uint32_t pos;
-		uint32_t frac;
+		uint32_t counter;
 		uint32_t end;
 		uint32_t volume;
-		uint32_t pan;
-		uint32_t effect;
 		uint32_t play;
 	};
 
-	void iremga20_reset();
-
 	sound_stream *m_stream;
-	uint8_t m_regs[0x40/2];
+	uint8_t m_regs[0x20];
 	channel_def m_channel[4];
 };
 

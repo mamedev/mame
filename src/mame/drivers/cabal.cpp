@@ -553,13 +553,13 @@ MACHINE_CONFIG_START(cabal_state::cabalt)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(trackball_main_map)
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN0")
-	MCFG_UPD4701_PORTY("IN1")
+	upd4701_device &upd4701l(UPD4701A(config, "upd4701l"));
+	upd4701l.set_portx_tag("IN0");
+	upd4701l.set_porty_tag("IN1");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN2")
-	MCFG_UPD4701_PORTY("IN3")
+	upd4701_device &upd4701h(UPD4701A(config, "upd4701h"));
+	upd4701h.set_portx_tag("IN2");
+	upd4701h.set_porty_tag("IN3");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cabal_state::cabalbl2)

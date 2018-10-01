@@ -239,7 +239,7 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 
 READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 {
-	switch (m_mcu->p2_r(space, 0) & 0xf0)
+	switch (m_mcu->p2_r() & 0xf0)
 	{
 	case 0x40:
 		return m_soundlatch[1]->read(space, 0);
@@ -255,7 +255,7 @@ READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 WRITE8_MEMBER(atetris_mcu_state::mcu_p2_w)
 {
 	if ((data & 0xc0) == 0x80)
-		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r(space, 0));
+		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r());
 }
 
 WRITE8_MEMBER(atetris_mcu_state::mcu_reg_w)
@@ -468,22 +468,26 @@ ROM_END
 
 
 ROM_START( atetrisb2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) )
+	ROM_REGION( 0x18000, "maincpu", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
+	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) ) // 27512
 	ROM_CONTINUE(         0x08000, 0x8000 )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+	ROM_REGION( 0x10000, "gfx1", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
+	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) ) // 27512
 
 	ROM_REGION( 0x0020, "proms", 0 ) // currently unused
-	ROM_LOAD( "m3-7603-5.prom1", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) )
+	ROM_LOAD( "m3-7603-5.prom1", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) ) // 82s123 or TBP18S030
 
-	ROM_REGION( 0xa00, "plds", 0 ) // all protected
-	ROM_LOAD( "tibpal16r4-25cn.pal1", 0x000, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16r4-25cn.pal3", 0x200, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal2", 0x400, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal4", 0x600, 0x104, NO_DUMP ) // main PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal5", 0x800, 0x104, NO_DUMP ) // main PCB
+	/* Unused. It's usual to find PLDs with different hashes, but defining equivalent equations */
+	ROM_REGION( 0x859, "plds", 0 )
+	ROM_LOAD( "a-gal16v8-b.bin", 0x000, 0x117, CRC(b1dfab0f) SHA1(e9e4db5459617a35a13df4b7a4586dd1b7be04ac) ) // sub PCB - Same content as "b"
+	ROM_LOAD( "b-gal16v8-b.bin", 0x117, 0x117, CRC(b1dfab0f) SHA1(e9e4db5459617a35a13df4b7a4586dd1b7be04ac) ) // sub PCB - Same content as "a"
+	ROM_LOAD( "c-gal16v8-b.bin", 0x22e, 0x117, CRC(e1a9db0b) SHA1(5bbac24e37a4d9b8a1387054722fa35478ca7941) ) // sub PCB
+	ROM_LOAD( "1-pal16l8-a.3g" , 0x345, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "2-pal16r4-a.3r" , 0x449, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) ) // main PCB 
+	ROM_LOAD( "3-pal16r4-a.8p" , 0x54D, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "4-pal16l8-a.9n" , 0x651, 0x104, CRC(3630e734) SHA1(a29dc202ffc75ac48815115b85e984fc0c9d5b59) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "5-pal16l8-a.9m" , 0x755, 0x104, CRC(53b64be1) SHA1(2bf712b766541c90c38c0810ee16848e448c5205) ) // main PCB - Found also as GAL16v8 on some PCBs
 ROM_END
 
 

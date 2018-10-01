@@ -467,8 +467,8 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart1, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(m_usart1, i8251_device, write_dsr))
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, sage2_state, fdc_irq))
+	UPD765A(config, m_fdc, false, false);
+	m_fdc->intrq_wr_callback().set(FUNC(sage2_state::fdc_irq));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, sage2_state, write_centronics_ack))

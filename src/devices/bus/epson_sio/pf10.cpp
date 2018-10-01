@@ -72,7 +72,7 @@ MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(cpu_io)
 	MCFG_M6801_SER_TX(WRITELINE(DEVICE_SELF, epson_pf10_device, hd6303_tx_w))
 
-	MCFG_UPD765A_ADD("upd765a", false, true)
+	UPD765A(config, m_fdc, false, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "smd165", floppy_image_device::default_floppy_formats)
 
 	MCFG_EPSON_SIO_ADD("sio", nullptr)

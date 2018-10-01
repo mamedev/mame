@@ -88,11 +88,11 @@ READ8_MEMBER( tk80bs_state::ppi_custom_r )
 	switch(offset)
 	{
 		case 1:
-			return m_ppi->read(space, 2);
+			return m_ppi->read(2);
 		case 2:
-			return m_ppi->read(space, 1);
+			return m_ppi->read(1);
 		default:
-			return m_ppi->read(space, offset);
+			return m_ppi->read(offset);
 	}
 }
 
@@ -101,13 +101,13 @@ WRITE8_MEMBER( tk80bs_state::ppi_custom_w )
 	switch(offset)
 	{
 		case 1:
-			m_ppi->write(space, 2, data);
+			m_ppi->write(2, data);
 			break;
 		case 2:
-			m_ppi->write(space, 1, data);
+			m_ppi->write(1, data);
 			break;
 		default:
-			m_ppi->write(space, offset, data);
+			m_ppi->write(offset, data);
 	}
 }
 

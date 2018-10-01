@@ -181,10 +181,10 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
 		}
 		m_c45_road->draw(bitmap, clip, pri);
-		
+
 		if (m_c169roz)
 			m_c169roz->draw(screen, bitmap, clip, pri);
-		
+
 		m_c355spr->draw(screen, bitmap, clip, pri);
 	}
 	return 0;

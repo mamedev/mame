@@ -142,7 +142,7 @@ READ8_MEMBER(qtsbc_state::io_r)
 		case 2:
 		case 3:
 		default:
-			return m_pit->read(space, offset & 3);
+			return m_pit->read(offset & 3);
 
 		case 4:
 		case 5:
@@ -181,7 +181,7 @@ WRITE8_MEMBER(qtsbc_state::io_w)
 		case 2:
 		case 3:
 		default:
-			m_pit->write(space, offset & 3, data);
+			m_pit->write(offset & 3, data);
 			break;
 
 		case 4:

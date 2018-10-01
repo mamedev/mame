@@ -2,16 +2,16 @@
 // copyright-holders:David Haywood, Phil Stroffolino
 
 /*
-	C123 Tilemaps
-	used by
-	namcos2.cpp (all games)
-	namcofl.cpp (all games)
-	namconb1.cpp (all games)
+    C123 Tilemaps
+    used by
+    namcos2.cpp (all games)
+    namcofl.cpp (all games)
+    namconb1.cpp (all games)
 
-	should be used by
-	namcos1.cpp (all games)
+    should be used by
+    namcos1.cpp (all games)
 
-	(TODO: merge with namcos1.cpp implementation)
+    (TODO: merge with namcos1.cpp implementation)
 */
 
 #include "emu.h"

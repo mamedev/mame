@@ -1317,9 +1317,10 @@ void msx_state::msx_mb8877a(machine_config & config)
 	fdc.set_force_ready(true);
 }
 
-MACHINE_CONFIG_START(msx_state::msx_tc8566af)
-	MCFG_TC8566AF_ADD("fdc")
-MACHINE_CONFIG_END
+void msx_state::msx_tc8566af(machine_config &config)
+{
+	TC8566AF(config, "fdc");
+}
 
 void msx_state::msx_microsol(machine_config &config)
 {

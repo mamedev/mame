@@ -208,7 +208,7 @@ READ8_MEMBER(pc6001_state::nec_ppi8255_r)
 		return res;
 	}
 
-	return m_ppi->read(space, offset);
+	return m_ppi->read(offset);
 }
 
 WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
@@ -224,7 +224,7 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 			m_bank1->set_base(m_region_gfx1->base());
 	}
 
-	m_ppi->write(space,offset,data);
+	m_ppi->write(offset,data);
 }
 
 void pc6001_state::pc6001_map(address_map &map)
@@ -566,7 +566,7 @@ WRITE8_MEMBER(pc6001mk2_state::necmk2_ppi8255_w)
 		}
 	}
 
-	m_ppi->write(space,offset,data);
+	m_ppi->write(offset,data);
 }
 
 void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
@@ -902,7 +902,7 @@ WRITE8_MEMBER(pc6001sr_state::necsr_ppi8255_w)
 		}
 	}
 
-	m_ppi->write(space,offset,data);
+	m_ppi->write(offset,data);
 }
 
 READ8_MEMBER(pc6001sr_state::hw_rev_r)

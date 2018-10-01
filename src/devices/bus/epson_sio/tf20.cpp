@@ -101,8 +101,8 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	m_mpsc->out_dtra_callback().set(FUNC(epson_tf20_device::dtra_w));
 
 	// floppy disk controller
-	MCFG_UPD765A_ADD("5a", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("19b", INPUT_LINE_IRQ0))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "sd320", floppy_image_device::default_floppy_formats)

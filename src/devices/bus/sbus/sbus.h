@@ -21,13 +21,13 @@ class sbus_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&sbus_tag, U &&opts, const char *dflt)
+	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&sbus_tag, U &&opts, const char *dflt, bool fixed = false)
 		: sbus_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
-		set_fixed(false);
+		set_fixed(fixed);
 		m_sbus.set_tag(std::forward<T>(sbus_tag));
 	}
 	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -106,7 +106,7 @@ protected:
 	address_space *m_space;
 
 	devcb_write_line    m_irq_cb[7];
-	devcb_write32		m_buserr;
+	devcb_write32       m_buserr;
 
 	device_sbus_card_interface *m_device_list[3];
 

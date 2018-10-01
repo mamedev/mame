@@ -8,7 +8,7 @@
   Each layer uses a designated subset of a master 256x256 tile tilemap (4096x4096 pixels).
   Each layer has configurable color and tile banking.
   ROZ attributes may be specified independently for each scanline.
- 
+
   Used by:
    Namco NB2 - The Outfoxies, Mach Breakers
    Namco System 2 - Metal Hawk, Lucky and Wild

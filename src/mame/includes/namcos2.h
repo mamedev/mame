@@ -169,12 +169,12 @@ enum
 	optional_device<namcoc68_device> m_c68;
 	optional_device<c140_device> m_c140;
 	optional_device<namco_c116_device> m_c116;
-	optional_device<namco_c123tmap_device> m_c123tmap; 
+	optional_device<namco_c123tmap_device> m_c123tmap;
 	optional_device<namco_c148_device> m_master_intc;
 	optional_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c139_device> m_sci;
-	optional_device<namco_c169roz_device> m_c169roz; 
-	optional_device<namco_c355spr_device> m_c355spr; 
+	optional_device<namco_c169roz_device> m_c169roz;
+	optional_device<namco_c355spr_device> m_c355spr;
 	required_device<palette_device> m_palette;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
@@ -231,8 +231,8 @@ enum
 	int m_sendval;
 
 	optional_device<namco_c45_road_device> m_c45_road;
-	optional_device<namcos2_sprite_device> m_ns2sprite; 
-	optional_device<namcos2_roz_device> m_ns2roz; 
+	optional_device<namcos2_sprite_device> m_ns2sprite;
+	optional_device<namcos2_roz_device> m_ns2roz;
 
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );

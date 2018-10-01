@@ -1160,7 +1160,8 @@ ROM_START( galpani4 ) // only main CPU and plds dumps were provided
 	/* 0x040000 - 0x3fffff empty? */
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
-	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) // to be verified
+	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) /* Doesn't seem to use these samples at all */
+	ROM_LOAD( "gp4-301-00.u7", 0x200000, 0x200000, NO_DUMP ) /* Different then GP4-301-01 - Changed some samples when compared to U4 rom */
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "skns-r09.u9",  0x000, 0x117, CRC(b02058d9) SHA1(77d07e0f329fb1969aa4543cd124e36ad34b07ba) ) // Atmel ATF16V8B
@@ -1919,7 +1920,7 @@ ROM_END
 
 GAME( 1996, skns,      0,        skns,  skns,     skns_state, empty_init,     ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // sound ROM wasn't dumped, it's probably different
+GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // 2nd sound ROM wasn't dumped, it's different than GP4-301-01
 GAME( 1996, galpani4j, galpani4, sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)",  MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?

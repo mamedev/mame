@@ -519,11 +519,11 @@ MACHINE_CONFIG_START(mmd1_state::mmd2)
 	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
-	i8279_device &kbdc(I8279(config, "i8279", 400000));				// based on divider
-	kbdc.out_sl_callback().set(FUNC(mmd1_state::mmd2_scanlines_w));	// scan SL lines
-	kbdc.out_disp_callback().set(FUNC(mmd1_state::mmd2_digit_w));	// display A&B
-	kbdc.in_rl_callback().set(FUNC(mmd1_state::mmd2_kbd_r));		// kbd RL lines
-	kbdc.in_shift_callback().set_constant(1);						// Shift key
+	i8279_device &kbdc(I8279(config, "i8279", 400000));             // based on divider
+	kbdc.out_sl_callback().set(FUNC(mmd1_state::mmd2_scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(mmd1_state::mmd2_digit_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(mmd1_state::mmd2_kbd_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                       // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
 
 MACHINE_CONFIG_END

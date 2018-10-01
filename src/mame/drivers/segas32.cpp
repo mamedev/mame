@@ -2326,17 +2326,17 @@ MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACKX1");
+	upd1.set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACKX2");
+	upd2.set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
+	upd4701_device &upd3(UPD4701A(config, "upd3"));
+	upd3.set_portx_tag("TRACKX3");
+	upd3.set_porty_tag("TRACKY3");
 
 	// 837-8685 I/O board has an unpopulated space for a fourth UPD4701A
 MACHINE_CONFIG_END
