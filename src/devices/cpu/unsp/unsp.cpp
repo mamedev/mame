@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**************************\
-*
-*   SunPlus u'nSP core
-*
-*    by Ryan Holtz
-*
-\**************************/
+/*****************************************************************************
+
+	SunPlus micro'nSP core
+
+	based primarily on Unununium, by segher
+
+*****************************************************************************/
 
 #include "emu.h"
 #include "unsp.h"
@@ -248,7 +248,7 @@ void unsp_device::check_irqs()
 	}
 	else
 	{
-		trigger_irq(highest_irq);
+		trigger_irq(highest_irq - 1);
 	}
 }
 
@@ -605,15 +605,21 @@ void unsp_device::execute_run()
 							if (OP0 != 0x0d)
 								r1 = read16(r2);
 							UNSP_REG_I(opb)--;
+							if (UNSP_REG_I(opb) == 0xffff)
+								UNSP_REG(SR) -= 0x0400;
 							break;
 						case 2: // r, [<ds:>r++]
 							r2 = UNSP_LREG_I(opb);
 							if (OP0 != 0x0d)
 								r1 = read16(r2);
 							UNSP_REG_I(opb)++;
+							if (UNSP_REG_I(opb) == 0x0000)
+								UNSP_REG(SR) += 0x0400;
 							break;
 						case 3: // r, [<ds:>++r]
 							UNSP_REG_I(opb)++;
+							if (UNSP_REG_I(opb) == 0x0000)
+								UNSP_REG(SR) += 0x0400;
 							r2 = UNSP_LREG_I(opb);
 							if (OP0 != 0x0d)
 								r1 = read16(r2);

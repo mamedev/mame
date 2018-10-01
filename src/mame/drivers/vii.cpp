@@ -52,14 +52,10 @@ also on this hardware
 Detailed list of bugs:
 - When loading a cart from file manager, sometimes it will crash
 - On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys
-- The game 'Jewel Master' on both above carts displays a priority error at top of screen
 - In the default bios (no cart loaded):
--- In the menu, when 'Come On!' is selected, a graphics error appears
--- Bowling, in between frames (bowling frames, not emulator frames) there is a small glitched sprite towards the lower-right
 -- The "MOTOR" option in the diagnostic menu does nothing when selected
 - Zone 60 / Wireless 60:
--- Speed Runner is missing the majority of its title screen. Opcode bug?
--- Auto Racing / Auto X, Dragon, Yummy, some other games: some sprites are inverted or opaque where they should be transparent
+-- Auto Racing / Auto X, Dragon, some other games: some sprites are inverted or opaque where they should be transparent
 -- Basketball: emulator crashes when starting the game due to jumping to invalid code.
 
 
@@ -77,6 +73,7 @@ Detailed list of bugs:
 #include "screen.h"
 #include "softlist.h"
 
+#define VII_DEBUG_VIDEO			(0)
 
 #define PAGE_ENABLE_MASK        0x0008
 #define PAGE_BLANK_MASK			0x0004
@@ -180,6 +177,9 @@ private:
 	bool m_hide_page0;
 	bool m_hide_page1;
 	bool m_hide_sprites;
+	bool m_debug_sprites;
+	bool m_debug_blit;
+	uint8_t m_sprite_index_to_debug;
 
 	uint16_t m_io_regs[0x200];
 	std::unique_ptr<uint8_t[]> m_serial_eeprom;
@@ -260,7 +260,7 @@ private:
 
 #define VERBOSE_LEVEL   (4)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 inline void spg2xx_game_state::verboselog(int n_level, const char *s_fmt, ...)
 {
@@ -325,8 +325,17 @@ void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, ui
 	uint32_t nc = ((attr & 0x0003) + 1) << 1;
 
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	if (m_debug_blit && VII_DEBUG_VIDEO)
+	{
+		printf("xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", xoff, yoff, attr, ctrl, bitmap_addr, tile);
+		printf("hw:%d,%d f:%d,%d fm:%d,%d ncols:%d pobs:%02x ", w, h, (attr & TILE_X_FLIP) ? 1 : 0, (attr & TILE_Y_FLIP) ? 1 : 0, xflipmask, yflipmask, nc, palette_offset);
+	}
 	palette_offset >>= nc;
 	palette_offset <<= nc;
+	if (m_debug_blit && VII_DEBUG_VIDEO)
+	{
+		printf("poas:%02x\n", palette_offset);
+	}
 
 	uint32_t m = bitmap_addr + nc * w*h / 16 * tile;
 	uint32_t bits = 0;
@@ -338,21 +347,30 @@ void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, ui
 		if (yy >= 0x01c0)
 			yy -= 0x0200;
 
+		if (m_debug_blit && VII_DEBUG_VIDEO)
+			printf("%3d:\n", yy);
+
 		for (uint32_t x = 0; x < w; x++)
 		{
 			int xx = xoff + (x ^ xflipmask);
 
 			bits <<= nc;
+			if (m_debug_blit && VII_DEBUG_VIDEO)
+				printf("    %08x:%d ", bits, nbits);
 			if (nbits < nc)
 			{
 				uint16_t b = space.read_word(m++ & 0x3fffff);
 				b = (b << 8) | (b >> 8);
 				bits |= b << (nc - nbits);
 				nbits += 16;
+				if (m_debug_blit && VII_DEBUG_VIDEO)
+					printf("(%04x:%08x:%d) ", b, bits, nbits);
 			}
 			nbits -= nc;
 
 			uint32_t pal = palette_offset + (bits >> 16);
+			if (m_debug_blit && VII_DEBUG_VIDEO)
+				printf("%02x:%02x:%04x ", bits >> 16, pal, bits & 0xffff);
 			bits &= 0xffff;
 
 			if ((ctrl & 0x0010) && yy < 240)
@@ -365,16 +383,26 @@ void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, ui
 			if (xx >= 0 && xx < 320 && yy >= 0 && yy < 240)
 			{
 				uint16_t rgb = m_p_palette[pal];
+				if (m_debug_blit && VII_DEBUG_VIDEO)
+					printf("rgb:%04x ", rgb);
 				if (!(rgb & 0x8000))
 				{
 					if (attr & 0x4000 || ctrl & 0x0100)
 					{
+						if (m_debug_blit && VII_DEBUG_VIDEO)
+							printf("M\n");
 						mix_pixel(xx + 320 * yy, rgb);
 					}
 					else
 					{
+						if (m_debug_blit && VII_DEBUG_VIDEO)
+							printf("S\n");
 						set_pixel(xx + 320 * yy, rgb);
 					}
+				}
+				else if (m_debug_blit && VII_DEBUG_VIDEO)
+				{
+					printf("X\n");
 				}
 			}
 		}
@@ -436,8 +464,8 @@ void spg2xx_game_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprec
 				tileattr &= ~0x0f00;
 				tileattr |= (palette << 8) & 0x0f00;    // palette
 
-				tileattr &= ~0x0100;
-				tileattr |= (palette << 2) & 0x0100;    // blend
+				tilectrl &= ~0x0100;
+				tilectrl |= (palette << 2) & 0x0100;    // blend
 			}
 
 			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
@@ -451,15 +479,12 @@ void spg2xx_game_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprec
 void spg2xx_game_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint16_t tile, attr;
-	int16_t x, y;
-	uint32_t h, w;
 	uint32_t bitmap_addr = 0x40 * m_video_regs[0x22];
 
-	tile = space.read_word(base_addr + 0);
-	x = space.read_word(base_addr + 1);
-	y = space.read_word(base_addr + 2);
-	attr = space.read_word(base_addr + 3);
+	uint16_t tile = space.read_word(base_addr + 0);
+	int16_t x = space.read_word(base_addr + 1);
+	int16_t y = space.read_word(base_addr + 2);
+	uint16_t attr = space.read_word(base_addr + 3);
 
 	if (!tile)
 	{
@@ -476,8 +501,8 @@ void spg2xx_game_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &clipr
 		x = 160 + x;
 		y = 120 - y;
 
-		h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-		w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+		uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+		uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 		x -= (w / 2);
 		y -= (h / 2) - 8;
@@ -486,7 +511,14 @@ void spg2xx_game_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &clipr
 	x &= 0x01ff;
 	y &= 0x01ff;
 
+#if VII_DEBUG_VIDEO
+	if (m_debug_sprites && machine().input().code_pressed(KEYCODE_MINUS))
+		m_debug_blit = true;
 	blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
+	m_debug_blit = false;
+#else
+	blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
+#endif
 }
 
 void spg2xx_game_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
@@ -496,13 +528,21 @@ void spg2xx_game_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &clip
 		return;
 	}
 
-	for (uint32_t n = 0; n < 256; n++)
+#if VII_DEBUG_VIDEO
+	if (!m_debug_sprites)
 	{
-		//if(space.read_word(0x2c00 + 4*n)
+#endif
+		for (uint32_t n = 0; n < 256; n++)
 		{
 			blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4 * n);
 		}
+#if VII_DEBUG_VIDEO
 	}
+	else
+	{
+		blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4 * m_sprite_index_to_debug);
+	}
+#endif
 }
 
 uint32_t spg2xx_game_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -599,15 +639,19 @@ WRITE16_MEMBER(spg2xx_game_state::video_w)
 	case 0x37:      // IRQ pos H
 		data &= 0x01ff;
 		COMBINE_DATA(&m_video_regs[offset]);
-		m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37]));
+		verboselog(0, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
+		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] < 240)
+			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
+		else
+			m_screenpos_timer->adjust(attotime::never);
 		break;
 
 	case 0x62: // Video IRQ Enable
 	{
 		verboselog(0, "video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
-		const uint16_t old = VII_VIDEO_IRQ_ENABLE;
+		const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
 		COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
-		const uint16_t changed = old ^ VII_VIDEO_IRQ_ENABLE;
+		const uint16_t changed = old ^ (VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS);
 		if (changed)
 			check_video_irq();
 		break;
@@ -616,9 +660,9 @@ WRITE16_MEMBER(spg2xx_game_state::video_w)
 	case 0x63: // Video IRQ Acknowledge
 	{
 		verboselog(0, "video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
-		const uint16_t old = VII_VIDEO_IRQ_STATUS;
+		const uint16_t old = VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS;
 		VII_VIDEO_IRQ_STATUS &= ~data;
-		const uint16_t changed = old ^ VII_VIDEO_IRQ_STATUS;
+		const uint16_t changed = old ^ (VII_VIDEO_IRQ_ENABLE & VII_VIDEO_IRQ_STATUS);
 		if (changed)
 			check_video_irq();
 		break;
@@ -1369,7 +1413,6 @@ void spg2xx_game_state::device_timer(emu_timer &timer, device_timer_id id, int p
 }
 
 void spg2xx_cart_state::machine_start()
-
 {
 	spg2xx_game_state::machine_start();
 
@@ -1385,6 +1428,22 @@ void spg2xx_cart_state::machine_start()
 
 void spg2xx_game_state::machine_start()
 {
+	m_tmb1 = timer_alloc(TIMER_TMB1);
+	m_tmb2 = timer_alloc(TIMER_TMB2);
+	m_tmb1->adjust(attotime::never);
+	m_tmb2->adjust(attotime::never);
+
+	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
+	m_screenpos_timer->adjust(attotime::never);
+
+	m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes() / 0x800000), memregion("maincpu")->base(), 0x800000);
+	m_bank->set_entry(0);
+
+	m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
+}
+
+void spg2xx_game_state::machine_reset()
+{
 	memset(m_video_regs, 0, 0x100 * sizeof(m_video_regs[0]));
 	memset(m_io_regs, 0, 0x200 * sizeof(m_io_regs[0]));
 	m_current_bank = 0;
@@ -1398,26 +1457,12 @@ void spg2xx_game_state::machine_start()
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 
-	m_tmb1 = timer_alloc(TIMER_TMB1);
-	m_tmb2 = timer_alloc(TIMER_TMB2);
-	m_tmb1->adjust(attotime::never);
-	m_tmb2->adjust(attotime::never);
-
-	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
-	m_screenpos_timer->adjust(attotime::never);
-
-	m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes() / 0x800000), memregion("maincpu")->base(), 0x800000);
-	m_bank->set_entry(0);
-
-	m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
-
 	m_hide_page0 = false;
 	m_hide_page1 = false;
 	m_hide_sprites = false;
-}
-
-void spg2xx_game_state::machine_reset()
-{
+	m_debug_sprites = false;
+	m_debug_blit = false;
+	m_sprite_index_to_debug = 0;
 }
 
 WRITE_LINE_MEMBER(spg2xx_game_state::vii_vblank)
@@ -1425,12 +1470,21 @@ WRITE_LINE_MEMBER(spg2xx_game_state::vii_vblank)
 	if (!state)
 		return;
 
+#if VII_DEBUG_VIDEO
 	if (machine().input().code_pressed_once(KEYCODE_5))
 		m_hide_page0 = !m_hide_page0;
 	if (machine().input().code_pressed_once(KEYCODE_6))
 		m_hide_page1 = !m_hide_page1;
 	if (machine().input().code_pressed_once(KEYCODE_7))
 		m_hide_sprites = !m_hide_sprites;
+	if (machine().input().code_pressed_once(KEYCODE_8))
+		m_debug_sprites = !m_debug_sprites;
+	if (machine().input().code_pressed_once(KEYCODE_9))
+		m_sprite_index_to_debug--;
+	if (machine().input().code_pressed_once(KEYCODE_0))
+		m_sprite_index_to_debug++;
+#endif
+
 	int32_t x = m_io_motionx ? ((int32_t)m_io_motionx->read() - 0x200) : 0;
 	int32_t y = m_io_motiony ? ((int32_t)m_io_motiony->read() - 0x200) : 0;
 	int32_t z = m_io_motionz ? ((int32_t)m_io_motionz->read() - 0x200) : 0;
