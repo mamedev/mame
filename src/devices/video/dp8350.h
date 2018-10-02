@@ -61,6 +61,7 @@ public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(lrc_r);
 	u8 lc_r() { return m_lc; }
+	DECLARE_READ_LINE_MEMBER(lbre_r);
 	DECLARE_READ_LINE_MEMBER(hsync_r);
 	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ_LINE_MEMBER(vblank_r);

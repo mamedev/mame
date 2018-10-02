@@ -378,7 +378,7 @@ void dp835x_device::register_load(u8 rs, u16 addr)
 
 
 //-------------------------------------------------
-//  lrc_r - report line rate clock state
+//  lrc_r - poll line rate clock state
 //-------------------------------------------------
 
 READ_LINE_MEMBER(dp835x_device::lrc_r)
@@ -391,7 +391,22 @@ READ_LINE_MEMBER(dp835x_device::lrc_r)
 
 
 //-------------------------------------------------
-//  hsync_r - report horizontal sync state
+//  lbre_r - poll line buffer recirculate enable
+//  state
+//-------------------------------------------------
+
+READ_LINE_MEMBER(dp835x_device::lbre_r)
+{
+	if (m_lc == (m_cgpi ? 0 : m_char_height - 1))
+		return 0;
+	else
+		return 1;
+}
+
+
+
+//-------------------------------------------------
+//  hsync_r - poll horizontal sync state
 //-------------------------------------------------
 
 READ_LINE_MEMBER(dp835x_device::hsync_r)
@@ -404,7 +419,7 @@ READ_LINE_MEMBER(dp835x_device::hsync_r)
 
 
 //-------------------------------------------------
-//  vsync_r - report vertical sync state
+//  vsync_r - poll vertical sync state
 //-------------------------------------------------
 
 READ_LINE_MEMBER(dp835x_device::vsync_r)
@@ -416,7 +431,7 @@ READ_LINE_MEMBER(dp835x_device::vsync_r)
 
 
 //-------------------------------------------------
-//  vblank_r - report vertical blanking state
+//  vblank_r - poll vertical blanking state
 //-------------------------------------------------
 
 READ_LINE_MEMBER(dp835x_device::vblank_r)
