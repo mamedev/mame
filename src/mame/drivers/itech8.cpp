@@ -615,7 +615,24 @@ MACHINE_START_MEMBER(itech8_state,sstrike)
 void itech8_state::machine_start()
 {
 	if (m_mainbank)
-		m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
+	{
+		if (memregion("maincpu")->bytes() > 0x10000)
+		{
+			// rimrockn uses different banking address and more banks
+			m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x0000, 0x4000);
+		}
+		else
+		{
+			m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x0000, 0x4000);
+		}
+	}
+
+	if (m_fixed)
+	{
+		uint8_t* fixedstart = memregion("maincpu")->base() + memregion("maincpu")->bytes() - 0x8000; // last 0x8000 bytes of the ROM
+		m_fixed->configure_entry(0, fixedstart);
+		m_fixed->set_entry(0);
+	}
 
 	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 	m_blitter_done_timer = timer_alloc(TIMER_BLITTER_DONE);
@@ -640,7 +657,7 @@ void itech8_state::machine_reset()
 	/* make sure bank 0 is selected */
 	if (m_mainbank)
 	{
-		m_mainbank->set_entry(0);
+		m_mainbank->set_entry(0 ^ m_bankxor);
 		m_maincpu->reset();
 	}
 
@@ -714,7 +731,7 @@ WRITE8_MEMBER(itech8_state::blitter_bank_w)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		m_mainbank->set_entry((data >> 5) & 1);
+		m_mainbank->set_entry(((data >> 5) & 1) ^ m_bankxor);
 
 	/* the rest is handled by the video hardware */
 	blitter_w(space, offset, data);
@@ -852,7 +869,8 @@ void itech8_state::common_lo_map(address_map &map)
 	map(0x11c0, 0x11df).rw(FUNC(itech8_state::blitter_r), FUNC(itech8_state::blitter_bank_w));
 	map(0x11e0, 0x11ff).w(FUNC(itech8_state::palette_w));
 	map(0x2000, 0x3fff).ram().share("nvram");
-	map(0x4000, 0xffff).bankr("mainbank");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr("fixed"); // non-banked area
 }
 
 
@@ -869,7 +887,8 @@ void itech8_state::common_hi_map(address_map &map)
 	map(0x01e0, 0x01ff).w(FUNC(itech8_state::palette_w));
 	map(0x1000, 0x1fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
 	map(0x2000, 0x3fff).ram().share("nvram");
-	map(0x4000, 0xffff).bankr("mainbank");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr("fixed"); // non-banked area
 }
 
 
@@ -928,7 +947,8 @@ void itech8_state::gtg2_map(address_map &map)
 	map(0x01e0, 0x01e0).w(m_tms34061, FUNC(tms34061_device::latch_w));
 	map(0x1000, 0x1fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
 	map(0x2000, 0x3fff).ram().share("nvram");
-	map(0x4000, 0xffff).bankr("mainbank");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr("fixed"); // non-banked area
 }
 
 /*------ Ninja Clowns layout ------*/
@@ -1273,6 +1293,9 @@ static INPUT_PORTS_START( slikshot )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Green")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
+	PORT_START("80")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("FAKEX") /* fake */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(1)
 
@@ -1323,6 +1346,9 @@ static INPUT_PORTS_START( sstrike )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("80")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("FAKEX") /* fake */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(1)
@@ -1956,10 +1982,8 @@ void itech8_state::gtg2(machine_config &config)
  *************************************/
 
 ROM_START( wfortune )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "wofpgm", 0x04000, 0x4000, CRC(bd984654) SHA1(8e16d2feb26e9a6f86c4a36bf0f03db80ded03f6) )
-	ROM_CONTINUE(       0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wofpgm", 0x00000, 0x10000, CRC(bd984654) SHA1(8e16d2feb26e9a6f86c4a36bf0f03db80ded03f6) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "wofsnd", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
@@ -1976,10 +2000,8 @@ ROM_END
 
 
 ROM_START( wfortunea )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "wofpgmr1.bin", 0x04000, 0x4000, CRC(c3d3eb21) SHA1(21137663afd19fba875e188640f0347fc8c5dcf0) )
-	ROM_CONTINUE(             0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wofpgmr1.bin", 0x00000, 0x10000, CRC(c3d3eb21) SHA1(21137663afd19fba875e188640f0347fc8c5dcf0) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "wofsnd", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
@@ -1996,10 +2018,8 @@ ROM_END
 
 
 ROM_START( grmatch )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "grudgematch.u5", 0x04000, 0x4000, CRC(11cadec9) SHA1(e21df623d1311ea63bafa2d6d0d94eb7d13232da) )
-	ROM_CONTINUE(               0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "grudgematch.u5", 0x00000, 0x10000, CRC(11cadec9) SHA1(e21df623d1311ea63bafa2d6d0d94eb7d13232da) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "grudgematch.u27", 0x08000, 0x8000, CRC(59c18e63) SHA1(0d00c9cc683ff17e3213ba343ae65d533b57a243) )
@@ -2019,9 +2039,8 @@ ROM_END
 
 
 ROM_START( stratab )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sb_prog_v3_u5.u5", 0x08000, 0x8000, CRC(a5ae728f) SHA1(85098eef1614d5148e8082df4c936883662292ee) ) /* Labeled as SB PROG V3 (U5) */
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sb_prog_v3_u5.u5", 0x00000, 0x8000, CRC(a5ae728f) SHA1(85098eef1614d5148e8082df4c936883662292ee) ) /* Labeled as SB PROG V3 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sb_snds_u27.u27", 0x08000, 0x8000, CRC(b36c8f0a) SHA1(c4c3edf3352d95561f76705087338c1946137447) ) /* Labeled as SB SNDS (U27) */
@@ -2037,9 +2056,8 @@ ROM_END
 
 
 ROM_START( stratab1 )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sb_prog_v1_u5.u5",  0x08000, 0x8000, CRC(46d51604) SHA1(de7b6306fdcee4907b07667baf874bd195822e6a) ) /* Labeled as SB PROG V1 (U5) */
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sb_prog_v1_u5.u5",  0x00000, 0x8000, CRC(46d51604) SHA1(de7b6306fdcee4907b07667baf874bd195822e6a) ) /* Labeled as SB PROG V1 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sb_snds_u27.u27", 0x08000, 0x8000, CRC(b36c8f0a) SHA1(c4c3edf3352d95561f76705087338c1946137447) ) /* Labeled as SB SNDS (U27) */
@@ -2055,10 +2073,8 @@ ROM_END
 
 
 ROM_START( gtg )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg_joy_3.3_u5.u5", 0x04000, 0x4000, CRC(983a5c0c) SHA1(245fd6b86e96ef57ea9a85c7a501d846e135cfc6) ) /* Joystick version - Labeled GTG JOY V3.3 (U5) */
-	ROM_CONTINUE(                  0x10000, 0xc000 )
-	ROM_COPY( "maincpu",  0x14000, 0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtg_joy_3.3_u5.u5", 0x00000, 0x10000, CRC(983a5c0c) SHA1(245fd6b86e96ef57ea9a85c7a501d846e135cfc6) ) /* Joystick version - Labeled GTG JOY V3.3 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
@@ -2077,10 +2093,8 @@ ROM_END
 
 
 ROM_START( gtgj31 )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg_joy_3.1_u5.u5", 0x04000, 0x4000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version - Labeled GTG JOY V3.1 (U5) */
-	ROM_CONTINUE(                  0x10000, 0xc000 )
-	ROM_COPY( "maincpu",  0x14000, 0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtg_joy_3.1_u5.u5", 0x00000, 0x10000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version - Labeled GTG JOY V3.1 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
@@ -2099,10 +2113,8 @@ ROM_END
 
 
 ROM_START( gtgt )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bin_2.0.u5", 0x4000, 0x4000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) ) /* Trackball version */
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtg.bin_2.0.u5", 0x0000, 0x10000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) ) /* Trackball version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "golf-snd.u27", 0x08000, 0x8000, CRC(f6a7429b) SHA1(0fb378606c12c3543aa1ff603101e262acb9c692) )
@@ -2121,10 +2133,8 @@ ROM_END
 
 
 ROM_START( gtgt1 )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bin_1.0.u5", 0x04000, 0x4000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) ) /* Trackball version */
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtg.bin_1.0.u5", 0x00000, 0x10000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) ) /* Trackball version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "snd-u27.256", 0x08000, 0x8000, CRC(471da557) SHA1(32bfe450a42d9eb6c14edcfa2b4e33f65a11126e) )
@@ -2143,11 +2153,8 @@ ROM_END
 
 
 ROM_START( gtg2t )
-	/* banks are loaded in the opposite order from the others, */
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtgii_tb_v1.1.u5", 0x10000, 0x4000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) ) /* Trackball version - labeled GTGII TB V1.1 (U5) */
-	ROM_CONTINUE(                 0x04000, 0xc000 )
-	ROM_COPY( "maincpu",  0x8000, 0x14000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtgii_tb_v1.1.u5", 0x00000, 0x10000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) ) /* Trackball version - labeled GTGII TB V1.1 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "gtgii_snd_v1_u27.u27", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) ) /* labeled GTGII SND V1 (U27) */
@@ -2169,10 +2176,8 @@ ROM_END
 
 
 ROM_START( gtg2j )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg2.bin_1.0.u5", 0x04000, 0x4000, CRC(9c95ceaa) SHA1(d9fd2b2419c026822a07d2ba51d6ab40b7cd0d49) ) /* Joystick version */
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtg2.bin_1.0.u5", 0x00000, 0x10000, CRC(9c95ceaa) SHA1(d9fd2b2419c026822a07d2ba51d6ab40b7cd0d49) ) /* Joystick version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "gtgii_snd_v1_u27.u27", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) ) /* labeled GTGII SND V1 (U27) */
@@ -2194,10 +2199,8 @@ ROM_END
 
 
 ROM_START( slikshot )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "poolpgm-20.u5",  0x04000, 0x4000, CRC(370a00eb) SHA1(b2878f161f4931d9fc3979a84b29660941e2608f) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "poolpgm-20.u5",  0x00000, 0x10000, CRC(370a00eb) SHA1(b2878f161f4931d9fc3979a84b29660941e2608f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
@@ -2218,10 +2221,8 @@ ROM_END
 
 
 ROM_START( slikshot17 )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "poolpgm-17.u5", 0x04000, 0x4000, CRC(09d70554) SHA1(a009cd3b22261c60f1028694baef51f61713154f) )
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "poolpgm-17.u5", 0x00000, 0x10000, CRC(09d70554) SHA1(a009cd3b22261c60f1028694baef51f61713154f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
@@ -2242,10 +2243,8 @@ ROM_END
 
 
 ROM_START( slikshot16 )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "poolpgm-16.u5", 0x04000, 0x4000, CRC(c0f17012) SHA1(5d466e058daf91b4f52e634498df9d2a03627aaa) )
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "poolpgm-16.u5", 0x00000, 0x10000, CRC(c0f17012) SHA1(5d466e058daf91b4f52e634498df9d2a03627aaa) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
@@ -2268,10 +2267,8 @@ ROM_END
 
 
 ROM_START( dynobop )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "dyno_pgm_1.1_u5.u5", 0x04000, 0x4000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
-	ROM_CONTINUE(                   0x10000, 0xc000 )
-	ROM_COPY( "maincpu",   0x14000, 0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dyno_pgm_1.1_u5.u5", 0x00000, 0x10000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "dyno_snd-u27.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
@@ -2292,9 +2289,8 @@ ROM_END
 
 
 ROM_START( sstrike )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sstrik_prg-v1_u5.u5", 0x08000, 0x8000, CRC(af00cddf) SHA1(b866e8dfce1449f7462a79efa385ea6b55cdc6e7) ) /* labeled SSTRIKE PRG-V1(U5) */
-	ROM_COPY( "maincpu",     0x8000, 0x14000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sstrik_prg-v1_u5.u5", 0x00000, 0x8000, CRC(af00cddf) SHA1(b866e8dfce1449f7462a79efa385ea6b55cdc6e7) ) /* labeled SSTRIKE PRG-V1(U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sstrik_snd1.4_u27.u27", 0x08000, 0x8000, CRC(efab7252) SHA1(eb3b2002531e551e3d67958ea3cc56a69fa660e2) ) /* labeled SSTRIKE SND1.4(U27) */
@@ -2316,9 +2312,8 @@ ROM_END
 
 
 ROM_START( stratabs )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sb_prog-v4t.u5",  0x08000, 0x8000, CRC(38ddae75) SHA1(71a9cbd36cf7b180a88bab3ab92a4dff93ce365f) )
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sb_prog-v4t.u5",  0x00000, 0x8000, CRC(38ddae75) SHA1(71a9cbd36cf7b180a88bab3ab92a4dff93ce365f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sb_snds_1.4.u27", 0x08000, 0x8000, CRC(526ef093) SHA1(884f9149b3d5eb33e47258e466ad9cd9ce5ffddb) )
@@ -2340,10 +2335,8 @@ ROM_END
 
 
 ROM_START( pokrdice )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "pd-v17.u5", 0x04000, 0x4000, CRC(5e24be82) SHA1(97e50cc023ff651fb09cc5e85a1bef1bc234ccb9) )
-	ROM_CONTINUE(          0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pd-v17.u5", 0x00000, 0x10000, CRC(5e24be82) SHA1(97e50cc023ff651fb09cc5e85a1bef1bc234ccb9) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "pd-snd.bin", 0x08000, 0x8000, CRC(4925401c) SHA1(e35983bec4a0dd4cb1d942fd909790b1adeb415d) )
@@ -2358,10 +2351,8 @@ ROM_END
 
 
 ROM_START( hstennis )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "tenbim.v11", 0x04000, 0x4000, CRC(faffab5c) SHA1(4de525f6adb16205c47788b78aecdebd57008295) )
-	ROM_CONTINUE(           0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tenbim.v11", 0x00000, 0x10000, CRC(faffab5c) SHA1(4de525f6adb16205c47788b78aecdebd57008295) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tensnd.v1", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) )
@@ -2382,10 +2373,8 @@ ROM_END
 
 
 ROM_START( hstennis10 )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "tenbim.v10", 0x04000, 0x4000, CRC(d108a6e0) SHA1(1041e1d95b10245fc50f6484e710803db2706f9a) )
-	ROM_CONTINUE(           0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tenbim.v10", 0x00000, 0x10000, CRC(d108a6e0) SHA1(1041e1d95b10245fc50f6484e710803db2706f9a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tensnd.v1", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) )
@@ -2406,10 +2395,8 @@ ROM_END
 
 
 ROM_START( arlingtn ) /* PCB  p/n 1030 rev. 1A */
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* banks are loaded in the opposite order from the others, */
-	ROM_LOAD( "ahr-d_v_1.21.u5", 0x10000, 0x4000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* Service menu reports version as 1.21-D */
-	ROM_CONTINUE(                0x04000, 0xc000 )
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ahr-d_v_1.21.u5", 0x00000, 0x10000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* Service menu reports version as 1.21-D */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ahr_snd_v1.1.u27", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) )
@@ -2426,10 +2413,8 @@ ROM_END
 
 
 ROM_START( peggle )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "j-stick.u5", 0x04000, 0x4000, CRC(140d5a9c) SHA1(841e5f45c6f306d9bd286e7d3e3c75b169c932e1) )
-	ROM_CONTINUE(           0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "j-stick.u5", 0x00000, 0x10000, CRC(140d5a9c) SHA1(841e5f45c6f306d9bd286e7d3e3c75b169c932e1) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound.u27", 0x08000, 0x8000, CRC(b99beb70) SHA1(8d82c3b081a1afb236afa658abb3aa605c6c2264) )
@@ -2445,10 +2430,8 @@ ROM_END
 
 
 ROM_START( pegglet )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "trakball.u5", 0x04000, 0x4000, CRC(d2694868) SHA1(9945a308550c9d89a647d80257e3ab14f793ac6f) )
-	ROM_CONTINUE(            0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "trakball.u5", 0x00000, 0x10000, CRC(d2694868) SHA1(9945a308550c9d89a647d80257e3ab14f793ac6f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound.u27", 0x08000, 0x8000, CRC(b99beb70) SHA1(8d82c3b081a1afb236afa658abb3aa605c6c2264) )
@@ -2464,11 +2447,8 @@ ROM_END
 
 
 ROM_START( neckneck )
-	/* banks are loaded in the opposite order from the others, */
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "nn_prg12.u5", 0x04000, 0x4000, CRC(8e51734a) SHA1(c184af73670235a9245bfdeec2b58acfe93170e3) )
-	ROM_CONTINUE(            0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nn_prg12.u5", 0x00000, 0x10000, CRC(8e51734a) SHA1(c184af73670235a9245bfdeec2b58acfe93170e3) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nn_snd10.u27", 0x08000, 0x8000, CRC(74771b2f) SHA1(0a963d2962699bb1b4d08bd486979151d0a228da) )
@@ -2485,15 +2465,8 @@ ROM_END
 
 
 ROM_START( rimrockn )
-	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_2.2.u5", 0x04000, 0x4000, CRC(97777683) SHA1(0998dde26daaa2d2b78e83647e03ba01b0ef31f2) )
-	ROM_CONTINUE(        0x10000, 0x4000 )
-	ROM_CONTINUE(        0x1c000, 0x4000 )
-	ROM_CONTINUE(        0x28000, 0xc000 )
-	ROM_CONTINUE(        0x2c000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rrb.bin_2.2.u5", 0x00000, 0x20000, CRC(97777683) SHA1(0998dde26daaa2d2b78e83647e03ba01b0ef31f2) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
@@ -2515,15 +2488,8 @@ ROM_END
 
 
 ROM_START( rimrockn20 )
-	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_2.0.u5", 0x04000, 0x4000, CRC(7e9d5545) SHA1(2aa028b3f5d05bec4ee289e7d39eaad30b3d4d5f) )
-	ROM_CONTINUE(        0x10000, 0x4000 )
-	ROM_CONTINUE(        0x1c000, 0x4000 )
-	ROM_CONTINUE(        0x28000, 0xc000 )
-	ROM_CONTINUE(        0x2c000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rrb.bin_2.0.u5", 0x00000, 0x20000, CRC(7e9d5545) SHA1(2aa028b3f5d05bec4ee289e7d39eaad30b3d4d5f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
@@ -2540,15 +2506,8 @@ ROM_END
 
 
 ROM_START( rimrockn16 )
-	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_1.6.u5",0x04000, 0x4000, CRC(999cd502) SHA1(8ad0d641a9f853eff27be1d4de04ab86b9275d57) )
-	ROM_CONTINUE(        0x10000, 0x4000 )
-	ROM_CONTINUE(        0x1c000, 0x4000 )
-	ROM_CONTINUE(        0x28000, 0xc000 )
-	ROM_CONTINUE(        0x2c000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rrb.bin_1.6.u5",0x00000, 0x20000, CRC(999cd502) SHA1(8ad0d641a9f853eff27be1d4de04ab86b9275d57) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
@@ -2565,15 +2524,8 @@ ROM_END
 
 
 ROM_START( rimrockn12 )
-	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_1.2.u5",0x04000, 0x4000, CRC(661761a6) SHA1(7224b1eac2fd0969d70657448ab241a433143df4) )
-	ROM_CONTINUE(        0x10000, 0x4000 )
-	ROM_CONTINUE(        0x1c000, 0x4000 )
-	ROM_CONTINUE(        0x28000, 0xc000 )
-	ROM_CONTINUE(        0x2c000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x08000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x14000, 0x8000 )
-	ROM_COPY( "maincpu", 0x2c000, 0x20000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rrb.bin_1.2.u5",0x00000, 0x20000, CRC(661761a6) SHA1(7224b1eac2fd0969d70657448ab241a433143df4) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rrbsndv1.u27", 0x08000, 0x8000, CRC(8eda5f53) SHA1(f256544a8c87125587719460ed0fef14efef9015) )
@@ -2590,15 +2542,8 @@ ROM_END
 
 
 ROM_START( rimrockn12b )
-	ROM_REGION( 0x34000, "maincpu", 0 )
-	ROM_LOAD( "rbba-1.u5", 0x04000, 0x4000, CRC(f99561a8) SHA1(ee59b934839ef5599bb393e0860d54c95f6df1b0) ) // ZX2880JL
-	ROM_CONTINUE(          0x10000, 0x4000 )
-	ROM_CONTINUE(          0x1c000, 0x4000 )
-	ROM_CONTINUE(          0x28000, 0xc000 )
-	ROM_CONTINUE(          0x2c000, 0x8000 )
-	ROM_COPY( "maincpu",   0x2c000, 0x08000, 0x8000 )
-	ROM_COPY( "maincpu",   0x2c000, 0x14000, 0x8000 )
-	ROM_COPY( "maincpu",   0x2c000, 0x20000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rbba-1.u5", 0x00000, 0x20000, CRC(f99561a8) SHA1(ee59b934839ef5599bb393e0860d54c95f6df1b0) ) // ZX2880JL
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rrbsndv1.u27", 0x08000, 0x8000, CRC(8eda5f53) SHA1(f256544a8c87125587719460ed0fef14efef9015) ) // Found on a double-sized ROM (27C512) with its first half empty
@@ -2646,10 +2591,8 @@ ROM_END
 
 
 ROM_START( gpgolf )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gpgv1_1.bin", 0x04000, 0x4000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version */
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gpgv1_1.bin", 0x00000, 0x10000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sndv1.u27", 0x08000, 0x8000, CRC(55734876) SHA1(eb5ef816acbc6e35642749e38a2908b7ba359b9d) )
@@ -2665,11 +2608,8 @@ ROM_END
 
 
 ROM_START( gtg2 )
-	/* banks are loaded in the opposite order from the others, */
-	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg2_v2_2.u5", 0x10000, 0x4000, CRC(4a61580f) SHA1(7c64648d47418fbcc0f9b5bd91f88856209bc0f5) ) /* Trackball version */
-	ROM_CONTINUE(        0x04000, 0xc000 )
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtg2_v2_2.u5", 0x00000, 0x10000, CRC(4a61580f) SHA1(7c64648d47418fbcc0f9b5bd91f88856209bc0f5) ) /* Trackball version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sndv1.u27", 0x08000, 0x8000, CRC(55734876) SHA1(eb5ef816acbc6e35642749e38a2908b7ba359b9d) )
@@ -2696,6 +2636,11 @@ ROM_END
  *  Driver-specific init
  *
  *************************************/
+
+void itech8_state::init_invbank()
+{
+	m_bankxor = 1;
+}
 
 void grmatch_state::driver_init()
 {
@@ -2736,6 +2681,7 @@ void itech8_state::init_hstennis()
 
 void itech8_state::init_arligntn()
 {
+	init_invbank();
 	m_visarea.set(16, 389, 0, 239);
 }
 
@@ -2750,15 +2696,6 @@ void itech8_state::init_neckneck()
 {
 	m_visarea.set(8, 375, 0, 239);
 }
-
-
-void itech8_state::init_rimrockn()
-{
-	/* different banking mechanism (disable the old one) */
-	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x4000, 0xc000);
-}
-
-
 
 /*************************************
  *
@@ -2780,7 +2717,7 @@ GAME( 1990, gtg,        0,         stratab_hi,        gtg,      itech8_state, em
 GAME( 1990, gtgj31,     gtg,       stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
 GAME( 1989, gtgt,       gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
 GAME( 1989, gtgt1,      gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
-GAME( 1989, gtg2t,      gtg2,      stratab_hi,        gtg2t,    itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
+GAME( 1989, gtg2t,      gtg2,      stratab_hi,        gtg2t,    itech8_state, init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
 GAME( 1991, gtg2j,      gtg2,      stratab_lo,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
@@ -2801,15 +2738,15 @@ GAME( 1991, pegglet,    peggle,    hstennis_lo,       pegglet,  itech8_state, in
 GAME( 1992, neckneck,   0,         hstennis_lo,       neckneck, itech8_state, init_neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn,    0,        rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
-GAME( 1991, rimrockn20,  rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
-GAME( 1991, rimrockn16,  rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
-GAME( 1991, rimrockn12,  rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
-GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "bootleg",                        "Rim Rockin' Basketball (V1.2, bootleg)", 0 )
+GAME( 1991, rimrockn,    0,        rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
+GAME( 1991, rimrockn20,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
+GAME( 1991, rimrockn16,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn12,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "bootleg",                        "Rim Rockin' Basketball (V1.2, bootleg)", 0 )
 
 /* Ninja Clowns-style PCB */
 GAME( 1991, ninclown,   0,         ninclown,          ninclown, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
 GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
-GAME( 1992, gtg2,       0,         gtg2,              gtg2,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )
+GAME( 1992, gtg2,       0,         gtg2,              gtg2,     itech8_state, init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )

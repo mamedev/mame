@@ -30,10 +30,13 @@ public:
 		m_ticket(*this, "ticket"),
 		m_grom(*this, "grom"),
 		m_mainbank(*this, "mainbank"),
+		m_fixed(*this, "fixed"),
 		m_an(*this, { { "AN_C", "AN_D", "AN_E", "AN_F" } }),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY"),
-		m_visarea(0, 0, 0, 0) { }
+		m_visarea(0, 0, 0, 0),
+		m_bankxor(0)
+	{}
 
 	void rimrockn(machine_config &config);
 	void gtg2(machine_config &config);
@@ -48,7 +51,7 @@ public:
 	void slikshot_hi(machine_config &config);
 	void hstennis_hi(machine_config &config);
 
-	void init_rimrockn();
+	void init_invbank();
 	void init_peggle();
 	void init_slikshot();
 	void init_neckneck();
@@ -82,6 +85,7 @@ protected:
 	required_device<ticket_dispenser_device> m_ticket;
 	required_region_ptr<uint8_t> m_grom;
 	optional_memory_bank m_mainbank;
+	optional_memory_bank m_fixed;
 	optional_ioport_array<4> m_an;
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;
@@ -121,6 +125,7 @@ protected:
 	emu_timer *m_behind_beam_update_timer;
 	emu_timer *m_blitter_done_timer;
 	emu_timer *m_delayed_z80_control_timer;
+	int m_bankxor;
 
 	// common
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
