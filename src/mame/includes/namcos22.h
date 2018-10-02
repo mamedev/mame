@@ -382,6 +382,8 @@ private:
 	uint32_t pdp_polygonram_read(offs_t offs);
 	void pdp_polygonram_write(offs_t offs, uint32_t data);
 	void point_write(offs_t offs, uint32_t data);
+	int32_t pointram_read(offs_t offs);
+	inline int32_t point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom_size) ? m_pointrom[offs] : pointram_read(offs); }
 	void master_enable(bool enable);
 	void slave_enable(bool enable);
 
@@ -402,7 +404,6 @@ private:
 	void slavesim_handle_233002(const int32_t *src);
 	void simulate_slavedsp(bitmap_rgb32 &bitmap);
 
-	int32_t point_read(int32_t addr);
 	void init_tables();
 	void update_mixer();
 	void update_palette();

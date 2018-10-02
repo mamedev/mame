@@ -2115,27 +2115,20 @@ void namcos22_state::point_write(offs_t offs, uint32_t data)
 	}
 }
 
-int32_t namcos22_state::point_read(int32_t addr)
+int32_t namcos22_state::pointram_read(offs_t offs) // called from point_read
 {
-	if (addr < 0)
-		return -1;
-
-	// point rom
-	else if (addr < m_pointrom_size)
-		return m_pointrom[addr];
-
 	// point ram, only used in ram test?
 	int32_t result = 0;
 	if (m_is_ss22)
 	{
-		if (addr >= 0xf80000 && addr < 0xfa0000)
-			result = m_pointram[addr - 0xf80000];
+		if (offs >= 0xf80000 && offs < 0xfa0000)
+			result = m_pointram[offs - 0xf80000];
 		else return -1;
 	}
 	else
 	{
-		if (addr >= 0xf00000 && addr < 0xf20000)
-			result = m_pointram[addr - 0xf00000];
+		if (offs >= 0xf00000 && offs < 0xf20000)
+			result = m_pointram[offs - 0xf00000];
 		else return -1;
 	}
 
@@ -2163,12 +2156,12 @@ WRITE16_MEMBER(namcos22_state::point_hiword_w)
 
 READ16_MEMBER(namcos22_state::point_loword_r)
 {
-	return point_read(m_point_address & 0x00ffffff) & 0xffff;
+	return point_read(m_point_address) & 0xffff;
 }
 
 READ16_MEMBER(namcos22_state::point_hiword_ir)
 {
-	return point_read(m_point_address++ & 0x00ffffff) >> 16 & 0xffff;
+	return point_read(m_point_address++) >> 16 & 0xffff;
 }
 
 
@@ -2219,7 +2212,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 					/* read word from point ram */
 					srcAddr = pdp_polygonram_read(offs++); /* 32 bit PointRAM address */
 					dstAddr = pdp_polygonram_read(offs++); /* CommRAM address; receives 24 bit PointRAM data */
-					data    = point_read(srcAddr & 0x00ffffff);
+					data    = point_read(srcAddr);
 					pdp_polygonram_write(dstAddr, data);
 					break;
 
@@ -2242,7 +2235,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 					numWords = pdp_polygonram_read(offs++); /* block size */
 					while (numWords--)
 					{
-						data = point_read(srcAddr++ & 0x00ffffff);
+						data = point_read(srcAddr++);
 						pdp_polygonram_write(dstAddr++, data);
 					}
 					break;
@@ -2265,7 +2258,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 					numWords = pdp_polygonram_read(offs++);
 					while (numWords--)
 					{
-						data = point_read(srcAddr++ & 0x00ffffff);
+						data = point_read(srcAddr++);
 						point_write(dstAddr++, data);
 					}
 					break;

@@ -23,7 +23,7 @@
  *       + cybrcomm/victlapw namco logo screen after attract demo
  *       + airco22b title logo after attract demo
  *       + aquajet namco logo/game over after ending
- * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors)
+ * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors), and alpinr2b character selection screen
  * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
