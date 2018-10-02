@@ -13,8 +13,10 @@
 #include "machine/i8243.h"
 #include "machine/input_merger.h"
 #include "machine/ins8250.h"
+#include "sound/beep.h"
 #include "video/dp8350.h"
 #include "screen.h"
+#include "speaker.h"
 
 class hazl1420_state : public driver_device
 {
@@ -26,6 +28,7 @@ public:
 		, m_ioexp(*this, "ioexp%u", 0U)
 		, m_mainint(*this, "mainint")
 		, m_crtc(*this, "crtc")
+		, m_beeper(*this, "beep")
 		, m_keys(*this, "KEY%u", 0U)
 	{
 	}
@@ -40,6 +43,7 @@ private:
 	u8 p2_r();
 	void p2_w(u8 data);
 	void crtc_w(offs_t offset, u8 data);
+	void p6_w(u8 data);
 	void p7_w(u8 data);
 
 	u8 key_r();
@@ -58,6 +62,7 @@ private:
 	required_device_array<i8243_device, 2> m_ioexp;
 	required_device<input_merger_device> m_mainint;
 	required_device<dp8350_device> m_crtc;
+	required_device<beep_device> m_beeper;
 	required_ioport_array<10> m_keys;
 };
 
@@ -87,6 +92,11 @@ void hazl1420_state::crtc_w(offs_t offset, u8 data)
 {
 	// CRTC registers are loaded only during vertical blanking period
 	m_crtc->register_load(bitswap<2>(offset >> 12, 0, 1), offset & 0xfff);
+}
+
+void hazl1420_state::p6_w(u8 data)
+{
+	m_beeper->set_state(!BIT(data, 1));
 }
 
 void hazl1420_state::p7_w(u8 data)
@@ -331,6 +341,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	I8243(config, m_ioexp[0]);
 	m_ioexp[0]->p4_in_cb().set_ioport("INP4");
 	m_ioexp[0]->p5_in_cb().set_ioport("INP5");
+	m_ioexp[0]->p6_out_cb().set(FUNC(hazl1420_state::p6_w));
 	m_ioexp[0]->p7_out_cb().set(FUNC(hazl1420_state::p7_w));
 
 	I8243(config, m_ioexp[1]);
@@ -348,6 +359,9 @@ void hazl1420_state::hazl1420(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(hazl1420_state::screen_update));
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 ROM_START(hazl1420)
@@ -363,4 +377,4 @@ ROM_START(hazl1420)
 	ROM_LOAD("8316.u23", 0x0000, 0x0800, NO_DUMP)
 ROM_END
 
-COMP(1979, hazl1420, 0, 0, hazl1420, hazl1420, hazl1420_state, empty_init, "Hazeltine", "1420 Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1979, hazl1420, 0, 0, hazl1420, hazl1420, hazl1420_state, empty_init, "Hazeltine", "1420 Video Display Terminal", MACHINE_NOT_WORKING)
