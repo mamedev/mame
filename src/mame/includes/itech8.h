@@ -7,6 +7,7 @@
 
 **************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "video/tlc34076.h"
@@ -17,15 +18,18 @@
 class itech8_state : public driver_device
 {
 public:
-	itech8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	itech8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_subcpu(*this, "sub"),
+		m_soundlatch(*this, "soundlatch"),
 		m_tms34061(*this, "tms34061"),
 		m_tlc34076(*this, "tlc34076"),
 		m_screen(*this, "screen"),
 		m_ticket(*this, "ticket"),
+		m_grom(*this, "grom"),
+		m_mainbank(*this, "mainbank"),
 		m_an(*this, { { "AN_C", "AN_D", "AN_E", "AN_F" } }),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY"),
@@ -50,7 +54,6 @@ public:
 	void init_neckneck();
 	void init_arligntn();
 	void init_hstennis();
-	void init_sstrike();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
@@ -64,7 +67,6 @@ protected:
 	{
 		TIMER_IRQ_OFF,
 		TIMER_BEHIND_BEAM_UPDATE,
-		TIMER_DELAYED_SOUND_DATA,
 		TIMER_BLITTER_DONE,
 		TIMER_DELAYED_Z80_CONTROL,
 		TIMER_BASE_LAST = TIMER_DELAYED_Z80_CONTROL
@@ -73,10 +75,13 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_subcpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<tms34061_device> m_tms34061;
 	required_device<tlc34076_device> m_tlc34076;
 	required_device<screen_device> m_screen;
 	required_device<ticket_dispenser_device> m_ticket;
+	required_region_ptr<uint8_t> m_grom;
+	optional_memory_bank m_mainbank;
 	optional_ioport_array<4> m_an;
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;
@@ -87,7 +92,6 @@ protected:
 	uint8_t m_blitter_int;
 	uint8_t m_tms34061_int;
 	uint8_t m_periodic_int;
-	uint8_t m_sound_data;
 	uint8_t m_pia_porta_data;
 	uint8_t m_pia_portb_data;
 	uint8_t m_z80_ctrl;
@@ -113,11 +117,8 @@ protected:
 	uint8_t m_fetch_rle_count;
 	uint8_t m_fetch_rle_value;
 	uint8_t m_fetch_rle_literal;
-	uint8_t *m_grom_base;
-	uint32_t m_grom_size;
 	emu_timer *m_irq_off_timer;
 	emu_timer *m_behind_beam_update_timer;
-	emu_timer *m_delayed_sound_data_timer;
 	emu_timer *m_blitter_done_timer;
 	emu_timer *m_delayed_z80_control_timer;
 
@@ -127,12 +128,10 @@ protected:
 	DECLARE_WRITE8_MEMBER(blitter_bank_w);
 	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
 	DECLARE_WRITE8_MEMBER(pia_portb_out);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
-	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(grom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(page_w);
+	void page_w(u8 data);
 	DECLARE_READ8_MEMBER(blitter_r);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(tms34061_w);
@@ -155,7 +154,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(ninclown_irq);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
-	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(blitter_done);
 
 	inline uint8_t fetch_next_raw();
@@ -165,7 +163,7 @@ protected:
 	void perform_blit(address_space &space);
 	void update_interrupts(int periodic, int tms34061, int blitter);
 
-	/*----------- defined in machine/slikshot.c -----------*/
+	/*----------- defined in machine/itech8.cpp -----------*/
 
 	DECLARE_READ8_MEMBER( slikz80_port_r );
 	DECLARE_WRITE8_MEMBER( slikz80_port_w );
@@ -190,8 +188,6 @@ protected:
 	DECLARE_READ16_MEMBER(rom_constant_r);
 	DECLARE_READ8_MEMBER(ninclown_palette_r);
 	DECLARE_WRITE8_MEMBER(ninclown_palette_w);
-	DECLARE_WRITE16_MEMBER(grom_bank16_w);
-	DECLARE_WRITE16_MEMBER(display_page16_w);
 
 	void itech8_sound_ym2203(machine_config &config);
 	void itech8_sound_ym2608b(machine_config &config);
@@ -200,16 +196,19 @@ protected:
 	void itech8_core_devices(machine_config &config);
 	void itech8_core_lo(machine_config &config);
 	void itech8_core_hi(machine_config &config);
+	void common_hi_map(address_map &map);
+	void common_lo_map(address_map &map);
 	void gtg2_map(address_map &map);
 	void ninclown_map(address_map &map);
+	void rimrockn_map(address_map &map);
+	void slikshot_map(address_map &map);
 	void slikz80_io_map(address_map &map);
 	void slikz80_mem_map(address_map &map);
 	void sound2203_map(address_map &map);
 	void sound2608b_map(address_map &map);
 	void sound3812_external_map(address_map &map);
 	void sound3812_map(address_map &map);
-	void tmshi_map(address_map &map);
-	void tmslo_map(address_map &map);
+	void sstrike_map(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -217,8 +216,8 @@ protected:
 class grmatch_state : public itech8_state
 {
 public:
-	grmatch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: itech8_state(mconfig, type, tag),
+	grmatch_state(const machine_config &mconfig, device_type type, const char *tag) :
+		itech8_state(mconfig, type, tag),
 		m_palette_timer(nullptr)
 	{
 	}
@@ -249,4 +248,6 @@ protected:
 	uint8_t m_palcontrol;
 	uint8_t m_xscroll;
 	rgb_t m_palette[2][16];
+
+	void grmatch_map(address_map &map);
 };
