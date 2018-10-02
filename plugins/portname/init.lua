@@ -57,7 +57,8 @@ function portname.startplugin()
 			if ioport then
 				for mask, label in pairs(port.labels) do
 					for num3, field in pairs(ioport.fields) do
-						if tonumber(mask) == field.mask and label.player == field.player then
+						local nummask = tonumber(mask, 16)
+						if nummask == field.mask and label.player == field.player then
 							field.live.name = label.name
 						end
 					end
@@ -77,18 +78,18 @@ function portname.startplugin()
 				local labels = {}
 				local sort = {}
 				for fname, field in pairs(port.fields) do
-					local mask = tostring(field.mask)
+					local mask = string.format("%x", field.mask)
 					if not labels[mask] then
 						sort[#sort + 1] = mask
 						labels[mask] = { name = fname, player = field.player }
 						setmetatable(labels[mask], { __tojson = function(v,s)
 							local label = { name = v.name, player = v.player }
 							setmetatable(label, { __jsonorder = { "player", "name" }})
-							return json.stringify({ name = v.name, player = v.player }) end })
+							return json.stringify(label) end })
 					end
 				end
 				if #sort > 0 then
-					table.sort(sort, function(i, j) return tonumber(i) < tonumber(j) end)
+					table.sort(sort, function(i, j) return tonumber(i, 16) < tonumber(j, 16) end)
 					setmetatable(labels, { __jsonorder = sort })
 					ports[pname] = { labels = labels }
 				end
