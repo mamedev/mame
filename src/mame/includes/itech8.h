@@ -196,6 +196,8 @@ protected:
 	void itech8_core_devices(machine_config &config);
 	void itech8_core_lo(machine_config &config);
 	void itech8_core_hi(machine_config &config);
+	void common_hi_map(address_map &map);
+	void common_lo_map(address_map &map);
 	void gtg2_map(address_map &map);
 	void ninclown_map(address_map &map);
 	void rimrockn_map(address_map &map);
@@ -207,8 +209,6 @@ protected:
 	void sound3812_external_map(address_map &map);
 	void sound3812_map(address_map &map);
 	void sstrike_map(address_map &map);
-	void tmshi_map(address_map &map);
-	void tmslo_map(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

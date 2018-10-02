@@ -840,7 +840,7 @@ WRITE8_MEMBER(itech8_state::ninclown_palette_w)
  *************************************/
 
 /*------ common layout with TMS34061 at 0000 ------*/
-void itech8_state::tmslo_map(address_map &map)
+void itech8_state::common_lo_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
 	map(0x1100, 0x1100).nopw();
@@ -857,7 +857,7 @@ void itech8_state::tmslo_map(address_map &map)
 
 
 /*------ common layout with TMS34061 at 1000 ------*/
-void itech8_state::tmshi_map(address_map &map)
+void itech8_state::common_hi_map(address_map &map)
 {
 	map(0x0100, 0x0100).nopw();
 	map(0x0120, 0x0120).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -876,74 +876,42 @@ void itech8_state::tmshi_map(address_map &map)
 /*------ Grudge Match layout ------*/
 void grmatch_state::grmatch_map(address_map &map)
 {
-	map(0x0100, 0x0100).nopw();
-	map(0x0120, 0x0120).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0140, 0x0140).portr("40").w(FUNC(grmatch_state::grom_bank_w));
-	map(0x0160, 0x0160).portr("60").w(FUNC(grmatch_state::palette_w));
-	map(0x0180, 0x0180).portr("80").w(FUNC(grmatch_state::xscroll_w));
-	map(0x01a0, 0x01a0).w(FUNC(grmatch_state::nmi_ack_w));
-	map(0x01c0, 0x01df).rw(FUNC(grmatch_state::blitter_r), FUNC(grmatch_state::blitter_bank_w));
-	map(0x1000, 0x1fff).rw(FUNC(grmatch_state::tms34061_r), FUNC(grmatch_state::tms34061_w));
-	map(0x2000, 0x3fff).ram().share("nvram");
-	map(0x4000, 0xffff).bankr("mainbank");
+	itech8_state::common_hi_map(map);
+	map(0x0160, 0x0160).w(FUNC(grmatch_state::palette_w));
+	map(0x0180, 0x0180).w(FUNC(grmatch_state::xscroll_w));
+	map(0x01e0, 0x01ff).nopw();
 }
 
 
 /*------ Slick Shot layout ------*/
 void itech8_state::slikshot_map(address_map &map)
 {
-	map(0x0100, 0x0100).nopw();
-	map(0x0120, 0x0120).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0140, 0x0140).portr("40").w(FUNC(itech8_state::grom_bank_w));
-	map(0x0160, 0x0160).portr("60").w(FUNC(itech8_state::page_w));
-	map(0x0180, 0x0180).r(FUNC(itech8_state::slikshot_z80_r)).w(m_tms34061, FUNC(tms34061_device::latch_w));
-	map(0x01a0, 0x01a0).w(FUNC(itech8_state::nmi_ack_w));
-	map(0x01c0, 0x01df).rw(FUNC(itech8_state::blitter_r), FUNC(itech8_state::blitter_bank_w));
+	common_hi_map(map);
+	map(0x0180, 0x0180).r(FUNC(itech8_state::slikshot_z80_r));
 	map(0x01cf, 0x01cf).rw(FUNC(itech8_state::slikshot_z80_control_r), FUNC(itech8_state::slikshot_z80_control_w));
-	map(0x01e0, 0x01ff).w(FUNC(itech8_state::palette_w));
-	map(0x1000, 0x1fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
-	map(0x2000, 0x3fff).ram().share("nvram");
-	map(0x4000, 0xffff).bankr("mainbank");
 }
 
 
 /*------ Super Strike Bowling layout ------*/
 void itech8_state::sstrike_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
-	map(0x1100, 0x1100).nopw();
-	map(0x1120, 0x1120).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1140, 0x1140).portr("40").w(FUNC(itech8_state::grom_bank_w));
-	map(0x1160, 0x1160).portr("60").w(FUNC(itech8_state::page_w));
-	map(0x1180, 0x1180).r(FUNC(itech8_state::slikshot_z80_r)).w(m_tms34061, FUNC(tms34061_device::latch_w));
-	map(0x11a0, 0x11a0).w(FUNC(itech8_state::nmi_ack_w));
-	map(0x11c0, 0x11df).rw(FUNC(itech8_state::blitter_r), FUNC(itech8_state::blitter_bank_w));
+	common_lo_map(map);
+	map(0x1180, 0x1180).r(FUNC(itech8_state::slikshot_z80_r));
 	map(0x11cf, 0x11cf).rw(FUNC(itech8_state::slikshot_z80_control_r), FUNC(itech8_state::slikshot_z80_control_w));
-	map(0x11e0, 0x11ff).w(FUNC(itech8_state::palette_w));
-	map(0x2000, 0x3fff).ram().share("nvram");
-	map(0x4000, 0xffff).bankr("mainbank");
 }
 
 
 /*------ Rim Rockin' Basketball layout ------*/
 void itech8_state::rimrockn_map(address_map &map)
 {
-	map(0x0100, 0x0100).nopw();
-	map(0x0120, 0x0120).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0140, 0x0140).portr("40").w(FUNC(itech8_state::grom_bank_w));
-	map(0x0160, 0x0160).portr("60").w(FUNC(itech8_state::page_w));
+	common_hi_map(map);
 	map(0x0161, 0x0161).portr("161");
 	map(0x0162, 0x0162).portr("162");
 	map(0x0163, 0x0163).portr("163");
 	map(0x0164, 0x0164).portr("164");
 	map(0x0165, 0x0165).portr("165");
-	map(0x0180, 0x0180).portr("80").w(m_tms34061, FUNC(tms34061_device::latch_w));
 	map(0x01a0, 0x01a0).w(FUNC(itech8_state::rimrockn_bank_w));
-	map(0x01c0, 0x01df).rw(FUNC(itech8_state::blitter_r), FUNC(itech8_state::blitter_w));
-	map(0x01e0, 0x01ff).w(FUNC(itech8_state::palette_w));
-	map(0x1000, 0x1fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
-	map(0x2000, 0x3fff).ram().share("nvram");
-	map(0x4000, 0xffff).bankr("mainbank");
+	map(0x01c0, 0x01df).w(FUNC(itech8_state::blitter_w));
 }
 
 
@@ -1760,7 +1728,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 void itech8_state::itech8_core_lo(machine_config &config)
 {
 	MC6809(config, m_maincpu, CLOCK_8MHz);
-	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::tmslo_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::common_lo_map);
 
 	itech8_core_devices(config);
 }
@@ -1768,7 +1736,7 @@ void itech8_state::itech8_core_lo(machine_config &config)
 void itech8_state::itech8_core_hi(machine_config &config)
 {
 	itech8_core_lo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::tmshi_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::common_hi_map);
 }
 
 void itech8_state::itech8_sound_ym2203(machine_config &config)
