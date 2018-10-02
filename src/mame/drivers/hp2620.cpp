@@ -67,6 +67,7 @@ private:
 	required_shared_ptr<u8> m_nvram;
 
 	u16 m_display_page;
+	u8 m_key_status;
 };
 
 
@@ -90,7 +91,7 @@ void hp2620_state::nvram_w(offs_t offset, u8 data)
 u8 hp2620_state::keystat_r()
 {
 	// LS299 at U25
-	return 0xff;
+	return m_key_status;
 }
 
 void hp2620_state::keydisp_w(u8 data)
@@ -140,6 +141,8 @@ WRITE_LINE_MEMBER(hp2620_state::nlrc_w)
 	// clock input for LS175 at U59
 	if (state)
 		m_nmigate->in_w<1>((m_crtc->lc_r() & 7) == 3);
+
+	// TODO: shift keyboard response into m_key_status
 }
 
 WRITE_LINE_MEMBER(hp2620_state::bell_w)
@@ -171,12 +174,14 @@ void hp2620_state::io_map(address_map &map)
 void hp2620_state::machine_start()
 {
 	save_item(NAME(m_display_page));
+	save_item(NAME(m_key_status));
 }
 
 void hp2620_state::machine_reset()
 {
 	m_nmigate->in_w<1>(0);
 	m_display_page = 0;
+	m_key_status = 0;
 }
 
 static INPUT_PORTS_START( hp2622 )
