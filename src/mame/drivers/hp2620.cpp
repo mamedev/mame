@@ -98,7 +98,7 @@ void hp2620_state::keydisp_w(u8 data)
 	// LS374 at U26
 
 	// TODO: D0-D3 = KEY3-KEY6
-	m_bellctr->reset_w(1 /*BIT(data, 5)*/); // FIXME: does this ever get turned off?
+	m_bellctr->reset_w(BIT(data, 4));
 	// TODO: D6 = BLINK RATE
 	// TODO: D7 = ENHOFF
 }
@@ -237,4 +237,4 @@ ROM_START( hp2622a )
 	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
 ROM_END
 
-COMP(1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, empty_init, "HP", "HP-2622A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, empty_init, "HP", "HP-2622A", MACHINE_NOT_WORKING)
