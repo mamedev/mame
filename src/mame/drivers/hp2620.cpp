@@ -36,6 +36,7 @@ public:
 	void hp2622(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -50,6 +51,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_WRITE_LINE_MEMBER(nlrc_w);
 	DECLARE_WRITE_LINE_MEMBER(bell_w);
 
 	void io_map(address_map &map);
@@ -63,6 +65,8 @@ private:
 	required_device<ripple_counter_device> m_bellctr;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_nvram;
+
+	u16 m_display_page;
 };
 
 
@@ -86,7 +90,7 @@ void hp2620_state::nvram_w(offs_t offset, u8 data)
 u8 hp2620_state::keystat_r()
 {
 	// LS299 at U25
-	return 0;
+	return 0xff;
 }
 
 void hp2620_state::keydisp_w(u8 data)
@@ -94,7 +98,7 @@ void hp2620_state::keydisp_w(u8 data)
 	// LS374 at U26
 
 	// TODO: D0-D3 = KEY3-KEY6
-	m_bellctr->reset_w(BIT(data, 5));
+	m_bellctr->reset_w(1 /*BIT(data, 5)*/); // FIXME: does this ever get turned off?
 	// TODO: D6 = BLINK RATE
 	// TODO: D7 = ENHOFF
 }
@@ -123,11 +127,19 @@ void hp2620_state::modem_w(u8 data)
 void hp2620_state::crtc_w(offs_t offset, u8 data)
 {
 	m_crtc->register_load(data & 3, offset & 0xfff);
+	m_display_page = offset & 0x3000;
 }
 
 void hp2620_state::ennmi_w(offs_t offset, u8 data)
 {
 	m_nmigate->in_w<0>(BIT(offset, 0));
+}
+
+WRITE_LINE_MEMBER(hp2620_state::nlrc_w)
+{
+	// clock input for LS175 at U59
+	if (state)
+		m_nmigate->in_w<1>((m_crtc->lc_r() & 7) == 3);
 }
 
 WRITE_LINE_MEMBER(hp2620_state::bell_w)
@@ -156,10 +168,15 @@ void hp2620_state::io_map(address_map &map)
 	map(0xe1, 0xe1).nopw(); // program bug, undocumented expansion or ???
 }
 
+void hp2620_state::machine_start()
+{
+	save_item(NAME(m_display_page));
+}
+
 void hp2620_state::machine_reset()
 {
 	m_nmigate->in_w<1>(0);
-	m_bellctr->reset_w(1); // FIXME: this behavior isn't accurate
+	m_display_page = 0;
 }
 
 static INPUT_PORTS_START( hp2622 )
@@ -181,6 +198,7 @@ void hp2620_state::hp2622(machine_config &config)
 	DP8367(config, m_crtc, 25.7715_MHz_XTAL).set_screen("screen");
 	m_crtc->set_half_shift(true);
 	m_crtc->hsync_callback().set(m_bellctr, FUNC(ripple_counter_device::clock_w)).invert();
+	m_crtc->lrc_callback().set(FUNC(hp2620_state::nlrc_w)).invert();
 
 	mos6551_device &acia(MOS6551(config, "acia", 0)); // SY6551
 	acia.set_xtal(25.7715_MHz_XTAL / 14); // 1.84 MHz
@@ -219,4 +237,4 @@ ROM_START( hp2622a )
 	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
 ROM_END
 
-COMP(1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, empty_init, "HP", "HP-2622A", MACHINE_NOT_WORKING)
+COMP(1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, empty_init, "HP", "HP-2622A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
