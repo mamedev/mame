@@ -187,7 +187,7 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		// Call
 		case 0x1f:
 			if(OPA == 0)
-				util::stream_format(stream, "call %06x", ((OPIMM << 16) | imm16) << 1);
+				util::stream_format(stream, "call %06x", (OPIMM << 16) | imm16);
 			else
 				util::stream_format(stream, "<inv>");
 			return UNSP_DASM_OK;
@@ -195,7 +195,7 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		// Far Jump
 		case 0x2f: case 0x3f: case 0x6f: case 0x7f:
 			if (OPA == 7 && OP1 == 2)
-				util::stream_format(stream, "goto %06x", ((OPIMM << 16) | imm16) << 1);
+				util::stream_format(stream, "goto %06x", (OPIMM << 16) | imm16);
 			else
 				util::stream_format(stream, "<inv>");
 			return UNSP_DASM_OK;

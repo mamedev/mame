@@ -11,9 +11,12 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/i8243.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
+#include "sound/beep.h"
 #include "video/dp8350.h"
 #include "screen.h"
+#include "speaker.h"
 
 class hazl1420_state : public driver_device
 {
@@ -23,7 +26,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "bankdev")
 		, m_ioexp(*this, "ioexp%u", 0U)
+		, m_mainint(*this, "mainint")
 		, m_crtc(*this, "crtc")
+		, m_beeper(*this, "beep")
 		, m_keys(*this, "KEY%u", 0U)
 	{
 	}
@@ -38,9 +43,13 @@ private:
 	u8 p2_r();
 	void p2_w(u8 data);
 	void crtc_w(offs_t offset, u8 data);
+	void p6_w(u8 data);
 	void p7_w(u8 data);
 
 	u8 key_r();
+
+	DECLARE_WRITE_LINE_MEMBER(crtc_lbre_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vblank_w);
 
 	void prog_map(address_map &map);
 	void io_map(address_map &map);
@@ -51,7 +60,9 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device_array<i8243_device, 2> m_ioexp;
+	required_device<input_merger_device> m_mainint;
 	required_device<dp8350_device> m_crtc;
+	required_device<beep_device> m_beeper;
 	required_ioport_array<10> m_keys;
 };
 
@@ -59,11 +70,15 @@ void hazl1420_state::p1_w(u8 data)
 {
 	m_ioexp[0]->cs_w((data & 0xc0) == 0x80 ? 0 : 1);
 	m_ioexp[1]->cs_w((data & 0xc0) == 0xc0 ? 0 : 1);
+
+	// acknowledge CRTC interrupts
+	if (BIT(data, 4))
+		m_mainint->in_w<0>(0);
 }
 
 u8 hazl1420_state::p2_r()
 {
-	u8 result = 0xe0 | (m_crtc->hsync_r() << 4);
+	u8 result = 0xe0 | (!m_crtc->lbre_r() << 4);
 	result |= m_ioexp[0]->p2_r() & m_ioexp[1]->p2_r();
 	return result;
 }
@@ -75,7 +90,13 @@ void hazl1420_state::p2_w(u8 data)
 
 void hazl1420_state::crtc_w(offs_t offset, u8 data)
 {
-	m_crtc->register_load(offset >> 12, offset & 0xfff);
+	// CRTC registers are loaded only during vertical blanking period
+	m_crtc->register_load(bitswap<2>(offset >> 12, 0, 1), offset & 0xfff);
+}
+
+void hazl1420_state::p6_w(u8 data)
+{
+	m_beeper->set_state(!BIT(data, 1));
 }
 
 void hazl1420_state::p7_w(u8 data)
@@ -108,6 +129,18 @@ void hazl1420_state::bank_map(address_map &map)
 
 void hazl1420_state::machine_start()
 {
+}
+
+WRITE_LINE_MEMBER(hazl1420_state::crtc_lbre_w)
+{
+	if (!state && !m_crtc->vblank_r() && !BIT(m_maincpu->p1_r(), 4))
+		m_mainint->in_w<0>(1);
+}
+
+WRITE_LINE_MEMBER(hazl1420_state::crtc_vblank_w)
+{
+	if (state && !BIT(m_maincpu->p1_r(), 4))
+		m_mainint->in_w<0>(1);
 }
 
 u32 hazl1420_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -296,6 +329,9 @@ void hazl1420_state::hazl1420(machine_config &config)
 	m_maincpu->t0_in_cb().set(m_crtc, FUNC(dp8350_device::vblank_r));
 	m_maincpu->t1_in_cb().set("ace", FUNC(ins8250_device::intrpt_r));
 
+	INPUT_MERGER_ANY_HIGH(config, m_mainint);
+	m_mainint->output_handler().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+
 	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(0, &hazl1420_state::bank_map);
 	m_bankdev->set_data_width(8);
@@ -305,6 +341,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	I8243(config, m_ioexp[0]);
 	m_ioexp[0]->p4_in_cb().set_ioport("INP4");
 	m_ioexp[0]->p5_in_cb().set_ioport("INP5");
+	m_ioexp[0]->p6_out_cb().set(FUNC(hazl1420_state::p6_w));
 	m_ioexp[0]->p7_out_cb().set(FUNC(hazl1420_state::p7_w));
 
 	I8243(config, m_ioexp[1]);
@@ -313,13 +350,18 @@ void hazl1420_state::hazl1420(machine_config &config)
 	m_ioexp[1]->p6_in_cb().set_ioport("INP6");
 	m_ioexp[1]->p7_in_cb().set_ioport("INP7");
 
-	INS8250(config, "ace", 2'764'800);
+	ins8250_device &ace(INS8250(config, "ace", 2'764'800));
+	ace.out_int_callback().set(m_mainint, FUNC(input_merger_device::in_w<1>));
 
 	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen");
-	m_crtc->hsync_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_crtc->lbre_callback().set(FUNC(hazl1420_state::crtc_lbre_w));
+	m_crtc->vblank_callback().set(FUNC(hazl1420_state::crtc_vblank_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(hazl1420_state::screen_update));
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 ROM_START(hazl1420)
@@ -335,4 +377,4 @@ ROM_START(hazl1420)
 	ROM_LOAD("8316.u23", 0x0000, 0x0800, NO_DUMP)
 ROM_END
 
-COMP(1979, hazl1420, 0, 0, hazl1420, hazl1420, hazl1420_state, empty_init, "Hazeltine", "1420 Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1979, hazl1420, 0, 0, hazl1420, hazl1420, hazl1420_state, empty_init, "Hazeltine", "1420 Video Display Terminal", MACHINE_NOT_WORKING)

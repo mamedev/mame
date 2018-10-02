@@ -333,6 +333,7 @@ private:
 	DECLARE_READ16_MEMBER(dsp_slave_portb_r);
 	DECLARE_WRITE16_MEMBER(dsp_slave_portb_w);
 	DECLARE_READ32_MEMBER(namcos22_sci_r);
+	DECLARE_WRITE32_MEMBER(namcos22_sci_w);
 	DECLARE_READ8_MEMBER(namcos22_system_controller_r);
 	DECLARE_WRITE8_MEMBER(namcos22s_system_controller_w);
 	DECLARE_WRITE8_MEMBER(namcos22_system_controller_w);
@@ -381,9 +382,8 @@ private:
 	uint32_t pdp_polygonram_read(offs_t offs);
 	void pdp_polygonram_write(offs_t offs, uint32_t data);
 	void point_write(offs_t offs, uint32_t data);
-	void slave_halt();
-	void slave_enable();
-	void enable_slave_simulation(bool enable);
+	void master_enable(bool enable);
+	void slave_enable(bool enable);
 
 	void matrix3d_multiply(float a[4][4], float b[4][4]);
 	void matrix3d_identity(float m[4][4]);
@@ -426,14 +426,14 @@ private:
 	uint32_t screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
+	INTERRUPT_GEN_MEMBER(dsp_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(dsp_serial_pulse);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_update);
 	TIMER_CALLBACK_MEMBER(adillor_trackball_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
 	void alpine_io_map(address_map &map);
 	void alpinesa_am(address_map &map);
 	void iomcu_s22_io(address_map &map);
@@ -528,6 +528,7 @@ private:
 	uint16_t m_PrimitiveID;
 	float m_viewmatrix[4][4];
 	uint8_t m_reflection;
+	bool m_cullflip;
 	uint8_t m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES];
 	int32_t m_SurfaceNormalFormat;
 	unsigned m_LitSurfaceCount;

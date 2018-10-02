@@ -15,11 +15,14 @@
  *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
  *       + 100% fog if you start dirtdash at the hill level
  * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
- * - improve ss22 spot:
+ * - improve ss22 spot: the bugs hint toward an extra bg layer bank?
  *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
  *       + dirtdash speedometer has wrong colors when in the jungle level
- *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level (possibly just a game bug?)
- * - add layer enable in system 22, see bugs in cybrcomm and victlapw
+ *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
+ * - polygon layer stays visible sometimes when it shouldn't:
+ *       + cybrcomm/victlapw namco logo screen after attract demo
+ *       + airco22b title logo after attract demo
+ *       + aquajet namco logo/game over after ending
  * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors)
  * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
@@ -782,7 +785,7 @@ void namcos22_state::matrix3d_identity(float m[4][4])
 	{
 		for (int col = 0; col < 4; col++)
 		{
-			m[row][col] = (row == col) ? 1.0 : 0.0;
+			m[row][col] = (row == col) ? 1.0f : 0.0f;
 		}
 	}
 }
@@ -796,9 +799,9 @@ void namcos22_state::matrix3d_apply_reflection(float m[4][4])
 	matrix3d_identity(r);
 
 	if (m_reflection & 0x10)
-		r[0][0] = -1.0;
+		r[0][0] = -1.0f;
 	if (m_reflection & 0x20)
-		r[1][1] = -1.0;
+		r[1][1] = -1.0f;
 
 	matrix3d_multiply(m, r);
 }
@@ -1004,16 +1007,16 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 	/* backface cull one-sided polygons */
 	if (flags & 0x0020)
 	{
-		double c1 =
+		float c1 =
 			(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
 			(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
 			(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y)));
-		double c2 =
+		float c2 =
 			(v[0].x*((v[2].z*v[3].y)-(v[2].y*v[3].z)))+
 			(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
 			(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y)));
 
-		if ((m_reflection && c1 <= 0 && c2 <= 0) || (!m_reflection && c1 >= 0 && c2 >= 0))
+		if ((m_cullflip && c1 <= 0.0f && c2 <= 0.0f) || (!m_cullflip && c1 >= 0.0f && c2 >= 0.0f))
 			return;
 	}
 
@@ -1040,7 +1043,7 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 			else if (m_SurfaceNormalFormat == 0x4000)
 				m_LitSurfaceIndex++;
 			else
-				logerror("unknown normal format: 0x%x\n", m_SurfaceNormalFormat);
+				logerror("blit_single_quad:unknown normal format: 0x%x\n", m_SurfaceNormalFormat);
 		}
 		else if (packetformat & 0x40)
 		{
@@ -1291,6 +1294,7 @@ void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
 	m_reflection = src[0x2] >> 16 & 0x30; // z too?
+	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
 	m_absolute_priority = src[0x3] >> 16;
 	m_camera_vx = (int16_t)(src[5] >> 16);
 	m_camera_vy = (int16_t)(src[5] & 0xffff);
@@ -1351,7 +1355,7 @@ void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t 
 	}
 	else if (m_PrimitiveID != 0 && m_PrimitiveID != 2)
 	{
-		logerror("slavesim_handle_200002:unk code=0x%x\n", m_PrimitiveID);
+		logerror("slavesim_handle_200002:unknown code=0x%x\n", m_PrimitiveID);
 		// ridgerac title screen waving flag: 0x5
 	}
 }
@@ -1392,9 +1396,6 @@ void namcos22_state::slavesim_handle_233002(const int32_t *src)
 void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 {
 	const int32_t *src = 0x300 + (int32_t *)m_polygonram.target();
-	int16_t len;
-
-	matrix3d_identity(m_viewmatrix);
 
 	if (m_is_ss22)
 	{
@@ -1407,9 +1408,15 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 
 	for (;;)
 	{
-		int16_t next;
+		/* hackery! commands should be streamed, not parsed here */
 		m_PrimitiveID = *src++;
-		len  = (int16_t)*src++;
+		uint16_t len = *src++;
+		int32_t index = src - (int32_t *)m_polygonram.target();
+		if ((index + len) >= 0x7fff)
+		{
+			logerror("simulate_slavedsp:buffer overflow len=0x%x code=0x%x addr=0x%x\n", len, m_PrimitiveID, index);
+			return;
+		}
 
 		switch (len)
 		{
@@ -1430,26 +1437,34 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 				break;
 
 			default:
-				logerror("unk 3d data(%d) addr=0x%x!", len, (int)(src-(int32_t*)m_polygonram.target()));
+			{
+				std::string polydata;
+				int i = 0;
+				for (; i < len && i < 0x20; i++)
 				{
-					int i;
-					for (i = 0; i < len; i++)
-					{
-						logerror(" %06x", src[i] & 0xffffff);
-					}
-					logerror("\n");
+					char h[8];
+					sprintf(h, " %06x", src[i] & 0xffffff);
+					polydata += h;
 				}
+				if (i < len)
+					polydata += " (...)";
+				logerror("simulate_slavedsp:unknown 3d data len=0x%x code=0x%x addr=0x%x!%s\n", len, m_PrimitiveID, index, polydata);
 				return;
+			}
 		}
 
-		/* hackery! commands should be streamed, not parsed here */
 		src += len;
 		src++; /* always 0xffff */
-		next = (int16_t)*src++; /* link to next command */
-		if ((next & 0x7fff) != (src - (int32_t *)m_polygonram.target()))
+		uint16_t next = 0x7fff & *src++; /* link to next command */
+		if (next != (index + len + 1 + 1))
 		{
 			/* end of list */
 			break;
+		}
+		if (next == 0x7fff)
+		{
+			logerror("simulate_slavedsp:buffer overflow next=0x7fff\n");
+			return;
 		}
 	}
 }
@@ -2374,6 +2389,8 @@ uint32_t namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rg
 
 void namcos22_state::init_tables()
 {
+	matrix3d_identity(m_viewmatrix);
+
 	m_dirtypal = std::make_unique<uint8_t[]>(0x8000/4);
 	memset(m_dirtypal.get(), 1, 0x8000/4);
 	memset(m_paletteram, 0, 0x8000);

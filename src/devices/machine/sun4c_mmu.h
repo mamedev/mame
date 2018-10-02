@@ -131,6 +131,7 @@ protected:
 	uint32_t m_ram_size_words;
 	uint32_t m_context;
 	uint32_t m_context_masked;
+	uint32_t m_cache_context;
 	uint8_t m_system_enable;
 	bool m_fetch_bootrom;
 	uint32_t m_buserr[4];
