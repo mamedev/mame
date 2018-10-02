@@ -7454,7 +7454,7 @@ GAME( 1981, piranhao, puckman,  piranha,  mspacman, pacman_state,  init_eyes,   
 GAME( 1981, abscam,   puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "GL (US Billiards license)", "Abscam", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, pacman_state,  empty_init,    ROT90,  "hack", "Piranha (hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, titanpac, puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "hack", "Titan (Pac-Man hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, pacmanfm, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (FAMARE S.A.)", "Pac Man (bootleg, FAMARE S.A.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pacmanfm, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (FAMARE S.A.)", "Pac Man (FAMARE S.A. bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacman_state,  init_pacplus,  ROT90,  "Namco (Midway license)", "Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
 
