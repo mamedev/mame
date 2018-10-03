@@ -86,6 +86,8 @@ public:
 
 	void SendCommand(u16 command);
 	void SendCommand2(u16 command);
+	void SetCommandParameter(u16 parameter);
+	void SetCommandParameter2(u16 parameter);
 	u16 GetStatus();
 	u16 GetStatus2();
 	void ClearStatus();
@@ -100,6 +102,8 @@ public:
 	void AdvanceStatus2();
 
 	void SetDmaParameter(smioc_dma_parameter_t param, u16 value);
+
+	void WriteRamParameter(const char* function, const char* register_name, int address, int value);
 
 protected:
 	/* Device-level overrides */

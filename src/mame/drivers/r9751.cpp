@@ -740,6 +740,14 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Status 2", nullptr);
 			break;
 
+		case 0x4070: // SMIOC upper port command (ports 4-7)
+			m_smioc->SendCommand2(data);
+			break;
+
+		case 0x8070: // SMIOC upper port parameter (ports 4-7)
+			m_smioc->SetCommandParameter2(data);
+			break;
+
 		case 0x0198: // SMIOC soft reset?
 			// It's not clear what exactly this register write does.
 			//   It isn't a soft reset of the SMIOC because the 68k does not wait long enough for the SMIOC to finish rebooting.
@@ -756,6 +764,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		case 0x4090: // Command to device 0x90/4
 			
 			break;
+
 
 		case 0x4098: /* Serial DMA Command */
 			m_smioc->SendCommand(data);
@@ -801,6 +810,11 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			}
 			TRACE_SMIOC_WRITE(offset << 2 | 0x5FF00000, data, "Serial Command", nullptr);
 			break;
+
+		case 0x8098: /* Command Parameter */
+			m_smioc->SetCommandParameter(data);
+			break;
+
 		case 0xC098: /* Serial DMA output address */
 			m_smioc->SetDmaParameter(smiocdma_sendaddress, data);
 			m_smioc->m_dmaSendAddress = data;

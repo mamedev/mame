@@ -116,7 +116,7 @@ void smioc_device::smioc_mem(address_map &map)
 	map(0xC00A0, 0xC00AF).rw("dma8237_3", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
 	map(0xC00B0, 0xC00BF).rw("dma8237_4", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
 	map(0xC00C0, 0xC00CF).rw("dma8237_5", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
-	map(0xC0100, 0xC011F).rw(FUNC(smioc_device::boardlogic_mmio_r), FUNC(smioc_device::boardlogic_mmio_w));
+	map(0xC0100, 0xC01FF).rw(FUNC(smioc_device::boardlogic_mmio_r), FUNC(smioc_device::boardlogic_mmio_w));
 	map(0xC0200, 0xC023F).rw("scc2698b", FUNC(scc2698b_device::read), FUNC(scc2698b_device::write));
 	map(0xF8000, 0xFFFFF).rom().region("rom", 0);
 }
@@ -306,6 +306,22 @@ void smioc_device::SendCommand2(u16 command)
 	m_smioccpu->int2_w(HOLD_LINE);
 
 }
+void smioc_device::SetCommandParameter(u16 parameter)
+{
+	WriteRamParameter("SetCommandParameter", "Parameter", 0xCC6, parameter);
+	m_requestFlags_11D |= 0x40;
+	m_smioccpu->int2_w(CLEAR_LINE);
+	m_smioccpu->int2_w(HOLD_LINE);
+}
+void smioc_device::SetCommandParameter2(u16 parameter)
+{
+	WriteRamParameter("SetCommandParameter2", "Parameter", 0xB86, parameter);
+	m_requestFlags_11D |= 0x80;
+	m_smioccpu->int2_w(CLEAR_LINE);
+	m_smioccpu->int2_w(HOLD_LINE);
+}
+
+
 
 u16 smioc_device::GetStatus()
 {
@@ -394,9 +410,6 @@ void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
 
 		int address = baseAddress + portOffset;
 
-		m_logic_ram[address] = value & 0xFF;
-		m_logic_ram[address + 1] = (value >> 8) & 0xFF;
-
 		const char* paramNames[] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
 		const char* paramName = "?";
 		if (param >= 0 && param < (sizeof(paramNames) / sizeof(*paramNames)))
@@ -404,10 +417,22 @@ void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
 			paramName = paramNames[param];
 		}
 
-		logerror("%s SetDmaParameter %d (%s) ram2[0x%04x] = %04X\n", machine().time().as_string(), param, paramName, address, value);
+		WriteRamParameter("SetDmaParameter", paramName, address, value);
 	}
 }
 
+void smioc_device::WriteRamParameter(const char* function, const char* register_name, int address, int value)
+{
+	if (address < 0 || address > 0xFFE)
+	{
+		logerror("%s Invalid Parameter Ram write (%s %s %04x %04x)\n", machine().time().as_string(), function, register_name, address, value);
+		return;
+	}
+	m_logic_ram[address] = value & 0xFF;
+	m_logic_ram[address + 1] = (value >> 8) & 0xFF;
+
+	logerror("%s %s (%s) ram2[0x%04x] = %04X\n", machine().time().as_string(), function, register_name, address, value);
+}
 
 
 
@@ -428,44 +453,37 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 	switch (offset)
 	{
 
-
-	case 0xB82:
+	case 0xB82: // Command 2 - C011D Bit 2
 		data = m_commandValue2 & 0xFF;
 		description = "(Command2)";
 		break;
 	case 0xB83:
 		data = m_commandValue2 >> 8;
-		LOG_COMMAND("SMIOC Read B83 (Command)\n");
 		description = "(Command2)";
 		break;
 
-	case 0xB86: 
-		description = "(Unimplemented - Bit 7 Parameter)";
+	case 0xB86: // Command parameter 2 - C011D Bit 7
+		description = "(Command Parameter 2)";
 		break;
 	case 0xB87: 
-		description = "(Unimplemented - Bit 7 Parameter)";
-		LOG_COMMAND("SMIOC Read B87 (Unknown)\n");
+		description = "(Command Parameter 2)";
 		break;
 
-
-	case 0xCC2: // Command from 68k?
+	case 0xCC2: // Command - C011D Bit 0
 		data = m_commandValue & 0xFF;
 		description = "(Command)";
 		break;
 	case 0xCC3:
 		data = m_commandValue >> 8;
 		description = "(Command)";
-		LOG_COMMAND("SMIOC Read CC3 (Command)\n");
 		break;
 
-	case 0xCC6:
-		description = "(Unimplemented - Bit 6 Parameter)";
+	case 0xCC6: // Command parameter - C011D Bit 6
+		description = "(Command Parameter)";
 		break;
 	case 0xCC7:
-		description = "(Unimplemented - Bit 6 Parameter)";
-		LOG_COMMAND("SMIOC Read CC7 (Unknown)\n");
+		description = "(Command Parameter)";
 		break;
-
 
 	case 0xCD8: // DMA source address (for writing characters) - Port 0
 		data = m_dmaSendAddress & 0xFF;
@@ -487,7 +505,6 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 
 	}
 
-
 	logerror("ram2[%04X] => %02X %s\n", offset, data, description);
 	return data;
 }
@@ -504,7 +521,6 @@ WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 		// This value is written after the CPU resets, it may be accessible to the 68k via some register but that is not clear.
 		description = "(Indicate Reset)";
 		break;
-
 
 	case 0xC84:
 		//update_and_log(m_wordcount, (m_wordcount & 0xFF00) | data, "Wordcount[40C84]");
@@ -608,6 +624,13 @@ READ8_MEMBER(smioc_device::boardlogic_mmio_r)
 			data = 0xFF;
 			break;
 
+
+		case 0x80: // C0180 - Related to talking to the 87C451 chip interfacing to the breakout box
+			data = 0x05; // Hack hack
+			// We need the 8051 to provide a pair of bytes with 0x05 followed by a byte with the bottom bit set.
+			// For now 0x05 should work to provide this condition, and might make the required status work.
+			break;
+
 	}
 	LOG_REGISTER_ACCESS("logic[%04X] => %02X\n", offset, data);
 	return data;
@@ -702,6 +725,8 @@ READ8_MEMBER(smioc_device::dma8237_2_dmaread)
 }
 WRITE8_MEMBER(smioc_device::dma8237_2_dmawrite)
 {
-	LOG_REGISTER_ACCESS("dma2write 0x%x\n", data);
+	data = m_scc2698b->read_reg(0x03);
+	LOG_REGISTER_ACCESS("dma2write [0x%x] <= 0x%x\n", offset, data);
+	m_smioccpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
