@@ -17,7 +17,7 @@ providing the interface to the 8255, or is it coincidence?
 void igs017_igs031_device::map(address_map &map)
 {
 	map(0x1000, 0x17ff).ram().share("spriteram");
-//  map(0x1800, 0x1bff).ram() //.w("palette", FUNC(palette_device::write).share("palette");
+//  map(0x1800, 0x1bff).ram() //.w(m_palette, FUNC(palette_device::write8).share("palette");
 	map(0x1800, 0x1bff).ram().w(FUNC(igs017_igs031_device::palram_w)).share("palram");
 	map(0x1c00, 0x1fff).ram();
 
@@ -54,7 +54,7 @@ static const gfx_layout layout_8x8x4 =
 };
 
 GFXDECODE_MEMBER( igs017_igs031_device::gfxinfo )
-	GFXDECODE_DEVICE( "^tilemaps", 0, layout_8x8x4, 0, 16 )
+	GFXDECODE_DEVICE( "tilemaps", 0, layout_8x8x4, 0, 16 )
 //  GFXDECODE_DEVICE( DEVICE_SELF, 0, spritelayout, 0, 0x1000 )
 GFXDECODE_END
 
@@ -62,17 +62,19 @@ GFXDECODE_END
 DEFINE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device, "igs017_031", "IGS017_IGS031")
 
 igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IGS017_IGS031, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		device_video_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this)),
-		m_spriteram(*this, "spriteram", 0),
-		m_fg_videoram(*this, "fg_videoram", 0),
-		m_bg_videoram(*this, "bg_videoram", 0),
-		m_palram(*this, "palram", 0),
-		m_i8255(*this, "^ppi8255"),
-		m_palette(*this, "^palette")
+	: device_t(mconfig, IGS017_IGS031, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
+	, device_video_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this))
+	, m_spriteram(*this, "spriteram", 0)
+	, m_fg_videoram(*this, "fg_videoram", 0)
+	, m_bg_videoram(*this, "bg_videoram", 0)
+	, m_palram(*this, "palram", 0)
+	, m_i8255(*this, finder_base::DUMMY_TAG)
+	, m_palette(*this, "palette")
+	, m_sprite_region(*this, "sprites")
+	, m_tilemap_region(*this, "tilemaps")
 {
 	m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(FUNC(igs017_igs031_device::palette_callback_straight), this);
 	m_revbits = 0;
@@ -85,7 +87,7 @@ device_memory_interface::space_config_vector igs017_igs031_device::memory_space_
 	};
 }
 
-uint16_t igs017_igs031_device::palette_callback_straight(uint16_t bgr)
+uint16_t const igs017_igs031_device::palette_callback_straight(uint16_t bgr)
 {
 	return bgr;
 }
@@ -112,8 +114,8 @@ void igs017_igs031_device::video_start()
 
 	if (m_revbits)
 	{
-		uint8_t *rom  =   memregion("^tilemaps")->base();
-		int size      =   memregion("^tilemaps")->bytes();
+		uint8_t *rom  =   m_tilemap_region->base();
+		int size      =   m_tilemap_region->bytes();
 
 		for (int i = 0; i < size ; i++)
 		{
@@ -128,6 +130,11 @@ void igs017_igs031_device::device_reset()
 	m_video_disable = 0;
 	m_nmi_enable = 0;
 	m_irq_enable = 0;
+}
+
+void igs017_igs031_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette, 0x400/2);
 }
 
 READ8_MEMBER(igs017_igs031_device::read)
@@ -165,13 +172,12 @@ WRITE8_MEMBER(igs017_igs031_device::palram_w)
 
 	offset &= ~1;
 
-	int bgr = (m_palram[offset+1] << 8) | (m_palram[offset]);
+	uint16_t bgr = (m_palram[offset | 1] << 8) | (m_palram[offset]);
 
 	// bitswap (some games)
 	bgr = m_palette_scramble_cb(bgr);
 
 	m_palette->set_pen_color(offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
-
 }
 
 
@@ -207,8 +213,8 @@ WRITE8_MEMBER(igs017_igs031_device::bg_w)
 // This routine expands each word into three bytes.
 void igs017_igs031_device::expand_sprites()
 {
-	uint8_t *rom  =   memregion("^sprites")->base();
-	int size      =   memregion("^sprites")->bytes();
+	uint8_t *rom  =   m_sprite_region->base();
+	int size      =   m_sprite_region->bytes();
 
 	m_sprites_gfx_size   =   size / 2 * 3;
 	m_sprites_gfx        =   std::make_unique<uint8_t[]>(m_sprites_gfx_size);
@@ -349,7 +355,7 @@ int igs017_igs031_device::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cli
 	return 0;
 }
 
-uint32_t igs017_igs031_device::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs017_igs031_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

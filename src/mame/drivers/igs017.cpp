@@ -86,18 +86,19 @@ class igs_bitswap_device : public device_t
 public:
 	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_pa_cb() { return m_in_pa_cb.bind(); }
+	auto in_pb_cb() { return m_in_pb_cb.bind(); }
+	auto in_pc_cb() { return m_in_pc_cb.bind(); }
 
-	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_pa_cb() { return m_out_pa_cb.bind(); }
+	auto out_pb_cb() { return m_out_pb_cb.bind(); }
+	auto out_pc_cb() { return m_out_pc_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( data_r );
 
+	// note: b3 seems fixed to ~15, it may go away in the future
 	void set_m3_bits(int m3, uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3);
 	void set_mf_bits(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3);
 	void set_val_xor(uint16_t val_xor);
@@ -161,43 +162,6 @@ void igs_bitswap_device::set_val_xor(uint16_t val_xor)
 	printf("igs_bitswap: INIT val_xor = %04x\n", m_val_xor);
 #endif
 }
-
-#define MCFG_IGS_BITSWAP_IN_PORTA_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_IN_PORTB_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_IN_PORTC_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTA_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTB_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTC_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
-
-// note: b3 seems fixed to ~15, it may go away in the future
-#define MCFG_IGS_BITSWAP_M3_0_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(0, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_1_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(1, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_2_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(2, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_3_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(3, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_MF_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_mf_bits(_b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_VAL_XOR(_val_xor) \
-	downcast<igs_bitswap_device &>(*device).set_val_xor(_val_xor);
 
 DEFINE_DEVICE_TYPE(IGS_BITSWAP, igs_bitswap_device, "igs_bitswap", "IGS Bitswap Protection")
 
@@ -499,7 +463,6 @@ public:
 		m_igs025(*this,"igs025"),
 		m_igs022(*this,"igs022"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_igs_bitswap(*this, "igs_bitswap"),
@@ -546,7 +509,6 @@ private:
 	optional_device<igs025_device> m_igs025; // Mj Shuang Long Qiang Zhu 2
 	optional_device<igs022_device> m_igs022; // Mj Shuang Long Qiang Zhu 2
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	optional_device<igs_bitswap_device> m_igs_bitswap;
@@ -556,7 +518,7 @@ private:
 
 	uint8_t m_input_select;
 	uint8_t m_hopper;
-	uint16_t m_igs_magic[2];
+	uint16_t m_igs_magic;
 	uint8_t m_scramble_data;
 
 	uint8_t m_dsw_select;
@@ -569,25 +531,27 @@ private:
 	uint32_t m_igs029_mgcs_long;
 
 	DECLARE_WRITE8_MEMBER(input_select_w);
+	u8 magic_r();
+	void magic_w(u8 data);
 
 	DECLARE_WRITE8_MEMBER(iqblocka_keyin_w);
 	DECLARE_WRITE8_MEMBER(iqblockf_keyout_w);
 	DECLARE_WRITE8_MEMBER(iqblocka_remap_addr_w);
 
-	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
-	DECLARE_READ16_MEMBER(mgcs_magic_r);
+	DECLARE_WRITE8_MEMBER(mgcs_magic_w);
+	DECLARE_READ8_MEMBER(mgcs_magic_r);
 
-	uint16_t mgcs_palette_bitswap(uint16_t bgr);
-	uint16_t lhzb2a_palette_bitswap(uint16_t bgr);
-	uint16_t tjsb_palette_bitswap(uint16_t bgr);
-	uint16_t slqz2_palette_bitswap(uint16_t bgr);
+	uint16_t const mgcs_palette_bitswap(uint16_t bgr);
+	uint16_t const lhzb2a_palette_bitswap(uint16_t bgr);
+	uint16_t const tjsb_palette_bitswap(uint16_t bgr);
+	uint16_t const slqz2_palette_bitswap(uint16_t bgr);
 
-	DECLARE_READ8_MEMBER(sdmg2_keys_r);
-	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
-	DECLARE_READ16_MEMBER(sdmg2_magic_r);
-	DECLARE_READ8_MEMBER(mgdh_keys_r);
-	DECLARE_WRITE16_MEMBER(mgdha_magic_w);
-	DECLARE_READ16_MEMBER(mgdha_magic_r);
+	u8 sdmg2_keys_r();
+	DECLARE_WRITE8_MEMBER(sdmg2_magic_w);
+	DECLARE_READ8_MEMBER(sdmg2_magic_r);
+	u8 mgdh_keys_r();
+	DECLARE_WRITE8_MEMBER(mgdha_magic_w);
+	DECLARE_READ8_MEMBER(mgdha_magic_r);
 
 	DECLARE_WRITE8_MEMBER(tjsb_output_w);
 	DECLARE_READ8_MEMBER(tjsb_input_r);
@@ -597,17 +561,16 @@ private:
 	DECLARE_READ16_MEMBER(lhzb2a_input_r);
 	DECLARE_WRITE16_MEMBER(lhzb2a_remap_addr_w);
 
-	DECLARE_WRITE16_MEMBER(lhzb2_magic_w);
-	DECLARE_READ16_MEMBER(lhzb2_magic_r);
+	DECLARE_WRITE8_MEMBER(lhzb2_magic_w);
+	DECLARE_READ8_MEMBER(lhzb2_magic_r);
 
-	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
-	DECLARE_READ16_MEMBER(slqz2_magic_r);
+	DECLARE_WRITE8_MEMBER(slqz2_magic_w);
+	DECLARE_READ8_MEMBER(slqz2_magic_r);
 	DECLARE_READ8_MEMBER(mgcs_keys_r);
 
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
-	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
@@ -659,33 +622,27 @@ void igs017_state::video_start()
 	m_igs017_igs031->video_start();
 }
 
-uint32_t igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_igs017_igs031->screen_update_igs017(screen, bitmap, cliprect);
-	return 0;
-}
-
 // palette bitswap callbacks
-uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr)
+uint16_t const igs017_state::mgcs_palette_bitswap(uint16_t bgr)
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
 	return bitswap<16>(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
-uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
+uint16_t const igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 	return bitswap<16>(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
-uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr)
+uint16_t const igs017_state::tjsb_palette_bitswap(uint16_t bgr)
 {
 	// bitswap
 	return bitswap<16>(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
-uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr)
+uint16_t const igs017_state::slqz2_palette_bitswap(uint16_t bgr)
 {
 	return bitswap<16>(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
@@ -764,8 +721,8 @@ void igs017_state::init_iqblocka()
 
 void igs017_state::tjsb_decrypt_sprites()
 {
-	int length = memregion("sprites")->bytes();
-	uint8_t *rom = memregion("sprites")->base();
+	int length = memregion("igs017_igs031:sprites")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:sprites")->base();
 	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
@@ -849,8 +806,8 @@ void igs017_state::mgcs_decrypt_program_rom()
 
 void igs017_state::mgcs_decrypt_tiles()
 {
-	int length = memregion("tilemaps")->bytes();
-	uint8_t *rom = memregion("tilemaps")->base();
+	int length = memregion("igs017_igs031:tilemaps")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<uint8_t> tmp(length);
 	int i;
 
@@ -864,8 +821,8 @@ void igs017_state::mgcs_decrypt_tiles()
 
 void igs017_state::mgcs_flip_sprites()
 {
-	int length = memregion("sprites")->bytes();
-	uint8_t *rom = memregion("sprites")->base();
+	int length = memregion("igs017_igs031:sprites")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
@@ -909,8 +866,8 @@ void igs017_state::init_mgcs()
 
 void igs017_state::tarzan_decrypt_tiles()
 {
-	int length = memregion("tilemaps")->bytes();
-	uint8_t *rom = memregion("tilemaps")->base();
+	int length = memregion("igs017_igs031:tilemaps")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<uint8_t> tmp(length);
 	int i;
 
@@ -1158,8 +1115,8 @@ void igs017_state::lhzb2_patch_rom()
 
 void igs017_state::lhzb2_decrypt_tiles()
 {
-	int length = memregion("tilemaps")->bytes();
-	uint8_t *rom = memregion("tilemaps")->base();
+	int length = memregion("igs017_igs031:tilemaps")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<uint8_t> tmp(length);
 	int i;
 
@@ -1174,8 +1131,8 @@ void igs017_state::lhzb2_decrypt_tiles()
 
 void igs017_state::lhzb2_decrypt_sprites()
 {
-	int length = memregion("sprites")->bytes();
-	uint8_t *rom = memregion("sprites")->base();
+	int length = memregion("igs017_igs031:sprites")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:sprites")->base();
 	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
@@ -1373,8 +1330,8 @@ void igs017_state::slqz2_patch_rom()
 
 void igs017_state::slqz2_decrypt_tiles()
 {
-	int length = memregion("tilemaps")->bytes();
-	uint8_t *rom = memregion("tilemaps")->base();
+	int length = memregion("igs017_igs031:tilemaps")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:tilemaps")->base();
 	std::vector<uint8_t> tmp(length);
 	int i;
 
@@ -1476,8 +1433,8 @@ void igs017_state::init_slqz2()
 
 void igs017_state::spkrform_decrypt_sprites()
 {
-	int length = memregion("sprites")->bytes();
-	uint8_t *rom = memregion("sprites")->base();
+	int length = memregion("igs017_igs031:sprites")->bytes();
+	uint8_t *rom = memregion("igs017_igs031:sprites")->base();
 	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
@@ -1505,6 +1462,16 @@ void igs017_state::init_spkrform()
 /***************************************************************************
                                 Memory Maps
 ***************************************************************************/
+
+u8 igs017_state::magic_r()
+{
+	return m_igs_magic;
+}
+
+void igs017_state::magic_w(u8 data)
+{
+	m_igs_magic = data;
+}
 
 // iqblocka, iqblockf, genius6
 
@@ -1720,58 +1687,50 @@ void igs017_state::mgcs_igs029_run()
 	m_igs029_send_len = 0;
 }
 
-WRITE16_MEMBER(igs017_state::mgcs_magic_w)
+WRITE8_MEMBER(igs017_state::mgcs_magic_w)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	bool igs029_irq = !(m_input_select & 0x04) &&  (data & 0x04);   // 0->1
+	switch(m_igs_magic)
 	{
 		case 0x00:
-			if (ACCESSING_BITS_0_7)
+
+			// 7654 3--- Keys
+			// ---- -2-- IRQ on IGS029
+			// ---- --1-
+			// ---- ---0 Hopper Motor
+			m_input_select = data & 0xff;
+
+			m_hopperdev->motor_w(BIT(data, 0));
+
+			if (igs029_irq)
 			{
-				bool igs029_irq = !(m_input_select & 0x04) &&  (data & 0x04);   // 0->1
-
-				// 7654 3--- Keys
-				// ---- -2-- IRQ on IGS029
-				// ---- --1-
-				// ---- ---0 Hopper Motor
-				m_input_select = data & 0xff;
-
-				m_hopperdev->motor_w(BIT(data, 0));
-
-				if (igs029_irq)
+				if (!m_igs029_recv_len)
 				{
-					if (!m_igs029_recv_len)
-					{
-						// SEND
-						if (m_igs029_send_len < sizeof(m_igs029_send_buf))
-							m_igs029_send_buf[m_igs029_send_len++] = m_igs029_send_data;
+					// SEND
+					if (m_igs029_send_len < sizeof(m_igs029_send_buf))
+						m_igs029_send_buf[m_igs029_send_len++] = m_igs029_send_data;
 
-						logerror("%s: igs029 send ", machine().describe_context());
-						for (int i = 0; i < m_igs029_send_len; i++)
-							logerror("%02x ", m_igs029_send_buf[i]);
-						logerror("\n");
+					logerror("%s: igs029 send ", machine().describe_context());
+					for (int i = 0; i < m_igs029_send_len; i++)
+						logerror("%02x ", m_igs029_send_buf[i]);
+					logerror("\n");
 
-						if (m_igs029_send_buf[0] == m_igs029_send_len)
-							mgcs_igs029_run();
-					}
+					if (m_igs029_send_buf[0] == m_igs029_send_len)
+						mgcs_igs029_run();
+				}
+
+				if (m_igs029_recv_len)
+				{
+					// RECV
+					logerror("%s: igs029 recv ", machine().describe_context());
+					for (int i = 0; i < m_igs029_recv_len; i++)
+						logerror("%02x ", m_igs029_recv_buf[i]);
+					logerror("\n");
 
 					if (m_igs029_recv_len)
-					{
-						// RECV
-						logerror("%s: igs029 recv ", machine().describe_context());
-						for (int i = 0; i < m_igs029_recv_len; i++)
-							logerror("%02x ", m_igs029_recv_buf[i]);
-						logerror("\n");
+						--m_igs029_recv_len;
 
-						if (m_igs029_recv_len)
-							--m_igs029_recv_len;
-
-						m_igs029_recv_data = m_igs029_recv_buf[m_igs029_recv_len];
-					}
+					m_igs029_recv_data = m_igs029_recv_buf[m_igs029_recv_len];
 				}
 			}
 
@@ -1781,60 +1740,52 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 			break;
 
 		case 0x01:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_scramble_data = data & 0xff;
-//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
-			}
+			m_scramble_data = data & 0xff;
+//          logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic);
 			break;
 
 		// case 0x02: ?
 
 		case 0x03:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_igs029_send_data = data & 0xff;
-//              logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic[0]);
-			}
+			m_igs029_send_data = data & 0xff;
+//          logerror("%s: writing %02x to igs_magic = %02x\n", machine().describe_context(), data & 0xff, m_igs_magic);
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
+			break;
 	}
 }
 
-READ16_MEMBER(igs017_state::mgcs_magic_r)
+READ8_MEMBER(igs017_state::mgcs_magic_r)
 {
-	if (offset == 0)
-		return m_igs_magic[0];
-
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x00:
 			return m_input_select | 0x02;
 
 		case 0x01:
 		{
-			uint16_t ret = bitswap<8>( (bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
-			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
+			uint8_t ret = bitswap<8>( (bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
+			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic);
 			return ret;
 		}
 
 		case 0x02:
 		{
 			uint8_t ret = m_igs029_recv_data;
-			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
+			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic);
 			return ret;
 		}
 
 //      case 0x05: ???
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
-	return 0xffff;
+	return 0xff;
 }
 
 READ8_MEMBER(igs017_state::mgcs_keys_r)
@@ -1853,7 +1804,8 @@ void igs017_state::mgcs(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x300000, 0x303fff).ram();
-	map(0x49c000, 0x49c003).w(FUNC(igs017_state::mgcs_magic_w)).r(FUNC(igs017_state::mgcs_magic_r));
+	map(0x49c001, 0x49c001).rw(FUNC(igs017_state::magic_r), FUNC(igs017_state::magic_w));
+	map(0x49c003, 0x49c003).rw(FUNC(igs017_state::mgcs_magic_r), FUNC(igs017_state::mgcs_magic_w));
 
 	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -1864,7 +1816,7 @@ void igs017_state::mgcs(address_map &map)
 
 // sdmg2
 
-READ8_MEMBER(igs017_state::sdmg2_keys_r)
+u8 igs017_state::sdmg2_keys_r()
 {
 	if (~m_input_select & 0x01) return ioport("KEY0")->read();
 	if (~m_input_select & 0x02) return ioport("KEY1")->read();
@@ -1878,58 +1830,48 @@ READ8_MEMBER(igs017_state::sdmg2_keys_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
+WRITE8_MEMBER(igs017_state::sdmg2_magic_w)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		// case 0x00: ? 0x80
 
 		case 0x01:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_input_select  =   data & 0x1f;
-				machine().bookkeeping().coin_counter_w(0,    data & 0x20);
-				//  coin out        data & 0x40
-				m_hopper            =   data & 0x80;
-			}
+			m_input_select  =   data & 0x1f;
+			machine().bookkeeping().coin_counter_w(0,    data & 0x20);
+			//  coin out        data & 0x40
+			m_hopper            =   data & 0x80;
 			break;
 
 		case 0x02:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_oki->set_rom_bank((data >> 7) & 1);
-			}
+			m_oki->set_rom_bank((data >> 7) & 1);
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
+			break;
 	}
 }
 
-READ16_MEMBER(igs017_state::sdmg2_magic_r)
+READ8_MEMBER(igs017_state::sdmg2_magic_r)
 {
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x00:
 		{
-			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			uint8_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x00 : 0x01;
 			return ioport("COINS")->read() | hopper_bit;
 		}
 
 		case 0x02:
-			return sdmg2_keys_r(space, 0);
+			return sdmg2_keys_r();
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
-	return 0xffff;
+	return 0xff;
 }
 
 void igs017_state::sdmg2(address_map &map)
@@ -1940,14 +1882,14 @@ void igs017_state::sdmg2(address_map &map)
 	map(0x200000, 0x20ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
 	map(0x210001, 0x210001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x300000, 0x300003).w(FUNC(igs017_state::sdmg2_magic_w));
-	map(0x300002, 0x300003).r(FUNC(igs017_state::sdmg2_magic_r));
+	map(0x300001, 0x300001).w(FUNC(igs017_state::magic_w));
+	map(0x300003, 0x300003).rw(FUNC(igs017_state::sdmg2_magic_r), FUNC(igs017_state::sdmg2_magic_w));
 }
 
 
 // mgdh, mgdha
 
-READ8_MEMBER(igs017_state::mgdh_keys_r)
+u8 igs017_state::mgdh_keys_r()
 {
 	if (~m_input_select & 0x04) return ioport("KEY0")->read();
 	if (~m_input_select & 0x08) return ioport("KEY1")->read();
@@ -1961,21 +1903,13 @@ READ8_MEMBER(igs017_state::mgdh_keys_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::mgdha_magic_w)
+WRITE8_MEMBER(igs017_state::mgdha_magic_w)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x00:
-			if (ACCESSING_BITS_0_7)
-			{
-				//  coin out     data & 0x40
-				machine().bookkeeping().coin_counter_w(0, data & 0x80);
-			}
+			//  coin out     data & 0x40
+			machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
 			if ( data & ~0xc0 )
 				logerror("%s: warning, unknown bits written to igs_magic 00 = %02x\n", machine().describe_context(), data);
@@ -1983,11 +1917,8 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 			break;
 
 		case 0x01:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_input_select = data & 0xff;
-				m_hopper = data & 0x01;
-			}
+			m_input_select = data & 0xff;
+			m_hopper = data & 0x01;
 
 			if ( m_input_select & ~0xfd )
 				logerror("%s: warning, unknown bits written in input_select = %02x\n", machine().describe_context(), m_input_select);
@@ -1995,11 +1926,8 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 			break;
 
 		case 0x03:
-			if (ACCESSING_BITS_0_7)
-			{
-				// bit 7?
-				m_oki->set_rom_bank((data >> 6) & 1);
-			}
+			// bit 7?
+			m_oki->set_rom_bank((data >> 6) & 1);
 			break;
 
 		default:
@@ -2014,16 +1942,17 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
             04ac10: warning, writing to igs_magic 06 = ff
             04ac20: warning, writing to igs_magic 07 = 3f
 */
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
+			break;
 	}
 }
 
-READ16_MEMBER(igs017_state::mgdha_magic_r)
+READ8_MEMBER(igs017_state::mgdha_magic_r)
 {
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x00:
-			return mgdh_keys_r(space, 0);
+			return mgdh_keys_r();
 
 		case 0x01:
 			return ioport("BUTTONS")->read();
@@ -2033,24 +1962,24 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 
 		case 0x03:
 		{
-			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			uint8_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x00 : 0x01;
 			return ioport("COINS")->read() | hopper_bit;
 		}
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
-	return 0xffff;
+	return 0xff;
 }
 
 void igs017_state::mgdha_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x600000, 0x603fff).ram();
-	map(0x876000, 0x876003).w(FUNC(igs017_state::mgdha_magic_w));
-	map(0x876002, 0x876003).r(FUNC(igs017_state::mgdha_magic_r));
+	map(0x876001, 0x876001).w(FUNC(igs017_state::magic_w));
+	map(0x876003, 0x876003).rw(FUNC(igs017_state::mgdha_magic_r), FUNC(igs017_state::mgdha_magic_w));
 
 	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -2181,43 +2110,33 @@ void igs017_state::spkrform_io(address_map &map)
 
 // lhzb2
 
-WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
+WRITE8_MEMBER(igs017_state::lhzb2_magic_w)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x00:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_input_select = data & 0xff;
-			}
+			m_input_select = data & 0xff;
 
 			if ( m_input_select & ~0x1f )
 				logerror("%s: warning, unknown bits written in input_select = %02x\n", machine().describe_context(), m_input_select);
 			break;
 
 		case 0x01:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_oki->set_rom_bank((data >> 7) & 1);
+			m_oki->set_rom_bank((data >> 7) & 1);
 
-				if ( data & 0x7f )
-					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
-			}
+			if ( data & 0x7f )
+				logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
+			break;
 	}
 }
 
-READ16_MEMBER(igs017_state::lhzb2_magic_r)
+READ8_MEMBER(igs017_state::lhzb2_magic_r)
 {
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x01:
 		{
@@ -2228,23 +2147,23 @@ READ16_MEMBER(igs017_state::lhzb2_magic_r)
 			if (~m_input_select & 0x10) return ioport("KEY4")->read();
 
 			logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
-			return 0xffff;
+			return 0xff;
 		}
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
-	return 0xffff;
+	return 0xff;
 }
 
 void igs017_state::lhzb2(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x500000, 0x503fff).ram();
-	map(0x910000, 0x910003).w(FUNC(igs017_state::lhzb2_magic_w));
-	map(0x910002, 0x910003).r(FUNC(igs017_state::lhzb2_magic_r));
+	map(0x910001, 0x910001).w(FUNC(igs017_state::magic_w));
+	map(0x910003, 0x910003).rw(FUNC(igs017_state::lhzb2_magic_r), FUNC(igs017_state::lhzb2_magic_w));
 
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -2329,7 +2248,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	{
 		m_oki->set_rom_bank((data >> 8) & 1);
 
-		if ( data & 0x0fe00 )
+		if ( data & 0xfe00 )
 			logerror("%s: warning, unknown bits written in input_select = %04x\n", machine().describe_context(), data);
 	}
 }
@@ -2358,37 +2277,30 @@ void igs017_state::lhzb2a(address_map &map)
 
 // slqz2
 
-WRITE16_MEMBER(igs017_state::slqz2_magic_w)
+WRITE8_MEMBER(igs017_state::slqz2_magic_w)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x00:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_oki->set_rom_bank(data & 0x01);
+			m_oki->set_rom_bank(data & 0x01);
 
-//              m_hopper            =           data & 0x20;    // hopper motor
-//              machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
-				machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in  counter
+//          m_hopper            =           data & 0x20;    // hopper motor
+//          machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
+			machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in  counter
 
-				if ( data & 0x7e )
-					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
-			}
+			if ( data & 0x7e )
+				logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
 			break;
 
 		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic, data);
+			break;
 	}
 }
 
-READ16_MEMBER(igs017_state::slqz2_magic_r)
+READ8_MEMBER(igs017_state::slqz2_magic_r)
 {
-	switch(m_igs_magic[0])
+	switch(m_igs_magic)
 	{
 		case 0x00:
 			return ioport("PLAYER2")->read();
@@ -2398,19 +2310,19 @@ READ16_MEMBER(igs017_state::slqz2_magic_r)
 			return ioport("BUTTONS")->read();
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic);
 			break;
 	}
 
-	return 0xffff;
+	return 0xff;
 }
 
 void igs017_state::slqz2(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x602000, 0x602003).w(FUNC(igs017_state::slqz2_magic_w));
-	map(0x602002, 0x602003).r(FUNC(igs017_state::slqz2_magic_r));
+	map(0x602001, 0x602001).w(FUNC(igs017_state::magic_w));
+	map(0x602003, 0x602003).rw(FUNC(igs017_state::slqz2_magic_r), FUNC(igs017_state::slqz2_magic_w));
 
 	map(0x900000, 0x90ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -3568,34 +3480,31 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// protection
-	MCFG_DEVICE_ADD("igs_bitswap", IGS_BITSWAP, 0)
-	MCFG_IGS_BITSWAP_IN_PORTA_CB(IOPORT("PLAYER1"))
-	MCFG_IGS_BITSWAP_IN_PORTB_CB(IOPORT("PLAYER2"))
-	MCFG_IGS_BITSWAP_IN_PORTC_CB(IOPORT("COINS"))
-	MCFG_IGS_BITSWAP_OUT_PORTA_CB(WRITE8(*this, igs017_state, iqblocka_keyin_w))
-	MCFG_IGS_BITSWAP_VAL_XOR(0x15d6)
-	MCFG_IGS_BITSWAP_MF_BITS(3, 5, 9, 11)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~5, 8,  ~10, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS( 3, ~8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS( 2, ~6, ~11, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS( 0, ~1,  ~3, ~15)
+	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	m_igs_bitswap->in_pa_cb().set_ioport("PLAYER1");
+	m_igs_bitswap->in_pb_cb().set_ioport("PLAYER2");
+	m_igs_bitswap->in_pc_cb().set_ioport("COINS");
+	m_igs_bitswap->out_pa_cb().set(FUNC(igs017_state::iqblocka_keyin_w));
+	m_igs_bitswap->set_val_xor(0x15d6);
+	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
+	m_igs_bitswap->set_m3_bits(0, ~5, 8,  ~10, ~15);
+	m_igs_bitswap->set_m3_bits(1,  3, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(2,  2, ~6, ~11, ~15);
+	m_igs_bitswap->set_m3_bits(3,  0, ~1,  ~3, ~15);
 
-	MCFG_DEVICE_ADD("igs_incdec", IGS_INCDEC, 0)
+	IGS_INCDEC(config, m_igs_incdec, 0);
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3608,19 +3517,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs017_state::iqblockf)
 	iqblocka(config);
-	MCFG_DEVICE_MODIFY("igs_bitswap") // tweaked protection bitswap
-	MCFG_IGS_BITSWAP_OUT_PORTB_CB(WRITE8(*this, igs017_state, iqblockf_keyout_w))
-	MCFG_IGS_BITSWAP_MF_BITS(0, 5, 9, 13)
+	// tweaked protection bitswap
+	m_igs_bitswap->out_pb_cb().set(FUNC(igs017_state::iqblockf_keyout_w));
+	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs017_state::genius6)
 	iqblockf(config);
-	MCFG_DEVICE_MODIFY("igs_bitswap") // tweaked protection bitswap
-	MCFG_IGS_BITSWAP_MF_BITS(2, 7, 9, 13)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~5,  6,  ~7, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS( 1, ~6,  ~9, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS( 4, ~8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS( 3, ~5,  ~6, ~15)
+	// tweaked protection bitswap
+	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
+	m_igs_bitswap->set_m3_bits(0, ~5,  6,  ~7, ~15);
+	m_igs_bitswap->set_m3_bits(1,  1, ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits(2,  4, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(3,  3, ~5,  ~6, ~15);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs017_state::starzan)
@@ -3648,7 +3557,7 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	MACHINE_RESET_CALL_MEMBER( iqblocka );
 
 	m_scramble_data = 0;
-	memset(m_igs_magic, 0, sizeof(m_igs_magic));
+	m_igs_magic = 0;
 }
 
 MACHINE_CONFIG_START(igs017_state::mgcs)
@@ -3666,20 +3575,17 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, mgcs_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::mgcs_palette_bitswap), this));
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3710,20 +3616,17 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	MCFG_DEVICE_ADD("igs022", IGS022, 0)
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::lhzb2a_palette_bitswap), this));
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3751,31 +3654,28 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 //  MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 
 	// protection
-	MCFG_DEVICE_ADD("igs_bitswap", IGS_BITSWAP, 0)
-	MCFG_IGS_BITSWAP_VAL_XOR(0x289a)
-	MCFG_IGS_BITSWAP_MF_BITS(4, 7,  10, 13)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~3,   8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS(~3,  ~6,  ~9, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS(~3,   4,  ~5, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS(~9, ~11,  12, ~15)
+	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	m_igs_bitswap->set_val_xor(0x289a);
+	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
+	m_igs_bitswap->set_m3_bits(0, ~3,   8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(1, ~3,  ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits(2, ~3,   4,  ~5, ~15);
+	m_igs_bitswap->set_m3_bits(3, ~9, ~11,  12, ~15);
 
-	MCFG_DEVICE_ADD("igs_incdec", IGS_INCDEC, 0)
+	IGS_INCDEC(config, m_igs_incdec, 0);
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)    // VSync 60Hz, HSync 15.3kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));    // VSync 60Hz, HSync 15.3kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::lhzb2a_palette_bitswap), this));
+//	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3806,20 +3706,17 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	MCFG_DEVICE_ADD("igs022", IGS022, 0)
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, slqz2_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::slqz2_palette_bitswap), this));
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3843,19 +3740,16 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 	ppi.in_pb_callback().set_ioport("DSW2");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)    // VSync 60Hz, HSync 15.3kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));    // VSync 60Hz, HSync 15.3kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3889,19 +3783,16 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 	ppi.in_pa_callback().set_ioport("DSW1");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3927,20 +3818,17 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, tjsb_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::tjsb_palette_bitswap), this));
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3969,19 +3857,16 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -4047,10 +3932,10 @@ ROM_START( iqblocka )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v.u18", 0x00000, 0x40000, CRC(2e2b7d43) SHA1(cc73f4c8f9a6e2219ee04c9910725558a80b4eb2) )
 
-	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "cg.u7", 0x000000, 0x080000, CRC(cb48a66e) SHA1(6d597193d1333a97957d5ceec8179a24bedfd928) )   // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0)
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0)
 	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -4063,10 +3948,10 @@ ROM_START( iqblockf )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v113fr.u18", 0x00000, 0x40000, CRC(346c68af) SHA1(ceae4c0143c288dc9c1dd1e8a51f1e3371ffa439) )
 
-	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "cg.u7", 0x000000, 0x080000, CRC(cb48a66e) SHA1(6d597193d1333a97957d5ceec8179a24bedfd928) )   // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -4109,10 +3994,10 @@ ROM_START( genius6 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "genius6_v110f.u18", 0x00000, 0x40000, CRC(2630ad44) SHA1(37002fa913ad60c59145f5a7692eef8862b9d6eb) )
 
-	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "genius6_cg.u7", 0x000000, 0x080000, CRC(1842d021) SHA1(78bfb5108741d39bd19b603cc97623fba7b2a31e) )   // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) ) // same as iqblocka
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -4172,10 +4057,10 @@ ROM_START( tjsb )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "p0700.u16", 0x00000, 0x40000,CRC(1b2a50df) SHA1(95a272e624f727df9523667864f933118d9e633c) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "a0701.u3", 0x00000, 0x400000, CRC(27502a0a) SHA1(cca79e253697f47b688ef781b1b6de9d2945f199) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "text.u6", 0x00000, 0x80000,  CRC(3be886b8) SHA1(15b3624ed076640c1828d065b01306a8656f5a9b) )  // BADADDR --xxxxxxxxxxxxxxxxx
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4230,10 +4115,10 @@ ROM_START( mgcs )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1500.u8", 0x00000, 0x80000, CRC(a8cb5905) SHA1(37be7d926a1352869632d43943763accd4dec4b7) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m1501.u23", 0x000000, 0x400000, CRC(96fce058) SHA1(6b87f47d646bad9b3061bdc8a9af65467fdbbc9f) )   // FIXED BITS (xxxxxxx0xxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "text.u25", 0x00000, 0x80000, CRC(a37f9613) SHA1(812f060ca98a34540c48a180c359c3d0f1c0b5bb) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4287,11 +4172,11 @@ ROM_START( sdmg2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
 
-	ROM_REGION( 0x280000, "sprites", 0 )
+	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m0901.u5", 0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) )    // FIXED BITS (xxxxxxxx0xxxxxxx)
 	ROM_LOAD( "m0902.u4", 0x200000, 0x080000, CRC(3298b13b) SHA1(13b21ddeed368b7f4fea1408c8fc511244342faf) )    // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x20000, "tilemaps", 0 )
+	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "text.u6", 0x000000, 0x020000, CRC(cb34cbc0) SHA1(ceedbdda085fd1acc9a575502bdf7cf998f54f05) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4349,10 +4234,10 @@ ROM_START( lhzb2 )
 	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1104.u11",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // address scrambling
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4365,10 +4250,10 @@ ROM_START( lhzb2a )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(41293f32) SHA1(df4e993f4a458729ade13981e58f32d8116c0082) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // address scrambling
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4425,10 +4310,10 @@ ROM_START( slqz2 )
 	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u4", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // light address scrambling
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )    // light address scrambling
 	ROM_LOAD( "text.u6", 0x00000, 0x80000, CRC(40d21adf) SHA1(18b202d6330ac89026bec2c9c8224b52540dd48d) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4480,10 +4365,10 @@ ROM_START( mgdha )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "flash.u19", 0x00000, 0x80000, CRC(ff3aed2c) SHA1(829140e6fc7e4dfc039b0e7b647ce26d59b23b3d) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m1001.u4", 0x000000, 0x400000, CRC(0cfb60d6) SHA1(e099aca730e7fd91a72915c27e569ad3d21f0d8f) )    // FIXED BITS (xxxxxxx0xxxxxxxx)
 
-	ROM_REGION( 0x20000, "tilemaps", 0 )
+	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "text.u6", 0x00000, 0x20000, CRC(db50f8fc) SHA1(e2ce4a42f5bdc0b4b7988ad9e8d14661f17c3d51) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4505,11 +4390,11 @@ ROM_START( mgdh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "igs_f4bd.125", 0x00000, 0x80000, CRC(8bb0b870) SHA1(f0313f0b8b7575f4fff1feb99d48699d50556ef5) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	// not in this set
 	ROM_LOAD( "m1001.u4", 0x000000, 0x400000, CRC(0cfb60d6) SHA1(e099aca730e7fd91a72915c27e569ad3d21f0d8f) )    // FIXED BITS (xxxxxxx0xxxxxxxx)
 
-	ROM_REGION( 0x20000, "tilemaps", 0 )
+	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "igs_512e.u6", 0x00000, 0x20000, CRC(db50f8fc) SHA1(e2ce4a42f5bdc0b4b7988ad9e8d14661f17c3d51) )   // == text.u6
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4564,10 +4449,10 @@ ROM_START( tarzanc )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C (same as tarzan set)
 	ROM_LOAD( "u19", 0x00000, 0x40000, CRC(e6c552a5) SHA1(f156de9459833474c85a1f5b35917881b390d34c) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_a2104_cg_v110.u15", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "igs_t2105_cg_v110.u5", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) ) // 27C4096 (27C2048 printed on the PCB)
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4585,10 +4470,10 @@ ROM_START( tarzan )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C (same as tarzanc set)
 	ROM_LOAD( "0228-u16.bin", 0x00000, 0x40000, CRC(e6c552a5) SHA1(f156de9459833474c85a1f5b35917881b390d34c) )
 
-	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "sprites.u15", 0x00000, 0x80000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "0228-u6.bin", 0x00000, 0x80000, CRC(55e94832) SHA1(b15409f4f1264b6d1218d5dc51c5bd1de2e40284) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
@@ -4604,10 +4489,10 @@ ROM_START( tarzana )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // V107 TAISAN
 	ROM_LOAD( "0228-u21.bin", 0x00000, 0x80000, CRC(80aaece4) SHA1(07cad92492c5de36c3915867ed4c6544b1a30c07) ) // 1ST AND 2ND HALF IDENTICAL
 
-	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "sprites.u17", 0x00000, 0x80000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "0228-u6.bin", 0x00000, 0x80000, CRC(55e94832) SHA1(b15409f4f1264b6d1218d5dc51c5bd1de2e40284) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
@@ -4671,11 +4556,11 @@ ROM_START( starzan )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v100i.u9", 0x00000, 0x40000, CRC(64180bff) SHA1(b08dbe8a17ca33024442ebee41f111c8f98a2109) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_REGION( 0x100000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "cg.u2",             0x00000, 0x80000, CRC(884f95f5) SHA1(2e526aa966e90dc696a8b392a5a99e14f03c4bd4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "t2105_cg_v110.u11", 0x80000, 0x80000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "c0057209.u3", 0x00000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE )
@@ -4707,11 +4592,11 @@ ROM_START( spkrform )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "super2in1-v100xd03.u29", 0x00000, 0x40000, CRC(e8f7476c) SHA1(e20241d68d22ee01a65f5d7921fe2291077f081f) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_REGION( 0x100000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "super2in1.u26", 0x00000, 0x80000, CRC(af3b1d9d) SHA1(ce84b076939d2c9d959cd430d4f5664f32735d60) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 	ROM_LOAD( "super2in1.u25", 0x80000, 0x80000, CRC(7ebaf0a0) SHA1(c278810742cd7e1daa89a93fd7fe82495543ccbf) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "super2in1.u24", 0x00000, 0x40000, CRC(54d68c49) SHA1(faad78779c3a5b4ecb1c733192d9477ce3324f71) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -4722,7 +4607,7 @@ ROM_END
 GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M, gambling)",              0 )
 GAME( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS",                      "IQ Block (V113FR, gambling)",                 0 )
 GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, init_mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V125T1)",    MACHINE_IMPERFECT_COLORS ) // wrong colors in betting screen
-GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, init_mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
+GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh,     igs017_state, init_mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
 GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
 GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V110F)",                            0 )

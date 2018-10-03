@@ -8,13 +8,7 @@
 #include "machine/i8255.h"
 #include "emupal.h"
 
-typedef device_delegate<uint16_t (uint16_t)> igs017_igs031_palette_scramble_delegate;
-
-#define MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( _class, _method) \
-	downcast<igs017_igs031_device &>(*device).set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
-#define MCFG_IGS017_IGS031_REVERSE_TEXT_BITS \
-	downcast<igs017_igs031_device &>(*device).set_text_reverse_bits();
+typedef device_delegate<uint16_t const (uint16_t)> igs017_igs031_palette_scramble_delegate;
 
 class igs017_igs031_device : public device_t,
 							public device_gfx_interface,
@@ -25,13 +19,13 @@ public:
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename Object> void set_palette_scramble_cb(Object &&cb) { m_palette_scramble_cb = std::forward<Object>(cb); }
-
+	template<typename T> void set_ppi(T &&tag) { m_i8255.set_tag(std::forward<T>(tag)); }
 	void set_text_reverse_bits()
 	{
 		m_revbits = 1;
 	}
 
-	uint16_t palette_callback_straight(uint16_t bgr);
+	uint16_t const palette_callback_straight(uint16_t bgr);
 
 	igs017_igs031_palette_scramble_delegate m_palette_scramble_cb;
 
@@ -43,12 +37,10 @@ public:
 	int get_nmi_enable() { return m_nmi_enable; }
 	int get_irq_enable() { return m_irq_enable; }
 
-
 	DECLARE_WRITE8_MEMBER(palram_w);
 	DECLARE_READ8_MEMBER(i8255_r);
 
 	DECLARE_WRITE8_MEMBER(video_disable_w);
-
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -63,7 +55,7 @@ public:
 	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	virtual void video_start();
@@ -71,6 +63,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -85,6 +78,8 @@ private:
 	required_shared_ptr<uint8_t> m_palram;
 	optional_device<i8255_device> m_i8255;
 	required_device<palette_device> m_palette;
+	required_memory_region m_sprite_region;
+	required_memory_region m_tilemap_region;
 
 	// the gfx roms were often hooked up with the bits backwards, allow us to handle it here to save doing it in every driver.
 	int m_revbits;
